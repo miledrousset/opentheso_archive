@@ -1,0 +1,41 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    <div style="float: right;">
+        <div id="help"><h:form><p:commandButton value="?" onclick="PF('dlgHelp').show();" styleClass="styleButton"/></h:form></div>
+
+        <div id="internationnal">
+            <h:form class="iconePays">
+                <p:commandButton icon="ui-icon-france" action="#{langueBean.changeLangue('fr')}" ajax="false" styleClass="cbSupp" />
+            </h:form>
+            <h:form class="iconePays">
+                <p:commandButton icon="ui-icon-runi" action="#{langueBean.changeLangue('en')}" ajax="false" styleClass="cbSupp" />
+            </h:form>
+            <h:form class="iconePays">
+                <p:commandButton icon="ui-icon-allemagne" action="#{langueBean.changeLangue('de')}" ajax="false" styleClass="cbSupp" />
+            </h:form>
+            <h:form class="iconePays">
+                <p:commandButton icon="ui-icon-espagne" action="#{langueBean.changeLangue('es')}" ajax="false" styleClass="cbSupp" />
+            </h:form>
+            <h:form class="iconePays">
+                <p:commandButton icon="ui-icon-italie" action="#{langueBean.changeLangue('it')}" ajax="false" styleClass="cbSupp" />
+            </h:form>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+    <div id="onglets">
+        <ul id="listeMenu"> 
+            <li id="itemMenu"><h:outputLink value="/opentheso/index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
+            <!--
+             <li id="itemMenu"><h:outputLink value="/opentheso/openindex.xhtml">OpenIndex</h:outputLink></li>
+            --> 
+            <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="/opentheso/gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
+            <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="/opentheso/conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
+            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(1))}" value="/opentheso/edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
+            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(1))}" value="/opentheso/statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
+        </ul>
+    </div><br/>
+</ui:composition>

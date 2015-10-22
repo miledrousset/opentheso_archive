@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+	<title>OpenTheso - Configurations</title>
+        <link rel="icon" href="images/icoTheso.jpg" />
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+    </h:head>
+    <h:body>
+        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
+            <h1>Configurations</h1>
+            Depuis cette page, les administrateurs peuvent gérer les utilisateurs. Il leur est possible de créer/désactiver un compte ou de modifier les droit d'un utilisateur.
+            <br/><br/>
+            La modification du mot de passe du compte courant est également effective.
+            <br/><br/>
+            Le choix de la langue de travail préférée de l'utilisateur (pour avoir automatiquement le thésaurus dans cette langue) et la possibilité de modifier le nombre de 
+            propositions nécessaires à un candidat pour l'envois automatique d'un e-mail (qui préviendra les administrateurs que ce candidat est fortement demandé) sont à venir.
+        </p:dialog>  
+        <div id="menuHead">
+            <ui:include src="logo.xhtml" />
+            <h:panelGroup id="panChoixTheso" style="float: left;" >
+                <div id="choixTheso">
+                    <h:form id="liste1">
+                        <table>
+                            <tr>
+                                <td style="padding-right: 5px;">
+                                    <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
+                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
+                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                    </h:selectOneMenu>
+                                </td>
+                                <td>
+                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
+                                                     update=":panChoixTheso" styleClass="styleButton"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>
+                </div>
+            </h:panelGroup>
+            <ui:include src="menuAll.xhtml" />
+        </div>
+        <center>
+<!-- POPUP ADD USER DEBUT -->
+        <h:panelGroup id="panAddUser" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.addUser == true}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.addUser == true}" styleClass="popUp">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('conf.popup2Title')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseFacette" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{user1.reInit()}" 
+                                     update=":panAddUser" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
+                <h:form>
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>
+                            <td><h:inputText value="#{user1.nameEdit}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.mail')} : " /></td>
+                            <td><h:inputText value="#{user1.mailEdit}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('co.att2')} : " /></td>
+                            <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.confPwd')} : " /></td>
+                            <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
+                        </tr>
+                        <tr>
+                            <td>#{langueBean.getMsg('conf.tabUserOpt2')} : </td>
+                            <td>
+                                <h:selectOneMenu value="#{user1.roleEdit}">
+                                    <f:selectItems value="#{user1.selectAllRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <br/><p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{user1.addUser()}" update=":panAddUser,:tabUser" 
+                                                      styleClass="styleButton" />
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+            </h:panelGroup>
+        </h:panelGroup>
+<!-- POPUP ADD USER FIN -->
+
+<!-- POPUP EDIT USER DEBUT -->
+        <h:panelGroup id="panEditUser" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.editUser == true}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.editUser == true}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('conf.popup1Title')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseFacette" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{user1.reInit()}" 
+                                     update=":panEditUser" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
+                <h:form>
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.popup1opt1')}" /> : </td>
+                            <td><h:outputText value="#{user1.nameEdit}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.popup1Opt2')}" /> : </td>
+                            <td>
+                                <h:selectOneMenu value="#{user1.roleEdit}">
+                                    <f:selectItems value="#{user1.selectAllRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <br/><p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{user1.editUser()}" 
+                                                      update=":panEditUser,:tabUser" styleClass="styleButton"/>
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+            </h:panelGroup>
+        </h:panelGroup>
+<!-- POPUP EDIT USER FIN -->
+        </center>
+        <div id="principaleConf">
+            <h:panelGroup rendered="#{user1.haveRights(1)}">
+                <fieldset class="fieldUser">
+                    <legend><h:outputText value="#{langueBean.getMsg('conf.field1')}" /></legend>
+                    <h:form>
+                        <p:commandButton value="#{langueBean.getMsg('conf.btnAddUser')}" actionListener="#{vue.setAddUser(true)}" update=":panAddUser" styleClass="styleButton" />
+                    </h:form><br/>
+                    <p:dataTable id="tabUser" value="#{user1.selectAllUser()}" var="u" scrollable="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                        <f:facet name="header">
+                            <h:outputText value="#{langueBean.getMsg('conf.tabUser')}" />
+                        </f:facet>
+                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}">
+                            <h:outputText value="#{u.name}" />
+                        </p:column>
+                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt2')}">
+                            <h:outputText value="#{u.role}" />
+                        </p:column>
+                        <p:column width="20" >
+                            <h:form>
+                                <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{user1.selectUser(u)}" update=":panEditUser" />
+                            </h:form>
+                        </p:column>
+                        <p:column width="20" >
+                           <h:form>
+                               <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
+                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('conf.valid1')}" icon="ui-icon-alert" />  
+                                </p:commandButton>  
+
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                </p:confirmDialog> 
+                            </h:form>
+                        </p:column>
+                    </p:dataTable>
+                </fieldset>
+            </h:panelGroup>
+
+            <fieldset class="fieldMyAccount">
+                <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
+                <h:form id="formEditPwd">
+                    <table>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <h:outputText value="#{user1.user.name}" /><br/><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.currentPwd')}" /> : </td>
+                            <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd1')}" /> : </td>
+                            <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd2')}" /> :</td>
+                            <td><h:inputSecret value="#{user1.pwdEdit3}" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <br/><p:commandButton value="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{user1.changePwd()}" 
+                                                      update=":formEditPwd" styleClass="styleButton" />
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+                <br/><hr/><br/>
+                <h:form id="formEditMail">
+                    <table>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <h:outputText value="#{user1.user.mail}" /><br/><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.newMail')}" /> : </td>
+                            <td><h:inputText value="#{user1.mailEdit}" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <br/><p:commandButton value="#{langueBean.getMsg('conf.editMail')}" actionListener="#{user1.changeMail()}" 
+                                                      update=":formEditMail" styleClass="styleButton" />
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+            </fieldset>
+
+            <h:panelGroup rendered="#{user1.haveRights(1)}">
+                <fieldset class="fieldPref">
+                    <legend><h:outputText value="#{langueBean.getMsg('conf.field3')}" /></legend><br/>
+                    <h:form id="formEditPref">
+                        <table>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.langSource')}" /> : </td>
+                                <td>
+                                    <h:selectOneMenu value="#{user1.langSourceEdit}" style="width: 100px;">
+                                        <f:selectItem itemValue="fr" itemLabel="Français" />
+                                        <f:selectItem itemValue="en" itemLabel="Anglais" />
+                                        <f:selectItem itemValue="de" itemLabel="Allemand" />
+                                        <f:selectItem itemValue="es" itemLabel="Espagnole" />
+                                        <f:selectItem itemValue="it" itemLabel="Italien" />
+                                    </h:selectOneMenu>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.nbCdt')}" /> : </td>
+                                <td>
+                                    <h:selectOneMenu value="#{user1.alertNbCdtEdit}" style="width: 60px;">
+                                        <f:selectItem itemValue="5" itemLabel="5" />
+                                        <f:selectItem itemValue="10" itemLabel="10" />
+                                        <f:selectItem itemValue="15" itemLabel="15" />
+                                        <f:selectItem itemValue="20" itemLabel="20" />
+                                    </h:selectOneMenu>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.alertCdt')}" /> :</td>
+                                <td>
+                                    <h:selectOneRadio value="#{user1.alertCdtEdit}">
+                                        <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                        <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                    </h:selectOneRadio>
+                                </td>
+                            </tr>
+                        </table>
+                        <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editPrefUser()}"  styleClass="styleButton" />
+                    </h:form> 
+                </fieldset>
+            </h:panelGroup>
+        </div>
+        <footer style="text-align: center;">
+            <br />
+            <div style="margin-bottom: 5px; margin-top: 5px;">
+                <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©OpenTheso</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS</a>
+            </div>
+        </footer>
+        <ui:insert name="status">
+            <p:ajaxStatus>
+                <f:facet name="start">
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </ui:insert>
+    </h:body>
+</html>

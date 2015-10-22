@@ -1,0 +1,85 @@
+package mom.trd.opentheso.bdd.helper.nodes.concept;
+
+import java.text.Normalizer;
+
+
+/**
+ * Cette Classe permet de gérer les noeuds de Concept dans l'arbre.
+ * 
+ * @author miled.rousset
+ */
+  
+
+public class NodeConceptTree implements Comparable {
+
+	private String title;
+	private String idConcept;
+        private String idThesaurus;
+        private String idLang;
+        private String statusConcept;
+	private boolean haveChildren = false;
+        
+    public NodeConceptTree() {
+        this.title = "";
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getIdConcept() {
+        return idConcept;
+    }
+
+    public void setIdConcept(String idConcept) {
+        this.idConcept = idConcept;
+    }
+
+    public String getIdThesaurus() {
+        return idThesaurus;
+    }
+
+    public void setIdThesaurus(String idThesaurus) {
+        this.idThesaurus = idThesaurus;
+    }
+
+    public String getIdLang() {
+        return idLang;
+    }
+
+    public void setIdLang(String idLang) {
+        this.idLang = idLang;
+    }
+
+    public boolean isHaveChildren() {
+        return haveChildren;
+    }
+
+    public void setHaveChildren(boolean haveChildren) {
+        this.haveChildren = haveChildren;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        String str1, str2;
+        str1 = Normalizer.normalize(this.title, Normalizer.Form.NFD);
+        str1 = str1.replaceAll("[^\\p{ASCII}]", "");
+        str2 = Normalizer.normalize(((NodeConceptTree)o).title, Normalizer.Form.NFD);
+        str2 = str2.replaceAll("[^\\p{ASCII}]", "");
+        return str1.toUpperCase().compareTo(str2.toUpperCase());
+    }
+
+    public String getStatusConcept() {
+        return statusConcept;
+    }
+
+    public void setStatusConcept(String statusConcept) {
+        this.statusConcept = statusConcept;
+    }
+
+
+}

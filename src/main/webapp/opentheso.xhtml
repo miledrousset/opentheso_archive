@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <h:head>
+        <title>OpenTheso - Copyright</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+    </h:head>
+    <h:body>
+        <div id="menuHead">
+            <a href="index.xhtml">
+                <div id="titre">
+                    <img src="images/opentheso.png" style="width: 100px; margin-top: -10px; margin-right: -20px; margin-bottom: -25px;"/><br/>
+                </div>
+            </a>
+            <div style="clear: both;"></div>
+            <div id="onglets">
+                <ul id="listeMenu"> 
+                    <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
+                 <!--   <li id="itemMenu"><h:outputLink value="openindex.xhtml">OpenIndex</h:outputLink></li>  -->
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
+                </ul>
+            </div><br/>
+        </div>
+        <div style="margin: auto; width: 1000px; margin-top: 100px;">
+            <h1>OpenTheso</h1>
+            <h3>Version 4.0.0</h3>
+            <h3> copyright   ©CNRS MOM/TRD FRANTIQ</h3>
+                
+                OpenTheso est distribué sous licence <A HREF="http://www.cecill.info/licences.fr.html" target="_blank">CeCILL_C</A>, Licence libre de droit français compatible avec la licence <A HREF="http://www.gnu.org/copyleft/gpl.html" target="_blank">GNU GPL</A>
+                <br/><br/>
+             
+                C'est un gestionnaire de thesaurus multilingue, développé par la plateforme Technologique <A HREF="http://www.mom.fr/plateformes-technologiques/tetes-de-reseaux-documentaires" target="_blank">TRD</A> (Têtes des Réseaux Documentaires) située à la MOM <br/>
+                en partenariat avec le <A HREF="http://www.frantiq.fr" target="_blank">GDS-FRANTIQ</A><br/><br/>
+                Le développement de la version 3 a bénéficié d’une participation financière du Consortium MASA (Mémoire des archéologues et des Sites Archéologiques) de la TGIR Corpus, <br/>
+                ce financement a permis de reprendre l’ancienne version d’OpenTheso et de produire une version FullWeb qui respecte la nouvelle norme des thésaurus internationale.<br/><br/><br/>
+
+                Chef de Projet : <b>Miled Rousset</b>
+                <br/>
+                Développement : <b>Carole Bonfré et Miled Rousset</b>
+                
+                <br/>
+                Partenariat, test et expertise : <b>Les équipes du réseau Frantiq</b>
+                
+                <br/><br/>
+                Le développement a été réalisé avec les technologies suivantes :<br/>
+                <ul>
+                    <li>PostgreSQL pour la base des données</li>
+                    <li>Java pour le module API et module métier</li>
+                    <li>JSF2 et PrimeFaces pour la partie graphique </li>
+                </ul>
+                <br/><br/>
+                <b>OpenTheso</b> s'appuie sur le projet <A HREF="http://ark.mom.fr" target="_blank">Arkéo</A> 
+                de la MOM pour générer des identifiants type <A HREF="http://fr.wikipedia.org/wiki/Archival_Resource_Key" target="_blank">ARK</A>
+            <br/><br/>
+            Modules complémentaires :
+            <ul>
+                <li><b><A HREF="http://www.cnrs.fr" target="_blank">Hikari</A></b></li>
+                <li>Weka</li>
+                <li>Skosapi</li>
+                <li>Kj-jzkit</li>
+            </ul>
+            
+            Partenaires :
+            <ul>
+                <li><A HREF="http://www.cnrs.fr" target="_blank">CNRS</A></li>
+                <li><A HREF="http://www.mom.fr" target="_blank">MOM</A></li>
+                <li><A HREF="http://www.mae.u-paris10.fr" target="_blank">MAE</A></li>
+                <li><A HREF="http://www.frantiq.fr" target="_blank">Frantiq</A></li>
+                <li><A HREF="http://masa.hypotheses.org/" target="_blank">MASA</A></li>
+                <li><A HREF="http://www.huma-num.fr" target="_blank">Huma-Num</A></li>
+                
+            </ul>
+            
+            <br/><br/>
+            
+
+        </div>
+    </h:body>
+</html>

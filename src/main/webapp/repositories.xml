@@ -1,0 +1,32 @@
+﻿<RepositoryDirectory>
+
+  <!-- Collections and repositories must appear here before instance entries 
+  The collection_dn values are the strings you can actally use in an IRQuery as
+  values in the collections vector. The searchable object will deal with resolving
+  that collection-dn into a specific instance of a collection at a repository and
+  make the appropriate connection using the right database name for that repository.
+  -->
+
+  <TypeMapping type="Z3950" class="com.k_int.z3950.IRClient.Z3950Origin"/>
+
+  <Collection collection_dn="KOHA/biblios"  collection_name="Base de données du SIGB KOHA"/>
+
+
+  <!-- The type parameter is used when looking for factories to create instances of
+       Searchable capable of searching the identified repository -->
+
+
+  <Repository repository_dn="FRANTIQ" name="FRANTIQ" type="Z3950" can_multiplex_sessions="no" >
+	  <RepositoryProperty name="ServiceHost" value="catalogue.frantiq.fr" />
+	  <RepositoryProperty name="ServicePort" value="210" />
+	  <RepositoryProperty name="service_short_name" value="biblios" />
+	  <RepositoryProperty name="default_record_syntax" value="unimarc" />
+  </Repository>
+
+
+  <!-- Map logical collection-dn strings on to physical instances of databases at targets (in z-speak) -->
+ 
+  <Instance instance_dn="biblios" collection_dn="KOHA/biblios" repository_dn="FRANTIQ" local_name="biblios" />
+  
+
+</RepositoryDirectory>

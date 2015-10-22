@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <h:head>
+        <title>OpenTheso - Erreur 404</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+    </h:head>
+    <h:body>
+        <div id="menuHead">
+            <a href="index.xhtml">
+                <div id="titre">
+                    <img src="images/theso.png" style="width: 125px; margin-top: -10px; margin-right: -20px; margin-bottom: -25px;"/><br/>
+                    <span style="color: #66AE09;">Open</span><span style="color: #956620;">Theso</span>
+                </div>
+            </a>
+            <div style="clear: both;"></div>
+            <div id="onglets">
+                <ul id="listeMenu"> 
+                    <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink value="openindex.xhtml">OpenIndex</h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
+                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
+                </ul>
+            </div><br/>
+        </div>
+        <div style="margin: auto; width: 1000px; margin-top: 100px;">
+            <h1>Une erreur est survenue : Error404</h1>
+            Oups, vous avez à faire à l'erreur 404, qui indique que cette page n'est
+            pas disponible pour le moment. <br/><br/>
+            Cette erreur peut être due à une coupure temporaire de connexion, essayez de nouveau l'opération plus tard.
+        </div>
+    </h:body>
+</html>
+

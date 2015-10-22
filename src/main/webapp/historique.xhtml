@@ -1,0 +1,192 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog header="#{langueBean.getMsg('histo.popupheader')}" widgetVar="dlgHisto" modal="true" resizable="false">
+        <h:form>
+
+            <p:selectOneRadio id="typeHisto" value="#{histo.typeHisto}" layout="custom">
+                <f:selectItem itemLabel="#{langueBean.getMsg('histo.opt1')}" itemValue="0" />
+                <f:selectItem itemLabel="#{langueBean.getMsg('histo.opt2')}" itemValue="1" />
+            </p:selectOneRadio>
+
+            <h:panelGrid columns="3" cellpadding="2">
+                <p:radioButton id="opt2" for="typeHisto" itemIndex="0" />
+                <h:outputLabel for="opt2" value="#{langueBean.getMsg('histo.opt1')}" />
+                <p:calendar id="calendar" pattern="dd-MM-yyyy" mask="true" value="#{histo.dateHisto}" /> 
+
+                <p:radioButton id="opt1" for="typeHisto" itemIndex="1" />
+                <h:outputLabel for="opt1" value="#{langueBean.getMsg('histo.opt2')}" />
+            </h:panelGrid>
+            <p:commandButton value="#{langueBean.getMsg('btnSee')}" actionListener="#{histo.load(selectedTerme.idTheso, selectedTerme.idC, selectedTerme.idT, selectedTerme.idlangue)}" update="panelHisto1, panelHisto2" />
+        </h:form>
+
+
+        <div class="ui-grid ui-grid-responsive">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-6" style="padding: 10px;">
+                    <h:panelGroup id="panelHisto1">
+                        <!--TERMES GENERIQUES DEBUT -->
+                        <div id="divGenerale">
+                            <div class="titreGenerique">
+                                <h:outputText value="#{langueBean.getMsg('index.BT')}" /> 
+                            </div>
+                            <div class="contenuGenerique">
+                                <h:panelGroup id="geneH">
+                                    <ui:repeat value="#{histo.relationHisto}" var="geneHisto">
+                                        <h:panelGroup rendered="#{geneHisto.id_relation == 'NT' and geneHisto.id_concept2 == selectedTerme.idC and geneHisto.action == 'ADD'}" 
+                                                      style="color: green;">
+                                            <span class="date"><h:outputText value="#{geneHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{geneHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{geneHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{geneHisto.id_relation == 'NT' and geneHisto.id_concept2 == selectedTerme.idC and geneHisto.action == 'DEL'}" 
+                                                      style="color: red;">
+                                            <span class="date"><h:outputText value="#{geneHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{geneHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{geneHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <!--TERMES GENERIQUES FIN -->
+                        <!--INFO TERMES DEBUT -->
+                        <div id="divGenerale">
+                            <div class="contenuTerme">
+                                <ui:repeat value="#{histo.termHisto}" var="termHisto">
+                                    <h:panelGroup>
+                                        <span class="date"><h:outputText value="#{termHisto.modified} : " /></span>
+                                        <span class="valeurHisto"><h:outputText value="&quot; #{termHisto.lexical_value} &quot;" /></span>
+                                        <span class="auteur"><h:outputText value="#{termHisto.idUser}" /></span><br/>
+                                    </h:panelGroup>
+                                </ui:repeat>                            
+                            </div>
+                        </div>
+                        <!--INFO TERMES FIN -->
+                        <!--TERMES SPECIFIQUES DEBUT -->
+                        <div id="divGenerale">
+                            <div class="titreSpecifique">
+                                <h:outputText value="#{langueBean.getMsg('index.NT')}" /> 
+                            </div>
+                            <div class="contenuSpecifique" style="text-align: left;">
+                                <h:panelGroup  id="speciH">
+                                    <ui:repeat value="#{histo.relationHisto}" var="specHisto">
+                                        <h:panelGroup rendered="#{specHisto.id_relation == 'BT' and specHisto.id_concept2 == selectedTerme.idC and specHisto.action == 'ADD'}" 
+                                                      style="color: green;">
+                                            <span class="date"><h:outputText value="#{specHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{specHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{specHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{specHisto.id_relation == 'BT' and specHisto.id_concept2 == selectedTerme.idC and specHisto.action == 'DEL'}" 
+                                                      style="color: red;">
+                                            <span class="date"><h:outputText value="#{specHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{specHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{specHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <!--TERMES SPECIFIQUES FIN -->
+                    </h:panelGroup>
+                </div>
+                <div class="ui-grid-col-6" style="padding: 10px;">
+                    <h:panelGroup id="panelHisto2">
+                        <!--TERMES ASSOCIES DEBUT -->
+                        <div id="divGenerale">
+                            <div class="titreAssocie">
+                                <h:outputText value="#{langueBean.getMsg('index.RT')}" />
+                            </div>
+                            <div class="contenuAssocie">
+                                <h:panelGroup id="assoH">
+                                    <ui:repeat value="#{histo.relationHisto}" var="assoHisto">
+                                        <h:panelGroup rendered="#{assoHisto.id_relation == 'RT' and assoHisto.id_concept2 == selectedTerme.idC and assoHisto.action == 'ADD'}" 
+                                                      style="color: green;">
+                                            <span class="date"><h:outputText value="#{assoHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{assoHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{assoHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{assoHisto.id_relation == 'RT' and assoHisto.id_concept2 == selectedTerme.idC and assoHisto.action == 'DEL'}" 
+                                                      style="color: red;">
+                                            <span class="date"><h:outputText value="#{assoHisto.modified} : " /></span>
+                                            <span class="valeurHisto"><h:outputText value="&quot; #{assoHisto.id_concept1} &quot;" /></span>
+                                            <span class="auteur"><h:outputText value="#{assoHisto.idUser}" /></span><br/>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <!--TERMES ASSOCIE FIN -->
+                        <!--TERMES SYNONYMES DEBUT -->
+                        <div id="divGenerale">
+                            <div class="titreSynonyme">
+                                <h:outputText value="#{langueBean.getMsg('index.UF')}" />
+                            </div>
+                            <div class="contenuSynonyme">
+                                <h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>
+                                <ui:repeat value="#{histo.nonPrefTermHisto}" var="nonPrefTermHisto1">
+                                    <h:panelGroup rendered="#{nonPrefTermHisto1.status == 'USE' and nonPrefTermHisto1.action == 'ADD'}" style="color: green;">
+                                        <span class="date"><h:outputText value="#{nonPrefTermHisto1.modified} : " /></span>
+                                        <span class="valeurHisto"><h:outputText value="&quot; #{nonPrefTermHisto1.lexical_value} &quot;" /></span>
+                                        <span class="auteur"><h:outputText value="#{nonPrefTermHisto1.idUser}" /></span><br/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{nonPrefTermHisto1.status == 'USE' and nonPrefTermHisto1.action == 'DEL'}" style="color: red;">
+                                        <span class="date"><h:outputText value="#{nonPrefTermHisto1.modified} : " /></span>
+                                        <span class="valeurHisto"><h:outputText value="&quot; #{nonPrefTermHisto1.lexical_value} &quot;" /></span>
+                                        <span class="auteur"><h:outputText value="#{nonPrefTermHisto1.idUser}" /></span><br/>
+                                    </h:panelGroup>
+                                </ui:repeat>
+                                <h:outputText value="#{langueBean.getMsg('index.UF2')}" />  : <br/>
+                                <ui:repeat value="#{histo.nonPrefTermHisto}" var="nonPrefTermHisto2">
+                                    <h:panelGroup rendered="#{nonPrefTermHisto2.status == 'USE+' and nonPrefTermHisto2.action == 'ADD'}" style="color: green;">
+                                        <span class="date"><h:outputText value="#{nonPrefTermHisto2.modified} : " /></span>
+                                        <span class="valeurHisto"><h:outputText value="&quot; #{nonPrefTermHisto2.lexical_value} &quot;" /></span>
+                                        <span class="auteur"><h:outputText value="#{nonPrefTermHisto2.idUser}" /></span><br/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{nonPrefTermHisto2.status == 'USE+' and nonPrefTermHisto2.action == 'DEL'}" style="color: red;">
+                                        <span class="date"><h:outputText value="#{nonPrefTermHisto2.modified} : " /></span>
+                                        <span class="valeurHisto"><h:outputText value="&quot; #{nonPrefTermHisto2.lexical_value} &quot;" /></span>
+                                        <span class="auteur"><h:outputText value="#{nonPrefTermHisto2.idUser}" /></span><br/>
+                                    </h:panelGroup>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                        <!--TERMES SYNONYMES FIN -->
+                        <!--NOTE DEBUT -->
+                        <h:panelGroup> 
+                            <div id="divGenerale">
+                                <div class="titreNote">
+                                    <h:outputText value="#{langueBean.getMsg('index.note')}" />
+                                </div>
+                                <div class="contenuNote" id="noteH" style="text-align: left;">
+                                    <div id="clean" />
+                                    <h:panelGroup>
+                                        <ui:repeat value="#{histo.noteHisto}" var="noteHisto">
+                                            <h:panelGroup>
+                                                <span class="date"><h:outputText value="#{noteHisto.modified} : " /></span>
+                                                <span class="valeurHisto"><h:outputText value="&quot; #{noteHisto.lexicalvalue} &quot;" /></span>
+                                                <span class="auteur"><h:outputText value="#{noteHisto.idUser}" /></span><br/>
+                                            </h:panelGroup>
+                                        </ui:repeat>
+
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                        <!--NOTE FIN -->
+                    </h:panelGroup>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
+  <endpoint implementation="mom.trd.opentheso.ws.soap.Soap" name="soap" url-pattern="/soap"/>
+  <endpoint implementation="fr.mom.arkeo.soap.LoginPortImpl" name="LoginService" url-pattern="/LoginService"/>
+  <endpoint implementation="fr.mom.arkeo.soap.ArkManagerPortImpl" name="ArkManagerService" url-pattern="/ArkManagerService"/>
+</endpoints>

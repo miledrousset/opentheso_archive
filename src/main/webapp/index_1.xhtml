@@ -1,0 +1,876 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>
+            <h:outputText  value="#{selectedTerme.nom}"/>
+        </title>
+        <link rel="icon" href="images/icoTheso.jpg" />
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <link rel="stylesheet" href="css/jqx.base.css" type="text/css" />
+        <!--      <script type="text/javascript" src="javascript/jquery-1.10.2.min.js"></script> -->
+        <script type="text/javascript" src="javascript/jqxcore.js"></script>
+        <script type="text/javascript" src="javascript/jqxsplitter.js"></script>
+        <script type="text/javascript" src="javascript/gettheme.js"></script>
+        <script type="text/javascript" src="javascript/jqxscrollbar.js"></script>
+        <script type="text/javascript" src="javascript/indexScript.js"></script>
+    </h:head>
+    <!--<h:body style="background-image: url(/opentheso/images/panda_roue.jpg)">-->
+     <h:body rendered="#{(treeBean.browserName != 'agent') }">
+        <f:metadata>
+            <f:viewParam name="idc" value="#{theso.idCurl}"/>
+            <f:viewParam name="idt" value="#{theso.idTurl}"/>
+            <f:viewParam name="idg" value="#{theso.idGurl}"/>
+            <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
+        </f:metadata>
+        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" />
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
+            <h1>Gestionnaire de thésaurus</h1>
+            Depuis cette page d'accueil, il vous est possible de parcourir le thésaurus.<br/>
+            <ul>
+                <li>Choisir le thésaurus en haut à gauche de la page (il sera en français par défaut)</li>
+                <li>Choisir la langue du thésaurus parmi la liste située au dessus de l'arbre si une autre langue que le français est souhaitée</li>
+            </ul>
+
+            La catégorie Orphelins présente dans l'arbre "Thésaurus" regroupe les termes qui ne sont plus rattachés au thésaurus (ils pourront y être réinsérés par la suite).<br/>
+
+            Il est possible d'effectuer une recherche en ouvrant l'onglet <h2>"Recherche"</h2> en dessous de l'arbre du "Thésaurus". Le résultat de la recherche apparaîtra dans l'onglet 
+            juste en dessous de ce dernier.<br/><br/>
+
+            Une fois connecté, il est possible de modifier le thésaurus en sélectionnant les termes et en cliquant sur les boutons d'édition 
+            (<img src="images/iconeAjouter.jpg" />). Les domaines sont très peu éditables, il est donc préférable de sélectionner un concept
+            plus bas dans l'arbre pour avoir accès à toutes les fonctionnalités.<br/><br/>
+
+            La gestion des facettes permet de regrouper par thèmes différents concepts (peu importe leur place dans le thésaurus).
+        </p:dialog>  
+        <div id="menuHead">
+            <ui:include src="logo.xhtml" />
+            <h:panelGroup id="panChoixTheso" style="float: left;" >
+                <ul id="choixTheso">
+                    <li><a href="#"><h:outputText value="#{langueBean.getMsg('theso')}" /><br/><h:outputLabel id="infoThesoCompte" 
+                                                                                                              value="#{langueBean.getMsg('theso2')} : #{theso.thesaurus.title}(#{theso.thesaurus.language})"/></a>
+                        <ul>
+                            <li>
+                                <h:form id="liste1">
+                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" style="margin-bottom: 4px; margin-top: 15px;" >
+                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                    </h:selectOneMenu><br/>
+                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
+                                                     update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                     styleClass="styleButton"/>
+                                </h:form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </h:panelGroup>
+            <ui:include src="menuAll.xhtml" />
+        </div>
+        <center>
+            <div id="clean" />
+            <ui:include src="popUpIndex.xhtml" />
+            <!-- GESTIONNAIRE DEBUT -->  
+            <div id="SplitterVertical1">
+                <div id="gauche">
+                    <p:accordionPanel id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}">
+                        <p:tab title="#{langueBean.getMsg('theso')}">
+                            <!-- CHOIX LANGUE DEBUT -->  
+                            <div id="divLangue">
+                                <h:panelGroup id="liste2">
+                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: left;">
+                                        <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
+                                            <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                           itemValue="#{t.id_iso639_1}" />
+                                        </h:selectOneMenu>&nbsp;
+                                        <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
+                                                         update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                         styleClass="styleButton"/>
+                                    </h:form>
+                                </h:panelGroup>
+                                <div id="imageEdition">
+                                    <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
+                                        <p:commandButton id="cbAjDom" 
+                                                         styleClass="cbEdit" icon="ui-icon-edit" 
+                                                         actionListener="#{vue.setAddDom(true)}" 
+                                                         update=":ajGroup" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <!-- CHOIX LANGUE FIN -->  
+                            <hr/>
+                            <!-- ARBRE DEBUT -->  
+                            <div id="divArbreTheso">
+                                <h:form id="form">
+                                    <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
+                                            selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true">
+                                        <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
+                                        <p:ajax event="select" 
+                                                update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                listener="#{treeBean.onNodeSelect}" />
+
+                                        <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                                    collapsedIcon="ui-icon ui-icon-domaine-close">  
+                                            <h:outputText value="#{node}"/>  
+                                        </p:treeNode>  
+                                        <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                                    collapsedIcon="ui-icon ui-icon-dossier-close">  
+                                            <h:outputText value="#{node}"/>  
+                                        </p:treeNode>  
+                                        <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                                            <h:outputText value="#{node}"/>  
+                                        </p:treeNode> 
+                                        <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                                    collapsedIcon="ui-icon ui-icon-domaine-close">  
+                                            <h:outputText value="#{node}"/>  
+                                        </p:treeNode>
+                                    </p:tree>  
+                                </h:form>
+                            </div>
+                            <!-- ARBRE FIN -->  
+                        </p:tab>
+                        <p:tab title="#{langueBean.getMsg('index.search')}">
+                            <!-- TAB RECHERCHE DEBUT -->
+                            <div id="recherche" >
+                                <h:form rendered="#{theso.thesaurus.id_thesaurus != null}">
+                                    <br/><br/><br/>
+                                    <table>
+                                        <tr>
+                                            <td colspan="2">
+                                                <img src="images/iconeSearch.png" style="height: 20px;" />
+                                                <h:inputText value="#{search.entry}"/><br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Objet : </td>
+                                            <td>
+                                                <h:selectOneMenu value="#{search.typeValueSearch}" style="width: 120px;">
+                                                    <f:selectItem itemValue="0" itemLabel="#{langueBean.getMsg('term')}" />
+                                                    <f:selectItem itemValue="1" itemLabel="Id #{langueBean.getMsg('concept')}" />
+                                                </h:selectOneMenu><br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><h:outputText value="#{langueBean.getMsg('language')}" /> :</td>
+                                            <td>
+                                                <h:selectOneMenu value="#{search.langue}"  style="width: 120px;">
+                                                    <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                                   itemValue="#{t.id_iso639_1}" />
+                                                </h:selectOneMenu><br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><h:outputText value="#{langueBean.getMsg('index.tabSearch2')}" /> :</td>
+                                            <td>
+                                                <h:selectOneMenu value="#{search.idGroup}"  style="width: 120px;">
+                                                    <f:selectItems value="#{theso.listeDomaine()}"/>
+                                                </h:selectOneMenu> <br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <br/><br/>
+                                            </td>
+                                            <td>
+                                                <p:selectOneRadio value="#{search.typeSearch}" layout="pageDirection" >
+                                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption1')}" itemValue="1" />
+                                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption2')}" itemValue="2" />
+                                                </p:selectOneRadio><br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <p:commandButton value="#{langueBean.getMsg('index.goSearch')}" actionListener="#{search.research()}"
+                                                                 update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                                 styleClass="styleButton" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <br/>
+                                </h:form>
+                                <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />
+                            </div>
+                            <!-- TAB RECHERCHE FIN -->
+                        </p:tab>
+                        <p:tab title="#{langueBean.getMsg('index.searchRes')}">
+                            <!-- TAB RESULTAT RECHERCHE DEBUT -->
+                            <h:panelGroup id="resultSearch">
+                                <h:form id="tableSearch1" rendered="#{search.typeSearch == 1}">
+                                    <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
+                                                 rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="460"
+                                                 emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                                        <p:ajax event="rowSelect" listener="#{selectedTerme.majSearch()}" 
+                                                update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                        <f:facet name="header">
+                                            <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
+                                        </f:facet>
+                                        <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                                            <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />
+                                            <h:panelGroup rendered="#{ts.preferredLabel == false}" >
+                                                <i><h:outputText value="#{ts.lexical_value}" /></i>&nbsp;
+                                            </h:panelGroup>
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60">
+                                            <h:outputText value="#{ts.groupLabel}" />
+                                        </p:column>
+                                        <p:column width="10" style="padding-left: 1px;">
+                                            <h:form>
+                                                <p:graphicImage id="seeTree" value="images/iconeTree.png" styleClass="hierarchicalSearch" />
+                                                <p:tooltip id="toolTipContent" for="seeTree">
+                                                    <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                                        <ui:repeat value="#{search.getHierachi(ts.idConcept)}" var="path" >
+                                                            <ui:repeat value="#{path}" var="termeS" >
+                                                                <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
+                                                                    <img src="images/conceptOpen.png" />
+                                                                    <h:outputText value="#{search.getNom(termeS)}" />
+                                                                </div>
+                                                            </ui:repeat>
+                                                            <br/>
+                                                        </ui:repeat>
+                                                    </p:fieldset>
+                                                </p:tooltip>
+                                            </h:form>
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:form>
+                                <h:form id="tableSearch2" rendered="#{search.typeSearch == 2}">
+                                    <p:dataTable var="tsp" value="#{search.result2}" selectionMode="single" selection="#{selectedTerme.nodePe}" 
+                                                 rowKey="#{tsp.idConcept}" scrollable="true" scrollHeight="460"
+                                                 emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                                        <p:ajax event="rowSelect" listener="#{selectedTerme.majSearchPermute()}" 
+                                                update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                        <f:facet name="header">
+                                            <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
+                                        </f:facet>
+                                        <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                                            <h:outputText rendered="#{tsp.firstColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.firstColumn.trim()}&nbsp;" />
+                                            <h:outputText rendered="#{tsp.isPreferredTerm == true}" value="#{tsp.searchedValue}" style="font-weight: bold;" />&nbsp;
+                                            <h:outputText rendered="#{tsp.lastColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.lastColumn.trim()}" />
+                                            <h:panelGroup rendered="#{tsp.isPreferredTerm == false}" >
+                                                <i>
+                                                    <h:outputText rendered="#{tsp.firstColumn != ''}" value="#{tsp.firstColumn.trim()}&nbsp;" />
+                                                    <h:outputText value="#{tsp.searchedValue}" style="font-weight: bold;" />&nbsp;
+                                                    <h:outputText rendered="#{tsp.lastColumn != ''}" value="#{tsp.lastColumn.trim()}" />
+                                                </i>
+                                            </h:panelGroup>
+
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60">
+                                            <h:outputText value="#{search.getValueGroup(tsp.idGroup)}" />
+                                        </p:column>
+                                        <p:column width="10" style="padding-left: 1px;">
+                                            <h:form>
+                                                <p:graphicImage id="seeTreeP" value="images/iconeTree.png" styleClass="hierarchicalSearch" />
+                                                <p:tooltip id="toolTipContent" for="seeTreeP">
+                                                    <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                                        <ui:repeat value="#{search.getHierachi(tsp.idConcept)}" var="pathP" >
+                                                            <ui:repeat value="#{pathP}" var="termeSP" >
+                                                                <div style="margin-left: #{pathP.indexOf(termeSP)*35}px; margin-top: 4px;">
+                                                                    <img src="images/conceptOpen.png" />
+                                                                    <h:outputText value="#{search.getNom(termeSP)}" />
+                                                                </div>
+                                                            </ui:repeat>
+                                                            <br/>
+                                                        </ui:repeat>
+                                                    </p:fieldset>
+                                                </p:tooltip>
+                                            </h:form>
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:form>
+                            </h:panelGroup>
+                            <!-- TAB RESULTAT RECHERCHE FIN -->
+                        </p:tab>
+                        <p:tab title="#{langueBean.getMsg('index.underTree')}">
+                            <!-- SOUS ARBRE DEBUT -->
+                            <div id="imageEdition" style="margin-bottom: 2px; margin-top: 1px; margin-right: 4px; height: 20px;">
+                                <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
+                                    <p:commandButton id="cbAjFacette" 
+                                                     styleClass="cbEdit" icon="ui-icon-edit" 
+                                                     actionListener="#{vue.setFacette(true)}"  
+                                                     update=":panFacette" />
+                                </h:form>
+                            </div>
+                            <div id="clean" />
+                            <h:form>
+                                <p:tree id="uTree" value="#{ssTree.root}" var="node" dynamic="true" cache="true" animate="true" 
+                                        selectionMode="single"  selection="#{ssTree.selectedNode}" styleClass="styleSSTree" >
+                                    <p:ajax event="expand" listener="#{ssTree.onNodeExpand}" />  
+                                    <p:ajax event="select" 
+                                            update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                            listener="#{ssTree.onNodeSelect}" /> 
+                                    <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                                collapsedIcon="ui-icon ui-icon-dossier-close">  
+                                        <h:outputText value="#{node}"/>  
+                                    </p:treeNode>  
+                                    <p:treeNode type="facette" icon="ui-icon ui-icon-facette">  
+                                        <h:outputText value="(#{node})" style="color: #659123;"/>  
+                                    </p:treeNode>
+                                    <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                                        <h:outputText value="#{node}"/>  
+                                    </p:treeNode>
+                                    <p:treeNode>  
+                                        <h:outputText value="#{node}"/>  
+                                    </p:treeNode>
+                                </p:tree>
+                            </h:form>
+                        </p:tab>
+                        <!-- SOUS ARBRE FIN -->
+                    </p:accordionPanel>
+                </div>
+                <div>
+                    <div id="SplitterVertical2" itemscope="article" itemtype="http://schema.org/Article">
+                        <div id="principale">
+<!-- CONTENU CENTRAL DEBUT -->  
+                          <!-- <div id="contenuPrincipale" style="background-image: url(/opentheso/images/panda_roue2.jpg)">-->
+                            
+                            <div id="contenuPrincipale">
+                                <h:panelGroup id="panContenu">
+                                    <div style="text-align: center" >
+                                        <h:form rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 10px;" >
+                                            <p:commandButton value="#{langueBean.getMsg('index.btnExpCpt')}" actionListener="#{vue.setCptToSkos(true)}"
+                                                             update=":panCptToSkos" styleClass="styleButton" />
+                                            <br/><br/>
+                                        </h:form>
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type != 1)}" 
+                                                style="float: left; margin-right: 10px;" >
+                                            <p:commandButton value="#{langueBean.getMsg('index.btnExpBranch')}" 
+                                                             actionListener="#{downloadBean.branchSkos(selectedTerme.idC, selectedTerme.idTheso)}"
+                                                             update=":panBranchToSkos,:panBranchToSkosFile" styleClass="styleButton" />
+                                            <br/><br/>
+                                        </h:form>
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type == 1)}" 
+                                                style="float: left; margin-right: 10px;" >
+                                            <p:commandButton value="#{langueBean.getMsg('index.btnExpBranch')}" 
+                                                             actionListener="#{downloadBean.branchGroupSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}"
+                                                             update=":panBranchToSkos,:panBranchToSkosFile" styleClass="styleButton" />
+                                            <br/><br/>
+                                        </h:form>
+                                        <h:form rendered="#{selectedTerme.canBeDel()}" style="float: left;" >
+                                            <p:commandButton value="#{langueBean.getMsg('index.btnDelCpt')}" actionListener="#{treeBean.suppConcept()}"
+                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                             styleClass="styleButtonRefus" >
+                                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('index.valid1')}" icon="ui-icon-alert" />  
+                                            </p:commandButton>
+                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                            </p:confirmDialog>
+                                            <br/><br/>
+                                        </h:form>
+                                        <div id="clean" />
+                                    </div>
+                                    <div id="alignGauche">
+                                        <!--TERMES GENERIQUES DEBUT -->
+                                        <div id="divGenerale">
+                                            <div id="titreGenerique">
+                                                <h:outputText value="#{langueBean.getMsg('index.BT')}" /> 
+                                                <h:panelGroup id="panFormEditTGen">
+                                                    <div id="imageEdition">
+                                                        <h:form id="formEditTGen" 
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+
+                                                            <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                                            <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
+                                                                <p:menuitem value="#{langueBean.getMsg('panel.addBT')}" actionListener="#{vue.setAddTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" actionListener="#{vue.setAddTGen(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setAddTGen(3)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            </p:menu>
+
+                                                        </h:form>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </div>
+                                            <div id="contenuGenerique">
+                                                <h:panelGroup id="gene">
+                                                    <ui:repeat value="#{selectedTerme.termeGenerique}" var="item0">
+                                                        <h:form>
+                                                            <p:commandButton styleClass="termClick" rendered="#{item0.value != ''}" value="#{item0.value}" 
+                                                                             actionListener="#{treeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                                            <p:commandButton styleClass="termClick" rendered="#{item0.value == ''}" value="#{item0.key}" 
+                                                                             actionListener="#{treeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />                                                            
+                                                        </h:form>
+                                                    </ui:repeat>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                        <!--TERMES GENERIQUES FIN -->
+                                        <!--INFO TERMES DEBUT -->
+                                        <div id="divGenerale">
+
+                                            <div id="contenuTerme">
+                                                <div id="imageEdition">
+                                                    <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2))}">
+                                                        <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit"  
+                                                                         actionListener="#{vue.setAddTInfo(true)}" 
+                                                                         update=":panPopUp" />
+                                                    </h:form>
+                                                </div>
+
+
+                                                <span itemprop="name" style="font-size: 17px; font-weight: bold;">
+                                                    <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
+                                                </span>
+
+                                                <h:outputText id="idC" value="Concept_Id : #{selectedTerme.idC}"/><br/>
+                                                <span itemprop="citation">
+                                                    <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+
+                                                    <a  href="#{selectedTerme.urlNotice}" target="blanc" >
+                                                        <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices}"/>
+                                                    </a>
+                                                </span>
+                                                <br/>
+
+                                                <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
+
+                                                <span itemprop="articleSection">
+                                                    <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
+                                                </span>
+                                                <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
+                                                <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
+                                                <span itemprop="datePublished">
+                                                    <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
+                                                    <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
+                                                </span>
+
+                                                <!-- affichage de l'URL pérenne-->
+
+
+                                                <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
+                                                <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                              value="#{langueBean.getMsg('index.link')} :" /> <br />
+
+                                                <!-- pour afficher un toolTipText-->
+                                                <p:tooltip id="toolTipGrow" for="ark" value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}"
+                                                           showEffect="clip" hideEffect="explode" />
+
+
+                                                <span itemprop="url">
+                                                    <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
+                                                        <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                                      value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
+                                                    </h:outputLink>
+                                                </span>
+                                                <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
+                                                <h:outputText id= "url" rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                              value="#{langueBean.getMsg('index.link')} :" /> <br />
+                                                <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
+                                                    <span itemprop="url">
+                                                        <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                                      value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
+                                                    </span>
+                                                </h:outputLink>                                                
+                                            </div>
+                                        </div>
+                                        <!--INFO TERMES FIN -->
+                                        <!--TERMES SPECIFIQUES DEBUT -->
+                                        <div id="divGenerale">
+                                            <div id="titreSpecifique">
+                                                <h:outputText value="#{langueBean.getMsg('index.NT')}" /> 
+                                                <div id="imageEdition">
+                                                    <h:form id="formEditTSpe" 
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                        <p:commandButton id="cbEditThesoTSpe" styleClass="cbEdit" icon="ui-icon-edit"  
+                                                                         actionListener="#{vue.setAddTSpe(true)}" 
+                                                                         update=":panPopUp" />
+                                                    </h:form>
+                                                </div>
+                                            </div>
+                                            <div id="contenuSpecifique">
+                                                <h:panelGroup  id="speci">
+                                                    <ui:repeat value="#{selectedTerme.termesSpecifique}" var="item1">
+                                                        <h:form>
+
+                                                            <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}"
+                                                                             actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                                            <p:commandButton styleClass="termClick" rendered="#{item1.value == ''}" value="#{item1.key}"
+                                                                             actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+
+                                                        </h:form>
+                                                    </ui:repeat>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                        <!--TERMES SPECIFIQUES FIN -->
+                                    </div>
+                                    <div id="alignDroite">
+                                        <!--TERMES ASSOCIES DEBUT -->
+                                        <div id="divGenerale">
+                                            <div id="titreAssocie">
+                                                <h:outputText value="#{langueBean.getMsg('index.RT')}" /> 
+                                                <div id="imageEdition">
+                                                    <h:form id="formEditTAsso"
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                        <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" actionListener="#{vue.setAddTAsso(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.delRel')}" actionListener="#{vue.setAddTAsso(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                        </p:menu>
+
+                                                    </h:form>
+                                                </div>
+                                            </div>
+                                            <div id="contenuAssocie">
+                                                <h:panelGroup  id="asso">
+                                                    <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
+                                                        <h:form>
+                                                            <p:commandButton styleClass="termClick" rendered="#{item2.value != ''}" value="#{item2.value}" 
+                                                                             actionListener="#{treeBean.changeTerme(item2.key, 0)}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                                            <p:commandButton styleClass="termClick" rendered="#{item2.value == ''}" value="#{item2.key}" 
+                                                                             actionListener="#{treeBean.changeTerme(item2.key, 0)}" 
+                                                                             update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                                        </h:form>
+                                                    </ui:repeat>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                        <!--TERMES ASSOCIE FIN -->
+                                        <!--TERMES SYNONYMES DEBUT -->
+                                        <div id="divGenerale">
+                                            <div id="titreSynonyme">
+                                                <h:outputText value="#{langueBean.getMsg('index.UF')}" /> 
+                                                <div id="imageEdition">
+                                                    <h:form id="formEditTSyno" 
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2))}">                                                        
+                                                        <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" actionListener="#{vue.setAddTSyno(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.delRel')}" actionListener="#{vue.setAddTSyno(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                        </p:menu>
+
+                                                    </h:form>
+                                                </div>
+                                            </div>
+                                            <div id="contenuSynonyme">
+                                                <h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>
+                                                <h:panelGroup  id="synoE">
+                                                    <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
+                                                        <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
+                                                    </ui:repeat>
+                                                </h:panelGroup>
+                                                <h:outputText value="#{langueBean.getMsg('index.UF2')}" />  : <br/>
+                                                <h:panelGroup  id="synoP">
+                                                    <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
+                                                        <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
+                                                    </ui:repeat>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                        <!--TERMES SYNONYMES FIN -->
+                                        <!--NOTE DEBUT -->
+                                        <h:panelGroup> <!--
+                                                      rendered="#{selectedTerme.definition != '' or selectedTerme.noteApplication != '' or selectedTerme.noteHistorique != '' or selectedTerme.noteEditoriale != '' }"
+                                            -->
+
+                                            <div id="divGenerale">
+                                                <div id="titreNote">
+                                                    <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
+                                                    <div id="imageEdition">
+                                                        <h:form id="formEditNote" 
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2))}">
+
+                                                            <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                                            <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note1')}" actionListener="#{vue.setAddNote(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note2')}" actionListener="#{vue.setAddNote(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note3')}" actionListener="#{vue.setAddNote(3)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note4')}" actionListener="#{vue.setAddNote(4)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            </p:menu>
+
+                                                        </h:form>
+                                                    </div>
+                                                </div>
+                                                <div id="contenuNote">
+
+                                                    <!-- &lt;br/&gt; pour afficher <br/> -->
+                                                    <div id="clean" />
+                                                    <h:panelGroup id="note">
+
+                                                        <h:outputText value="#{langueBean.getMsg('index.note1')} : " escape="false" style="font-weight: bold;"
+                                                                      rendered="#{selectedTerme.definition != null and selectedTerme.definition != '' }" />
+                                                        <span itemprop="articleBody">
+                                                            <h:outputText value="#{selectedTerme.definition} &lt;br/&gt;" escape="false" />
+                                                        </span>
+                                                        <h:outputText value="#{langueBean.getMsg('index.note2')} : " style="font-weight: bold;"
+                                                                      rendered="#{selectedTerme.noteApplication != null and selectedTerme.noteApplication != ''}" />
+                                                        <h:outputText value="#{selectedTerme.noteApplication} &lt;br/&gt;" escape="false"/>
+
+                                                        <h:outputText value="#{langueBean.getMsg('index.note3')} : " style="font-weight: bold;"
+                                                                      rendered="#{selectedTerme.noteHistorique != null and selectedTerme.noteHistorique != ''}" />
+                                                        <h:outputText value="#{selectedTerme.noteHistorique} &lt;br/&gt;" escape="false"/>
+
+                                                        <h:outputText value="#{langueBean.getMsg('index.note4')} : " style="font-weight: bold;"
+                                                                      rendered="#{selectedTerme.noteEditoriale != null and selectedTerme.noteEditoriale != ''}" />
+                                                        <h:outputText value="#{selectedTerme.noteEditoriale} &lt;br/&gt;" escape="false"/>
+                                                    </h:panelGroup>
+                                                    <!--<p:accordionPanel id="note" multiple="true" dynamic="true" cache="true">
+                                                        <p:tab title="#{langueBean.getMsg('index.note1')}">
+                                                            <h:outputText value="#{selectedTerme.definition}"/>
+                                                        </p:tab>                                                    
+                                                        <p:tab title="#{langueBean.getMsg('index.note2')}">
+                                                            <h:outputText value="#{selectedTerme.noteApplication}"/>
+                                                        </p:tab>
+                                                        <p:tab title="#{langueBean.getMsg('index.note3')}">
+                                                            <h:outputText value="#{selectedTerme.noteHistorique}"/>
+                                                        </p:tab>
+                                                        <p:tab title="#{langueBean.getMsg('index.note4')}">
+                                                            <h:outputText value="#{selectedTerme.noteEditoriale}"/>
+                                                        </p:tab>
+                                                    </p:accordionPanel>-->
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <!--NOTE FIN -->
+                                        <!--ALIGNEMENT DEBUT -->
+                                        <div id="divGenerale">
+                                            <div id="titreAlign">
+                                                <h:outputText value="#{langueBean.getMsg('index.align')}" />
+                                                <div id="imageEdition">
+                                                    <h:form id="formEditAlign" 
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                        <p:commandButton id="cbEditAlign" rendered="#{selectedTerme.type != 1}" 
+                                                                         styleClass="cbEdit" icon="ui-icon-edit"  
+                                                                         actionListener="#{vue.setAddAlign(true)}" 
+                                                                         update=":panPopUp" />
+                                                    </h:form>
+                                                </div>
+                                            </div>
+                                            <div id="contenuAlign">
+                                                <ui:repeat value="#{selectedTerme.ALignType}" var="allAlign">
+                                                    <h:outputText value="#{allAlign.value} : " /><br/>
+                                                    <ui:repeat value="#{selectedTerme.align}" var="alignVar">
+                                                        <h:panelGroup rendered="#{allAlign.key == alignVar.alignement_id_type}" styleClass="nomSynonyme">
+                                                            <h:outputText value="#{alignVar.thesaurus_target} - " />
+                                                            <a href="#{alignVar.uri_target}">
+                                                                <h:outputText value="#{alignVar.uri_target}" />
+                                                            </a>
+                                                            <br/>
+                                                        </h:panelGroup>
+                                                    </ui:repeat>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                        <!--ALIGNEMENT FIN -->
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                            <div id="clean" ></div>
+                            <!-- CONTENU CENTRAL FIN -->
+                        </div>
+                        <div id="droite">
+                            <div id="SplitterHorizDroit1">
+
+                                <!--TRADUCTION DEBUT -->
+                                <div id="langue" style="overflow-y: auto;">
+                                    <h:panelGroup id="contenuDroite3">
+
+                                        <div id="titreSplinter">
+                                            <h:outputText value="#{langueBean.getMsg('index.trad')}" /> 
+
+                                            <div id="imageEdition">
+                                                <h:form id="formEditTrad" 
+                                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2)))}">
+                                                    <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit"  
+                                                                     actionListener="#{vue.setAddTrad(true)}" 
+                                                                     update=":panPopUp" />
+                                                </h:form>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup  id="lang">
+                                            <ui:repeat value="#{selectedTerme.langues}" var="item5">
+                                                <h:form>
+                                                    <p:commandButton styleClass="termClick" value="#{item5.value} (#{item5.key})" 
+                                                                     actionListener="#{theso.changeTermeTrad(selectedTerme.idC, item5.key, selectedTerme.type)}" 
+                                                                     update=":panChoixTheso,:accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                                </h:form>
+                                            </ui:repeat>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                </div>
+                                <!--TRADUCTION FIN -->
+                                <div>
+                                    <div id="SplitterHorizDroit2">
+                                        <!--FACETTE DEBUT -->
+                                        <div id="facette">
+                                            <h:panelGroup id="contenuDroite2">
+                                                <div id="titreSplinter">
+                                                    <h:outputText value="#{langueBean.getMsg('index.facet')}" /> 
+                                                    <div id="imageEdition">
+                                                        <h:form id="formEditFacette" target="_blanc"
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                            <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit" 
+                                                                             action="#{vue.setAddFacette(true)}" update=":panPopUp" />
+                                                        </h:form>
+                                                    </div>
+                                                </div>
+                                                <h:form>
+                                                    <p:tree id="facetteTree" value="#{selectedTerme.root}" var="nodeFT" dynamic="true" cache="true" animate="true" 
+                                                            selectionMode="single"  selection="#{selectedTerme.selectedNode}" styleClass="styleFacetteTerm" >
+                                                        <p:ajax event="expand" listener="#{selectedTerme.onNodeExpand}" />  
+                                                        <p:ajax event="select" 
+                                                                update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                                listener="#{selectedTerme.onNodeSelect}" /> 
+                                                        <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                                                    collapsedIcon="ui-icon ui-icon-dossier-close">  
+                                                            <h:outputText value="#{nodeFT}"/>  
+                                                        </p:treeNode>  
+                                                        <p:treeNode type="facette" icon="ui-icon ui-icon-facette">  
+                                                            <h:outputText value="(#{nodeFT})" style="color: #659123;"/>  
+                                                        </p:treeNode>
+                                                        <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                                                            <h:outputText value="#{nodeFT}"/>  
+                                                        </p:treeNode>
+                                                        <p:treeNode>  
+                                                            <h:outputText value="#{nodeFT}"/>  
+                                                        </p:treeNode>
+                                                    </p:tree>
+                                                </h:form>
+                                            </h:panelGroup>
+                                        </div>
+                                        <!--FACETTE FIN -->
+
+                                        <!--IMAGE DEBUT -->
+                                        <div id="image">
+                                            <h:panelGroup id="contenuDroite1">
+                                                <div id="titreSplinter">
+                                                    <h:form style="float: left; width: 45px;"
+                                                            rendered="#{selectedTerme.images.size() != 0}">
+                                                        <p:commandButton type="button" onclick="PF('switcher').previous();"
+                                                                         icon="ui-icon-circle-triangle-w" id="prev" styleClass="stylePix"/>
+                                                        <p:commandButton type="button" onclick="PF('switcher').next();"
+                                                                         icon="ui-icon-circle-triangle-e" id="next" styleClass="stylePix"/>
+                                                    </h:form>
+                                                    <h:outputText value="#{langueBean.getMsg('index.picture')}" /> 
+                                                    <div id="imageEdition">
+                                                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                            <p:commandButton id="cbEditThesoImage" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"  
+                                                                             actionListener="#{vue.setAddImage(true)}" update=":panPopUp" />
+                                                        </h:form>
+                                                    </div>
+                                                    <div id="clean" />
+                                                </div>
+                                                <p:imageSwitch effect="wipe" widgetVar="switcher" id="manuelSwitcher" slideshowAuto="true">
+
+                                                    <ui:repeat value="#{selectedTerme.images}" var="image" id="manuelSwitcherImages">
+                                                        <h:form>
+
+                                                            <img itemprop="image">
+                                                                <p:graphicImage value="/pix/#{fileBean.dossierResize}/#{image.imageName}" onclick="PF('dlgPix').show()" 
+                                                                                style="cursor: pointer;"/>
+                                                            </img>
+                                                            <p:commandButton value="Supprimer" actionListener="#{selectedTerme.delImage(image.imageName)}" 
+                                                                             update=":contenuDroite1" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null)}" 
+                                                                             styleClass="styleButtonRefus" >
+                                                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('index.valid2')}" 
+                                                                           icon="ui-icon-alert" />  
+                                                            </p:commandButton>
+                                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" 
+                                                                                 icon="ui-icon-check"/>  
+                                                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" 
+                                                                                 icon="ui-icon-close"/>       
+                                                            </p:confirmDialog>
+                                                        </h:form>
+                                                    </ui:repeat>
+
+                                                </p:imageSwitch>
+                                                <p:dialog header="Images" widgetVar="dlgPix" modal="true" draggable="false" resizable="false">
+                                                    <h:form style="float: left;">
+                                                        <p:commandButton type="button" onclick="PF('fullSwitcher').previous();" icon="ui-icon-circle-triangle-w" 
+                                                                         id="prev" styleClass="stylePix"/>
+                                                        <p:commandButton type="button" onclick="PF('fullSwitcher').next();" icon="ui-icon-circle-triangle-e" 
+                                                                         id="next" styleClass="stylePix"/>
+                                                    </h:form>
+                                                    <div id="clean" />
+                                                    <p:imageSwitch effect="fade" widgetVar="fullSwitcher" slideshowAuto="false">
+                                                        <ui:repeat value="#{selectedTerme.images}" var="imageFull">
+                                                            <p:graphicImage value="/pix/#{imageFull.imageName}" />
+                                                        </ui:repeat>
+                                                    </p:imageSwitch>
+                                                </p:dialog>
+                                            </h:panelGroup>
+                                        </div>
+                                        <!--IMAGES FIN -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br/>
+            <!-- GESTIONNAIRE FIN --> 
+            <footer style="text-align: center">
+                <br />
+                <div style="margin-bottom: 5px; margin-top: -15px;">
+                    <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©OpenTheso</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS                    
+
+                    </a>
+                </div>
+            </footer>
+        </center>
+        <ui:insert name="status">
+            <p:ajaxStatus>
+                <f:facet name="start">
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </ui:insert>
+
+    </h:body>
+    <!-- Code pour les robots d'indexation -->
+    <h:body rendered="#{(treeBean.browserName == 'agent') }">
+        <div id="agent" itemscope="article" itemtype="http://schema.org/Article">
+
+            <span itemprop="name" style="font-size: 17px; font-weight: bold;">
+                <h:outputText  id="nom_agent" value="#{selectedTerme.nom}"/><br/>
+            </span>
+            <span itemprop="citation">
+                <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+
+                <a  href="#{selectedTerme.urlNotice}" target="blanc" >
+                    <h:outputText id="nbNoti1_agent" value="#{selectedTerme.nbNotices}"/>
+                </a>
+            </span>
+            <span itemprop="articleSection">
+                <h:outputText id="mTheso_agent" value="#{selectedTerme.microTheso}"/><br/>
+            </span>
+
+            <span itemprop="datePublished">
+                <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
+                <h:outputText id="dateM_agent" value="#{selectedTerme.dateM}"/><br/>
+            </span>
+            
+            <span itemprop="url">
+                <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
+            </span>
+            
+            <span itemprop="articleBody">
+                <h:outputText value="#{selectedTerme.definition} &lt;br/&gt;" escape="false" />
+            </span>
+            
+        </div>
+          
+   </h:body>
+
+</html>

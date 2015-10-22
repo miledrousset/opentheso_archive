@@ -1,0 +1,7 @@
+<SchemaMappings>
+	<templatesource directory="/mappings"/>
+	<mapping from="meta"   to="xml"    sheet="meta_to_xml.xsl"/>
+	<mapping from="meta"   to="sutrs"  sheet="meta_to_sutrs.xsl"/>
+	<mapping from="meta"   to="usmarc" sheet="meta_to_usmarc.xsl"/>
+	<mapping from="meta"   to="html"   sheet="meta_to_html.xsl"/>
+</SchemaMappings>
