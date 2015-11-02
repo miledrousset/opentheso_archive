@@ -561,7 +561,35 @@
                             <h:outputText value="#{langueBean.getMsg('cdt.valAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
                             <h:outputText value="#{selectedCandidat.msgAdm.message}" />
                         </div>
-                    </h:panelGroup><h:panelGroup id="messageInsert1" rendered="#{selectedCandidat.selected.etat == 'i'}">
+                    </h:panelGroup>
+                    <h:panelGroup id="manuelInsertion2" rendered="#{selectedCandidat.selected.etat == 'v'}">
+                        <h:form>
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
+                                <p:commandButton value="Ok" icon="ui-icon-check" actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" update=":panEditProp" />
+                            </h:panelGrid>
+                        </h:form>
+                    </h:panelGroup>
+                    
+                    
+                    
+                                <h:panelGroup id="manuelInsertion3" rendered="#{selectedCandidat.selected.etat == 'v'}">
+                                    <h:form rendered="#{(user1.haveRights(1))}">
+                                        <p:commandButton value="Ok" icon="ui-icon-ok" update=":panEditProp,:tableCdt"
+                                                         actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
+                                            <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  
+                                        </p:commandButton>   
+
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                            <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                        </p:confirmDialog> 
+                                    </h:form>
+                                 </h:panelGroup>
+                    
+                    
+                    
+                    <h:panelGroup id="messageInsert1" rendered="#{selectedCandidat.selected.etat == 'i'}">
                         <div class="messageValid">
                             <h:outputText value="#{langueBean.getMsg('cdt.insAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
                             <h:outputText value="#{selectedCandidat.msgAdm.message}" />

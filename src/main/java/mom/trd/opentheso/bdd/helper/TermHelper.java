@@ -976,7 +976,8 @@ public class TermHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")){
+          //  if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
                 log.error("Error while adding values in table Permuted for Non_Preferred_term : " + idConcept, sqle);
             }
         }

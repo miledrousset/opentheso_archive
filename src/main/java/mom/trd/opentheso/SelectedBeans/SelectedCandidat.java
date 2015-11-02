@@ -68,6 +68,10 @@ public class SelectedCandidat implements Serializable {
     private Date createdProposition;
     private Date modifiedProposition;
 
+    private String statusCandidat;
+
+
+    
     private ArrayList<String> nomsProp;
 
     // Variables resourcesBundle
@@ -626,6 +630,15 @@ public class SelectedCandidat implements Serializable {
         domaineEdit = np.getIdGroup();
         vue.setEditPropCandidat(true);
     }
+    
+    public boolean setStatusToInsert() {
+        CandidateHelper candidateHelper = new CandidateHelper();
+        if(candidateHelper.setStatusCandidatToInserted(connect.getPoolConnexion(), selected.getIdConcept(),
+                idTheso, theUser.getUser().getId()))
+           return true;
+        else 
+            return false;
+    }
 
     /**
      * Permet d'éditer sa propre proposition
@@ -866,6 +879,19 @@ public class SelectedCandidat implements Serializable {
 
     public void setModifiedProposition(Date modifiedProposition) {
         this.modifiedProposition = modifiedProposition;
+    }
+    
+    public String getStatusCandidat() {
+        return statusCandidat;
+    }
+
+    public boolean setStatusCandidat(String idCandidat) {
+        CandidateHelper candidateHelper = new CandidateHelper();
+        return candidateHelper.setStatusCandidatToInserted(
+                connect.getPoolConnexion(),
+                idCandidat,
+                idTheso,
+                theUser.getUser().getId());
     }
 
 }

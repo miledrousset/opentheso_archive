@@ -1761,7 +1761,50 @@ public class CandidateHelper {
             log.error("Error while asking if Title of Candidat exist : " + title, sqle);
         }
         return existe;
+    }
+    
+    
+   /**
+     * Cette fonction permet de savoir si le Candidat existe ou non
+     * @param ds
+     * @param idCandidat
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+
+    public boolean setStatusCandidatToInserted(HikariDataSource ds,
+            String idCandidat, String idThesaurus, int idUser) {
+
+        Statement stmt;
+
+        try {
+            try {
+                Connection conn = ds.getConnection();
+                stmt = conn.createStatement();
+                try {
+                    String query = "Update concept_candidat set"
+                            + " status = 'i'"
+                            + " where id_concept = '" + idCandidat + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    
+                    stmt.executeUpdate(query);
+                    return true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if Title of Candidat exist : " + sqle);
+        }
+        return false;
     }    
+   
+    
         /**
      * Cette fonction permet de savoir si le Candidat existe ou non
      * @param ds
