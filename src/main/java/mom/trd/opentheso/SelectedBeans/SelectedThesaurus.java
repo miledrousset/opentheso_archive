@@ -29,7 +29,7 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
-import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatList;
+import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
@@ -53,9 +53,9 @@ public class SelectedThesaurus implements Serializable {
     private ArrayList<Entry<String, String>> arrayFacette;
     private SelectItem[] langues;
     private SelectItem[] languesTheso;
-    private List<NodeCandidatList> filteredCandidats;
-    private List<NodeCandidatList> filteredCandidatsV;
-    private List<NodeCandidatList> filteredCandidatsA;
+    private List<NodeCandidatValue> filteredCandidats;
+    private List<NodeCandidatValue> filteredCandidatsV;
+    private List<NodeCandidatValue> filteredCandidatsA;
     private String idEdit;
     private String langueEdit;
     private String valueEdit;
@@ -94,6 +94,8 @@ public class SelectedThesaurus implements Serializable {
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
     
+    @ManagedProperty(value = "#{conceptbean}")
+    private ConceptBean conceptbean;   
     /************************************** INITIALISATION **************************************/
     
     /**
@@ -249,7 +251,7 @@ public class SelectedThesaurus implements Serializable {
         editTheso = new Thesaurus();
         nodeCG = new NodeGroup();
         ResourceBundle bundlePref = getBundlePref();
-        System.out.println(langueSource);
+//        System.out.println(langueSource);
         cheminSite = bundlePref.getString("cheminSite");
         String useArk = bundlePref.getString("useArk");
         arkActive = useArk.equals("true");
@@ -358,8 +360,8 @@ public class SelectedThesaurus implements Serializable {
      * Récupération de la liste des candidats propre au thésaurus courant
      * @return la liste de candidats
      */
-    public List<NodeCandidatList> listeCandidats() {
-        List<NodeCandidatList> candidats = new ArrayList<>();
+    public List<NodeCandidatValue> listeCandidats() {
+        List<NodeCandidatValue> candidats = new ArrayList<>();
         if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
             candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
@@ -370,8 +372,8 @@ public class SelectedThesaurus implements Serializable {
      * Récupération de la liste des candidats propre au thésaurus courant
      * @return la liste de candidats
      */
-    public List<NodeCandidatList> listeCdtArchives() {
-        List<NodeCandidatList> candidats = new ArrayList<>();
+    public List<NodeCandidatValue> listeCdtArchives() {
+        List<NodeCandidatValue> candidats = new ArrayList<>();
         if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
             candidats = new CandidateHelper().getListCandidatsArchives(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
@@ -382,8 +384,8 @@ public class SelectedThesaurus implements Serializable {
      * Récupération de la liste des candidats propre au thésaurus courant
      * @return la liste de candidats
      */
-    public List<NodeCandidatList> listeCdtValid() {
-        List<NodeCandidatList> candidats = new ArrayList<>();
+    public List<NodeCandidatValue> listeCdtValid() {
+        List<NodeCandidatValue> candidats = new ArrayList<>();
         if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
             candidats = new CandidateHelper().getListCandidatsValidated(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
@@ -430,7 +432,7 @@ public class SelectedThesaurus implements Serializable {
         candidat.setNoteEdit("");
         candidat.setNiveauEdit("");
         candidat.setDomaineEdit("");
-        List<NodeCandidatList> candidats = new ArrayList<>();
+        List<NodeCandidatValue> candidats = new ArrayList<>();
         if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
             candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
@@ -963,27 +965,27 @@ public class SelectedThesaurus implements Serializable {
         this.languesTheso = languesTheso;
     }
 
-    public List<NodeCandidatList> getFilteredCandidats() {
+    public List<NodeCandidatValue> getFilteredCandidats() {
         return filteredCandidats;
     }
 
-    public void setFilteredCandidats(List<NodeCandidatList> filteredCandidats) {
+    public void setFilteredCandidats(List<NodeCandidatValue> filteredCandidats) {
         this.filteredCandidats = filteredCandidats;
     }
 
-    public List<NodeCandidatList> getFilteredCandidatsV() {
+    public List<NodeCandidatValue> getFilteredCandidatsV() {
         return filteredCandidatsV;
     }
 
-    public void setFilteredCandidatsV(List<NodeCandidatList> filteredCandidatsV) {
+    public void setFilteredCandidatsV(List<NodeCandidatValue> filteredCandidatsV) {
         this.filteredCandidatsV = filteredCandidatsV;
     }
 
-    public List<NodeCandidatList> getFilteredCandidatsA() {
+    public List<NodeCandidatValue> getFilteredCandidatsA() {
         return filteredCandidatsA;
     }
 
-    public void setFilteredCandidatsA(List<NodeCandidatList> filteredCandidatsA) {
+    public void setFilteredCandidatsA(List<NodeCandidatValue> filteredCandidatsA) {
         this.filteredCandidatsA = filteredCandidatsA;
     }
 
@@ -1091,4 +1093,15 @@ public class SelectedThesaurus implements Serializable {
     public void setValueEdit(String valueEdit) {
         this.valueEdit = valueEdit;
     }
+
+    public ConceptBean getConceptbean() {
+        return conceptbean;
+    }
+
+    public void setConceptbean(ConceptBean conceptbean) {
+        this.conceptbean = conceptbean;
+    }
+
+    
+    
 }

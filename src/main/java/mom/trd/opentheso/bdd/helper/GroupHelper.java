@@ -13,8 +13,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import mom.trd.opentheso.bdd.datas.ConceptGroup;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
@@ -995,6 +997,67 @@ public class GroupHelper {
     }
 
     /**
+     * Cette fonction permet de récupérer la liste des domaines pour
+     * l'autocomplétion
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param text
+     * @param idLang
+     * @return Objet class Concept
+     */
+    public List<NodeAutoCompletion> getAutoCompletionGroup(HikariDataSource ds,
+            String idThesaurus, String idLang, String text) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = null;
+        text = new StringPlus().convertString(text);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT concept_group_label.idgroup,"
+                            + " concept_group_label.lexicalvalue FROM concept_group_label"
+                            + " WHERE "
+                            + " concept_group_label.idthesaurus = '" + idThesaurus + "'"
+                            + " AND concept_group_label.lang = '" + idLang + "'"
+                            + " AND unaccent_string(concept_group_label.lexicalvalue) ILIKE unaccent_string('" + text + "%')"
+                            + " ORDER BY concept_group_label.lexicalvalue ASC LIMIT 20";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    nodeAutoCompletionList = new ArrayList<>();
+                    while (resultSet.next()) {
+                        if (resultSet.getRow() != 0) {
+                            NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                            nodeAutoCompletion.setIdConcept("");
+                            nodeAutoCompletion.setTermLexicalValue("");
+                            nodeAutoCompletion.setGroupLexicalValue(resultSet.getString("lexicalvalue"));
+                            nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                            nodeAutoCompletionList.add(nodeAutoCompletion);
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    }      
+    
+    /**
      * Permet de retourner une ArrayList de String (idGroup) par thésaurus / ou
      * null si rien
      *
@@ -1266,5 +1329,53 @@ public class GroupHelper {
         }
         return group;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le Domaine existe dans cette langue
+     *
+     * @param ds
+     * @param title
+     * @param idThesaurus
+     * @param idLang
+     * @return boolean
+     */
+    public boolean isDomainExist(HikariDataSource ds,
+            String title, String idThesaurus, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+        title = new StringPlus().convertString(title);
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select idgroup from group_concept_label where "
+                            + "unaccent_string(lexicalvalue) ilike "
+                            + "unaccent_string('" + title
+                            + "')  and lang = '" + idLang
+                            + "' and idthesaurus = '" + idThesaurus
+                            + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if Title of Term exist : " + title, sqle);
+        }
+        return existe;
+    }    
 
 }

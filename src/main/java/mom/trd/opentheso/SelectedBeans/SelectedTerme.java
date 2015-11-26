@@ -155,6 +155,9 @@ public class SelectedTerme implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
+    
+    @ManagedProperty(value = "#{conceptbean}")
+    private ConceptBean conceptbean;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -690,6 +693,7 @@ public class SelectedTerme implements Serializable {
     }
 
     /**
+     * $$$$$ deprecated $$$$$$
      * Ajoute une relation terme générique au concept courant
      *
      * @param idCBT
@@ -764,6 +768,45 @@ public class SelectedTerme implements Serializable {
         vue.setAddTGen(0);
         return true;
     }
+    
+    /**
+     * Ajoute une relation terme générique au concept courant
+     *
+     * @param idNT
+     * @param idBT
+     * @return true or false
+     */
+    public boolean addTermeGene(String idNT, String idBT) {
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if (termeGenerique.isEmpty()) {
+                // c'était un orphelin
+                if (!new OrphanHelper().deleteOrphan(conn, idNT, idTheso)) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+            
+            //On ajoute la realtion BT au concept
+            if (!new RelationsHelper().addRelationBT(conn, idNT, idTheso, idBT, user.getUser().getId())) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+        termeGenerique = new ArrayList<>();
+        majTGen();
+        vue.setAddTGen(0);
+        return true;
+    }    
 
     /**
      * Corrigé par M.R. Ajoute une relation terme spécifique au concept courant
@@ -905,6 +948,7 @@ public class SelectedTerme implements Serializable {
                 break;
             }
         }
+        // traduction du domaine
         if (type == 1 && !tradExist) {
             ConceptGroupLabel cgl = new ConceptGroupLabel();
             cgl.setLexicalvalue(valueEdit);
@@ -913,7 +957,16 @@ public class SelectedTerme implements Serializable {
             cgl.setLang(langueEdit);
 
             GroupHelper cgh = new GroupHelper();
-            cgh.addGroupTraduction(connect.getPoolConnexion(), cgl, user.getUser().getId());
+            if (!cgh.isDomainExist(connect.getPoolConnexion(),
+                    cgl.getLexicalvalue(),
+                    cgl.getIdthesaurus(), cgl.getLang())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
+                return;
+            }
+            if(!cgh.addGroupTraduction(connect.getPoolConnexion(), cgl, user.getUser().getId())){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
+                return;
+            }
 
             ArrayList<NodeGroupTraductions> tempNGT = new GroupHelper().getGroupTraduction(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
             langues = new ArrayList<>();
@@ -923,15 +976,25 @@ public class SelectedTerme implements Serializable {
             }
             langues.addAll(tempMapL.entrySet());
 
+        // traduction du TT
         } else if (type == 2 && !tradExist) {
             Term terme = new Term();
             terme.setId_thesaurus(idTheso);
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
+            if (new TermHelper().isTermExist(connect.getPoolConnexion(),
+                    terme.getLexical_value(),
+                    terme.getId_thesaurus(), terme.getLang())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
+                return;
+            }
 
             ConceptHelper ch = new ConceptHelper();
-            ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId());
+            if(!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
+                return;
+            }
 
             ArrayList<NodeTermTraduction> tempNTT = new TermHelper().getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
             langues = new ArrayList<>();
@@ -941,6 +1004,7 @@ public class SelectedTerme implements Serializable {
             }
             langues.addAll(tempMapL.entrySet());
 
+        // traduction des concepts
         } else if (type == 3 && !tradExist) {
             Term terme = new Term();
             terme.setId_thesaurus(idTheso);
@@ -948,8 +1012,17 @@ public class SelectedTerme implements Serializable {
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
 
+            if (new TermHelper().isTermExist(connect.getPoolConnexion(),
+                    terme.getLexical_value(),
+                    terme.getId_thesaurus(), terme.getLang())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
+                return;
+            }
             ConceptHelper ch = new ConceptHelper();
-            ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId());
+            if(!ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
+                return;
+            }
 
             ArrayList<NodeTermTraduction> tempNTT = new TermHelper().getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
             langues = new ArrayList<>();
@@ -1002,8 +1075,12 @@ public class SelectedTerme implements Serializable {
             gemet = false;
         }
         if (opentheso) {
+            String lien = "";
             if(!linkOT.trim().equals("") && !idOT.trim().equals("")) {
-                String lien = linkOT.trim() + "webresources/rest/skos/concept/value=" + nom.replaceAll(" ", "_") + "&lang=" + idlangue + "&th=" + idOT;
+                if(linkOT.lastIndexOf("/") == linkOT.length()-1)
+                    lien = linkOT.trim() + "webresources/rest/skos/concept/value=" + nom.replaceAll(" ", "_") + "&lang=" + idlangue + "&th=" + idOT;
+                else
+                    lien = linkOT.trim() + "/webresources/rest/skos/concept/value=" + nom.replaceAll(" ", "_") + "&lang=" + idlangue + "&th=" + idOT;
                 listAlignTemp.addAll(new AlignmentQuery().query("OPENT", idC, idTheso, nom, idlangue, lien));
             }
             opentheso = false;
@@ -1176,7 +1253,10 @@ public class SelectedTerme implements Serializable {
      * @param id
      */
     public void delAsso(String id) {
-        new RelationsHelper().deleteRelationRT(connect.getPoolConnexion(), idC, idTheso, id, user.getUser().getId());
+        if(!new RelationsHelper().deleteRelationRT(connect.getPoolConnexion(), idC, idTheso, id, user.getUser().getId())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.info7")));
+                return;
+        }
         majTAsso();
         vue.setAddTAsso(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info7")));
@@ -1224,7 +1304,11 @@ public class SelectedTerme implements Serializable {
      */
     public boolean delGene(String id) {
         // id est l'identifiant du concept à qui on doit supprimer la relation BT
-
+        boolean TGisDomaine = false;
+        if(idDomaine.equals(id)) {
+            // cas où le générique est un domaine // donc le concept est un TT
+            TGisDomaine = true;
+        }
         // premier cas, si la branche n'a qu'un BT, alors elle devient orpheline
         if (termeGenerique.size() == 1) {
             // Le concept devient orphelin
@@ -1279,10 +1363,20 @@ public class SelectedTerme implements Serializable {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
 
-                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
+                if(TGisDomaine) {
+                    if(!new RelationsHelper().deleteRelationTT(conn, idC,
+                            idDomaine, idTheso, user.getUser().getId())) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                    }
+                } 
+                else {
+                    if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                    }
                 }
                 conn.commit();
                 conn.close();
@@ -1877,6 +1971,16 @@ public class SelectedTerme implements Serializable {
         this.vue = vue;
     }
 
+    public ConceptBean getConceptbean() {
+        return conceptbean;
+    }
+
+    public void setConceptbean(ConceptBean conceptbean) {
+        this.conceptbean = conceptbean;
+    }
+
+
+
     public String getValueEdit() {
         return valueEdit;
     }
@@ -2219,4 +2323,6 @@ public class SelectedTerme implements Serializable {
     public void setListAlignTemp(ArrayList<NodeAlignment> listAlignTemp) {
         this.listAlignTemp = listAlignTemp;
     }
+    
+    
 }

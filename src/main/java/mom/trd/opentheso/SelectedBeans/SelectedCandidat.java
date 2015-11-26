@@ -35,7 +35,7 @@ import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidat;
-import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatList;
+import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
@@ -46,7 +46,7 @@ import org.primefaces.event.TabChangeEvent;
 public class SelectedCandidat implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private NodeCandidatList selected;
+    private NodeCandidatValue selected;
     private NodeCandidat infoCdt;
     private String langueEdit = "";
     private String valueEdit = "";
@@ -113,7 +113,7 @@ public class SelectedCandidat implements Serializable {
 
     @PostConstruct
     public void initSelectedCandidat() {
-        selected = new NodeCandidatList();
+        selected = new NodeCandidatValue();
         selected.setEtat("");
         selected.setIdConcept("");
         selected.setValue("");
@@ -129,7 +129,7 @@ public class SelectedCandidat implements Serializable {
      * Réinitialise le candidat (tout est vide)
      */
     public void reInit() {
-        selected = new NodeCandidatList();
+        selected = new NodeCandidatValue();
         selected.setEtat("");
         selected.setIdConcept("");
         selected.setValue("");
@@ -164,6 +164,13 @@ public class SelectedCandidat implements Serializable {
         }
     }
 
+    
+    /**
+     *   $$$$$$$$$
+     *      fonction à revoir, trop de connection, à optimiser
+     *   $$$$$$$$$
+     */   
+
     /**
      * Récupération des informations d'un candidat lors de sa sélection dans la
      * table des candidats
@@ -172,6 +179,7 @@ public class SelectedCandidat implements Serializable {
      * @param langue
      */
     public void maj(String theso, String langue) {
+       // if(theso == null) return;
         idTheso = theso;
         langueTheso = langue;
         infoCdt.setNodesUser(new CandidateHelper().getListUsersOfCandidat(connect.getPoolConnexion(), selected.getIdConcept(), theso));
@@ -697,11 +705,11 @@ public class SelectedCandidat implements Serializable {
      *
      * @return
      */
-    public NodeCandidatList getSelected() {
+    public NodeCandidatValue getSelected() {
         return selected;
     }
 
-    public void setSelected(NodeCandidatList selected) {
+    public void setSelected(NodeCandidatValue selected) {
         this.selected = selected;
     }
 
@@ -887,11 +895,16 @@ public class SelectedCandidat implements Serializable {
 
     public boolean setStatusCandidat(String idCandidat) {
         CandidateHelper candidateHelper = new CandidateHelper();
-        return candidateHelper.setStatusCandidatToInserted(
+        if(!candidateHelper.setStatusCandidatToInserted(
                 connect.getPoolConnexion(),
                 idCandidat,
                 idTheso,
-                theUser.getUser().getId());
+                theUser.getUser().getId()))
+                return false;
+        else
+            
+            selected.setEtat("i");
+        return true;
     }
 
 }

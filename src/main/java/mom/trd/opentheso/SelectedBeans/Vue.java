@@ -40,6 +40,10 @@ public class Vue implements Serializable {
     private int addTInfo = 0;
     private boolean addTSpe = false;
     private int addTGen = 0;
+    private int delTGen = 0;
+    private int moveBranch = 0;
+    private int moveBranchToMT = 0;
+    private int moveBranchFromMT = 0;
     private int addTAsso = 0;
     private int addTSyno = 0;
     private int addNote = 0;
@@ -99,6 +103,38 @@ public class Vue implements Serializable {
         this.addTGen = addTGen;
     }
 
+    public int getDelTGen() {
+        return delTGen;
+    }
+
+    public void setDelTGen(int delTGen) {
+        this.delTGen = delTGen;
+    }
+
+    public int getMoveBranch() {
+        return moveBranch;
+    }
+
+    public void setMoveBranch(int moveBranch) {
+        this.moveBranch = moveBranch;
+    }
+    
+    public int getMoveBranchToMT() {
+        return moveBranchToMT;
+    }
+
+    public void setMoveBranchToMT(int moveBranchToMT) {
+        this.moveBranchToMT = moveBranchToMT;
+    }
+
+    public int getMoveBranchFromMT() {
+        return moveBranchFromMT;
+    }
+
+    public void setMoveBranchFromMT(int moveBranchFromMT) {
+        this.moveBranchFromMT = moveBranchFromMT;
+    }
+    
     public boolean isEdit() {
         return edit;
     }

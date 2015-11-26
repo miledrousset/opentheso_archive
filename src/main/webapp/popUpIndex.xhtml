@@ -110,14 +110,28 @@
                                 </f:facet>
                             </p:autoComplete>
                             <br/><br/>
-                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newTGene()}"
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGene()}"
                                              update=":addTGen,:panContenu,:accordeonTree" styleClass="styleButton" />
                         </h:form>
                     </fieldset>
                 </h:panelGroup>
-
+            </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup id="delTGen" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.delTGen != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.delTGen != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setDelTGen(0)}" update=":delTGen" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
                 <!-- Cas de suppression de TG  -->   
-                <h:panelGroup rendered="#{vue.addTGen == 2}">
+                <h:panelGroup rendered="#{vue.delTGen == 1}">
                     <fieldset style="overflow-y: auto">
                         <legend><h:outputText value="#{langueBean.getMsg('popup.delRel')}" /></legend>
                         <table id="tableRelations">
@@ -130,7 +144,7 @@
                                     <td><h:outputText value="#{item0.value} (#{item0.key})" /></td>
                                     <td>
                                         <h:form>
-                                            <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:addTGen"
+                                            <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:delTGen"
                                                              actionListener="#{treeBean.suppRel(item0.key, 0)}">
                                                 <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid1')}" icon="ui-icon-alert" />  
                                             </p:commandButton>  
@@ -146,9 +160,23 @@
                         </table>
                     </fieldset>
                 </h:panelGroup>
-
+            </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup id="moveBranch" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.moveBranch != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.moveBranch != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setMoveBranch(0)}" update=":moveBranch" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
                 <!-- Cas de déplacement d'une branche -->
-                <h:panelGroup rendered="#{vue.addTGen == 3}">
+                <h:panelGroup rendered="#{vue.moveBranch == 1}">
                     <fieldset>
                         <legend><h:outputText value="#{langueBean.getMsg('popup.move')}" /></legend>
                         <h:form>
@@ -186,10 +214,114 @@
                                 </tr>
                             </table><br/>
                             <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBranche()}"
-                                             update=":addTGen,:panContenu,:accordeonTree" styleClass="styleButton" />
+                                             update=":moveBranch,:panContenu,:accordeonTree" styleClass="styleButton" />
                         </h:form>
                     </fieldset>
                 </h:panelGroup>
+            </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup id="moveBranchFromMT" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.moveBranchFromMT != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.moveBranchFromMT != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setMoveBranchFromMT(0)}" update="moveBranchFromMT" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
+                <!-- Cas de déplacement d'une branche TT -->
+                <h:panelGroup rendered="#{vue.moveBranchFromMT == 1}">
+                    <fieldset>
+                        <legend><h:outputText value="#{langueBean.getMsg('popup.move')}" /></legend>
+                        <h:form>
+                            <p:messages showDetail="true" autoUpdate="true" /><br/>
+                            <table>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                                    <td>
+                                        <p:selectOneMenu value="#{autoComp.idOld}">
+                                            <f:selectItems value="#{selectedTerme.termeGenerique}" var="tg" itemValue="#{tg.key}"  itemLabel="#{tg.value}" />
+                                        </p:selectOneMenu>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                                    <td>
+                                        <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                                        itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
+                                            <f:facet name="itemtip">
+                                                <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                                    <f:facet name="header" rendered="#{(t1.url) != null}">
+                                                        <h:outputText value="ID : " />
+                                                        <h:outputText value="#{t1.idConcept}" />
+                                                    </f:facet>
+
+                                                    <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                                    <h:outputText value="#{t1.groupLexicalValue}" />
+
+                                                    <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                                    <h:outputText value="#{t1.definition}" />
+                                                </h:panelGrid>
+                                            </f:facet>
+                                        </p:autoComplete>
+                                    </td>
+                                </tr>
+                            </table><br/>
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromDomain()}"
+                                             update=":moveBranchFromMT,:panContenu,:accordeonTree" styleClass="styleButton" />
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:panelGroup>        
+            
+        <h:panelGroup id="moveBranchToMT" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.moveBranchToMT != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.moveBranchToMT != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setMoveBranchToMT(0)}" update=":moveBranchToMT" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>            
+                <!-- Cas d'ajout de déplacement d'une branche vers un domaine -->
+                <h:panelGroup rendered="#{vue.moveBranchToMT == 1}">
+                    <fieldset>
+                        <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
+                        <h:form>
+                            <p:messages showDetail="true" autoUpdate="true" /><br/>
+                            <table>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                                    <td>
+                                        <p:selectOneMenu value="#{autoComp.idOld}">
+                                            <f:selectItems value="#{selectedTerme.termeGenerique}" var="tg" itemValue="#{tg.key}"  itemLabel="#{tg.value}" />
+                                        </p:selectOneMenu>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                                    <td>
+                                        <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completGroup}" var="t1"
+                                                        itemLabel="#{t1.groupLexicalValue}" itemValue="#{t1}" converter="groupConverter" forceSelection="true">
+
+                                        </p:autoComplete>
+                                    </td>
+                                </tr>
+                            </table><br/>
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToDomain()}"
+                                             update=":moveBranchToMT,:panContenu,:accordeonTree" styleClass="styleButton" />
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>                
             </h:panelGroup>
         </h:panelGroup>
 
@@ -744,8 +876,9 @@
                             <p:selectBooleanCheckbox value="#{selectedTerme.opentheso}" />
                             <h:outputText value=" Opentheso" />
                             
-                            <h:inputText a:placeholder="#{langueBean.getMsg('popup.addAlign2')}" value="#{selectedTerme.linkOT}" />
-                            <h:inputText a:placeholder="Id" value="#{selectedTerme.idOT}" style="width: 25px;" />
+                            <h:inputText a:placeholder="#{langueBean.getMsg('popup.addAlign2')}" value="#{selectedTerme.linkOT}"  title="exp: http://pactols.frantiq.fr/opentheso/" />
+                            
+                            <h:inputText a:placeholder="Id" value="#{selectedTerme.idOT}" style="width: 25px;" title="Id thesaurus" />
                         </h:panelGrid>
                         <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.creerAlignAuto()}"
                                          update=":panEditAlign" styleClass="styleButton"/>

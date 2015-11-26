@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
-import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatList;
+import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
@@ -658,6 +658,7 @@ public class CandidateHelper {
                             + " and id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
+                    updateDateOfCandidat(conn, idConceptCandidat, idThesaurus);
                     etat = true;
 
                 } finally {
@@ -715,6 +716,7 @@ public class CandidateHelper {
                             + " and id_user = " + idUser;
 
                     stmt.executeUpdate(query);
+                    updateDateOfCandidat(conn, idCandidat, idThesaurus);
                     etat = true;
 
                 } finally {
@@ -762,6 +764,7 @@ public class CandidateHelper {
                             + " and id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
+                    updateDateOfCandidat(conn, idCandidat, idThesaurus);
                     etat = true;
 
                 } finally {
@@ -1029,6 +1032,7 @@ public class CandidateHelper {
                             + ",'" + idGroup + "')";
 
                     stmt.executeUpdate(query);
+                    updateDateOfCandidat(conn, idConcept, idThesaurus);
                     status = true;
 
                 } finally {
@@ -1042,7 +1046,41 @@ public class CandidateHelper {
             log.error("Error while adding Proposition Candidat  : " + idConcept, sqle);
         }
         return status;
-    }     
+    }
+    
+    /**
+     * cette fonction permet de mettre à jour la date de modification du candidat
+     * @return 
+     */
+    private boolean updateDateOfCandidat(Connection conn,
+            String idConcept,
+            String idThesaurus) {
+
+        Statement stmt;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Update concept_candidat set"
+                            + " modified = now()"
+                            + " where id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    
+                    stmt.executeUpdate(query);
+                    return true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while uddating date of Candidat : " + idConcept);
+        }
+        return false;
+    }
     
     /**
      * Cette fonction permet de rajouter une proposition de candidat 
@@ -1349,15 +1387,15 @@ public class CandidateHelper {
      * @param ds le pool de connexion
      * @param idThesaurus
      * @param idLang
-     * @return Objet Class ArrayList NodeCandidatList
+     * @return Objet Class ArrayList NodeCandidatValue
      */
-    public ArrayList<NodeCandidatList> getListCandidatsWaiting(HikariDataSource ds,
+    public ArrayList<NodeCandidatValue> getListCandidatsWaiting(HikariDataSource ds,
             String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList <NodeCandidatList> nodeCandidatLists = null;
+        ArrayList <NodeCandidatValue> nodeCandidatLists = null;
         ArrayList tabIdConcept = new ArrayList();
         
         try {
@@ -1366,22 +1404,22 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept from concept_candidat where id_thesaurus = '" + idThesaurus +"' and status ='a' ";
+                    String query = "select id_concept from concept_candidat where id_thesaurus = '" + idThesaurus +"'"
+                            + " and status ='a' order by modified DESC";
                             
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        while(resultSet.next()) {
-                            tabIdConcept.add(resultSet.getString("id_concept"));
-                        }
-                        nodeCandidatLists = new ArrayList<>();
-                        for (Object tabIdConcept1 : tabIdConcept) {
-                            NodeCandidatList nodeCandidatList;
-                            nodeCandidatList = getThisCandidatList(ds, tabIdConcept1.toString(), idThesaurus, idLang);
-                            if(nodeCandidatList == null) return null;
-                            nodeCandidatLists.add(nodeCandidatList);
-                        }
-                        
+                    while(resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+                    nodeCandidatLists = new ArrayList<>();
+                    for (Object tabIdConcept1 : tabIdConcept) {
+                        NodeCandidatValue nodeCandidatValue;
+                        nodeCandidatValue = getThisCandidat(ds, tabIdConcept1.toString(), idThesaurus, idLang);
+                        if(nodeCandidatValue == null) return null;
+                        nodeCandidatValue.setEtat("a");
+                        nodeCandidatValue.setNbProp(getNbPropCandidat(ds,idThesaurus,tabIdConcept1.toString()));
+                        nodeCandidatLists.add(nodeCandidatValue);
                     }
 
                 } finally {
@@ -1407,16 +1445,18 @@ public class CandidateHelper {
      * @param ds le pool de connexion
      * @param idThesaurus
      * @param idLang
-     * @return Objet Class ArrayList NodeCandidatList
+     * @return Objet Class ArrayList NodeCandidatValue
      */
-    public ArrayList<NodeCandidatList> getListCandidatsArchives(HikariDataSource ds,
+    public ArrayList<NodeCandidatValue> getListCandidatsArchives(HikariDataSource ds,
             String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList <NodeCandidatList> nodeCandidatLists = null;
+        ArrayList <NodeCandidatValue> nodeCandidatLists = null;
         ArrayList tabIdConcept = new ArrayList();
+        ArrayList tabStatus = new ArrayList();
+        NodeCandidatValue nodeCandidatValue = new NodeCandidatValue();
         
         try {
             // Get connection from pool
@@ -1424,22 +1464,24 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept from concept_candidat where id_thesaurus = '" + idThesaurus +"' and status != 'a' ";
+                    String query = "select id_concept, status from concept_candidat where id_thesaurus = '" + idThesaurus +"' and status != 'a' "
+                            + " order by modified DESC";
                             
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        while(resultSet.next()) {
-                            tabIdConcept.add(resultSet.getString("id_concept"));
-                        }
-                        nodeCandidatLists = new ArrayList<>();
-                        for (Object tabIdConcept1 : tabIdConcept) {
-                            NodeCandidatList nodeCandidatList;
-                            nodeCandidatList = getThisCandidatList(ds, tabIdConcept1.toString(), idThesaurus, idLang);
-                            if(nodeCandidatList == null) return null;
-                            nodeCandidatLists.add(nodeCandidatList);
-                        }
-                        
+                    while(resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                        tabStatus.add(resultSet.getString("status"));
+                    }
+                    nodeCandidatLists = new ArrayList<>();
+
+                    int i = 0;
+                    for (Object tabIdConcept1 : tabIdConcept) {
+                        nodeCandidatValue = getThisCandidat(ds, tabIdConcept1.toString(), idThesaurus, idLang);
+                        if(nodeCandidatValue == null) return null;
+                        nodeCandidatValue.setEtat(tabStatus.get(i++).toString());
+                        nodeCandidatValue.setNbProp(getNbPropCandidat(ds, idThesaurus, tabIdConcept1.toString()));
+                        nodeCandidatLists.add(nodeCandidatValue);
                     }
 
                 } finally {
@@ -1464,15 +1506,15 @@ public class CandidateHelper {
      * @param ds le pool de connexion
      * @param idThesaurus
      * @param idLang
-     * @return Objet Class ArrayList NodeCandidatList
+     * @return Objet Class ArrayList NodeCandidatValue
      */
-    public ArrayList<NodeCandidatList> getListCandidatsValidated(HikariDataSource ds,
+    public ArrayList<NodeCandidatValue> getListCandidatsValidated(HikariDataSource ds,
             String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList <NodeCandidatList> nodeCandidatLists = null;
+        ArrayList <NodeCandidatValue> nodeCandidatLists = null;
         ArrayList tabIdConcept = new ArrayList();
         
         try {
@@ -1481,24 +1523,23 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept from concept_candidat where id_thesaurus = '" + idThesaurus +"' and status = 'v' ";
+                    String query = "select id_concept from concept_candidat where id_thesaurus = '" + idThesaurus +"' and status = 'v' "
+                            + "order by modified DESC";
                             
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        while(resultSet.next()) {
-                            tabIdConcept.add(resultSet.getString("id_concept"));
-                        }
-                        nodeCandidatLists = new ArrayList<>();
-                        for (Object tabIdConcept1 : tabIdConcept) {
-                            NodeCandidatList nodeCandidatList;
-                            nodeCandidatList = getThisCandidatList(ds, tabIdConcept1.toString(), idThesaurus, idLang);
-                            if(nodeCandidatList == null) return null;
-                            nodeCandidatLists.add(nodeCandidatList);
-                        }
-                        
+                    while(resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
                     }
-
+                    nodeCandidatLists = new ArrayList<>();
+                    for (Object tabIdConcept1 : tabIdConcept) {
+                        NodeCandidatValue nodeCandidatValue;
+                        nodeCandidatValue = getThisCandidat(ds, tabIdConcept1.toString(), idThesaurus, idLang);
+                        if(nodeCandidatValue == null) return null;
+                        nodeCandidatValue.setEtat("v");
+                        nodeCandidatValue.setNbProp(getNbPropCandidat(ds, idThesaurus, tabIdConcept1.toString()));
+                        nodeCandidatLists.add(nodeCandidatValue);
+                    }
                 } finally {
                     stmt.close();
                 }
@@ -1514,21 +1555,22 @@ public class CandidateHelper {
     
     
     /**
+     * $$$$$$$ deprecated $$$$$$$
      * Cette fonction permet de récupérer la liste des candidats
      * 
      * @param ds
      * @param idConcept
      * @param idThesaurus
      * @param idLang
-     * @return Objet class NodeCandidatList
+     * @return Objet class NodeCandidatValue
      */
-    public NodeCandidatList getThisCandidatList(HikariDataSource ds,
+    public NodeCandidatValue getThisCandidatList(HikariDataSource ds,
             String idConcept, String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        NodeCandidatList nodeCandidatList = null;
+        NodeCandidatValue nodeCandidatList = null;
                 
         if(isTraductionExistOfCandidat(ds, idConcept, idThesaurus, idLang)) {
             try {
@@ -1552,7 +1594,7 @@ public class CandidateHelper {
                         if (resultSet != null) {
                             
                             while(resultSet.next()) {
-                                nodeCandidatList = new NodeCandidatList();
+                                nodeCandidatList = new NodeCandidatValue();
                                 nodeCandidatList.setValue(resultSet.getString("lexical_value"));
                                 nodeCandidatList.setIdConcept(idConcept);
                                 nodeCandidatList.setEtat(resultSet.getString("status"));
@@ -1588,7 +1630,7 @@ public class CandidateHelper {
                         resultSet = stmt.getResultSet();
                         if (resultSet != null) {
                             while(resultSet.next()) {
-                                nodeCandidatList = new NodeCandidatList();
+                                nodeCandidatList = new NodeCandidatValue();
                                 nodeCandidatList.setValue("");
                                 nodeCandidatList.setIdConcept(idConcept);
                                 nodeCandidatList.setEtat(resultSet.getString("status"));
@@ -1608,8 +1650,104 @@ public class CandidateHelper {
             }
             
         }
-        
+        return nodeCandidatList;
+    }
+    
+/**
+     * Cette fonction permet de récupérer un candidat 
+     * avec sa traduction, sinon, son identifiant
+     * 
+     * @param ds
+     * @param idCandidat
+     * @param idThesaurus
+     * @param idLang
+     * @return Objet class NodeCandidatValue
+     */
+    public NodeCandidatValue getThisCandidat(HikariDataSource ds,
+            String idCandidat, String idThesaurus, String idLang) {
 
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        NodeCandidatValue nodeCandidatList = null;
+                
+//        if(isTraductionExistOfCandidat(ds, idConcept, idThesaurus, idLang)) {
+            try {
+            // Get connection from pool
+            conn = ds.getConnection();
+                try {
+                    stmt = conn.createStatement();
+                    try {
+                        String query = "SELECT term_candidat.lexical_value" +
+                            " FROM concept_term_candidat, term_candidat" +
+                            " WHERE concept_term_candidat.id_term = term_candidat.id_term" +
+                            " AND concept_term_candidat.id_concept = '" + idCandidat + "'" +
+                            " AND term_candidat.lang = '" + idLang + "'" + 
+                            " AND term_candidat.id_thesaurus = '" + idThesaurus + "'";
+                                
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                            
+                        if(resultSet.next()) {
+                            nodeCandidatList = new NodeCandidatValue();
+                            nodeCandidatList.setValue(resultSet.getString("lexical_value").trim());
+                            nodeCandidatList.setIdConcept(idCandidat);
+                        }
+                        else {
+                            nodeCandidatList = new NodeCandidatValue();
+                            nodeCandidatList.setValue("");
+                            nodeCandidatList.setIdConcept(idCandidat);
+                        }
+                            
+
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while getting Concept : " + idCandidat, sqle);
+            }
+/*        }
+        else {
+            try {
+            // Get connection from pool
+                conn = ds.getConnection();
+                try {
+                    stmt = conn.createStatement();
+                    try {
+                        String query = "SELECT concept_candidat.id_concept,"
+                                + " concept_candidat.status FROM"
+                                + " concept_candidat" 
+                                + " WHERE concept_candidat.id_concept ='" + idConcept +"'"
+                                + " and concept_candidat.id_thesaurus = '" + idThesaurus + "'";
+
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        if (resultSet != null) {
+                            while(resultSet.next()) {
+                                nodeCandidatList = new NodeCandidatValue();
+                                nodeCandidatList.setValue("");
+                                nodeCandidatList.setIdConcept(idConcept);
+                                nodeCandidatList.setEtat(resultSet.getString("status"));
+                                nodeCandidatList.setNbProp(getNbPropCandidat(ds,idThesaurus,idConcept));
+                            }
+                        }
+
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while getting Concept : " + idConcept, sqle);
+            }
+            
+        }*/
         return nodeCandidatList;
     }    
     
@@ -1789,6 +1927,7 @@ public class CandidateHelper {
                             + " and id_thesaurus = '" + idThesaurus + "'";
                     
                     stmt.executeUpdate(query);
+                    updateDateOfCandidat(conn, idCandidat, idThesaurus);
                     return true;
 
                 } finally {

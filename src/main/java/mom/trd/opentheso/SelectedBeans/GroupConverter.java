@@ -6,13 +6,12 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 
-@FacesConverter("termConverter")
-public class TermeConverter implements Converter{
+@FacesConverter("groupConverter")
+public class GroupConverter implements Converter{
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {
             NodeAutoCompletion nac = new NodeAutoCompletion();
-            nac.setIdConcept(value);
             nac.setIdGroup(value);
             return nac;
         }
@@ -26,7 +25,7 @@ public class TermeConverter implements Converter{
         if(o == null) {
             return null;
         } else {
-            return ((NodeAutoCompletion)o).getIdConcept();
+            return ((NodeAutoCompletion)o).getIdGroup();
         }
     }
 }

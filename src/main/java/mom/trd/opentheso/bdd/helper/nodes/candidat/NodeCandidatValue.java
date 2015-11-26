@@ -2,7 +2,7 @@ package mom.trd.opentheso.bdd.helper.nodes.candidat;
 
 import java.io.Serializable;
 
-public class NodeCandidatList implements Serializable {
+public class NodeCandidatValue implements Serializable {
     
     private static final long serialVersionUID = 1L;
     private String idConcept;

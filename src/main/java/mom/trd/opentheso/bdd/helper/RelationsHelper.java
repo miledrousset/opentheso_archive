@@ -444,17 +444,12 @@ public class RelationsHelper {
         try {
 
             try {
-                conn.setAutoCommit(false);
                 stmt = conn.createStatement();
                 try {
                     if (!new RelationsHelper().addRelationHistorique(conn, idConceptBT, idThesaurus, idConceptNT, "NT", idUser, "DEL")) {
-                        conn.rollback();
-                        conn.close();
                         return false;
                     }
                     if (!new RelationsHelper().addRelationHistorique(conn, idConceptNT, idThesaurus, idConceptBT, "BT", idUser, "DEL")) {
-                        conn.rollback();
-                        conn.close();
                         return false;
                     }
                     String query = "delete from hierarchical_relationship"
@@ -472,7 +467,6 @@ public class RelationsHelper {
 
                     stmt.executeUpdate(query);
                     status = true;
-                    conn.commit();
                 } finally {
                     stmt.close();
                 }
@@ -552,7 +546,200 @@ public class RelationsHelper {
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de supprimer la relation TT d'un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idGroup
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+    public boolean deleteRelationTT(Connection conn,
+            String idConcept, String idGroup, String idThesaurus,
+            int idUser) {
 
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            conn.setAutoCommit(false);
+            try {
+                stmt = conn.createStatement();
+                try {
+
+                    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
+                        return false;
+                    }
+
+                    String query = "UPDATE Concept set"
+                            + " top_concept = false,"
+                            + " modified = current_date"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus = '" + idThesaurus + "'"
+                            + " AND id_group = '" + idGroup + "'"; 
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting relation TT of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }
+    
+    /**
+     * Cette fonction permet de supprimer la relation MT ou domaine à un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idGroup
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean deleteRelationMT(Connection conn,
+            String idConcept, String idGroup, String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            conn.setAutoCommit(false);
+            try {
+                stmt = conn.createStatement();
+                try {
+
+                /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
+                        return false;
+                    }*/
+                    String query = "UPDATE concept set"
+                            + " id_group = '" + "" + "'," 
+                            + " modified = current_date"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus = '" + idThesaurus + "'"
+                            + " AND id_group = '" + idGroup + "'"; 
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting relation TT of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }
+    
+    /**
+     * Cette fonction permet d'ajouter une relation MT ou domaine à un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idGroup
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean setRelationMT(Connection conn,
+            String idConcept, String idGroup, String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            conn.setAutoCommit(false);
+            try {
+                stmt = conn.createStatement();
+                try {
+
+                /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
+                        return false;
+                    }*/
+                    String query = "UPDATE concept set"
+                            + " id_group = '" + idGroup + "'," 
+                            + " modified = now()"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus = '" + idThesaurus + "'"; 
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }    
+
+    /**
+     * Cette fonction permet d'ajouter une relation TT à un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idGroup
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+    public boolean addRelationTT(Connection conn,
+            String idConcept, String idGroup, String idThesaurus,
+            int idUser) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            conn.setAutoCommit(false);
+            try {
+                stmt = conn.createStatement();
+                try {
+
+                    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "ADD")) {
+                        return false;
+                    }
+
+                    String query = "UPDATE Concept set"
+                            + " top_concept = true,"
+                            + " modified = current_date"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus = '" + idThesaurus + "'"
+                            + " AND id_group = '" + idGroup + "'"; 
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding relation TT of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }      
+    
     /**
      * Cette fonction permet de supprimer toutes les relations d'un concept
      *

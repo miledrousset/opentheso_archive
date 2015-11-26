@@ -80,6 +80,7 @@
             <div id="clean" />
             <ui:include src="popUpIndex.xhtml" />
             <ui:include src="historique.xhtml" />
+            <ui:include src="conceptPopUp.xhtml" />
             <!-- GESTIONNAIRE DEBUT -->  
             <div id="SplitterVertical1">
 
@@ -333,13 +334,12 @@
                         <!-- SOUS ARBRE FIN -->
                     </p:accordionPanel>
                 </div>
-
                 <div>
                     <div id="SplitterVertical2" itemscope="article" itemtype="http://schema.org/Article">
                         <div id="principale">
                             <!-- CONTENU CENTRAL DEBUT -->  
                             <!-- <div id="contenuPrincipale" style="background-image: url(/opentheso/images/panda_roue2.jpg)">-->
-
+                                                
                             <div id="contenuPrincipale">
                                 <h:panelGroup id="panContenu">
                                     <div style="text-align: center" >
@@ -384,8 +384,9 @@
                                                             <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
                                                                 <p:menuitem value="#{langueBean.getMsg('panel.addBT')}" actionListener="#{vue.setAddTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" actionListener="#{vue.setAddTGen(2)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setAddTGen(3)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" actionListener="#{vue.setDelTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                               
+                                                                                                                                                                                             
                                                             </p:menu>
 
                                                         </h:form>
@@ -420,6 +421,10 @@
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" actionListener="#{vue.setAddTInfo(2)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
+                                                            <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setMoveBranch(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setMoveBranchFromMT(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.addToMT')}" actionListener="#{vue.setMoveBranchToMT(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                         </p:menu>
                                                     </h:form>
                                                 </div>
@@ -430,7 +435,6 @@
                                                 <span itemprop="name" style="font-size: 17px; font-weight: bold;">
                                                     <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
                                                 </span>
-
                                                 <h:outputText id="idC" value="Concept_Id : #{selectedTerme.idC}"/><br/>
                                                 <span itemprop="citation">
                                                     <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
@@ -851,6 +855,16 @@
                 </div>
             </footer>
         </center>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-58798616-3', 'auto');
+          ga('send', 'pageview');
+
+        </script>        
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
@@ -862,22 +876,5 @@
                 </f:facet>
             </p:ajaxStatus>
         </ui:insert>
-        <script>
-            (function (i, s, o, g, r, a, m) {
-                i['GoogleAnalyticsObject'] = r;
-                i[r] = i[r] || function () {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
-                a = s.createElement(o),
-                        m = s.getElementsByTagName(o)[0];
-                a.async = 1;
-                a.src = g;
-                m.parentNode.insertBefore(a, m)
-            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-            ga('create', 'UA-58798616-3', 'auto');
-            ga('send', 'pageview');
-
-        </script>
     </h:body>
 </html>

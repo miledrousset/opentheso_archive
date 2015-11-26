@@ -1,6 +1,8 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,7 @@ import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
+import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
@@ -56,6 +59,9 @@ public class TreeBean implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
+    
+    @ManagedProperty(value = "#{conceptbean}")
+    private ConceptBean conceptbean;
 
     /**
      * ************************** INITIALISATION ***************************
@@ -266,12 +272,9 @@ public class TreeBean implements Serializable {
     //    if (!event.getTreeNode().getType().equals("orphan")) {
         // séparation des cliques entre les orphélins et les concepts
         if (!((MyTreeNode) event.getTreeNode()).getIdDomaine().equalsIgnoreCase("orphan")) {
-
-            //     ((MyTreeNode) event.getTreeNode()).getIdDomaine().equalsIgnoreCase("orphan");
             selectedTerme.majTerme((MyTreeNode) selectedNode);
         } else {
             selectedTerme.majTerme((MyTreeNode) selectedNode);
-        //    selectedTerme.reInitTerme();
         }
         vue.setOnglet(0);
         selectedTerme.setTree(0);
@@ -282,9 +285,9 @@ public class TreeBean implements Serializable {
      */
     public void reExpand() {
         if (selectedNode == null) {
-            selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
+      //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
-        selectedNode.setSelected(false);
+    //    selectedNode.setSelected(false);
         for (TreeNode tn : selectedNodes) {
             tn.setSelected(false);
         }
@@ -304,6 +307,7 @@ public class TreeBean implements Serializable {
      * @param langue
      */
     private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue) {
+      //  if(selectedNodes.isEmpty()){
         if (root.getChildCount() == 0) {
             // On recrÃ©e la racine
             List<NodeGroup> racineNode = new GroupHelper().getListConceptGroup(connect.getPoolConnexion(), idTheso, langue);
@@ -516,6 +520,52 @@ public class TreeBean implements Serializable {
         initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
         selectedTerme.reInitTerme();
     }
+
+    /**
+     * Cette fonction permet de supprimer le ou les orphelins (une branche à partir du concept orphelin sélectionné
+     * @return 
+     */
+    public boolean delOrphans() {
+        if(!deleteOrphanBranch(connect.getPoolConnexion(),
+                selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return false;
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info8")));
+        conceptbean.setDeleteBranchOrphan(0);
+        reInit();
+        initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.reInitTerme();
+        return true;
+    }
+    
+        /**
+     * Fonction recursive qui permet de supprimer une branche d'orphelins un concept de tête 
+     * et thesaurus. La suppression est descendante qui ne supprime pas les autres branches remontantes.
+     * @param conn
+     * @param idConcept
+     * @param idTheso
+     * @return 
+     */
+    private boolean deleteOrphanBranch(HikariDataSource ds, String idConcept, String idTheso, int idUser) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        ArrayList <String> listIdsOfConceptChildren = 
+                conceptHelper.getListChildrenOfConcept(ds,
+                        idConcept, idTheso);
+
+        if(!conceptHelper.deleteConceptForced(ds, idConcept, idTheso, idUser))
+            return false;
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+       //     if(!conceptHelper.deleteConceptForced(ds, listIdsOfConceptChildren1, idTheso, idUser))
+        //        return false;
+            deleteOrphanBranch(ds, listIdsOfConceptChildren1, idTheso, idUser);
+        }
+        return true;
+    }    
+    
     
     /**
      * Mise à jour du terme et de l'abre lors de la selection d'un terme lié
@@ -554,15 +604,21 @@ public class TreeBean implements Serializable {
         selectedTerme.setValueEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
         if (selectedTerme.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }
+        
+        String temp = selectedTerme.getValueEdit();
+        
+        if (selectedTerme.getValueEdit().trim().equalsIgnoreCase(selectedTerme.getNom())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
+            return;
+        }        
+        if (!selectedTerme.creerTermeSpe()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
         } else {
-            String temp = selectedTerme.getValueEdit();
-            if (!selectedTerme.creerTermeSpe()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-            } else {
-                reInit();
-                reExpand();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info1")));
-            }
+            reInit();
+            reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info1")));
         }
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
     }
@@ -757,4 +813,16 @@ public class TreeBean implements Serializable {
     public void setLangueBean(LanguageBean langueBean) {
         this.langueBean = langueBean;
     }
+
+    public ConceptBean getConceptbean() {
+        return conceptbean;
+    }
+
+    public void setConceptbean(ConceptBean conceptbean) {
+        this.conceptbean = conceptbean;
+    }
+
+
+    
+    
 }

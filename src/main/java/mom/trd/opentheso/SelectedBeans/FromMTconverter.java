@@ -6,8 +6,8 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 
-@FacesConverter("termConverter")
-public class TermeConverter implements Converter{
+@FacesConverter("fromMTconverter")
+public class FromMTconverter implements Converter{
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {

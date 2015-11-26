@@ -80,8 +80,8 @@ public class AlignmentQuery {
     private ArrayList<NodeAlignment> queryWikipedia(String idC, String idTheso, String lexicalValue, String lang) {
         listeAlign = new ArrayList<>();
         try {
-            lexicalValue.replaceAll(" ", "_");
-            URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue);
+            lexicalValue = lexicalValue.replaceAll(" ", "%20");
+            URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue + "&srnamespace=0");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/xml");
@@ -127,13 +127,26 @@ public class AlignmentQuery {
                                 snippet = el.getAttribute("snippet") + "...";
                             }
                             NodeAlignment na = new NodeAlignment();
-                            na.setConcept_target(title);
-                            na.setDef_target(snippet);
-                            na.setInternal_id_concept(idC);
-                            na.setInternal_id_thesaurus(idTheso);
-                            na.setThesaurus_target("Wikipedia");
-                            na.setUri_target("https://" + lang + ".wikipedia.org/wiki/" + title.replaceAll(" ", "_"));
-                            listeAlign.add(na);
+                            //si le titre est équivalent, on le place en premier
+                            if(lexicalValue.trim().equalsIgnoreCase(title.trim())) {
+                                na.setConcept_target(title);
+                                na.setDef_target(snippet);
+                                na.setInternal_id_concept(idC);
+                                na.setInternal_id_thesaurus(idTheso);
+                                na.setThesaurus_target("Wikipedia");
+                                na.setUri_target("https://" + lang + ".wikipedia.org/wiki/" + title.replaceAll(" ", "_"));
+                                listeAlign.add(0, na);
+                            }
+                            else {
+                                na.setConcept_target(title);
+                                na.setDef_target(snippet);
+                                na.setInternal_id_concept(idC);
+                                na.setInternal_id_thesaurus(idTheso);
+                                na.setThesaurus_target("Wikipedia");
+                                na.setUri_target("https://" + lang + ".wikipedia.org/wiki/" + title.replaceAll(" ", "_"));
+                                listeAlign.add(na);
+                            }
+                            
                         }
                     }
                 }

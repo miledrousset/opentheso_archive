@@ -118,6 +118,43 @@ public class AlignmentHelper {
             log.error("Error while deleting alignment from thesaurus with idAlignment : " + idAlignment, sqle);
         }
         return status;
+    }
+    
+    /**
+     * Cette focntion permet de supprimer tous les aligenements d'un concept
+     * @param conn
+     * @param idConcept
+     * @param idThesaurus 
+     * @return  
+     */
+    public boolean deleteAlignmentOfConcept(Connection conn,
+            String idConcept, String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from alignement "
+                            + " where internal_id_concept = " + idConcept
+                            + " and internal_id_thesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting alignment from thesaurus with idConcept : " + idConcept, sqle);
+        }
+        return status;
     }    
     
     /**

@@ -471,11 +471,95 @@ public class ConceptHelper {
 
         TermHelper termHelper = new TermHelper();
         RelationsHelper relationsHelper = new RelationsHelper();
+        NoteHelper noteHelper = new NoteHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
 
         // controle si le Concept a des fils avant de le supprimer
         if (relationsHelper.isRelationNTExist(ds, idConcept, idThesaurus)) {
             return false;
         }
+
+        String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
+        if (idTerm == null) {
+            return false;
+        }
+
+        // suppression du term avec les traductions et les synonymes
+        // gestion du Rollback en cas d'erreur
+        Connection conn = null;
+        try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            if (!termHelper.deleteTerm(conn, idTerm, idThesaurus, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            if (!relationsHelper.deleteAllRelationOfConcept(conn, idConcept, idThesaurus, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            
+            if (!noteHelper.deleteNotesOfConcept(conn, idConcept, idThesaurus)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            
+            if (!noteHelper.deleteNotesOfTerm(conn, idTerm, idThesaurus)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            
+            if (!alignmentHelper.deleteAlignmentOfConcept(conn, idConcept, idThesaurus)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            } 
+            
+            if (!deleteConceptFromTable(conn, idConcept, idThesaurus, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            conn.commit();
+            conn.close();
+            return true;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    conn.close();
+                } catch (SQLException ex1) {
+                    Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Cette fonction permet de supprimer un Concept avec ses relations et
+     * traductions, notes, alignements, ...
+     * pas de controle s'il a des fils, c'est une suppression définitive
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+    public boolean deleteConceptForced(HikariDataSource ds,
+            String idConcept, String idThesaurus, int idUser) {
+
+        TermHelper termHelper = new TermHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
 
         String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
         if (idTerm == null) {
@@ -522,8 +606,8 @@ public class ConceptHelper {
             }
             return false;
         }
-    }
-
+    }    
+    
     public boolean deleteGroupOfConcept(HikariDataSource ds,
             String idConcept, String idGroup, String idThesaurus, int idUser) {
 
@@ -640,6 +724,70 @@ public class ConceptHelper {
         }
         return false;
     }
+    
+    /**
+     * Cette fonction permet de déplacer une Branche vers un domaine
+     * Le domaine de destination est le même que la branche  (déplamcent dans le même domaine)
+     *
+     * @param conn
+     * @param idConcept
+     * @param idOldConceptBT
+     * @param idMT
+     * @param idThesaurus
+     * @param idUser
+     * @return true or false
+     */
+    public boolean moveBranchToMT(Connection conn,
+            String idConcept,
+            String idOldConceptBT, String idMT,
+            String idThesaurus, int idUser) {
+        try {
+            RelationsHelper relationsHelper = new RelationsHelper();
+            conn.setAutoCommit(false);
+
+            if (!relationsHelper.deleteRelationBT(conn, idConcept, idThesaurus, idOldConceptBT, idUser)) {
+                return false;
+            }
+            return relationsHelper.addRelationTT(conn, idConcept, idMT, idThesaurus, idUser);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }
+    
+    /**
+     * Cette fonction permet de déplacer une Branche d'un domaine
+     * vers un concept dans le thésaurus
+     * Le domaine de destination est le même que la branche (déplacement dans le même domaine)
+     *
+     * @param conn
+     * @param idConcept
+     * @param idNewConcept
+     * @param idMT
+     * @param idThesaurus
+     * @param idUser
+     * @return true or false
+     */
+    public boolean moveBranchFromMT(Connection conn,
+            String idConcept,
+            String idNewConcept, String idMT,
+            String idThesaurus, int idUser) {
+        try {
+            RelationsHelper relationsHelper = new RelationsHelper();
+            conn.setAutoCommit(false);
+
+            if (!relationsHelper.deleteRelationTT(conn, idConcept, idMT, idThesaurus, idUser)) {
+                return false;
+            }
+            return relationsHelper.addRelationBT(conn, idConcept, idThesaurus, idNewConcept, idUser);
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }      
 
     /**
      * Cette fonction permet de supprimer un ConceptCandidat
@@ -672,9 +820,10 @@ public class ConceptHelper {
 
      return idConceptCandidat;
      }*/
+    
+    
     /**
-     * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
-     * libellé
+     * Cette fonction permet d'ajouter une traduction à un terme
      *
      * @param ds
      * @param term

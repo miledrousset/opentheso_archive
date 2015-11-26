@@ -146,6 +146,100 @@ public final class Ark_Client {
     //    System.out.println("ark.result=" + returnedArk.getArk());
     }
     
+    public String updateArkId(String date, String url, String title, 
+            String creator, ArrayList<DcElement> dcElementsList, String type) {
+
+     // compte de Frantiq
+        Account account = login(
+                propertiesArk.getProperty("idNaan"),
+                propertiesArk.getProperty("user"),
+                propertiesArk.getProperty("password"));
+        
+        
+    //    System.out.println("authentification.result=" + account.getUser().getFirstname() + " " + account.getUser().getLastname());
+        Ark inputArk = new Ark();
+        inputArk.setDate(date);
+        inputArk.setUrlTarget(url);
+        inputArk.setTitle(title);
+        //prefixes à définir type DCMI
+        inputArk.setType(type);//"pcrt");
+        
+        inputArk.setCreator(creator);
+      
+        for (DcElement dcElementsList1 : dcElementsList) {
+            inputArk.getDcElements().add(dcElementsList1);
+        }
+        Ark returnedArk = updateArk(account, inputArk);
+        
+        /*
+        for(DcElement dcElement : returnedArk.getDcElements()){
+        	System.out.println(dcElement.getName()+" = " +dcElement.getValue());
+        }
+        */
+        return returnedArk.getArk();
+        
+        // Liste des DcElements
+    /*     
+        EL_ABSTRACT = "abstract",
+        EL_ACCRIGHTS = "accessRights",
+        EL_ACCMETHOD = "accrualMethod",
+        EL_ACCPERIOD = "accrualPeriodicity",
+        EL_ACCPOLICY = "accrualPolicy",
+        EL_ALT = "alternative",
+        EL_AUDIENCE = "audience",
+        EL_AVAILABLE = "available",
+        EL_BIBCITE = "bibliographicCitation",
+        EL_CONFORMS = "conformsTo",
+        EL_CONTRIB = "contributor",
+        EL_COVERAGE = "coverage",
+        EL_CREATED = "created",
+        EL_CREATOR = "creator",
+        EL_DATE = "date",
+        EL_DATEACC = "dateAccepted",
+        EL_DATECPR = "dateCopyrighted",
+        EL_DATESUB = "dateSubmitted",
+        EL_DESC = "description",
+        EL_EDUCLEVEL = "educationLevel",
+        EL_EXTENT = "extent",
+        EL_FORMAT = "format",
+        EL_HASFORMAT = "hasFormat",
+        EL_HASPART = "hasPart",
+        EL_HASVERS = "hasVersion",
+        EL_ID = "identifier",
+        EL_INSTMETHOD = "instructionalMethod",
+        EL_ISFMTOF = "isFormatOf",
+        EL_ISPARTOF = "isPartOf",
+        EL_ISREFBY = "isReferencedBy",
+        EL_ISREPBY = "isReplacedBy",
+        EL_ISREQBY = "isRequiredBy",
+        EL_ISSUED = "issued",
+        EL_ISVSNOF = "isVersionOf",
+        EL_LANG = "language",
+        EL_LICENSE = "license",
+        EL_MEDIATOR = "mediator",
+        EL_MEDIUM = "medium",
+        EL_MOD = "modified",
+        EL_PROV = "provenance",
+        EL_PUB = "publisher",
+        EL_REFS = "references",
+        EL_REL = "relation",
+        EL_REP = "replaces",
+        EL_REQ = "requires",
+        EL_RIGHTS = "rights",
+        EL_RIGHTSHOLDER = "rightsHolder",
+        EL_SOURCE = "source",
+        EL_SPATIAL = "spatial",
+        EL_SUBJECT = "subject",
+        EL_TOC = "tableOfContents",
+        EL_TEMPORAL = "temporal",
+        EL_TITLE = "title",
+        EL_TYPE = "type",
+        EL_VALID = "valid";
+        */
+
+    //    System.out.println("ark.result=" + returnedArk.getArk());
+    }    
+    
     private static Ark updateArk(Account account, Ark ark){
       	 URL wsdlURL = ArkManagerService.WSDL_LOCATION;
       	 ArkManagerService ss = new ArkManagerService(wsdlURL, ARKMANAGER_SERVICE_NAME);

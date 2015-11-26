@@ -127,6 +127,45 @@ public class OrphanHelper {
         return status;
     }    
     
+    
+    /**
+     * Cette fonction permet de supprimer une branche du thésaurus (type Orphelins)
+     * Il faut controler si un des concepts fait pas partie d'autres branches (plusieurs BT), 
+     * alors, on ne supprime que la branche descendante. 
+     * @param conn
+     * @param idConcept 
+     * @param idThesaurus 
+     * @param idUser 
+     * @return  true or false
+     */
+    public boolean deleteOrphanBranch2(Connection conn,
+            String idConcept, String idThesaurus, int idUser) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from concept_orphan "
+                            + " where id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+      //          conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting orphan concept : " + idConcept, sqle);
+        }
+        return status;
+    }
+    
     /**
      * Cette fonction permet de savoir si le Concept est un orphelin ou non
      * @param ds

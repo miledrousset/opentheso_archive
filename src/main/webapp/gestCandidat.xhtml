@@ -143,7 +143,7 @@
                             <tr>
                                 <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
                                 <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t"
+                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
                                                     itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
                                         <f:facet name="itemtip">
                                             <h:panelGrid columns="2" cellpadding="5" width="200" >
@@ -172,7 +172,7 @@
                             </tr>
                         </table><br/>
                         <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                         update=":panAjProp,:gestionCandidat"/>
+                                         update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt"/>
                     </h:form>
                 </h:panelGroup>
             </h:panelGroup>
@@ -187,7 +187,7 @@
                         <div id="divClose">
                             <h:form>
                                 <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setEditPropCandidat(false)}" 
-                                                 update=":panEditProp" />
+                                                 update=":panEditProp,:gestionCandidat,:tableCdt" />
                             </h:form>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                             <tr>
                                 <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
                                 <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="tep"
+                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="tep" forceSelection="true"
                                                     itemLabel="#{tep.termLexicalValue}" itemValue="#{tep}" converter="termConverter" styleClass="styleAutoCompCdt">
                                         <f:facet name="itemtip">
                                             <h:panelGrid columns="2" cellpadding="5" width="200" >
@@ -331,7 +331,7 @@
                                     : 
                                 </td>
                                 <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t"
+                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
                                                     itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
                                         <f:facet name="itemtip">
                                             <h:panelGrid columns="2" cellpadding="5" width="200" >
@@ -477,7 +477,7 @@
                     <div style="float: left; margin-left: 30px;">
                         <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null)}">
                             <p:commandButton id="cbAjCandidat" styleClass="styleButton"  value="#{langueBean.getMsg('cdt.btnAddCdt')}"
-                                             actionListener="#{vue.setAddCandidat(true)}" update=":panAjCdt" /><br/>
+                                             actionListener="#{vue.setAddCandidat(true)}" update=":gestionCandidat,:tableCdt,:panAjCdt" /><br/>
                         </h:form>
                     </div>
 
@@ -491,7 +491,7 @@
                     <div style="float: right; margin-right: 30px;">
                         <h:form  rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.userHaveProp() != true) and (selectedCandidat.selected.etat == 'a')}">
                             <p:commandButton id="cbAjPropCandidat" styleClass="styleButton"  value="#{langueBean.getMsg('cdt.btnAddProp')}"
-                                             actionListener="#{vue.setAddPropCandidat(true)}" update=":panAjProp" />
+                                             actionListener="#{vue.setAddPropCandidat(true)}" update=":panAjProp,:gestionCandidat,:tableCdt" />
                         </h:form>
 
                         <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">
@@ -562,30 +562,22 @@
                             <h:outputText value="#{selectedCandidat.msgAdm.message}" />
                         </div>
                     </h:panelGroup>
-                    <h:panelGroup id="manuelInsertion2" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                        <h:form>
-                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
-                                <p:commandButton value="Ok" icon="ui-icon-check" actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" update=":panEditProp" />
-                            </h:panelGrid>
-                        </h:form>
-                    </h:panelGroup>
                     
-                    
-                    
-                                <h:panelGroup id="manuelInsertion3" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                                    <h:form rendered="#{(user1.haveRights(1))}">
-                                        <p:commandButton value="Ok" icon="ui-icon-ok" update=":panEditProp,:tableCdt"
-                                                         actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
-                                            <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  
-                                        </p:commandButton>   
+                    <h:panelGroup id="manuelInsertion" rendered="#{selectedCandidat.selected.etat == 'v'}">
+                        <h:form rendered="#{(user1.haveRights(1))}">
+                            <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
+                            <p:commandButton icon="ui-icon-ok" update=":gestionCandidat,:panValidCdt,:tableCdt"
+                                             actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
+                                           
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid3')}" icon="ui-icon-alert" />  
+                            </p:commandButton>   
 
-                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                            <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                                        </p:confirmDialog> 
-                                    </h:form>
-                                 </h:panelGroup>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                     </h:panelGroup>
                     
                     
                     

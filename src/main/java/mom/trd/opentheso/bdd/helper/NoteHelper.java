@@ -868,4 +868,73 @@ public class NoteHelper {
         return existe;
     }
 
+    
+    /**
+     * Cette fonction permet de supprimer les notes d'un Concept
+     * 
+     * @param conn
+     * @param idConcept
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean deleteNotesOfConcept(Connection conn,
+            String idConcept, String idThesaurus) {
+
+        Statement stmt;
+        try {
+            // Get connection from pool
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from note"
+                            + " where id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeUpdate(query);
+                    return true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting all notes of Concept : " + idConcept, sqle);
+        }
+        return false;
+    }
+    
+    /**
+     * Cette fonction permet de supprimer les notes d'un Concept
+     * 
+     * @param conn
+     * @param idTerm
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean deleteNotesOfTerm(Connection conn,
+            String idTerm, String idThesaurus) {
+
+        Statement stmt;
+        try {
+            // Get connection from pool
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from note"
+                            + " where id_term = '" + idTerm + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeUpdate(query);
+                    return true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting all notes of Term : " + idTerm, sqle);
+        }
+        return false;
+    }      
+    
 }

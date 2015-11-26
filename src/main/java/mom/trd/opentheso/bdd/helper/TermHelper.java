@@ -1707,7 +1707,7 @@ public class TermHelper {
         Statement stmt;
         ResultSet resultSet;
         boolean existe = false;
-
+        
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -1864,6 +1864,7 @@ public class TermHelper {
         Statement stmt;
         ResultSet resultSet;
         boolean existe = false;
+        title = new StringPlus().convertString(title);
 
         try {
             // Get connection from pool
@@ -1915,6 +1916,7 @@ public class TermHelper {
         Statement stmt;
         ResultSet resultSet;
         boolean existe = false;
+        title = new StringPlus().convertString(title);
 
         try {
             // Get connection from pool
