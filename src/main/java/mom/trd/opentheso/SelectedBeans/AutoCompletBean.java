@@ -312,6 +312,7 @@ public class AutoCompletBean implements Serializable {
             tree.reInit();
             tree.reExpand();
             terme.getVue().setMoveBranchFromMT(0);
+            terme.getVue().setMoveBranchFromOrphin(0);
             selectedAtt = new NodeAutoCompletion();
             selectedNode = null;
             return true;
@@ -425,6 +426,7 @@ public class AutoCompletBean implements Serializable {
             tree.reInit();
             tree.reExpand();
             terme.getVue().setMoveBranchToMT(0);
+            terme.getVue().setMoveBranchFromOrphinToMT(0);
             selectedAtt = new NodeAutoCompletion();
             return true;
         } catch (SQLException ex) {

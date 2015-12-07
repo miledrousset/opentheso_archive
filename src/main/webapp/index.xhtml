@@ -379,19 +379,17 @@
                                                 <h:panelGroup id="panFormEditTGen">
                                                     <div id="imageEdition">
                                                         <h:form id="formEditTGen" 
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden')}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
 
                                                             <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
-                                                                <p:menuitem value="#{langueBean.getMsg('panel.addBT')}" actionListener="#{vue.setAddTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" actionListener="#{vue.setAddTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                                 <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" actionListener="#{vue.setDelTGen(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                               
-                                                                                                                                                                                             
                                                             </p:menu>
 
                                                         </h:form>
                                                     </div>
-                                                </h:panelGroup>
+                                                </h:panelGroup>s
                                             </div>
                                             <div class="contenuGenerique">
                                                 <h:panelGroup id="gene">
@@ -414,21 +412,29 @@
 
                                             <div class="contenuTerme">
                                                 <div id="imageEdition">
-                                                    <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2))}">
+                                                    <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" actionListener="#{vue.setAddTInfo(2)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-                                                            <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setMoveBranch(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setMoveBranchFromMT(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.addToMT')}" actionListener="#{vue.setMoveBranchToMT(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                         </p:menu>
                                                     </h:form>
+                                                    <!--options pour les orphelins -->
+                                                    <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine == 'Orphan')}">
+                                                        <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
+                                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
+                                                            <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" actionListener="#{vue.setMoveBranchFromOrphin(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.addToMT')}" actionListener="#{vue.setMoveBranchFromOrphinToMT(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                        </p:menu>
+                                                    </h:form>
                                                 </div>
-
                                                 <script type="application/ld+json">
                                                     <h:outputText value="#{theso.getMetaData()}" />
                                                 </script>
@@ -462,8 +468,20 @@
                                                         <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
                                                     </ui:repeat>
                                                 </h:panelGroup>
+                                                
+                                                <!-- affichage du nombre total des fils -->
+                                                <span itemprop="totalOfBranch">
+                                                    <p:tooltip />
+                                                    <h:form>
+                                                        <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
+                                                        <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
+                                                    </h:form>
+                                                </span>
+                                                
+                                                
+                                                
+                                                
                                                 <!-- affichage de l'URL pérenne-->
-
 
                                                 <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
                                                 <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
@@ -500,7 +518,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.NT')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTSpe" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden')}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTSpe" styleClass="cbEdit" icon="ui-icon-edit"  
                                                                          actionListener="#{vue.setAddTSpe(true)}" 
                                                                          update=":panPopUp" />
@@ -532,7 +550,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.RT')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTAsso"
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1))}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1) and (selectedTerme.idDomaine != 'Orphan'))}">
                                                         <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" actionListener="#{vue.setAddTAsso(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -564,7 +582,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.UF')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTSyno" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden')}">                                                        
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
                                                         <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" actionListener="#{vue.setAddTSyno(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -600,7 +618,7 @@
                                                     <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
                                                     <div id="imageEdition">
                                                         <h:form id="formEditNote" 
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2))}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine != 'Orphan')}">
 
                                                             <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
@@ -664,7 +682,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.align')}" />
                                                 <div id="imageEdition">
                                                     <h:form id="formEditAlign" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden')}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                                                          styleClass="cbEdit" icon="ui-icon-edit" >
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
@@ -711,7 +729,7 @@
 
                                             <div id="imageEdition">
                                                 <h:form id="formEditTrad" 
-                                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (selectedTerme.status != 'hidden')}">
+                                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit" />
                                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
                                                         <p:menuitem value="#{langueBean.getMsg('index.addTrad')}" actionListener="#{vue.setAddTrad(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -742,7 +760,7 @@
                                                     <h:outputText value="#{langueBean.getMsg('index.facet')}" /> 
                                                     <div id="imageEdition">
                                                         <h:form id="formEditFacette" target="_blanc"
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden')}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                             <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit" 
                                                                              action="#{vue.setAddFacette(true)}" update=":panPopUp" />
                                                         </h:form>
@@ -787,7 +805,7 @@
                                                     </h:form>
                                                     <h:outputText value="#{langueBean.getMsg('index.picture')}" /> 
                                                     <div id="imageEdition">
-                                                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden')}">
+                                                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                             <p:commandButton id="cbEditThesoImage" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"  
                                                                              actionListener="#{vue.setAddImage(true)}" update=":panPopUp" />
                                                         </h:form>

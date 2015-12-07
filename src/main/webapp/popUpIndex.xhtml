@@ -277,7 +277,107 @@
                     </fieldset>
                 </h:panelGroup>
             </h:panelGroup>
-        </h:panelGroup>        
+        </h:panelGroup>    
+            
+        <h:panelGroup id="moveBranchFromOrphin" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.moveBranchFromOrphin != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.moveBranchFromOrphin != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setMoveBranchFromOrphin(0)}" update=":moveBranchFromOrphin" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>
+                <h:panelGroup rendered="#{vue.moveBranchFromOrphin == 1}">
+                    <fieldset>
+                        <legend><h:outputText value="#{langueBean.getMsg('popup.move')}" /></legend>
+                        <h:form>
+                            <p:messages showDetail="true" autoUpdate="true" /><br/>
+                            <table>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                                    <td>
+                                        <h:outputText value="#{autoComp.terme.idDomaine}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                                    <td>
+                                        <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                                        itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
+                                            <f:facet name="itemtip">
+                                                <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                                    <f:facet name="header" rendered="#{(t1.url) != null}">
+                                                        <h:outputText value="ID : " />
+                                                        <h:outputText value="#{t1.idConcept}" />
+                                                    </f:facet>
+
+                                                    <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                                    <h:outputText value="#{t1.groupLexicalValue}" />
+
+                                                    <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                                    <h:outputText value="#{t1.definition}" />
+                                                </h:panelGrid>
+                                            </f:facet>
+                                        </p:autoComplete>
+                                    </td>
+                                </tr>
+                            </table><br/>
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromDomain()}"
+                                             update=":moveBranchFromOrphin,:panContenu,:accordeonTree" styleClass="styleButton" />
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:panelGroup>      
+            
+         <h:panelGroup id="moveBranchFromOrphinToMT" style="background: transparent; box-shadow: none;">
+            <h:panelGroup rendered="#{vue.moveBranchFromOrphinToMT != 0}" styleClass="overlay" />
+            <h:panelGroup rendered="#{vue.moveBranchFromOrphinToMT != 0}" styleClass="popUp" style="width: 250px;">
+                <div id="titreAllEdit">
+                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
+                    <div id="divClose">
+                        <h:form>
+                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
+                                             actionListener="#{vue.setMoveBranchFromOrphinToMT(0)}" update=":moveBranchFromOrphinToMT" />
+                        </h:form>
+                    </div>
+                </div>
+                <br/>            
+                <!-- Cas d'ajout de déplacement d'une branche vers un domaine -->
+                <h:panelGroup rendered="#{vue.moveBranchFromOrphinToMT == 1}">
+                    <fieldset>
+                        <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
+                        <h:form>
+                            <p:messages showDetail="true" autoUpdate="true" /><br/>
+                            <table>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                                    <td>
+                                        <h:outputText value="#{autoComp.terme.idDomaine}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                                    <td>
+                                        <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completGroup}" var="t1"
+                                                        itemLabel="#{t1.groupLexicalValue}" itemValue="#{t1}" converter="groupConverter" forceSelection="true">
+
+                                        </p:autoComplete>
+                                    </td>
+                                </tr>
+                            </table><br/>
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToDomain()}"
+                                             update=":moveBranchFromOrphinToMT,:panContenu,:accordeonTree" styleClass="styleButton" />
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>                
+            </h:panelGroup>
+        </h:panelGroup>           
             
         <h:panelGroup id="moveBranchToMT" style="background: transparent; box-shadow: none;">
             <h:panelGroup rendered="#{vue.moveBranchToMT != 0}" styleClass="overlay" />

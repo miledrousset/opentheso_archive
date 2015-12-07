@@ -2355,7 +2355,7 @@ public class ConceptHelper {
         }
         return listIdsOfConcept;
     }
-
+    
     /**
      * Cette fonction permet de récupérer la liste des concepts suivant l'id du
      * Concept-Père et le thésaurus sous forme de classe NodeConceptTree (sans

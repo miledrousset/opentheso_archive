@@ -432,6 +432,10 @@ public class ReadFileSKOS {
                         //	System.out.println("CHARACTERS : " + text);
                         resource.addDate(text, SKOSProperty.modified);
                     }
+                    if ("identifier".equals(localName)) {
+                        //	System.out.println("CHARACTERS : " + text);
+                        resource.addIdentifier(text, SKOSProperty.identifier);
+                    }
 
                 }
                 break;

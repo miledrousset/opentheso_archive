@@ -71,7 +71,6 @@ public class Rest {
         config.setAutoCommit(true);
         config.setIdleTimeout(Integer.parseInt(properties.getProperty("idleTimeout")));
         config.setConnectionTimeout(Integer.parseInt(properties.getProperty("connectionTimeout")));
-        config.setJdbc4ConnectionTest(false);
         config.setConnectionTestQuery(properties.getProperty("connectionTestQuery"));
         config.setDataSourceClassName(properties.getProperty("dataSourceClassName"));
         
@@ -122,11 +121,14 @@ public class Rest {
     
     /**
      * La partie REST pour produire du SKOS
+    */
+
+    /**
+     * 
      * @param idConcept
      * @param idTheso
      * @return 
-     */
-    
+    */
     @Path("/skos/concept/id={id}&th={th}")
     @GET
     @Produces("application/xml;charset=UTF-8")
@@ -136,6 +138,20 @@ public class Rest {
         ds.close();
         return skos.toString();
     }
+    
+    /**
+     * 
+     * @param idTheso
+     * @return 
+    */
+    @Path("/skos/concept/th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getAllGroups(@PathParam("th") String idTheso){
+        StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
+        ds.close();
+        return skos.toString();
+    }    
     
     /**
      * Pour retourner un domaine (Groupe) en SKOS
@@ -342,6 +358,23 @@ public class Rest {
         StringBuffer skos = exportFromBDD.exportThisGroup(ds, idThesaurus, idGroup);
         return skos;
     }
+    
+    /**
+     * Fonction qui permet de récupérer les groupes d'un thésauurs
+     * @param idThesaurus
+     * @return skos
+     */
+    private StringBuffer groupsOfThesaurusToSkos(String idThesaurus) {
+                        
+        if(ds == null) return null;
+        if(prefs == null) return null;
+        
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerArk(prefs.getProperty("serverArk"));
+        exportFromBDD.setServerAdress(prefs.getProperty("cheminSite"));
+        StringBuffer skos = exportFromBDD.exportGroupsOfThesaurus(ds, idThesaurus);
+        return skos;
+    }    
     
     /**
      * cette fonction permet de retourner tous les concetps qui contiennenet la valeur recherchée 

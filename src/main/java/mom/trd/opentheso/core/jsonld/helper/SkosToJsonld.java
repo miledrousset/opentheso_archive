@@ -121,6 +121,12 @@ public class SkosToJsonld {
             if(!skosConcept.getDateList().isEmpty()) {
                 addDates(skosConcept.getDateList());
             }
+            
+            // add Identifier / second
+            if(!skosConcept.getSdc().getIdentifier().isEmpty()) {
+                addIdentifier(skosConcept.getSdc().getIdentifier());
+            }
+            
             // add documentations
             if(!skosConcept.getDocumentationsList().isEmpty()){
                 addDocumentations(skosConcept.getDocumentationsList());
@@ -185,6 +191,18 @@ public class SkosToJsonld {
             }
         }
     }
+    
+    /**
+     * Ajout des dates à Json
+     * @param dates 
+     */
+    private void addIdentifier(String identifier) {
+        String id;
+        endElement();
+        id = "      \"" + nameSpaceDcTerms + "identifier" + "\": ";
+        id += "\"" + identifier + "\"";
+        jsonLd.append(id);
+    }    
     
     private void addLabels(ArrayList<SKOSLabel> sKOSLabels) {
         ArrayList <SKOSLabel> prefLabel = new ArrayList<>();

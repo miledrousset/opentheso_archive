@@ -47,6 +47,7 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.bdd.helper.StatisticHelper;
 import mom.trd.opentheso.bdd.helper.FacetHelper;
 import mom.trd.opentheso.bdd.helper.ImagesHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
@@ -691,6 +692,20 @@ public class SelectedTerme implements Serializable {
         }
         return false;
     }
+    
+    /**
+     * Fonction pour trouver le nombre des concepts dans une branche 
+     * @return 
+     */
+    public int getNbConceptOfBranch() {
+
+        StatisticHelper statisticHelper = new StatisticHelper();
+        int tot = statisticHelper.getConceptCountOfBranch(connect.getPoolConnexion(),
+                idC, idTheso);
+        return tot;
+    }
+    
+    
 
     /**
      * $$$$$ deprecated $$$$$$

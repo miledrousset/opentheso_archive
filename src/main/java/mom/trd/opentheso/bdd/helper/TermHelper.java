@@ -1638,7 +1638,7 @@ public class TermHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        List<NodeAutoCompletion> nodeAutoCompletionList = null;
+        List<NodeAutoCompletion> nodeAutoCompletionList = new ArrayList<>();
         text = new StringPlus().convertString(text);
 
         try {
@@ -1647,7 +1647,52 @@ public class TermHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT DISTINCT term.lexical_value, concept.id_concept,"
+                    
+                    String query = 
+                            "SELECT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "FROM preferred_term, term, concept WHERE " +
+                            "preferred_term.id_term = term.id_term AND " +
+                            "preferred_term.id_thesaurus = term.id_thesaurus AND " +
+                            "concept.id_concept = preferred_term.id_concept AND " +
+                            "concept.id_thesaurus = preferred_term.id_thesaurus AND " +
+                            "term.id_thesaurus = '" + idThesaurus + "' AND " +
+                            "term.lexical_value iLIKE '" + text + "' AND " +
+                            "term.lang = '" + idLang + "' AND " +
+                            "concept.status != 'hidden'";
+                    
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+
+                        while (resultSet.next()) {
+                            if (resultSet.getRow() != 0) {
+                                NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                                nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                                nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
+                                        //resultSet.getString("lexicalvalue"));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                                nodeAutoCompletionList.add(nodeAutoCompletion);
+                            }
+                        }
+                    }
+                    query = 
+                            "SELECT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "FROM preferred_term, term, concept WHERE " +
+                            "preferred_term.id_term = term.id_term AND " +
+                            "preferred_term.id_thesaurus = term.id_thesaurus AND " +
+                            "concept.id_concept = preferred_term.id_concept AND " +
+                            "concept.id_thesaurus = preferred_term.id_thesaurus AND " +
+                            "term.id_thesaurus = '" + idThesaurus + "' AND " +
+                            "term.lang = '" + idLang + "' AND " +
+                            "concept.status != 'hidden' AND " +
+                            "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')" +
+                            " ORDER BY term.lexical_value ASC LIMIT 20";
+                    
+
+                    /*
+                    query = "SELECT DISTINCT term.lexical_value, concept.id_concept,"
                             + " concept_group_label.lexicalvalue, concept_group_label.idgroup FROM"
                             + " concept, preferred_term, term, concept_group_label"
                             + " WHERE concept.id_concept = preferred_term.id_concept"
@@ -1659,19 +1704,21 @@ public class TermHelper {
                             + " AND term.lang = '" + idLang + "'"
                             + " AND concept_group_label.lang = '" + idLang + "'"
                             + " AND unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')"
-                            + " ORDER BY term.lexical_value ASC LIMIT 10";
+                            + " ORDER BY term.lexical_value ASC LIMIT 20";
+                    */
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
-                        nodeAutoCompletionList = new ArrayList<>();
+
                         while (resultSet.next()) {
                             if (resultSet.getRow() != 0) {
                                 NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
-                                nodeAutoCompletion.setGroupLexicalValue(resultSet.getString("lexicalvalue"));
-                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
                         }

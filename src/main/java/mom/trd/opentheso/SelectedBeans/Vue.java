@@ -44,6 +44,9 @@ public class Vue implements Serializable {
     private int moveBranch = 0;
     private int moveBranchToMT = 0;
     private int moveBranchFromMT = 0;
+    private int moveBranchFromOrphin = 0;   
+    private int moveBranchFromOrphinToMT = 0;
+    
     private int addTAsso = 0;
     private int addTSyno = 0;
     private int addNote = 0;
@@ -133,6 +136,24 @@ public class Vue implements Serializable {
 
     public void setMoveBranchFromMT(int moveBranchFromMT) {
         this.moveBranchFromMT = moveBranchFromMT;
+    }
+
+    public int getMoveBranchFromOrphinToMT() {
+        return moveBranchFromOrphinToMT;
+    }
+
+    public void setMoveBranchFromOrphinToMT(int moveBranchFromOrphinToMT) {
+        this.moveBranchFromOrphinToMT = moveBranchFromOrphinToMT;
+    }
+
+
+
+    public int getMoveBranchFromOrphin() {
+        return moveBranchFromOrphin;
+    }
+
+    public void setMoveBranchFromOrphin(int moveBranchFromOrphin) {
+        this.moveBranchFromOrphin = moveBranchFromOrphin;
     }
     
     public boolean isEdit() {

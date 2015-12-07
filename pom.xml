@@ -4,7 +4,7 @@
 
     <groupId>mom.trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.0.3</version>
+    <version>4.0.4</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -105,12 +105,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.12</version>
-        </dependency> 
-                
+        </dependency>
         <dependency>
             <groupId>skosapi</groupId>
             <artifactId>skosapi</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

@@ -157,6 +157,10 @@ public class WriteFileSKOS {
             concept.addDate(nodeGroupLabel.getNodeGroupTraductionses().get(0).getCreated().toString(), SKOSProperty.created);
             concept.addDate(nodeGroupLabel.getNodeGroupTraductionses().get(0).getModified().toString(), SKOSProperty.modified);
         }
+        
+        if(!nodeGroupLabel.getIdGroup().isEmpty()){
+            concept.addIdentifier(nodeGroupLabel.getIdGroup(), SKOSProperty.identifier);
+        }
 
         for (NodeUri listIdOfTopConcept1 : listIdOfTopConcept) {
             if(listIdOfTopConcept1.getIdArk() == null || listIdOfTopConcept1.getIdArk().trim().isEmpty()) {
@@ -196,6 +200,10 @@ public class WriteFileSKOS {
 
         concept.addDate(nodeConceptExport.getConcept().getCreated().toString(), SKOSProperty.created);
         concept.addDate(nodeConceptExport.getConcept().getModified().toString(), SKOSProperty.modified);
+        
+        if(!nodeConceptExport.getConcept().getIdConcept().isEmpty()){
+            concept.addIdentifier(nodeConceptExport.getConcept().getIdConcept(), SKOSProperty.identifier);
+        }
 
         for (int i = 0; i < nodeConceptExport.getNodeListIdsOfConceptGroup().size(); i++) {
         //    concept.addRelation(URI + "/concept#" + nodeConceptExport.getNodeListIdsOfConceptGroup().get(i), SKOSProperty.inScheme);

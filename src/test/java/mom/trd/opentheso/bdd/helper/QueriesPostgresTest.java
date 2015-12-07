@@ -48,18 +48,31 @@ public class QueriesPostgresTest {
 
     private HikariDataSource openConnexionPool() {
         HikariConfig config = new HikariConfig();
-        config.setMaximumPoolSize(100);
-        config.setJdbc4ConnectionTest(false);
+        config.setMaximumPoolSize(1000);
         config.setConnectionTestQuery("SELECT 1");
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+        
+        config.setMinimumIdle(1);
+        config.setAutoCommit(true);
+        config.setIdleTimeout(30000);
+        config.setConnectionTimeout(30000);
+        
 
         /*    config.addDataSourceProperty("user", "opentheso");
          config.addDataSourceProperty("password", "opentheso");
          config.addDataSourceProperty("databaseName", "OTW");
          */
+        
+//        dataSource.serverName=localhost
+//dataSource.serverPort=5433
+//dataSource.user=opentheso
+//dataSource.password=opentheso
+//dataSource.databaseName=zoo
+        
+        config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "OTW");
+        config.addDataSourceProperty("databaseName", "zoo");
 
         config.addDataSourceProperty("serverName", "localhost");
         //config.addDataSourceProperty("serverName", "opentheso.mom.fr");
@@ -1158,5 +1171,26 @@ public class QueriesPostgresTest {
             conn.close();
         }*/
     }
+    
+    
+    /**
+     * Test of Opentheso WebServices.
+     */
+    @org.junit.Test
 
+    public void testgGtConceptCountOfBranch() {
+        
+        HikariDataSource conn = openConnexionPool();
+        StatisticHelper statisticHelper = new StatisticHelper();
+        int nb = 0;
+        int total = statisticHelper.getConceptCountOfBranch(conn, "105142", "1");
+        System.out.println("" + total);
+        System.out.println("" + statisticHelper.getNombreConcept());
+        
+        conn.close();
+    }
+    
+
+    
+    
 }

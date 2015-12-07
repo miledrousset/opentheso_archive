@@ -13,10 +13,96 @@ import org.apache.commons.logging.LogFactory;
 public class StatisticHelper {
     
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
+    private int nombreConcept = 0;
     
     public StatisticHelper() {
         
     }
+
+    public int getNombreConcept() {
+        return nombreConcept;
+    }
+
+    public void setNombreConcept(int nombreConcept) {
+        this.nombreConcept = nombreConcept;
+    }
+    
+    
+    
+    /**
+     * Fonction recursive qui permet de retrouver le nombre de concepts dans la branche + le concept lui même
+     * @param ds
+     * @param idConcept
+     * @param idTheso
+     * @return 
+     */
+    public int getConceptCountOfBranch(HikariDataSource ds, String idConcept,
+            String idTheso) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        ArrayList <String> listIdsOfConceptChildren = conceptHelper.getListChildrenOfConcept(ds,
+                        idConcept, idTheso);
+
+        
+        int compteur = getChildrenCountOfConcept(ds, idConcept, idTheso);
+        if(compteur != -1) {
+            nombreConcept = nombreConcept + compteur;
+        }
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+       //     if(!conceptHelper.deleteConceptForced(ds, listIdsOfConceptChildren1, idTheso, idUser))
+        //        return false;
+            getConceptCountOfBranch(ds, listIdsOfConceptChildren1, idTheso);
+        }
+        return nombreConcept + 1;
+    }   
+    
+    
+    /**
+     * Cette fonction permet de récupérer le nombre des concepts suivant l'id du
+     * Concept-Père et le thésaurus
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet Array String
+     */
+    public int getChildrenCountOfConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(id_concept2) from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role = '" + "NT" + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if(resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                    return count;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of childs for Concept : " + idConcept, sqle);
+        }
+        return -1;
+    }    
     
     public int getNbCpt(HikariDataSource ds, String idThesaurus) {
         Connection conn;
