@@ -54,11 +54,11 @@ public class SkosToJsonldSchemaOrg {
             addLabels(sKOSConceptScheme.getSkosLabels());
         }
         
-        if(!sKOSConceptScheme.getTopConceptsList().isEmpty()){
+      /*  if(!sKOSConceptScheme.getTopConceptsList().isEmpty()){
             addElementInScheme(sKOSConceptScheme.getTopConceptsList(),
                     "hasTopConcept");
         }
-        
+        */
         endLastConcept();
         endJson();
         
@@ -89,11 +89,14 @@ public class SkosToJsonldSchemaOrg {
 
             // add this concept to Json
             addIdConcept(skosConcept.getUri());
-
-            // add dates
-            if(!skosConcept.getDateList().isEmpty()) {
-                addDates(skosConcept.getDateList());
+            // add mappings
+            if(!skosConcept.getMappings().isEmpty()){
+                addSameAs(skosConcept.getMappings());
             }
+            // add dates
+        /*    if(!skosConcept.getDateList().isEmpty()) {
+                addDates(skosConcept.getDateList());
+            }*/
             // add documentations
             if(!skosConcept.getDocumentationsList().isEmpty()){
                 addDocumentations(skosConcept.getDocumentationsList());
@@ -105,14 +108,11 @@ public class SkosToJsonldSchemaOrg {
             }
             
             // add relations
-            if(!skosConcept.getRelationsList().isEmpty()){
+        /*    if(!skosConcept.getRelationsList().isEmpty()){
                 addRelations(skosConcept.getRelationsList());
-            }
-            
-            // add mappings
-        /*    if(!skosConcept.getMappings().isEmpty()){
-                addMappings(skosConcept.getMappings());
             }*/
+            
+
         //    endConcept();
          //   endElement();
             first = false;
@@ -149,6 +149,26 @@ public class SkosToJsonldSchemaOrg {
             }
         }
     }
+    
+    /**
+     * Ajout des dates à Json
+     * @param dates 
+     */
+    private void addSameAs(ArrayList <SKOSMapping> sameAs) {
+        String mapping;
+        
+        endElement();
+        mapping = "      \"sameAs" + "\": [\n";
+        boolean first = true;
+        for (SKOSMapping sameAs1 : sameAs) {
+            if(!first)
+                mapping += ",\n"; 
+            mapping += "          \"" + sameAs1.getTargetUri() + "\"";
+            first = false;
+        }
+        mapping += "\n      ]";
+        jsonLd.append(mapping);
+    }    
     
     private void addLabels(ArrayList<SKOSLabel> sKOSLabels) {
         ArrayList <SKOSLabel> prefLabel = new ArrayList<>();
@@ -264,34 +284,6 @@ public class SkosToJsonldSchemaOrg {
             }
         }
     }    
-    
-    private void addMappings(ArrayList<SKOSMapping> mappings) {
-        ArrayList <SKOSMapping> closeMatch = new ArrayList<>();
-        ArrayList <SKOSMapping> exactMatch = new ArrayList<>();        
-        
-        for (SKOSMapping mapping : mappings) {
-            switch (mapping.getProperty()) {
-                case SKOSProperty.closeMatch:
-                    closeMatch.add(mapping);
-                    break;
-                case SKOSProperty.exactMatch:
-                    exactMatch.add(mapping);
-                    break;                    
-                default:
-                    break;
-            }
-        }
-
-        // closeMatch
-        if(!closeMatch.isEmpty()) {
-            addElementMapping(closeMatch, "closeMatch");
-        } 
-        
-        // exactMatch
-        if(!exactMatch.isEmpty()) {
-            addElementMapping(exactMatch, "exactMatch");
-        } 
-    }
     
     private void addElementRelation(ArrayList <SKOSRelation> skosRelation, String nameSpace) {
         String element;
@@ -409,8 +401,8 @@ public class SkosToJsonldSchemaOrg {
         jsonLd.append(",\n");
    	jsonLd.append("      \"@type\": \"Thing\"");
         jsonLd.append(",\n");
-   	jsonLd.append("      \"@context\": \"http://purl.org/dc/terms\"");
-        jsonLd.append(",\n");        
+//   	jsonLd.append("      \"@context\": \"http://purl.org/dc/terms\"");
+//        jsonLd.append(",\n");        
     }
     
     private void endJson() {

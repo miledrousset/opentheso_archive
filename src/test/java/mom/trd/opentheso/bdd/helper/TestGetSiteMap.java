@@ -131,7 +131,6 @@ public class TestGetSiteMap {
         HikariConfig config = new HikariConfig();
         config.setMinimumIdle(1);
         config.setMaximumPoolSize(1000);
-        config.setJdbc4ConnectionTest(false);
         config.setConnectionTestQuery("SELECT 1");
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
@@ -141,7 +140,7 @@ public class TestGetSiteMap {
          */
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "frantiq2014");
-        config.addDataSourceProperty("databaseName", "pactols");
+        config.addDataSourceProperty("databaseName", "pactols2");
 
       //  config.addDataSourceProperty("serverName", "localhost");
         config.addDataSourceProperty("portNumber", "5432");

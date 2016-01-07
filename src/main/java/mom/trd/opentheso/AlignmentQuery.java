@@ -182,7 +182,9 @@ public class AlignmentQuery {
             lexicalValue = lexicalValue.substring(0, lexicalValue.indexOf(" "));
         }
         lexicalValue = String.valueOf(lexicalValue.charAt(0)).toUpperCase() + lexicalValue.substring(1);
-        String sparqlQueryString1 = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
+        String sparqlQueryString1 =
+                
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
                 + "PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>"
                 + "PREFIX foaf: <http://xmlns.com/foaf/0.1/>"
                 + "SELECT * WHERE {"
@@ -194,6 +196,8 @@ public class AlignmentQuery {
                 + "       FILTER(lang(?label) = \"" + lang + "\")"
                 + "       FILTER(lang(?comment) = \"" + lang + "\")"
                 + "   }";
+                
+                
         System.out.println(sparqlQueryString1);
         Query query = QueryFactory.create(sparqlQueryString1);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
@@ -377,11 +381,29 @@ public class AlignmentQuery {
                     na.setInternal_id_thesaurus(idTheso);
                     na.setThesaurus_target("OpenTheso");
                     na.setUri_target(resource.getUri());
-                    for(SKOSLabel sl : resource.getLabelsList()) {
-                        if(sl.getLanguage().equals(lang)) {
-                            na.setConcept_target(sl.getLabel());
+                    for(SKOSLabel label : resource.getLabelsList()) {
+                        switch (label.getProperty()) {
+                            case SKOSProperty.prefLabel:
+                                if(label.getLanguage().equals(lang)) {
+                                    na.setConcept_target(label.getLabel());
+                                }
+                                break;
+                            case SKOSProperty.altLabel:
+                                if(label.getLanguage().equals(lang)) {
+                                    if(na.getConcept_target_alt().isEmpty()) {
+                                        na.setConcept_target_alt(label.getLabel());
+                                    } 
+                                    else {
+                                        na.setConcept_target_alt(
+                                                na.getConcept_target_alt() + ";" + label.getLabel());                                        
+                                    }
+                                }
+                                break;                                
+                            default:
+                                break;
                         }
                     }
+
                     for(SKOSDocumentation sd : resource.getDocumentationsList()) {
                         if(sd.getProperty() == SKOSProperty.definition && sd.getLanguage().equals(lang)) {
                             na.setDef_target(sd.getText());
@@ -394,13 +416,7 @@ public class AlignmentQuery {
             }
 
         } catch (MalformedURLException e) {
-
-            e.printStackTrace();
-
         } catch (IOException e) {
-
-            e.printStackTrace();
-
         }
         return listeAlign;
     }

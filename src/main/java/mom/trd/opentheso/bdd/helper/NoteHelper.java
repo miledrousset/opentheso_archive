@@ -104,6 +104,7 @@ public class NoteHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        StringPlus stringPlus = new StringPlus();
 
         try {
             // Get connection from pool
@@ -126,7 +127,10 @@ public class NoteHelper {
                         nodeNote.setId_concept(idConcept);
                         nodeNote.setId_note(resultSet.getInt("id_note"));
                         nodeNote.setLang(resultSet.getString("lang"));
-                        nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
+                        nodeNote.setLexicalvalue(
+                            stringPlus.normalizeStringForXml(
+                                resultSet.getString("lexicalvalue"))
+                            );
                         nodeNote.setModified(resultSet.getDate("modified"));
                         nodeNote.setCreated(resultSet.getDate("created"));
                         nodeNote.setNotetypecode(resultSet.getString("notetypecode"));
@@ -222,6 +226,7 @@ public class NoteHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        StringPlus stringPlus = new StringPlus();
 
         try {
             // Get connection from pool
@@ -244,7 +249,10 @@ public class NoteHelper {
                         nodeNote.setId_term(idTerm);
                         nodeNote.setId_note(resultSet.getInt("id_note"));
                         nodeNote.setLang(resultSet.getString("lang"));
-                        nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue").replaceAll("\"", " "));
+                        nodeNote.setLexicalvalue(
+                            stringPlus.normalizeStringForXml(
+                                resultSet.getString("lexicalvalue"))
+                            );
                         nodeNote.setModified(resultSet.getDate("modified"));
                         nodeNote.setCreated(resultSet.getDate("created"));
                         nodeNote.setNotetypecode(resultSet.getString("notetypecode"));

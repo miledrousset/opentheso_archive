@@ -16,15 +16,7 @@ Installation d'OpenTheso :
         du dossier pathImage).
     - cheminSite : Adresse web du site (pour la création automatique de lien 
         vers les concepts).
-    - pathOpenIndex : Chemin vers le dossier contenant les dossiers générés par 
-        les indexations utilisateurs dans OpenIndex. Il doit être créé avant 
-        utilisation.
-    - cheminEn/cheminFr/cheminEs : Chemin vers les fichiers "stopwords" de Kea.
-    - cheminThesaurus/cheminDocTest : Chemin vers les fichiers nécessaires 
-        au fonctionnement de Kea.
 
-Les fichiers de Kea sont présents dans src/main/ressources. Il est possible de
-les utiliser directement dans le projet (peut recommandé pour le dossier 'tmp')
-ou de les copier/coller dans un dossier externe (recommandé).
+
 
 

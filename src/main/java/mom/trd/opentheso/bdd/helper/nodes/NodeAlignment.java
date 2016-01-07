@@ -18,6 +18,7 @@ public class NodeAlignment {
     private Date modified;
     private int id_author;
     private String concept_target;
+    private String concept_target_alt;
     private String thesaurus_target;
     private String uri_target;
     private int alignement_id_type;
@@ -28,6 +29,7 @@ public class NodeAlignment {
     private boolean save;
 
     public NodeAlignment() {
+        concept_target_alt = "";
     }
 
     public int getId_alignement() {
@@ -70,6 +72,14 @@ public class NodeAlignment {
         this.concept_target = concept_target;
     }
 
+    public String getConcept_target_alt() {
+        return concept_target_alt;
+    }
+
+    public void setConcept_target_alt(String concept_target_alt) {
+        this.concept_target_alt = concept_target_alt;
+    }
+    
     public String getThesaurus_target() {
         return thesaurus_target;
     }

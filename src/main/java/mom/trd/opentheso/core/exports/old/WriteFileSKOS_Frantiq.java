@@ -243,9 +243,16 @@ public class WriteFileSKOS_Frantiq {
         }
 
         for (int i = 0; i < nodeConceptExport.getNodeEM().size(); i++) {
-            concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
-                    nodeConceptExport.getNodeEM().get(i).getLang(),
-                    SKOSProperty.altLabel);
+            if(nodeConceptExport.getNodeEM().get(i).isHiden()) {
+                concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
+                        nodeConceptExport.getNodeEM().get(i).getLang(),
+                        SKOSProperty.hiddenLabel);                
+            }
+            else {
+                concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
+                        nodeConceptExport.getNodeEM().get(i).getLang(),
+                        SKOSProperty.altLabel);
+            }
         }
         
         for (NodeAlignment alignment : nodeConceptExport.getNodeAlignmentsList()) {

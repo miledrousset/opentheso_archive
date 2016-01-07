@@ -86,11 +86,66 @@ public class OrphanHelper {
            //     conn.close();
             }
         } catch (SQLException sqle) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding Orphan concept : " + idConcept, sqle);
+                return false;
+            }
+            return true;
             // Log exception
-            log.error("Error while adding Orphan concept : " + idConcept, sqle);
+
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de savoir si un orphelin existe ou non
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean isOrphanExist(HikariDataSource ds,
+            String idConcept, String idThesaurus){
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_concept FROM concept_orphan WHERE"
+                            + " id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept = '" + idConcept + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        resultSet.next();
+                        if (resultSet.getRow() == 0) {
+                            existe = false;
+                        } else {
+                            existe = true;
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        }
+        catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of Orphan concept of thesaurus : " + idThesaurus, sqle);
+        }
+        
+        return existe;        
+    }    
     
     /**
      * 

@@ -67,9 +67,9 @@ public class Timer {
             59 11 * * 1-5
         */
         // Schedules the task, once every minute.
-        scheduler.schedule("* * * * *", task);
+//        scheduler.schedule("* * * * *", task);
         // Starts the scheduler.
-        scheduler.start();
+  //      scheduler.start();
         // Stays alive for five minutes.
     /*    try {
             Thread.sleep(5L * 60L * 1000L);
@@ -77,6 +77,6 @@ public class Timer {
             System.err.println("erreur");
         }*/
         // Stops the scheduler.
-        scheduler.stop();
+    //    scheduler.stop();
     }
 }

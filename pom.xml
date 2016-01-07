@@ -4,7 +4,7 @@
 
     <groupId>mom.trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.0.4</version>
+    <version>4.0.5</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>skosapi</groupId>
             <artifactId>skosapi</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -208,6 +208,23 @@
         </resources>
         -->
         <plugins>
+            <!-- code pour récupérer la version du logiciel -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>mom.trd.opentheso.bdd.helper.Connexion</mainClass>
+                            <addDefaultImplementationEntries>
+                                true
+                            </addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -226,11 +243,7 @@
                 <version>2.6</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    
-
                 </configuration>
-
-                                
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

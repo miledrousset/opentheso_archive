@@ -563,7 +563,8 @@ public class ConceptHelper {
 
         String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
         if (idTerm == null) {
-            return false;
+            /// c'est à dire que le concept n'a aucune traduction (cas de concept corrompu)
+     //       return false;
         }
 
         // suppression du term avec les traductions et les synonymes
@@ -2311,6 +2312,51 @@ public class ConceptHelper {
         return existe;
     }
 
+/**
+     * Cette fonction permet de savoir si le Concept est un TopConcept
+     * sans définir le group (pour permettre de nettoyer les orphelins)
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isTopConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select top_concept from concept where "
+                            + " id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getBoolean("top_concept");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while Asking if TopConcept : " + idConcept, sqle);
+        }
+        return existe;
+    }    
+    
     /**
      * Cette fonction permet de récupérer les Ids des concepts suivant l'id du
      * Concept-Père et le thésaurus sous forme de classe tableau
@@ -2854,7 +2900,6 @@ public class ConceptHelper {
      */
     public NodeConcept getConcept(HikariDataSource ds,
             String idConcept, String idThesaurus, String idLang) {
-
         NodeConcept nodeConcept = new NodeConcept();
 
         // récupération des BT

@@ -157,6 +157,7 @@ public class SelectedCandidat implements Serializable {
             if (nom.equals(nu.getName())) {
                 NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, nu.getId());
                 note = np.getNote();
+                modifiedProposition = np.getModified();
                 niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langueTheso) + " (" + np.getIdConceptParent() + ")";
                 domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langueTheso) + " (" + np.getIdGroup() + ")";
                 break;

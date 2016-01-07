@@ -238,9 +238,16 @@ public class WriteFileSKOS {
         }
 
         for (int i = 0; i < nodeConceptExport.getNodeEM().size(); i++) {
-            concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
-                    nodeConceptExport.getNodeEM().get(i).getLang(),
-                    SKOSProperty.altLabel);
+            if(nodeConceptExport.getNodeEM().get(i).isHiden()) {
+                concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
+                        nodeConceptExport.getNodeEM().get(i).getLang(),
+                        SKOSProperty.hiddenLabel);                
+            } 
+            else {
+                concept.addLabel(nodeConceptExport.getNodeEM().get(i).getLexical_value(),
+                        nodeConceptExport.getNodeEM().get(i).getLang(),
+                        SKOSProperty.altLabel);
+            }
         }
         
         for (NodeAlignment alignment : nodeConceptExport.getNodeAlignmentsList()) {
@@ -253,6 +260,19 @@ public class WriteFileSKOS {
             if(alignment.getAlignement_id_type() == 2) {
                 concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.closeMatch);
             }
+            
+            // alignement broadMatch
+            if(alignment.getAlignement_id_type() == 3) {
+                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.broadMatch);
+            }
+            // alignement relatedMatch
+            if(alignment.getAlignement_id_type() == 4) {
+                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.relatedMatch);
+            }      
+            // alignement narrowMatch
+            if(alignment.getAlignement_id_type() == 5) {
+                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.narrowMatch);
+            }              
         }
   /*     for (int i = 0; i < nodeConceptExport.getNodeAlignmentsList().size(); i++) {
             // alignement exactMatch
@@ -267,9 +287,6 @@ public class WriteFileSKOS {
         }*/
         
         for (NodeNote nodeNote : nodeConceptExport.getNodeNoteTerm()) {
-            if(nodeNote.getNotetypecode().equalsIgnoreCase("scopeNote")){
-                concept.addDocumentation(nodeNote.getLexicalvalue(), nodeNote.getLang(), SKOSProperty.scopeNote);
-            }
             if(nodeNote.getNotetypecode().equalsIgnoreCase("historyNote")){
                 concept.addDocumentation(nodeNote.getLexicalvalue(), nodeNote.getLang(), SKOSProperty.historyNote);
             }
@@ -280,6 +297,15 @@ public class WriteFileSKOS {
                 concept.addDocumentation(nodeNote.getLexicalvalue(), nodeNote.getLang(), SKOSProperty.definition);
             }
         }
+        for (NodeNote nodeNote : nodeConceptExport.getNodeNoteConcept()) {
+            if(nodeNote.getNotetypecode().equalsIgnoreCase("note")){
+                concept.addDocumentation(nodeNote.getLexicalvalue(), nodeNote.getLang(), SKOSProperty.note);
+            }
+            if(nodeNote.getNotetypecode().equalsIgnoreCase("scopeNote")){
+                concept.addDocumentation(nodeNote.getLexicalvalue(), nodeNote.getLang(), SKOSProperty.scopeNote);
+            }
+        }        
+        
         skosBuff.append("    ").append(concept.toString());
         return true;
     }

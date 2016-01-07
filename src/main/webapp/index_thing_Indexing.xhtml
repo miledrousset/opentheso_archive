@@ -20,16 +20,7 @@
         <script type="text/javascript" src="javascript/gettheme.js"></script>
         <script type="text/javascript" src="javascript/jqxscrollbar.js"></script>
         <script type="text/javascript" src="javascript/indexScript.js"></script>
-        <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-          ga('create', 'UA-58798616-3', 'auto');
-          ga('send', 'pageview');
-
-        </script>  
 
     </h:head>
     <!--<h:body style="background-image: url(/opentheso/images/panda_roue.jpg)">-->
@@ -41,9 +32,8 @@
             <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
         </f:metadata>
         <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" />
-        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Gestionnaire de thésaurus</h1>
-            <h:outputText value="version :  #{theso.getVersion()}" /><br/>
             Depuis cette page d'accueil, il vous est possible de parcourir le thésaurus.<br/>
             <ul>
                 <li>Choisir le thésaurus en haut à gauche de la page (il sera en français par défaut)</li>
@@ -354,7 +344,7 @@
                     </p:accordionPanel>
                 </div>
                 <div>
-                    <div id="SplitterVertical2">
+                    <div id="SplitterVertical2" itemscope="article" itemtype="http://schema.org/Article">
                         <div id="principale">
                             <!-- CONTENU CENTRAL DEBUT -->  
                             <!-- <div id="contenuPrincipale" style="background-image: url(/opentheso/images/panda_roue2.jpg)">-->
@@ -381,7 +371,7 @@
                                                              update=":panBranchToSkos,:panBranchToSkosFile" styleClass="styleButton" />
                                             <br/><br/>
                                         </h:form>
-                                        <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(1))}" style="float: left;" >
+                                        <h:form rendered="#{selectedTerme.status == 'hidden'}" style="float: left;" >
                                             <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
                                                              update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                                              styleClass="styleButtonValid" >
@@ -392,9 +382,9 @@
                                     </div>
                                     <div id="alignGauche">
                                         <!--TERMES GENERIQUES DEBUT -->
-                                        <div id="divGenerale" >
+                                        <div id="divGenerale">
                                             <div class="titreGenerique">
-                                                <h:outputText value="#{langueBean.getMsg('index.BT') }" rendered="#{(treeBean.browserName != 'agent')}"/> 
+                                                <h:outputText value="#{langueBean.getMsg('index.BT')}" /> 
                                                 <h:panelGroup id="panFormEditTGen">
                                                     <div id="imageEdition">
                                                         <h:form id="formEditTGen" 
@@ -408,10 +398,10 @@
 
                                                         </h:form>
                                                     </div>
-                                                </h:panelGroup>
+                                                </h:panelGroup>s
                                             </div>
                                             <div class="contenuGenerique">
-                                                <h:panelGroup id="gene" rendered="#{(treeBean.browserName != 'agent')}">
+                                                <h:panelGroup id="gene">
                                                     <ui:repeat value="#{selectedTerme.termeGenerique}" var="item0">
                                                         <h:form>
                                                             <p:commandButton styleClass="termClick" rendered="#{item0.value != ''}" value="#{item0.value}" escape="false"
@@ -457,11 +447,11 @@
                                                 <script type="application/ld+json">
                                                     <h:outputText value="#{theso.getMetaData()}" />
                                                 </script>
-                                                <span style="font-size: 17px; font-weight: bold;">
+                                                <span itemprop="name" style="font-size: 17px; font-weight: bold;">
                                                     <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
                                                 </span>
                                                 <h:outputText id="idC" value="Concept_Id : #{selectedTerme.idC}"/><br/>
-                                                <span>
+                                                <span itemprop="citation">
                                                     <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
                                                     <a  href="#{selectedTerme.urlNotice}" target="blanc" >
@@ -472,12 +462,12 @@
 
                                                 <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
 
-                                                <span>
+                                                <span itemprop="articleSection">
                                                     <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
                                                 </span>
                                                 <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
                                                 <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
-                                                <span>
+                                                <span itemprop="datePublished">
                                                     <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
                                                     <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
                                                 </span>
@@ -489,7 +479,7 @@
                                                 </h:panelGroup>
                                                 
                                                 <!-- affichage du nombre total des fils -->
-                                                <span>
+                                                <span itemprop="totalOfBranch">
                                                     <p:tooltip />
                                                     <h:form>
                                                         <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
@@ -511,7 +501,7 @@
                                                            showEffect="clip" hideEffect="explode" />
 
 
-                                                <span>
+                                                <span itemprop="url">
                                                     <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
                                                                   value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
                                                         <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
@@ -523,7 +513,7 @@
                                                               value="#{langueBean.getMsg('index.link')} :" /> <br />
                                                 <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
                                                               value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
-                                                    <span>
+                                                    <span itemprop="url">
                                                         <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
                                                                       value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
                                                     </span>
@@ -534,7 +524,7 @@
                                         <!--TERMES SPECIFIQUES DEBUT -->
                                         <div id="divGenerale">
                                             <div class="titreSpecifique">
-                                                <h:outputText value="#{langueBean.getMsg('index.NT')}" rendered="#{(treeBean.browserName != 'agent')}"/> 
+                                                <h:outputText value="#{langueBean.getMsg('index.NT')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTSpe" 
                                                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
@@ -545,7 +535,7 @@
                                                 </div>
                                             </div>
                                             <div class="contenuSpecifique">
-                                                <h:panelGroup  id="speci" rendered="#{(treeBean.browserName != 'agent')}">
+                                                <h:panelGroup  id="speci">
                                                     <ui:repeat value="#{selectedTerme.termesSpecifique}" var="item1">
                                                         <h:form>
                                                             <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}" escape="false"
@@ -566,7 +556,7 @@
                                         <!--TERMES ASSOCIES DEBUT -->
                                         <div id="divGenerale">
                                             <div class="titreAssocie">
-                                                <h:outputText value="#{langueBean.getMsg('index.RT')}" rendered="#{(treeBean.browserName != 'agent')}" /> 
+                                                <h:outputText value="#{langueBean.getMsg('index.RT')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTAsso"
                                                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1) and (selectedTerme.idDomaine != 'Orphan'))}">
@@ -580,7 +570,7 @@
                                                 </div>
                                             </div>
                                             <div class="contenuAssocie">
-                                                <h:panelGroup  id="asso" rendered="#{(treeBean.browserName != 'agent')}">
+                                                <h:panelGroup  id="asso">
                                                     <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
                                                         <h:form>
                                                             <p:commandButton styleClass="termClick" rendered="#{item2.value != ''}" value="#{item2.value}" escape="false"
@@ -641,7 +631,6 @@
 
                                                             <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note5')}" actionListener="#{vue.setAddNote(5)}" update=":panPopUp" style="font-size: 12px;"/>
                                                                 <p:menuitem value="#{langueBean.getMsg('index.note1')}" actionListener="#{vue.setAddNote(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                                 <p:menuitem value="#{langueBean.getMsg('index.note2')}" actionListener="#{vue.setAddNote(2)}" update=":panPopUp" style="font-size: 12px;"/>
                                                                 <p:menuitem value="#{langueBean.getMsg('index.note3')}" actionListener="#{vue.setAddNote(3)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -663,12 +652,6 @@
                                                             <h:outputText value="#{selectedTerme.definition} &lt;br/&gt;" escape="false" 
                                                                           rendered="#{selectedTerme.definition != null and selectedTerme.definition != '' }"/>
                                                         </span>
-                                                        
-                                                        <h:outputText value="#{langueBean.getMsg('index.note5')} : " style="font-weight: bold;"
-                                                                      rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
-                                                        <h:outputText value="#{selectedTerme.note} &lt;br/&gt;" escape="false"
-                                                                      rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
-                                                        
                                                         <h:outputText value="#{langueBean.getMsg('index.note2')} : " style="font-weight: bold;"
                                                                       rendered="#{selectedTerme.noteApplication != null and selectedTerme.noteApplication != ''}" />
                                                         <h:outputText value="#{selectedTerme.noteApplication} &lt;br/&gt;" escape="false"
@@ -891,7 +874,7 @@
             <footer style="text-align: center">
                 <br />
                 <div style="margin-bottom: 5px; margin-top: -15px;">
-                    <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©Opentheso</a>
+                    <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©OpenTheso</a>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS                    
 
@@ -899,7 +882,16 @@
                 </div>
             </footer>
         </center>
-      
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-58798616-3', 'auto');
+          ga('send', 'pageview');
+
+        </script>        
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">

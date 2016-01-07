@@ -71,8 +71,6 @@ public class Connexion implements Serializable {
             poolConnexion1.close();
             return null;
         }
-
-        
         return poolConnexion1;
      }
 

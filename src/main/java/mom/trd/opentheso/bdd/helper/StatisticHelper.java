@@ -298,15 +298,16 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select DISTINCT concept.id_concept, concept.created, concept.modified, concept.id_group, term.lexical_value "
+                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified, concept.id_group, term.lexical_value "
                             + "FROM concept, preferred_term, term"
                             + " WHERE concept.id_concept= preferred_term.id_concept"
                             + " AND  preferred_term.id_term=term.id_term"
                             + " AND concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " AND concept.created <= '" + end + "'"
-                            + " AND concept.created >= '" + begin + "'"
+                            + " AND term.created <= '" + end + "'"
+                            + " AND term.created >= '" + begin + "'"
                             + " AND term.lang = '" + langue.trim() + "'"
-                            + " LIMIT 100";
+                            + " order by term.created DESC "
+                            + " LIMIT 500";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
@@ -344,15 +345,16 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select DISTINCT concept.id_concept, concept.created, concept.modified, concept.id_group, term.lexical_value "
+                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified, concept.id_group, term.lexical_value "
                             + "FROM concept, preferred_term, term"
                             + " WHERE concept.id_concept= preferred_term.id_concept"
                             + " AND  preferred_term.id_term=term.id_term"
                             + " AND concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " AND concept.modified <= '" + end + "'"
-                            + " AND concept.modified >= '" + begin + "'"
+                            + " AND term.modified <= '" + end + "'"
+                            + " AND term.modified >= '" + begin + "'"
                             + " AND term.lang = '" + langue.trim() + "'"
-                            + " LIMIT 100";
+                            + " order by term.modified DESC "
+                            + " LIMIT 500";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {

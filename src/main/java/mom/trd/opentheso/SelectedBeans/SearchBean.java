@@ -21,6 +21,7 @@ public class SearchBean implements Serializable {
     private int typeValueSearch;
     private String idGroup;
     private int typeSearch = 1;
+    private int startByOrContain = 1;
     private String langue;
     private int nbRes;
     ArrayList<NodeSearch> result1 = new ArrayList<>();
@@ -38,13 +39,27 @@ public class SearchBean implements Serializable {
         result2 = new ArrayList<>();
         if (typeSearch == 1) { // ALPHABETIQUE/HIERARCHIQUE
             if (typeValueSearch == 0) { // Terme
-                if (idGroup == null || idGroup.equals("")) {
-                    result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus());
-                //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus()));
-                } else {
-                    result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup);
-                //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup));
+                // recherche commencant par startByOrContain = 2
+                // recherche contient startByOrContain = 1
+                if(startByOrContain == 1) {
+                    if (idGroup == null || idGroup.equals("")) {
+                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus());
+                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus()));
+                    } else {
+                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup);
+                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup));
+                    }
                 }
+                if(startByOrContain == 2) {
+                    if (idGroup == null || idGroup.equals("")) {
+                        result1 = new SearchHelper().searchTermStartBy(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus());
+                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus()));
+                    } else {
+                        result1 = new SearchHelper().searchTermStartBy(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup);
+                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup));
+                    }
+                }                
+                
             } else if(typeValueSearch == 1) { // idC
                 result1 = new SearchHelper().searchIdConcept(connect.getPoolConnexion(), entry, theso.getThesaurus().getId_thesaurus(), langue.trim());
             }
@@ -135,6 +150,14 @@ public class SearchBean implements Serializable {
 
     public void setTypeSearch(int typeSearch) {
         this.typeSearch = typeSearch;
+    }
+
+    public int getStartByOrContain() {
+        return startByOrContain;
+    }
+
+    public void setStartByOrContain(int startByOrContain) {
+        this.startByOrContain = startByOrContain;
     }
 
     public String getLangue() {

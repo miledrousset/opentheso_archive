@@ -2,7 +2,11 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.Ark_Client;
@@ -66,4 +70,49 @@ public class ToolsHelper {
 
         return true;
     }
+    
+    /**
+     * Fonction qui permet de repérer les termes orphelins et les ranger dans les orphelins.
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean orphanDetect(HikariDataSource ds,
+            String idThesaurus) {
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        OrphanHelper orphanHelper = new OrphanHelper();
+        ArrayList<String> idBT;
+
+        // récupération de tous les Id concepts du thésaurus
+        ArrayList<String> tabIdConcept = conceptHelper.getAllIdConceptOfThesaurus(ds, idThesaurus);
+        
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            for (String idConcept : tabIdConcept) {
+                idBT = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
+                if(idBT.isEmpty()) {
+                    if(!conceptHelper.isTopConcept(ds, idConcept, idThesaurus)){
+                        // le concept est orphelin
+                        if(!orphanHelper.isOrphanExist(ds, idConcept, idThesaurus)) {
+                            if(!orphanHelper.addNewOrphan(conn, idConcept, idThesaurus)){
+                                conn.rollback();
+                                conn.close();
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
 }

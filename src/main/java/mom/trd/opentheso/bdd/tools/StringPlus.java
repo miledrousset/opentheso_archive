@@ -62,4 +62,19 @@ public class StringPlus {
         s = s.replaceAll("\\\\", "\\\\\\\\");
         return s;
     }
+    
+    /**
+     * Fonction qui permet de normaliser les textes pour les documents XML
+     * @param s
+     * @return 
+     */
+    public String normalizeStringForXml(String s) {
+        if (s == null) {
+            return null;
+        }
+        // normalisation of words for XML
+        s = s.replaceAll("&", "&amp;");
+        s = s.replaceAll("\"", " ");
+        return s;
+    }
 }

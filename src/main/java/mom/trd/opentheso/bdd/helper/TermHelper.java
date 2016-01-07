@@ -554,14 +554,15 @@ public class TermHelper {
                 try {
                     String query = "Insert into non_preferred_term "
                             + "(id_term, lexical_value, lang, "
-                            + "id_thesaurus, source, status)"
+                            + "id_thesaurus, source, status, hiden)"
                             + " values ("
                             + "'" + term.getId_term() + "'"
                             + ",'" + term.getLexical_value() + "'"
                             + ",'" + term.getLang() + "'"
                             + ",'" + term.getId_thesaurus() + "'"
                             + ",'" + term.getSource() + "'"
-                            + ",'" + term.getStatus() + "')";
+                            + ",'" + term.getStatus() + "'"
+                            + "," + term.isHidden() + ")";
 
                     stmt.executeUpdate(query);
                     status = true;

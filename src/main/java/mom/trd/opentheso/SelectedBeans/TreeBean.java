@@ -226,8 +226,10 @@ public class TreeBean implements Serializable {
                             value = nct.getTitle();
                         }
                     }
-                    if (nct.getStatusConcept().equals("hidden")) {
-                        icon = "hidden";
+                    if(nct.getStatusConcept() != null){
+                        if (nct.getStatusConcept().equals("hidden")) {
+                            icon = "hidden";
+                        }
                     }
                     tn = new MyTreeNode(type, nct.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
                             ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdDomaine(),
@@ -449,8 +451,10 @@ public class TreeBean implements Serializable {
                     } else {
                         value = nct.getTitle();
                     }
-                    if (nct.getStatusConcept().equals("hidden")) {
-                        icon = "hidden";
+                    if(nct.getStatusConcept() != null){
+                        if (nct.getStatusConcept().equals("hidden")) {
+                            icon = "hidden";
+                        }
                     }
                     tn = new MyTreeNode(type, nct.getIdConcept(), ((MyTreeNode) node).getIdTheso(), ((MyTreeNode) node).getLangue(),
                             ((MyTreeNode) node).getIdDomaine(), topC, icon, value, node);
@@ -643,7 +647,12 @@ public class TreeBean implements Serializable {
                 if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
                     selectedTerme.editTerme(1);
                 } else {
-                    selectedTerme.editTerme(2);
+                    // le terme n'existe pas encore
+                    if(!selectedTerme.editTerme(2)) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                        selectedTerme.setNomEdit(selectedTerme.getNom());
+                        return;
+                    }
                 }
 
             }

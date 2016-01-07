@@ -31,12 +31,14 @@ public class Vue implements Serializable {
     private boolean addCsv = false;
     private boolean thesoToSkosCsv = false;
     private boolean thesoToSkosCsvFile = false;
+
     
     /*Attributs gestion*/
 
     
 //    private boolean addDom = false;
-    private int selectedActionDom = PropertiesNames.noActionDom;    
+    private int selectedActionDom = PropertiesNames.noActionDom;   
+    private int regenerateOrphan = 0;
     private int addTInfo = 0;
     private boolean addTSpe = false;
     private int addTGen = 0;
@@ -442,6 +444,14 @@ public class Vue implements Serializable {
 
     public boolean isAddCsv() {
         return addCsv;
+    }
+
+    public int getRegenerateOrphan() {
+        return regenerateOrphan;
+    }
+
+    public void setRegenerateOrphan(int regenerateOrphan) {
+        this.regenerateOrphan = regenerateOrphan;
     }
 
     public void setAddCsv(boolean addCsv) {

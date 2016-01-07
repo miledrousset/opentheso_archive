@@ -483,17 +483,19 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
                                 <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                               minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
-                                    
-
+                                                itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
                                     <f:facet name="itemtip">
-                                        <h:panelGrid columns="2" cellpadding="5" width="300" >
-                                                                                <ui:repeat value="#{t1}" var="itemFuRT">
-                                        <tr>
-                                            <td><h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" /></td>
-                                        </tr>
-                                    </ui:repeat>
-                                            <h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" />
+                                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                            <f:facet name="header" rendered="#{(t1.url) != null}">
+                                                <h:outputText value="ID : " />
+                                                <h:outputText value="#{t1.idConcept}" />
+                                            </f:facet>
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                            <h:outputText value="#{t1.groupLexicalValue}" />
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                            <h:outputText value="#{t1.definition}" />
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
@@ -801,7 +803,7 @@
                                     <td>
                                         <h:selectOneMenu value="#{selectedTerme.statutEdit}" styleClass="listes" style="width: 150px;">
                                             <f:selectItem itemLabel="#{langueBean.getMsg('index.UF1')}" itemValue="USE"/>
-                                            <f:selectItem itemLabel="#{langueBean.getMsg('index.UF2')}" itemValue="Hidden"/>
+                                            <f:selectItem itemLabel="#{langueBean.getMsg('index.UF2')}" itemValue="USE+"/>
                                         </h:selectOneMenu>
                                     </td>
                                 </tr>            
@@ -844,7 +846,7 @@
                         <br/>
                         <table id="tableRelations">
                             <tr>
-                                <th><h:outputText value="#{langueBean.getMsg('popup.termHidden')}" /></th>
+                                <th><h:outputText value="#{langueBean.getMsg('popup.termUF')}" /></th>
                                 <th></th>
                             </tr>
                             <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
@@ -853,7 +855,7 @@
                                     <td>
                                         <h:form>
                                             <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
-                                                             actionListener="#{selectedTerme.delSyno(item4, 'Hidden')}" update=":panEditTSyno,:panContenu">
+                                                             actionListener="#{selectedTerme.delSyno(item4, 'USE+')}" update=":panEditTSyno,:panContenu">
                                                 <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid4')}" icon="ui-icon-alert" />  
                                             </p:commandButton>  
 
@@ -886,17 +888,6 @@
                     </div>
                 </div>
                 <br/>
-                <h:panelGroup rendered="#{vue.addNote == 5}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note5')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.note}" styleClass="areaNote" /><br/>
-                            <p:commandButton id="cbEditDef" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editNote()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
-                
                 <h:panelGroup rendered="#{vue.addNote == 1}" >
                     <h:form>
                         <fieldset>

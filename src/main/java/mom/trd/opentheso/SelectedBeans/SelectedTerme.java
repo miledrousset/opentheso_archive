@@ -99,6 +99,7 @@ public class SelectedTerme implements Serializable {
     private ArrayList<Entry<String, String>> arrayFacette;
 
     private ArrayList<Entry<String, String>> langues = new ArrayList<>();
+    private String note;
     private String definition;
     private String noteApplication;
     private String noteHistorique;
@@ -206,6 +207,7 @@ public class SelectedTerme implements Serializable {
         langues = new ArrayList<>();
         images = new ArrayList<>();
         align = new ArrayList<>();
+        note = "";
         definition = "";
         noteApplication = "";
         noteHistorique = "";
@@ -430,6 +432,12 @@ public class SelectedTerme implements Serializable {
                         noteHistorique = nodeNoteList1.getLexicalvalue();
                     }
                 }
+                // cas de Note
+                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("note")) {
+                    if (nodeNoteList1.getLexicalvalue() != null) {
+                        note = nodeNoteList1.getLexicalvalue();
+                    }
+                }                
             }
         }
     }
@@ -598,6 +606,11 @@ public class SelectedTerme implements Serializable {
             temp.setId_thesaurus(idTheso);
             temp.setLang(idlangue);
             temp.setLexical_value(valueEdit);
+            if(statutEdit.equalsIgnoreCase("Hidden")) {
+                temp.setHidden(true);
+            }
+            else
+                temp.setHidden(false);
             temp.setStatus(statutEdit);
             temp.setSource(String.valueOf(user.getUser().getName()));
             if (!new TermHelper().addNonPreferredTerm(connect.getPoolConnexion(), temp, user.getUser().getId())) {
@@ -1090,7 +1103,7 @@ public class SelectedTerme implements Serializable {
             gemet = false;
         }
         if (opentheso) {
-            String lien = "";
+            String lien;
             if(!linkOT.trim().equals("") && !idOT.trim().equals("")) {
                 if(linkOT.lastIndexOf("/") == linkOT.length()-1)
                     lien = linkOT.trim() + "webresources/rest/skos/concept/value=" + nom.replaceAll(" ", "_") + "&lang=" + idlangue + "&th=" + idOT;
@@ -1122,8 +1135,9 @@ public class SelectedTerme implements Serializable {
      * Modifie le nom du terme selectionné
      *
      * @param cas
+     * @return 
      */
-    public void editTerme(int cas) {
+    public boolean editTerme(int cas) {
         if (cas == 1) {
             Term t = new Term();
             t.setLexical_value(nomEdit);
@@ -1132,7 +1146,9 @@ public class SelectedTerme implements Serializable {
             t.setLang(idlangue);
             new TermHelper().updateTermTraduction(connect.getPoolConnexion(), t, user.getUser().getId());
         } else if (cas == 2) {
+            //le terme n'existe pas, il faut le créer
             String idTerme = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), idC, idTheso);
+            if(idTerme == null) return false;
             Term termTemp = new Term();
             termTemp.setId_concept(idC);
             termTemp.setId_term(idTerme);
@@ -1158,6 +1174,7 @@ public class SelectedTerme implements Serializable {
         }
         vue.setAddTInfo(0);
         nom = nomEdit;
+        return true;
     }
 
     /**
@@ -1173,6 +1190,17 @@ public class SelectedTerme implements Serializable {
         vue.setAddNote(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
     }
+    
+    public void editNote() {
+        int idUser = user.getUser().getId();
+        if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idT, idTheso, idlangue, "note")) {
+            new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idT, idlangue, idTheso, note, "note", idUser);
+        } else {
+            new NoteHelper().addConceptNote(connect.getPoolConnexion(), idT, idlangue, idTheso, note, "note", idUser);
+        }
+        vue.setAddNote(0);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
+    }    
 
     public void editNoteApp() {
         int idUser = user.getUser().getId();
@@ -2055,6 +2083,15 @@ public class SelectedTerme implements Serializable {
     public String getNoteApplication() {
         return noteApplication;
     }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+    
 
     public void setNoteApplication(String noteApplication) {
         this.noteApplication = noteApplication;

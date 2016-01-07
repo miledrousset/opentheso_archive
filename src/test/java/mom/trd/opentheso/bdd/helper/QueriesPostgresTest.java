@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedProperty;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
+import org.glassfish.jersey.jaxb.internal.XmlCollectionJaxbProvider.App;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -72,7 +73,7 @@ public class QueriesPostgresTest {
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "zoo");
+        config.addDataSourceProperty("databaseName", "OTW");
 
         config.addDataSourceProperty("serverName", "localhost");
         //config.addDataSourceProperty("serverName", "opentheso.mom.fr");
@@ -1180,17 +1181,44 @@ public class QueriesPostgresTest {
 
     public void testgGtConceptCountOfBranch() {
         
-        HikariDataSource conn = openConnexionPool();
+    /*    HikariDataSource conn = openConnexionPool();
         StatisticHelper statisticHelper = new StatisticHelper();
         int nb = 0;
         int total = statisticHelper.getConceptCountOfBranch(conn, "105142", "1");
         System.out.println("" + total);
         System.out.println("" + statisticHelper.getNombreConcept());
         
-        conn.close();
+        conn.close();*/
+    }
+    
+    /**
+     * Test of récupération des orphelin dans le thésaurus pour les ranger dans la table des orphelins
+     */
+    @org.junit.Test
+
+    public void testOrphanDetect() {
+        
+    /*    HikariDataSource conn = openConnexionPool();
+        ToolsHelper toolsHelper = new ToolsHelper();
+        boolean test = toolsHelper.orphanDetect(conn, "TH_1");
+        System.out.println("" + test);
+        
+        conn.close();*/
+    }
+    
+    @org.junit.Test
+
+    public void testGetVersion() {
+        System.out.println(getClass().getPackage().getImplementationVersion());
+        System.out.println(QueriesPostgresTest.class.getPackage().getImplementationVersion());
+    /*    HikariDataSource conn = openConnexionPool();
+        ToolsHelper toolsHelper = new ToolsHelper();
+        boolean test = toolsHelper.orphanDetect(conn, "TH_1");
+        System.out.println
+        
+        conn.close();*/
+        System.out.println("");
     }
     
 
-    
-    
 }

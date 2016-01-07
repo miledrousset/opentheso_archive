@@ -27,6 +27,7 @@ import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
+import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
@@ -70,6 +71,7 @@ public class SelectedThesaurus implements Serializable {
     // Variables resourcesBundle
     String langueSource;
     String cheminSite;
+    private String version;
     private boolean arkActive;
     private String serverArk;
     
@@ -253,6 +255,7 @@ public class SelectedThesaurus implements Serializable {
         ResourceBundle bundlePref = getBundlePref();
 //        System.out.println(langueSource);
         cheminSite = bundlePref.getString("cheminSite");
+        version = bundlePref.getString("version");
         String useArk = bundlePref.getString("useArk");
         arkActive = useArk.equals("true");
         serverArk = bundlePref.getString("serverArk");
@@ -625,6 +628,24 @@ public class SelectedThesaurus implements Serializable {
     }
     
     /**
+     * Cette fonction permet de regénérer les Orphelins
+     * @return 
+     */
+    public boolean regenerateOrphan() {
+        if(thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) return false;
+        
+        if(!new ToolsHelper().orphanDetect(connect.getPoolConnexion(), thesaurus.getId_thesaurus())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"),  "error"));
+            vue.setRegenerateOrphan(0);
+            return false;
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info"),  langueBean.getMsg("theso.statusRegenerateOrphan")));
+        vue.setRegenerateOrphan(0);
+        return true;
+    }
+    
+    
+    /**
      * Affiche le thésaurus en cour d'édition (pas le thésaurus courant)
      * @param type
      * @param nom
@@ -852,6 +873,10 @@ public class SelectedThesaurus implements Serializable {
             }
         }
         return ""; */
+    }
+    
+    public String getVersion(){
+        return version;
     }
     
     public String getCheminSite() {
