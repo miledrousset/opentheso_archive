@@ -96,20 +96,32 @@
             <artifactId>a2jruntime</artifactId>
             <version>1.2.3</version>
         </dependency>
-        <dependency>
-          <groupId>org.openrdf.sesame</groupId>
-          <artifactId>sesame-runtime</artifactId>
-          <version>4.0.0-M1</version>
-        </dependency>     
+    
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.12</version>
         </dependency>
+        
+        <!-- Ancienne version locale de skosapi-->
+       <!-- <dependency>
+            <groupId>owlapi-bin</groupId>
+            <artifactId>owlapi-bin</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        -->
+
+        <dependency>
+            <groupId>skos-api-onejar</groupId>
+            <artifactId>skos-api-onejar</artifactId>
+            <version>3</version>
+        </dependency>
         <dependency>
             <groupId>skosapi</groupId>
             <artifactId>skosapi</artifactId>
-            <version>1.4</version>
+            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -181,6 +193,8 @@
             <artifactId>smtp</artifactId>
             <version>1.5.2</version>
         </dependency>
+        
+
 
     </dependencies>
 

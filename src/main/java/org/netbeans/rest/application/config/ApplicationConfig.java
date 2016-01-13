@@ -29,7 +29,6 @@ public class ApplicationConfig extends Application {
  If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(mom.trd.opentheso.ws.cron.Cron.class);
         resources.add(mom.trd.opentheso.ws.rest.Rest.class);
     }
     

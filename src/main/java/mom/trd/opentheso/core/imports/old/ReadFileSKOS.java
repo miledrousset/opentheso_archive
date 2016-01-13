@@ -387,57 +387,60 @@ public class ReadFileSKOS {
 //			System.out.println(text);
             //    text = ajouterQuotes(text);
 
+                if(resource !=null) {
+                    if (text.trim().length() > 0) {
 
-                if (text.trim().length() > 0) {
-
-                    if ("prefLabel".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        if(isConceptScheme) {
-                            conceptScheme.addLabel(text, langPrefLabel, SKOSProperty.prefLabel);
+                        if ("prefLabel".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            if(isConceptScheme) {
+                                conceptScheme.addLabel(text, langPrefLabel, SKOSProperty.prefLabel);
+                            }
+                            else
+                                resource.addLabel(text, langPrefLabel, SKOSProperty.prefLabel);
                         }
-                        else
-                            resource.addLabel(text, langPrefLabel, SKOSProperty.prefLabel);
-                    }
 
-                    if ("altLabel".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addLabel(text, langAltLabel, SKOSProperty.altLabel);
-                    }
+                        if ("altLabel".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addLabel(text, langAltLabel, SKOSProperty.altLabel);
+                        }
 
-                    if ("scopeNote".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDocumentation(text, langScopeNote, SKOSProperty.scopeNote);
-                    }
+                        if ("scopeNote".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addDocumentation(text, langScopeNote, SKOSProperty.scopeNote);
+                        }
 
-                    if ("historyNote".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDocumentation(text, langHistoryNote, SKOSProperty.historyNote);
-                    }
+                        if ("historyNote".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addDocumentation(text, langHistoryNote, SKOSProperty.historyNote);
+                        }
 
-                    if ("definition".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDocumentation(text, langDefinitionNote, SKOSProperty.definition);
-                    }
-                    if ("editorialNote".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDocumentation(text, langEditorialNote, SKOSProperty.editorialNote);
-                    }
-                    
-                    if ("created".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDate(text, SKOSProperty.created);
-                    }
+                        if ("definition".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addDocumentation(text, langDefinitionNote, SKOSProperty.definition);
+                        }
+                        if ("editorialNote".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addDocumentation(text, langEditorialNote, SKOSProperty.editorialNote);
+                        }
 
-                    if ("modified".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addDate(text, SKOSProperty.modified);
-                    }
-                    if ("identifier".equals(localName)) {
-                        //	System.out.println("CHARACTERS : " + text);
-                        resource.addIdentifier(text, SKOSProperty.identifier);
-                    }
+                        if ("created".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addDate(text, SKOSProperty.created);
+                        }
 
+                        if ("modified".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+
+                            resource.addDate(text, SKOSProperty.modified);
+                        }
+                        if ("identifier".equals(localName)) {
+                            //	System.out.println("CHARACTERS : " + text);
+                            resource.addIdentifier(text, SKOSProperty.identifier);
+                        }
+
+                    }
                 }
+                
                 break;
 
             case XMLStreamConstants.END_ELEMENT:

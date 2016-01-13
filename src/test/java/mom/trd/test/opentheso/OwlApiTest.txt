@@ -1,0 +1,115 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package mom.trd.test.opentheso;
+
+import java.io.File;
+import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLOntologyDocumentTarget;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.io.SystemOutDocumentTarget;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
+/**
+ *
+ * @author miled.rousset
+ */
+public class OwlApiTest {
+    
+    public OwlApiTest() {
+    }
+    
+    @BeforeClass
+    public static void setUpClass() {
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
+    }
+
+    // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    @Test
+    public void testingOWL() throws OWLOntologyCreationException, OWLOntologyStorageException
+        {
+
+        // Get hold of an ontology manager 
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); 
+
+        // Load an ontology from the Web.  We load the ontology from a document IRI 
+        IRI docIRI = IRI.create("http://www.w3.org/2009/08/skos-reference/skos.rdf"); 
+        OWLOntology skos = manager.loadOntologyFromOntologyDocument(docIRI); 
+
+        for (OWLAnnotation ann: skos.getAnnotations())
+        {
+            System.out.println("ann: " + ann.getProperty() + "\n" + ann.getValue());
+            System.out.println();
+        }
+        
+        System.out.println("Loaded ontology: " + skos); 
+        System.out.println();
+
+        // Save a local copy of the ontology.  (Specify a path appropriate to your setup) 
+        File file = new File("/Users/Miled/Downloads/downloadAndSaveOWLFile.owl"); 
+        manager.saveOntology(skos, IRI.create(file.toURI())); 
+
+        // Ontologies are saved in the format from which they were loaded.   
+        // We can get information about the format of an ontology from its manager 
+        OWLOntologyFormat format = (OWLOntologyFormat) manager.getOntologyFormat(skos); 
+        System.out.println("    format: " + format); 
+        System.out.println();
+
+        // Save the ontology in owl/xml format 
+        OWLXMLOntologyFormat owlxmlFormat = new OWLXMLOntologyFormat(); 
+
+        // Some ontology formats support prefix names and prefix IRIs.   
+        // In our case we loaded the pizza ontology from an rdf/xml format, which supports prefixes.  
+        // When we save the ontology in the new format we will copy the prefixes over  
+        // so that we have nicely abbreviated IRIs in the new ontology document 
+        if(format.isPrefixOWLOntologyFormat()) 
+        { 
+            owlxmlFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat()); 
+        } 
+
+        manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) owlxmlFormat, IRI.create(file.toURI())); 
+
+        // Dump an ontology to System.out by specifying a different OWLOntologyOutputTarget 
+        // Note that we can write an ontology to a stream in a similar way  
+        // using the StreamOutputTarget class 
+        OWLOntologyDocumentTarget documentTarget = new SystemOutDocumentTarget(); 
+
+        // Try another format - The Manchester OWL Syntax 
+        ManchesterOWLSyntaxOntologyFormat manSyntaxFormat = new ManchesterOWLSyntaxOntologyFormat(); 
+
+        if(format.isPrefixOWLOntologyFormat()) 
+        { 
+            manSyntaxFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat()); 
+        } 
+        manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) manSyntaxFormat, documentTarget); 
+    }
+}

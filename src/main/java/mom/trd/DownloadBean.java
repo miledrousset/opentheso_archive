@@ -245,7 +245,6 @@ public class DownloadBean implements Serializable {
             }
             vue.setThesoToSkosCsvFile(true);
         }
-
     }
 
     public Connexion getConnect() {

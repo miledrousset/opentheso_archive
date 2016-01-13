@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedProperty;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
-import org.glassfish.jersey.jaxb.internal.XmlCollectionJaxbProvider.App;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
