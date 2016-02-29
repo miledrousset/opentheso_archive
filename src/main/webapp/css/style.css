@@ -70,6 +70,8 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
 }
 
+
+
 .ui-icon-exp {
     background: url("../images/iconeExport.png") no-repeat top left !important;
     height: 25px;
@@ -498,8 +500,16 @@ input[type="button"], input[type="submit"]{
 .nomSynonyme {
     text-align: left; 
     font-size: 12px; 
-    padding-left: 30px;
+    padding-left: 5px;
 }
+
+.nomSynonymeCache {
+    text-align: left; 
+    font-size: 13px; 
+    padding-left: 0px;
+    color: #942724;
+}
+
 
 .titreNote {
     background: linear-gradient(#FEC404, #B6921A);

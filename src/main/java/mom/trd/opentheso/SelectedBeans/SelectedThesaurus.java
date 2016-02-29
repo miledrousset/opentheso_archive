@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+//import com.hp.hpl.jena.util.OneToManyMap;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -269,9 +270,10 @@ public class SelectedThesaurus implements Serializable {
     @PostConstruct
     public void initTheso() {
         if (connect.getPoolConnexion() != null) {
+            langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
             arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
             langues = new LanguageHelper().getSelectItemLanguages(connect.getPoolConnexion());
-            langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();//bundlePref.getString("langueSource");
+            //bundlePref.getString("langueSource");
         } else {
             arrayTheso = new ArrayList<>();
         }
@@ -339,7 +341,7 @@ public class SelectedThesaurus implements Serializable {
     }
     
     /**
-     * Création d'un traduction d'un thésaurus
+     * Création d'une traduction d'un thésaurus
      */
     public void ajouterTraduction(){
         if(nomTrad.trim().equals("")) {
@@ -688,7 +690,20 @@ public class SelectedThesaurus implements Serializable {
      * @return une liste des traductions
      */
     public ArrayList<Languages_iso639> getThisTrad() {
-        return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
+        thesaurus.getLanguage();
+        ArrayList<Languages_iso639> languages_iso639s = new ArrayList<>();
+        
+        ArrayList<Languages_iso639> languages_iso639s_temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
+        
+        // on replace la langue sélectionnée en premier
+        for (Languages_iso639 languages_iso639 : languages_iso639s_temp) {
+            if(languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage()))
+                languages_iso639s.add(0, languages_iso639);
+            else
+                languages_iso639s.add(languages_iso639);
+        }
+        return languages_iso639s;
+        //return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
     }
     
     public void remplirEditTheso(String id, String langue) {
@@ -914,6 +929,8 @@ public class SelectedThesaurus implements Serializable {
 
     public ArrayList<Entry<String, String>> getArrayTheso() {
         if(connect.getPoolConnexion() != null) {
+         /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
+            p.put("", "");*/
             arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
         }
         return arrayTheso;

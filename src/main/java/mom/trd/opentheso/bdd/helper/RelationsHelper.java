@@ -266,6 +266,7 @@ public class RelationsHelper {
 
                     stmt.executeUpdate(query);
                     status = true;
+                  // System.err.println(query);
                 } finally {
                     stmt.close();
                 }

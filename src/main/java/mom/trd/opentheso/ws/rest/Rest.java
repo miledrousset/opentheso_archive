@@ -124,7 +124,7 @@ public class Rest {
     */
 
     /**
-     * 
+     * Cette fonction renvoie un concept par son id et par l'id du thésaurus 
      * @param idConcept
      * @param idTheso
      * @return 
@@ -140,7 +140,7 @@ public class Rest {
     }
     
     /**
-     * 
+     * pour récuperer la liste des domaines d'un thésaurus
      * @param idTheso
      * @return 
     */
@@ -149,6 +149,23 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public String getAllGroups(@PathParam("th") String idTheso){
         StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
+        ds.close();
+        return skos.toString();
+    }    
+    
+    
+    /**
+     * Pour retourner un domaine (Groupe) en SKOS avec ses concepts
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     */
+    @Path("/skos/concept/all/idg={idg}&th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getConceptsOfGroup(@PathParam("idg") String idGroup,
+            @PathParam("th") String idTheso){
+        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
         ds.close();
         return skos.toString();
     }    
@@ -358,6 +375,24 @@ public class Rest {
         StringBuffer skos = exportFromBDD.exportThisGroup(ds, idThesaurus, idGroup);
         return skos;
     }
+    
+    /**
+     * Fonction qui permet de récupérer un concept skos par identifiant
+     * @param idGroup
+     * @param idThesaurus
+     * @return skos
+     */
+    private StringBuffer conceptsOfGroupToSkos(String idGroup, String idThesaurus) {
+                        
+        if(ds == null) return null;
+        if(prefs == null) return null;
+        
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerArk(prefs.getProperty("serverArk"));
+        exportFromBDD.setServerAdress(prefs.getProperty("cheminSite"));
+        StringBuffer skos = exportFromBDD.exportGroup(ds, idThesaurus, idGroup);
+        return skos;
+    }    
     
     /**
      * Fonction qui permet de récupérer les groupes d'un thésauurs

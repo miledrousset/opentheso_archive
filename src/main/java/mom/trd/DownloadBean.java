@@ -174,6 +174,28 @@ public class DownloadBean implements Serializable {
     }
     
     /**
+     * Cette fonction permet d'exporter un thésaurus au format SKOS2 new Version à partir de
+     * son identifiant. Le résultat est enregistré dans la variable 'skos' du
+     * downloadBean si la taille est petite, ou dans la variable 'file' du
+     * downloadBean sinon. Dans le premier cas on affiche la variable, dans le
+     * second cas l'utilisateur télécharge de fichier.
+     *
+     * @param idTheso
+     */
+    public void thesoSkos2(String idTheso) {
+
+        /**
+         * Cette initialisation est pour exporter les PACTOLS au format accepté
+         * par Koha
+         */
+        //ExportFromBDD_Frantiq exportFromBDD = new ExportFromBDD_Frantiq();
+        /**
+         * ici c'est la classe à utiliser pour un export standard au foramt SKOS
+         */
+
+    }    
+    
+    /**
      * Cette fonction permet d'exporter un thésaurus au format SKOS à partir de
      * son identifiant. Le résultat est enregistré dans la variable 'skos' du
      * downloadBean si la taille est petite, ou dans la variable 'file' du

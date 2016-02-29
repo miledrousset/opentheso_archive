@@ -28,6 +28,7 @@ public class Vue implements Serializable {
     private boolean creat = false;
     private boolean trad = false;
     private boolean addSkos = false;
+    private boolean addSkos2 = false;    
     private boolean addCsv = false;
     private boolean thesoToSkosCsv = false;
     private boolean thesoToSkosCsvFile = false;
@@ -97,6 +98,7 @@ public class Vue implements Serializable {
         edit = false;
         trad = false;
         addSkos = false;
+        addSkos2 = false;
         addCsv = false;
     }
 
@@ -167,6 +169,7 @@ public class Vue implements Serializable {
         trad = false;
         creat = false;
         addSkos = false;
+        addSkos2 = false;
         addCsv = false;
     }
 
@@ -180,6 +183,7 @@ public class Vue implements Serializable {
         trad = false;
         language = false;
         addSkos = false;
+        addSkos2 = false;
         addCsv = false;
     }
 
@@ -192,6 +196,7 @@ public class Vue implements Serializable {
         edit = false;
         creat = false;
         addSkos = false;
+        addSkos2 = false;
         addCsv = false;
     }
 
@@ -206,6 +211,7 @@ public class Vue implements Serializable {
         language = false;
         creat = false;
         addCsv = false;
+        addSkos2 = false;
     }
     
     public int getSelectedActionDom() {
@@ -461,5 +467,22 @@ public class Vue implements Serializable {
         creat = false;
         language = false;
         addSkos = false;
+        addSkos2 = false;
     }
+
+    public boolean isAddSkos2() {
+        return addSkos2;
+    }
+
+    public void setAddSkos2(boolean addSkos2) {
+        this.addSkos2 = addSkos2;
+        edit = false;
+        trad = false;
+        language = false;
+        creat = false;
+        addCsv = false;
+        addSkos = false;
+    }
+    
+    
 }

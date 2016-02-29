@@ -42,9 +42,16 @@ public class ConceptHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
+    // 1=numericId ; 2=alphaNumericId
+    private int identifierType = 1; 
+    
     public ConceptHelper() {
     }
 
+    public void setIdentifierType(int identifierType) {
+        this.identifierType = identifierType;
+    }
+    
     /**
      * Cette fonction permet d'ajouter un Top Concept avec le libellé et les
      * relations Si l'opération échoue, on rollback les modifications
@@ -877,9 +884,8 @@ public class ConceptHelper {
     }
 
     /**
-     * Cette fonction permet d'ajouter un Concept à la table Concept, en
-     * paramètre un objet Classe Concept
-     *
+     * Cette fonction permet d'ajouter une relation à la table hierarchicalRelationship
+     * 
      * @param conn
      * @param hierarchicalRelationship
      * @param idUser
@@ -1069,6 +1075,51 @@ public class ConceptHelper {
         }
         return idConcept;
     }
+    
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isIdExiste(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept
+                            + "' and id_thesaurus = '" + idThesaurus
+                            + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id exist : " + idConcept, sqle);
+        }
+        return existe;
+    }   
 
     /**
      * Cette fonction permet d'ajouter l'historique d'un concept
@@ -1464,7 +1515,9 @@ public class ConceptHelper {
                                 new FileUtilities().getDate(),
                                 urlSite + "?idc=" + concept.getIdConcept() + "&idt=" + concept.getIdThesaurus(),
                                 "", "", dcElementsList, "pcrt"); // pcrt : p= pactols, crt=code DCMI pour collection
+                        concept.setIdArk(idArk);
                     }
+
                     /**
                      * Ajout des informations dans la table Concept
                      */
@@ -1481,7 +1534,7 @@ public class ConceptHelper {
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
-                                + ",'" + idArk + "'"
+                                + ",'" + concept.getIdArk() + "'"
                                 + ",'" + concept.getStatus() + "'"
                                 + ",'" + concept.getNotation() + "'"
                                 + "," + concept.isTopConcept()
@@ -1492,7 +1545,7 @@ public class ConceptHelper {
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
-                                + ",'" + idArk + "'"
+                                + ",'" + concept.getIdArk() + "'"
                                 + ",'" + concept.getCreated() + "'"
                                 + ",'" + concept.getModified() + "'"
                                 + ",'" + concept.getStatus() + "'"
@@ -2266,6 +2319,44 @@ public class ConceptHelper {
         return nodeConceptTree;
     }
 
+    /**
+     * Cette fonction permet de rendre un Concept de type Topconcept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean setTopConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE concept "
+                            + "set top_concept = true"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus='" + idThesaurus + "'";
+
+                    stmt.executeUpdate(query);
+                    return true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating group of concept : " + idConcept, sqle);
+        }
+        return false;
+    }    
+    
     /**
      * Cette fonction permet de savoir si le Concept est un TopConcept
      *

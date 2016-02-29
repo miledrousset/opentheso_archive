@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -44,6 +45,7 @@ public class TreeBean implements Serializable {
     private TreeNode selectedNode;
     private ArrayList<TreeNode> selectedNodes;
     private ArrayList<String> orphans;
+    private boolean createValid = false;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -63,6 +65,12 @@ public class TreeBean implements Serializable {
     @ManagedProperty(value = "#{conceptbean}")
     private ConceptBean conceptbean;
 
+    
+    @PostConstruct
+    public void initTerme() {
+        int i = 0;
+    }
+    
     /**
      * ************************** INITIALISATION ***************************
      */
@@ -601,42 +609,83 @@ public class TreeBean implements Serializable {
         vue.setOnglet(0);
     }
 
+    public boolean isCreateValid() {
+        return createValid;
+    }
+    
+    
     /**
-     * Ajoute un terme spÃ©cifique et remet l'abre Ã  jour
+     * cette fonction permet d'ajouter un nouveau terme spécifique (si le terme existe, on propose de créer une relation) 
      */
     public void newTSpe() {
+        createValid = false;
         selectedTerme.setValueEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
         if (selectedTerme.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
             return;
         }
         
-        String temp = selectedTerme.getValueEdit();
+        String valueEdit = selectedTerme.getValueEdit().trim();
         
-        if (selectedTerme.getValueEdit().trim().equalsIgnoreCase(selectedTerme.getNom())) {
+        // vérification si c'est le même nom, on fait rien
+        if (valueEdit.equalsIgnoreCase(selectedTerme.getNom())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
             return;
-        }        
+        }
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if( (idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+                return;
+        }
+        
+        
         if (!selectedTerme.creerTermeSpe()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
         } else {
             reInit();
             reExpand();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info1")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
         }
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
     }
-
+    
     /**
-     * Change le nom du terme courant avec mise Ã  jour dans l'abre
+     * Change le nom du terme courant avec mise à jour dans l'abre
      */
     public void editNomT() {
+        // si c'est la même valeur, on fait rien
+        String valueEdit = selectedTerme.getSelectedTermComp().getTermLexicalValue().trim();
+        if(selectedTerme.getNom().trim().equals(valueEdit)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
+            selectedTerme.setNomEdit(selectedTerme.getNom());
+            return;
+        }
+        
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if( (idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+                return;
+        }        
+        
         selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
         if (selectedTerme.getNomEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
         } else {
             String temp = selectedTerme.getNomEdit();
+            // cas d'un domaine
             if (selectedTerme.getType() == 1) {
                 if (selectedTerme.getNom() == null || selectedTerme.getNom().equals("")) {
                     selectedTerme.editTerme(3);

@@ -1,31 +1,35 @@
 package mom.trd.opentheso.bdd.datas;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 public class Thesaurus {
 
-    String id_thesaurus;
-    String id_ark;
-    String contributor = "";
-    String coverage = "";
-    String creator = "";
-    Date created;
-    Date modified;
-    String description = "";
-    String format = "";
-    String language;
-    String publisher = "";
-    String relation = "";
-    String rights = "";
-    String source = "";
-    String subject = "";
-    String title = "";
-    String type = "";
+    private String id_thesaurus;
+    private String id_ark;
+    private String contributor = "";
+    private String coverage = "";
+    private String creator = "";
+    private Date created;
+    private Date modified;
+    private String description = "";
+    private String format = "";
+    private String language;
+    private String publisher = "";
+    private String relation = "";
+    private String rights = "";
+    private String source = "";
+    private String subject = "";
+    private String title = "";
+    private String type = "";
+ 
+    private ArrayList <DcElement> dcElement;
 
     /**
      *
      */
     public Thesaurus() {
+        dcElement = new ArrayList<>();
     }
     
     /**
@@ -194,5 +198,18 @@ public class Thesaurus {
     public void setId_ark(String id_ark) {
         this.id_ark = id_ark;
     }
+
+    public ArrayList<DcElement> getDcElement() {
+        return dcElement;
+    }
+
+    public void setDcElement(ArrayList<DcElement> dcElement) {
+        this.dcElement = dcElement;
+    }
+    
+    public void addDcElement(DcElement dcElement) {
+        this.dcElement.add(dcElement);
+    }
+
 
 }

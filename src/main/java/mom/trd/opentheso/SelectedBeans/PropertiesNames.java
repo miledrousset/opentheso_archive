@@ -5,11 +5,13 @@
  */
 package mom.trd.opentheso.SelectedBeans;
 
+import java.io.Serializable;
+
 /**
  *
  * @author miled.rousset
  */
-public class PropertiesNames {
+public class PropertiesNames implements Serializable{
     public static final int noActionDom = 0;
     public static final int deleteDom = 1;
     public static final int addDom = 2;

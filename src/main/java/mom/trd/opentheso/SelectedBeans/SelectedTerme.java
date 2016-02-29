@@ -179,6 +179,7 @@ public class SelectedTerme implements Serializable {
         arkActive = temp.equals("true");
         root = (TreeNode) new DefaultTreeNode("Root", null);
         serverAdress = bundlePref.getString("cheminSite");
+        user.setIdTheso(idTheso);
     }
 
     /**
@@ -320,7 +321,7 @@ public class SelectedTerme implements Serializable {
                 e.hints.put("default_element_set_name", "f");
                 e.hints.put("small_set_setname", "f");
                 e.hints.put("record_syntax", "unimarc");
-                e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idT)).append("\"").toString());
+                e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idC)).append("\"").toString());
                 SearchTask st = federated_search_proxy.createTask(e, null);
                 st.evaluate(5000);
                 nbNotices = st.getTaskResultSet().getFragmentCount();
@@ -521,7 +522,30 @@ public class SelectedTerme implements Serializable {
         MyTreeNode mtn = new MyTreeNode(type, nodePe.getIdConcept(), nodePe.getIdThesaurus(), nodePe.getIdLang(), nodePe.getIdGroup(), null, null, value, null);
         majTerme(mtn);
     }
+    
+    /**
+     * cette fonction permet de savoir si un term existe à l'identique, si oui,
+     * on a son identifiant, sinon, un null
+     * @param term
+     * @return null or idTerm
+     */
+    public String isTermExist(String term) {
+        TermHelper termHelper = new TermHelper();
+        return termHelper.isTermEqualTo(connect.getPoolConnexion(), term, idTheso, idlangue);
+    }
+    
+    public String getIdConceptOf(String idTerm) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        return conceptHelper.getIdConceptOfTerm(connect.getPoolConnexion(), idTerm, idTheso);
+    }
 
+    public boolean isCreateAuthorizedForTS(String idConceptNew) {
+        RelationsHelper relationsHelper = new RelationsHelper();
+        
+
+        return false;
+    }  
+    
     /**
      * *************************************** CREATION
      * ****************************************

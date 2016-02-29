@@ -6,6 +6,7 @@
 
 package mom.trd.test.opentheso;
 
+import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,6 +22,10 @@ import org.semanticweb.skos.*;
 
 
 import java.net.URI;
+import java.util.ArrayList;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.bdd.helper.ToolsHelper;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 
 /**
@@ -57,14 +62,30 @@ public class skosApiTest {
     @Test
     public void testReadSkos() {
 
+        // récupération d'un identifiant unique
+    /*    ToolsHelper toolsHelper = new ToolsHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        String id = toolsHelper.getNewId(10);
+        for (int i = 0; i < 10; i++) {
+            id = toolsHelper.getNewId(10);
+        }
+      */  
         try {
 
             SKOSManager man = new SKOSManager();
 //
-            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/object_type.xml"));
-
+            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/pactols_test.rdf"));
+            SKOSDataFactory sKOSDataFactory = man.getSKOSDataFactory();
+      //      SKOSCollection skosCollection = sKOSDataFactory.getSKOSCollection(URI.create("file:/Users/Miled/Desktop/test_unesco.xml"));
             //////
 
+           
+      /*      SKOSConcept concept1 = skosCollection.asSKOSConcept();
+            SKOSConceptScheme sKOSConceptScheme1 = skosCollection.asSKOSConceptScheme();
+            SKOSResource sKOSResource = skosCollection.asSKOSResource();
+*/
+            
+            
             // print out all concepts;
             for (SKOSConcept concept : dataSet.getSKOSConcepts()) {
                 System.out.println("Concept: " + concept.getURI());
@@ -82,6 +103,27 @@ public class skosApiTest {
                     System.err.println("\t hasRelated: " + relatedConcepts.getURI());
                 }
                 
+                for (SKOSAnnotation anno : concept.getSKOSAnnotations(dataSet)) {
+                    System.err.print("\t\tAnnotation: " + anno.getURI() + "-> ");
+                    if (anno.isAnnotationByConstant()) {
+                        if (anno.getAnnotationValueAsConstant().isTyped()) {
+                            SKOSTypedLiteral con = anno.getAnnotationValueAsConstant().getAsSKOSTypedLiteral();
+                            System.err.print(con.getLiteral() + " Type: " + con.getDataType().getURI());
+                        }
+                        else {
+                            SKOSUntypedLiteral con = anno.getAnnotationValueAsConstant().getAsSKOSUntypedLiteral();
+                            System.err.print(con.getLiteral());
+                            if (con.hasLang()) {
+                                System.err.print("@" + con.getLang());
+                            }
+                        }
+                        System.err.println("");
+                    }
+                    else {
+                        System.err.println(anno.getAnnotationValue().getURI().toString());
+                    }
+                }
+                
             }
 
 
@@ -93,31 +135,30 @@ public class skosApiTest {
 
             for (SKOSConceptScheme scheme : dataSet.getSKOSConceptSchemes()) {
                 
-                for (SKOSConcept con : scheme.getTopConcepts(dataSet)) {
-
-                    System.out.println("Top Concept: " + con.getURI());
-
-                }
-
                 int counter = 0;
+
+
+                counter = dataSet.getSKOSConcepts().size();
+                System.out.println("Count: " + counter);
 //
-//                for (SKOSConcept con : scheme.getConceptsInScheme(dataSet)) {
-//                    counter++;
-//                    System.out.println("Concept: " + con.getURI().getFragment());
-//
-//                    for (OWLUntypedConstant type : con.getSKOSPrefLabel(dataSet)) {
-//                        System.out.println("PrefLabel: " + type.getLiteral() + " lang: " + type.getLang());
-//                    }
-//
-//                    for (OWLUntypedConstant type : con.getSKOSAltLabel(vocab)) {
-//                        System.out.println("AltLabel: " + type.getLiteral() + " lang: " + type.getLang());
-//                    }
-//
-//                    for (SKOSConcept concepts : con.getSKOSBroaderConcepts(vocab)) {
-//                        System.out.println("\tHas Broader: " + concepts.getURI().getFragment());
-//                    }
-//
-//                }
+////
+////                for (SKOSConcept con : scheme.getConceptsInScheme(dataSet)) {
+////                    counter++;
+////                    System.out.println("Concept: " + con.getURI().getFragment());
+////
+////                    for (OWLUntypedConstant type : con.getSKOSPrefLabel(dataSet)) {
+////                        System.out.println("PrefLabel: " + type.getLiteral() + " lang: " + type.getLang());
+////                    }
+////
+////                    for (OWLUntypedConstant type : con.getSKOSAltLabel(vocab)) {
+////                        System.out.println("AltLabel: " + type.getLiteral() + " lang: " + type.getLang());
+////                    }
+////
+////                    for (SKOSConcept concepts : con.getSKOSBroaderConcepts(vocab)) {
+////                        System.out.println("\tHas Broader: " + concepts.getURI().getFragment());
+////                    }
+////
+////                }
                 System.out.println("Count: " + counter);
                 
                 
@@ -186,6 +227,7 @@ public class skosApiTest {
 
                 }
 
+
             }
             
             
@@ -241,8 +283,8 @@ public class skosApiTest {
 //
 //
         
-        catch (SKOSCreationException e) {
-            e.printStackTrace();
+        catch (SKOSCreationException ex){//SKOSCreationException e) {
+            ex.printStackTrace();
         }
         
     }

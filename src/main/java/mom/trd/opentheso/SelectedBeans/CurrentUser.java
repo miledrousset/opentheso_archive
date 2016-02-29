@@ -37,6 +37,7 @@ public class CurrentUser implements Serializable {
     private String langSourceEdit;
     private int alertNbCdtEdit;
     private boolean alertCdtEdit;
+    private String idTheso;
     
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -46,6 +47,7 @@ public class CurrentUser implements Serializable {
     
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+   
     
     @PostConstruct
     public void initUser() {
@@ -55,7 +57,9 @@ public class CurrentUser implements Serializable {
             langSourceEdit = np.getSourceLang();
             alertNbCdtEdit = np.getNbAlertCdt();
             alertCdtEdit = np.isAlertCdt();
+            
         }
+        
     }
     
     /**
@@ -313,4 +317,14 @@ public class CurrentUser implements Serializable {
     public void setAlertCdtEdit(boolean alertCdtEdit) {
         this.alertCdtEdit = alertCdtEdit;
     }
+
+    public String getIdTheso() {
+        return idTheso;
+    }
+
+    public void setIdTheso(String idTheso) {
+        this.idTheso = idTheso;
+    }
+    
+    
 }

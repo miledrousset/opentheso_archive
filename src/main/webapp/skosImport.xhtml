@@ -1,0 +1,66 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <h:panelGroup id="skosImport">
+
+        <!-- Section upload SKOS2 to theso -->
+       <h:panelGroup id="panSkos2">
+           <h:panelGroup layout="block" rendered="#{vue.addSkos2 == true}">
+               <div class="importerTheso">
+                   <div id="titreEditTheso">
+                       <h:outputText value="#{langueBean.getMsg('edit.import')} new version" />
+                       <div id="divClose">
+                           <h:form>
+                               <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                actionListener="#{vue.setAddSkos2(false)}" update=":panSkos2" />
+                           </h:form>
+                       </div>
+                   </div>
+                   <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+                       <p:growl id="growl" />  
+                       <p:messages showDetail="true" autoUpdate="true" />
+                       <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
+                       <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                       <h:inputText id="date" value="#{fileBean.formatDate}" />
+                       <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
+                       <br/><br/>
+
+
+                       <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
+                                     cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeSkos2}" process="@form"
+                                     update="@form,:panSkos2,:tableTheso" onstart="document.getElementById('#{requestScope.foo.clientId}').style.display = 'block';"/>
+
+
+
+                       <p:commandButton value="Start Function" 
+                                        onclick="PF('pbAjax').start();PF('startButton2').disable();" 
+                                        widgetVar="startButton2" 
+                                        actionListener="#{progressBean.startTestFunction(fileBean.conceptCount)}"/>  
+
+                       <p:commandButton value="Cancel" 
+                                        actionListener="#{progressBean.cancel}" 
+                                        oncomplete="pbAjax.cancel();startButton2.enable();" />  
+
+                       <p:progressBar widgetVar="pbAjax" 
+                                      ajax="true" 
+                                      value="#{progressBean.progress}" 
+                                      labelTemplate="{value}%" 
+                                      styleClass="animated">  
+
+                           <p:ajax event="complete" 
+                                   listener="#{progressBean.onComplete}" 
+                                   update=":growl" 
+                                   oncomplete="startButton2.enable()"/>  
+                       </p:progressBar>  
+                   </h:form>
+                   <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/>
+               </div>
+           </h:panelGroup>
+       </h:panelGroup>  
+    </h:panelGroup>
+</ui:composition>
+

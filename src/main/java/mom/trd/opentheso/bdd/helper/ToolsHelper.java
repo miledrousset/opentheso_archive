@@ -115,4 +115,14 @@ public class ToolsHelper {
         return false;
     }
     
+    public String getNewId(int length) {
+        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"; 
+        StringBuilder pass = new StringBuilder();
+        for(int x=0;x<length;x++)   {
+           int i = (int)Math.floor(Math.random() * (chars.length() -1));
+           pass.append(chars.charAt(i));
+        }
+        return pass.toString();
+    }
+    
 }

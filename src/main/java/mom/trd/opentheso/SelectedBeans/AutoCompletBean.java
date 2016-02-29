@@ -29,6 +29,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.core.exports.old.WriteFileSKOS;
+import org.primefaces.event.SelectEvent;
 
 @ManagedBean(name = "autoComp", eager = true)
 @SessionScoped
@@ -59,8 +60,6 @@ public class AutoCompletBean implements Serializable {
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
 
-    private List<NodeAutoCompletion> selectedNode;
-
     public List<NodeAutoCompletion> completTerm(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
@@ -68,7 +67,6 @@ public class AutoCompletBean implements Serializable {
             liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
                     theso.getThesaurus().getLanguage(), query);
         }
-        selectedNode = liste;
         return liste;
     }
 
@@ -314,7 +312,6 @@ public class AutoCompletBean implements Serializable {
             terme.getVue().setMoveBranchFromMT(0);
             terme.getVue().setMoveBranchFromOrphin(0);
             selectedAtt = new NodeAutoCompletion();
-            selectedNode = null;
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);

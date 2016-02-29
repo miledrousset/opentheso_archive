@@ -81,6 +81,58 @@ public class AlignmentHelper {
     }
     
     /**
+     * Cette fonction permet d'ajouter un nouvel alignement sur un
+     * thésaurus distant pour ce concept
+     * 
+     * @param ds 
+     * @param nodeAlignment 
+
+     * @return  
+     */
+    public boolean addNewAlignment(HikariDataSource ds,
+            NodeAlignment nodeAlignment) {
+
+        Connection conn;
+        Statement stmt;
+
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into alignement "
+                            + "(author, concept_target, thesaurus_target,"
+                            + " uri_target, alignement_id_type,"
+                            + " internal_id_thesaurus, internal_id_concept)"
+                            + " values ("
+                            + nodeAlignment.getId_author()
+                            + ",'" + nodeAlignment.getConcept_target() + "'"
+                            + ",'" + nodeAlignment.getThesaurus_target() + "'"
+                            + ",'" + nodeAlignment.getUri_target() + "'"
+                            + "," + nodeAlignment.getAlignement_id_type() 
+                            + ",'" + nodeAlignment.getInternal_id_thesaurus() + "'"
+                            + ",'" + nodeAlignment.getInternal_id_concept() + "')";
+
+                    stmt.executeUpdate(query);
+                    
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding external alignement with target : " + nodeAlignment.getUri_target(), sqle);
+        }
+        return status;
+    }    
+    
+    /**
      * Cette focntion permet de supprimer un alignement 
      * @param ds 
      * @param idAlignment 

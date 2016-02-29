@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <title>PrimeFaces Progress Bar</title>
+            </f:facet>
+        </h:head>
+        <h:body>
+            <h:form>
+                <p:growl id="growl" />  
+                <h3>Progress Bar Test</h3>  
+
+                <p:commandButton value="Start Function" 
+                                 onclick="PF('pbAjax').start();PF('startButton2').disable();" 
+                                 widgetVar="startButton2" 
+                                 actionListener="#{progressBean.startTestFunction(50)}"/>  
+
+                <p:commandButton value="Cancel" 
+                                 actionListener="#{progressBean.cancel}" 
+                                 oncomplete="pbAjax.cancel();startButton2.enable();" />  
+
+                <p:progressBar widgetVar="pbAjax" 
+                               ajax="true" 
+                               value="#{progressBean.progress}" 
+                               labelTemplate="{value}%" 
+                               styleClass="animated">  
+
+                    <p:ajax event="complete" 
+                            listener="#{progressBean.onComplete}" 
+                            update="growl" 
+                            oncomplete="startButton2.enable()"/>  
+                </p:progressBar>  
+            </h:form>  
+            
+            <h:form>
+                <h:panelGrid columns="1" cellpadding="5">
+                    <p:commandButton value="Basic" type="button" onclick="PF('dlg1').show();" />
+
+                    <p:commandButton value="Modal" type="button" onclick="PF('dlg2').show();" />
+
+                    <p:commandButton value="Effects" type="button" onclick="PF('dlg3').show();" /> 
+                </h:panelGrid>
+
+                <p:dialog header="Basic Dialog" widgetVar="dlg1" minHeight="40">
+                    <h:outputText value="Resistance to PrimeFaces is futile!" />
+                </p:dialog>
+
+                <p:dialog header="Modal Dialog" widgetVar="dlg2" modal="true" height="100">
+                    <h:outputText value="This is a Modal Dialog." />
+                </p:dialog>   
+
+                <p:dialog header="Effects" widgetVar="dlg3" showEffect="explode" hideEffect="bounce" height="100">
+                    <h:outputText value="This dialog has nice effects." />
+                </p:dialog>
+            </h:form>
+            
+            
+        </h:body>
+    </f:view>
+</html>

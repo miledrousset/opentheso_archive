@@ -1650,7 +1650,7 @@ public class TermHelper {
                 try {
                     
                     String query = 
-                            "SELECT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
                             "FROM preferred_term, term, concept WHERE " +
                             "preferred_term.id_term = term.id_term AND " +
                             "preferred_term.id_thesaurus = term.id_thesaurus AND " +
@@ -1679,7 +1679,7 @@ public class TermHelper {
                         }
                     }
                     query = 
-                            "SELECT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
                             "FROM preferred_term, term, concept WHERE " +
                             "preferred_term.id_term = term.id_term AND " +
                             "preferred_term.id_thesaurus = term.id_thesaurus AND " +
@@ -1715,12 +1715,14 @@ public class TermHelper {
                         while (resultSet.next()) {
                             if (resultSet.getRow() != 0) {
                                 NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                                
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
                                         new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
                                 nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
-                                nodeAutoCompletionList.add(nodeAutoCompletion);
+                                if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                    nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
                         }
                     }
@@ -1895,6 +1897,53 @@ public class TermHelper {
         }
         return nodeTraductionsList;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le terme est un parfait doublon ou non
+     * si oui, on retourne l'identifiant, sinon, on retourne null
+     *
+     * @param ds
+     * @param title
+     * @param idThesaurus
+     * @param idLang
+     * @return idTerm or null
+     */
+    public String isTermEqualTo(HikariDataSource ds,
+            String title, String idThesaurus, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idTerm = null;
+        title = new StringPlus().convertString(title);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_term from term where "
+                            + "lexical_value = '" + title +"'"
+                            + " and lang = '" + idLang + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        idTerm = resultSet.getString("id_term");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if Term exist : " + title, sqle);
+        }
+        return idTerm;
+    }    
 
     /**
      * Cette fonction permet de savoir si le terme existe ou non

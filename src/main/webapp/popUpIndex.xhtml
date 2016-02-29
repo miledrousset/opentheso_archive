@@ -633,6 +633,7 @@
         <!-- POP UP INFO TERME FIN -->
 
         <!-- POP UP TERMES SPECIFIQUES DEBUT -->
+        <p:growl id="msgs" showDetail="true" />
         <h:panelGroup id="panEditTSpe" style="background: transparent; box-shadow: none;">
             <h:panelGroup rendered="#{vue.addTSpe == true}" styleClass="overlay"/>
             <h:panelGroup rendered="#{vue.addTSpe == true}" styleClass="popUp">
@@ -655,7 +656,9 @@
                                 <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                                 <td>
                                     <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                                    forceSelection="false" active="true"  queryDelay="1000"
                                                     itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
+                                        
                                         <f:facet name="itemtip">
                                             <h:panelGrid columns="2" cellpadding="5" width="200" >
                                                 <f:facet name="header" rendered="#{(t1.url) != null}">
@@ -675,8 +678,12 @@
                             </tr>
                             <tr>
                                 <td colspan="2" style="text-align: center;">
-                                    <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{treeBean.newTSpe}" 
-                                                     update=":panEditTSpe,:accordeonTree,:panContenu" styleClass="styleButton"/>
+                                    <h:form>
+                                        <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{treeBean.newTSpe()}" 
+                                                         update=":panEditTSpe,:accordeonTree,:panContenu" styleClass="styleButton">
+                                        </p:commandButton>  
+                               </h:form>
+                                    
                                 </td>
                             </tr>
                         </table>

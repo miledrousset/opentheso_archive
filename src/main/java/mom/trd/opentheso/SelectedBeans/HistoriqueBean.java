@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.faces.bean.ManagedBean;
@@ -20,7 +21,7 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 
 @ManagedBean(name="histo", eager=true)
 @RequestScoped
-public class HistoriqueBean {
+public class HistoriqueBean implements Serializable {
     private int typeHisto = -1; // 0 = date, 1 = all
     private Date dateHisto;
     

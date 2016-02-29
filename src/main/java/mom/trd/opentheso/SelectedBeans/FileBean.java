@@ -29,6 +29,7 @@ import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ImagesHelper;
 import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
+import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
 import mom.trd.opentheso.core.imports.helper.ImportTabulateHelper;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
 import mom.trd.opentheso.core.imports.tabulate.ImportTabuleIntoBDD;
@@ -40,6 +41,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.skos.SKOSCreationException;
 
 @ManagedBean(name = "fileBean", eager = true)
 @SessionScoped
@@ -47,16 +50,27 @@ import org.primefaces.model.UploadedFile;
 public class FileBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    private Integer progress;  
+    private boolean desabled = true;
+
     private String source = "";
     private String pathImage;
     private String dossierResize;
+    private String langueSource;
+   
     // Import SKOS
     private String formatDate;
+    private boolean createNewId;
+    
     // Import CVS
     private String sepCol;
     private String sepChamps;
     private String sepLangue;
     private String idTheso;
+
+    
+    private ImportSkosHelper importSkosHelper;
 
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
@@ -85,9 +99,101 @@ public class FileBean implements Serializable {
     public void initFileBean() {
         ResourceBundle bundlePref = getBundlePref();
         pathImage = bundlePref.getString("pathImage");
+        langueSource = bundlePref.getString("langueSource");
         dossierResize = bundlePref.getString("dossierResize");
+
     }
 
+    public Integer getProgress() {
+        if(progress == null) {
+            setProgress(0);
+            onComplete();
+        }
+        System.out.println("getProgress: " + progress);
+        return progress;  
+    }  
+
+    public void setProgress(Integer progress) { 
+        System.out.println("SetProgress called: " + progress);
+        this.progress = progress;  
+    }  
+
+    public boolean isDesabled() {
+        return desabled;
+    }
+
+    public void setDesabled(boolean desabled) {
+        this.desabled = desabled;
+    }
+
+    public void onComplete() { 
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucess !!", "Total =  " + importSkosHelper.getConceptsCount()));  
+        vue.setAddSkos2(false);
+    }  
+
+    public void cancel() {  
+        System.out.println("Cancel called: " + progress);
+        progress = null;  
+    }      
+    
+    
+    public void startImportSkos2() {
+        //System.out.println("Start thesaurus import ! ");
+
+        if(getConceptCount() == 0)
+        // chargement dans la base de données 
+
+        //chargement du nom du thesaurus 
+        if(!importSkosHelper.addThesaurus()){
+           FacesContext.getCurrentInstance().addMessage(null, 
+                   new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+
+           if(!importSkosHelper.addDeafaultThesaurus()){
+               // echec de l'ajout du nom de thésaurus
+               FacesContext.getCurrentInstance().addMessage(null, 
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+               return;
+           }
+        }       
+       
+        // chargement des concepts
+        if(!importSkosHelper.addConcepts_progress(this)){
+            FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+            return;
+            // echec de l'ajout des concepts 
+        }
+    
+        FacesContext.getCurrentInstance().addMessage(null, 
+            new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));
+
+        vue.setAddSkos2(false);
+        desabled = true;
+        
+     /*   
+        for (int i = 0; i < count; i++) {
+            if(progress == null) return;
+            if(count < 100) {
+                setProgress(i*(100/count));
+            }
+            else{
+                setProgress(i/(count/100));
+            }
+            System.out.println("TestFunction - setting progress to: " + i);
+            try {
+                Thread.sleep(200);
+                if(progress == null) {
+                    setProgress(100);
+                    return;
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+        setProgress(100);
+        System.out.println("Finished Function");*/
+    }    
+    
+    
     /**
      * Cette fonction permet d'insérer un thésaurus en base de données à partir
      * d'un fichier Skos
@@ -123,6 +229,199 @@ public class FileBean implements Serializable {
         }
     }
 
+    
+    /**
+     * Cette fonction permet de lire un fichier Skos en utilsant le skosapi et owlapi (officiel)
+     *
+     * @param event
+     */
+    public void readSkos2(FileUploadEvent event) {
+        importSkosHelper = null;
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            UploadedFile file = event.getFile();
+
+            if (formatDate == null || formatDate.equals("")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
+            } else {
+                try {
+                    boolean useArk = false;
+                    ResourceBundle bundlePref = getBundlePref();
+                    if (bundlePref.getString("useArk").equalsIgnoreCase("true")) {
+                        useArk = true;
+                    }
+
+                    String adressSite = bundlePref.getString("cheminSite");
+                    int idUser = selectedTerme.getUser().getUser().getId();
+                    
+                    // lecture du fichier SKOS
+                    importSkosHelper = new ImportSkosHelper();
+                    importSkosHelper.setInfos(connect.getPoolConnexion(), 
+                            formatDate, useArk, adressSite, idUser, langueSource);
+                    if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
+                        FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                        return;
+                    }
+                    FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));
+                    desabled = false;
+                                      
+                }
+//                catch (IOException ex) {
+//                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+                catch (IOException | OWLOntologyCreationException | SKOSCreationException ex) {
+                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                    FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.getMessage()));
+                }
+
+            }
+        }
+    } 
+    
+    /**
+     * Cette focntion permet de charger le thésaurus dans la BDD
+     * @return 
+     */
+    public boolean addSkosDatas2(){
+
+        if(importSkosHelper == null) return false;
+        
+        // initialisation des infos (message)
+        importSkosHelper.setMessage("");
+        
+        // chargement dans la base de données 
+        
+        //chargement du nom du thesaurus 
+        if(!importSkosHelper.addThesaurus()){
+            FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+
+            if(!importSkosHelper.addDeafaultThesaurus()){
+                FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+            }
+            // echec de l'ajout du nom de thésaurus
+        }
+
+        // ajout des groups ou domaine
+       /* if(!importSkosHelper.addGroups()){
+            // echec de l'ajout des groups ou domaines
+        }*/
+
+        // chargement des concepts
+        if(!importSkosHelper.addConcepts()){
+            FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+            return false;
+            // echec de l'ajout des concepts 
+        }
+        FacesContext.getCurrentInstance().addMessage(null, 
+            new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));
+        vue.setAddSkos2(false);
+        return true;
+    }
+    
+    public int getConceptCount(){
+        if(importSkosHelper == null) return -1;
+        return importSkosHelper.getConceptsCount();
+    }
+
+    public ImportSkosHelper getImportSkosHelper() {
+        return importSkosHelper;
+    }
+    
+    
+    /**
+     * Cette fonction permet d'insérer un thésaurus en base de données à partir
+     * d'un fichier Skos en utilsant leskosapi et owlapi (officiel)
+     *
+     * @param event
+     */
+    public void chargeSkos2(FileUploadEvent event) {
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            UploadedFile file = event.getFile();
+
+            if (formatDate == null || formatDate.equals("")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
+            } else {
+                try {
+                    boolean useArk = false;
+                    ResourceBundle bundlePref = getBundlePref();
+                    if (bundlePref.getString("useArk").equalsIgnoreCase("true")) {
+                        useArk = true;
+                    }
+
+                    String adressSite = bundlePref.getString("cheminSite");
+                    int idUser = selectedTerme.getUser().getUser().getId();
+                    
+                    // lecture du fichier SKOS
+                    ImportSkosHelper importSkosHelper = new ImportSkosHelper();
+                    importSkosHelper.setInfos(connect.getPoolConnexion(), 
+                            formatDate, useArk, adressSite, idUser, langueSource);
+                    if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
+                        FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                        return;
+                    }
+                    else {
+                        FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));            
+                    }
+                    
+                    // chargement dans la base de données 
+                    
+                    //chargement du nom du thesaurus 
+                    if(!importSkosHelper.addThesaurus()){
+                        FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+                        
+                        if(!importSkosHelper.addDeafaultThesaurus()){
+                            FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                        }
+                        // echec de l'ajout du nom de thésaurus
+                    }
+                    
+                    // ajout des groups ou domaine
+                   /* if(!importSkosHelper.addGroups()){
+                        // echec de l'ajout des groups ou domaines
+                    }*/
+                    
+                    // chargement des concepts
+                    if(!importSkosHelper.addConcepts()){
+                        FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+                        
+                        // echec de l'ajout des concepts 
+                    }
+                    FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));
+                    
+                    vue.setAddSkos2(false);
+                    
+                }
+//                catch (IOException ex) {
+//                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+                catch (IOException | OWLOntologyCreationException | SKOSCreationException ex) {
+                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                    FacesContext.getCurrentInstance().addMessage(null, 
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.getMessage()));
+                }
+
+            }
+        }
+    }
+    
+    
     /**
      * Cette fonction permet d'insérer un thésaurus en base de données à partir
      * d'un fichier CSV

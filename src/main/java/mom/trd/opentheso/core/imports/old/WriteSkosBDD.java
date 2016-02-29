@@ -76,12 +76,14 @@ public class WriteSkosBDD {
         idsTopConcept = new ArrayList<>();
         
         for (SKOSResource resource : resourcesList) {
-            if (!isDescriptor(resource, topConceptsList)) {
-                // on insère un domaine
-                writeDomaine(resource, idThesaurus, "fr", adressSite, useArk, idUser);
-            } else {
-                // on insère un concept
-                writeConcept(resource, idThesaurus, "fr", dateFormat, adressSite, useArk, idUser);
+            if(resource != null) {
+                if (!isDescriptor(resource, topConceptsList)) {
+                    // on insère un domaine
+                    writeDomaine(resource, idThesaurus, "fr", adressSite, useArk, idUser);
+                } else {
+                    // on insère un concept
+                    writeConcept(resource, idThesaurus, "fr", dateFormat, adressSite, useArk, idUser);
+                }
             }
         } // ici la fin du fichier on controle si le thésaurus a toutes les langues des concepts
         // Vérifier l'existence de la langue et l'ajouter si elle n'existe pas déjà
@@ -534,7 +536,14 @@ public class WriteSkosBDD {
                     nodeNote4.setLexicalvalue(documentation.getText());
                     nodeNote4.setNotetypecode("editorialNote");
                     nodeNotes.add(nodeNote4);
-                    break;                    
+                    break;
+                case SKOSProperty.note:
+                    NodeNote nodeNote5 = new NodeNote();
+                    nodeNote5.setLang(documentation.getLanguage());
+                    nodeNote5.setLexicalvalue(documentation.getText());
+                    nodeNote5.setNotetypecode("note");
+                    nodeNotes.add(nodeNote5);
+                    break; 
                 default:
                     break;
             }

@@ -159,8 +159,8 @@ public class LanguageHelper {
                         language = new ArrayList<>();
                         while (resultSet.next()) {
                             Languages_iso639 languageTmp = new Languages_iso639();
-                            languageTmp.setId_iso639_1(resultSet.getString("iso639_1"));
-                            languageTmp.setId_iso639_2(resultSet.getString("iso639_2"));
+                            languageTmp.setId_iso639_1(resultSet.getString("iso639_1").trim());
+                            languageTmp.setId_iso639_2(resultSet.getString("iso639_2").trim());
                             languageTmp.setFrench_name(resultSet.getString("french_name"));
                             languageTmp.setEnglish_name(resultSet.getString("english_name"));
                             language.add(languageTmp);

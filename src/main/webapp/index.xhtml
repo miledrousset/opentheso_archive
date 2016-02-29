@@ -33,6 +33,7 @@
 
     </h:head>
     <!--<h:body style="background-image: url(/opentheso/images/panda_roue.jpg)">-->
+    <!--<h:body style="background-image: url(/opentheso/images/panda_roue3.jpg)">-->
     <h:body>
         <f:metadata>
             <f:viewParam name="idc" value="#{theso.idCurl}"/>
@@ -79,6 +80,11 @@
                                                      update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                                      styleClass="styleButton"/>
                                 </td>
+                                <td>
+                                    <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
+                                    <h:outputText value="#{theso.thesaurus.language}" />
+                                    <br/>
+                                </td>
                             </tr>
                         </table>
                     </h:form>
@@ -103,7 +109,7 @@
                                     <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: left;">
                                         <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
                                             <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
-                                                           itemValue="#{t.id_iso639_1}" />
+                                                           itemValue="#{t.id_iso639_1}"  />
                                         </h:selectOneMenu>&nbsp;
                                         <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
                                                          update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
@@ -358,6 +364,7 @@
                         <div id="principale">
                             <!-- CONTENU CENTRAL DEBUT -->  
                             <!-- <div id="contenuPrincipale" style="background-image: url(/opentheso/images/panda_roue2.jpg)">-->
+                            <!-- <div id="contenuPrincipale" style="background-image: url(../images/panda_roue3.jpg)">-->
                                                 
                             <div id="contenuPrincipale">
                                 <h:panelGroup id="panContenu">
@@ -612,14 +619,17 @@
                                                 </div>
                                             </div>
                                             <div class="contenuSynonyme">
-                                                <h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>
+                                                <!--<h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>-->
                                                 <h:panelGroup  id="synoE">
                                                     <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
                                                         <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
                                                     </ui:repeat>
                                                 </h:panelGroup>
-                                                <h:outputText value="#{langueBean.getMsg('index.UF2')}" />  : <br/>
-                                                <h:panelGroup  id="synoP">
+                                                <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+                                                
+                                               
+                                                
+                                                <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
                                                         <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
                                                     </ui:repeat>

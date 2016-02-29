@@ -142,7 +142,7 @@ public class UserHelper {
         return nu;
     }
     
-    public NodePreference getPreferenceUser(HikariDataSource ds) {
+    public NodePreference getPreferenceUser(HikariDataSource ds){//, String idThesaurus) {
         NodePreference np = new NodePreference();
         Connection conn;
         Statement stmt;
@@ -153,7 +153,7 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT * FROM preferences";
+                    String query = "SELECT * FROM preferences";// where id_thesaurus = '" + idThesaurus + "'";
                     resultSet = stmt.executeQuery(query);
 
                     resultSet.next();
@@ -377,7 +377,7 @@ public class UserHelper {
         }
     }
     
-     public void updatePreferenceUser(HikariDataSource ds, NodePreference np) {
+     public void updatePreferenceUser(HikariDataSource ds, NodePreference np){//,             String idThesaurus) {
         Connection conn;
         Statement stmt;
 
@@ -390,6 +390,7 @@ public class UserHelper {
                     String query = "update preferences set source_lang='"+np.getSourceLang()+
                             "', nb_alert_cdt="+np.getNbAlertCdt()+", alert_cdt="+np.isAlertCdt()+" where"
                             + " id_pref = 1";
+                          //  + " id_thesaurus ='" + idThesaurus + "'";
                     stmt.executeUpdate(query);
 
                 } finally {
