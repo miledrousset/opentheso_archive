@@ -34,6 +34,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import skos.SKOSXmlDocument;
@@ -420,11 +421,23 @@ public class SelectedThesaurus implements Serializable {
     public void creerCandidat() {
         if(candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error2")));
-        } else if(new CandidateHelper().isCandidatExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
+        } else 
+            if(new CandidateHelper().isCandidatExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error3")));
             vue.setAddCandidat(false);
-            creerPropCdt();
-            return;
+
+            String idCandidat = new CandidateHelper().getIdCandidatFromTitle(connect.getPoolConnexion(),
+                    new StringPlus().addQuotes(candidat.getValueEdit().trim()), thesaurus.getId_thesaurus());
+            if(idCandidat == null) {
+                cleanEditCandidat();
+                return;
+            }
+            else {
+                candidat.getSelected().setIdConcept(idCandidat);
+                vue.setAddPropCandidat(true);
+               // creerPropCdt();
+                return;
+            }
         } else if(new TermHelper().isTermExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error4")));
         } else {
@@ -433,10 +446,7 @@ public class SelectedThesaurus implements Serializable {
             vue.setAddCandidat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info2.1") +  " " + temp + " " + langueBean.getMsg("theso.info2.2")));
         }
-        candidat.setValueEdit("");
-        candidat.setNoteEdit("");
-        candidat.setNiveauEdit("");
-        candidat.setDomaineEdit("");
+        cleanEditCandidat();
         List<NodeCandidatValue> candidats = new ArrayList<>();
         if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
             candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -446,13 +456,21 @@ public class SelectedThesaurus implements Serializable {
     public void creerPropCdt() {
         if(!candidat.newPropCandidat(thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            cleanEditCandidat();
             return;
         }
         vue.setAddPropCandidat(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info3")));
-        candidat.setNoteEdit("");
-        candidat.setNiveauEdit("");
-        candidat.setDomaineEdit("");
+        cleanEditCandidat();
+    }
+    
+    private void cleanEditCandidat(){
+        if(candidat != null) {
+            candidat.setValueEdit("");
+            candidat.setNoteEdit("");
+            candidat.setNiveauEdit("");
+            candidat.setDomaineEdit("");
+        }
     }
     
     public void creerTradCdt() {
@@ -705,6 +723,33 @@ public class SelectedThesaurus implements Serializable {
         return languages_iso639s;
         //return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
     }
+    
+    /**
+     * Récupération des traductions du thésaurus
+     * @return une liste des traductions
+     */
+    public ArrayList<Languages_iso639> getTradForSearch() {
+        thesaurus.getLanguage();
+        ArrayList<Languages_iso639> languages_iso639s = new ArrayList<>();
+        
+        ArrayList<Languages_iso639> languages_iso639s_temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
+        
+        // on replace la langue sélectionnée en premier
+        for (Languages_iso639 languages_iso639 : languages_iso639s_temp) {
+            if(languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage()))
+                languages_iso639s.add(0, languages_iso639);
+            else
+                languages_iso639s.add(languages_iso639);
+        }
+        Languages_iso639 languages_iso639_all = new Languages_iso639();
+        languages_iso639_all.setFrench_name("");
+        languages_iso639_all.setEnglish_name("");
+        languages_iso639_all.setId_iso639_1("");
+        languages_iso639_all.setId_iso639_1("");
+        languages_iso639s.add(languages_iso639_all);
+        return languages_iso639s;
+        //return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
+    }    
     
     public void remplirEditTheso(String id, String langue) {
         editTheso = new ThesaurusHelper().getThisThesaurus(connect.getPoolConnexion(), id, langue);

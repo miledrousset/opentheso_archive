@@ -81,28 +81,11 @@
                                                      update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                                      styleClass="styleButton"/>
                                 </td>
-                                
-                                                            <!-- CHOIX LANGUE DEBUT -->  
-                            <td id="divLangue">
-                                <h:panelGroup id="liste2">
-                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
-                                        <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
-                                            <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
-                                                           itemValue="#{t.id_iso639_1}"  />
-                                        </h:selectOneMenu>&nbsp;
-                                        <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                                         update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                                         styleClass="styleButton"/>
-                                    </h:form>
-                                </h:panelGroup>
-                            </td>
-                               <!-- 
                                 <td>
                                     <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
                                     <h:outputText value="#{theso.thesaurus.language}" />
                                     <br/>
                                 </td>
-                               -->
                             </tr>
                         </table>
                     </h:form>
@@ -127,7 +110,6 @@
             <ui:include src="dialogs/nt/ntEditDlg.xhtml" />
             <ui:include src="dialogs/bt/addTgDlg.xhtml" />
             <ui:include src="dialogs/bt/deleteTgDlg.xhtml" />
-
             
             
             
@@ -138,34 +120,31 @@
                 <div id="gauche">
                     <p:accordionPanel id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}" rendered="#{(treeBean.browserName != 'agent') }">
                         <p:tab title="#{langueBean.getMsg('theso')}">
-                            <!-- navigation rapide par auto-complétion --> 
-                            <div id="rapidAccess" align="center" >
-                                <h:form >
-                                    <p:growl id="indexSearch" showDetail="true" />
-                                    <p:messages showDetail="true" autoUpdate="true" />
-                                    <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                   minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                                   a:placeholder="#{langueBean.getMsg('index.search')}" >
-                                       <!-- <p:ajax event="itemSelect" listener="#{autoComp.onItemSelect}" update="indexSearch" />-->
-                                        
-                                        <p:ajax event="itemSelect" listener="#{treeBean.majIndexRapidSearch()}" 
-                                                update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
-                                        
-                                    </p:autoComplete>
+                            <!-- CHOIX LANGUE DEBUT -->  
+                            <div id="divLangue">
+                                <h:panelGroup id="liste2">
+                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: left;">
+                                        <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
+                                            <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                           itemValue="#{t.id_iso639_1}"  />
+                                        </h:selectOneMenu>&nbsp;
+                                        <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
+                                                         update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                         styleClass="styleButton"/>
+                                    </h:form>
+                                </h:panelGroup>
 
-                                    <!-- gestion des domaines ou groupes --> 
-                                    <div id="imageEdition">
-                                        <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
-                                            <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
-                                            <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
-                                                <p:menuitem value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                <p:menuitem value="#{langueBean.getMsg('tools.regenerateOrphan')}" actionListener="#{vue.setRegenerateOrphan(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                            </p:menu>
-                                        </h:form>
-                                    </div>
-                                </h:form>
+                                <div id="imageEdition">
+                                    <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
+                                        <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
+                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
+                                            <p:menuitem value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                            <p:menuitem value="#{langueBean.getMsg('tools.regenerateOrphan')}" actionListener="#{vue.setRegenerateOrphan(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                        </p:menu>
+                                    </h:form>
+                                </div>
                             </div>
-                            <!-- navigation rapide par auto-complétion FIN -->  
+                            <!-- CHOIX LANGUE FIN -->  
                             <hr/>
                             <!-- ARBRE DEBUT -->  
                             <div id="divArbreTheso">
@@ -442,47 +421,51 @@
                                 <h:panelGroup id="panContenu">
                                     <div style="text-align: center">
                                         
-                                        <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 5px;" >
-                                            <!-- exporter le concept en SKOS -->
-                                            <p:commandButton value="Skos" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.conceptToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
-                                        
-                                            <!-- exporter le concept en JsonLd -->
-                                            <p:commandButton value="JsonLd" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.conceptToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
-                                        </h:form>                 
+                                        <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 10px;" >
 
-                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
-                                            <!-- exporter la branche en SKOS mode connecté -->
-                                            <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.brancheToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
-                                                                                    
-                                            <!-- exporter la branche en JsonLd -->
-                                            <p:commandButton value="JsonLd_Branch" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.brancheToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
-                                        </h:form>  
-                                        
-                                        
-                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type == 1)}" 
-                                                style="float: left; margin-right: 5px;" >
-                                            <!-- exporter la branche en SKOS mode connecté -->
-                                            <p:commandButton value="skos_Group" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.groupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
-                                                                                    
-                                            <!-- exporter la branche en JsonLd -->
-                                            <p:commandButton value="JsonLd_Group" ajax="false" styleClass="link">
-                                                <p:fileDownload  value="#{downloadBean.groupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
-                                            </p:commandButton>
+                                            
+                                            <p:commandLink id="exportSkos" actionListener="#{vue.setCptToSkos(true)}" ajax="false" styleClass="link" >
+                                                <h:outputText  value="Skos" title="#{langueBean.getMsg('index.btnExpCpt')}"/>
+                                            </p:commandLink>
+                                               
+                                             &nbsp; &nbsp; &nbsp;
+                                            
+                                            <p:commandLink id="exportJsonld" actionListener="#{vue.setCptToSkos(true)}" ajax="false" styleClass="link" >
+                                                <h:outputText value="JsonLd" title="#{langueBean.getMsg('index.btnExpCpt')}" />
+                                            </p:commandLink>  
+                                             
+                                            
+                                            
+                                            <br/><br/>
                                         </h:form>
-                                        
-                                        
-                                        
-                                        
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type != 1)}" 
+                                                style="float: left; margin-right: 10px;" >
+
+
+                                            &nbsp; &nbsp;
+                                            <p:commandLink id="exportSkosBranch" actionListener="#{downloadBean.branchSkos(selectedTerme.idC, selectedTerme.idTheso)}" ajax="false" styleClass="link" >
+                                                <h:outputText value="Skos_Branch" title="#{langueBean.getMsg('index.btnExpBranch')}" />
+                                            </p:commandLink>
+                                            &nbsp; &nbsp;
+                                            <p:commandLink id="exportJsonldBranch" actionListener="#{downloadBean.branchGroupSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" ajax="false" styleClass="link" >
+                                                <h:outputText value="JsonLd_Branch" title="#{langueBean.getMsg('index.btnExpBranch')}"/>
+                                            </p:commandLink>                                            
+                                            
+                                        </h:form>
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type == 1)}" 
+                                                style="float: left; margin-right: 10px;" >
+                                            &nbsp; &nbsp;
+                                            <p:commandLink id="exportSkosBranchGroup" actionListener="#{downloadBean.branchSkos(selectedTerme.idC, selectedTerme.idTheso)}" ajax="false" styleClass="link" >
+                                                <h:outputText value="Skos_Branch" title="#{langueBean.getMsg('index.btnExpBranch')}" />
+                                            </p:commandLink>
+                                            &nbsp; &nbsp;
+                                            <p:commandLink id="exportJsonldBranchGroup" actionListener="#{downloadBean.branchGroupSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" ajax="false" styleClass="link" >
+                                                <h:outputText value="JsonLd_Branch" title="#{langueBean.getMsg('index.btnExpBranch')}"/>
+                                            </p:commandLink>
+                                            
+                                            
+                                            <br/><br/>
+                                        </h:form>
                                         <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(1))}" style="float: left;" >
                                             <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
                                                              update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
@@ -490,17 +473,8 @@
                                             </p:commandButton>
                                             <br/><br/>
                                         </h:form>
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                    <div id="clean" />
+                                        <div id="clean" />
                                     </div>
-                                        
                                     <div id="alignGauche">
                                         <!--TERMES GENERIQUES DEBUT -->
                                         <div id="divGenerale" >
@@ -511,7 +485,7 @@
                                                         <h:form id="formEditTGen" 
                                                                 rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
 
-                                                            <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                                            <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-branch"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
                                                                 <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgDlg" oncomplete="PF('addTgDlg').show();" style="font-size: 12px;"/>
                                                                 <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" update=":idDeleteTgDlg" oncomplete="PF('deleteTgDlg').show();" style="font-size: 12px;"/>

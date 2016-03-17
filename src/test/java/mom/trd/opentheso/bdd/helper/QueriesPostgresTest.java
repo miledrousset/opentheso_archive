@@ -73,7 +73,7 @@ public class QueriesPostgresTest {
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "OTW");
+        config.addDataSourceProperty("databaseName", "pactols");
 
         config.addDataSourceProperty("serverName", "localhost");
         //config.addDataSourceProperty("serverName", "opentheso.mom.fr");
@@ -1205,6 +1205,21 @@ public class QueriesPostgresTest {
         
         conn.close();*/
     }
+    
+    /**
+     * Test of récupération des orphelin dans le thésaurus pour les ranger dans la table des orphelins
+     */
+    @org.junit.Test
+
+    public void testDeleteThesaurus() {
+        
+       HikariDataSource conn = openConnexionPool();
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        thesaurusHelper.deleteThesaurus(conn, "null");
+
+        
+        conn.close();
+    }    
     
     @org.junit.Test
 

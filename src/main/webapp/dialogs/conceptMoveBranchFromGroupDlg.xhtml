@@ -1,0 +1,59 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptMoveBranchFromGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="conceptMoveBranchFromGroupDlg" modal="true" resizable="false" >
+        <!-- Cas de la modification du nom du terme -->
+        <h:form >
+            <p:messages showDetail="true" autoUpdate="true" />
+            <!-- Cas de déplacement d'une branche TT vers un concept (d'un domaine à un concept) -->
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('popup.move')}" /></legend>
+                <h:form>
+                    <p:messages showDetail="true" autoUpdate="true" />
+                    <table>
+                        <tr>
+                            <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                            <td>
+                                <p:selectOneMenu value="#{autoComp.idOld}">
+                                    <f:selectItems value="#{selectedTerme.termeGenerique}" var="tg" itemValue="#{tg.key}"  itemLabel="#{tg.value}" />
+                                </p:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                            <td>
+                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                                itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
+                                    <f:facet name="itemtip">
+                                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                            <f:facet name="header" rendered="#{(t1.url) != null}">
+                                                <h:outputText value="ID : " />
+                                                <h:outputText value="#{t1.idConcept}" />
+                                            </f:facet>
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                            <h:outputText value="#{t1.groupLexicalValue}" />
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                            <h:outputText value="#{t1.definition}" />
+                                        </h:panelGrid>
+                                    </f:facet>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                    </table><br/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromDomain()}"
+                                     update=":idConceptMoveBranchFromGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton" 
+                                     oncomplete="PF('conceptMoveBranchFromGroupDlg').hide();"/>
+                </h:form>
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -69,6 +69,21 @@ public class AutoCompletBean implements Serializable {
         }
         return liste;
     }
+    
+    public void onItemSelect(SelectEvent event) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
+    }
+    
+    
+    public List<NodeAutoCompletion> completSearchTerm(String query) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), query);
+        }
+        return liste;
+    }    
 
     public List<NodeAutoCompletion> completGroup(String query) {
         selectedAtt = new NodeAutoCompletion();

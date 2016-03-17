@@ -1,0 +1,42 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idMoveBranchFromOrphanToGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="moveBranchFromOrphanToGroupDlg" modal="true" resizable="false" >
+        <h:form >
+            <!-- Cas d'ajout de déplacement d'une branche Orphenine vers un domaine -->
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
+                <h:form>
+                    <p:messages showDetail="true" autoUpdate="true" />
+                    <table>
+                        <tr>
+                            <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
+                        </tr>                        
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                            <td>
+                                <h:outputText value="#{autoComp.terme.idDomaine}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                            <td>
+                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completGroup}" var="t1"
+                                                itemLabel="#{t1.groupLexicalValue}" itemValue="#{t1}" converter="groupConverter" forceSelection="true">
+
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                    </table><br/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToDomain()}"
+                                     update=":idMoveBranchFromOrphanToGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton"
+                                     oncomplete="PF('moveBranchFromOrphanToGroupDlg').hide();"/>
+                </h:form>
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

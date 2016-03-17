@@ -176,6 +176,16 @@ public class TreeBean implements Serializable {
         reInit();
         reExpand();
     }
+    
+    /**
+     * Permet de mettre à jour l'arbre et le terme à la sélection d'un index rapide par autocomplétion
+     */
+    public void majIndexRapidSearch() {
+        selectedTerme.majIndexRapidSearch();
+        reInit();
+        reExpand();
+    }    
+    
 
     /**
      * Permet de mettre à jour l'arbre et le terme à la sélection d'un résultat de recherche permutée
@@ -660,6 +670,8 @@ public class TreeBean implements Serializable {
      * Change le nom du terme courant avec mise à jour dans l'abre
      */
     public void editNomT() {
+        if(selectedTerme == null) return;
+        if(selectedTerme.getSelectedTermComp() == null) return;
         // si c'est la même valeur, on fait rien
         String valueEdit = selectedTerme.getSelectedTermComp().getTermLexicalValue().trim();
         if(selectedTerme.getNom().trim().equals(valueEdit)) {
@@ -716,34 +728,6 @@ public class TreeBean implements Serializable {
     }
 
     /**
-     * Fusionne les concepts avec mise Ã  jour dans l'abre
-     */
-    public void fusionConcept() {
-        if (selectedTerme.getConceptFusionId().equals(selectedTerme.getIdC())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), langueBean.getMsg("error")));
-            selectedTerme.setConceptFusionId(null);
-            selectedTerme.setConceptFusionAlign(null);
-            selectedTerme.setConceptFusionNodeRT(null);
-        } else {
-            int idUser = selectedTerme.getUser().getUser().getId();
-            for (NodeRT rt : selectedTerme.getConceptFusionNodeRT()) {
-                HierarchicalRelationship hr = new HierarchicalRelationship(rt.getIdConcept(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), "RT");
-                new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
-            }
-            for (NodeAlignment na : selectedTerme.getConceptFusionAlign()) {
-                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso());
-            }
-            new ConceptHelper().addConceptFusion(connect.getPoolConnexion(), selectedTerme.getConceptFusionId(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info6")));
-            reInit();
-            reExpand();
-
-        }
-        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
-        vue.setAddTInfo(0);
-    }
-
-    /**
      * Supprime la relation hiÃ©rarchique qui lie le terme courant au terme dont
      * l'id est passÃ© en paramÃ¨tre puis met l'arbre Ã  jour. Si type vaut 0,
      * le terme courant est le fils, si type vaut 1, le terme courant est le
@@ -775,8 +759,63 @@ public class TreeBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info3")));
     }
 
-    public boolean suppConcept() {
-        if (selectedTerme.getChoixdesactive().equals("0")) {
+    public boolean desactivateConcept() {
+        if (!selectedTerme.deprecateConcept()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.error3")));
+            return false;
+        }
+        reInit();
+        reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info4")));
+        vue.setAddTInfo(0);
+        return true;
+        
+    }
+    
+    public boolean getConceptForFusion() {
+        if (selectedTerme.getSelectedTermComp() == null || !selectedTerme.loadConceptFusion()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error5")));
+            vue.setAddTInfo(0);
+            return false;
+        }
+        vue.setAddTInfo(3);
+        return true;
+    }
+    
+    public void initConceptFusion (){
+        selectedTerme.initConceptFusion();
+    }
+  
+    
+    /**
+     * Fusionne les concepts avec mise à  jour dans l'abre
+     */
+    public void fusionConcept() {
+        if (selectedTerme.getConceptFusionId().equals(selectedTerme.getIdC())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), langueBean.getMsg("error")));
+            selectedTerme.setConceptFusionId(null);
+            selectedTerme.setConceptFusionAlign(null);
+            selectedTerme.setConceptFusionNodeRT(null);
+        } else {
+            int idUser = selectedTerme.getUser().getUser().getId();
+            for (NodeRT rt : selectedTerme.getConceptFusionNodeRT()) {
+                HierarchicalRelationship hr = new HierarchicalRelationship(rt.getIdConcept(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), "RT");
+                new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
+            }
+            for (NodeAlignment na : selectedTerme.getConceptFusionAlign()) {
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso());
+            }
+            new ConceptHelper().addConceptFusion(connect.getPoolConnexion(), selectedTerme.getConceptFusionId(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info6")));
+            reInit();
+            reExpand();
+
+        }
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        vue.setAddTInfo(0);
+    }    
+        
+ /*       if (selectedTerme.getChoixdesactive().equals("0")) {
             if (!selectedTerme.delConcept()) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.error3")));
                 return false;
@@ -798,9 +837,9 @@ public class TreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error6")));
             vue.setAddTInfo(0);
             return false;
-        }
-
-    }
+        }*/        
+        
+    
 
     public boolean reactivConcept() {
         if (!selectedTerme.reactivConcept()) {

@@ -75,7 +75,13 @@ INSERT INTO note_type (code, isterm, isconcept) VALUES ('editorialNote', true, f
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('historyNote', true, true);
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('scopeNote', false, true);
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('note', false, true);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('example', true, false);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, false);
 
+
+--mise à jour de la table term 
+ALTER TABLE term ADD COLUMN contributor character varying;
+ALTER TABLE term ADD COLUMN creator character varying;
 
 
 -- Table: preferences

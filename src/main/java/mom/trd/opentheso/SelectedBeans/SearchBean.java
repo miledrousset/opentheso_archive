@@ -22,6 +22,8 @@ public class SearchBean implements Serializable {
     private String idGroup;
     private int typeSearch = 1;
     private int startByOrContain = 1;
+    private boolean withNote = false;
+    private boolean onlyNote = false;
     private String langue;
     private int nbRes;
     ArrayList<NodeSearch> result1 = new ArrayList<>();
@@ -41,25 +43,16 @@ public class SearchBean implements Serializable {
             if (typeValueSearch == 0) { // Terme
                 // recherche commencant par startByOrContain = 2
                 // recherche contient startByOrContain = 1
-                if(startByOrContain == 1) {
-                    if (idGroup == null || idGroup.equals("")) {
-                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus());
-                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus()));
-                    } else {
-                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup);
-                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup));
-                    }
-                }
-                if(startByOrContain == 2) {
-                    if (idGroup == null || idGroup.equals("")) {
-                        result1 = new SearchHelper().searchTermStartBy(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus());
-                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus()));
-                    } else {
-                        result1 = new SearchHelper().searchTermStartBy(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup);
-                    //    result1.addAll(new SearchHelper().searchNonPreferedTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup));
-                    }
-                }                
                 
+                if(onlyNote) {
+                    result1 = new SearchHelper().searchNote(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                    startByOrContain);
+                }
+                else {
+                    result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                            startByOrContain, withNote);                        
+                }
+               
             } else if(typeValueSearch == 1) { // idC
                 result1 = new SearchHelper().searchIdConcept(connect.getPoolConnexion(), entry, theso.getThesaurus().getId_thesaurus(), langue.trim());
             }
@@ -81,9 +74,11 @@ public class SearchBean implements Serializable {
                 nbRes = result1.size();
             }
         }
-        if (!langue.trim().equals(theso.getThesaurus().getLanguage())) {
-            theso.getThesaurus().setLanguage(langue.trim());
-            theso.update();
+        if(!langue.isEmpty()) {
+            if (!langue.trim().equals(theso.getThesaurus().getLanguage())) {
+                theso.getThesaurus().setLanguage(langue.trim());
+                theso.update();
+            }
         }
         for(NodeSearch ns : result1) {
             String temp = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), ns.getIdGroup(), theso.getThesaurus().getId_thesaurus(), theso.getThesaurus().getLanguage());
@@ -215,4 +210,21 @@ public class SearchBean implements Serializable {
     public void setNbRes(int nbRes) {
         this.nbRes = nbRes;
     }
+
+    public boolean isWithNote() {
+        return withNote;
+    }
+
+    public void setWithNote(boolean withNote) {
+        this.withNote = withNote;
+    }
+
+    public boolean isOnlyNote() {
+        return onlyNote;
+    }
+
+    public void setOnlyNote(boolean onlyNote) {
+        this.onlyNote = onlyNote;
+    }
+    
 }

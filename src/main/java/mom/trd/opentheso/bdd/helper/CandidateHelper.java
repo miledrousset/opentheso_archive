@@ -827,7 +827,60 @@ public class CandidateHelper {
         return idTermCandidat;
     }       
     
- 
+     /**
+     * Cette fonction permet de retourner l'Id du candidat d'après son nom
+     * 
+     * @param ds
+     * @param title
+     * @param idThesaurus
+     * @return  idTermCandidat
+     */
+    public String getIdCandidatFromTitle(HikariDataSource ds,
+            String title, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idTermCandidat = null;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT concept_candidat.id_concept"
+                            + " FROM concept_candidat, concept_term_candidat, term_candidat"
+                            + " WHERE"
+                            + " concept_candidat.id_concept = concept_term_candidat.id_concept"
+                            + " AND"
+                            + " concept_term_candidat.id_thesaurus = term_candidat.id_thesaurus"
+                            + " AND"
+                            + " term_candidat.id_term = concept_term_candidat.id_term"
+                            + " AND"
+                            + " term_candidat.id_thesaurus = '" + idThesaurus + "'"
+                            + " and"
+                            + " term_candidat.lexical_value = '" + title + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if(resultSet.next()) {
+                        idTermCandidat = resultSet.getString("id_concept");
+                    }
+                    else
+                        return null;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting idCandidat from candidat value : " + title, sqle);
+        }
+        return idTermCandidat;
+    }   
     
     /**
      * Cette fonction permet de supprimer un term_candidat 
@@ -1974,13 +2027,8 @@ public class CandidateHelper {
                             + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        resultSet.next();
-                        if (resultSet.getRow() == 0) {
-                            existe = false;
-                        } else {
-                            existe = true;
-                        }
+                    if(resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
                     }
 
                 } finally {

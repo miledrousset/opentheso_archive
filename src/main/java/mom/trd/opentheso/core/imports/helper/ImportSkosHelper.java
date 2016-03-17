@@ -40,6 +40,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -87,7 +88,7 @@ public class ImportSkosHelper {
         thesaurus = new Thesaurus();
         idTopConcept = new ArrayList<>();
         idGroups = new ArrayList<>();
-        idGroupDefault = "default";
+        idGroupDefault = "";
         dataSet = null;
     }
     
@@ -161,8 +162,7 @@ public class ImportSkosHelper {
 
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
 
-
-
+        idGroupDefault = getNewId();
         for (SKOSConceptScheme scheme : dataSet.getSKOSConceptSchemes()) {
             // récupération du nom de thésaurus
             thesaurus.setTitle(getIdFromUri(scheme.getURI().toString()));
@@ -239,7 +239,7 @@ public class ImportSkosHelper {
         return false;
     }
     
-    public boolean addDeafaultThesaurus(){
+    public boolean addDefaultThesaurus(){
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         
         thesaurus.setTitle("Theso1");
@@ -365,7 +365,8 @@ public class ImportSkosHelper {
         if(dataSet.getSKOSConcepts().isEmpty())
             return false;
         
-        int i=0;
+
+        conceptsCount = dataSet.getSKOSConcepts().size();
         // i can get all the concepts from this scheme
         for (SKOSConcept conceptsInScheme : dataSet.getSKOSConcepts()) {
             // URI du Concept récupération automatique de l'identifiant

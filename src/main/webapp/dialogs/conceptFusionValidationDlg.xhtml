@@ -1,0 +1,88 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptFusionValidationDlg" header="#{langueBean.getMsg('index.fusion')}" widgetVar="conceptFusionValidationDlg" modal="true" resizable="false">
+        <!-- Cas de la désactivation du concept Deprecated puis le transfert des liens vers le concept d'arrivé -->
+        <!-- POP UP INFO TERME DEBUT -->
+        <h:form>
+            <!-- Cas de la fusion du concept étape 2 -->
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <tr>
+                    <td colspan="2"><h:outputText value="#{langueBean.getMsg('popup.reorCpt')} (#{selectedTerme.idC} --> #{selectedTerme.conceptFusionId})" /> : </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h:outputText value="#{langueBean.getMsg('popup.duplicAsso')}" /> :
+                    </td>
+                    <td>
+                        <table id="tableRelations">
+                            <tr>
+                                <th><h:outputText value="#{langueBean.getMsg('popup.terms')}" /></th>
+                                <th></th>
+                            </tr>
+                            <ui:repeat value="#{selectedTerme.conceptFusionNodeRT}" var="itemFuRT">
+                                <tr>
+                                    <td><h:outputText value="#{itemFuRT.title} (#{itemFuRT.idConcept})" /></td>
+                                    <td>
+                                        <h:form>
+                                            <p:commandButton id="cbSuppRTFuTheso" styleClass="cbSupp" icon="ui-icon-supp"  update=":idConceptFusionValidationDlg"
+                                                             oncomplete="PF('conceptFusionValidationDlg').show();" actionListener="#{selectedTerme.delRTFusion(itemFuRT)}" />
+                                        </h:form>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h:outputText value="#{langueBean.getMsg('popup.duplicAlign')}" /> :
+                    </td>
+                    <td>
+                        <table id="tableRelations">
+                            <tr>
+                                <th><h:outputText value="#{langueBean.getMsg('theso')}" /></th>
+                                <th><h:outputText value="#{langueBean.getMsg('concept')}" /></th>
+                                <th></th>
+                            </tr>
+                            <ui:repeat value="#{selectedTerme.conceptFusionAlign}" var="itemDelFuAlign">
+                                <tr>
+                                    <td><h:outputText value="#{itemDelFuAlign.uri_target}" /></td>
+                                    <td><h:outputText value="#{itemDelFuAlign.concept_target}" /></td>
+                                    <td>
+                                        <h:form>
+                                            <p:commandButton id="cbSuppFiAlign" styleClass="cbSupp" icon="ui-icon-supp" 
+                                                             actionListener="#{selectedTerme.delFuAlign(itemDelFuAlign)}" update=":idConceptFusionValidationDlg"
+                                                             oncomplete="PF('conceptFusionValidationDlg').show();"/>
+                                        </h:form>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" style="text-align: center;">
+                        <h:form>
+                            <p:commandButton id="cbCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
+                                              actionListener="#{treeBean.fusionConcept()}"
+                                              update=":idConceptFusionValidationDlg,:accordeonTree,:panContenu," styleClass="styleButton"                                               
+                                              oncomplete="PF('conceptFusionValidationDlg').hide();"/>
+                        </h:form>
+                    </td>
+                    <td colspan="1" style="text-align: center;">
+                        <p:commandButton title="Cancel" icon="ui-icon-annuler" actionListener="#{treeBean.initConceptFusion()}" 
+                                         update=":idConceptFusionDlg"
+                                         oncomplete="PF('conceptFusionValidationDlg').hide();"  immediate="true"/>
+                    </td>                              
+                </tr>
+            </table>
+        </h:form>
+        <!-- POP UP INFO TERME FIN -->    
+    </p:dialog>
+</ui:composition>

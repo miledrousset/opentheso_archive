@@ -1,0 +1,49 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idModifyTraductionDlg"  header="#{langueBean.getMsg('btnEdit')}" widgetVar="modifyTraductionDlg" modal="true" resizable="false" >
+        <!-- Cas de la modification du nom du terme -->
+        <h:form >
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <tr>
+                    <td colspan="2" style="text-align: center;"><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
+                    <td>
+                        <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                       minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
+
+
+                            <f:facet name="itemtip">
+                                <h:panelGrid columns="2" cellpadding="5" width="300" >
+                                                                        <ui:repeat value="#{t1}" var="itemFuRT">
+                                <tr>
+                                    <td><h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" /></td>
+                                </tr>
+                            </ui:repeat>
+                                    <h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" />
+                                </h:panelGrid>
+                            </f:facet>
+                        </p:autoComplete>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{treeBean.editNomT}" 
+                                         update=":idConceptEditDlg,:accordeonTree,:panContenu" styleClass="styleButton"
+                                         oncomplete="PF('conceptEditDlg').hide();"/>
+                    </td>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton title="Cancel" icon="ui-icon-annuler" styleClass="styleButton" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -511,6 +511,19 @@ public class SelectedTerme implements Serializable {
         MyTreeNode mtn = new MyTreeNode(type, nodeSe.getIdConcept(), nodeSe.getIdThesaurus(), nodeSe.getIdLang(), nodeSe.getIdGroup(), null, null, nodeSe.getLexical_value(), null);
         majTerme(mtn);
     }
+    
+    public void majIndexRapidSearch() {
+        if (nodeSe.isTopConcept()) {
+            type = 2;
+        } else {
+            type = 3;
+        }
+        String idConcept = getSelectedTermComp().getIdConcept();
+        MyTreeNode mtn = new MyTreeNode(type,
+                idConcept, idTheso, idlangue, idDomaine, null, null, getSelectedTermComp(), null);
+           //     nodeSe.getIdConcept(), nodeSe.getIdThesaurus(), nodeSe.getIdLang(), nodeSe.getIdGroup(), null, null, nodeSe.getLexical_value(), null);
+        majTerme(mtn);
+    }    
 
     public void majSearchPermute() {
         if (new ConceptHelper().isTopConcept(connect.getPoolConnexion(), nodePe.getIdConcept(), idTheso, nodePe.getIdGroup())) {
@@ -1198,6 +1211,7 @@ public class SelectedTerme implements Serializable {
         }
         vue.setAddTInfo(0);
         nom = nomEdit;
+        nomEdit = "";
         return true;
     }
 
@@ -1624,7 +1638,7 @@ public class SelectedTerme implements Serializable {
      *
      * @return
      */
-    public boolean delConcept() {
+    public boolean deprecateConcept() {
         if (!new ConceptHelper().desactiveConcept(connect.getPoolConnexion(),
                 idC, idTheso, user.getUser().getId())) {
             return false;
@@ -1684,7 +1698,8 @@ public class SelectedTerme implements Serializable {
      * @return
      */
     public boolean loadConceptFusion() {
-        if (new ConceptHelper().getThisConcept(connect.getPoolConnexion(), selectedTermComp.getIdConcept(), idTheso) == null) {
+        if(!new ConceptHelper().isIdExiste(connect.getPoolConnexion(), selectedTermComp.getIdConcept(), idTheso)){
+        //if (new ConceptHelper().getThisConcept(connect.getPoolConnexion(), selectedTermComp.getIdConcept(), idTheso) == null) {
             return false;
         }
         conceptFusionId = selectedTermComp.getIdConcept();
@@ -1693,6 +1708,20 @@ public class SelectedTerme implements Serializable {
         vue.setAddTInfo(3);
         return true;
     }
+    
+     /**
+     * initialisation pour la fusion des concepts.
+     *
+     * @return
+     */
+    public boolean initConceptFusion() {
+        conceptFusionId = "";
+        conceptFusionNodeRT = new ArrayList<>();
+        conceptFusionAlign = new ArrayList<>();
+        selectedTermComp = new NodeAutoCompletion();
+                
+        return true;
+    }   
 
     /**
      * Renvoie le type du concept générique

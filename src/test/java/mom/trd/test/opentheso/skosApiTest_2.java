@@ -69,7 +69,7 @@ public class skosApiTest_2 {
 
             SKOSManager man = new SKOSManager();
 //
-            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/test_unesco2.xml"));
+            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/rameau17.xml"));
 
 
             //////
@@ -85,6 +85,27 @@ public class skosApiTest_2 {
                 for (SKOSEntity broaderConcepts : concept.getSKOSRelatedEntitiesByProperty(dataSet, man.getSKOSDataFactory().getSKOSBroaderProperty())) {
                     System.err.println("\t hasBroader: " + broaderConcepts.getURI());
                 }
+                
+                    for (SKOSAnnotation anno : concept.getSKOSAnnotations(dataSet)) {
+                        System.err.print("\t\tAnnotation: " + anno.getURI() + "-> ");
+                        if (anno.isAnnotationByConstant()) {
+                            if (anno.getAnnotationValueAsConstant().isTyped()) {
+                                SKOSTypedLiteral con = anno.getAnnotationValueAsConstant().getAsSKOSTypedLiteral();
+                                System.err.print(con.getLiteral() + " Type: " + con.getDataType().getURI());
+                            }
+                            else {
+                                SKOSUntypedLiteral con = anno.getAnnotationValueAsConstant().getAsSKOSUntypedLiteral();
+                                System.err.print(con.getLiteral());
+                                if (con.hasLang()) {
+                                    System.err.print("@" + con.getLang());
+                                }
+                            }
+                            System.err.println("");
+                        }
+                        else {
+                            System.err.println(anno.getAnnotationValue().getURI().toString());
+                        }
+                    }                
 
             }
 

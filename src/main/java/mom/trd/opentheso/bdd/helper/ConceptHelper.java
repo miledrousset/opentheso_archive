@@ -2844,7 +2844,7 @@ public class ConceptHelper {
         ArrayList<NodeConceptExport> listNce = new ArrayList<>();
 
         //Récupération des concept
-        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idThesaurus);
+        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idThesaurus, "", 1, false);
         for (NodeSearch ns : listRes) {
             Concept concept = getThisConcept(ds, ns.getIdConcept(), idThesaurus);
             NodeConceptExport nce = new NodeConceptExport();
@@ -2923,7 +2923,7 @@ public class ConceptHelper {
         ArrayList<NodeConceptExport> listNce = new ArrayList<>();
 
         //Récupération des concept
-        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idThesaurus, idGroup);
+        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idThesaurus, idGroup, 1, false);
         for (NodeSearch ns : listRes) {
             Concept concept = getThisConcept(ds, ns.getIdConcept(), idThesaurus);
             NodeConceptExport nce = new NodeConceptExport();

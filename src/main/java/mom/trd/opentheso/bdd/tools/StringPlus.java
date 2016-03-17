@@ -60,7 +60,7 @@ public class StringPlus {
         s = s.replaceAll("\\'", "''");
         // Handle backslashes (You like the Java style...)
         s = s.replaceAll("\\\\", "\\\\\\\\");
-        return s;
+        return s.trim();
     }
     
     /**
@@ -77,4 +77,26 @@ public class StringPlus {
         s = s.replaceAll("\"", " ");
         return s;
     }
+    
+    /**
+     * Fonction qui permet de normaliser les textes pour les documents XML
+     * @param s
+     * @return 
+     */
+    public String clearStringForSerach(String s) {
+        if (s == null) {
+            return null;
+        }
+        // normalisation of words for XML
+        s = s.replaceAll("&", " ");
+        s = s.replaceAll("-", " ");
+        s = s.replaceAll("_", " ");
+        s = s.replaceAll("/", " ");
+        s = s.replaceAll("(", " ");
+        s = s.replaceAll(")", " ");        
+        
+        return s;
+    }    
+    
+    
 }

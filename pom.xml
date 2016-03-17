@@ -124,6 +124,16 @@
             <version>4.0.2</version>
         </dependency>
 
+        <!--
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-distribution</artifactId>
+            <version>5.0.0</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        -->
+
         <dependency>
             <groupId>skosapi</groupId>
             <artifactId>skosapi</artifactId>

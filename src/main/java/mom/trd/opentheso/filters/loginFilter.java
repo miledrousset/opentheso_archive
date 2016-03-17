@@ -34,13 +34,14 @@ public class loginFilter implements Filter {
         String url = req.getRequestURI();
         if(url.contains("deco.xhtml")) {
             CurrentUser temp = (CurrentUser)req.getSession().getAttribute("user1");
+            
             temp.setUser(new NodeUser());
             temp.setIsLogged(false);
             req.getSession().setAttribute("user1", temp);
             
             ((SelectedCandidat)req.getSession().getAttribute("selectedCandidat")).reInit();
             
-            resp.sendRedirect(req.getServletContext().getContextPath());
+            resp.sendRedirect("/index.xhtml");//req.getServletContext().getContextPath());
         }
         else if(session == null || !session.isLogged()) {
             if(url.contains("conf.xhtml") || url.contains("gestCandidat.xhtml") || url.contains("edition.xhtml") || url.contains("statistic.xhtml")) {

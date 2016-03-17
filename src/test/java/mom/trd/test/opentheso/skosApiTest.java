@@ -74,7 +74,7 @@ public class skosApiTest {
 
             SKOSManager man = new SKOSManager();
 //
-            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/pactols_test.rdf"));
+            SKOSDataset dataSet = man.loadDatasetFromPhysicalURI(URI.create("file:/Users/Miled/Desktop/test_unesco2.rdf"));
             SKOSDataFactory sKOSDataFactory = man.getSKOSDataFactory();
       //      SKOSCollection skosCollection = sKOSDataFactory.getSKOSCollection(URI.create("file:/Users/Miled/Desktop/test_unesco.xml"));
             //////

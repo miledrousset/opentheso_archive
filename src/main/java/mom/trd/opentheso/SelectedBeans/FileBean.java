@@ -148,7 +148,7 @@ public class FileBean implements Serializable {
            FacesContext.getCurrentInstance().addMessage(null, 
                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
 
-           if(!importSkosHelper.addDeafaultThesaurus()){
+           if(!importSkosHelper.addDefaultThesaurus()){
                // echec de l'ajout du nom de thésaurus
                FacesContext.getCurrentInstance().addMessage(null, 
                    new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
@@ -301,7 +301,7 @@ public class FileBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
 
-            if(!importSkosHelper.addDeafaultThesaurus()){
+            if(!importSkosHelper.addDefaultThesaurus()){
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
             }
@@ -383,7 +383,7 @@ public class FileBean implements Serializable {
                         FacesContext.getCurrentInstance().addMessage(null, 
                                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
                         
-                        if(!importSkosHelper.addDeafaultThesaurus()){
+                        if(!importSkosHelper.addDefaultThesaurus()){
                             FacesContext.getCurrentInstance().addMessage(null, 
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
                         }
