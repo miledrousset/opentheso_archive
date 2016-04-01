@@ -16,7 +16,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
@@ -29,8 +28,8 @@ import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
@@ -71,8 +70,12 @@ public class SelectedThesaurus implements Serializable {
     
     
     // Variables resourcesBundle
-    String langueSource;
+    String langueSource; // la langue de travail par thésaurus (info de la base de données)
+    String workLanguage; // la langue de travail pour démarrer (info du fichier de configuration
     String cheminSite;
+    String defaultThesaurusId;
+    
+    private NodePreference nodePreference;
     private String version;
     private boolean arkActive;
     private String serverArk;
@@ -255,12 +258,13 @@ public class SelectedThesaurus implements Serializable {
         editTheso = new Thesaurus();
         nodeCG = new NodeGroup();
         ResourceBundle bundlePref = getBundlePref();
-//        System.out.println(langueSource);
         cheminSite = bundlePref.getString("cheminSite");
         version = bundlePref.getString("version");
         String useArk = bundlePref.getString("useArk");
         arkActive = useArk.equals("true");
         serverArk = bundlePref.getString("serverArk");
+        workLanguage = bundlePref.getString("workLanguage");
+        defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
         idCurl = null;
         idGurl = null;        
         idTurl = null;
@@ -270,9 +274,11 @@ public class SelectedThesaurus implements Serializable {
 
     @PostConstruct
     public void initTheso() {
+        // récupération de la langue de travail préférée à partir du fichier de conf (péférences.properties)
+        
         if (connect.getPoolConnexion() != null) {
-            langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
-            arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+           // langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
+            arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), workLanguage).entrySet());
             langues = new LanguageHelper().getSelectItemLanguages(connect.getPoolConnexion());
             //bundlePref.getString("langueSource");
         } else {
@@ -509,8 +515,9 @@ public class SelectedThesaurus implements Serializable {
         tree.initTree(null, null);
         statBean.reInit();
         ThesaurusHelper th = new ThesaurusHelper();
-        if(th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), langueSource) != null) {
-            thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), langueSource);
+        nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+        if(th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang()) != null) {
+            thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang());
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         } else {
             thesaurus.setLanguage("");
@@ -534,25 +541,18 @@ public class SelectedThesaurus implements Serializable {
         tree.reInit();
         tree.initTree(null, null);
         statBean.reInit();
-        ThesaurusHelper th = new ThesaurusHelper();
-        
-        /*
-        vérification s'il y a un thésaurus par défaut à initialiser
-        */
-        ResourceBundle bundlePref = getBundlePref();
-        String defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
-        
-        if(th.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, langueSource) != null) {
-            thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, langueSource);
-            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        } else {
-            thesaurus.setLanguage("");
-        }
         uTree.reInit();
-        uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        vue.setCreat(false);
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        if(thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
+            thesaurus = thesaurusHelper.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, workLanguage);
+            if(thesaurus == null) return;
+            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            vue.setCreat(false);
+            tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+        }
     }
     
     /**
@@ -976,7 +976,11 @@ public class SelectedThesaurus implements Serializable {
         if(connect.getPoolConnexion() != null) {
          /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
             p.put("", "");*/
-            arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+            if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+                arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),workLanguage).entrySet());
+            else
+                arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
+                        connect.getPoolConnexion(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
         }
         return arrayTheso;
     }

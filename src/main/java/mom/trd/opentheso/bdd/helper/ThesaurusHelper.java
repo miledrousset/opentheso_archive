@@ -567,6 +567,48 @@ public class ThesaurusHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le thesaurus existe ou non
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isThesaurusExiste(HikariDataSource ds, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_thesaurus from thesaurus where "
+                            + " id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if thesaurus exist : " + idThesaurus, sqle);
+        }
+        return existe;
+    }       
+    
 
     /**
      * Cette fonction permet d'ajouter des cotes pour passer des données en JDBC

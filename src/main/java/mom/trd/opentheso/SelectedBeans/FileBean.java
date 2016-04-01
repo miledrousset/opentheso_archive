@@ -24,8 +24,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
-import mom.trd.DownloadBean;
-import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ImagesHelper;
 import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
@@ -99,7 +97,7 @@ public class FileBean implements Serializable {
     public void initFileBean() {
         ResourceBundle bundlePref = getBundlePref();
         pathImage = bundlePref.getString("pathImage");
-        langueSource = bundlePref.getString("langueSource");
+        langueSource = bundlePref.getString("workLanguage");
         dossierResize = bundlePref.getString("dossierResize");
 
     }

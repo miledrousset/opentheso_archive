@@ -104,3 +104,76 @@ ALTER TABLE preferences
   OWNER TO opentheso;
 
 INSERT INTO preferences (id_pref, source_lang, nb_alert_cdt, alert_cdt, id_thesaurus) VALUES (1, 'fr', 5, false, '1');
+
+
+--
+-- TOC entry 210 (class 1259 OID 56478)
+-- Name: roles; Type: TABLE; Schema: public; Owner: opentheso; Tablespace: 
+--
+DROP TABLE roles;
+
+CREATE TABLE roles (
+    id integer NOT NULL,
+    name character varying,
+    description character varying
+);
+
+
+ALTER TABLE roles OWNER TO opentheso;
+
+--
+-- TOC entry 211 (class 1259 OID 56484)
+-- Name: role_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+--
+
+CREATE SEQUENCE role_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE role_id_seq OWNER TO opentheso;
+
+--
+-- TOC entry 2465 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: opentheso
+--
+
+ALTER SEQUENCE role_id_seq OWNED BY roles.id;
+
+
+--
+-- TOC entry 2347 (class 2604 OID 56571)
+-- Name: id; Type: DEFAULT; Schema: public; Owner: opentheso
+--
+
+ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('role_id_seq'::regclass);
+
+
+--
+-- TOC entry 2466 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+--
+
+SELECT pg_catalog.setval('role_id_seq', 1, false);
+
+
+--
+-- TOC entry 2459 (class 0 OID 56478)
+-- Dependencies: 210
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: opentheso
+--
+
+INSERT INTO roles (id, name, description) VALUES (1, 'superAdmin', 'Super Administrateur pour tout gérer tout thésaurus et tout utilisateur');
+INSERT INTO roles (id, name, description) VALUES (2, 'admin', 'administrateur par thésaurus ou plus');
+INSERT INTO roles (id, name, description) VALUES (3, 'user', 'utilisateur par thésaurus ou plus');
+INSERT INTO roles (id, name, description) VALUES (4, 'traducteur', 'traducteur par thésaurus ou plus');
+INSERT INTO roles (id, name, description) VALUES (5, 'images', 'gestion des images par thésaurus ou plus');
+ALTER TABLE ONLY roles
+    ADD CONSTRAINT role_pkey PRIMARY KEY (id);
+
+

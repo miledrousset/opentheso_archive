@@ -13,7 +13,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
@@ -29,6 +28,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -421,8 +421,19 @@ public class TreeBean implements Serializable {
             }
         }
 
+
     }
 
+
+    
+    public void scrollToVisible() {
+        RequestContext.getCurrentInstance().update("accordeonTree:form:tree");//:divArbreTheso:form:scrollPanelTree");
+        RequestContext.getCurrentInstance().scrollTo("accordeonTree:form:tree:5_27_6_1");
+        RequestContext.getCurrentInstance().update("accordeonTree:form:tree");//"accordeonTree:form:tree");
+   //     RequestContext.getCurrentInstance().update("form:tree");
+    }
+    
+    
     /**
      * Expansion automatique des branches suivant la racine
      *

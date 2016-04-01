@@ -6,8 +6,9 @@ public class NodeUser implements Serializable {
     private int id;
     private String name;
     private String mail;
-    private String idRole;
+    private int idRole;
     private String role;
+    private String idThesaurus;
     
     public NodeUser() {
         
@@ -29,11 +30,11 @@ public class NodeUser implements Serializable {
         this.name = name;
     }
 
-    public String getIdRole() {
+    public int getIdRole() {
         return idRole;
     }
 
-    public void setIdRole(String idRole) {
+    public void setIdRole(int idRole) {
         this.idRole = idRole;
     }
 
@@ -52,4 +53,13 @@ public class NodeUser implements Serializable {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
+    public String getIdThesaurus() {
+        return idThesaurus;
+    }
+
+    public void setIdThesaurus(String idThesaurus) {
+        this.idThesaurus = idThesaurus;
+    }
+    
 }

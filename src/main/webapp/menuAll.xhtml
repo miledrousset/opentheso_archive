@@ -34,8 +34,8 @@
             --> 
             <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
             <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
-            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(1))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
-            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(1))}" value="statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
+            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
+            <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2))}" value="statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
         </ul>
     </div><br/>
 </ui:composition>

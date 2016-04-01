@@ -1,0 +1,52 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddUserDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="addUserDlg" modal="true" resizable="false" >
+           <!-- POPUP ADD USER DEBUT -->
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />
+               <table>
+                   <tr>
+                       <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>
+                       <td><h:inputText value="#{user1.nameEdit}" /></td>
+                   </tr>
+                   <tr>
+                       <td><h:outputText value="#{langueBean.getMsg('conf.mail')} : " /></td>
+                       <td><h:inputText value="#{user1.mailEdit}" /></td>
+                   </tr>
+                   <tr>
+                       <td><h:outputText value="#{langueBean.getMsg('co.att2')} : " /></td>
+                       <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
+                   </tr>
+                   <tr>
+                       <td><h:outputText value="#{langueBean.getMsg('conf.confPwd')} : " /></td>
+                       <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
+                   </tr>
+                   <tr>
+                       <td>#{langueBean.getMsg('conf.tabUserOpt2')} : </td>
+                       <td>
+                           <h:selectOneMenu value="#{user1.roleEdit}">
+                               <f:selectItems value="#{user1.selectAuthorizedRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
+                           </h:selectOneMenu>
+                       </td>
+                   </tr>
+                   <tr style="text-align: right;">
+                       <td >
+                           <br/>
+                           <p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{user1.addUser()}"  update=":tabUser" 
+                                                 styleClass="styleButton" oncomplete="PF('addUserDlg').hide();"/>
+                       </td>
+                       <td >
+                           <br/>
+                            <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton" update=":tabUser" oncomplete="PF('addUserDlg').hide();"  immediate="true"/>
+                        </td>
+                   </tr>
+               </table>
+           </h:form>        
+        <!-- POPUP ADD USER FIN --> 
+    </p:dialog>
+</ui:composition>

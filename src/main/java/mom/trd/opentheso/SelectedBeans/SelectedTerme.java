@@ -37,8 +37,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import mom.trd.LanguageBean;
-import mom.trd.opentheso.AlignmentQuery;
+import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
@@ -513,6 +512,11 @@ public class SelectedTerme implements Serializable {
     }
     
     public void majIndexRapidSearch() {
+        if(nodeSe == null) return;
+        //cas du premier chargement du thésaurus 
+        if(nodeSe.getIdConcept() == null) {
+            
+        }
         if (nodeSe.isTopConcept()) {
             type = 2;
         } else {

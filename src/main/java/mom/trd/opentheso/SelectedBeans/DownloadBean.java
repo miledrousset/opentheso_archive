@@ -1,4 +1,4 @@
-package mom.trd;
+package mom.trd.opentheso.SelectedBeans;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;

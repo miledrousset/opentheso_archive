@@ -12,6 +12,9 @@
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
     </h:head>
     <h:body>
+        <ui:include src="dialogs/user/addUserDlg.xhtml" />
+        <ui:include src="dialogs/user/editUserDlg.xhtml" />
+        
         <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
@@ -47,106 +50,18 @@
             <ui:include src="menuAll.xhtml" />
         </div>
         <center>
-<!-- POPUP ADD USER DEBUT -->
-        <h:panelGroup id="panAddUser" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.addUser == true}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.addUser == true}" styleClass="popUp">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('conf.popup2Title')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseFacette" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{user1.reInit()}" 
-                                     update=":panAddUser" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <h:form>
-                    <table>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>
-                            <td><h:inputText value="#{user1.nameEdit}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.mail')} : " /></td>
-                            <td><h:inputText value="#{user1.mailEdit}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('co.att2')} : " /></td>
-                            <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.confPwd')} : " /></td>
-                            <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
-                        </tr>
-                        <tr>
-                            <td>#{langueBean.getMsg('conf.tabUserOpt2')} : </td>
-                            <td>
-                                <h:selectOneMenu value="#{user1.roleEdit}">
-                                    <f:selectItems value="#{user1.selectAllRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
-                                </h:selectOneMenu>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <br/><p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{user1.addUser()}" update=":panAddUser,:tabUser" 
-                                                      styleClass="styleButton" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-            </h:panelGroup>
-        </h:panelGroup>
-<!-- POPUP ADD USER FIN -->
 
-<!-- POPUP EDIT USER DEBUT -->
-        <h:panelGroup id="panEditUser" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.editUser == true}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.editUser == true}" styleClass="popUp" style="width: 250px;">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('conf.popup1Title')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseFacette" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{user1.reInit()}" 
-                                     update=":panEditUser" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <h:form>
-                    <table>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.popup1opt1')}" /> : </td>
-                            <td><h:outputText value="#{user1.nameEdit}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.popup1Opt2')}" /> : </td>
-                            <td>
-                                <h:selectOneMenu value="#{user1.roleEdit}">
-                                    <f:selectItems value="#{user1.selectAllRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
-                                </h:selectOneMenu>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <br/><p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{user1.editUser()}" 
-                                                      update=":panEditUser,:tabUser" styleClass="styleButton"/>
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-            </h:panelGroup>
-        </h:panelGroup>
-<!-- POPUP EDIT USER FIN -->
+
         </center>
         <div id="principaleConf">
-            <h:panelGroup rendered="#{user1.haveRights(1)}">
+            <h:panelGroup rendered="#{user1.haveRights(2)}">
                 <fieldset class="fieldUser">
                     <legend><h:outputText value="#{langueBean.getMsg('conf.field1')}" /></legend>
                     <h:form>
-                        <p:commandButton value="#{langueBean.getMsg('conf.btnAddUser')}" actionListener="#{vue.setAddUser(true)}" update=":panAddUser" styleClass="styleButton" />
+                        <p:commandButton value="#{langueBean.getMsg('conf.btnAddUser')}"  update=":idAddUserDlg" oncomplete="PF('addUserDlg').show();" styleClass="styleButton" />
+
                     </h:form><br/>
-                    <p:dataTable id="tabUser" value="#{user1.selectAllUser()}" var="u" scrollable="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                    <p:dataTable id="tabUser" value="#{user1.selectAuthorizedUser()}" var="u" scrollable="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
                         <f:facet name="header">
                             <h:outputText value="#{langueBean.getMsg('conf.tabUser')}" />
                         </f:facet>
@@ -158,7 +73,7 @@
                         </p:column>
                         <p:column width="20" >
                             <h:form>
-                                <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{user1.selectUser(u)}" update=":panEditUser" />
+                                <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{user1.selectUser(u)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
                             </h:form>
                         </p:column>
                         <p:column width="20" >
@@ -228,7 +143,7 @@
                 </h:form>
             </fieldset>
 
-            <h:panelGroup rendered="#{user1.haveRights(1)}">
+            <h:panelGroup rendered="#{user1.haveRights(2)}">
                 <fieldset class="fieldPref">
                     <legend><h:outputText value="#{langueBean.getMsg('conf.field3')}" /></legend><br/>
                     <h:form id="formEditPref">

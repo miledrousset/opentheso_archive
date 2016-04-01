@@ -1333,10 +1333,10 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT users.username, users.id,"
+                    String query = "SELECT users.username, users.id_user,"
                             + " proposition.modified"
                             + " FROM proposition, users WHERE"
-                            + " proposition.id_user = users.id"
+                            + " proposition.id_user = users.id_user"
                             + " and proposition.id_concept = '" + idConcept + "'"
                             + " and proposition.id_thesaurus = '" + idThesaurus + "'"
                             + " order By proposition.modified DESC;";
@@ -1347,7 +1347,7 @@ public class CandidateHelper {
                         nodeUserList = new ArrayList<> ();
                         while(resultSet.next()) {
                             NodeUser nodeUser = new NodeUser();
-                            nodeUser.setId(resultSet.getInt("id"));
+                            nodeUser.setId(resultSet.getInt("id_user"));
                             nodeUser.setName(resultSet.getString("username"));
                             nodeUserList.add(nodeUser);
                         }
@@ -1394,9 +1394,9 @@ public class CandidateHelper {
                 try {
                     idTermCandidat = getIdTermOfConceptCandidat(ds, idConcept, idThesaurus);
                     String query = "SELECT term_candidat.lexical_value, term_candidat.lang,"
-                            + " users.username, users.id"
+                            + " users.username, users.id_user"
                             + " FROM users, term_candidat WHERE"
-                            + " term_candidat.contributor = users.id"
+                            + " term_candidat.contributor = users.id_user"
                             + " and term_candidat.lang != '" + idLang + "'"
                             + " and term_candidat.id_thesaurus = '" + idThesaurus + "'"
                             + " and term_candidat.id_term = '" + idTermCandidat + "'"

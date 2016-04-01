@@ -2013,7 +2013,7 @@ SELECT pg_catalog.setval('role_id_seq', 1, false);
 --
 
 INSERT INTO roles (id, name, description) VALUES (1, 'admin', 'administrateur');
-INSERT INTO roles (id, name, description) VALUES (2, 'repporter', 'repporter');
+INSERT INTO roles (id, name, description) VALUES (2, 'traducteur', 'traducteur');
 INSERT INTO roles (id, name, description) VALUES (3, 'user', 'utilisateur ');
 
 

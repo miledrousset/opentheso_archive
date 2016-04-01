@@ -1,15 +1,19 @@
 package mom.trd.opentheso.SelectedBeans;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
@@ -30,14 +34,16 @@ public class CurrentUser implements Serializable {
     private int idEdit;
     private String nameEdit;
     private String mailEdit;
-    private String roleEdit;
+    private int roleEdit;
     private String pwdEdit1 = "";
     private String pwdEdit2 = "";
     private String pwdEdit3 = "";
     private String langSourceEdit;
-    private int alertNbCdtEdit;
-    private boolean alertCdtEdit;
+    private int alertNbCdtEdit = 10;
+    private boolean alertCdtEdit = false;
     private String idTheso;
+    
+    private List<String> selectedThesaurus;
     
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -52,14 +58,40 @@ public class CurrentUser implements Serializable {
     @PostConstruct
     public void initUser() {
         user = new NodeUser();
-        if (connect.getPoolConnexion() != null) {
+    /*    if (connect.getPoolConnexion() != null) {
             NodePreference np = new UserHelper().getPreferenceUser(connect.getPoolConnexion());
             langSourceEdit = np.getSourceLang();
             alertNbCdtEdit = np.getNbAlertCdt();
             alertCdtEdit = np.isAlertCdt();
             
+        }*/
+    }
+    
+    /**
+     * cette fonction permet de retourner les préférences d'un thésaurus, 
+     * s'il y en a pas, on les initialises par les valeurs par defaut
+     * @param idThesaurus
+     * @param workLanguage 
+     * @return  
+     */
+    public NodePreference getThesaurusPreferences(String idThesaurus, String workLanguage) {
+        UserHelper userHelper = new UserHelper();
+        if (connect.getPoolConnexion() != null) {
+            NodePreference np = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
+            
+            if(np == null){ // cas où il n'y a pas de préférence pour ce thésaurus, il faut les créer 
+                userHelper.initPreferences(connect.getPoolConnexion(),
+                        idThesaurus, workLanguage, alertNbCdtEdit, alertCdtEdit);
+            } 
+            else {
+                langSourceEdit = np.getSourceLang();
+                alertNbCdtEdit = np.getNbAlertCdt();
+                alertCdtEdit = np.isAlertCdt();
+                idTheso = idThesaurus;                
+            }
+            return np;
         }
-        
+        return null;
     }
     
     /**
@@ -69,7 +101,7 @@ public class CurrentUser implements Serializable {
     public String action() {
         if(new UserHelper().isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
             isLogged = true; 
-            user = new UserHelper().getInfoUser(connect.getPoolConnexion(), name);
+            user = new UserHelper().getInfoUser(connect.getPoolConnexion(), name, idTheso);
             name = null;
             pwd = null;
             return "index.xhtml?faces-redirect=true";
@@ -80,13 +112,36 @@ public class CurrentUser implements Serializable {
     }
     
     public ArrayList<NodeUser> selectAllUser() {
-        ArrayList<NodeUser> listeUser = new UserHelper().getAllUsers(connect.getPoolConnexion());
+        ArrayList<NodeUser> listeUser = new UserHelper().getAllUsers(connect.getPoolConnexion(), idTheso);
         return listeUser;
     }
+    
+    public ArrayList<NodeUser> selectAuthorizedUser() {
+        int idRoleFrom = 3;
+        if(user.getIdRole() == 1) idRoleFrom = 1; // l'utilisateur est superAdmin
+        if(user.getIdRole() == 2) idRoleFrom = 2; // l'utilisateur est admin
+        if(user.getIdRole() > 2) idRoleFrom = 3; // l'utilisateur est autre        
+        ArrayList<NodeUser> listeUser = new UserHelper().getAuthorizedUsers(connect.getPoolConnexion(), idTheso, idRoleFrom);
+        return listeUser;
+    }    
     
     public ArrayList<Entry<String,String>> selectAllRoles() {
         return new UserHelper().getRoles(connect.getPoolConnexion());
     }
+    
+    /**
+     * Cette fonction permet de retourner la liste des roles autorisés
+     * pour un Role donné (c'est la liste qu'un utilisateur a le droit d'attribué à un nouvel utilisateur)
+     * @return 
+     */
+    public ArrayList<Entry<String,String>> selectAuthorizedRoles() {
+        int idRoleFrom = 3;
+        if(user.getIdRole() == 1) idRoleFrom = 1; // l'utilisateur est superAdmin
+        if(user.getIdRole() == 2) idRoleFrom = 2; // l'utilisateur est admin
+        if(user.getIdRole() > 2) idRoleFrom = 3; // l'utilisateur est autre
+       
+        return new UserHelper().getAuthorizedRoles(connect.getPoolConnexion(), idRoleFrom);
+    }    
     
     public void changePwd() {
         if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || pwdEdit3 == null || pwdEdit3.equals("")) {
@@ -132,8 +187,79 @@ public class CurrentUser implements Serializable {
         } else if (new UserHelper().isUserLoginExist(connect.getPoolConnexion(), nameEdit)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
         } else {
-            new UserHelper().addUser(connect.getPoolConnexion(), nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), Integer.parseInt(roleEdit));
-            vue.setAddUser(false);
+            Connection conn;
+            try {
+                UserHelper userHelper = new UserHelper();
+                conn = connect.getPoolConnexion().getConnection();
+                conn.setAutoCommit(false);
+
+                
+                // si l'utilisateur est un superAdmin, il peut créer un superAdmin                
+                
+                
+                // Cas de création de SuperAdmin
+                if(user.getIdRole() == 1) {
+                    // ajout de l'utilisateur
+                    if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;
+                    }
+                    // récupération de l'Id du User
+                    int idUser  = userHelper.getIdUser(conn, nameEdit);
+                    if(idUser == -1) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;
+                    }
+
+                    // ajout du role 
+                    if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;                    
+                    }
+                    conn.commit();
+                    conn.close();
+                }
+                
+                // Cas de création d'admin (par thésaurus)
+                if(user.getIdRole() == 2) {
+                    // ajout de l'utilisateur
+                    if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;
+                    }
+                    // récupération de l'Id du User
+                    int idUser  = userHelper.getIdUser(conn, nameEdit);
+                    if(idUser == -1) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;
+                    }
+
+                    // ajout du role 
+                    if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        conn.rollback();
+                        conn.close();
+                        return;                    
+                    }
+                    conn.commit();
+                    conn.close();
+                }                
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            
             mailEdit = "";
             pwdEdit1 = "";
             pwdEdit2 = "";
@@ -143,7 +269,7 @@ public class CurrentUser implements Serializable {
     }
     
     public void editUser() {
-        new UserHelper().updateRoleUser(connect.getPoolConnexion(), idEdit, Integer.parseInt(roleEdit));
+        new UserHelper().updateRoleUser(connect.getPoolConnexion(), idEdit, roleEdit, idTheso);
         nameEdit = "";
         vue.setEditUser(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info4")));
@@ -175,7 +301,7 @@ public class CurrentUser implements Serializable {
     }
     
     public boolean haveRights(int min) {
-        return Integer.parseInt(user.getIdRole()) <= min;
+        return user.getIdRole() <= min;
     }
     
     public String afficheEncode() {
@@ -254,11 +380,11 @@ public class CurrentUser implements Serializable {
         this.nameEdit = nameEdit;
     }
 
-    public String getRoleEdit() {
+    public int getRoleEdit() {
         return roleEdit;
     }
 
-    public void setRoleEdit(String roleEdit) {
+    public void setRoleEdit(int roleEdit) {
         this.roleEdit = roleEdit;
     }
 
@@ -324,6 +450,14 @@ public class CurrentUser implements Serializable {
 
     public void setIdTheso(String idTheso) {
         this.idTheso = idTheso;
+    }
+
+    public List<String> getSelectedThesaurus() {
+        return selectedThesaurus;
+    }
+
+    public void setSelectedThesaurus(List<String> selectedThesaurus) {
+        this.selectedThesaurus = selectedThesaurus;
     }
     
     

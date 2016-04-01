@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mom.trd.opentheso;
+package mom.trd.opentheso.core.alignment;
 
 import java.util.ArrayList;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;

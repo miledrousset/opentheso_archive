@@ -1403,7 +1403,7 @@ public class TermHelper {
                             + " WHERE id_term = '" + idTerm + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
-                            + " and term_historique.id_user=users.id"
+                            + " and term_historique.id_user=users.id_user"
                             + " order by modified DESC, lexical_value ASC";
 
                     stmt.executeQuery(query);
@@ -1423,7 +1423,6 @@ public class TermHelper {
                             nodeTermList.add(t);
                         }
                     }
-
                 } finally {
                     stmt.close();
                 }

@@ -23,7 +23,6 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import mom.trd.LanguageBean;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
@@ -279,7 +278,7 @@ public class SelectedCandidat implements Serializable {
             selected.setNbProp(selected.getNbProp() + 1);
 
             // envoie d'email d'alerte !!
-            int minAlert = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getNbAlertCdt();
+            int minAlert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(),idTheso).getNbAlertCdt();
             if (selected.getNbProp() >= minAlert) {
                 ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion());
                 for (String mail : lesMails) {
@@ -307,7 +306,7 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertNb(String candidat, String dest, int minAlert) {
         try {
-            boolean alert = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).isAlertCdt();
+            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
                 ResourceBundle bundlePref = getBundlePref();
 
@@ -347,7 +346,7 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertValid(String candidat, String dest) {
         try {
-            boolean alert = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).isAlertCdt();
+            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
                 ResourceBundle bundlePref = getBundlePref();
 
@@ -387,7 +386,7 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertRefut(String candidat, String dest) {
         try {
-            boolean alert = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).isAlertCdt();
+            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
                 ResourceBundle bundlePref = getBundlePref();
 

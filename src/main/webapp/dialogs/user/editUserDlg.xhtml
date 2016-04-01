@@ -1,0 +1,50 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idEditUserDlg" header="#{langueBean.getMsg('conf.popup1Title')}" widgetVar="editUserDlg" modal="true" resizable="false" >
+        <!-- POPUP EDIT USER DEBUT -->        
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <td>
+                    <p:panelGrid columns="2" >
+                        <h:outputText value="#{langueBean.getMsg('conf.popup1opt1')}" /> 
+                        <h:outputText value="#{user1.nameEdit}" style="color: green" />
+
+                        <h:outputText value="#{langueBean.getMsg('conf.popup1Opt2')}" /> 
+                        <h:selectOneMenu value="#{user1.roleEdit}">
+                            <f:selectItems value="#{user1.selectAuthorizedRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
+                        </h:selectOneMenu>
+                    </p:panelGrid>
+                </td>
+                <td>
+                        <p:panelGrid columns="1" >
+                            <p:outputLabel title="sélectionnez un ou plusieurs"  value="#{langueBean.getMsg('theso')}" />
+
+                            <p:selectManyMenu id="advanced" value="#{user1.selectedThesaurus}" >    
+                                <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                            </p:selectManyMenu>
+                        </p:panelGrid>
+                </td>                
+
+                 
+                <tr>
+                    <td colspan="1" style="text-align: center;">
+                        <br/><p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{user1.editUser()}" 
+                                              update=":tabUser" styleClass="styleButton" oncomplete="PF('editUserDlg').hide();"/>
+                    </td>
+                    <td >
+                        <br/>
+                         <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton"  oncomplete="PF('editUserDlg').hide();"  actionListener="#{user1.reInit()}" immediate="true"/>
+                    </td>                    
+                </tr>
+
+            </table>
+        </h:form>
+    </p:dialog>
+<!-- POPUP EDIT USER FIN -->    
+</ui:composition>

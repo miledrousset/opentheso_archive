@@ -1,4 +1,4 @@
-package mom.trd;
+package mom.trd.opentheso.SelectedBeans;
 
 import java.io.Serializable;
 import java.util.ResourceBundle;
@@ -38,9 +38,13 @@ public class LanguageBean implements Serializable {
     @PostConstruct
     public void InitLanguageBean() {
         if (connect.getPoolConnexion() != null) {
-           String langInit = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
-           currentBundle = "langue_" + langInit;
-        idLangue = langInit.toUpperCase();
+            
+            FacesContext context = FacesContext.getCurrentInstance();
+            ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
+            String langInit = bundlePref.getString("workLanguage");
+          // String langInit = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
+            currentBundle = "langue_" + langInit;
+            idLangue = langInit.toUpperCase();
         } else {
             currentBundle = "langue_fr";
             idLangue = "FR";

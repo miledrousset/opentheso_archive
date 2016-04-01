@@ -22,11 +22,11 @@
 
                             <f:facet name="itemtip">
                                 <h:panelGrid columns="2" cellpadding="5" width="300" >
-                                                                        <ui:repeat value="#{t1}" var="itemFuRT">
-                                <tr>
-                                    <td><h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" /></td>
-                                </tr>
-                            </ui:repeat>
+                                    <ui:repeat value="#{t1}" var="itemFuRT">
+                                        <tr>
+                                            <td><h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" /></td>
+                                        </tr>
+                                    </ui:repeat>
                                     <h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" />
                                 </h:panelGrid>
                             </f:facet>
