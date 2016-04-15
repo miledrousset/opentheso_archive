@@ -332,6 +332,69 @@ public class ThesaurusHelper {
     }
 
     /**
+     * retourne la liste des thésaurus  d'un utilisateur
+     * @param ds
+     * @param idUser
+     * @param idLang
+     * @return 
+     */
+    public Map getListThesaurusOfUser(HikariDataSource ds, int idUser, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        Map map = new HashMap();
+        ArrayList tabIdThesaurus = new ArrayList();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT DISTINCT user_role.id_thesaurus FROM"
+                            + " user_role WHERE"
+                            + " id_user = " + idUser;
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            tabIdThesaurus.add(resultSet.getString("id_thesaurus"));
+                        }
+                        for (Object tabIdThesauru : tabIdThesaurus) {
+                            query = "select title from thesaurus_label where"
+                                    + " id_thesaurus = '" + tabIdThesauru + "'" + " and lang = '" + idLang + "'";
+                            stmt.executeQuery(query);
+                            resultSet = stmt.getResultSet();
+                            if (resultSet != null) {
+                                resultSet.next();
+                                if (resultSet.getRow() == 0) {
+                                    map.put("(" + tabIdThesauru + ")", tabIdThesauru);
+                                } else {
+                                    map.put(resultSet.getString("title") + "(" + tabIdThesauru + ")", tabIdThesauru);
+                                }
+
+                            } else {
+                            }
+                        }
+
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Map of thesaurus : " + map.toString(), sqle);
+        }
+        return map;
+    }    
+    
+    /**
      * Retourne la liste des traductions d'un thesaurus sous forme de MAP (lang
      * + title)
      *

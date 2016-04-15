@@ -9,20 +9,20 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Classe Java pour dcElement complex type.
  * 
- * <p>Le fragment de sch?ma suivant indique le contenu attendu figurant dans cette classe.
+ * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="dcElement">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="language" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="dcElement"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="language" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -40,7 +40,7 @@ public class DcElement {
     protected String value;
 
     /**
-     * Obtient la valeur de la propri?t? language.
+     * Obtient la valeur de la propri\u00e9t\u00e9 language.
      * 
      * @return
      *     possible object is
@@ -52,7 +52,7 @@ public class DcElement {
     }
 
     /**
-     * D?finit la valeur de la propri?t? language.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 language.
      * 
      * @param value
      *     allowed object is
@@ -64,7 +64,7 @@ public class DcElement {
     }
 
     /**
-     * Obtient la valeur de la propri?t? name.
+     * Obtient la valeur de la propri\u00e9t\u00e9 name.
      * 
      * @return
      *     possible object is
@@ -76,7 +76,7 @@ public class DcElement {
     }
 
     /**
-     * D?finit la valeur de la propri?t? name.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 name.
      * 
      * @param value
      *     allowed object is
@@ -88,7 +88,7 @@ public class DcElement {
     }
 
     /**
-     * Obtient la valeur de la propri?t? value.
+     * Obtient la valeur de la propri\u00e9t\u00e9 value.
      * 
      * @return
      *     possible object is
@@ -100,7 +100,7 @@ public class DcElement {
     }
 
     /**
-     * D?finit la valeur de la propri?t? value.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 value.
      * 
      * @param value
      *     allowed object is

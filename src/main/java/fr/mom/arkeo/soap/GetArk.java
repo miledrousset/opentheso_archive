@@ -9,19 +9,19 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Classe Java pour getArk complex type.
  * 
- * <p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.
+ * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="getArk">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="arg0" type="{http://soap.arkeo.mom.fr/}account" minOccurs="0"/>
- *         &lt;element name="arg1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="getArk"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="arg0" type="{http://soap.arkeo.mom.fr/}account" minOccurs="0"/&gt;
+ *         &lt;element name="arg1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -37,7 +37,7 @@ public class GetArk {
     protected String arg1;
 
     /**
-     * Obtient la valeur de la propri�t� arg0.
+     * Obtient la valeur de la propri\u00e9t\u00e9 arg0.
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class GetArk {
     }
 
     /**
-     * D�finit la valeur de la propri�t� arg0.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 arg0.
      * 
      * @param value
      *     allowed object is
@@ -61,7 +61,7 @@ public class GetArk {
     }
 
     /**
-     * Obtient la valeur de la propri�t� arg1.
+     * Obtient la valeur de la propri\u00e9t\u00e9 arg1.
      * 
      * @return
      *     possible object is
@@ -73,7 +73,7 @@ public class GetArk {
     }
 
     /**
-     * D�finit la valeur de la propri�t� arg1.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 arg1.
      * 
      * @param value
      *     allowed object is

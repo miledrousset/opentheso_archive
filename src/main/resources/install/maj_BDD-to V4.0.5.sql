@@ -177,3 +177,65 @@ ALTER TABLE ONLY roles
     ADD CONSTRAINT role_pkey PRIMARY KEY (id);
 
 
+
+-- contraintes d'unicité sur la table note 
+ALTER TABLE ONLY note
+  ADD CONSTRAINT note_notetypecode_id_thesaurus_id_concept_lang_key UNIQUE (notetypecode, id_thesaurus, id_concept, lang);
+ALTER TABLE ONLY note
+  ADD CONSTRAINT note_notetypecode_id_thesaurus_id_term_lang_key UNIQUE (notetypecode, id_thesaurus, id_term, lang);
+
+
+
+-- Sequence: user__id_seq
+
+-- DROP SEQUENCE user__id_seq;
+
+CREATE SEQUENCE user__id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+ALTER TABLE user__id_seq
+  OWNER TO opentheso;
+
+
+
+-- Table: users
+
+DROP TABLE users;
+
+CREATE TABLE users
+(
+  id_user integer NOT NULL DEFAULT nextval('user__id_seq'::regclass),
+  username character varying NOT NULL,
+  password character varying NOT NULL,
+  active boolean NOT NULL,
+  mail character varying,
+  CONSTRAINT user_pkey PRIMARY KEY (id_user),
+  CONSTRAINT user_username_key UNIQUE (username)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE users
+  OWNER TO opentheso;
+
+
+-- Table: user_role
+
+-- DROP TABLE user_role;
+
+CREATE TABLE user_role
+(
+  id_user integer NOT NULL,
+  id_role integer NOT NULL,
+  id_thesaurus character varying NOT NULL,
+  id_group character varying,
+  CONSTRAINT user_role_pkey PRIMARY KEY (id_user, id_role, id_thesaurus)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE user_role
+  OWNER TO opentheso;

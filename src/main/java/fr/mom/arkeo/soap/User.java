@@ -9,24 +9,24 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Classe Java pour user complex type.
  * 
- * <p>Le fragment de sch?ma suivant indique le contenu attendu figurant dans cette classe.
+ * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="user">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="dbId" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="firstname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="lastname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="mail" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="uid" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="user" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="userGroup" type="{http://soap.arkeo.mom.fr/}group" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="user"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="dbId" type="{http://www.w3.org/2001/XMLSchema}int"/&gt;
+ *         &lt;element name="firstname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="lastname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="mail" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="uid" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="user" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="userGroup" type="{http://soap.arkeo.mom.fr/}group" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -52,7 +52,7 @@ public class User {
     protected Group userGroup;
 
     /**
-     * Obtient la valeur de la propri?t? dbId.
+     * Obtient la valeur de la propri\u00e9t\u00e9 dbId.
      * 
      */
     public int getDbId() {
@@ -60,7 +60,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? dbId.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 dbId.
      * 
      */
     public void setDbId(int value) {
@@ -68,7 +68,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? firstname.
+     * Obtient la valeur de la propri\u00e9t\u00e9 firstname.
      * 
      * @return
      *     possible object is
@@ -80,7 +80,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? firstname.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 firstname.
      * 
      * @param value
      *     allowed object is
@@ -92,7 +92,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? lastname.
+     * Obtient la valeur de la propri\u00e9t\u00e9 lastname.
      * 
      * @return
      *     possible object is
@@ -104,7 +104,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? lastname.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 lastname.
      * 
      * @param value
      *     allowed object is
@@ -116,7 +116,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? mail.
+     * Obtient la valeur de la propri\u00e9t\u00e9 mail.
      * 
      * @return
      *     possible object is
@@ -128,7 +128,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? mail.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 mail.
      * 
      * @param value
      *     allowed object is
@@ -140,7 +140,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? uid.
+     * Obtient la valeur de la propri\u00e9t\u00e9 uid.
      * 
      * @return
      *     possible object is
@@ -152,7 +152,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? uid.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 uid.
      * 
      * @param value
      *     allowed object is
@@ -164,7 +164,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? user.
+     * Obtient la valeur de la propri\u00e9t\u00e9 user.
      * 
      * @return
      *     possible object is
@@ -176,7 +176,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? user.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 user.
      * 
      * @param value
      *     allowed object is
@@ -188,7 +188,7 @@ public class User {
     }
 
     /**
-     * Obtient la valeur de la propri?t? userGroup.
+     * Obtient la valeur de la propri\u00e9t\u00e9 userGroup.
      * 
      * @return
      *     possible object is
@@ -200,7 +200,7 @@ public class User {
     }
 
     /**
-     * D?finit la valeur de la propri?t? userGroup.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 userGroup.
      * 
      * @param value
      *     allowed object is

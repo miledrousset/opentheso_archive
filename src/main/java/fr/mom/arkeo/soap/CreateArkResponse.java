@@ -10,18 +10,18 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Classe Java pour createArkResponse complex type.
  * 
- * <p>Le fragment de sch?ma suivant indique le contenu attendu figurant dans cette classe.
+ * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="createArkResponse">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="return" type="{http://soap.arkeo.mom.fr/}ark" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="createArkResponse"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="return" type="{http://soap.arkeo.mom.fr/}ark" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -36,7 +36,7 @@ public class CreateArkResponse {
     protected Ark _return;
 
     /**
-     * Obtient la valeur de la propri?t? return.
+     * Obtient la valeur de la propri\u00e9t\u00e9 return.
      * 
      * @return
      *     possible object is
@@ -48,7 +48,7 @@ public class CreateArkResponse {
     }
 
     /**
-     * D?finit la valeur de la propri?t? return.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 return.
      * 
      * @param value
      *     allowed object is

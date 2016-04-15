@@ -336,7 +336,7 @@ public class WriteFileSKOS {
             return uri;
         }
         if(nodeConceptExport.getConcept().getIdArk() == null){
-            System.out.println("nodeConcept.getConcept().getIdArk = Null");
+         //   System.out.println("nodeConcept.getConcept().getIdArk = Null");
             uri = serverAdress + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
                                 + "&amp;idt=" + nodeConceptExport.getConcept().getIdThesaurus();
             return uri;

@@ -8,7 +8,6 @@ package mom.trd.opentheso.core.jsonld.helper;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
-import mom.trd.opentheso.core.jsonld.api.JsonLdDocument;
 import skos.SKOSXmlDocument;
 
 /**

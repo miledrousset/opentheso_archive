@@ -984,6 +984,41 @@ public class SelectedThesaurus implements Serializable {
         }
         return arrayTheso;
     }
+    
+    /**
+     * Permet de retourner la liste des thésaurus autorisée pour un role
+     * @return 
+     */
+    public ArrayList<Entry<String, String>> getAuthorizedThesaurus() {
+        if(connect.getPoolConnexion() != null) {
+         /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
+            p.put("", "");*/
+         
+            if(tree.getSelectedTerme().getUser().getUser().getIdRole() == 1){// cas d'un SuperAdmin
+                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),
+                             workLanguage).entrySet());
+                else
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
+                            connect.getPoolConnexion(),
+                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());            
+            }
+            else {
+                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfUser(connect.getPoolConnexion(),
+                            tree.getSelectedTerme().getUser().getUser().getIdRole(),
+                            workLanguage).entrySet());
+                else
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfUser(
+                            connect.getPoolConnexion(),
+                            tree.getSelectedTerme().getUser().getUser().getIdRole(),
+                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());                 
+            }
+            
+
+        }
+        return arrayTheso;
+    }    
 
     public void setArrayTheso(ArrayList<Entry<String, String>> arrayTheso) {
         this.arrayTheso = arrayTheso;

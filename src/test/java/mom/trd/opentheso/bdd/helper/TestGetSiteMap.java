@@ -140,7 +140,7 @@ public class TestGetSiteMap {
          */
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "frantiq2014");
-        config.addDataSourceProperty("databaseName", "pactols2");
+        config.addDataSourceProperty("databaseName", "pactols");
 
       //  config.addDataSourceProperty("serverName", "localhost");
         config.addDataSourceProperty("portNumber", "5432");

@@ -1194,7 +1194,7 @@ public class ConceptHelper {
                     String query = "SELECT modified, status, notation, top_concept, id_group, username from concept_historique, users where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and id_concept = '" + idConcept + "'"
-                            + " and concept_historique.id_user=users.id"
+                            + " and concept_historique.id_user=users.id_user"
                             + " order by modified DESC";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -1251,7 +1251,7 @@ public class ConceptHelper {
                     String query = "SELECT modified, status, notation, top_concept, id_group, username from concept_historique, users where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and id_concept = '" + idConcept + "'"
-                            + " and concept_historique.id_user=users.id"
+                            + " and concept_historique.id_user=users.id_user"
                             + " and modified <= '" + date
                             + "' order by modified DESC";
                     stmt.executeQuery(query);
@@ -1303,7 +1303,7 @@ public class ConceptHelper {
          * récupération du code Ark via WebServices
          *
          */
-        Ark_Client ark_Client = new Ark_Client();
+            Ark_Client ark_Client = new Ark_Client();
         String idArk = ark_Client.getArkId(
                 new FileUtilities().getDate(),
                 urlSite + "?idc=" + idConcept + "&idt=" + idThesaurus,
@@ -1516,6 +1516,9 @@ public class ConceptHelper {
                                 urlSite + "?idc=" + concept.getIdConcept() + "&idt=" + concept.getIdThesaurus(),
                                 "", "", dcElementsList, "pcrt"); // pcrt : p= pactols, crt=code DCMI pour collection
                         concept.setIdArk(idArk);
+                    }
+                    else {
+                        concept.setIdArk("");
                     }
 
                     /**

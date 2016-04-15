@@ -22,19 +22,18 @@
                     </p:panelGrid>
                 </td>
                 <td>
-                        <p:panelGrid columns="1" >
-                            <p:outputLabel title="sélectionnez un ou plusieurs"  value="#{langueBean.getMsg('theso')}" />
-
-                            <p:selectManyMenu id="advanced" value="#{user1.selectedThesaurus}" >    
-                                <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                            </p:selectManyMenu>
-                        </p:panelGrid>
+                    <p:panelGrid columns="1" >
+                        <p:outputLabel title="sélectionnez un ou plusieurs"  value="#{langueBean.getMsg('theso')}" />
+                    </p:panelGrid>
+                    <p:scrollPanel  mode="native" style="width:200px;height:100px">
+                        <p:selectManyCheckbox rendered="#{user1.roleEdit != 1}" id="advanced" value="#{user1.selectedThesaurus}" layout="grid" columns="1" >
+                            <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                        </p:selectManyCheckbox>
+                    </p:scrollPanel>
                 </td>                
-
-                 
                 <tr>
                     <td colspan="1" style="text-align: center;">
-                        <br/><p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{user1.editUser()}" 
+                        <br/><p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{user1.editUserRole()}" 
                                               update=":tabUser" styleClass="styleButton" oncomplete="PF('editUserDlg').hide();"/>
                     </td>
                     <td >

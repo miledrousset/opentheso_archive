@@ -508,7 +508,7 @@ public class NoteHelper {
                             + " WHERE id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
                             + " and (id_concept = '" + idConcept + "' OR id_term = '" + idTerm + "' )"
-                            + " and note_historique.id_user=users.id"
+                            + " and note_historique.id_user=users.id_user"
                             + " order by modified DESC";
 
                     stmt.executeQuery(query);
@@ -570,7 +570,7 @@ public class NoteHelper {
                             + " WHERE id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
                             + " and (id_concept = '" + idConcept + "' OR id_term = '" + idTerm + "' )"
-                            + " and note_historique.id_user=users.id"
+                            + " and note_historique.id_user=users.id_user"
                             + " and modified <= '" + date.toString()
                             + "' order by modified DESC";
 

@@ -5,6 +5,7 @@
  */
 package mom.trd.opentheso.core.jsonld.helper;
 import java.util.ArrayList;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import skos.SKOSConceptScheme;
 import skos.SKOSDate;
 import skos.SKOSDocumentation;
@@ -465,9 +466,10 @@ public class SkosToJsonld {
     }
     
     private void addElementDocumentation(SKOSDocumentation sKOSDocumentation, String nameSpace) {
+        StringPlus stringPlus = new StringPlus();
         String element = "      \"" + nameSpaceSkosCore + nameSpace + "\": {\n";
         element += "        \"@language\": \"" + sKOSDocumentation.getLanguage() + "\",\n";
-        element += "        \"@value\": \"" + sKOSDocumentation.getText() + "\"\n";        
+        element += "        \"@value\": \"" + stringPlus.normalizeStringForXml(sKOSDocumentation.getText()) + "\"\n";        
         element += "      }";
         jsonLd.append(element);
     }

@@ -133,7 +133,7 @@ public class LDAPAuthenticator extends Authenticator {
     private  String dnFromUser(String username) throws NamingException {
 	    Properties props = new Properties();
 	    props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-	    props.put(Context.PROVIDER_URL, "ldap://ldap.mom.fr");
+	    props.put(Context.PROVIDER_URL, "ldap://ldap.mondomaine.fr");
 	    props.put(Context.REFERRAL, "ignore");
 
 	    InitialDirContext context = new InitialDirContext(props);

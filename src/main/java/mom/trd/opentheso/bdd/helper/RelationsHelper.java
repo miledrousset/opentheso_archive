@@ -316,7 +316,7 @@ public class RelationsHelper {
                             + " and term.id_thesaurus='" + idThesaurus + "'"
                             + " and ( id_concept1 = '" + idConcept + "'"
                             + " or id_concept2 = '" + idConcept + "' )"
-                            + " and hierarchical_relationship_historique.id_user=users.id"
+                            + " and hierarchical_relationship_historique.id_user=users.id_user"
                             + " order by hierarchical_relationship_historique.modified DESC";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -381,7 +381,7 @@ public class RelationsHelper {
                             + " and term.id_thesaurus='" + idThesaurus + "'"
                             + " and ( id_concept1 = '" + idConcept + "'"
                             + " or id_concept2 = '" + idConcept + "' )"
-                            + " and hierarchical_relationship_historique.id_user=users.id"
+                            + " and hierarchical_relationship_historique.id_user=users.id_user"
                             + " and hierarchical_relationship_historique.modified <= '" + date.toString()
                             + "' order by hierarchical_relationship_historique.modified ASC";
                     stmt.executeQuery(query);

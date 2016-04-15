@@ -7,17 +7,17 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java pour group complex type.
+ * <p>Classe Java pour arkQualifier complex type.
  * 
  * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="group"&gt;
+ * &lt;complexType name="arkQualifier"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="qualifier" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="urlTarget" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -27,61 +27,61 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "group", propOrder = {
-    "id",
-    "name"
+@XmlType(name = "arkQualifier", propOrder = {
+    "qualifier",
+    "urlTarget"
 })
-public class Group {
+public class ArkQualifier {
 
-    protected String id;
-    protected String name;
+    protected String qualifier;
+    protected String urlTarget;
 
     /**
-     * Obtient la valeur de la propri\u00e9t\u00e9 id.
+     * Obtient la valeur de la propri\u00e9t\u00e9 qualifier.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getId() {
-        return id;
+    public String getQualifier() {
+        return qualifier;
     }
 
     /**
-     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 id.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 qualifier.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setId(String value) {
-        this.id = value;
+    public void setQualifier(String value) {
+        this.qualifier = value;
     }
 
     /**
-     * Obtient la valeur de la propri\u00e9t\u00e9 name.
+     * Obtient la valeur de la propri\u00e9t\u00e9 urlTarget.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getUrlTarget() {
+        return urlTarget;
     }
 
     /**
-     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 name.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 urlTarget.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setUrlTarget(String value) {
+        this.urlTarget = value;
     }
 
 }

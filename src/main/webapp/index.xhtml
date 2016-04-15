@@ -127,6 +127,7 @@
             <ui:include src="dialogs/nt/ntEditDlg.xhtml" />
             <ui:include src="dialogs/bt/addTgDlg.xhtml" />
             <ui:include src="dialogs/bt/deleteTgDlg.xhtml" />
+            <ui:include src="dialogs/group/addGroupDlg.xhtml" />
 
             
             
@@ -158,7 +159,7 @@
                                         <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
                                             <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
-                                                <p:menuitem value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                <p:menuitem  value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
                                                 <p:menuitem value="#{langueBean.getMsg('tools.regenerateOrphan')}" actionListener="#{vue.setRegenerateOrphan(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                             </p:menu>
                                         </h:form>
@@ -434,6 +435,18 @@
                             <div id="contenuPrincipale">
                                 <h:panelGroup id="panContenu">
                                     <div style="text-align: center">
+                                        
+                                        <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
+                                            <!-- exporter le Group en SKOS -->
+                                            <p:commandButton value="Skos" ajax="false" styleClass="link">
+                                                <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                                            </p:commandButton>
+                                        
+                                            <!-- exporter le grpup en JsonLd -->
+                                            <p:commandButton value="JsonLd" ajax="false" styleClass="link">
+                                                <p:fileDownload  value="#{downloadBean.thisGroupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                                            </p:commandButton>
+                                        </h:form>  
                                         
                                         <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 5px;" >
                                             <!-- exporter le concept en SKOS -->

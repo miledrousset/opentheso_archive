@@ -12,20 +12,20 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Classe Java pour account complex type.
  * 
- * <p>Le fragment de sch?ma suivant indique le contenu attendu figurant dans cette classe.
+ * <p>Le fragment de sch\u00e9ma suivant indique le contenu attendu figurant dans cette classe.
  * 
  * <pre>
- * &lt;complexType name="account">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="baseId" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="groups" type="{http://soap.arkeo.mom.fr/}group" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="user" type="{http://soap.arkeo.mom.fr/}user" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="account"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="baseId" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="groups" type="{http://soap.arkeo.mom.fr/}group" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="user" type="{http://soap.arkeo.mom.fr/}user" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -44,7 +44,7 @@ public class Account {
     protected User user;
 
     /**
-     * Obtient la valeur de la propri?t? baseId.
+     * Obtient la valeur de la propri\u00e9t\u00e9 baseId.
      * 
      * @return
      *     possible object is
@@ -56,7 +56,7 @@ public class Account {
     }
 
     /**
-     * D?finit la valeur de la propri?t? baseId.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 baseId.
      * 
      * @param value
      *     allowed object is
@@ -97,7 +97,7 @@ public class Account {
     }
 
     /**
-     * Obtient la valeur de la propri?t? user.
+     * Obtient la valeur de la propri\u00e9t\u00e9 user.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class Account {
     }
 
     /**
-     * D?finit la valeur de la propri?t? user.
+     * D\u00e9finit la valeur de la propri\u00e9t\u00e9 user.
      * 
      * @param value
      *     allowed object is

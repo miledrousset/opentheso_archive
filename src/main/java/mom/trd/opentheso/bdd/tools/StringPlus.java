@@ -75,6 +75,8 @@ public class StringPlus {
         // normalisation of words for XML
         s = s.replaceAll("&", "&amp;");
         s = s.replaceAll("\"", " ");
+        s = s.replaceAll("\n", " ");
+        s = s.replaceAll("\t", " ");
         return s;
     }
     

@@ -87,8 +87,22 @@ public class DownloadBean implements Serializable {
 
         return exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup).toString();
     }
+    
+    public String groupJsonLd(String idGroup, String idTheso) {
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerAdress(serverAdress);
+        exportFromBDD.setServerArk(serverArk);
+        exportFromBDD.setArkActive(arkActive);
 
-    public void branchSkos(String idC, String idTheso) {
+        StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
+
+        JsonHelper jsonHelper = new JsonHelper();
+        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
+        return jsonLd.toString();
+    }    
+
+/*    public void branchSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -109,7 +123,7 @@ public class DownloadBean implements Serializable {
             }
             vue.setBranchToSkosFile(true);
         }
-    }
+    }*/
 
     public void branchGroupSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
@@ -143,8 +157,9 @@ public class DownloadBean implements Serializable {
      * second cas l'utilisateur télécharge de fichier.
      *
      * @param idTheso
+     * @return 
      */
-    public void thesoSkos(String idTheso) {
+    public StreamedContent thesoSkos(String idTheso) {
 
         /**
          * Cette initialisation est pour exporter les PACTOLS au format accepté
@@ -162,8 +177,22 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
 
-        StringBuffer temp = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
-        if (temp.length() <= 1500000) {
+        
+        
+        StringBuffer skos_local = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", idTheso + "_skos.xml");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        vue.setThesoToSkosCsvFile(true);
+        return file;
+
+
+/*        if (temp.length() <= 1500000) {
             skos = temp.toString();
             vue.setThesoToSkosCsv(true);
         } else {
@@ -175,11 +204,13 @@ public class DownloadBean implements Serializable {
                 Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
             }
             vue.setThesoToSkosCsvFile(true);
-        }
+        }*/
+
     }
     
     /**
-     * Cette fonction permet d'exporter un concept en SKOS
+     * Cette fonction permet d'exporter un concept en SKOS 
+     * en temps réel dans la page principale
      * @param idC
      * @param idTheso
      * @return 
@@ -206,7 +237,7 @@ public class DownloadBean implements Serializable {
     } 
      
     /**
-     * Cette fonction permet d'exporter un concept en SKOS
+     * Cette fonction permet d'exporter un concept en JsonLd
      * @param idC
      * @param idTheso
      * @return 
@@ -292,7 +323,63 @@ public class DownloadBean implements Serializable {
     }
     
     /**
-     * Cette fonction permet de retourner la branche d'un groupe en SKOS
+     * Cette fonction permet de retourner pour téléchargement un groupe en SKOS
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     */
+    public StreamedContent thisGroupToSkos(String idGroup, String idTheso){
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerAdress(serverAdress);
+        exportFromBDD.setServerArk(serverArk);
+        exportFromBDD.setArkActive(arkActive);
+
+        StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
+
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_skos.xml");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;        
+    }
+    
+    /**
+     * Cette fonction permet de retourner pour téléchargement un groupe en JsonLd
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     */
+    public StreamedContent thisGroupToJsonLd(String idGroup, String idTheso){
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerAdress(serverAdress);
+        exportFromBDD.setServerArk(serverArk);
+        exportFromBDD.setArkActive(arkActive);
+
+        StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
+
+        JsonHelper jsonHelper = new JsonHelper();
+        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);        
+        
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_jsonld.xml");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;        
+    }    
+    
+    
+    
+    /**
+     * Cette fonction permet de retourner la branche antière d'un groupe en SKOS
      * @param idGroup
      * @param idTheso
      * @return 

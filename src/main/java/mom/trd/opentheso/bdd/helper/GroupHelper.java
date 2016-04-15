@@ -209,7 +209,7 @@ public class GroupHelper {
                     String query = "select idgroup, id_ark, idtypecode, idparentgroup, notation, modified, username from concept_group_historique, users "
                             + "where idconcept = '" + idConcept + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
-                            + " and concept_group_historique.id_user=users.id"
+                            + " and concept_group_historique.id_user=users.id_user"
                             + " order by modified DESC";
 
                     ResultSet resultSet = stmt.executeQuery(query);
@@ -270,7 +270,7 @@ public class GroupHelper {
                     String query = "select idgroup, id_ark, idtypecode, idparentgroup, notation, modified, username from concept_group_historique, users "
                             + "where idconcept = '" + idConcept + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
-                            + " and concept_group_historique.id_user=users.id"
+                            + " and concept_group_historique.id_user=users.id_user"
                             + " and modified <= '" + date.toString()
                             + "' order by modified DESC";
 
@@ -619,7 +619,7 @@ public class GroupHelper {
                             + "where idgrouplabel = '" + idGroup + "'"
                             + " and lang = '" + lang + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
-                            + " and concept_group_label_historique.id_user=users.id"
+                            + " and concept_group_label_historique.id_user=users.id_user"
                             + "' order by modified DESC";
 
                     ResultSet resultSet = stmt.executeQuery(query);
@@ -679,7 +679,7 @@ public class GroupHelper {
                             + "where idgrouplabel = '" + idGroup + "'"
                             + " and lang = '" + lang + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
-                            + " and concept_group_label_historique.id_user=users.id"
+                            + " and concept_group_label_historique.id_user=users.id_user"
                             + " and modified <= '" + date.toString()
                             + "' order by modified DESC";
 

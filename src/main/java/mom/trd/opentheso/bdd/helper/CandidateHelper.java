@@ -597,10 +597,10 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT users.username, users.id,"
+                    String query = "SELECT users.username, users.id_user,"
                             + " concept_candidat.admin_message"
                             + " FROM concept_candidat, users WHERE"
-                            + " concept_candidat.admin_id = users.id"
+                            + " concept_candidat.admin_id = users.id_user"
                             + " and concept_candidat.id_concept = '" + idConcept + "'"
                             + " and concept_candidat.id_thesaurus = '" + idThesaurus + "'";
 
@@ -608,7 +608,7 @@ public class CandidateHelper {
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {
                         nodeMessageAdmin = new NodeMessageAdmin();
-                        nodeMessageAdmin.setId_user(resultSet.getInt("id"));
+                        nodeMessageAdmin.setId_user(resultSet.getInt("id_user"));
                         nodeMessageAdmin.setUser(resultSet.getString("username"));
                         nodeMessageAdmin.setMessage(resultSet.getString("admin_message"));
                     }
@@ -1275,7 +1275,7 @@ public class CandidateHelper {
                             + " proposition.concept_parent,"
                             + " proposition.id_group"
                             + " FROM proposition, users WHERE "
-                            + " proposition.id_user = users.id"
+                            + " proposition.id_user = users.id_user"
                             + " and proposition.id_concept = '" + idConcept + "'"
                             + " and proposition.id_thesaurus = '" + idThesaurus + "'"
                             + " and proposition.id_user = " + idUser;

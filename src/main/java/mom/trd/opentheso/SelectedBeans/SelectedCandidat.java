@@ -190,6 +190,10 @@ public class SelectedCandidat implements Serializable {
         }
         if (selected.getIdConcept() != null && !selected.getIdConcept().equals("")) {
             NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(), selected.getIdConcept(), theso, infoCdt.getNodesUser().get(0).getId());
+            if(np == null) { // erreur
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
+                return;                
+            }
             note = np.getNote();
             niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langue) + " (" + np.getIdConceptParent() + ")";
             domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langue) + " (" + np.getIdGroup() + ")";
@@ -280,7 +284,7 @@ public class SelectedCandidat implements Serializable {
             // envoie d'email d'alerte !!
             int minAlert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(),idTheso).getNbAlertCdt();
             if (selected.getNbProp() >= minAlert) {
-                ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion());
+                ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
                 for (String mail : lesMails) {
                     if (mail != null && !mail.trim().equals("")) {
                         envoyerMailAlertNb(selected.getValue(), mail, minAlert);
@@ -477,8 +481,8 @@ public class SelectedCandidat implements Serializable {
         selected.setEtat("v");
 
         // envoie d'email d'alerte !!
-        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion());
-        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept());
+        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(),idTheso);
+        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(),idTheso);
         for (String contrib : contribs) {
             if (!lesMails.contains(contrib)) {
                 lesMails.add(contrib);
@@ -508,8 +512,8 @@ public class SelectedCandidat implements Serializable {
         selected.setEtat("r");
 
         // envoie d'email d'alerte !!
-        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion());
-        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept());
+        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
+        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(), idTheso);
         for (String contrib : contribs) {
             if (!lesMails.contains(contrib)) {
                 lesMails.add(contrib);

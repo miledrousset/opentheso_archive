@@ -319,6 +319,25 @@ public class Rest {
         return jsonLd.toString();
     }    
     
+    /**
+     * Pour retourner un domaine (Groupe) en JsonLd avec ses concepts
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     */
+    @Path("/jsonld/concept/all/idg={idg}&th={th}")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public String getConceptsJsonOfGroup(@PathParam("idg") String idGroup,
+            @PathParam("th") String idTheso){
+        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
+        JsonHelper jsonHelper = new JsonHelper();
+        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);         
+        ds.close();
+        return jsonLd.toString();
+    }     
+    
     
     /**
      * Fonction qui permet de récupérer un concept skos par identifiant

@@ -1267,7 +1267,7 @@ public class TermHelper {
                             + " WHERE id_term = '" + idTerm + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
-                            + " and non_preferred_term_historique.id_user=users.id"
+                            + " and non_preferred_term_historique.id_user=users.id_user"
                             + " order by modified DESC, lexical_value ASC";
 
                     stmt.executeQuery(query);
@@ -1330,7 +1330,7 @@ public class TermHelper {
                             + " WHERE id_term = '" + idTerm + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
-                            + " and non_preferred_term_historique.id_user=users.id"
+                            + " and non_preferred_term_historique.id_user=users.id_user"
                             + " and modified <= '" + date.toString()
                             + "' order by modified, lexical_value ASC";
 
@@ -1465,7 +1465,7 @@ public class TermHelper {
                             + " WHERE id_term = '" + idTerm + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
-                            + " and term_historique.id_user=users.id"
+                            + " and term_historique.id_user=users.id_user"
                             + " and modified <= '" + date.toString()
                             + "' order by modified DESC, lexical_value ASC";
 
@@ -1648,7 +1648,8 @@ public class TermHelper {
                 stmt = conn.createStatement();
                 try {
                     
-                    String query = 
+                    // cette partie permettait de se placer directement sur un terme, mais quand on tappe le temre exacte, on a le resultat avec le teme en double 
+             /*       String query = 
                             "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
                             "FROM preferred_term, term, concept WHERE " +
                             "preferred_term.id_term = term.id_term AND " +
@@ -1676,8 +1677,8 @@ public class TermHelper {
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
                         }
-                    }
-                    query = 
+                    }*/
+                    String query = 
                             "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
                             "FROM preferred_term, term, concept WHERE " +
                             "preferred_term.id_term = term.id_term AND " +
@@ -1720,7 +1721,7 @@ public class TermHelper {
                                 nodeAutoCompletion.setGroupLexicalValue(
                                         new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
                                 nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
-                                if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                              //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
                                     nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
                         }

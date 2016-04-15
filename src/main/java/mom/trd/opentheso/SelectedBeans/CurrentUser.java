@@ -99,9 +99,26 @@ public class CurrentUser implements Serializable {
      * @return le lien de l'index si le compte existe, un message d'erreur sinon
      */
     public String action() {
-        if(new UserHelper().isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
+        UserHelper userHelper = new UserHelper();
+        if(userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
+            // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
+            if(userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
+                user = new UserHelper().getInfoAdmin(connect.getPoolConnexion(), name);
+                if(user == null) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
+                    return "";
+                }
+                user.setIdThesaurus(idTheso);
+            }
+            // on récupère ses droits par rapport au thésaurus en cours
+            else { 
+                user = new UserHelper().getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                if(user == null) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
+                    return "";
+                }
+            }
             isLogged = true; 
-            user = new UserHelper().getInfoUser(connect.getPoolConnexion(), name, idTheso);
             name = null;
             pwd = null;
             return "index.xhtml?faces-redirect=true";
@@ -111,17 +128,40 @@ public class CurrentUser implements Serializable {
         return "";
     }
     
-    public ArrayList<NodeUser> selectAllUser() {
-        ArrayList<NodeUser> listeUser = new UserHelper().getAllUsers(connect.getPoolConnexion(), idTheso);
+    /**
+     * permet de retourner tous les utilisateurs d'un thésaurus
+     * @return 
+     */
+    private ArrayList<NodeUser> selectAllUserOfThesaurus() {
+        ArrayList<NodeUser> listeUser = new UserHelper().getAllUsersOfThesaurus(connect.getPoolConnexion(), idTheso);
+        return listeUser;
+    }
+
+    /**
+     * Permet de retourner les les utilisateurs sans exception
+     * @return 
+     */
+    private ArrayList<NodeUser> selectAllUsers() {
+        ArrayList<NodeUser> listeUser = new UserHelper().getAllUsers(connect.getPoolConnexion());
         return listeUser;
     }
     
+    /**
+     * retoure la liste des utilisateurs suivant leurs droits
+     * @return 
+     */
     public ArrayList<NodeUser> selectAuthorizedUser() {
-        int idRoleFrom = 3;
-        if(user.getIdRole() == 1) idRoleFrom = 1; // l'utilisateur est superAdmin
+        UserHelper userHelper = new UserHelper();
+        int idRoleFrom = 1;
+        
+        if(user.getIdRole() == 1) {// l'utilisateur est superAdmin
+            return selectAllUsers();
+            
+        } 
+            
         if(user.getIdRole() == 2) idRoleFrom = 2; // l'utilisateur est admin
         if(user.getIdRole() > 2) idRoleFrom = 3; // l'utilisateur est autre        
-        ArrayList<NodeUser> listeUser = new UserHelper().getAuthorizedUsers(connect.getPoolConnexion(), idTheso, idRoleFrom);
+        ArrayList<NodeUser> listeUser = userHelper.getAuthorizedUsers(connect.getPoolConnexion(), idTheso, idRoleFrom);
         return listeUser;
     }    
     
@@ -201,7 +241,7 @@ public class CurrentUser implements Serializable {
                 if(user.getIdRole() == 1) {
                     // ajout de l'utilisateur
                     if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;
@@ -209,7 +249,7 @@ public class CurrentUser implements Serializable {
                     // récupération de l'Id du User
                     int idUser  = userHelper.getIdUser(conn, nameEdit);
                     if(idUser == -1) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;
@@ -217,7 +257,7 @@ public class CurrentUser implements Serializable {
 
                     // ajout du role 
                     if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;                    
@@ -230,7 +270,7 @@ public class CurrentUser implements Serializable {
                 if(user.getIdRole() == 2) {
                     // ajout de l'utilisateur
                     if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;
@@ -238,7 +278,7 @@ public class CurrentUser implements Serializable {
                     // récupération de l'Id du User
                     int idUser  = userHelper.getIdUser(conn, nameEdit);
                     if(idUser == -1) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;
@@ -246,7 +286,7 @@ public class CurrentUser implements Serializable {
 
                     // ajout du role 
                     if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error BDD")));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
                         return;                    
@@ -268,8 +308,23 @@ public class CurrentUser implements Serializable {
         }
     }
     
-    public void editUser() {
-        new UserHelper().updateRoleUser(connect.getPoolConnexion(), idEdit, roleEdit, idTheso);
+    public void editUserRole() {
+        UserHelper userHelper = new UserHelper();
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if(!userHelper.updateRoleUser(conn, idEdit, roleEdit, selectedThesaurus)) {
+                conn.rollback();
+                conn.close();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                return;
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
         nameEdit = "";
         vue.setEditUser(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info4")));
@@ -280,6 +335,8 @@ public class CurrentUser implements Serializable {
         idEdit = nu.getId();
         roleEdit = nu.getIdRole();
         vue.setEditUser(true);
+        selectedThesaurus = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(),
+                idEdit);
     }
     
     public void reInit() {
@@ -296,7 +353,10 @@ public class CurrentUser implements Serializable {
         np.setAlertCdt(alertCdtEdit);
         np.setSourceLang(langSourceEdit);
         np.setNbAlertCdt(alertNbCdtEdit);
-        new UserHelper().updatePreferenceUser(connect.getPoolConnexion(), np);
+        if(!new UserHelper().updatePreferenceUser(connect.getPoolConnexion(), np, idTheso)){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+            return;
+        }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info6")));
     }
     
