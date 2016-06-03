@@ -1740,7 +1740,247 @@ public class TermHelper {
 
         return nodeAutoCompletionList;
     }
+    
+    /**
+     * Cette fonction permet de récupérer une liste des terms pour
+     * l'autocomplétion en se limitant à un Group
+     * et en ignorant le terme lui même et ses BT
+     *
+     * @param ds
+     * @param idSelectedConcept
+     * @param idBT
+     * @param idThesaurus
+     * @param text
+     * @param idGroup
+     * @param idLang
+     * @return Objet class Concept
+     */
+    public List<NodeAutoCompletion> getAutoCompletionTerm(HikariDataSource ds,
+            String idSelectedConcept, ArrayList <String> idBTs, // le concept à ignorer
+            String idThesaurus, String idLang, String idGroup, String text) {
 
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = new ArrayList<>();
+        text = new StringPlus().convertString(text);
+
+        String BT = "";
+        for (String idBt : idBTs) {
+            if(!BT.isEmpty()) {
+                BT = BT + ",'" + idBt + "'"; 
+            }
+            else 
+                BT = "'" + idBt + "'";
+        }
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = 
+                            "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "FROM preferred_term, term, concept WHERE " +
+                            "preferred_term.id_term = term.id_term AND " +
+                            "preferred_term.id_thesaurus = term.id_thesaurus AND " +
+                            "concept.id_concept = preferred_term.id_concept AND " +
+                            "concept.id_thesaurus = preferred_term.id_thesaurus AND " +
+                            "term.id_thesaurus = '" + idThesaurus + "' AND " +
+                            "term.lang = '" + idLang + "' AND " +
+                            "concept.id_group = '" + idGroup + "' AND " +
+                            "concept.id_concept != '" + idSelectedConcept + "' AND " +
+                            "concept.id_concept not in (" + BT + ") AND " +
+                            "concept.status != 'hidden' AND " +
+                            "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')" +
+                            " ORDER BY term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+
+                        while (resultSet.next()) {
+                            if (resultSet.getRow() != 0) {
+                                NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                                
+                                nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                                nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                              //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                    nodeAutoCompletionList.add(nodeAutoCompletion);
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    }    
+    
+    /**
+     * Cette fonction permet de récupérer une liste des terms pour
+     * l'autocomplétion en se limitant à un Group
+     * et en ignorant le terme lui même
+     *
+     * @param ds
+     * @param idSelectedConcept
+     * @param idThesaurus
+     * @param text
+     * @param idGroup
+     * @param idLang
+     * @return Objet class Concept
+     */
+    public List<NodeAutoCompletion> getAutoCompletionTerm(HikariDataSource ds,
+            String idSelectedConcept, // le concept à ignorer
+            String idThesaurus, String idLang, String idGroup, String text) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = new ArrayList<>();
+        text = new StringPlus().convertString(text);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = 
+                            "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "FROM preferred_term, term, concept WHERE " +
+                            "preferred_term.id_term = term.id_term AND " +
+                            "preferred_term.id_thesaurus = term.id_thesaurus AND " +
+                            "concept.id_concept = preferred_term.id_concept AND " +
+                            "concept.id_thesaurus = preferred_term.id_thesaurus AND " +
+                            "term.id_thesaurus = '" + idThesaurus + "' AND " +
+                            "term.lang = '" + idLang + "' AND " +
+                            "concept.id_group = '" + idGroup + "' AND " +
+                            "concept.id_concept != '" + idSelectedConcept + "' AND " +
+                            "concept.status != 'hidden' AND " +
+                            "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')" +
+                            " ORDER BY term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+
+                        while (resultSet.next()) {
+                            if (resultSet.getRow() != 0) {
+                                NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                                
+                                nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                                nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                              //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                    nodeAutoCompletionList.add(nodeAutoCompletion);
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    } 
+
+    /**
+     * Cette fonction permet de récupérer une liste des terms pour
+     * l'autocomplétion en se évitant le Group actuel
+     * et en ignorant le terme lui même
+     *
+     * @param ds
+     * @param idSelectedConcept
+     * @param idThesaurus
+     * @param text
+     * @param idGroup
+     * @param idLang
+     * @return Objet class Concept
+     */
+    public List<NodeAutoCompletion> getAutoCompletionTermOfOtherGroup(HikariDataSource ds,
+            String idSelectedConcept, // le concept à ignorer
+            String idThesaurus, String idLang, String idGroup, String text) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = new ArrayList<>();
+        text = new StringPlus().convertString(text);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = 
+                            "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group " +
+                            "FROM preferred_term, term, concept WHERE " +
+                            "preferred_term.id_term = term.id_term AND " +
+                            "preferred_term.id_thesaurus = term.id_thesaurus AND " +
+                            "concept.id_concept = preferred_term.id_concept AND " +
+                            "concept.id_thesaurus = preferred_term.id_thesaurus AND " +
+                            "term.id_thesaurus = '" + idThesaurus + "' AND " +
+                            "term.lang = '" + idLang + "' AND " +
+                            "concept.id_group != '" + idGroup + "' AND " +
+                            "concept.id_concept != '" + idSelectedConcept + "' AND " +
+                            "concept.status != 'hidden' AND " +
+                            "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')" +
+                            " ORDER BY term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+
+                        while (resultSet.next()) {
+                            if (resultSet.getRow() != 0) {
+                                NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                                
+                                nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                                nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                              //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                    nodeAutoCompletionList.add(nodeAutoCompletion);
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    }     
+    
+    
     /**
      * Cette fonction permet de savoir si le terme existe ou non
      *

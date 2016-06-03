@@ -132,8 +132,9 @@ public class UserHelper {
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id AND" 
-                            + " users.username = '" + logName + "' AND" 
-                            + " user_role.id_thesaurus = '" + idThesaurus + "'";
+                            + " users.username = '" + logName + "'";
+                            //+ " AND" 
+                            //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
   
   
   
@@ -860,6 +861,46 @@ public class UserHelper {
 
         return false;       
     }
+    
+    /**
+     * On vérifie si le User est suprAdmin par Id
+     * @param ds
+     * @param idUser
+     * @return 
+     */
+    public boolean isAdminUser(HikariDataSource ds, 
+           int idUser){
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT users.id_user FROM user_role"
+                            + " WHERE "
+                            + " users.id_user = " + idUser
+                            + " AND"
+                            + " user_role.id_role = 1";
+                    resultSet = stmt.executeQuery(query);
+                    resultSet.next();
+                    if (resultSet.getRow() != 0) {
+                        return true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;       
+    }    
     
     /**
      * Cette fonction permet de changer le role d'un utlisateur et ses droits sur un ou plusieurs thésaurus

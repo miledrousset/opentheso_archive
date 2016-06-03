@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idConceptMoveBranchToGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="conceptMoveBranchToGroupDlg" modal="true" resizable="false" >
+    <p:dialog id="idMoveBranchToGroupOfOtherGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="moveBranchToGroupOfOtherGroupDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du nom du terme -->
         <h:form >
             <p:messages showDetail="true" autoUpdate="true" />
@@ -29,15 +29,15 @@
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
                             <td>
-                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completGroup}" var="t1"
+                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completOtherGroup}" var="t1"
                                                 itemLabel="#{t1.groupLexicalValue}" itemValue="#{t1}" converter="groupConverter" forceSelection="true">
 
                                 </p:autoComplete>
                             </td>
                         </tr>
                     </table><br/>
-                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToDomain()}"
-                                     update=":idConceptMoveBranchToGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton" oncomplete="PF('conceptMoveBranchToGroupDlg').hide();"/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToTopTermOtherGroup()}"
+                                     update=":idMoveBranchToGroupOfOtherGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').hide();"/>
                 </h:form>
             </fieldset>
         </h:form>

@@ -34,26 +34,8 @@
         </p:dialog>  
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
-            <h:panelGroup id="panChoixTheso" style="float: left;" >
-                <div id="choixTheso">
-                    <h:form id="liste1">
-                        <table>
-                            <tr>
-                                <td style="padding-right: 5px;">
-                                    <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
-                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                                    </h:selectOneMenu>
-                                </td>
-                                <td>
-                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                     update=":liste2,:panChoixTheso,:tableCdt,:gestionCandidat" styleClass="styleButton"/>
-                                </td>
-                            </tr>
-                        </table>
-                    </h:form>
-                </div>
-            </h:panelGroup>
+            <ui:include src="account.xhtml" />
+
             <ui:include src="menuAll.xhtml" />
         </div>
         <center>
@@ -392,7 +374,7 @@
                                                itemValue="#{tl.id_iso639_1}" />
                             </h:selectOneMenu>&nbsp;
                             <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                             update=":tableCdt,:gestionCandidat,:panChoixTheso" styleClass="styleButton"/>
+                                             update=":tableCdt,:gestionCandidat" styleClass="styleButton"/>
                         </h:form>
                     </h:panelGroup>
                 </div>
@@ -482,7 +464,7 @@
                     </div>
 
                     <div style="float: left; margin-left: 45px;">
-                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'a') and (user1.haveRights(1))}">
+                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'a') and (user1.haveRights(2))}">
                             <p:commandButton id="cbAjCandidat" styleClass="styleButton"  value="#{langueBean.getMsg('cdt.btnValid')}"
                                              actionListener="#{vue.setAddValidCdt(true)}" update=":panValidCdt" /><br/>
                         </h:form>
@@ -506,7 +488,7 @@
                             </p:confirmDialog>
                         </h:form>
 
-                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'v') and (user1.haveRights(1))}">
+                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'v') and (user1.haveRights(2))}">
                             <p:commandButton id="cbInsertCdt" value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton" 
                                              actionListener="#{vue.setAddInsertCdt(true)}" update=":panInsertCdt" />
                         </h:form>
@@ -564,7 +546,7 @@
                     </h:panelGroup>
                     
                     <h:panelGroup id="manuelInsertion" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                        <h:form rendered="#{(user1.haveRights(1))}">
+                        <h:form rendered="#{(user1.haveRights(2))}">
                             <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
                             <p:commandButton icon="ui-icon-ok" update=":gestionCandidat,:panValidCdt,:tableCdt"
                                              actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
@@ -632,7 +614,7 @@
                                     <h:outputText value="#{tradCdt.user}" />
                                 </p:column>
                                 <p:column width="25" rendered="#{selectedCandidat.selected.etat == 'a'}">
-                                    <h:form rendered="#{(tradCdt.user == user1.user.name) or (user1.haveRights(1))}">
+                                    <h:form rendered="#{(tradCdt.user == user1.user.name) or (user1.haveRights(2))}">
                                         <p:commandButton id="cbSuppTheso" icon="ui-icon-supp" update=":tableTradCdt,:tableCdt"
                                                          actionListener="#{selectedCandidat.delTradCdt(tradCdt.idLang)}" styleClass="cbSupp" >
                                             <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  

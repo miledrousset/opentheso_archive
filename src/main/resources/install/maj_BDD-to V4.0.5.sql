@@ -239,3 +239,4 @@ WITH (
 );
 ALTER TABLE user_role
   OWNER TO opentheso;
+

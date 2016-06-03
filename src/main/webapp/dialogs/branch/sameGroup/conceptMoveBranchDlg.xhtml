@@ -5,11 +5,11 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idConceptMoveBranchFromGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="conceptMoveBranchFromGroupDlg" modal="true" resizable="false" >
+    <p:dialog id="idConceptMoveBranchDlg"  header="#{langueBean.getMsg('popup.move')}" widgetVar="conceptMoveBranchDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du nom du terme -->
         <h:form >
             <p:messages showDetail="true" autoUpdate="true" />
-            <!-- Cas de déplacement d'une branche TT vers un concept (d'un domaine à un concept) -->
+                <!-- Cas de déplacement d'une branche entre les concepts -->
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('popup.move')}" /></legend>
                 <h:form>
@@ -18,6 +18,7 @@
                         <tr>
                             <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
                         </tr>
+                        
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
                             <td>
@@ -29,8 +30,8 @@
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
                             <td>
-                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
+                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTerm}" var="t1"
+                                                itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" width="200" >
                                             <f:facet name="header" rendered="#{(t1.url) != null}">
@@ -49,9 +50,8 @@
                             </td>
                         </tr>
                     </table><br/>
-                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromDomain()}"
-                                     update=":idConceptMoveBranchFromGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton" 
-                                     oncomplete="PF('conceptMoveBranchFromGroupDlg').hide();"/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBranchToConcept()}"
+                                     update=":idConceptMoveBranchDlg,:panContenu,:accordeonTree" styleClass="styleButton" oncomplete="PF('conceptMoveBranchDlg').hide();" />
                 </h:form>
             </fieldset>
         </h:form>

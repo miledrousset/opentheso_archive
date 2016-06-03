@@ -15,6 +15,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
@@ -42,8 +43,12 @@ public class CurrentUser implements Serializable {
     private int alertNbCdtEdit = 10;
     private boolean alertCdtEdit = false;
     private String idTheso;
+    private List<String> authorizedTheso;
     
     private List<String> selectedThesaurus;
+    
+    private boolean isHaveWriteToCurrentThesaurus = false;
+    private boolean isHaveWriteToCurrentThesaurus2 = false;
     
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -103,21 +108,24 @@ public class CurrentUser implements Serializable {
         if(userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
             // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
             if(userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
-                user = new UserHelper().getInfoAdmin(connect.getPoolConnexion(), name);
+                user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
                 if(user == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
                     return "";
                 }
                 user.setIdThesaurus(idTheso);
+                authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
             }
             // on récupère ses droits par rapport au thésaurus en cours
             else { 
-                user = new UserHelper().getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
                 if(user == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
                     return "";
                 }
+                authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
             }
+           
             isLogged = true; 
             name = null;
             pwd = null;
@@ -359,6 +367,15 @@ public class CurrentUser implements Serializable {
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info6")));
     }
+
+//    public boolean isHaveWriteToCurrentThesaurus() {
+//        return authorizedTheso.contains(idTheso);
+//    }
+
+    public boolean isIsHaveWriteToCurrentThesaurus() {
+        return authorizedTheso.contains(idTheso);
+    }
+    
     
     public boolean haveRights(int min) {
         return user.getIdRole() <= min;
@@ -518,6 +535,14 @@ public class CurrentUser implements Serializable {
 
     public void setSelectedThesaurus(List<String> selectedThesaurus) {
         this.selectedThesaurus = selectedThesaurus;
+    }
+
+    public boolean isIsHaveWriteToCurrentThesaurus2() {
+        return authorizedTheso.contains(idTheso);
+    }
+
+    public void setIsHaveWriteToCurrentThesaurus2(boolean isHaveWriteToCurrentThesaurus2) {
+        this.isHaveWriteToCurrentThesaurus2 = isHaveWriteToCurrentThesaurus2;
     }
     
     

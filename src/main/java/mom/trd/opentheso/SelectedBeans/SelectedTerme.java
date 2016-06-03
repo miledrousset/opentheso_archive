@@ -141,6 +141,9 @@ public class SelectedTerme implements Serializable {
 
     private NodeSearch nodeSe;
     private NodePermute nodePe;
+    
+    private String identifierType;    
+    
 
     // Variables resourcesBundle
     String cheminNotice1;
@@ -179,6 +182,7 @@ public class SelectedTerme implements Serializable {
         root = (TreeNode) new DefaultTreeNode("Root", null);
         serverAdress = bundlePref.getString("cheminSite");
         user.setIdTheso(idTheso);
+        identifierType = bundlePref.getString("identifierType");
     }
 
     /**
@@ -573,9 +577,10 @@ public class SelectedTerme implements Serializable {
      * @return true or false
      */
     public boolean creerTermeSpe() {
-        if (type == 1) {
-            ConceptHelper instance = new ConceptHelper();
+        ConceptHelper instance = new ConceptHelper();
+        instance.setIdentifierType(identifierType);        
 
+        if (type == 1) {
             Concept concept = new Concept();
             concept.setIdGroup(idC);
             concept.setIdThesaurus(idTheso);
@@ -601,7 +606,6 @@ public class SelectedTerme implements Serializable {
             termesSpecifique.addAll(tempMap.entrySet());
 
         } else {
-            ConceptHelper instance = new ConceptHelper();
 
             Concept concept = new Concept();
             concept.setIdGroup(idDomaine);
@@ -884,12 +888,16 @@ public class SelectedTerme implements Serializable {
      * @return true or false
      */
     public boolean creerTermeSpe(String idCNT) {
+        ConceptHelper conceptHelper =  new ConceptHelper();
+        conceptHelper.setIdentifierType(identifierType);
+        
         if (new OrphanHelper().isOrphan(connect.getPoolConnexion(), idCNT, idTheso)) {
             try {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
 
-                ArrayList<String> newGroup = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
+
+                ArrayList<String> newGroup = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
                 for (String s : newGroup) {
                     Concept c = new Concept();
                     c.setIdConcept(idCNT);
@@ -897,7 +905,7 @@ public class SelectedTerme implements Serializable {
                     c.setIdThesaurus(idTheso);
                     c.setStatus("D");
 
-                    String idConcept = new ConceptHelper().addConceptInTable(conn, c, user.getUser().getId());
+                    String idConcept = conceptHelper.addConceptInTable(conn, c, user.getUser().getId());
                     // si ça se passe mal, on ajoute rien;
                     if (idConcept == null) {
                         conn.rollback();
@@ -962,8 +970,8 @@ public class SelectedTerme implements Serializable {
                     Connection conn = connect.getPoolConnexion().getConnection();
                     conn.setAutoCommit(false);
                     // On ajoute les nouveaux domaines s'il y en a
-                    ArrayList<String> groupNT = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idCNT, idTheso);
-                    ArrayList<String> groupCurrent = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
+                    ArrayList<String> groupNT = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), idCNT, idTheso);
+                    ArrayList<String> groupCurrent = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
                     ArrayList<String> newGroup = new ArrayList<>();
                     for (String s : groupCurrent) {
                         if (!groupNT.contains(s)) {

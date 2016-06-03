@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,18 @@ import org.apache.commons.logging.LogFactory;
 public class ThesaurusHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
+    
+    private String identifierType = "1";
+
+    public String getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(String identifierType) {
+        this.identifierType = identifierType;
+    }
+
+
 
     /**
      * Permet de créer un nouveau Thésaurus. Retourne l'identifiant du thésaurus
@@ -51,14 +64,6 @@ public class ThesaurusHelper {
         Statement stmt;
         ResultSet resultSet;
 
-        /*
-         * récupération de l'identifiant Ark pour le thésaurus
-         * de type : ark:/66666/srvq9a5Ll41sk
-         */
-        /**
-         * Controler si l'identifiant du thesaurus existe
-         */
-        // à faire
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -112,6 +117,150 @@ public class ThesaurusHelper {
         }
         return idThesaurus;
     }
+    
+    /**
+     * Permet de créer un nouveau Thésaurus. Retourne l'identifiant du thésaurus
+     * ou null
+     *
+     * @param conn
+     * @param thesaurus
+     * @param urlSite
+     * @param isArkActive
+     * @return String Id du thésaurus rajouté
+     */
+    public String addThesaurusRollBack(Connection conn, Thesaurus thesaurus,
+            String urlSite, boolean isArkActive) {
+
+        String idThesaurus = null;
+        String idArk = "";
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query;
+                    if(identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
+                        ToolsHelper toolsHelper = new ToolsHelper();
+                        idThesaurus = toolsHelper.getNewId(10);
+                        while (isThesaurusExiste(conn, idThesaurus)) {
+                            idThesaurus = toolsHelper.getNewId(10);
+                        }
+                    }
+                    else {
+                        query = "select max(id) from thesaurus";
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        resultSet.next();
+                        int idNumeriqueThesaurus = resultSet.getInt(1);
+                        idThesaurus = "" + ++idNumeriqueThesaurus;
+                        while (isThesaurusExiste(conn, idThesaurus)) {
+                            idThesaurus = "" + ++idNumeriqueThesaurus;
+                        }
+                    }
+                    /**
+                     * récupération du code Ark via WebServices
+                     *
+                     */
+                    if (isArkActive) {
+                        ArrayList<DcElement> dcElementsList = new ArrayList<>();
+                        Ark_Client ark_Client = new Ark_Client();
+                        idArk = ark_Client.getArkId(
+                                new FileUtilities().getDate(),
+                                urlSite + "?idt=" + idThesaurus,
+                                "", "", dcElementsList, "pcrt"); // pcrt : p= pactols, crt=code DCMI pour collection
+                    }
+
+                    query = "Insert into thesaurus (id_thesaurus,"
+                            + " id_ark, created, modified)"
+                            + " values ("
+                            + "'" + idThesaurus + "'"
+                            + ",'" + idArk + "'"
+                            + "," + "current_date,"
+                            + "current_date)";
+
+                    stmt.executeUpdate(query);
+                    thesaurus.setId_thesaurus(idThesaurus);
+                    if(!addThesaurusTraductionRollBack(conn, thesaurus)) {
+                        stmt.close();
+                        return null;
+                    }
+                       
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding Thesaurus : " + idThesaurus, sqle);
+            idThesaurus = null;
+        }
+        return idThesaurus;
+    }
+    
+    /**
+     * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
+     * du thésaurus et la langue retourne yes or No si l'opération a réussie ou
+     * non
+     *
+     * @param conn
+     * @param thesaurus la classe Thesaurus
+     * @return boolean
+     */
+    public boolean addThesaurusTraductionRollBack(Connection conn,
+            Thesaurus thesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+        thesaurus = addQuotes(thesaurus);
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into thesaurus_label ("
+                            + " id_thesaurus,"
+                            + " contributor, coverage,"
+                            + " creator, created, modified, description,"
+                            + " format,lang, publisher, relation,"
+                            + " rights, source, subject, title,"
+                            + " type)"
+                            + " values ("
+                            + "'" + thesaurus.getId_thesaurus() + "'"
+                            + ",'" + thesaurus.getContributor() + "'"
+                            + ",'" + thesaurus.getCoverage() + "'"
+                            + ",'" + thesaurus.getCreator() + "'"
+                            + ",current_date"
+                            + ",current_date"
+                            + ",'" + thesaurus.getDescription() + "'"
+                            + ",'" + thesaurus.getFormat() + "'"
+                            + ",'" + thesaurus.getLanguage().trim() + "'"
+                            + ",'" + thesaurus.getPublisher() + "'"
+                            + ",'" + thesaurus.getRelation() + "'"
+                            + ",'" + thesaurus.getRights() + "'"
+                            + ",'" + thesaurus.getSource() + "'"
+                            + ",'" + thesaurus.getSubject() + "'"
+                            + ",'" + thesaurus.getTitle() + "'"
+                            + ",'" + thesaurus.getType() + "')";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding Traduction Thesaurus : " + thesaurus.getTitle(), sqle);
+        }
+        return status;
+    }    
 
     /**
      * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
@@ -331,6 +480,45 @@ public class ThesaurusHelper {
         return map;
     }
 
+    /**
+     * Retourne la liste des Ids des thésaurus existants 
+     *
+     * @param ds
+     * @return
+     */
+    public List getAllIdOfThesaurus(HikariDataSource ds) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List tabIdThesaurus = new ArrayList();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_thesaurus from thesaurus";
+
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        tabIdThesaurus.add(resultSet.getString("id_thesaurus"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All ids of thesaurus : ", sqle);
+        }
+        return tabIdThesaurus;
+    }    
+    
     /**
      * retourne la liste des thésaurus  d'un utilisateur
      * @param ds
@@ -670,7 +858,44 @@ public class ThesaurusHelper {
             log.error("Error while asking if thesaurus exist : " + idThesaurus, sqle);
         }
         return existe;
-    }       
+    }
+    
+    /**
+     * Cette fonction permet de savoir si le thesaurus existe ou non
+     *
+     * @param conn
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isThesaurusExiste(Connection conn, String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_thesaurus from thesaurus where "
+                            + " id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if thesaurus exist : " + idThesaurus, sqle);
+        }
+        return existe;
+    }    
     
 
     /**
@@ -764,8 +989,8 @@ public class ThesaurusHelper {
     public boolean deleteThesaurus(HikariDataSource ds, String idThesaurus) {
         StringPlus text = new StringPlus();
         idThesaurus = text.convertString(idThesaurus);
-        Statement stmt = null;
-        Connection conn = null;
+        Statement stmt;
+        Connection conn;
         boolean state = false;
 
         try {
@@ -802,7 +1027,10 @@ public class ThesaurusHelper {
                             + "delete from alignement where internal_id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_orphan where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from proposition where id_thesaurus = '" + idThesaurus + "';"
-                            + "delete from concept_fusion where id_thesaurus = '" + idThesaurus + "';";
+                            + "delete from concept_fusion where id_thesaurus = '" + idThesaurus + "';"
+                            + "delete from user_role where id_thesaurus = '" + idThesaurus + "';"
+                            ;
+                    
                     
 
                     stmt.executeUpdate(query);

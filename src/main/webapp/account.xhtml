@@ -1,0 +1,17 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+    <h:panelGroup rendered="#{user1.user.name != null}">
+        <div id="disconnect">
+            <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
+            <h:outputLink value="deco.xhtml">
+                <h:outputText value="#{langueBean.getMsg('menu.account2')}" />
+            </h:outputLink>
+        </div>
+    </h:panelGroup>
+</ui:composition>

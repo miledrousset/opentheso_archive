@@ -140,6 +140,22 @@ public class Rest {
     }
     
     /**
+     * Cette fonction renvoie un concept par son id et par l'id du thésaurus 
+     * @param idConcept
+     * @param idTheso
+     * @return 
+    */
+    @Path("/skos/concept/idc={idc}&idt={idt}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getConceptClone(@PathParam("idc") String idConcept,
+            @PathParam("idt") String idTheso){
+        StringBuffer skos = conceptToSkos(idConcept, idTheso);
+        ds.close();
+        return skos.toString();
+    }    
+    
+    /**
      * pour récuperer la liste des domaines d'un thésaurus
      * @param idTheso
      * @return 
@@ -151,11 +167,13 @@ public class Rest {
         StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
         ds.close();
         return skos.toString();
-    }    
+    }
+    
+    
     
     
     /**
-     * Pour retourner un domaine (Groupe) en SKOS avec ses concepts
+     * Pour retourner une branche complète d'un domaine (Groupe) en SKOS avec ses concepts
      * @param idGroup
      * @param idTheso
      * @return 

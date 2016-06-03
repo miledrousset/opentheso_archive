@@ -39,26 +39,8 @@
         </p:dialog>  
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
-            <h:panelGroup id="panChoixTheso" style="float: left;" >
-                <div id="choixTheso">
-                    <h:form id="liste1">
-                        <table>
-                            <tr>
-                                <td style="padding-right: 5px;">
-                                    <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
-                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                                    </h:selectOneMenu>
-                                </td>
-                                <td>
-                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                     update=":panChoixTheso" styleClass="styleButton"/>
-                                </td>
-                            </tr>
-                        </table>
-                    </h:form>
-                </div>
-            </h:panelGroup>
+            <ui:include src="account.xhtml" />
+
             <ui:include src="menuAll.xhtml" />
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -119,7 +101,7 @@
             <div id="generalEdition">
                 <div id="listeTheso">
                     <h:panelGroup id="panTable">
-                        <h:dataTable id="tableTheso" value="#{theso.arrayTheso}" var="entry" styleClass="styleTable">
+                        <h:dataTable id="tableTheso" value="#{theso.authorizedThesaurus}" var="entry" styleClass="styleTable">
                             <h:column id="column1">
                                 <f:facet name="header">
                                     <h:outputText value="#{langueBean.getMsg('edit.tab1Opt1')}" />
@@ -373,7 +355,7 @@
                                     </tr>
                                 </table><br/>
                                 <div style="float: left; margin-left: 50px;">
-                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" actionListener="#{theso.ajouterTheso()}" 
+                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" actionListener="#{theso.ajouterTheso(user1.user.id, user1.user.idRole)}" 
                                                      styleClass="styleButton" update=":panCreer,:tableTheso"/>
                                 </div>
                             </h:form>

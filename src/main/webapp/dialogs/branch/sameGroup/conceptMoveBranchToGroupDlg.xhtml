@@ -1,0 +1,42 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptMoveBranchToGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="conceptMoveBranchToGroupDlg" modal="true" resizable="false" >
+        <!-- Cas de la modification du nom du terme -->
+        <h:form >
+            <p:messages showDetail="true" autoUpdate="true" />
+            <!-- Cas de déplacement d'une branche vers un domaine -->
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
+                <h:form>
+                    <p:messages showDetail="true" autoUpdate="true" />
+                    <table>
+                        <tr>
+                            <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
+                            <td>
+                                <p:selectOneMenu value="#{autoComp.idOld}">
+                                    <f:selectItems value="#{selectedTerme.termeGenerique}" var="tg" itemValue="#{tg.key}"  itemLabel="#{tg.value}" />
+                                </p:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
+                            <td>
+                                <h:outputText style="text-align: left; color: green; font-style: oblique" value="#{selectedTerme.microTheso}" />
+                            </td>
+                        </tr>
+                    </table><br/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToTopTerm()}"
+                                     update=":idConceptMoveBranchToGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton" oncomplete="PF('conceptMoveBranchToGroupDlg').hide();"/>
+                </h:form>
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

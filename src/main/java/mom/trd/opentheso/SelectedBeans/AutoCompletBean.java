@@ -68,12 +68,68 @@ public class AutoCompletBean implements Serializable {
         }
         return liste;
     }
-    
+
+    /**
+     * Fonction qui permet de retrouver les concepts dans un même Group en
+     * partant d'un concept
+     *
+     * @param query
+     * @return
+     */
+    public List<NodeAutoCompletion> getListTerm(String query) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(),
+                    terme.getIdC(), // les termes qu'il faut éviter dans la recherche (le terme lui même et le BT)
+                    theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), terme.getIdDomaine(), query);
+        }
+        return liste;
+    }
+
+    /**
+     * Fonction qui permet de retrouver les concepts dans un même Group en
+     * partant d'un TopTerm
+     *
+     * @param query
+     * @return
+     */
+    public List<NodeAutoCompletion> getListTermFromThisGroup(String query) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(),
+                    terme.getIdC(), // le terme séléctionné qu'il faut éviter dans la recherche
+                    theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), terme.getIdDomaine(), query);
+        }
+        return liste;
+    }
+
+    /**
+     * Fonction qui permet de retrouver les concepts dans un autre Group en
+     * partant d'un TopTerm
+     *
+     * @param query
+     * @return
+     */
+    public List<NodeAutoCompletion> getListTermOfOtherGroup(String query) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTermOfOtherGroup(connect.getPoolConnexion(),
+                    terme.getIdC(), // le terme séléctionné qu'il faut éviter dans la recherche
+                    theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), terme.getIdDomaine(), query);
+        }
+        return liste;
+    }
+
     public void onItemSelect(SelectEvent event) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
     }
-    
-    
+
     public List<NodeAutoCompletion> completSearchTerm(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
@@ -82,13 +138,25 @@ public class AutoCompletBean implements Serializable {
                     theso.getThesaurus().getLanguage(), query);
         }
         return liste;
-    }    
+    }
 
     public List<NodeAutoCompletion> completGroup(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
         if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
             liste = new GroupHelper().getAutoCompletionGroup(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), query);
+        }
+        return liste;
+    }
+
+    public List<NodeAutoCompletion> completOtherGroup(String query) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new GroupHelper().getAutoCompletionOtherGroup(connect.getPoolConnexion(),
+                    theso.getThesaurus().getId_thesaurus(),
+                    terme.getIdDomaine(),
                     theso.getThesaurus().getLanguage(), query);
         }
         return liste;
@@ -209,8 +277,416 @@ public class AutoCompletBean implements Serializable {
     }
 
     /**
-     * Déplace la branche d'un arbre de idOld à l'id du selected att déplacement
-     * de la branche d'un concept vers un autre concept (pas d'un domaine)
+     * *****
+     *
+     * Auteur : Miled Rousset Nouvelles fonctions pour le déplacement de
+     * branches Elles sont stables avec RollBack
+     *
+     *****
+     */
+    /**
+     * Permet de déplacer une branche à l'intérieur d'un même domaine et d'un
+     * concept à un autre
+     *
+     * @return
+     */
+    public boolean moveBranchToConcept() {
+
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+            return false;
+        }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        HikariDataSource ds = connect.getPoolConnexion();
+
+        // permet de déplacer une branche simplement, en cas d'erreur, rien n'est écrit 
+        if (!conceptHelper.moveBranch(ds,
+                terme.getIdC(), idOld, selectedAtt.getIdConcept(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return false;
+        }
+
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+        tree.reInit();
+        tree.reExpand();
+//        terme.getVue().setMoveBranch(0);
+        return true;
+    }
+
+    /**
+     * Déplace la branche du thésaurus, d'un domaine à un concept
+     *
+     * @return
+     */
+    public boolean moveBrancheFromDomainToConcept() {
+        // idOld = MT actuel, c'est le domaine 
+        // selectedAtt.getIdConcept = l'id du concept de destination
+        // terme.getIdC = le concept sélectionné
+        // List selectedNode (c'est le noeud complet sélectionné)
+
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+            return false;
+        }
+
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            ConceptHelper conceptHelper = new ConceptHelper();
+
+            // on déplace la branche au nouveau concept puis création de TG-TS (on ajoute la relation BT du concept, puis on supprime  
+            // au concept la relation TT
+            if (!conceptHelper.moveBranchFromMT(conn, terme.getIdC(),
+                    selectedAtt.getIdConcept(),
+                    terme.getIdDomaine(),
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+            tree.reInit();
+            tree.reExpand();
+            selectedAtt = new NodeAutoCompletion();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    /**
+     * Déplace la branche vers la racine du Group (même
+     * Groupe/Domaine/Collection), la tete de la branche devient un TT
+     * (TopTerme)
+     *
+     * @return
+     */
+    public boolean moveBrancheToTopTerm() {
+        // idOld = TG actuel
+        // selectedAtt.getIdGroup() = l'id  domaine de destination
+        // terme.getIdC = le concept sélectionné
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            /*    if (selectedAtt == null || selectedAtt.getIdGroup().equals("")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+                return false;
+            }*/
+            ConceptHelper conceptHelper = new ConceptHelper();
+
+            // on déplace la branche au domaine (on coupe les relations BT du concept, puis on afecte 
+            // au concept la relation TT
+            if (!conceptHelper.moveBranchToMT(conn, terme.getIdC(),
+                    idOld, terme.getIdDomaine(), terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+            tree.reInit();
+            tree.reExpand();
+            selectedAtt = new NodeAutoCompletion();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    ///////// 
+    //// Other Group
+    /////////
+    /**
+     * Déplace la branche vers la racine d'un autre Group
+     * (Groupe/Domaine/Collection), la tete de la branche devient un TT
+     * (TopTerme)
+     *
+     * @return
+     */
+    public boolean moveBrancheToTopTermOtherGroup() {
+        // idOld = TG actuel
+        // selectedAtt.getIdGroup() = l'id  domaine de destination
+        // terme.getIdC = le concept sélectionné
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            /*    if (selectedAtt == null || selectedAtt.getIdGroup().equals("")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+                return false;
+            }*/
+            ConceptHelper conceptHelper = new ConceptHelper();
+
+            // on déplace la branche au domaine (on coupe les relations BT du concept, puis on afecte 
+            // au concept la relation TT
+            if (!conceptHelper.moveBranchToAnotherMT(conn, terme.getIdC(),
+                    idOld, terme.getIdDomaine(), // ancien Group
+                    selectedAtt.getIdGroup(), // nouveau Group
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            // on supprime l'ancien Groupe de la branche 
+            ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
+            for (String domsOld1 : domsOld) {
+                if (!deleteAllDomainOfBranch(conn, terme.getIdC(), domsOld1, terme.getIdTheso())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+
+            // on ajoute le nouveau domaine à la branche
+            if (!setDomainToBranch(conn, terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso())) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+            tree.reInit();
+            tree.reExpand();
+            selectedAtt = new NodeAutoCompletion();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    /**
+     * Déplace la branche du thésaurus, d'un domaine à un concept d'un autre
+     * Group
+     *
+     * @return
+     */
+    public boolean moveBrancheFromDomainToConceptOtherGroup() {
+        // idOld = MT actuel, c'est le domaine 
+        // selectedAtt.getIdConcept = l'id du concept de destination
+        // terme.getIdC = le concept sélectionné
+        // List selectedNode (c'est le noeud complet sélectionné)
+
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+            return false;
+        }
+
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            ConceptHelper conceptHelper = new ConceptHelper();
+
+            // on déplace la branche au nouveau concept puis création de TG-TS (on ajoute la relation BT du concept, puis on supprime  
+            // au concept la relation TT
+            if (!conceptHelper.moveBranchFromMT(conn, terme.getIdC(),
+                    selectedAtt.getIdConcept(),
+                    terme.getIdDomaine(),
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            // on supprime l'ancien Groupe de la branche 
+            ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
+            for (String domsOld1 : domsOld) {
+                if (!deleteAllDomainOfBranch(conn, terme.getIdC(), domsOld1, terme.getIdTheso())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+
+            // on ajoute le nouveau domaine à la branche
+            ArrayList<String> domsNew = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), selectedAtt.getIdConcept(), terme.getIdTheso());
+            for (String domsNew1 : domsNew) {
+
+                if (!setDomainToBranch(conn, terme.getIdC(), domsNew1, terme.getIdTheso())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+            tree.reInit();
+            tree.reExpand();
+            selectedAtt = new NodeAutoCompletion();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    /**
+     * Permet de déplacer une branche vers un autre domaine mais vers un concept
+     * uniquement
+     *
+     * @return
+     */
+    public boolean moveBranchToConceptOtherGroup() {
+        // idOld = MT actuel, c'est le domaine 
+        // selectedAtt.getIdConcept = l'id du concept de destination
+        // terme.getIdC = le concept sélectionné
+        // List selectedNode (c'est le noeud complet sélectionné)
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+            return false;
+        }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            // permet de déplacer une branche simplement, en cas d'erreur, rien n'est écrit 
+            if (!conceptHelper.moveBranchToConceptOtherGroup(conn,
+                    terme.getIdC(),
+                    idOld,
+                    selectedAtt.getIdConcept(),
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                return false;
+            }
+
+            // on supprime l'ancien Groupe de la branche 
+            ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
+            for (String domsOld1 : domsOld) {
+                if (!deleteAllDomainOfBranch(conn, terme.getIdC(), domsOld1, terme.getIdTheso())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+
+            // on ajoute le nouveau domaine à la branche
+            ArrayList<String> domsNew = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), selectedAtt.getIdConcept(), terme.getIdTheso());
+            for (String domsNew1 : domsNew) {
+
+                if (!setDomainToBranch(conn, terme.getIdC(), domsNew1, terme.getIdTheso())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+            tree.reInit();
+            tree.reExpand();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    /**
+     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
+     * concept de tête un domaine et thesaurus
+     *
+     * @param conn
+     * @param idConceptDeTete
+     * @param idGroup
+     * @param idTheso
+     * @return
+     */
+    private boolean deleteAllDomainOfBranch(Connection conn, String idConceptDeTete,
+            String idGroup, String idTheso) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        ArrayList<String> listIdsOfConceptChildren
+                = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(),
+                        idConceptDeTete, idTheso);
+
+        if (!relationsHelper.deleteRelationMT(conn, idConceptDeTete, idGroup, idTheso)) {
+            return false;
+        }
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            //      if(!relationsHelper.deleteRelationMT(conn, listIdsOfConceptChildren1, idGroup, idTheso))
+            //          return false;
+            deleteAllDomainOfBranch(conn, listIdsOfConceptChildren1,
+                    idGroup, idTheso);
+        }
+        return true;
+    }
+
+    /**
+     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
+     * concept de tête un domaine et thesaurus
+     *
+     * @param conn
+     * @param idConceptDeTete
+     * @param idGroup
+     * @param idTheso
+     * @return
+     */
+    private boolean setDomainToBranch(Connection conn, String idConceptDeTete,
+            String idGroup, String idTheso) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        ArrayList<String> listIdsOfConceptChildren
+                = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(),
+                        idConceptDeTete, idTheso);
+
+        if (!relationsHelper.setRelationMT(conn, idConceptDeTete, idGroup, idTheso)) {
+            return false;
+        }
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            if (!relationsHelper.setRelationMT(conn, listIdsOfConceptChildren1, idGroup, idTheso)) {
+                return false;
+            }
+            setDomainToBranch(conn, listIdsOfConceptChildren1,
+                    idGroup, idTheso);
+        }
+        return true;
+    }
+
+    /**
+     * *****
+     *
+     * Fin des fonctions pour le déplacement de branches Auteur : Miled Rousset
+     *
+     *****
+     */
+    /**
+     * Déplace la branche d'un arbre de l'ancien concept idOld vers le nouveau
+     * id selectionné déplacement de la branche d'un concept vers un autre
+     * concept (pas d'un domaine)
      *
      * @return
      */
@@ -271,7 +747,7 @@ public class AutoCompletBean implements Serializable {
             ConceptHelper ch = new ConceptHelper();
             ArrayList<String> domsOld = ch.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
             ArrayList<String> domsNew = ch.getListGroupIdOfConcept(connect.getPoolConnexion(), selectedAtt.getIdConcept(), terme.getIdTheso());
-            
+
             // on vérifie s'il on change de domaine, si oui, on supprime l'ancien domaine, et on affecte le nouveau domaine à la branche.
             if (!domsOld.equals(domsNew)) {
                 // fonction pour nettoyer les anciens domaines et remplacer par le nouveau
@@ -309,7 +785,7 @@ public class AutoCompletBean implements Serializable {
             }
 
             // On distingue la branche si elle vient des orphelins ou non.
-            if (terme.getIdDomaine().trim().equalsIgnoreCase("orphan")) {    
+            if (terme.getIdDomaine().trim().equalsIgnoreCase("orphan")) {
                 if (!new OrphanHelper().deleteOrphan(conn, terme.getIdC(), terme.getIdTheso())) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                     conn.rollback();
@@ -444,73 +920,6 @@ public class AutoCompletBean implements Serializable {
             Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-    }
-
-    /**
-     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
-     * concept de tête un domaine et thesaurus
-     *
-     * @param conn
-     * @param idConceptDeTete
-     * @param idGroup
-     * @param idTheso
-     * @return
-     */
-    private boolean deleteAllDomainOfBranch(Connection conn, String idConceptDeTete,
-            String idGroup, String idTheso) {
-
-        ConceptHelper conceptHelper = new ConceptHelper();
-        RelationsHelper relationsHelper = new RelationsHelper();
-
-        ArrayList<String> listIdsOfConceptChildren
-                = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(),
-                        idConceptDeTete, idTheso);
-
-        if (!relationsHelper.deleteRelationMT(conn, idConceptDeTete, idGroup, idTheso)) {
-            return false;
-        }
-
-        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
-      //      if(!relationsHelper.deleteRelationMT(conn, listIdsOfConceptChildren1, idGroup, idTheso))
-            //          return false;
-            deleteAllDomainOfBranch(conn, listIdsOfConceptChildren1,
-                    idGroup, idTheso);
-        }
-        return true;
-    }
-
-    /**
-     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
-     * concept de tête un domaine et thesaurus
-     *
-     * @param conn
-     * @param idConceptDeTete
-     * @param idGroup
-     * @param idTheso
-     * @return
-     */
-    private boolean setDomainToBranch(Connection conn, String idConceptDeTete,
-            String idGroup, String idTheso) {
-
-        ConceptHelper conceptHelper = new ConceptHelper();
-        RelationsHelper relationsHelper = new RelationsHelper();
-
-        ArrayList<String> listIdsOfConceptChildren
-                = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(),
-                        idConceptDeTete, idTheso);
-
-        if (!relationsHelper.setRelationMT(conn, idConceptDeTete, idGroup, idTheso)) {
-            return false;
-        }
-
-        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
-            if (!relationsHelper.setRelationMT(conn, listIdsOfConceptChildren1, idGroup, idTheso)) {
-                return false;
-            }
-            setDomainToBranch(conn, listIdsOfConceptChildren1,
-                    idGroup, idTheso);
-        }
-        return true;
     }
 
     private void recursiveMoveBranche(HikariDataSource ds, String idC, String idOld, ArrayList<String> domsOld, ArrayList<String> domsNew) {

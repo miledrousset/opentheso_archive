@@ -42,7 +42,7 @@
             <f:viewParam name="idg" value="#{theso.idGurl}"/>
             <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
         </f:metadata>
-        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" />
+      
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
             <h1>Gestionnaire de thésaurus</h1>
             <h:outputText value="version :  #{theso.getVersion()}" /><br/>
@@ -65,6 +65,8 @@
         </p:dialog>  
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
+            <ui:include src="connection.xhtml" />
+            
             <h:panelGroup id="panChoixTheso" style="float: left;" >
                 <div id="choixTheso">
                     <h:form id="liste1">
@@ -78,8 +80,8 @@
                                 </td>
                                 <td>
                                     <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                     update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                                     styleClass="styleButton"/>
+                                                     update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu" 
+                                                     styleClass="styleButton" />
                                 </td>
                                 
                                                             <!-- CHOIX LANGUE DEBUT -->  
@@ -119,9 +121,17 @@
             <ui:include src="dialogs/conceptDeprecateDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionValidationDlg.xhtml" />
-            <ui:include src="dialogs/conceptMoveBranchDlg.xhtml" />
-            <ui:include src="dialogs/conceptMoveBranchToGroupDlg.xhtml" />
-            <ui:include src="dialogs/conceptMoveBranchFromGroupDlg.xhtml" />
+            
+            <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchDlg.xhtml" />
+            <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchFromGroupDlg.xhtml" />
+            <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchToGroupDlg.xhtml" />
+            
+
+            <ui:include src="dialogs/branch/otherGroup/moveBranchFromTopTermToConceptOtherGroupDlg.xhtml" />            
+            <ui:include src="dialogs/branch/otherGroup/moveBranchToConceptOtherGroupDlg.xhtml" />
+            <ui:include src="dialogs/branch/otherGroup/moveBranchToGroupOfOtherGroupDlg.xhtml" />            
+            
+            
             <ui:include src="dialogs/orphan/moveBranchFromOrphanDlg.xhtml" />
             <ui:include src="dialogs/orphan/moveBranchFromOrphanToGroupDlg.xhtml" />
             <ui:include src="dialogs/nt/ntEditDlg.xhtml" />
@@ -142,7 +152,7 @@
                             <!-- navigation rapide par auto-complétion --> 
                             <div id="rapidAccess" align="center" >
                                 <h:form >
-                                    <p:growl id="indexSearch" showDetail="true" />
+                                   
 
                                     <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
                                                    minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
@@ -156,7 +166,7 @@
 
                                     <!-- gestion des domaines ou groupes --> 
                                     <div id="imageEdition">
-                                        <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
+                                        <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
                                             <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
                                                 <p:menuitem  value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
@@ -391,7 +401,7 @@
                         <p:tab title="#{langueBean.getMsg('index.underTree')}">
                             <!-- SOUS ARBRE DEBUT -->
                             <div id="imageEdition" style="margin-bottom: 2px; margin-top: 1px; margin-right: 4px; height: 20px;">
-                                <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(1)) and (theso.getThisTheso() != null)}">
+                                <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
                                     <p:commandButton id="cbAjFacette" 
                                                      styleClass="cbEdit" icon="ui-icon-edit" 
                                                      actionListener="#{vue.setFacette(true)}"  
@@ -460,7 +470,7 @@
                                             </p:commandButton>
                                         </h:form>                 
 
-                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
                                             <!-- exporter la branche en SKOS mode connecté -->
                                             <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.brancheToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
@@ -473,7 +483,7 @@
                                         </h:form>  
                                         
                                         
-                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(1)) and (selectedTerme.type == 1)}" 
+                                        <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type == 1)}" 
                                                 style="float: left; margin-right: 5px;" >
                                             <!-- exporter la branche en SKOS mode connecté -->
                                             <p:commandButton value="skos_Group" ajax="false" styleClass="link">
@@ -489,7 +499,7 @@
                                         
                                         
                                         
-                                        <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(1))}" style="float: left;" >
+                                        <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
                                             <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
                                                              update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                                              styleClass="styleButtonValid" >
@@ -515,7 +525,7 @@
                                                 <h:panelGroup id="panFormEditTGen">
                                                     <div id="imageEdition">
                                                         <h:form id="formEditTGen" 
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
 
                                                             <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
@@ -548,9 +558,10 @@
 
                                             <div class="contenuTerme">
                                                 <div id="imageEdition">
-                                                    <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine != 'Orphan')}">
+                                                    <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
+                                                            
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
                                                             
@@ -561,23 +572,21 @@
                                                             <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                                                             
                                                             
-                                                            
-                                                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
-                                                            
-                                                            
-                                                            
-                                                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
-                                                            
-                                                            
-                                                            <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.addToMT')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
-                                                            
-                                                            
-                                                            
+                                                            <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
+                                                                <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem rendered="#{(selectedTerme.type != 2) and (selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheToGroup')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
+                                                            </p:submenu>
+                                                            <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
+                                                                <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroup')}" update=":idMoveBranchToConceptOtherGroupDlg" oncomplete="PF('moveBranchToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
+                                                            </p:submenu>
                                                             
                                                         </p:menu>
                                                     </h:form>
                                                     <!--options pour les orphelins -->
-                                                    <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine == 'Orphan')}">
+                                                    <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine == 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -673,7 +682,8 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.NT')}" rendered="#{(treeBean.browserName != 'agent')}"/> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTSpe" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.isHaveWriteToCurrentThesaurus) 
+                                                                        and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTSpe" styleClass="cbEdit" icon="ui-icon-edit"/>                                                        
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTSpe" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
@@ -708,7 +718,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.RT')}" rendered="#{(treeBean.browserName != 'agent')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTAsso"
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1) and (selectedTerme.idDomaine != 'Orphan'))}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan'))}">
                                                         <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" actionListener="#{vue.setAddTAsso(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -740,7 +750,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.UF')}" /> 
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTSyno" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
                                                         <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" actionListener="#{vue.setAddTSyno(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -757,11 +767,11 @@
                                                         <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
                                                     </ui:repeat>
                                                 </h:panelGroup>
-                                                <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+                                                <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
                                                 
                                                
                                                 
-                                                <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
                                                         <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
                                                     </ui:repeat>
@@ -779,7 +789,7 @@
                                                     <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
                                                     <div id="imageEdition">
                                                         <h:form id="formEditNote" 
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (selectedTerme.idDomaine != 'Orphan')}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
 
                                                             <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
@@ -850,7 +860,7 @@
                                                 <h:outputText value="#{langueBean.getMsg('index.align')}" />
                                                 <div id="imageEdition">
                                                     <h:form id="formEditAlign" 
-                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                                                          styleClass="cbEdit" icon="ui-icon-edit" >
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
@@ -897,10 +907,9 @@
 
                                             <div id="imageEdition">
                                                 <h:form id="formEditTrad" 
-                                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit" />
                                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
-                                                        <p:menuitem value="#{langueBean.getMsg('index.addTrad')}" actionListener="#{vue.setAddTrad(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                         <p:menuitem value="#{langueBean.getMsg('index.addTrad')}" actionListener="#{vue.setAddTrad(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                         <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" actionListener="#{vue.setAddTrad(2)}" update=":panPopUp" style="font-size: 12px;"/>
                                                     </p:menu>
@@ -929,7 +938,7 @@
                                                     <h:outputText value="#{langueBean.getMsg('index.facet')}" /> 
                                                     <div id="imageEdition">
                                                         <h:form id="formEditFacette" target="_blanc"
-                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                             <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit" 
                                                                              action="#{vue.setAddFacette(true)}" update=":panPopUp" />
                                                         </h:form>
@@ -974,7 +983,7 @@
                                                     </h:form>
                                                     <h:outputText value="#{langueBean.getMsg('index.picture')}" /> 
                                                     <div id="imageEdition">
-                                                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(1)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                                                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                             <p:commandButton id="cbEditThesoImage" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"  
                                                                              actionListener="#{vue.setAddImage(true)}" update=":panPopUp" />
                                                         </h:form>

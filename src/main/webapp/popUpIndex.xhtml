@@ -703,6 +703,7 @@
                 <br/>
                 <!-- Ajoute de traduction -->
                 <h:form rendered="#{vue.addTrad == 1}">
+                    
                     <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : <h:inputText id="nomTermeTrad" value="#{selectedTerme.valueEdit}" /><br/><br/>
                     <h:selectOneMenu value="#{selectedTerme.langueEdit}" styleClass="listes">
                         <f:selectItems value="#{theso.languesTheso}"/>

@@ -113,6 +113,16 @@ input[type="button"], input[type="submit"]{
     box-shadow: none;
 }
 
+.cbSeparateMenu{
+    background: #D9C7BE;
+    height: 25px;
+    width: 14px;
+    border: none;
+    box-shadow: none;
+    font-family:"Palatino linotype",Times,serif;
+    font-size: 12px;
+}
+
 .listes {
     font-family: "Palatino linotype",Times,serif;
     max-width: 140px;
@@ -257,6 +267,14 @@ input[type="button"], input[type="submit"]{
     padding: auto;
     text-align: center;
     height: 514px;
+}
+
+.panelNoBorder, .panelNoBorder tr, .panelNoBorder td{
+    border: hidden;
+    border-color: white;
+    background:none;
+    font-family:"Palatino linotype",Times,serif;
+    font-size: 14px;
 }
 
 .cbTree {

@@ -15,7 +15,7 @@
         <ui:include src="dialogs/user/addUserDlg.xhtml" />
         <ui:include src="dialogs/user/editUserDlg.xhtml" />
         
-        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+    
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
             Depuis cette page, les administrateurs peuvent gérer les utilisateurs. Il leur est possible de créer/désactiver un compte ou de modifier les droit d'un utilisateur.
@@ -27,26 +27,8 @@
         </p:dialog>  
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
-            <h:panelGroup id="panChoixTheso" style="float: left;" >
-                <div id="choixTheso">
-                    <h:form id="liste1">
-                        <table>
-                            <tr>
-                                <td style="padding-right: 5px;">
-                                    <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
-                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                                    </h:selectOneMenu>
-                                </td>
-                                <td>
-                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                     update=":panChoixTheso" styleClass="styleButton"/>
-                                </td>
-                            </tr>
-                        </table>
-                    </h:form>
-                </div>
-            </h:panelGroup>
+            <ui:include src="account.xhtml" />
+
             <ui:include src="menuAll.xhtml" />
         </div>
         <center>

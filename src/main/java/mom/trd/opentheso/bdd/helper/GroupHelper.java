@@ -1055,7 +1055,72 @@ public class GroupHelper {
         }
 
         return nodeAutoCompletionList;
-    }      
+    }
+
+    /**
+     * Cette fonction permet de récupérer la liste des domaines sauf celui en cours pour
+     * l'autocomplétion
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param idGroup
+     * @param text
+     * @param idLang
+     * @return Objet class Concept
+     */
+    public List<NodeAutoCompletion> getAutoCompletionOtherGroup(HikariDataSource ds,
+            String idThesaurus, 
+            String idGroup, // le Group à ignorer
+            String idLang, String text) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = null;
+        text = new StringPlus().convertString(text);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT concept_group_label.idgroup,"
+                            + " concept_group_label.lexicalvalue FROM concept_group_label"
+                            + " WHERE "
+                            + " concept_group_label.idthesaurus = '" + idThesaurus + "'"
+                            + " AND concept_group_label.lang = '" + idLang + "'"
+                            + " AND concept_group_label.idgroup != '" + idGroup + "'"
+                            + " AND unaccent_string(concept_group_label.lexicalvalue) ILIKE unaccent_string('" + text + "%')"
+                            + " ORDER BY concept_group_label.lexicalvalue ASC LIMIT 20";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    nodeAutoCompletionList = new ArrayList<>();
+                    while (resultSet.next()) {
+                        if (resultSet.getRow() != 0) {
+                            NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                            nodeAutoCompletion.setIdConcept("");
+                            nodeAutoCompletion.setTermLexicalValue("");
+                            nodeAutoCompletion.setGroupLexicalValue(resultSet.getString("lexicalvalue"));
+                            nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                            nodeAutoCompletionList.add(nodeAutoCompletion);
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    }    
     
     /**
      * Permet de retourner une ArrayList de String (idGroup) par thésaurus / ou

@@ -59,9 +59,9 @@ public class skosApiTest3 {
     // public void hello() {}
    
     @Test
-    public void testReadSkos() {
+    public void testReadSkosCollection() {
         
-        try {
+    /*    try {
             OWLOntologyManager m = OWLManager.createOWLOntologyManager();
             m.getOntologyParsers().set(new RDFXMLParserFactory());
             OWLOntology ont = m.loadOntologyFromOntologyDocument(IRI.create("file:/Users/Miled/Desktop/unescothes.rdf"));
@@ -90,8 +90,66 @@ public class skosApiTest3 {
             }
         } catch (OWLOntologyCreationException ex) {
             Logger.getLogger(skosApiTest3.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 
+    
+        // TODO add test methods here.
+    // The methods must be annotated with annotation @Test. For example:
+    //
+    // @Test
+    // public void hello() {}
+   
+    @Test
+    public void testReadSkosOWL() {
+        
+        try {
+            OWLOntologyManager m = OWLManager.createOWLOntologyManager();
+            m.getOntologyParsers().set(new RDFXMLParserFactory());
+            OWLOntology ont = m.loadOntologyFromOntologyDocument(IRI.create("file:/Users/Miled/Desktop/test_unesco2.xml"));
+        //    OWLNamedIndividual ind = m.getOWLDataFactory().getOWLNamedIndividual(IRI.create("http://skos.um.es/unescothes/COL205"));
+    //        OWLNamedIndividual ind = m.getOWLDataFactory().getOWLNamedIndividual(IRI.create("file:/Users/Miled/Desktop/test_unesco2.xml"));
+            
+            Set<? extends OWLAxiom> axioms = ont.getAxioms();
+            
+         //   Set<? extends OWLAxiom> axioms = ont.getAxioms(ind);
+
+            
+            for (OWLAxiom ax : axioms) {
+                if(ax.isTopEntity()){
+                    System.out.println("top " + ax);
+                    System.out.println("top entité " + ax.getAxiomType());
+                }
+                if(ax.isAnnotationAxiom()){
+                    System.out.println("annotation ::::" + ax);
+                    System.out.println("annotation type :::::" + ax.getAxiomType());
+                }
+                ///  ici on detecte les Concepts, ConceptScheme, ConceptGroup ....
+                else {
+                    System.out.println("autre ::::" + ax);
+                    System.out.println("autre type :::::" + ax.getAxiomType()); 
+                    ax.getAnnotations();
+                    ax.getNNF();
+                    ax.getAnnotations().toString();
+                }
+
+
+            }
+         /*   axioms = ont.getAnnotationAssertionAxioms(ont.get//ind.getIRI());
+            for (OWLAxiom ax : axioms) {
+                System.out.println("ReadSKOSExample.ReadSKOSExample() " + ax);
+            }
+            axioms = ont.getDataPropertyAssertionAxioms(ind);
+            for (OWLAxiom ax : axioms) {
+                System.out.println("ReadSKOSExample.ReadSKOSExample() " + ax);
+            }
+            axioms = ont.getObjectPropertyAssertionAxioms(ind);
+            for (OWLAxiom ax : axioms) {
+                System.out.println("ReadSKOSExample.ReadSKOSExample() " + ax);
+            }*/
+        } catch (OWLOntologyCreationException ex) {
+            Logger.getLogger(skosApiTest3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
 }

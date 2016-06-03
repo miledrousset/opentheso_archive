@@ -43,12 +43,12 @@ public class ConceptHelper {
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
     // 1=numericId ; 2=alphaNumericId
-    private int identifierType = 1; 
+    private String identifierType = "1"; 
     
     public ConceptHelper() {
     }
 
-    public void setIdentifierType(int identifierType) {
+    public void setIdentifierType(String identifierType) {
         this.identifierType = identifierType;
     }
     
@@ -734,6 +734,42 @@ public class ConceptHelper {
     }
     
     /**
+     * Cette fonction permet de déplacer une Branche vers un concept d'un autre Groupe
+     *
+     * @param conn
+     * @param idConcept
+     * @param idOldConceptBT
+     * @param idNewConceptBT
+     * @param idThesaurus
+     * @param idUser
+     * @return true or false
+     */
+    public boolean moveBranchToConceptOtherGroup(
+            Connection conn,
+            String idConcept,
+            String idOldConceptBT, String idNewConceptBT,
+            String idThesaurus, int idUser) {
+        try {
+            if (!new RelationsHelper().deleteRelationBT(conn, idConcept, idThesaurus, idOldConceptBT, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            if (!new RelationsHelper().addRelationBT(conn, idConcept, idThesaurus, idNewConceptBT, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            return true;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }    
+    
+    /**
      * Cette fonction permet de déplacer une Branche vers un domaine
      * Le domaine de destination est le même que la branche  (déplamcent dans le même domaine)
      *
@@ -764,6 +800,43 @@ public class ConceptHelper {
         }
         return false;
     }
+    
+    /**
+     * Cette fonction permet de déplacer une Branche vers un domaine
+     * Le domaine de destination est le même que la branche  (déplamcent dans le même domaine)
+     *
+     * @param conn
+     * @param idConcept
+     * @param idOldConceptBT
+     * @param oldMT
+     * @param idNewMT
+     * @param idThesaurus
+     * @param idUser
+     * @return true or false
+     */
+    public boolean moveBranchToAnotherMT(Connection conn,
+            String idConcept,
+            String idOldConceptBT,
+            String oldMT,
+            String idNewMT,
+            String idThesaurus, int idUser) {
+        try {
+            RelationsHelper relationsHelper = new RelationsHelper();
+            conn.setAutoCommit(false);
+            
+            if (!relationsHelper.deleteRelationBT(conn, idConcept, idThesaurus, idOldConceptBT, idUser)) {
+                return false;
+            }
+            // on attribue la relation TT  au concept qui va passer à la racine d'un autre Group,
+            // mais comme on est en mode Autocommit= false, l'ancien Group du concept ne change pas tant qu'on a pas Commité  
+            return relationsHelper.addRelationTT(conn, idConcept, oldMT, idThesaurus, idUser);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }    
     
     /**
      * Cette fonction permet de déplacer une Branche d'un domaine
@@ -1022,31 +1095,32 @@ public class ConceptHelper {
         //   Connection conn;
         Statement stmt;
         ResultSet resultSet;
-
+        
         try {
             // Get connection from pool
             //     conn = ds.getConnection();
             try {
-                conn.setAutoCommit(false);
                 stmt = conn.createStatement();
+                String query;
                 try {
-                    String query = "select max(id) from concept "
-                            + "where id_thesaurus ='" + concept.getIdThesaurus() + "'";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    resultSet.next();
-                    int idNumerique = resultSet.getInt(1);
-                    idConcept = "" + (++idNumerique);
-                    concept.setIdConcept(idConcept);
-
-                    /**
-                     * Ajout des informations dans la table Concept
-                     */
-                    if (!addConceptHistorique(conn, concept, idUser)) {
-                        conn.rollback();
-                        conn.close();
-                        return null;
+                    if(identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
+                        ToolsHelper toolsHelper = new ToolsHelper();
+                        idConcept = toolsHelper.getNewId(10);
+                        while (isIdExiste(conn, idConcept, concept.getIdThesaurus())) {
+                            idConcept = toolsHelper.getNewId(10);
+                        }
+                        concept.setIdConcept(idConcept);
                     }
+                    else {
+                        query = "select max(id) from concept "
+                                + "where id_thesaurus ='" + concept.getIdThesaurus() + "'";
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        resultSet.next();
+                        int idNumerique = resultSet.getInt(1);
+                        idConcept = "" + (++idNumerique);
+                        concept.setIdConcept(idConcept);
+                    }  
 
                     query = "Insert into concept "
                             + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept, id_group)"
@@ -1060,7 +1134,15 @@ public class ConceptHelper {
                             + ",'" + concept.getIdGroup() + "')";
 
                     stmt.executeUpdate(query);
-                    conn.commit();
+                    
+                    /**
+                     * Ajout des informations dans la table Concept
+                     */
+                    if (!addConceptHistorique(conn, concept, idUser)) {
+                        stmt.close();
+                        return null;
+                    }
+                    
                 } finally {
                     stmt.close();
                 }
@@ -1072,6 +1154,7 @@ public class ConceptHelper {
             if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
                 log.error("Error while adding Concept : " + idConcept, sqle);
             }
+            idConcept = null;
         }
         return idConcept;
     }
@@ -1119,7 +1202,48 @@ public class ConceptHelper {
             log.error("Error while asking if id exist : " + idConcept, sqle);
         }
         return existe;
-    }   
+    }
+
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non
+     *
+     * @param conn
+     * @param idConcept
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isIdExiste(Connection conn,
+            String idConcept, String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept
+                            + "' and id_thesaurus = '" + idThesaurus
+                            + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id exist : " + idConcept, sqle);
+        }
+        return existe;
+    }     
 
     /**
      * Cette fonction permet d'ajouter l'historique d'un concept
