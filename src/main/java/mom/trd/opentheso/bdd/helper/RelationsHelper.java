@@ -9,10 +9,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.datas.Relation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
@@ -32,6 +35,71 @@ public class RelationsHelper {
     public RelationsHelper() {
     }
 
+    
+    /**
+     * Cette fonction permet de rajouter une relation type Groupe ou domaine à un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idGroup
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+    public boolean addRelationMT(Connection conn,
+            String idConcept, String idThesaurus,
+            String idGroup, int idUser) {
+
+        Statement stmt;
+        boolean status = false;
+
+        String query;
+        Savepoint savepoint = null;
+        
+        try {
+            // Get connection from pool
+            savepoint = conn.setSavepoint();
+            try {
+                stmt = conn.createStatement();
+                try {
+                  /*  if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "MT", idUser, "ADD")) {
+                        return false;
+                    }*/
+                    query = "Insert into concept"
+                            + "(id_concept, id_thesaurus, id_ark, top_concept, id_group)"
+                            + " values ("
+                            + "'" + idConcept + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'',"
+                            + "false"
+                            + ",'" + idGroup + "')";
+ 
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            //    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                try {
+                    if(savepoint != null) {
+                        conn.rollback(savepoint);
+                        status = true;
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else
+                log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+        }
+        return status;        
+    }    
+    
     /**
      * Cette fonction permet de rÃ©cupÃ©rer les termes gÃ©nÃ©riques d'un concept
      *
@@ -55,7 +123,7 @@ public class RelationsHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select DISTINCT id_concept2, status from hierarchical_relationship, concept"
+                    String query = "select DISTINCT (id_concept2), status from hierarchical_relationship, concept"
                             + " where hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'"
                             + " and hierarchical_relationship.id_concept2 = concept.id_concept"
                             + " and id_concept1 = '" + idConcept + "'"
@@ -659,10 +727,12 @@ public class RelationsHelper {
 
         Statement stmt;
         boolean status = false;
-
+        String query;
+        Savepoint savepoint = null;
+        
         try {
             // Get connection from pool
-            conn.setAutoCommit(false);
+            savepoint = conn.setSavepoint();
             try {
                 stmt = conn.createStatement();
                 try {
@@ -670,7 +740,7 @@ public class RelationsHelper {
                 /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
-                    String query = "UPDATE concept set"
+                     query = "UPDATE concept set"
                             + " id_group = '" + idGroup + "'," 
                             + " modified = now()"
                             + " WHERE id_concept ='" + idConcept + "'"
@@ -686,7 +756,18 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                try {
+                    if(savepoint != null) {
+                        conn.rollback(savepoint);
+                        status = true;
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else
+                log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
         }
         return status;
     }    

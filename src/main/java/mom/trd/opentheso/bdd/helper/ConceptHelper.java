@@ -52,6 +52,58 @@ public class ConceptHelper {
         this.identifierType = identifierType;
     }
     
+    /**************************************************************
+    /**************************************************************
+    * Nouvelles fonctions stables 
+    * auteur Miled Rousset
+    /**************************************************************
+    /**************************************************************/
+
+    /**
+     *  Cette fonction permet de retrouver tous tes identifiants d'une branche
+     * en partant du concetp en paramètre
+     * @param hd
+     * @param idConceptDeTete
+     * @param idGroup
+     * @param idTheso
+     * @param lisIds
+     * @return 
+     */
+    public ArrayList<String> getIdsOfBranch(HikariDataSource hd,
+            String idConceptDeTete,
+            String idGroup, String idTheso,
+            ArrayList<String> lisIds) {
+
+        lisIds.add(idConceptDeTete);
+
+        ArrayList<String> listIdsOfConceptChildren
+                = getListChildrenOfConcept(hd, idConceptDeTete, idTheso);
+        
+        System.out.println("idConcept = " + idConceptDeTete);
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            getIdsOfBranch(hd, listIdsOfConceptChildren1,
+                    idGroup, idTheso, lisIds);
+        }
+        return lisIds;
+    }    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**************************************************************
+    /**************************************************************
+    * Fin des nouvelles fonctions stables 
+    * auteur Miled Rousset
+    /**************************************************************
+    /**************************************************************/    
+    
+    
     /**
      * Cette fonction permet d'ajouter un Top Concept avec le libellé et les
      * relations Si l'opération échoue, on rollback les modifications

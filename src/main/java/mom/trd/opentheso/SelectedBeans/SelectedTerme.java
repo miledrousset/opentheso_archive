@@ -879,6 +879,66 @@ public class SelectedTerme implements Serializable {
         majTGen();
         vue.setAddTGen(0);
         return true;
+    }
+    
+    /**
+     * Ajoute une relation terme générique au concept courant
+     *
+     * @param idConcept
+     * @param idGroup
+     * @param idNewConceptBT
+     * @return true or false
+     */
+    public boolean addTermeGeneOtherGroup(String idConcept, String idGroup, String idNewConceptBT) {
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        GroupHelper groupHelper = new GroupHelper();
+        
+        String idNewGroup = conceptHelper.getGroupIdOfConcept(connect.getPoolConnexion(), idNewConceptBT, idTheso);
+        if(idNewGroup == null) return false;
+        
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if (termeGenerique.isEmpty()) {
+                // c'était un orphelin
+                if (!new OrphanHelper().deleteOrphan(conn, idConcept, idTheso)) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+            
+            //On ajoute la realtion BT au concept
+            if (!relationsHelper.addRelationBT(conn, idConcept, idTheso, idNewConceptBT, user.getUser().getId())) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            
+            // on récupère les Ids des concepts à modifier 
+            ArrayList<String> lisIds = new  ArrayList<>();
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idGroup, idTheso, lisIds);
+
+            // on ajoute le nouveau domaine à la branche
+            if (!groupHelper.addDomainToBranch(conn, lisIds, idNewGroup, idTheso, user.getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }  
+            
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+        termeGenerique = new ArrayList<>();
+        majTGen();
+        return true;
     }    
 
     /**

@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idAddTgDlg"  header="#{langueBean.getMsg('panel.addBT')}" widgetVar="addTgDlg" modal="true" resizable="false" >
+    <p:dialog id="idAddTgOtherGroupDlg"  header="#{langueBean.getMsg('panel.addBT')}" widgetVar="addTgOtherGroupDlg" modal="true" resizable="false" >
         <!-- Cas d'ajout d'un terme générique au concept -->
         <fieldset>
             <legend><h:outputText value="#{langueBean.getMsg('popup.addTermExist')}" /></legend>
@@ -18,7 +18,7 @@
                     <tr>
                         <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                         <td>
-                            <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTermFromThisGroup}" var="t1"
+                            <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTermOfOtherGroup}" var="t1"
                                             itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
                                 <f:facet name="itemtip">
                                     <h:panelGrid columns="2" cellpadding="5" width="200" >
@@ -41,9 +41,9 @@
                     <tr>
                         <td colspan="2" style="text-align: center;">
                             <h:form>
-                                <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGene()}"
-                                                 update=":idAddTgDlg,:panContenu,:accordeonTree" styleClass="styleButton"
-                                                 oncomplete="PF('addTgDlg').hide();">
+                                <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGeneOtherGroup()}"
+                                                 update=":idAddTgOtherGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton"
+                                                 oncomplete="PF('addTgOtherGroupDlg').hide();">
                                 </p:commandButton>  
                             </h:form>
 

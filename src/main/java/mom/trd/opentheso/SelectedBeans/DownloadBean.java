@@ -1,28 +1,22 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
-import mom.trd.opentheso.SelectedBeans.Vue;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
-import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
-import mom.trd.opentheso.core.imports.tabulate.ReadFileTabule;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -30,6 +24,7 @@ import skos.SKOSXmlDocument;
 
 @ManagedBean(name = "downloadBean", eager = true)
 @SessionScoped
+
 public class DownloadBean implements Serializable {
 
     private String skos;
@@ -40,6 +35,9 @@ public class DownloadBean implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    @ManagedProperty(value = "#{langueBean}")
+    private LanguageBean languageBean;    
 
     private String serverArk;
     private boolean arkActive;
@@ -256,6 +254,10 @@ public class DownloadBean implements Serializable {
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
+        if(jsonLd == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("index.exportJsonError")));
+            return file;
+        }
 
         try {
             stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
@@ -560,4 +562,14 @@ public class DownloadBean implements Serializable {
     public void setFile(StreamedContent file) {
         this.file = file;
     }
+
+    public LanguageBean getLanguageBean() {
+        return languageBean;
+    }
+
+    public void setLanguageBean(LanguageBean languageBean) {
+        this.languageBean = languageBean;
+    }
+    
+   
 }

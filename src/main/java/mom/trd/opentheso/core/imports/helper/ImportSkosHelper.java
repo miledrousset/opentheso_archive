@@ -188,6 +188,16 @@ public class ImportSkosHelper {
                             }
                             thesaurus.addDcElement(dcElement);
                         }
+                        else {
+                            DcElement dcElement = new DcElement();
+                            dcElement.setName("title");
+                            dcElement.setValue(con.getLiteral());
+                            if (con.hasLang()) {
+                                dcElement.setLanguage(con.getLang());
+                            }
+                            thesaurus.addDcElement(dcElement);
+                        }
+
                     }
     //              * created or date;
 //                    if(anno.getURI().getPath().contains("date") ){
@@ -1600,8 +1610,10 @@ public class ImportSkosHelper {
         {
             uri = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
         }
+        StringPlus stringPlus = new StringPlus();
+        uri =stringPlus.normalizeStringForIdentifier(uri);
         return uri;
-    }     
+    }  
 
     public String getMessage() {
         return message;

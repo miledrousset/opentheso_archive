@@ -878,7 +878,10 @@ public class SelectedThesaurus implements Serializable {
                     JsonHelper jsonHelper = new JsonHelper();
                     SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                     StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
-                    return jsonLd.toString();
+                    if(jsonLd != null)
+                        return jsonLd.toString();
+                    else
+                        return "";
                 }
                 // cas d'un concept
                 if(tree.getSelectedTerme().getType() == 2 || tree.getSelectedTerme().getType() == 3) {
@@ -895,7 +898,10 @@ public class SelectedThesaurus implements Serializable {
                         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                         if(sKOSXmlDocument == null) return "";
                         StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
-                        return jsonLd.toString();
+                        if(jsonLd != null)
+                            return jsonLd.toString();
+                        else
+                            return "";
                     }
                 }
             }

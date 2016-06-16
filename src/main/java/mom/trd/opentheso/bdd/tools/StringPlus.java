@@ -85,6 +85,26 @@ public class StringPlus {
      * @param s
      * @return 
      */
+    public String normalizeStringForIdentifier(String s) {
+        if (s == null) {
+            return null;
+        }
+        // normalisation of words for identifier 
+        // exp : ?idg=MT_10&idt=2
+        // devient : idgMT_10idt2
+        
+        s = s.replaceAll("\\?", "");
+        s = s.replaceAll("=", "");
+        s = s.replaceAll("&", "");
+
+        return s;
+    }    
+    
+    /**
+     * Fonction qui permet de normaliser les textes pour les documents XML
+     * @param s
+     * @return 
+     */
     public String clearStringForSerach(String s) {
         if (s == null) {
             return null;

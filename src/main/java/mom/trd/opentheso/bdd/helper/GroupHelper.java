@@ -36,6 +36,78 @@ public class GroupHelper {
 
     public GroupHelper() {
     }
+    
+    /**
+     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
+     * concept de tête un domaine et thesaurus
+     *
+     * @param conn
+     * @param lisIds
+     * @param idGroup
+     * @param idTheso
+     * @return
+     */
+    public boolean deleteAllDomainOfBranch(Connection conn,
+            ArrayList<String> lisIds, // identifiants des concepts
+            String idGroup, String idTheso) {
+
+        RelationsHelper relationsHelper = new RelationsHelper();
+        for (String id : lisIds) {
+            if (!relationsHelper.deleteRelationMT(conn, id, idGroup, idTheso)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
+     * concept de tête un domaine et thesaurus
+     *
+     * @param conn
+     * @param lisIds
+     * @param idGroup
+     * @param idTheso
+     * @return
+     */
+    public boolean setDomainToBranch(Connection conn,
+            ArrayList<String> lisIds, // identifiants des concepts
+            String idGroup, String idTheso) {
+
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        for (String id : lisIds) {
+           if (!relationsHelper.setRelationMT(conn, id, idGroup, idTheso)) {
+               return false;
+           }              
+        }
+        return true;
+    }
+    
+    /**
+     * Fonction qui permet de supprimer un domaine de la branche donnée avec un
+     * concept de tête un domaine et thesaurus
+     *
+     * @param conn
+     * @param lisIds
+     * @param idGroup
+     * @param idTheso
+     * @param idUser
+     * @return
+     */
+    public boolean addDomainToBranch(Connection conn,
+            ArrayList<String> lisIds, // identifiants des concepts
+            String idGroup, String idTheso, int idUser) {
+
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        for (String id : lisIds) {
+           if (!relationsHelper.addRelationMT(conn, id, idTheso, idGroup, idUser)) {
+               return false;
+           }              
+        }
+        return true;
+    }    
 
     /**
      * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
