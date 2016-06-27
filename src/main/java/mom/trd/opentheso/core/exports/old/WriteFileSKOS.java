@@ -201,6 +201,10 @@ public class WriteFileSKOS {
         concept.addDate(nodeConceptExport.getConcept().getCreated().toString(), SKOSProperty.created);
         concept.addDate(nodeConceptExport.getConcept().getModified().toString(), SKOSProperty.modified);
         
+        if(!nodeConceptExport.getConcept().getNotation().isEmpty()){
+            concept.addNotation(nodeConceptExport.getConcept().getNotation(), SKOSProperty.notation);
+        }
+        
         if(!nodeConceptExport.getConcept().getIdConcept().isEmpty()){
             concept.addIdentifier(nodeConceptExport.getConcept().getIdConcept(), SKOSProperty.identifier);
         }

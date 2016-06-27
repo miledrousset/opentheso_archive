@@ -14,7 +14,7 @@
                     <td colspan="2" style="text-align: center;"><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
                 </tr>
                 <tr>
-                    <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
+                    <td><h:outputText value="#{langueBean.getMsg('popup.name')}" />  </td>
                     <td>
                         <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
                                        minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">

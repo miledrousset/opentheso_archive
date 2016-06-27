@@ -392,6 +392,16 @@ public class ImportSkosHelper {
             concept.setIdThesaurus(thesaurus.getId_thesaurus());
 //            concept.setIdGroup(idGroup.get(0));
             concept.setNotation("");
+            
+                        // skos:notation
+                       /* if(anno.getURI().getFragment().equalsIgnoreCase("notation")) {
+                            value = getValue(anno);
+                            NodeTermTraduction nodeTermTraduction = new NodeTermTraduction();
+                            nodeTermTraduction.setLexicalValue(value.getValue());
+                            nodeTermTraduction.setLang(value.getLang());
+                            nodeTermTraductionList.add(nodeTermTraduction);
+                        }*/              
+            
             concept.setStatus("");
             concept.setIdArk(conceptsInScheme.getURI().toString());
 
@@ -402,6 +412,12 @@ public class ImportSkosHelper {
                     
                     // balises SKOS
                     if(anno.getURI().getFragment() != null){
+                        
+                        // get notation
+                        if(anno.getURI().getFragment().equalsIgnoreCase("notation")) {
+                            value = getValue(anno);
+                            concept.setNotation(value.getValue());
+                        }                        
                         
                         // get altLabels
                         if(anno.getURI().getFragment().equalsIgnoreCase("prefLabel")) {
@@ -431,6 +447,7 @@ public class ImportSkosHelper {
                             nodeEM.setHiden(true);
                             nodeEMList.add(nodeEM);
                         }
+                      
                         
                         // get notes
                         if(anno.getURI().getFragment().equalsIgnoreCase("definition")) {

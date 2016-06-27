@@ -118,6 +118,7 @@
             <ui:include src="historique.xhtml" />
             <ui:include src="conceptPopUp.xhtml" />
             <ui:include src="dialogs/conceptEditDlg.xhtml" />
+            <ui:include src="dialogs/notationEditDlg.xhtml" />
             <ui:include src="dialogs/conceptDeprecateDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionValidationDlg.xhtml" />
@@ -567,6 +568,7 @@
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                                                             
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                                                            <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
                                                             
                                                             
@@ -608,7 +610,8 @@
                                                 <span style="font-size: 17px; font-weight: bold;">
                                                     <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
                                                 </span>
-                                                <h:outputText id="idC" value="Concept_Id : #{selectedTerme.idC}"/><br/>
+                                                <h:outputText id="idC" value="id : #{selectedTerme.idC}"/><br/>
+                                                <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : #{selectedTerme.notation}"/><br/>
                                                 <span>
                                                     <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 

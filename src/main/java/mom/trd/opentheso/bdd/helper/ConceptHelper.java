@@ -1295,7 +1295,47 @@ public class ConceptHelper {
             log.error("Error while asking if id exist : " + idConcept, sqle);
         }
         return existe;
-    }     
+    }
+    
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non
+     *
+     * @param conn
+     * @param idThesaurus
+     * @param notation
+     * @return boolean
+     */
+    public boolean isNotationExist(Connection conn,
+            String idThesaurus, String notation) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + " id_thesaurus = '" + idThesaurus + "'"
+                            + " and notation ilike '" + notation.trim() + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if Notation exist : " + notation, sqle);
+        }
+        return existe;
+    }    
 
     /**
      * Cette fonction permet d'ajouter l'historique d'un concept
@@ -3530,6 +3570,45 @@ public class ConceptHelper {
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de mettre à jour la notation pour un concept
+     *
+     * @param conn
+     * @param idConcept
+     * @param idTheso
+     * @param notation
+     * @return
+     */
+    public boolean updateNotation(Connection conn, String idConcept,
+            String idTheso, String notation) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE concept "
+                            + "set notation ='" + notation + "'"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus='" + idTheso + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //      conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating or adding ArkId of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }    
 
     public boolean haveThisGroup(HikariDataSource ds, String idConcept, String idDomaine, String idTheso) {
         Connection conn;

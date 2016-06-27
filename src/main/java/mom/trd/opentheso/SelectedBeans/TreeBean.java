@@ -863,6 +863,45 @@ public class TreeBean implements Serializable {
         return true;
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/***
+ * Nouvelles fonctions par Miled Rousset
+ */    
+    
+    
+    /**
+     * Permet de modifier la valeur de la notation d'un concept
+     */
+    public void editNotation() {
+        if(selectedTerme == null) return;
+        if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
+           
+            if(!selectedTerme.updateNotation()) {
+                return;
+            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info2")));
+        }
+    }
+    
+    
+/**
+ *  Fin des nouvelles fonctions 
+ */    
+    
+    
+    
+    
     /**
      * ************************** GETTERS SETTERS ***************************
      */

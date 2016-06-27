@@ -133,11 +133,10 @@
             <type>jar</type>
         </dependency>
         -->
-
         <dependency>
-            <groupId>skosapi</groupId>
-            <artifactId>skosapi</artifactId>
-            <version>1.6</version>
+            <groupId>skosapi_prive</groupId>
+            <artifactId>skosapi_prive</artifactId>
+            <version>1.7</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
