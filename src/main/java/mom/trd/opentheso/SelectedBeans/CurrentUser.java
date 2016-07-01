@@ -87,6 +87,7 @@ public class CurrentUser implements Serializable {
             if(np == null){ // cas où il n'y a pas de préférence pour ce thésaurus, il faut les créer 
                 userHelper.initPreferences(connect.getPoolConnexion(),
                         idThesaurus, workLanguage, alertNbCdtEdit, alertCdtEdit);
+                np = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
             } 
             else {
                 langSourceEdit = np.getSourceLang();

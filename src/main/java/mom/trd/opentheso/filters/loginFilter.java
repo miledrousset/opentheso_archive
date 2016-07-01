@@ -41,7 +41,7 @@ public class loginFilter implements Filter {
             
             ((SelectedCandidat)req.getSession().getAttribute("selectedCandidat")).reInit();
             
-            resp.sendRedirect("/index.xhtml");//req.getServletContext().getContextPath());
+            resp.sendRedirect("./index.xhtml");//req.getServletContext().getContextPath());
         }
         else if(session == null || !session.isLogged()) {
             if(url.contains("conf.xhtml") || url.contains("gestCandidat.xhtml") || url.contains("edition.xhtml") || url.contains("statistic.xhtml")) {

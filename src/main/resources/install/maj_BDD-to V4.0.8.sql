@@ -1,4 +1,16 @@
 
+--  !!!!!!! Attention !!!!!!!!!
+--
+-- pour le passage des anciennes versions vers la 4.0.8, vous allez perdre les utilisateurs
+-- à cause de la nouvelle gestion avancée des droits 
+-- L'utilisateur par defaut redevient (admin / admin)
+-- 
+-- Je suis en train de mettre en place un export et import complet pour passer les versions sans aucune perte de données.
+--
+--  !!!!!!! Attention !!!!!!!!! 
+
+
+
 -- Mise à jour de la table de types d'alignement
 DROP TABLE alignement_type;
 
@@ -86,16 +98,27 @@ ALTER TABLE term ADD COLUMN creator character varying;
 
 -- Table: preferences
 
+CREATE SEQUENCE pref__id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+ALTER TABLE pref__id_seq
+  OWNER TO opentheso;
+
+
 DROP TABLE preferences;
 
 CREATE TABLE preferences
 (
-  id_pref integer NOT NULL,
+  id_pref integer NOT NULL DEFAULT nextval('pref__id_seq'::regclass),
+  id_thesaurus character varying NOT NULL,
   source_lang character varying(3),
   nb_alert_cdt integer,
   alert_cdt boolean,
-  id_thesaurus character varying NOT NULL,
-  CONSTRAINT preferences_pkey PRIMARY KEY (id_pref)
+  CONSTRAINT preferences_pkey PRIMARY KEY (id_pref),
+  CONSTRAINT preferences_id_thesaurus_key UNIQUE (id_thesaurus)
 )
 WITH (
   OIDS=FALSE
@@ -103,7 +126,8 @@ WITH (
 ALTER TABLE preferences
   OWNER TO opentheso;
 
-INSERT INTO preferences (id_pref, source_lang, nb_alert_cdt, alert_cdt, id_thesaurus) VALUES (1, 'fr', 5, false, '1');
+
+-- INSERT INTO preferences (id_pref, source_lang, nb_alert_cdt, alert_cdt, id_thesaurus) VALUES (1, 'fr', 5, false, '1');
 
 
 --
@@ -239,4 +263,8 @@ WITH (
 );
 ALTER TABLE user_role
   OWNER TO opentheso;
+
+INSERT INTO users (id_user, username, password, active, mail) VALUES (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', true, 'admin@domaine.fr');
+
+INSERT INTO user_role (id_user, id_role, id_thesaurus, id_group) VALUES (1, 1, '', '');
 

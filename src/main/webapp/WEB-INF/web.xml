@@ -4,27 +4,9 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
-    <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>LoginService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>ArkManagerService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>soap</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -39,18 +21,6 @@
         <filter-name>LoggingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <servlet-mapping>
-        <servlet-name>LoginService</servlet-name>
-        <url-pattern>/LoginService</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ArkManagerService</servlet-name>
-        <url-pattern>/ArkManagerService</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>soap</servlet-name>
-        <url-pattern>/soap</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

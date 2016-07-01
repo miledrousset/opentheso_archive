@@ -1,0 +1,611 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>OpenTheso - Edition</title>
+        <link rel="icon" href="images/icoTheso.jpg" />
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <script type="text/javascript">
+            function selectText(containerid) {
+                if (document.selection) {
+                    var range = document.body.createTextRange();
+                    range.moveToElementText(document.getElementById(containerid));
+                    range.select();
+                } else if (window.getSelection) {
+                    var range = document.createRange();
+                    range.selectNode(document.getElementById(containerid));
+                    window.getSelection().addRange(range);
+                }
+            }
+        </script>
+    </h:head>
+    <h:body>
+        <ui:include src="conceptPopUp.xhtml" />
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
+            <h1>Edition de thésaurus</h1>
+            La page d'édition permet de créer/supprimer un thésaurus, et de lui ajouter/supprimer des traductions.<br/><br/>
+            Possibilités :
+            <ul>
+                <li>Créer un thésaurus en sélectionnant le bouton correspondant</li>
+                <li>Séléctionner/Supprimer un thésaurus existant dans la liste de gauche</li>
+                <li>Ajouter/Modifier/supprimer une traduction dans les fenêtres suivantes</li>
+                <li>Importer/exporter un thésaurus Skos.</li>
+            </ul>
+        </p:dialog>  
+        <div id="menuHead">
+            <ui:include src="logo.xhtml" />
+            <h:panelGroup id="panChoixTheso" style="float: left;" >
+                <div id="choixTheso">
+                    <h:form id="liste1">
+                        <table>
+                            <tr>
+                                <td style="padding-right: 5px;">
+                                    <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
+                                    <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
+                                        <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                    </h:selectOneMenu>
+                                </td>
+                                <td>
+                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
+                                                     update=":panChoixTheso" styleClass="styleButton"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>
+                </div>
+            </h:panelGroup>
+            <ui:include src="menuAll.xhtml" />
+        </div>
+        <!-- POP UP SKOS THESO DEBUT -->
+        <center>
+            <h:panelGroup id="panThesoToSkos" style="background: transparent; box-shadow: none;">
+                <h:panelGroup rendered="#{vue.thesoToSkosCsv == true}" styleClass="overlay" />
+                <h:panelGroup rendered="#{vue.thesoToSkosCsv == true}" styleClass="popUp">
+                    <div id="titreAllEdit">
+                        <h:outputText value="#{langueBean.getMsg('popup.exp')}" />
+                        <div id="divClose">
+                            <h:form>
+                                <p:commandButton id="cbCloseBranchSkos" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setThesoToSkosCsv(false)}"
+                                                 update=":panThesoToSkos" />
+                            </h:form>
+                        </div>
+                    </div>
+                    <br/>
+                    <div id="textSelectTheso" onclick="selectText('thistext')" style="padding: 10px; text-align: left; max-height: 500px; max-width: 800px; overflow: auto;">
+                        <pre>
+                            <h:outputText id="thistext2" value="#{downloadBean.skos.trim()}" />
+                        </pre>
+                    </div>
+                </h:panelGroup>
+            </h:panelGroup>
+        </center>
+        <!-- POP UP SKOS THESO FIN -->
+
+        <!-- POP UP DOWNLOAD SKOS THESO DEBUT -->
+        <center>
+            <h:panelGroup id="panThesoToSkosFile" style="background: transparent; box-shadow: none;">
+                <h:panelGroup rendered="#{vue.thesoToSkosCsvFile == true}" styleClass="overlay" />
+                <h:panelGroup rendered="#{vue.thesoToSkosCsvFile == true}" styleClass="popUp">
+                    <div id="titreAllEdit">
+                        <h:outputText value="#{langueBean.getMsg('popup.exp')}" />
+                        <div id="divClose">
+                            <h:form>
+                                <p:commandButton id="cbCloseBranchSkos" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setThesoToSkosCsvFile(false)}"
+                                                 update=":panThesoToSkosFile" />
+                            </h:form>
+                        </div>
+                    </div>
+                    <br/>
+                    <div style="padding: 10px;">
+                        <h:outputText value="#{langueBean.getMsg('popup.alertSkos')}" /><br/><br/>
+                        <h:form>
+                            <p:commandButton value="#{langueBean.getMsg('down')}" styleClass="styleButton" ajax="false">
+                                <p:fileDownload value="#{downloadBean.file}" />
+                            </p:commandButton>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+            </h:panelGroup>
+        </center>
+        <!-- POP UP DOWNLOAD SKOS THESO FIN -->
+
+        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+        <center>
+            <div id="generalEdition">
+                <div id="listeTheso">
+                    <h:panelGroup id="panTable">
+                        <h:dataTable id="tableTheso" value="#{theso.arrayTheso}" var="entry" styleClass="styleTable">
+                            <h:column id="column1">
+                                <f:facet name="header">
+                                    <h:outputText value="#{langueBean.getMsg('edit.tab1Opt1')}" />
+                                </f:facet>
+                                <h:outputText value="#{entry.key}" />
+                            </h:column>
+                            <h:column id="column2">
+                                <f:facet name="header">
+                                    <h:outputText value="#{langueBean.getMsg('edit.export')}" />
+                                </f:facet>
+                                <h:form>
+                                    <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-exp" />
+                                    <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{downloadBean.thesoSkos(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                                    style="font-size: 12px;"/>
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} New Version" actionListener="#{downloadBean.thesoSkos(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                                    style="font-size: 12px;"/>
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{downloadBean.thesoCsv(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                                    style="font-size: 12px;"/>
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} Frantiq" actionListener="#{downloadBean.thesoSkosFrantiq(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                                    style="font-size: 12px;"/>
+                                    </p:menu>
+                                </h:form>
+
+                            </h:column>
+                            <h:column id="column3">
+                                <f:facet name="header">
+                                    <h:outputText value="#{langueBean.getMsg('edit.tab1Opt2')}" />
+                                </f:facet>
+                                <h:form>
+                                    <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{theso.afficheEditTheso(1,entry.key,'',entry.value)}" 
+                                                     update=":panSkos,:panCsv,:panCreer,:panTrad,:panAjTrad,:panModif" />
+                                </h:form>
+
+                            </h:column>
+                            <h:column id="column4">
+                                <f:facet name="header">
+                                    <h:outputText value="#{langueBean.getMsg('edit.tab1Opt3')}" />
+                                </f:facet>
+                                <h:form>
+                                    <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{theso.supprimerTheso(entry.value)}" update=":panTable" >
+                                        <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('edit.valid1')}" icon="ui-icon-alert" />  
+                                    </p:commandButton>  
+
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                        <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                        <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                    </p:confirmDialog> 
+                                </h:form>
+                            </h:column>
+                        </h:dataTable>
+                    </h:panelGroup>
+                </div>
+                <!-- Section upload SKOS to theso -->
+                
+                <!--<ui:include src="skosImport.xhtml" />-->
+                
+               <!-- Section upload SKOS2 to theso -->
+               <h:panelGroup id="panSkos2">
+                   <h:panelGroup layout="block" rendered="#{vue.addSkos2 == true}" >
+                       <div class="importerTheso">
+                           <div id="titreEditTheso">
+                               <h:outputText value="#{langueBean.getMsg('edit.import')} new version" />
+                               <div id="divClose">
+                                   <h:form>
+                                       <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                        actionListener="#{vue.setAddSkos2(false)}" update=":panSkos2" />
+                                   </h:form>
+                               </div>
+                           </div>
+                           <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+                                <p:growl id="growl" /> 
+                               <p:messages showDetail="true" autoUpdate="true" />
+                               <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
+                               <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                               <h:inputText id="date" value="#{fileBean.formatDate}" />
+                               <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
+                               <br/><br/>
+
+
+                               <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
+                                             cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
+                                             update="@form,:panSkos2"  />
+
+
+                               <p:commandButton value="Insert into BDD"
+                                                disabled="#{fileBean.desabled}"
+                                                onclick="PF('pbAjax').start();PF('startButton2').disable();" 
+                                                widgetVar="startButton2" 
+                                                actionListener="#{fileBean.startImportSkos2}"/>  
+
+                               <p:commandButton value="Cancel" 
+                                                actionListener="#{fileBean.cancel}" 
+                                                oncomplete="pbAjax.cancel();startButton2.enable();" />  
+
+                               <p:progressBar widgetVar="pbAjax" 
+                                              ajax="true" 
+                                              value="#{fileBean.progress}" 
+                                              labelTemplate="{value}%" 
+                                              styleClass="animated">  
+
+                                   <p:ajax event="complete" 
+                                           listener="#{fileBean.onComplete}" 
+                                           update=":growl,:panSkos2,:tableTheso" 
+                                           oncomplete="#{fileBean.desabled}"/>  
+                               </p:progressBar>
+                           </h:form>
+                         <!--  <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/> -->
+                       </div>
+                   </h:panelGroup>
+               </h:panelGroup>                
+                
+                
+                
+                <h:panelGroup id="panSkos">
+                    <h:panelGroup layout="block" rendered="#{vue.addSkos == true}">
+                        <div class="importerTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.import')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setAddSkos(false)}" update=":panSkos" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+                                <p:messages showDetail="true" autoUpdate="true" />
+                                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
+                                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                                <h:inputText value="#{fileBean.formatDate}" />
+                                <br/><br/>
+                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
+                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeSkos}" process="@form"
+                                              update="@form,:panSkos,:tableTheso" />
+                            </h:form>
+                            <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                
+                
+
+                <!-- Section upload CSV to theso -->
+                <h:panelGroup id="panCsv">
+                    <h:panelGroup layout="block" rendered="#{vue.addCsv == true}">
+                        <div class="importerTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.import')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setAddCsv(false)}" update=":panCsv" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+                                <p:messages showDetail="true" autoUpdate="true" />
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('theso.id')}" /> <p:graphicImage id="question1" value="images/iconeQuestion.png" /> :
+                                            <p:tooltip id="toolTipFade1" for="question1" value="" />
+                                        </td>
+                                        <td><h:inputText value="#{fileBean.idTheso}" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('edit.sep1')}" /> <p:graphicImage id="question2" value="images/iconeQuestion.png" /> :
+                                            <p:tooltip id="toolTipFade2" for="question2" value="" />
+                                        </td>
+                                        <td><h:inputText value="#{fileBean.sepCol}" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('edit.sep2')}" /> <p:graphicImage id="question3" value="images/iconeQuestion.png" /> :
+                                            <p:tooltip id="toolTipFade3" for="question3" value="" />
+                                        </td>
+                                        <td><h:inputText value="#{fileBean.sepChamps}" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('edit.sep3')}" /> <p:graphicImage id="question4" value="images/iconeQuestion.png" /> :
+                                            <p:tooltip id="toolTipFade4" for="question4" value="" />
+                                        </td>
+                                        <td><h:inputText value="#{fileBean.sepLangue}" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question5" value="images/iconeQuestion.png" /> :
+                                            <p:tooltip id="toolTipFade5" for="question5" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                                        </td>
+                                        <td><h:inputText value="#{fileBean.formatDate}" /></td>
+                                    </tr>
+                                </table><br/>
+                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(csv)$/"
+                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeCsv}" process="@form"
+                                              update="@form,:panCsv,:tableTheso" />
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <h:panelGroup id="panCreer">
+                    <h:panelGroup layout="block" rendered="#{vue.creat == true}">
+                        <div id="creerTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.create')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setCreat(false)}" update=":panCreer" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <h:form>
+                                <table>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso1')}" /> : </td>
+                                        <td><h:inputText id="nomTheso" value="#{theso.editTheso.title}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso2')}" /> : </td>
+                                        <td>
+                                            <h:selectOneMenu value="#{theso.editTheso.language}" styleClass="listes">
+                                                <f:selectItems value="#{theso.langues}"/>
+                                            </h:selectOneMenu>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso3')}" /> : </td>
+                                        <td><h:inputText id="contribTheso" value="#{theso.editTheso.contributor}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso4')}" /> : </td>
+                                        <td><h:inputText id="coverTheso" value="#{theso.editTheso.coverage}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso5')}" /> : </td>
+                                        <td><h:inputText id="formatTheso" value="#{theso.editTheso.format}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso6')}" /> : </td>
+                                        <td><h:inputText id="relaTheso" value="#{theso.editTheso.relation}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso7')}" /> : </td>
+                                        <td><h:inputText id="droitTheso" value="#{theso.editTheso.rights}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso8')}" /> : </td>
+                                        <td><h:inputText id="sourceTheso" value="#{theso.editTheso.source}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso9')}" /> : </td>
+                                        <td><h:inputText id="sujetTheso" value="#{theso.editTheso.subject}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso10')}" /> : </td>
+                                        <td><h:inputText id="titreTheso" value="#{theso.editTheso.description}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso11')}" /> : </td>
+                                        <td><h:inputText id="typeTheso" value="#{theso.editTheso.type}"/></td>
+                                    </tr>
+                                </table><br/>
+                                <div style="float: left; margin-left: 50px;">
+                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" actionListener="#{theso.ajouterTheso()}" 
+                                                     styleClass="styleButton" update=":panCreer,:tableTheso"/>
+                                </div>
+                            </h:form>
+                            <h:form>
+                                <p:commandButton id="cbAnnulCreerTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setCreat(false)}" 
+                                                 update=":panCreer" styleClass="styleButton"/>
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup id="panModif">
+                    <h:panelGroup layout="block" rendered="#{vue.edit == true}">
+                        <div id="modifTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.edit')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setEdit(false)}" update=":panModif" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <br/>
+                            <h:form>
+                                <table>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso1')}" /> : </td>
+                                        <td><h:inputText id="nomModifTheso" value="#{theso.editTheso.title}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso3')}" /> : </td>
+                                        <td><h:inputText id="contribTheso" value="#{theso.editTheso.contributor}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso4')}" /> : </td>
+                                        <td><h:inputText id="coverTheso" value="#{theso.editTheso.coverage}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso5')}" /> : </td>
+                                        <td><h:inputText id="formatTheso" value="#{theso.editTheso.format}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso6')}" /> : </td>
+                                        <td><h:inputText id="relaTheso" value="#{theso.editTheso.relation}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso7')}" /> : </td>
+                                        <td><h:inputText id="droitTheso" value="#{theso.editTheso.rights}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso8')}" /> : </td>
+                                        <td><h:inputText id="sourceTheso" value="#{theso.editTheso.source}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso9')}" /> : </td>
+                                        <td><h:inputText id="sujetTheso" value="#{theso.editTheso.subject}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso10')}" /> : </td>
+                                        <td><h:inputText id="titreTheso" value="#{theso.editTheso.description}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><h:outputText value="#{langueBean.getMsg('edit.attTheso11')}" /> : </td>
+                                        <td><h:inputText id="typeTheso" value="#{theso.editTheso.type}"/></td>
+                                    </tr>
+                                </table><br/>
+                                <div style="float: left; margin-left: 50px;">
+                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" action="#{theso.editerTheso}" 
+                                                     styleClass="styleButton" update=":panModif,:panTrad"/>&nbsp;
+                                </div>
+                            </h:form>
+                            <h:form>
+                                <p:commandButton id="cbAnnulEditTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setEdit(false)}" 
+                                                 update=":panModif" styleClass="styleButton"/>
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup id="panAjTrad">
+                    <h:panelGroup layout="block" rendered="#{vue.trad == true}">
+                        <div id="modifTradTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.addTrad')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setTrad(false)}" update=":panAjTrad" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <br/>
+                            <h:form>
+                                <h:outputText value="#{langueBean.getMsg('edit.attTheso1')}" /> : 
+                                <h:inputText id="nomThesoTrad" value="#{theso.nomTrad}" /><br/>
+                                <h:selectOneMenu value="#{theso.langueTrad}" styleClass="listes">
+                                    <f:selectItems value="#{theso.langues}"/>
+                                </h:selectOneMenu><br/><br/>
+                                <div style="float: left; margin-left: 50px;">
+                                    <p:commandButton id="cbAjTradTradTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.ajouterTraduction()}" 
+                                                     update=":panAjTrad,:panTrad" styleClass="styleButton"/>
+                                </div>
+                            </h:form>
+                            <h:form>
+                                <p:commandButton id="cbAnnulEditTradTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setTrad(false)}" 
+                                                 update=":panAjTrad" styleClass="styleButton"/>
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup id="panTrad">
+                    <h:panelGroup layout="block" rendered="#{vue.language == true}">
+                        <div id="langueTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.trad')}" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setLanguage(false)}" update=":panAjTrad,:panModif,:panTrad" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <br/>
+                            <h:outputLabel value="#{theso.editTheso.title}"/><br/><br/>
+                            <div id="divTableTrad">
+                                <h:dataTable id="tableTrad" value="#{theso.arrayTrad}" var="entry" styleClass="styleTableTrad">
+                                    <h:column id="columnTrad1">
+                                        <f:facet name="header">
+                                            <h:outputText value="#{langueBean.getMsg('edit.attTheso2')}" />
+                                        </f:facet>
+                                        <h:outputText value="#{entry.key}" />
+                                    </h:column>
+                                    <h:column id="columnTrad2">
+                                        <f:facet name="header">
+                                            <h:outputText value="#{langueBean.getMsg('edit.attTheso1')}" />
+                                        </f:facet>
+                                        <h:outputText value="#{entry.value}" />
+                                    </h:column>
+                                    <h:column id="columnTrad3">
+                                        <f:facet name="header">
+                                            <h:outputText value="" />
+                                        </f:facet>                                        
+                                        <h:form>
+                                            <p:commandButton id="cbAjTradTheso" styleClass="cbSupp" icon="ui-icon-edi" 
+                                                             actionListener="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}" update=":panModif,:panAjTrad" />
+                                        </h:form>
+                                    </h:column>
+                                    <h:column id="columnTrad4">
+                                        <f:facet name="header">
+                                            <h:outputText value="" />
+                                        </f:facet>
+                                        <h:form>
+                                            <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
+                                                             actionListener="#{theso.supprimerTradTheso(theso.editTheso.id_thesaurus, entry.key)}" update=":tableTheso,:panTrad">
+                                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('edit.valid2')}" icon="ui-icon-alert" />  
+                                            </p:commandButton>  
+
+                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                            </p:confirmDialog> 
+                                        </h:form>
+                                    </h:column>
+                                </h:dataTable>
+                            </div><br/>
+                            <div style="float: left; margin-left: 20px;">
+                                <h:form>
+                                    <p:commandButton id="cbAjTradTheso" value="#{langueBean.getMsg('edit.addTrad')}" actionListener="#{vue.setTrad(true)}" 
+                                                     update=":panSkos,:panCsv,:panAjTrad,:panModif" styleClass="styleButton"/>
+                                </h:form>
+                            </div>
+                            <h:form>
+                                <p:commandButton id="cbAnnulTradTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setLanguage(false)}" 
+                                                 update=":panSkos,:panCsv,:panTrad,:panAjTrad,:panModif" styleClass="styleButton"/>
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <div style="clear: both"></div>
+                <div style="float: left;">
+                    <h:form>
+                        <p:commandButton id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{theso.setVueCreat(true)}" 
+                                         update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
+                    </h:form>
+                </div>
+                <div style="float: left; margin-left: 40px;">
+                    <h:form>
+                        <p:commandButton id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')}" actionListener="#{vue.setAddSkos(true)}" 
+                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')} new Version" actionListener="#{vue.setAddSkos2(true)}" 
+                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
+                            <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
+                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                        </p:menu>
+                    </h:form>
+                </div>
+            </div><br/>
+            <footer>
+                <br />
+                <div style="margin-bottom: 5px; margin-top: 15px;">
+                    <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©OpenTheso</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS</a>
+                </div>
+            </footer>
+
+        </center>
+        <ui:insert name="status">
+            <p:ajaxStatus>
+                <f:facet name="start">
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </ui:insert>
+    </h:body>
+</html>
