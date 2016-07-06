@@ -124,8 +124,10 @@ public class SkosToJsonld {
             }
             
             // add Identifier / second
-            if(!skosConcept.getSdc().getIdentifier().isEmpty()) {
-                addIdentifier(skosConcept.getSdc().getIdentifier());
+            if(skosConcept.getSdc() !=null){
+                if(!skosConcept.getSdc().getIdentifier().isEmpty()) {
+                    addIdentifier(skosConcept.getSdc().getIdentifier());
+                }
             }
             
             // add documentations
