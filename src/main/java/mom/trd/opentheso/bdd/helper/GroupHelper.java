@@ -175,9 +175,7 @@ public class GroupHelper {
                             + ",'" + idArk + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getIdthesaurus() + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getIdtypecode() + "'"
-                            + ",'" + nodeConceptGroup.getConceptGroup().getIdparentgroup() + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getNotation() + "'"
-                            + ",'" + nodeConceptGroup.getConceptGroup().getIdconcept() + "'"
                             + ")";
 
                     stmt.executeUpdate(query);
@@ -384,9 +382,7 @@ public class GroupHelper {
      * @param ds
      * @param idThesaurus
      * @param typeCode
-     * @param idParentGroup
      * @param idGroup
-     * @param idConcept
      * @param notation
      * @param urlSite
      * @param isArkActive
@@ -395,8 +391,8 @@ public class GroupHelper {
      */
     public boolean insertGroup(HikariDataSource ds,
             String idGroup, String idThesaurus,
-            String typeCode, String idParentGroup,
-            String notation, String idConcept,
+            String typeCode, 
+            String notation,
             String urlSite, boolean isArkActive,
             int idUser) {
 
@@ -438,9 +434,7 @@ public class GroupHelper {
                             + ",'" + idArk + "'"
                             + ",'" + idThesaurus + "'"
                             + ",'" + typeCode + "'"
-                            + ",'" + idParentGroup + "'"
                             + ",'" + notation + "'"
-                            + ",'" + idConcept + "'"
                             + ")";
 
                     stmt.executeUpdate(query);
@@ -823,9 +817,7 @@ public class GroupHelper {
                             conceptGroup.setIdthesaurus(idThesaurus);
                             conceptGroup.setIdARk(resultSet.getString("id_ark"));
                             conceptGroup.setIdtypecode(resultSet.getString("idtypecode"));
-                            conceptGroup.setIdparentgroup(resultSet.getString("idparentgroup"));
                             conceptGroup.setNotation(resultSet.getString("notation"));
-                            conceptGroup.setIdconcept(resultSet.getString("idconcept"));
                         }
                     }
                     if (conceptGroup != null) {

@@ -91,7 +91,7 @@ public class WriteBranchSkosBDD {
     }    
     
     
-    public boolean writeFirstConceptAfterGroup(SKOSResource resource,
+    private boolean writeFirstConceptAfterGroup(SKOSResource resource,
             String idGroup,
             String idThesaurus,
             String id_langueSource, String dateFormat,
@@ -267,7 +267,7 @@ public class WriteBranchSkosBDD {
 
     }
     
-    public void writeConceptAfterGroup(SKOSResource resource,
+    private void writeConceptAfterGroup(SKOSResource resource,
             String idGroup,
             String idThesaurus,
             String id_langueSource, String dateFormat,
@@ -526,7 +526,7 @@ public class WriteBranchSkosBDD {
         return true;
     }        
 
-    public void writeConcept(SKOSResource resource,
+    private void writeConcept(SKOSResource resource,
             String idConcept,
             String idGroup,
             String idThesaurus,

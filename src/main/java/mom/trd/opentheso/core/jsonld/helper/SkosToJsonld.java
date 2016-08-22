@@ -210,6 +210,7 @@ public class SkosToJsonld {
     private void addLabels(ArrayList<SKOSLabel> sKOSLabels) {
         ArrayList <SKOSLabel> prefLabel = new ArrayList<>();
         ArrayList <SKOSLabel> altLabel = new ArrayList<>();        
+        StringPlus stringPlus = new StringPlus();
         
         for (SKOSLabel sKOSLabel : sKOSLabels) {
             switch (sKOSLabel.getProperty()) {
@@ -236,7 +237,7 @@ public class SkosToJsonld {
                         prefLabelString += ",\n"; 
                     prefLabelString += "        {\n";
                     prefLabelString += "          \"@language\": \"" + prefLabel1.getLanguage() + "\",\n";
-                    prefLabelString += "          \"@value\": \"" + prefLabel1.getLabel() + "\"\n";
+                    prefLabelString += "          \"@value\": \"" + stringPlus.normalizeStringForXml(prefLabel1.getLabel()) + "\"\n";
                     prefLabelString += "        }";
                     first = false;
                 }
@@ -247,7 +248,7 @@ public class SkosToJsonld {
                 prefLabelString = "      \"" + nameSpaceSkosCore + "prefLabel" + "\": {\n";
                 for (SKOSLabel prefLabel1 : prefLabel) {
                     prefLabelString += "        \"@language\": \"" + prefLabel1.getLanguage() + "\",\n";
-                    prefLabelString += "        \"@value\": \"" + prefLabel1.getLabel() + "\"\n";            
+                    prefLabelString += "        \"@value\": \"" + stringPlus.normalizeStringForXml(prefLabel1.getLabel()) + "\"\n";            
                     prefLabelString += "      }";
                 }
             }
@@ -266,7 +267,7 @@ public class SkosToJsonld {
                         altLabelString += ",\n"; 
                     altLabelString += "        {\n";
                     altLabelString += "          \"@language\": \"" + altLabel1.getLanguage() + "\",\n";
-                    altLabelString += "          \"@value\": \"" + altLabel1.getLabel() + "\"\n";
+                    altLabelString += "          \"@value\": \"" + stringPlus.normalizeStringForXml(altLabel1.getLabel()) + "\"\n";
                     altLabelString += "        }";
                     first = false;
                 }
@@ -277,7 +278,7 @@ public class SkosToJsonld {
                 altLabelString = "      \"" + nameSpaceSkosCore + "altLabel" + "\": {\n";
                 for (SKOSLabel altLabel1 : altLabel) {
                     altLabelString += "        \"@language\": \"" + altLabel1.getLanguage() + "\",\n";
-                    altLabelString += "        \"@value\": \"" + altLabel1.getLabel() + "\"\n";            
+                    altLabelString += "        \"@value\": \"" + stringPlus.normalizeStringForXml(altLabel1.getLabel()) + "\"\n";            
                     altLabelString += "      }";
                 }
             }

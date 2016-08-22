@@ -379,6 +379,7 @@ public class CurrentUser implements Serializable {
     
     
     public boolean haveRights(int min) {
+        if(user.getIdRole() < 1) return false;
         return user.getIdRole() <= min;
     }
     
@@ -539,6 +540,7 @@ public class CurrentUser implements Serializable {
     }
 
     public boolean isIsHaveWriteToCurrentThesaurus2() {
+        if(idTheso == null) return false;
         return authorizedTheso.contains(idTheso);
     }
 

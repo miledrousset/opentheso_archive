@@ -49,7 +49,7 @@ public class TestImportBranch {
     /**
      * Test of Tabulate reading.
      */
-    /*@org.junit.Test
+    @org.junit.Test
 
     public void testReadSkosFile() {
     
@@ -62,7 +62,9 @@ public class TestImportBranch {
         try {
             
             FileInputStream file = new FileInputStream(
-                    "/Users/Miled/Google Drive/Projets/OpenTheso/demo Nice-Cepam/branches Pactols/Sujets/faune.rdf");
+                    "/Users/Miled/ownCloud_cnrs/Projets/OpenTheso/artefacts/25.xml");
+            
+            
             readFileSKOS.readBranchFile(conn,
                     file,
                     "yyyy-MM-dd",false, "http://localhost");
@@ -72,7 +74,7 @@ public class TestImportBranch {
             //System.out.println("test");
             
             
-            WriteBranchSkosBDD writeBranchSkosBDD = new WriteBranchSkosBDD(conn);*/
+            WriteBranchSkosBDD writeBranchSkosBDD = new WriteBranchSkosBDD(conn);
             
             
             
@@ -84,11 +86,11 @@ public class TestImportBranch {
 //            String idThesaurus,
 //            SKOSXmlDocument skosDocument, String dateFormat,
 //            boolean useArk, String adressSite, int idUser)            
-    /*        writeBranchSkosBDD.importBranchAfterGroup(
-                    "MT_7",
+            writeBranchSkosBDD.importBranchAfterGroup(
+                    "MT_1",
                     "1",
                     sKOSXmlDocument, "yyyy-MM-dd", false, "http://localhost",
-                    1);*/
+                    1);
             
             
             // permet d'importer une branche externe au thésaurus à parti d'un concept
@@ -107,11 +109,13 @@ public class TestImportBranch {
                     1);*/
             
             
-       /* } catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(TestGetSiteMap.class.getName()).log(Level.SEVERE, null, ex.getMessage());
         }
         
-    }*/
+    }
+    
+  
     
         /**
      * Test of Tabulate reading.
@@ -133,11 +137,10 @@ public class TestImportBranch {
     }*/
 
     
-   /* private HikariDataSource openConnexionPool() {
+    private HikariDataSource openConnexionPool() {
         HikariConfig config = new HikariConfig();
         config.setMinimumIdle(1);
         config.setMaximumPoolSize(1000);
-        config.setJdbc4ConnectionTest(false);
         config.setConnectionTestQuery("SELECT 1");
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
@@ -145,7 +148,7 @@ public class TestImportBranch {
         // Zoomathia
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "Zoomathia");        
+        config.addDataSourceProperty("databaseName", "artefacts");        
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");        
         
@@ -164,10 +167,9 @@ public class TestImportBranch {
         config.addDataSourceProperty("serverName", "localhost");
         //    config.addDataSourceProperty("serverName", "193.48.137.88");
                 */
-        /*HikariDataSource poolConnexion1 = new HikariDataSource(config);
+        HikariDataSource poolConnexion1 = new HikariDataSource(config);
         return poolConnexion1;
     }
 
-*/
     
 }

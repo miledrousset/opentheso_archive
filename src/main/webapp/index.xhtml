@@ -80,7 +80,7 @@
                                 </td>
                                 <td>
                                     <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                     update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu" 
+                                                     update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu,:footer" 
                                                      styleClass="styleButton" />
                                 </td>
                                 
@@ -447,8 +447,7 @@
                             <div id="contenuPrincipale">
                                 <h:panelGroup id="panContenu">
                                     <div style="text-align: center">
-                                        
-                                        <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
+                                        <h:form  rendered="#{(selectedTerme.type == 1) and (selectedTerme.idC != '')} " style="float: left; margin-right: 5px;" >
                                             <!-- exporter le Group en SKOS -->
                                             <p:commandButton value="Skos" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
@@ -1046,17 +1045,21 @@
                     </div>
                 </div>
             </div><br/>
-            <!-- GESTIONNAIRE FIN --> 
-            <footer style="text-align: center">
-                <br />
-                <div style="margin-bottom: 5px; margin-top: -15px;">
-                    <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©Opentheso</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS                    
+            <!-- GESTIONNAIRE FIN -->
+            <h:panelGroup id="footer">
+                <footer style="text-align: center">
+                    <br />
+                    <div style="margin-bottom: 5px; margin-top: -15px;">
+                        <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©Opentheso</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-                    </a>
-                </div>
-            </footer>
+                        <h:outputLink  value="copyright.xhtml" style="color: #BD6909; text-decoration: none;"> 
+                            <h:outputText value="©#{theso.thisTheso.title}" />
+                        </h:outputLink>
+
+                    </div>
+                </footer>
+            </h:panelGroup>
         </center>
       
         <ui:insert name="status">

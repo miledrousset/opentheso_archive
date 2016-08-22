@@ -76,6 +76,7 @@ public class SelectedCandidat implements Serializable {
     // Variables resourcesBundle
     private boolean arkActive;
     private String serverAdress;
+    private String identifierType;
 
     @ManagedProperty(value = "#{user1}")
     private CurrentUser theUser;
@@ -97,6 +98,7 @@ public class SelectedCandidat implements Serializable {
         String temp = bundlePref.getString("useArk");
         arkActive = temp.equals("true");
         serverAdress = bundlePref.getString("cheminSite");
+        identifierType = bundlePref.getString("identifierType");
     }
 
     /**
@@ -574,10 +576,12 @@ public class SelectedCandidat implements Serializable {
 
         ConceptHelper instance = new ConceptHelper();
 
+        instance.setIdentifierType(identifierType);
         Concept concept = new Concept();
         concept.setIdGroup(domaineEdit);
         concept.setIdThesaurus(idTheso);
         concept.setStatus("D");
+        concept.setNotation("");
 
         String langueTemp = temp.get(0).getKey();
 

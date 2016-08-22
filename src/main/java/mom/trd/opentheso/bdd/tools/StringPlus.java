@@ -72,12 +72,17 @@ public class StringPlus {
         if (s == null) {
             return null;
         }
+        if(s.contains("Estampilles")) {
+            int i = 1;
+        }
         // normalisation of words for XML
         s = s.replaceAll("&", "&amp;");
         s = s.replaceAll("\"", " ");
+        s = s.replace("\"", " ");
         s = s.replaceAll("\n", " ");
         s = s.replaceAll("\t", " ");
-        return s;
+        s = s.replaceAll("'", " ");
+        return s.trim();
     }
     
     /**

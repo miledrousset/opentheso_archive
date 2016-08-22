@@ -120,6 +120,7 @@ public class SelectedTerme implements Serializable {
     private int tree; // 0 pour treeBean, 2 pour underTree
     private String idArk;
 
+
     private String valueEdit;
     private String valueEdit2;
     private String langueEdit;
@@ -183,6 +184,8 @@ public class SelectedTerme implements Serializable {
         serverAdress = bundlePref.getString("cheminSite");
         user.setIdTheso(idTheso);
         identifierType = bundlePref.getString("identifierType");
+        
+
     }
 
     /**
@@ -195,6 +198,7 @@ public class SelectedTerme implements Serializable {
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
     }
+  
 
     /**
      * Vide toutes les informations du terme

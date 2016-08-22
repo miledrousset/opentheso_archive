@@ -358,6 +358,23 @@ public class Rest {
     
     
     /**
+     * pour récuperer la liste des domaines d'un thésaurus
+     * @param idTheso
+     * @return 
+    */
+    @Path("/jsonld/concept/th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getAllGroupsJson(@PathParam("th") String idTheso){
+        StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
+        JsonHelper jsonHelper = new JsonHelper();
+        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);          
+        ds.close();
+        return jsonLd.toString();
+    }    
+    
+    /**
      * Fonction qui permet de récupérer un concept skos par identifiant
      * @param idConcept
      * @param idThesaurus

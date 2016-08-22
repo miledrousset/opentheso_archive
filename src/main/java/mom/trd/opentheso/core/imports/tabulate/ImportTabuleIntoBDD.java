@@ -77,7 +77,7 @@ public class ImportTabuleIntoBDD {
                 tabulateDocument.getId(),
                 idThesaurus,
                 tabulateDocument.getType(),
-                "", "", "",
+                "", 
                 "", false, idUser)){
             return false;
         }

@@ -1312,6 +1312,7 @@ public class ConceptHelper {
         ResultSet resultSet;
         boolean existe = false;
 
+        if(notation.isEmpty()) return false;
         try {
             try {
                 stmt = conn.createStatement();

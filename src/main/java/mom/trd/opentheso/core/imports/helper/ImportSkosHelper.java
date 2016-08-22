@@ -297,14 +297,24 @@ public class ImportSkosHelper {
         GroupHelper groupHelper = new GroupHelper();
         
         for (String idGroup : idGroups) {
-            groupHelper.insertGroup(ds, idGroup,
-                thesaurus.getId_thesaurus(), "MT", "", "", "",
-                adressSite, useArk, idUser); 
+            groupHelper.insertGroup(ds,
+                    idGroup,
+                    thesaurus.getId_thesaurus(),
+                    "MT",
+                    "", //notation 
+                    adressSite,
+                    useArk,
+                    idUser); 
         }
         
-        groupHelper.insertGroup(ds, idGroupDefault,
-                thesaurus.getId_thesaurus(), "MT", "", "", "",
-                adressSite, useArk, idUser);
+        groupHelper.insertGroup(ds,
+                idGroupDefault,
+                thesaurus.getId_thesaurus(),
+                "MT",
+                "", //notation
+                adressSite,
+                useArk,
+                idUser);
         
       // ajouter les traductions des Groupes
         ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();

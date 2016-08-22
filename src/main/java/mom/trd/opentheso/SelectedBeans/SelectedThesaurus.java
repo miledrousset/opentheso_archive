@@ -81,6 +81,8 @@ public class SelectedThesaurus implements Serializable {
     private String defaultThesaurusId;
     private String identifierType;
     
+    private String idNaan;    
+    
     
     private NodePreference nodePreference;
     private String version;
@@ -130,6 +132,17 @@ public class SelectedThesaurus implements Serializable {
         return bundlePref;
     }
 
+    /**
+     * Récupération des préférences Ark
+     *
+     * @return la ressourceBundle des préférences Ark
+     */
+    private ResourceBundle getBundlePrefArk() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "ark");
+        return bundlePref;
+    }     
+    
     /**
      * récupère la variable URL et affiche le terme qu'elle désigne
      */
@@ -280,11 +293,16 @@ public class SelectedThesaurus implements Serializable {
         workLanguage = bundlePref.getString("workLanguage");
         defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
         identifierType = bundlePref.getString("identifierType");
+        
+        ResourceBundle bundlePrefArk = getBundlePrefArk();
+        idNaan = bundlePrefArk.getString("idNaan");
+        
         idCurl = null;
         idGurl = null;        
         idTurl = null;
         idLurl = null;
         arrayTrad = new ArrayList<>();
+        
     }
 
     @PostConstruct
@@ -1275,6 +1293,14 @@ public class SelectedThesaurus implements Serializable {
 
     public void setConceptbean(ConceptBean conceptbean) {
         this.conceptbean = conceptbean;
+    }
+
+    public String getIdNaan() {
+        return idNaan;
+    }
+
+    public void setIdNaan(String idNaan) {
+        this.idNaan = idNaan;
     }
 
     

@@ -161,7 +161,7 @@ public class WriteSkosBDD {
 
         String idConceptGroup = getId(resource.getUri());
         conceptGroupHelper.insertGroup(ds, idConceptGroup,
-                id_thesaurus, "D", "", "", "",
+                id_thesaurus, "D", "",
                 adressSite, useArk, idUser);
 
         // ajouter les traductions des Groupes

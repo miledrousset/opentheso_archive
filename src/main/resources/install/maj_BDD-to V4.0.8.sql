@@ -268,3 +268,4 @@ INSERT INTO users (id_user, username, password, active, mail) VALUES (1, 'admin'
 
 INSERT INTO user_role (id_user, id_role, id_thesaurus, id_group) VALUES (1, 1, '', '');
 
+UPDATE concept SET notation = '' WHERE notation ilike 'null';
