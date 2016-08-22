@@ -11,6 +11,7 @@
         <title>
             <h:outputText  value="#{selectedTerme.nom}"/>
         </title>
+
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
@@ -22,13 +23,20 @@
         <script type="text/javascript" src="javascript/jqxscrollbar.js"></script>
         <script type="text/javascript" src="javascript/indexScript.js"></script>
         <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r;
+                i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+                a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                a.async = 1;
+                a.src = g;
+                m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-          ga('create', 'UA-58798616-3', 'auto');
-          ga('send', 'pageview');
+            ga('create', 'UA-58798616-3', 'auto');
+            ga('send', 'pageview');
 
         </script>  
 
@@ -42,7 +50,7 @@
             <f:viewParam name="idg" value="#{theso.idGurl}"/>
             <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
         </f:metadata>
-      
+
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
             <h1>Gestionnaire de thésaurus</h1>
             <h:outputText value="version :  #{theso.getVersion()}" /><br/>
@@ -66,7 +74,7 @@
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
             <ui:include src="connection.xhtml" />
-            
+
             <h:panelGroup id="panChoixTheso" style="float: left;" >
                 <div id="choixTheso">
                     <h:form id="liste1">
@@ -83,28 +91,28 @@
                                                      update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu,:footer" 
                                                      styleClass="styleButton" />
                                 </td>
-                                
-                                                            <!-- CHOIX LANGUE DEBUT -->  
-                            <td id="divLangue">
-                                <h:panelGroup id="liste2">
-                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
-                                        <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
-                                            <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
-                                                           itemValue="#{t.id_iso639_1}"  />
-                                        </h:selectOneMenu>&nbsp;
-                                        <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                                         update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                                         styleClass="styleButton"/>
-                                    </h:form>
-                                </h:panelGroup>
-                            </td>
-                               <!-- 
-                                <td>
-                                    <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
-                                    <h:outputText value="#{theso.thesaurus.language}" />
-                                    <br/>
+
+                                <!-- CHOIX LANGUE DEBUT -->  
+                                <td id="divLangue">
+                                    <h:panelGroup id="liste2">
+                                        <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
+                                            <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
+                                                <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                               itemValue="#{t.id_iso639_1}"  />
+                                            </h:selectOneMenu>&nbsp;
+                                            <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
+                                                             update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                             styleClass="styleButton"/>
+                                        </h:form>
+                                    </h:panelGroup>
                                 </td>
-                               -->
+                                <!-- 
+                                 <td>
+                                     <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
+                                     <h:outputText value="#{theso.thesaurus.language}" />
+                                     <br/>
+                                 </td>
+                                -->
                             </tr>
                         </table>
                     </h:form>
@@ -122,17 +130,17 @@
             <ui:include src="dialogs/conceptDeprecateDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionDlg.xhtml" />
             <ui:include src="dialogs/conceptFusionValidationDlg.xhtml" />
-            
+
             <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchDlg.xhtml" />
             <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchFromGroupDlg.xhtml" />
             <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchToGroupDlg.xhtml" />
-            
+
 
             <ui:include src="dialogs/branch/otherGroup/moveBranchFromTopTermToConceptOtherGroupDlg.xhtml" />            
             <ui:include src="dialogs/branch/otherGroup/moveBranchToConceptOtherGroupDlg.xhtml" />
             <ui:include src="dialogs/branch/otherGroup/moveBranchToGroupOfOtherGroupDlg.xhtml" />            
-            
-            
+
+
             <ui:include src="dialogs/orphan/moveBranchFromOrphanDlg.xhtml" />
             <ui:include src="dialogs/orphan/moveBranchFromOrphanToGroupDlg.xhtml" />
             <ui:include src="dialogs/nt/ntEditDlg.xhtml" />
@@ -141,9 +149,9 @@
             <ui:include src="dialogs/bt/deleteTgDlg.xhtml" />
             <ui:include src="dialogs/group/addGroupDlg.xhtml" />
 
-            
-            
-            
+
+
+
 
             <!-- GESTIONNAIRE DEBUT -->  
             <div id="SplitterVertical1">
@@ -154,16 +162,16 @@
                             <!-- navigation rapide par auto-complétion --> 
                             <div id="rapidAccess" align="center" >
                                 <h:form >
-                                   
+
 
                                     <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                   minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                                   a:placeholder="#{langueBean.getMsg('index.search')}" >
-                                        
+                                                    minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
+                                                    a:placeholder="#{langueBean.getMsg('index.search')}" >
+
                                         <p:ajax event="itemSelect" listener="#{treeBean.majIndexRapidSearch()}" 
                                                 update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
-                                               />
-                                        
+                                                />
+
                                     </p:autoComplete>
 
                                     <!-- gestion des domaines ou groupes --> 
@@ -183,36 +191,36 @@
                             <!-- ARBRE DEBUT -->  
                             <div id="divArbreTheso">
                                 <h:panelGroup id="panelTree">
-                                <h:form id="form">
-                                    <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
-                                            selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true" >
-                                        <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
-                                        <p:ajax event="select" 
-                                                update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                                listener="#{treeBean.onNodeSelect}" />
+                                    <h:form id="form">
+                                        <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
+                                                selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true" >
+                                            <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
+                                            <p:ajax event="select" 
+                                                    update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                    listener="#{treeBean.onNodeSelect}" />
 
-                                        <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
-                                                    collapsedIcon="ui-icon ui-icon-domaine-close">  
-                                            <h:outputText value="#{node}"/>  
-                                        </p:treeNode>  
-                                        <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
-                                                    collapsedIcon="ui-icon ui-icon-dossier-close">  
-                                            <h:outputText value="#{node}"/>  
-                                        </p:treeNode>  
-                                        <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
-                                            <h:outputText value="#{node}"/>  
-                                        </p:treeNode> 
-                                        <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
-                                            <h:outputText value="#{node}"/>  
-                                        </p:treeNode> 
-                                        <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
-                                                    collapsedIcon="ui-icon ui-icon-domaine-close">  
-                                            <h:outputText value="#{node}"/>  
-                                        </p:treeNode>
-                                    </p:tree>
+                                            <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                                        collapsedIcon="ui-icon ui-icon-domaine-close">  
+                                                <h:outputText value="#{node}"/>  
+                                            </p:treeNode>  
+                                            <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                                        collapsedIcon="ui-icon ui-icon-dossier-close">  
+                                                <h:outputText value="#{node}"/>  
+                                            </p:treeNode>  
+                                            <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                                                <h:outputText value="#{node}"/>  
+                                            </p:treeNode> 
+                                            <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
+                                                <h:outputText value="#{node}"/>  
+                                            </p:treeNode> 
+                                            <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                                        collapsedIcon="ui-icon ui-icon-domaine-close">  
+                                                <h:outputText value="#{node}"/>  
+                                            </p:treeNode>
+                                        </p:tree>
 
-                                    
-                                </h:form>
+
+                                    </h:form>
                                 </h:panelGroup>
                             </div>
                             <!-- ARBRE FIN -->  
@@ -452,19 +460,19 @@
                                             <p:commandButton value="Skos" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                                             </p:commandButton>
-                                        
+
                                             <!-- exporter le grpup en JsonLd -->
                                             <p:commandButton value="JsonLd" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.thisGroupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                                             </p:commandButton>
                                         </h:form>  
-                                        
+
                                         <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 5px;" >
                                             <!-- exporter le concept en SKOS -->
                                             <p:commandButton value="Skos" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.conceptToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
                                             </p:commandButton>
-                                        
+
                                             <!-- exporter le concept en JsonLd -->
                                             <p:commandButton value="JsonLd" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.conceptToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
@@ -476,30 +484,30 @@
                                             <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.brancheToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
                                             </p:commandButton>
-                                                                                    
+
                                             <!-- exporter la branche en JsonLd -->
                                             <p:commandButton value="JsonLd_Branch" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.brancheToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
                                             </p:commandButton>
                                         </h:form>  
-                                        
-                                        
+
+
                                         <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type == 1)}" 
                                                 style="float: left; margin-right: 5px;" >
                                             <!-- exporter la branche en SKOS mode connecté -->
                                             <p:commandButton value="skos_Group" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.groupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                                             </p:commandButton>
-                                                                                    
+
                                             <!-- exporter la branche en JsonLd -->
                                             <p:commandButton value="JsonLd_Group" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.groupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                                             </p:commandButton>
                                         </h:form>
-                                        
-                                        
-                                        
-                                        
+
+
+
+
                                         <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
                                             <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
                                                              update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
@@ -507,17 +515,17 @@
                                             </p:commandButton>
                                             <br/><br/>
                                         </h:form>
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                    <div id="clean" />
+
+
+
+
+
+
+
+
+                                        <div id="clean" />
                                     </div>
-                                        
+
                                     <div id="alignGauche">
                                         <!--TERMES GENERIQUES DEBUT -->
                                         <div id="divGenerale" >
@@ -558,25 +566,25 @@
                                         <!--TERMES GENERIQUES FIN -->
                                         <!--INFO TERMES DEBUT -->
                                         <div id="divGenerale">
-                                            
+
 
                                             <div class="contenuTerme">
                                                 <div id="imageEdition">
                                                     <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
-                                                            
+
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
-                                                            
-                                                            
+
+
                                                             <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
-                                                            
+
                                                             <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-                                                            
-                                                            
+
+
                                                             <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
                                                                 <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
                                                                 <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
@@ -587,7 +595,7 @@
                                                                 <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
                                                                 <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
                                                             </p:submenu>
-                                                            
+
                                                         </p:menu>
                                                     </h:form>
                                                     <!--options pour les orphelins -->
@@ -596,9 +604,9 @@
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                                                             <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
                                                             <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
-                                                            
+
                                                             <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idMoveBranchFromOrphanDlg" oncomplete="PF('moveBranchFromOrphanDlg').show();" style="font-size: 12px;"/>
-                                                            
+
                                                             <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.addToMT')}" update=":idMoveBranchFromOrphanToGroupDlg" oncomplete="PF('moveBranchFromOrphanToGroupDlg').show();" style="font-size: 12px;"/>
                                                         </p:menu>
                                                     </h:form>
@@ -637,7 +645,7 @@
                                                         <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
                                                     </ui:repeat>
                                                 </h:panelGroup>
-                                                
+
                                                 <!-- affichage du nombre total des fils -->
                                                 <span>
                                                     <p:tooltip />
@@ -646,10 +654,10 @@
                                                         <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
                                                     </h:form>
                                                 </span>
-                                                
-                                                
-                                                
-                                                
+
+
+
+
                                                 <!-- affichage de l'URL pérenne-->
 
                                                 <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
@@ -681,7 +689,7 @@
                                             </div>
                                         </div>
                                         <!--INFO TERMES FIN -->
-                                        
+
                                         <!--TERMES SPECIFIQUES DEBUT -->
                                         <div id="divGenerale">
                                             <div class="titreSpecifique">
@@ -694,7 +702,7 @@
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTSpe" my="left top" at="left bottom">
                                                             <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
                                                         </p:menu>
-                                                        
+
                                                     </h:form>
                                                 </div>
                                             </div>
@@ -714,7 +722,7 @@
                                                 </h:panelGroup>
                                             </div>
                                         </div>
-                                        
+
                                         <!--TERMES SPECIFIQUES FIN -->
                                     </div>
                                     <div id="alignDroite">
@@ -774,9 +782,9 @@
                                                     </ui:repeat>
                                                 </h:panelGroup>
                                                 <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
-                                                
-                                               
-                                                
+
+
+
                                                 <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
                                                         <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
@@ -821,12 +829,12 @@
                                                             <h:outputText value="#{selectedTerme.definition} &lt;br/&gt;" escape="false" 
                                                                           rendered="#{selectedTerme.definition != null and selectedTerme.definition != '' }"/>
                                                         </span>
-                                                        
+
                                                         <h:outputText value="#{langueBean.getMsg('index.note5')} : " style="font-weight: bold;"
                                                                       rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
                                                         <h:outputText value="#{selectedTerme.note} &lt;br/&gt;" escape="false"
                                                                       rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
-                                                        
+
                                                         <h:outputText value="#{langueBean.getMsg('index.note2')} : " style="font-weight: bold;"
                                                                       rendered="#{selectedTerme.noteApplication != null and selectedTerme.noteApplication != ''}" />
                                                         <h:outputText value="#{selectedTerme.noteApplication} &lt;br/&gt;" escape="false"
@@ -1061,7 +1069,7 @@
                 </footer>
             </h:panelGroup>
         </center>
-      
+
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
@@ -1073,5 +1081,7 @@
                 </f:facet>
             </p:ajaxStatus>
         </ui:insert>
+        <br />
+        <h:link outcome="welcomePrimefaces" value="Primefaces welcome page" />
     </h:body>
 </html>
