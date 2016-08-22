@@ -455,7 +455,8 @@
                             <div id="contenuPrincipale">
                                 <h:panelGroup id="panContenu">
                                     <div style="text-align: center">
-                                        <h:form  rendered="#{(selectedTerme.type == 1) and (selectedTerme.idC != '')} " style="float: left; margin-right: 5px;" >
+
+                                        <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
                                             <!-- exporter le Group en SKOS -->
                                             <p:commandButton value="Skos" ajax="false" styleClass="link">
                                                 <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
