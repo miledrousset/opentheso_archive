@@ -269,3 +269,9 @@ INSERT INTO users (id_user, username, password, active, mail) VALUES (1, 'admin'
 INSERT INTO user_role (id_user, id_role, id_thesaurus, id_group) VALUES (1, 1, '', '');
 
 UPDATE concept SET notation = '' WHERE notation ilike 'null';
+
+
+ALTER TABLE concept_group ALTER COLUMN idtypecode SET DEFAULT 'MT';
+UPDATE concept_group SET idtypecode = 'MT' WHERE idtypecode ilike 'null';
+ALTER TABLE concept_group ALTER COLUMN idtypecode SET NOT NULL;
+UPDATE concept_group SET notation = '' WHERE notation ilike 'null';

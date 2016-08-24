@@ -424,7 +424,7 @@
                                 </table><br/>
                                 <div style="float: left; margin-left: 50px;">
                                     <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" action="#{theso.editerTheso}" 
-                                                     styleClass="styleButton" update=":panModif,:panTrad"/>&nbsp;
+                                                     styleClass="styleButton" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad"/>&nbsp;
                                 </div>
                             </h:form>
                             <h:form>
@@ -499,7 +499,7 @@
                                         </f:facet>                                        
                                         <h:form>
                                             <p:commandButton id="cbAjTradTheso" styleClass="cbSupp" icon="ui-icon-edi" 
-                                                             actionListener="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}" update=":panModif,:panAjTrad" />
+                                                             actionListener="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad" />
                                         </h:form>
                                     </h:column>
                                     <h:column id="columnTrad4">

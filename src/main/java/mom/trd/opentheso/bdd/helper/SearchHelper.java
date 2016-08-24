@@ -58,6 +58,7 @@ public class SearchHelper {
         String multivaluesTerm = "";
         String multivaluesSynonyme = "";
         String multivaluesNote = "";
+        String notation = "";
         
         // préparation de la valeur à rechercher 
         if(startByOrContain == 1){ // contient
@@ -71,6 +72,9 @@ public class SearchHelper {
                 multivaluesNote += 
                         " and unaccent_string(note.lexicalvalue) ilike" +
                         " unaccent_string('%" + value1 + "%')";
+                notation = 
+                        " and unaccent_string(concept.notation) ilike "
+                        + "unaccent_string('%"+ value +"%')";                   
             }       
         }
         if(startByOrContain == 2){ // commence par
@@ -90,7 +94,11 @@ public class SearchHelper {
                     " and (unaccent_string(note.lexicalvalue) ilike" +
                         " unaccent_string('" + value + "%')" +
                     " OR unaccent_string(note.lexicalvalue) ilike" +
-                        " unaccent_string('% " + value + "%'))";           
+                        " unaccent_string('% " + value + "%'))";
+            notation = 
+                    " and unaccent_string(concept.notation) ilike "
+                    + "unaccent_string('%"+ value +"%')";          
+            
         } 
         
         // préparation de la requête en focntion du choix (toutes les langues ou langue donnée) 
@@ -234,6 +242,37 @@ public class SearchHelper {
                             nodeSearchList.add(nodeSearch);
                         }                    
                     }
+                    /**
+                     * recherche aussi dans les notations 
+                     */
+                    if(withNote) {
+                        query = "SELECT concept.id_concept, concept.id_thesaurus," +
+                                " concept.top_concept, concept.id_group," +
+                                " concept.notation " +
+                                " FROM concept" +
+                                " WHERE" +
+                                " concept.id_thesaurus = '" + idThesaurus + "'" +
+                                notation +
+                                group +
+                                " order by notation ASC LIMIT 200";
+
+                        resultSet = stmt.executeQuery(query);
+
+                        while (resultSet.next()) {
+                            NodeSearch nodeSearch = new NodeSearch();
+                            nodeSearch.setLexical_value(resultSet.getString("notation"));
+                            nodeSearch.setIdConcept(resultSet.getString("id_concept"));
+       //                     nodeSearch.setIdTerm(resultSet.getString("id_term"));
+                            nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                            nodeSearch.setIdLang(idLang);
+                            nodeSearch.setIdThesaurus(idThesaurus);
+                            nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
+                            nodeSearch.setPreferredLabel(true);
+
+                            nodeSearchList.add(nodeSearch);
+                        }                    
+                    }
+                    
                 } finally {
                     stmt.close();
                 }
@@ -395,6 +434,88 @@ public class SearchHelper {
         return nodeSearchList;
     }
  
+    /**
+     * Cette fonction permet de faire une recherche par notation des Concepts uniquement
+     *
+     * @param ds
+     * @param value
+     * @param idLang
+     * @param idThesaurus
+     * @param idGroup
+     * @return
+     */
+    public ArrayList<NodeSearch> searchNotation(HikariDataSource ds,
+            String value, String idLang, String idThesaurus, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeSearch> nodeSearchList = null;
+        value = new StringPlus().convertString(value);
+        String query;
+        String lang;
+        String group;
+        String notation = 
+                " and unaccent_string(concept.notation) ilike "
+                + "unaccent_string('%"+ value +"%')";          
+            
+        // préparation de la requête en focntion du choix (toutes les langues ou langue donnée) 
+        if(idLang.isEmpty()) {
+            lang = "";
+        }
+        
+        // cas du choix d'un group
+        if(idGroup.isEmpty()) {
+            group = "";
+        }
+        else {
+            group = " and concept.id_group = '" + idGroup + "'";
+        }
+        
+        
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    query = "SELECT concept.id_concept, concept.id_thesaurus," +
+                            " concept.top_concept, concept.id_group," +
+                            " concept.notation " +
+                            " FROM concept" +
+                            " WHERE" +
+                            " concept.id_thesaurus = '" + idThesaurus + "'" +
+                            notation +
+                            group +
+                            " order by notation ASC LIMIT 200";
+
+                    resultSet = stmt.executeQuery(query);
+                    nodeSearchList = new ArrayList();
+                    while (resultSet.next()) {
+                        NodeSearch nodeSearch = new NodeSearch();
+                        nodeSearch.setLexical_value(resultSet.getString("notation"));
+                        nodeSearch.setIdConcept(resultSet.getString("id_concept"));
+   //                     nodeSearch.setIdTerm(resultSet.getString("id_term"));
+                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdLang(idLang);
+                        nodeSearch.setIdThesaurus(idThesaurus);
+                        nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
+                        nodeSearch.setPreferredLabel(true);
+
+                        nodeSearchList.add(nodeSearch);
+                    }                    
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeSearchList;
+    }  
+    
 
     /**
      * Cette fonction permet de faire une recherche par value sur les termes

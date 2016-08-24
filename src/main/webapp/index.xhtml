@@ -249,22 +249,35 @@
                                                 &nbsp;
                                                 <p:selectBooleanCheckbox id="withNote" value="#{search.withNote}" >
                                                     <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
                                                 </p:selectBooleanCheckbox>
                                                 &nbsp;
-                                                <h:outputText   value="inclure les notes " />
+                                                <h:outputText value="#{langueBean.getMsg('index.searchWithNote')}"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="3" align="left">
                                                 &nbsp;
                                                 <p:selectBooleanCheckbox id="onlyNote" value="#{search.onlyNote}" >
-                                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"  />
+                                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"/>
+                                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
                                                 </p:selectBooleanCheckbox>
                                                 &nbsp;
-                                                <h:outputText value="uniquement dans les notes " />
-                                                <br/><br/>
+                                                <h:outputText value="#{langueBean.getMsg('index.searchNoteOnly')}"/>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td colspan="3" align="left">
+                                                &nbsp;
+                                                <p:selectBooleanCheckbox id="onlyNotation" value="#{search.onlyNotation}" >
+                                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"  />
+                                                    <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                                </p:selectBooleanCheckbox>
+                                                &nbsp;
+                                                <h:outputText value="#{langueBean.getMsg('index.searchNotationOnly')}"/>
+                                                <br/><br/>
+                                            </td>
+                                        </tr>                                        
                                         <tr>
                                             <td>
                                                 <div align="left">
@@ -1082,7 +1095,5 @@
                 </f:facet>
             </p:ajaxStatus>
         </ui:insert>
-        <br />
-        <h:link outcome="welcomePrimefaces" value="Primefaces welcome page" />
     </h:body>
 </html>

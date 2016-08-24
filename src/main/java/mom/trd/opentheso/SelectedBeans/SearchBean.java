@@ -24,6 +24,7 @@ public class SearchBean implements Serializable {
     private int startByOrContain = 1;
     private boolean withNote = false;
     private boolean onlyNote = false;
+    private boolean onlyNotation = false;    
     private String langue;
     private int nbRes;
     ArrayList<NodeSearch> result1 = new ArrayList<>();
@@ -49,8 +50,14 @@ public class SearchBean implements Serializable {
                     startByOrContain);
                 }
                 else {
-                    result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
-                            startByOrContain, withNote);                        
+                    if(onlyNotation) {
+                        result1 = new SearchHelper().searchNotation(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup
+                        );
+                    }
+                    else {
+                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                                startByOrContain, withNote);                        
+                    }
                 }
                
             } else if(typeValueSearch == 1) { // idC
@@ -226,5 +233,16 @@ public class SearchBean implements Serializable {
     public void setOnlyNote(boolean onlyNote) {
         this.onlyNote = onlyNote;
     }
+    
+
+    public boolean isOnlyNotation() {
+        return onlyNotation;
+    }
+
+    public void setOnlyNotation(boolean onlyNotation) {
+        this.onlyNotation = onlyNotation;
+    }
+    
+    
     
 }
