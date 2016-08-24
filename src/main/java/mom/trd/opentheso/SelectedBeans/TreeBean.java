@@ -46,6 +46,8 @@ public class TreeBean implements Serializable {
     private ArrayList<TreeNode> selectedNodes;
     private ArrayList<String> orphans;
     private boolean createValid = false;
+    private String idThesoSelected;
+    private String defaultLanguage;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -181,7 +183,7 @@ public class TreeBean implements Serializable {
      * Permet de mettre à jour l'arbre et le terme à la sélection d'un index rapide par autocomplétion
      */
     public void majIndexRapidSearch() {
-        selectedTerme.majIndexRapidSearch();
+        selectedTerme.majIndexRapidSearch(idThesoSelected, defaultLanguage);
         reInit();
         reExpand();
     }    
@@ -967,6 +969,22 @@ public class TreeBean implements Serializable {
 
     public void setConceptbean(ConceptBean conceptbean) {
         this.conceptbean = conceptbean;
+    }
+
+    public String getIdThesoSelected() {
+        return idThesoSelected;
+    }
+
+    public void setIdThesoSelected(String idThesoSelected) {
+        this.idThesoSelected = idThesoSelected;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
     }
 
 

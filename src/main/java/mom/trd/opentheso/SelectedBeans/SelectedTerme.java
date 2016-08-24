@@ -527,14 +527,18 @@ public class SelectedTerme implements Serializable {
         majTerme(mtn);
     }
 
-    public void majIndexRapidSearch() {
+    public void majIndexRapidSearch(String idThesaurus, String idLangue) {
         if (nodeSe == null) {
             return;
         }
+
         //cas du premier chargement du thésaurus 
         if (nodeSe.getIdConcept() == null) {
-
+            idTheso = idThesaurus;
         }
+        if (idlangue.isEmpty()) {
+            idlangue = idLangue;
+        }        
         if (nodeSe.isTopConcept()) {
             type = 2;
         } else {

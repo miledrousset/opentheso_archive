@@ -580,6 +580,8 @@ public class SelectedThesaurus implements Serializable {
         if(th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang()) != null) {
             thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang());
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            tree.setIdThesoSelected(thesaurus.getId_thesaurus());
+            tree.setDefaultLanguage(thesaurus.getLanguage());
         } else {
             thesaurus.setLanguage("");
         }
