@@ -890,7 +890,7 @@
                                             <div class="titreAlign">
                                                 <h:outputText value="#{langueBean.getMsg('index.align')}" />
                                                 <div id="imageEdition">
-                                                    <h:form id="formEditAlign" 
+                                                    <h:form id="formEditAlign"  
                                                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                         <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                                                          styleClass="cbEdit" icon="ui-icon-edit" >
