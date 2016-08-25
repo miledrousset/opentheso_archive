@@ -110,6 +110,7 @@ public class TermHelper {
      * @param idConcept
      * @param idUser
      */
+
     public void insertLinkTerm(HikariDataSource ds,
             String idTerm,
             String idThesaurus,
@@ -223,14 +224,16 @@ public class TermHelper {
                      */
                     query = "Insert into term "
                             + "(id_term, lexical_value, lang, "
-                            + "id_thesaurus, source, status)"
+                            + "id_thesaurus, source, status, contributor, creator)"
                             + " values ("
                             + "'" + term.getId_term() + "'"
                             + ",'" + term.getLexical_value() + "'"
                             + ",'" + term.getLang() + "'"
                             + ",'" + term.getId_thesaurus() + "'"
                             + ",'" + term.getSource() + "'"
-                            + ",'" + term.getStatus() + "')";
+                            + ",'" + term.getStatus() + "'"
+                            + ", " + idUser + ""
+                            + ", " + idUser + ")";
 
                     stmt.executeUpdate(query);
 
@@ -818,7 +821,7 @@ public class TermHelper {
                     } else  {
                         query = "Insert into term "
                             + "(id_term, lexical_value, lang, "
-                            + "id_thesaurus, created, modified, source, status)"
+                            + "id_thesaurus, created, modified, source, status, contributor)"
                             + " values ("
                             + "'" + idTerm + "'"
                             + ",'" + lexicalValue + "'"
@@ -827,7 +830,8 @@ public class TermHelper {
                             + ",'" + created + "'"
                             + ",'" + modified + "'"
                             + ",'" + source + "'"
-                            + ",'" + status + "')";
+                            + ",'" + status + "'"
+                            + ", " +idUser + ")";
                     }
                         
 
@@ -1008,10 +1012,12 @@ public class TermHelper {
                 try {
                     String query = "UPDATE term set"
                             + " lexical_value = '" + term.getLexical_value() + "',"
-                            + " modified = current_date"
+                            + " modified = current_date ,"
+                            + " contributor = " +idUser
                             + " WHERE lang ='" + term.getLang() + "'"
                             + " AND id_term = '" + term.getId_term() + "'"
                             + " AND id_thesaurus = '" + term.getId_thesaurus() + "'";
+
                     stmt.executeUpdate(query);
                     status = true;
 
@@ -1079,6 +1085,8 @@ public class TermHelper {
                             term.setModified(resultSet.getDate("modified"));
                             term.setSource(resultSet.getString("source"));
                             term.setStatus(resultSet.getString("status"));
+                            term.setContributor(resultSet.getInt("contributor"));
+                            term.setCreator(resultSet.getInt("creator"));
                         }
 
                     } finally {

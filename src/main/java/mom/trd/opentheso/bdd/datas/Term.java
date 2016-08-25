@@ -16,6 +16,9 @@ public class Term {
     private boolean prefered;
     private boolean hidden;
     private String idUser;
+    
+    private int contributor;
+    private int creator;
 
     public Term() {
     }
@@ -116,6 +119,21 @@ public class Term {
         this.idUser = idUser;
     }
 
-    
-    
+    public int getContributor() {
+        return contributor;
+    }
+
+    public void setContributor(int contributor) {
+        this.contributor = contributor;
+    }
+
+    public int getCreator() {
+        return creator;
+    }
+
+    public void setCreator(int creator) {
+        this.creator = creator;
+    }
+
+
 }

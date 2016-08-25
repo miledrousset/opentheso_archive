@@ -53,6 +53,7 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
@@ -119,6 +120,8 @@ public class SelectedTerme implements Serializable {
     private int type; // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
     private int tree; // 0 pour treeBean, 2 pour underTree
     private String idArk;
+    private int contributor;
+    private int creator;
 
 
     private String valueEdit;
@@ -303,6 +306,10 @@ public class SelectedTerme implements Serializable {
             idT = t.getId_term();
             dateC = dateFormat.format(t.getCreated());
             dateM = dateFormat.format(t.getModified());
+            
+            creator = t.getCreator();
+            contributor = t.getContributor();
+            
 
             images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso, user.getUser().getId());
             majNotes();
@@ -2560,5 +2567,30 @@ public class SelectedTerme implements Serializable {
     public void setListAlignTemp(ArrayList<NodeAlignment> listAlignTemp) {
         this.listAlignTemp = listAlignTemp;
     }
+
+    public int getContributor() {
+        return contributor;
+    }
+
+    public void setContributor(int contributor) {
+        this.contributor = contributor;
+    }
+
+    public int getCreator() {
+        return creator;
+    }
+
+    public String getCreatorName() {
+        UserHelper userHelper = new UserHelper();
+        return userHelper.getNameUser(connect.getPoolConnexion(), creator);
+    }
+    public String getContributorName() {
+        UserHelper userHelper = new UserHelper();
+        return userHelper.getNameUser(connect.getPoolConnexion(), contributor);
+    }
+    public void setCreator(int creator) {
+        this.creator = creator;
+    }
+
 
 }
