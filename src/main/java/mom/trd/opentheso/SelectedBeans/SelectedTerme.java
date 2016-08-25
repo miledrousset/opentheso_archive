@@ -1331,10 +1331,10 @@ public class SelectedTerme implements Serializable {
 
     public void editNote() {
         int idUser = user.getUser().getId();
-        if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idT, idTheso, idlangue, "note")) {
-            new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idT, idlangue, idTheso, note, "note", idUser);
+        if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, "note")) {
+            new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
         } else {
-            new NoteHelper().addConceptNote(connect.getPoolConnexion(), idT, idlangue, idTheso, note, "note", idUser);
+            new NoteHelper().addConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
         }
         vue.setAddNote(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));

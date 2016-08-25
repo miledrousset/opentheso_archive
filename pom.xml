@@ -214,29 +214,32 @@
     </dependencies>
 
     <build>
-        <!--
-        <resources>
-          <resource>
-            <targetPath>conf</targetPath>
-            <filtering>false</filtering>
-            <directory>${basedir}</directory>
-            
-            <directory>${basedir}/src/main/resources</directory>
-            
-            <includes>
-              <include>hikari.properties</include>
-              <include>preferences.properties</include>
-              <include>ark.properties</include>
-            </includes>
-            
-           <excludes>
-              <exclude>sitemap.xml</exclude>
-            </excludes>
-            
-          </resource>
-        </resources>
+        <!-- décocher pour la version de distribution 
+            <resources>
+              <resource>
+
+                <directory>src/main/resources</directory>
+
+                <includes>
+                  <include>hikari_dist.properties</include>
+                  <include>preferences_dist.properties</include>
+                  <include>ark_dist.properties</include>
+                </includes>
+
+               <excludes>
+                  <exclude>sitemap.xml</exclude>
+                  <exclude>hikari.properties</exclude>
+                  <exclude>preferences.properties</exclude>
+                  <exclude>ark.properties</exclude>              
+                </excludes>
+
+              </resource>
+            </resources>
         -->
+        
+        
         <plugins>
+
             <!-- code pour récupérer la version du logiciel -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -300,8 +303,10 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        </plugins>        
     </build>
+
+
     <repositories>
         <repository>
             <url>http://repository.primefaces.org/</url>
