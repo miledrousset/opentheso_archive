@@ -412,11 +412,20 @@ public class SelectedTerme implements Serializable {
             }
         }
     }
+    
+    private void initNotes(){
+        noteEditoriale = "";
+        definition = "";
+        noteHistorique = "";
+        noteApplication = "";
+        note = "";
+    }
 
     private void majNotes() {
         // NodeNote contient la note avec le type de note, il faut filtrer pour trouver la bonne note
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote; 
+        initNotes();
         ArrayList<NodeNote> nodeNoteList = new NoteHelper().getListNotesTerm(connect.getPoolConnexion(), idT, idTheso, idlangue);
         for (NodeNote nodeNoteList1 : nodeNoteList) {
             if (nodeNoteList1 != null) {
@@ -1320,6 +1329,10 @@ public class SelectedTerme implements Serializable {
      */
     public void editDef() {
         int idUser = user.getUser().getId();
+        if(definition.isEmpty()) {
+            deleteThisNoteOfConcept("note");
+            return;
+        }
         if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "definition")) {
             new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, definition, "definition", idUser);
         } else {
@@ -1331,6 +1344,10 @@ public class SelectedTerme implements Serializable {
 
     public void editNote() {
         int idUser = user.getUser().getId();
+        if(note.isEmpty()) {
+            deleteThisNoteOfConcept("note");
+            return;
+        }
         if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, "note")) {
             new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
         } else {
@@ -1339,9 +1356,41 @@ public class SelectedTerme implements Serializable {
         vue.setAddNote(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
     }
+    
+        /**
+     * Cette fonction permet de supprimer une note suivant son type 
+     * 
+     * @param noteTypeCode 
+     */
+    public void deleteThisNoteOfConcept(String noteTypeCode) {
+        int idUser = user.getUser().getId();
+        new NoteHelper().deletethisNoteOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, noteTypeCode);
+
+        majNotes();
+        
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
+    }
+    
+    
+    /**
+     * Cette fonction permet de supprimer une note suivant son type 
+     * 
+     * @param noteTypeCode 
+     */
+    public void deleteThisNoteOfTerm(String noteTypeCode) {
+        int idUser = user.getUser().getId();
+        new NoteHelper().deleteThisNoteOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, noteTypeCode);
+
+        majNotes();        
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
+    }      
 
     public void editNoteApp() {
         int idUser = user.getUser().getId();
+        if(noteApplication.isEmpty()) {
+            deleteThisNoteOfConcept("note");
+            return;
+        }
         if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, "scopeNote")) {
             new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, noteApplication, "scopeNote", idUser);
         } else {
@@ -1356,6 +1405,10 @@ public class SelectedTerme implements Serializable {
      */
     public void editNoteHisto() {
         int idUser = user.getUser().getId();
+        if(noteHistorique.isEmpty()) {
+            deleteThisNoteOfConcept("note");
+            return;
+        }
         if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "historyNote")) {
             new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteHistorique, "historyNote", idUser);
         } else {
@@ -1369,7 +1422,12 @@ public class SelectedTerme implements Serializable {
      * Crée ou modifie la note éditoriale du terme courant
      */
     public void editNoteEdit() {
+        
         int idUser = user.getUser().getId();
+        if(noteEditoriale.isEmpty()) {
+            deleteThisNoteOfConcept("note");
+            return;
+        }
         if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "editorialNote")) {
             new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteEditoriale, "editorialNote", idUser);
         } else {

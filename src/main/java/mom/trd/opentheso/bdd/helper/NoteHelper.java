@@ -878,7 +878,7 @@ public class NoteHelper {
 
     
     /**
-     * Cette fonction permet de supprimer les notes d'un Concept
+     * Cette fonction permet de supprimer toutes les notes d'un Concept
      * 
      * @param conn
      * @param idConcept
@@ -912,7 +912,7 @@ public class NoteHelper {
     }
     
     /**
-     * Cette fonction permet de supprimer les notes d'un Concept
+     * Cette fonction permet de supprimer toutes les notes d'un terme
      * 
      * @param conn
      * @param idTerm
@@ -943,6 +943,88 @@ public class NoteHelper {
             log.error("Error while deleting all notes of Term : " + idTerm, sqle);
         }
         return false;
-    }      
+    }  
     
+   /**
+     * Cette fonction permet de supprimer une note suivant un IdTerme et un type de note
+     * 
+     * @param ds
+     * @param idTerm
+     * @param idThesaurus
+     * @param idLang
+     * @param noteTypeCode
+     * @return boolean
+     */
+    public boolean deleteThisNoteOfTerm(HikariDataSource ds,
+            String idTerm, String idThesaurus, String idLang, String noteTypeCode) {
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+        
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {   
+                    String query = "delete from note"
+                            + " where id_term = '" + idTerm + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'"
+                            + " and lang = '"+ idLang + "'"
+                            + " and notetypecode = '" + noteTypeCode + "'";
+                    stmt.executeUpdate(query);
+                    status = true;
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while deleting note of term : " + idTerm, sqle);
+            }
+        return status;
+    }
+    
+   /**
+     * Cette fonction permet de supprimer une note suivant un IdConcept et un type de note
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idLange
+     * @param noteTypeCode
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean deletethisNoteOfConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus, String idLang, String noteTypeCode) {
+        
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+        
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {   
+                    String query = "delete from note"
+                            + " where id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'"
+                            + " and lang = '"+ idLang + "'"
+                            + " and notetypecode = '" + noteTypeCode + "'";
+                    stmt.executeUpdate(query);
+                    status = true;
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while deleting note of concept : " + idConcept, sqle);
+            }
+        return status;
+    }
 }

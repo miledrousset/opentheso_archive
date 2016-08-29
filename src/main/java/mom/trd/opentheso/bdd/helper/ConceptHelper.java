@@ -405,13 +405,12 @@ public class ConceptHelper {
                     stmt.close();
                 }
             } finally {
-                //  conn.close();
+                conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
             log.error("Error while melting Concept : " + idConcept1 + " and " + idConcept2, sqle);
         }
-
         return status;
     }
 

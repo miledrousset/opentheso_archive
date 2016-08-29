@@ -306,60 +306,7 @@
                     </div>
                 </div>
                 <br/>
-                <h:panelGroup rendered="#{vue.addNote == 5}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note5')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.note}" styleClass="areaNote" /><br/>
-                            <p:commandButton id="cbEditDef" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editNote()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
-                
-                <h:panelGroup rendered="#{vue.addNote == 1}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note1')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.definition}" styleClass="areaNote" /><br/>
-                            <p:commandButton id="cbEditDef" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editDef()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
 
-                <h:panelGroup rendered="#{vue.addNote == 2}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note2')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.noteApplication}" styleClass="areaNote" /><br/>
-                            <p:commandButton id="cbEditNoteEd" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editNoteApp()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
-
-                <h:panelGroup rendered="#{vue.addNote == 3}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note3')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.noteHistorique}" styleClass="areaNote" /><br/>
-                            <p:commandButton id="cbEditNoteHis" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editNoteHisto()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
-
-                <h:panelGroup rendered="#{vue.addNote == 4}" >
-                    <h:form>
-                        <fieldset>
-                            <legend><h:outputText value="#{langueBean.getMsg('index.note4')}" /></legend>
-                            <h:inputTextarea value="#{selectedTerme.noteEditoriale}" styleClass="areaNote"/><br/>
-                            <p:commandButton id="cbEditNoteApp" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.editNoteEdit()}"
-                                             update=":panEditNote,:note" styleClass="styleButton"/>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
             </h:panelGroup>
         </h:panelGroup>
         <!-- POP UP NOTE FIN -->

@@ -149,7 +149,11 @@
             <ui:include src="dialogs/bt/deleteTgDlg.xhtml" />
             <ui:include src="dialogs/group/addGroupDlg.xhtml" />
 
-
+            <ui:include src="dialogs/notes/noteEditDlg.xhtml" />
+            <ui:include src="dialogs/notes/definitionEditDlg.xhtml" />
+            <ui:include src="dialogs/notes/notedApplicationEditDlg.xhtml" />
+            <ui:include src="dialogs/notes/noteHistoriqueEditDlg.xhtml" />
+            <ui:include src="dialogs/notes/noteEditorialeEditDlg.xhtml" />
 
 
 
@@ -810,10 +814,7 @@
                                         </div>
                                         <!--TERMES SYNONYMES FIN -->
                                         <!--NOTE DEBUT -->
-                                        <h:panelGroup> <!--
-                                                      rendered="#{selectedTerme.definition != '' or selectedTerme.noteApplication != '' or selectedTerme.noteHistorique != '' or selectedTerme.noteEditoriale != '' }"
-                                            -->
-
+                                        <h:panelGroup> 
                                             <div id="divGenerale">
                                                 <div class="titreNote">
                                                     <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
@@ -823,11 +824,12 @@
 
                                                             <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note5')}" actionListener="#{vue.setAddNote(5)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note1')}" actionListener="#{vue.setAddNote(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note2')}" actionListener="#{vue.setAddNote(2)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note3')}" actionListener="#{vue.setAddNote(3)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.note4')}" actionListener="#{vue.setAddNote(4)}" update=":panPopUp" style="font-size: 12px;"/>
+
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note5')}" update=":idNoteEditDlg" oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note1')}" update=":idDefinitionEditDlg" oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note2')}" update=":idNotedApplicationEditDlg" oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note3')}" update=":idNoteHistoriqueEditDlg" oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.note4')}" update=":idNoteEditorialeEditDlg" oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
                                                             </p:menu>
 
                                                         </h:form>
