@@ -1,0 +1,64 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!-- Effacer le(s) terme(s) synonymes -->
+    <p:dialog id="idTermeSynonymesDeleteEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeSynonymesDeleteEditDlg" modal="true" resizable="false">
+    <fieldset style="overflow-y: auto">
+        <legend><h:outputText value="#{langueBean.getMsg('popup.delRel')}" /></legend>
+        <table id="tableRelations">
+            <tr>
+                <th><h:outputText value="#{langueBean.getMsg('popup.termUSE')}" /></th>
+                <th></th>
+            </tr>
+            <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
+                <tr>
+                    <td><h:outputText value="#{item3}" /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppSynoCpt" styleClass="cbSupp" icon="ui-icon-supp" 
+                                             actionListener="#{selectedTerme.delSyno(item3, 'USE')}" update=":panContenu" oncomplete="PF('termeSynonymesDeleteEditDlg').hide();">
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid4')}" icon="ui-icon-alert" />  
+                            </p:commandButton>  
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+        <br/>
+        <table id="tableRelations">
+            <tr>
+                <th><h:outputText value="#{langueBean.getMsg('popup.termHidden')}" /></th>
+                <th></th>
+            </tr>
+            <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
+                <tr>
+                    <td><h:outputText value="#{item4}" /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
+                                             actionListener="#{selectedTerme.delSyno(item4, 'Hidden')}" update=":panContenu" oncomplete="PF('termeSynonymesDeleteEditDlg').hide();">
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid4')}" icon="ui-icon-alert" />  
+                            </p:commandButton>  
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+    </fieldset>
+
+    </p:dialog>
+</ui:composition>

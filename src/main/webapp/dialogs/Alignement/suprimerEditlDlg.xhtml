@@ -1,0 +1,37 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idSuprimerEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="suprimerEditDlg" modal="true" resizable="false" >
+        
+        <table id="tableRelations">
+            <tr>
+                <th><h:outputText value="#{langueBean.getMsg('theso')}" /></th>
+                <th><h:outputText value="#{langueBean.getMsg('concept')}" /></th>
+                <th></th>
+            </tr>
+            <ui:repeat value="#{selectedTerme.align}" var="itemDelALign">
+                <tr>
+                    <td><h:outputText value="#{itemDelALign.uri_target}" /></td>
+                    <td><h:outputText value="#{itemDelALign.concept_target}" /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
+                                             actionListener="#{selectedTerme.delAlign(itemDelALign.id_alignement)}" update=":panContenu,:idSuprimerEditDlg" >
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid5')}" icon="ui-icon-alert" />  
+                            </p:commandButton>  
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+    </p:dialog>
+</ui:composition>

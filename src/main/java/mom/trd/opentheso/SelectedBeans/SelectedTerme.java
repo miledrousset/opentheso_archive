@@ -123,7 +123,8 @@ public class SelectedTerme implements Serializable {
     private int contributor;
     private int creator;
 
-
+    private String langEnTraduction;
+    private String valueOfTraductionToModify;
     private String valueEdit;
     private String valueEdit2;
     private String langueEdit;
@@ -1257,7 +1258,7 @@ public class SelectedTerme implements Serializable {
             }
             opentheso = false;
         }
-        vue.setAddAlign(4);
+
     }
 
     public void ajouterAlignAuto() {
@@ -1356,7 +1357,37 @@ public class SelectedTerme implements Serializable {
         vue.setAddNote(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
     }
+    /**
+     * Cette fontion permet d'avoir l'information que se besoin 
+     * de le term qu'on va changer
+     * @param value
+     * @param key 
+     */
     
+    public void traductionEnCours(String value, String key){
+        valueOfTraductionToModify = value;
+        langEnTraduction = key;
+    
+    }
+    /**
+     * Cette fontion permet de modifier une Traduction 
+     * 
+     */
+    public void modifierTraduction(){
+ 
+        int idUser = user.getUser().getId();
+        Term term = new Term();
+        term.setLexical_value(valueOfTraductionToModify);
+        term.setId_term(idT);
+        term.setId_thesaurus(idTheso);
+        term.setLang(langEnTraduction);
+
+        if(!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
+            //erreur
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
+        majLangueConcept();
+    }
         /**
      * Cette fonction permet de supprimer une note suivant son type 
      * 
@@ -1484,6 +1515,8 @@ public class SelectedTerme implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
     }
 
+    
+    
     /**
      * Supprime la relation d'association qui lie le terme courant au terme dont
      * l'id est passé en paramètre.
@@ -1824,7 +1857,6 @@ public class SelectedTerme implements Serializable {
     public void delAlign(int id) {
         new AlignmentHelper().deleteAlignment(connect.getPoolConnexion(), id, idTheso);
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
-        vue.setAddAlign(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
     }
 
@@ -2648,6 +2680,22 @@ public class SelectedTerme implements Serializable {
     }
     public void setCreator(int creator) {
         this.creator = creator;
+    }
+
+    public String getValueOfTraductionToModify() {
+        return valueOfTraductionToModify;
+    }
+
+    public void setValueOfTraductionToModify(String valueOfTraductionToModify) {
+        this.valueOfTraductionToModify = valueOfTraductionToModify;
+    }
+
+    public String getLangEnTraduction() {
+        return langEnTraduction;
+    }
+
+    public void setLangEnTraduction(String langEnTraduction) {
+        this.langEnTraduction = langEnTraduction;
     }
 
 

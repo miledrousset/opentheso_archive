@@ -68,6 +68,11 @@ input[type="button"], input[type="submit"]{
     height: 25px;
     width: 40px;
 }
+.ui-icon-retour {
+    background: url("../images/retour2.png") no-repeat top left !important;
+    height: 25px;
+    width: 40px;
+}
 
 .ui-icon-edi {
     background: url("../images/iconeEditer.gif") no-repeat top left !important;

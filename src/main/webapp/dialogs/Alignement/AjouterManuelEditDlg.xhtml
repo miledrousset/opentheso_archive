@@ -1,0 +1,45 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAjouterManuelEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="AjouterManuelEditDlg" modal="true" resizable="false" >
+        <!-- Ajouter alignement manuel -->
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('theso')}" /> : </td>
+                    <td>
+                        <h:inputText value="#{selectedTerme.valueEdit}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('concept')}" /> : </td>
+                    <td>
+                        <h:inputText value="#{selectedTerme.valueEdit2}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>URI : </td>
+                    <td>
+                        <h:inputText value="#{selectedTerme.linkEdit}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('popup.type')}" /> : </td>
+                    <td>
+                        <h:selectOneMenu value="#{selectedTerme.statutEdit}" styleClass="listes" style="width: 150px;">
+                            <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
+                        </h:selectOneMenu>
+                    </td>
+                </tr>            
+            </table>
+            <br/>
+            <p:commandButton id="cbAjAlignManu" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerAlign()}"
+                             update=":panContenu" styleClass="styleButton" oncomplete="PF('AjouterManuelEditDlg').hide();"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
