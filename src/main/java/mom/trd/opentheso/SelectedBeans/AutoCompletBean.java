@@ -183,6 +183,7 @@ public class AutoCompletBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", laValeur.getLexical_value() + " " + langueBean.getMsg("autoComp.info1")));
             }
             selectedAtt = new NodeAutoCompletion();
+            
         }
     }
 

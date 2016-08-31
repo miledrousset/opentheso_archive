@@ -1,0 +1,39 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!-- Creation de terme synonymes -->
+    <p:dialog id="idTermeSynonymesEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeSynonymesEditDlg" modal="true" resizable="false">
+    
+        <fieldset>
+            <legend><h:outputText value="#{langueBean.getMsg('popup.addRel')}" /></legend>
+            <h:form>
+                <p:messages showDetail="true" autoUpdate="true" />
+                <table>
+                    <tr>
+                        <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
+                        <td>
+                            <h:inputText id="lVsyno" value="#{selectedTerme.valueEdit}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h:outputText value="#{langueBean.getMsg('popup.type')}" /> : </td>
+                        <td>
+                            <h:selectOneMenu value="#{selectedTerme.statutEdit}" styleClass="listes" style="width: 150px;">
+                                <f:selectItem itemLabel="#{langueBean.getMsg('index.UF1')}" itemValue="USE"/>
+                                <f:selectItem itemLabel="#{langueBean.getMsg('index.UF2')}" itemValue="Hidden"/>
+                            </h:selectOneMenu>
+                        </td>
+                    </tr>            
+                </table>
+                <br/>
+                <p:commandButton id="cbAjTSynoTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerTermeSyno()}"
+                                 update=":panContenu" styleClass="styleButton" oncomplete="PF('termeSynonymesEditDlg').hide();"/>
+            </h:form>
+        </fieldset>   
+    
+    </p:dialog>
+</ui:composition>

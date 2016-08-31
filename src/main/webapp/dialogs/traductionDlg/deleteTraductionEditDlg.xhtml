@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idDeleteTraductionEditDlg"  header="#{langueBean.getMsg('index.delTrad')}" widgetVar="deleteTraductionEditDlg" modal="true" resizable="false" >
+        <!-- effacer une traduction-->
+        
+        <table id="tableRelations">
+            <tr>
+                <th><h:outputText value="#{langueBean.getMsg('index.trad')}" /></th>
+                <th></th>
+            </tr>
+            <ui:repeat value="#{selectedTerme.langues}" var="itemTrad">
+                <tr>
+                    <td><h:outputText value="#{itemTrad.value} (#{itemTrad.key})" /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-supp" 
+                                             actionListener="#{selectedTerme.delTrad(itemTrad.key)}" update=":contenuDroite3" oncomplete="PF('deleteTraductionEditDlg').hide();">
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid6')}" icon="ui-icon-alert" />  
+                            </p:commandButton>  
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+    </p:dialog>
+</ui:composition>

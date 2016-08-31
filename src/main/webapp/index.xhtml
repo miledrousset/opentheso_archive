@@ -34,10 +34,8 @@
                 a.src = g;
                 m.parentNode.insertBefore(a, m)
             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
             ga('create', 'UA-58798616-3', 'auto');
             ga('send', 'pageview');
-
         </script>  
 
     </h:head>
@@ -154,7 +152,21 @@
             <ui:include src="dialogs/notes/notedApplicationEditDlg.xhtml" />
             <ui:include src="dialogs/notes/noteHistoriqueEditDlg.xhtml" />
             <ui:include src="dialogs/notes/noteEditorialeEditDlg.xhtml" />
-
+            
+            <ui:include src="dialogs/termeAssocies/termeAssocieEditDlg.xhtml"/>
+            <ui:include src="dialogs/termeAssocies/termeAssociedeleteEditDlg.xhtml"/>
+            <ui:include src="dialogs/termeSynonymes/termeSynonymesEditDlg.xhtml" />
+            <ui:include src="dialogs/termeSynonymes/termeSynonymesDeleteEditDlg.xhtml" />
+            
+            <ui:include src="dialogs/Alignement/AjouterManuelEditDlg.xhtml" />
+            <ui:include src="dialogs/Alignement/AjouterAutomatiqueEditDlg.xhtml" />
+            <ui:include src="dialogs/Alignement/AjouterAutomatique2EditDlg.xhtml" />
+            <ui:include src="dialogs/Alignement/suprimerEditlDlg.xhtml" />
+                       
+            <ui:include src="dialogs/traductionDlg/ajouterTraductionEditDlg.xhtml" />
+            <ui:include src='dialogs/traductionDlg/deleteTraductionEditDlg.xhtml' />
+            <ui:include src="dialogs/traductionDlg/modifierTraductionEditDlg.xhtml" />
+            <ui:include src="dialogs/traductionDlg/editTraductionDlg.xhtml" />
 
 
             <!-- GESTIONNAIRE DEBUT -->  
@@ -632,80 +644,86 @@
                                                 <script type="application/ld+json">
                                                     <h:outputText value="#{theso.getMetaData()}" />
                                                 </script>
-                                                <span style="font-size: 17px; font-weight: bold;">
-                                                    <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
-                                                </span>
-                                                <h:outputText id="idC" value="id : #{selectedTerme.idC}"/><br/>
-                                                <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : #{selectedTerme.notation}"/><br/>
-                                                <span>
-                                                    <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
-
-                                                    <a  href="#{selectedTerme.urlNotice}" target="blanc" >
-                                                        <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices}"/>
-                                                    </a>
-                                                </span>
-                                                <br/>
-
-                                                <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
-
-                                                <span>
-                                                    <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
-                                                </span>
-                                                <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
-                                                <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
-                                                <span>
-                                                    <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
-                                                    <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
-                                                </span>
-                                                <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
-                                                    <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
-                                                        <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
-                                                        <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
-                                                    </ui:repeat>
-                                                </h:panelGroup>
-
-                                                <!-- affichage du nombre total des fils -->
-                                                <span>
-                                                    <p:tooltip />
-                                                    <h:form>
-                                                        <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
-                                                        <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
-                                                    </h:form>
-                                                </span>
-                                                <h:outputText value="#{langueBean.getMsg('index.creator')} : #{selectedTerme.creatorName}"/><br/>
-                                                <h:outputText value="#{langueBean.getMsg('index.contributor')} :  #{selectedTerme.contributorName}"/><br/>
+                                                
+                                                <h:panelGroup rendered="#{(selectedTerme.idC != null)}">
+                                                        <span style="font-size: 17px; font-weight: bold;">
+                                                            <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
+                                                        </span>
+                                                        <h:outputText id="idC" value="id : #{selectedTerme.idC}"/><br/>
+                                                        <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : #{selectedTerme.notation}"/><br/>
 
 
 
+                                                        <span>
+                                                            <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
-                                                <!-- affichage de l'URL pérenne-->
+                                                            <a  href="#{selectedTerme.urlNotice}" target="blanc" >
+                                                                <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices}"/>
+                                                            </a>
+                                                        </span>
+                                                        <br/>
 
-                                                <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
-                                                <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                                              value="#{langueBean.getMsg('index.link')} :" /> <br />
+                                                        <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
 
-                                                <!-- pour afficher un toolTipText-->
-                                                <p:tooltip id="toolTipGrow" for="ark" value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}"
-                                                           showEffect="clip" hideEffect="explode" />
+                                                        <span>
+                                                            <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
+                                                        </span>
+                                                        <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
+                                                        <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
+                                                        <span>
+                                                            <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
+                                                            <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
+                                                        </span>
+                                                        <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
+                                                            <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
+                                                                <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
+                                                                <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
+                                                            </ui:repeat>
+                                                        </h:panelGroup>
+
+                                                        <!-- affichage du nombre total des fils -->
+                                                        <span>
+                                                            <p:tooltip />
+                                                            <h:form>
+                                                                <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
+                                                                <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
+                                                            </h:form>
+                                                        </span>
+                                                        <h:outputText value="#{langueBean.getMsg('index.creator')} : #{selectedTerme.creatorName}"/><br/>
+                                                        <h:outputText value="#{langueBean.getMsg('index.contributor')} :  #{selectedTerme.contributorName}"/><br/>
 
 
-                                                <span>
-                                                    <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
-                                                        <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                                                      value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
-                                                    </h:outputLink>
-                                                </span>
-                                                <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
-                                                <h:outputText id= "url" rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                                              value="#{langueBean.getMsg('index.link')} :" /> <br />
-                                                <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
-                                                    <span>
-                                                        <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                                                      value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
-                                                    </span>
-                                                </h:outputLink>                                                
+
+
+                                                        <!-- affichage de l'URL pérenne-->
+
+                                                        <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
+                                                        <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                                      value="#{langueBean.getMsg('index.link')} :" /> <br />
+
+                                                        <!-- pour afficher un toolTipText-->
+                                                        <p:tooltip id="toolTipGrow" for="ark" value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}"
+                                                                   showEffect="clip" hideEffect="explode" />
+
+
+                                                        <span>
+                                                            <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                                          value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
+                                                                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
+                                                            </h:outputLink>
+                                                        </span>
+                                                        <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
+                                                        <h:outputText id= "url" rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                                      value="#{langueBean.getMsg('index.link')} :" /> <br />
+                                                        <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                                      value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
+                                                            <span>
+                                                                <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
+                                                            </span>
+                                                        </h:outputLink>
+                                            </h:panelGroup>                                                
                                             </div>
                                         </div>
                                         <!--INFO TERMES FIN -->
@@ -755,8 +773,8 @@
                                                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan'))}">
                                                         <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
-                                                            <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" actionListener="#{vue.setAddTAsso(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                            <p:menuitem value="#{langueBean.getMsg('popup.delRel')}" actionListener="#{vue.setAddTAsso(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                             <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" update=":idTermeAssocieEditDlg" oncomplete="PF('termeAssocieEditDlg').show();" style="font-size: 12px;"/>
+                                                             <p:menuitem value="#{langueBean.getMsg('popup.delRel')}" update=":idTermeAssociedeleteEditDlg" oncomplete="PF('termeAssociedeleteEditDlg').show();" style="font-size: 12px;"/>
                                                         </p:menu>
 
                                                     </h:form>
@@ -786,9 +804,9 @@
                                                     <h:form id="formEditTSyno" 
                                                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
                                                         <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
-                                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">
-                                                            <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" actionListener="#{vue.setAddTSyno(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                            <p:menuitem value="#{langueBean.getMsg('popup.delUSE')}" actionListener="#{vue.setAddTSyno(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">  
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" update=":idTermeSynonymesEditDlg" oncomplete="PF('termeSynonymesEditDlg').show();" style="font-size: 12px;"/>
+                                                            <p:menuitem value="#{langueBean.getMsg('popup.delUSE')}" update=":idTermeSynonymesDeleteEditDlg" oncomplete="PF('termeSynonymesDeleteEditDlg').show();" style="font-size: 12px;"/>                                                        
                                                         </p:menu>
 
                                                     </h:form>
@@ -897,9 +915,9 @@
                                                         <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                                                          styleClass="cbEdit" icon="ui-icon-edit" >
                                                             <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
-                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn1')}" actionListener="#{vue.setAddAlign(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{vue.setAddAlign(2)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" actionListener="#{vue.setAddAlign(3)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn1')}" update=":idAjouterManuelEditDlg" oncomplete="PF('AjouterManuelEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('AjouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
+                                                                <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
                                                             </p:menu>
                                                         </p:commandButton>
                                                     </h:form>
@@ -931,6 +949,9 @@
                         <div id="droite">
                             <div id="SplitterHorizDroit1">
 
+                                
+                                
+                                
                                 <!--TRADUCTION DEBUT -->
                                 <div id="langue" style="overflow-y: auto;">
                                     <h:panelGroup id="contenuDroite3">
@@ -943,8 +964,9 @@
                                                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                                                     <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit" />
                                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
-                                                        <p:menuitem value="#{langueBean.getMsg('index.addTrad')}" actionListener="#{vue.setAddTrad(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                                                        <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" actionListener="#{vue.setAddTrad(2)}" update=":panPopUp" style="font-size: 12px;"/>
+                                                        <p:menuitem value="#{langueBean.getMsg('edit.addTrad')}" update=":idAjouterTraductionEditDlg" oncomplete="PF('ajouterTraductionEditDlg').show();" style="font-size: 12px;"/>
+                                                        <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" update=":idDeleteTraductionEditDlg" oncomplete="PF('deleteTraductionEditDlg').show();" style="font-size: 12px;"/>
+                                                        <p:menuitem value="#{langueBean.getMsg('index.modifyTrad')}" update=":idModifierTraductionEditDlg" oncomplete="PF('modifierTraductionEditDlg').show();" style="font-size: 12px;"/>
                                                     </p:menu>
 
                                                 </h:form>
@@ -962,6 +984,12 @@
                                     </h:panelGroup>
                                 </div>
                                 <!--TRADUCTION FIN -->
+                                
+                                
+                                
+                                
+                                
+                                
                                 <div>
                                     <div id="SplitterHorizDroit2">
                                         <!--FACETTE DEBUT -->

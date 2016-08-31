@@ -14,7 +14,7 @@
                                  update=":panEditNote,:note, :idNoteEditorialeEditDlg" styleClass="styleButton" oncomplete="PF('noteEditorialeEditDlg').hide();"/>
                 
                 <td colspan="3" style="text-align: center;">
-                <p:commandButton id="cbEditNomT" value="Effacer"  actionListener="#{selectedTerme.deleteThisNoteOfTerm('editorialNote')}" 
+                <p:commandButton id="cbEditNomT" title="#{langueBean.getMsg('edit.tab1Opt3')}" icon="ui-icon-annuler"  actionListener="#{selectedTerme.deleteThisNoteOfTerm('editorialNote')}" 
                                  update=":panEditNote,:note" styleClass="styleButton" oncomplete="PF('noteEditorialeEditDlg').hide();">
                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.validDelOrphan')}" icon="ui-icon-alert" />  
                 </p:commandButton> 
@@ -26,7 +26,7 @@
                 </p:confirmDialog> 
 
             <td colspan="3" style="text-align: center;">
-                <p:commandButton title="Cancel" icon="ui-icon-annuler" styleClass="styleButton" update=":idNoteEditorialeEditDlg,:panEditNote" oncomplete="PF('noteEditorialeEditDlg').hide();"  immediate="true"/>
+                <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton" update=":idNoteEditorialeEditDlg,:panEditNote" oncomplete="PF('noteEditorialeEditDlg').hide();"  immediate="true"/>
                 </td>
         </h:form>
     </p:dialog>   
