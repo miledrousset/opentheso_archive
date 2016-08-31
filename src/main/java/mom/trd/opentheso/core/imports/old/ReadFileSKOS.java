@@ -32,12 +32,13 @@ public class ReadFileSKOS {
     
     private static boolean isConceptScheme;
 
+    
     public ReadFileSKOS() {
     }
 
     
     public void readFile(HikariDataSource ds, InputStream filename, 
-            String formatDate, boolean useArk, String adressSite, int idUser) throws Exception {
+            String formatDate, boolean useArk, String adressSite, int idUser, String langueSource) throws Exception {
 
         thesaurus = new SKOSXmlDocument();
 
@@ -71,7 +72,7 @@ public class ReadFileSKOS {
 
             if (!error) {
                 WriteSkosBDD writeSkosBDD = new WriteSkosBDD(ds);
-                writeSkosBDD.writeThesaurus(thesaurus, formatDate, useArk, adressSite, idUser);
+                writeSkosBDD.writeThesaurus(thesaurus, formatDate, useArk, adressSite, idUser, langueSource);
             } else {
                 thesaurus = null;
             }

@@ -216,7 +216,7 @@ public class FileBean_progress implements Serializable {
 
                     String adressSite = bundlePref.getString("cheminSite");
                     int idUser = selectedTerme.getUser().getUser().getId();
-                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser);
+                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser,"");
                 } catch (IOException ex) {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {

@@ -102,7 +102,10 @@ public class ThesaurusHelper {
 
                     stmt.executeUpdate(query);
                     thesaurus.setId_thesaurus(idThesaurus);
-               //     addThesaurusTraduction(ds, thesaurus);
+                 /*   if(thesaurus.getTitle().isEmpty()){
+                        thesaurus.setTitle("Theso_" + idThesaurus);
+                    }
+                    addThesaurusTraduction(ds, thesaurus);*/
 
                 } finally {
                     stmt.close();
@@ -183,10 +186,13 @@ public class ThesaurusHelper {
 
                     stmt.executeUpdate(query);
                     thesaurus.setId_thesaurus(idThesaurus);
+                   /* if(thesaurus.getTitle().isEmpty()) {
+                        thesaurus.setTitle("theso_" + idThesaurus);
+                    }
                     if(!addThesaurusTraductionRollBack(conn, thesaurus)) {
                         stmt.close();
                         return null;
-                    }
+                    }*/
                        
 
                 } finally {

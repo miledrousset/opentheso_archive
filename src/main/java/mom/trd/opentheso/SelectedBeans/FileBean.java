@@ -216,7 +216,7 @@ public class FileBean implements Serializable {
 
                     String adressSite = bundlePref.getString("cheminSite");
                     int idUser = selectedTerme.getUser().getUser().getId();
-                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser);
+                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser, langueSource);
                 } catch (IOException ex) {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
@@ -282,7 +282,7 @@ public class FileBean implements Serializable {
     } 
     
     /**
-     * Cette focntion permet de charger le thésaurus dans la BDD
+     * Cette fonction permet de charger le thésaurus dans la BDD
      * @return 
      */
     public boolean addSkosDatas2(){
@@ -302,6 +302,7 @@ public class FileBean implements Serializable {
             if(!importSkosHelper.addDefaultThesaurus()){
                 FacesContext.getCurrentInstance().addMessage(null, 
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                return false;
             }
             // echec de l'ajout du nom de thésaurus
         }

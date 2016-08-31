@@ -165,6 +165,45 @@ public class UserHelper {
         return nu;
     }
     
+    /**
+     * cette fonction permet de retourner l'identifiant du role de l'utilisateur
+     * @param ds
+     * @param idUser
+     * @return 
+     */
+    public int getRoleOfUser(HikariDataSource ds, int idUser) {
+        int idRole = -1;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT user_role.id_role"
+                            + " FROM user_role WHERE"
+                            + " user_role.id_user = " + idUser;
+                    resultSet = stmt.executeQuery(query);
+
+                    if(resultSet.next()) {
+                        idRole = resultSet.getInt("id_role");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return idRole;
+    }    
+    
     public String getNameUser(HikariDataSource ds, int iden){
         
         String name = "";
@@ -803,6 +842,11 @@ public class UserHelper {
         
         // suppression de tous les roles avant de les récréer 
         if(!deleteAllRoleOfUser(conn, idUser)) return false;
+        
+        // cas où l'utilisateur n'a de droits sur aucun thésaurus, on conserve son role seulement
+        if(roleOnIdThesaurus.isEmpty()) {
+            if(!addRole(conn, idUser, newRole, "", "")) return false;
+        }
         
         for (String roleOnIdThesauru : roleOnIdThesaurus) {
             if(!addRole(conn, idUser, newRole, roleOnIdThesauru, "")) return false;

@@ -35,6 +35,7 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
@@ -185,7 +186,8 @@ public class ImportSkosHelper {
                             dcElement.setValue(con.getLiteral());
                             if (con.hasLang()) {
                                 dcElement.setLanguage(con.getLang());
-                            }
+                            }else
+                                dcElement.setLanguage(langueSource);
                             thesaurus.addDcElement(dcElement);
                         }
                         else {
@@ -194,7 +196,8 @@ public class ImportSkosHelper {
                             dcElement.setValue(con.getLiteral());
                             if (con.hasLang()) {
                                 dcElement.setLanguage(con.getLang());
-                            }
+                            }else
+                                dcElement.setLanguage(langueSource);
                             thesaurus.addDcElement(dcElement);
                         }
 
@@ -228,10 +231,25 @@ public class ImportSkosHelper {
                     //System.err.println(anno.getAnnotationValue().getURI().toString());
                 }
             }
-            thesaurus.setId_thesaurus(thesaurusHelper.addThesaurus(ds, thesaurus, adressSite, useArk));
+            if(!addThesaurusToBdd(thesaurusHelper)) {
+                return false;
+            }
+            
+                               /* if(thesaurus.getTitle().isEmpty()) {
+                        thesaurus.setTitle("theso_" + idThesaurus);
+                    }
+                    if(!addThesaurusTraductionRollBack(conn, thesaurus)) {
+                        stmt.close();
+                        return null;
+                    }*/
 
             if(thesaurus.getDcElement().isEmpty()) {
-                thesaurus.setTitle(thesaurus.getTitle());
+                if(thesaurus.getTitle().isEmpty()) {
+                        thesaurus.setTitle("theso_" + thesaurus.getId_thesaurus());
+                }
+                else {
+                    thesaurus.setTitle(thesaurus.getTitle());
+                }
                 thesaurus.setLanguage(langueSource);
                 thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
             }
@@ -242,21 +260,59 @@ public class ImportSkosHelper {
                     thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
                 }
             }
-            
             return true;
         }
-
         return false;
     }
     
     public boolean addDefaultThesaurus(){
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
-        
         thesaurus.setTitle("Theso1");
-        String idTheso = thesaurusHelper.addThesaurus(ds, thesaurus, adressSite, useArk);
-        if(idTheso == null) return false;
-        thesaurus.setId_thesaurus(idTheso);
+        if(thesaurus.getLanguage() == null) {
+            thesaurus.setLanguage(langueSource);
+        }
+        if(!addThesaurusToBdd(thesaurusHelper)) {
+            return false;
+        }
         return true;
+    }
+    
+    /**
+     * cette fonction est privée, elle permet de créer le thésaurus dans la BDD et le role de l'utilisateur sur le thésaurus
+     * @return 
+     */
+    private boolean addThesaurusToBdd(ThesaurusHelper thesaurusHelper){
+
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            String idTheso;
+            if(thesaurus.getLanguage() == null) {
+                thesaurus.setLanguage(langueSource);
+            }
+            if( (idTheso = thesaurusHelper.addThesaurusRollBack(conn, thesaurus, adressSite, useArk)) == null){
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            thesaurus.setId_thesaurus(idTheso);
+
+            UserHelper userHelper = new UserHelper();
+            int idRole = userHelper.getRoleOfUser(ds, idUser);
+
+            if(!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
+                conn.rollback();
+                conn.close();
+                return false;                    
+            }
+            conn.commit();
+            conn.close();
+            return true;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ImportSkosHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
     
     private void addLangsToThesaurus(HikariDataSource ds, String idThesaurus) {
@@ -279,12 +335,11 @@ public class ImportSkosHelper {
                 thesaurus2.setRights("");
                 thesaurus2.setSource("");
                 thesaurus2.setSubject("");
-                thesaurus2.setTitle("");
+                thesaurus2.setTitle("theso_" + idThesaurus);
                 thesaurus2.setType("");
                 thesaurusHelper.addThesaurusTraduction(ds, thesaurus2);
             }
         }
-
     }    
     
     /**

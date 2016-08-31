@@ -21,6 +21,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
@@ -46,7 +47,7 @@ public class WriteSkosBDD {
     }
 
     public void writeThesaurus(SKOSXmlDocument skosDocument, String dateFormat,
-            boolean useArk, String adressSite, int idUser) {
+            boolean useArk, String adressSite, int idUser, String langueSource) {
         SKOSConceptScheme conceptScheme = skosDocument.getConceptScheme();
         ArrayList<SKOSTopConcept> topConceptsList = conceptScheme.getTopConceptsList();
         
@@ -61,12 +62,38 @@ public class WriteSkosBDD {
 
         Thesaurus thesaurus = new Thesaurus();
         thesaurus.setTitle(descriptionThesaurus);
-        thesaurus.setLanguage("fr");
+        thesaurus.setLanguage(langueSource);
 
         String idThesaurus = thesaurusHelper.addThesaurus(ds, thesaurus, adressSite, useArk);
         if(idThesaurus == null) return;
-        
         thesaurus.setId_thesaurus(idThesaurus);
+        
+        
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            UserHelper userHelper = new UserHelper();
+            int idRole = userHelper.getRoleOfUser(ds, idUser);
+
+            if(!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
+                conn.rollback();
+                conn.close();
+                return;                    
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(WriteSkosBDD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        // Si le Titre du thésaurus n'est pas detecter, on donne un nom par defaut
+        if(conceptScheme.getSkosLabels().isEmpty()) {
+            if(thesaurus.getTitle().isEmpty()){
+                thesaurus.setTitle("Theso_" + idThesaurus);
+                thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
+            }
+        }
         for (SKOSLabel skosLabel : conceptScheme.getSkosLabels()) {
             thesaurus.setTitle(skosLabel.getLabel());
             thesaurus.setLanguage(skosLabel.getLanguage());
@@ -146,7 +173,7 @@ public class WriteSkosBDD {
                 thesaurus.setRights("");
                 thesaurus.setSource("");
                 thesaurus.setSubject("");
-                thesaurus.setTitle("");
+                thesaurus.setTitle("theso_" + idThesaurus);
                 thesaurus.setType("");
                 thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
             }
