@@ -142,181 +142,15 @@
         <!-- POP UP ALIGNEMENT FIN -->
 
         <!-- POP UP IMAGE DEBUT -->
-        <h:panelGroup id="panEditImage" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.addImage == true}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.addImage == true}" styleClass="popUp">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('index.picture')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseImg" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddImage(false)}" 
-                                             update=":panEditImage" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <h:form style="text-align: left;">
-                    <p:messages showDetail="true" autoUpdate="true" />
-                    <br/>
-                    <h:outputText value="#{langueBean.getMsg('popup.imgSource')}" /> : <h:inputText value="#{fileBean.source}" /><br/><br/>
-                    <p:fileUpload styleClass="divFileUpload" label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" 
-                                  cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeImage}" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" 
-                                  process="@form" update=":contenuDroite1,:panEditImage,@form"/>
-                </h:form>
-                <br/>
-            </h:panelGroup>
-        </h:panelGroup>
+
         <!-- POP UP IMAGE FIN -->
 
         <!-- POP UP FACETTE1 DEBUT -->
-        <h:panelGroup id="panFacette" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.facette == true}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.facette == true}" styleClass="popUp">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('index.facet')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseFacette2" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setFacette(false)}" 
-                                             update=":panFacette" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <fieldset style="float: left; margin-right: 10px; width: 225px; height: 120px;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.addFacet')}" /></legend>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('popup.parent')}" /> : </td>
-                                <td>
-                                    <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t4"
-                                                    itemLabel="#{t4.termLexicalValue}" itemValue="#{t4}" converter="termConverter" forceSelection="true">
-                                        <f:facet name="itemtip">
-                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
-                                                <f:facet name="header" rendered="#{(t4.url) != null}">
-                                                    <h:outputText value="ID : " />
-                                                    <h:outputText value="#{t4.idConcept}" />
-                                                </f:facet>
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                                                <h:outputText value="#{t4.groupLexicalValue}" />
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                                <h:outputText value="#{t4.definition}" />
-                                            </h:panelGrid>
-                                        </f:facet>
-                                    </p:autoComplete>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('index.facet')}" /> : </td>
-                                <td><h:inputText value="#{autoComp.facetEdit}" /></td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <p:commandButton value="Créer" styleClass="styleButton" actionListener="#{autoComp.newFacette()}" update=":accordeonTree,:panFacette" />
-                    </h:form>
-                </fieldset>
-                <fieldset style="float: right; width: 200px; height: 120px;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.delFacet')}" /></legend>
-                    <h:form>
-                        <h:selectOneMenu value="#{theso.idEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                            <f:selectItems value="#{theso.arrayFacette}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
-                        </h:selectOneMenu><br/><br/>
-                        <p:commandButton value="#{langueBean.getMsg('popup.supp')}" actionListener="#{theso.delFacette()}" update=":accordeonTree,:panFacette" 
-                                         styleClass="styleButtonRefus" />
-                    </h:form>
-                </fieldset>
-                <div id="clean" style="margin-bottom: 10px;" />
-                <fieldset style="float: left; margin-right: 10px; width: 225px; height: 160px;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.tradFacet')}" /></legend>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><br/><h:outputText value="#{langueBean.getMsg('index.facet')}" /> : </td>
-                                <td>
-                                    <h:selectOneMenu value="#{theso.idEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                                        <f:selectItems value="#{theso.arrayFacette}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
-                                    </h:selectOneMenu>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('language')}" /> : </td>
-                                <td>
-                                    <h:selectOneMenu value="#{theso.langueEdit}" styleClass="listes">
-                                        <f:selectItems value="#{theso.languesTheso}"/>
-                                    </h:selectOneMenu>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('index.trad')}" /> : </td>
-                                <td><h:inputText value="#{theso.valueEdit}" /></td>
-                            </tr>
-                        </table><br/>
-                        <p:commandButton value="Traduire" actionListener="#{theso.tradFacette()}" update=":panFacette" styleClass="styleButton" />
-                    </h:form>
-                </fieldset>
-                <fieldset style="float: right; width: 200px; height: 160px;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.editFacet')}" /></legend>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><br/><h:outputText value="#{langueBean.getMsg('index.facet')}" /> : </td>
-                                <td>
-                                    <h:selectOneMenu value="#{theso.idEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                                        <f:selectItems value="#{theso.arrayFacette}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
-                                    </h:selectOneMenu>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
-                                <td><h:inputText value="#{theso.valueEdit}" /></td>
-                            </tr>
-                        </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnEdit')}" actionListener="#{theso.updateFacette()}" update=":accordeonTree,:panFacette" styleClass="styleButton" />
-                    </h:form>
-                </fieldset>
-            </h:panelGroup>
-        </h:panelGroup>
+        
         <!-- POP UP FACETTE1 FIN -->
 
         <!-- POP UP FACETTE2 DEBUT -->
-        <h:panelGroup id="panEditFacette" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.addFacette == true}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.addFacette == true}" styleClass="popUp">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('index.facet')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseFacette" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddFacette(false)}" 
-                                             update=":panEditFacette" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <fieldset style="float: left; margin-right: 10px;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.inc')}" /></legend>
-                    <h:form>
-                        <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                            <f:selectItems value="#{selectedTerme.arrayFacetteInclure}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
-                        </h:selectOneMenu>
-                        <br/><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" actionListener="#{ssTree.insertNewConcept()}" update=":panEditFacette,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
-                    </h:form>
-                </fieldset>
-                <fieldset style="float: right;">
-                    <legend><h:outputText value="#{langueBean.getMsg('popup.ex')}" /></legend>
-                    <h:form>
-                        <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                            <f:selectItems value="#{selectedTerme.arrayFacette}" var="tft" itemLabel="#{tft.value}" itemValue="#{tft.key}" />
-                        </h:selectOneMenu>
-                        <br/><br/>
-                        <p:commandButton value="#{langueBean.getMsg('popup.delFrom')}" actionListener="#{ssTree.delConcept()}" update=":panEditFacette,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
-                    </h:form>
-                </fieldset>
-                <div id="clean" style="margin-bottom: 10px;" />
-            </h:panelGroup>
-        </h:panelGroup>
+
         <!-- POP UP FACETTE2 FIN -->
 
         <!-- POP UP TRADUCTION DEBUT -->
@@ -324,7 +158,6 @@
                 <!-- Ajoute de traduction -->
 
                 <!-- Suppression de traduction-->
-
         <!-- POP UP TRADUCTION FIN -->
         <!-- POP UP SKOS CONCEPT DEBUT -->
         <h:panelGroup id="panCptToSkos" style="background: transparent; box-shadow: none;">
@@ -357,6 +190,7 @@
             </h:panelGroup>
         </h:panelGroup>
         <!-- POP UP SKOS CONCEPT FIN -->
+
         <!-- POP UP SKOS BRANCHE DEBUT -->
         <h:panelGroup id="panBranchToSkos" style="background: transparent; box-shadow: none;">
             <h:panelGroup rendered="#{vue.branchToSkos == true}" styleClass="overlay" />
@@ -396,7 +230,7 @@
                 <br/>
                 <div style="padding: 10px;">
                     <h:outputText value="#{langueBean.getMsg('popup.alertSkos')}" /><br/><br/>
-                    <h:form>
+                      <h:form>
                         <p:commandButton value="#{langueBean.getMsg('down')}" styleClass="styleButton" ajax="false">
                             <p:fileDownload value="#{downloadBean.file}" />
                         </p:commandButton>

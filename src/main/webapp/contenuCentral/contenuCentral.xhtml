@@ -1,0 +1,100 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    
+                            <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue2.jpg)"> -->
+                            <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue3.jpg)"> --> 
+                            <!-- <div id="contenuPrincipale" style="background-color: #e4dada"> -->  
+                            
+    <div id="contenuPrincipale">
+        <h:panelGroup id="panContenu">
+            <div style="text-align: center">
+
+                <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
+                    <!-- exporter le Group en SKOS -->
+                    <p:commandButton value="Skos" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+
+                    <!-- exporter le grpup en JsonLd -->
+                    <p:commandButton value="JsonLd" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.thisGroupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+                </h:form>  
+
+                <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 5px;" >
+                    <!-- exporter le concept en SKOS -->
+                    <p:commandButton value="Skos" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.conceptToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+
+                    <!-- exporter le concept en JsonLd -->
+                    <p:commandButton value="JsonLd" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.conceptToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+                </h:form>                 
+
+                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
+                    <!-- exporter la branche en SKOS mode connecté -->
+                    <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.brancheToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+
+                    <!-- exporter la branche en JsonLd -->
+                    <p:commandButton value="JsonLd_Branch" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.brancheToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+                </h:form>  
+
+
+                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type == 1)}" 
+                        style="float: left; margin-right: 5px;" >
+                    <!-- exporter la branche en SKOS mode connecté -->
+                    <p:commandButton value="skos_Group" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.groupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+
+                    <!-- exporter la branche en JsonLd -->
+                    <p:commandButton value="JsonLd_Group" ajax="false" styleClass="link">
+                        <p:fileDownload  value="#{downloadBean.groupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
+                    </p:commandButton>
+                </h:form>
+
+
+
+
+                <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
+                    <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
+                                     update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                     styleClass="styleButtonValid" >
+                    </p:commandButton>
+                    <br/><br/>
+                </h:form>
+
+                <div id="clean" />
+            </div>
+
+            <div id="alignGauche">
+                <!--TERMES GENERIQUES DEBUT -->
+                <ui:include src="termesGeneriques/termesGeneriques.xhtml"/>
+                <!--INFO TERMES DEBUT -->
+                <ui:include src="infoConcept/infoconcept.xhtml" />
+                <!--TERMES SPECIFIQUES DEBUT -->
+                <ui:include src="termesSpecifiques/termesSpecifiques.xhtml"/>
+            </div>
+            <div id="alignDroite">
+                <!--TERMES ASSOCIES DEBUT -->
+                <ui:include src="termesAssocies/termesAssocies.xhtml"/>
+                <!--TERMES SYNONYMES DEBUT -->
+                <ui:include src="synonymes/synonymes.xhtml"/>
+                <!--NOTES -->
+                <ui:include src="notes/notes.xhtml" />
+                <!--ALIGNEMENT DEBUT -->
+                <ui:include src="alignement/alignement.xhtml"/>
+            </div>
+        </h:panelGroup>
+    </div>
+</ui:composition>

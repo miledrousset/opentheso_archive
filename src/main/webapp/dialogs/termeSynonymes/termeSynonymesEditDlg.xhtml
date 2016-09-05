@@ -6,10 +6,9 @@
     xmlns:p="http://primefaces.org/ui">
 
     <!-- Creation de terme synonymes -->
-    <p:dialog id="idTermeSynonymesEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeSynonymesEditDlg" modal="true" resizable="false">
+    <p:dialog id="idTermeSynonymesEditDlg"  header="#{langueBean.getMsg('popup.addUSE')}" widgetVar="termeSynonymesEditDlg" modal="true" resizable="false">
     
-        <fieldset>
-            <legend><h:outputText value="#{langueBean.getMsg('popup.addRel')}" /></legend>
+        <fieldset>       
             <h:form>
                 <p:messages showDetail="true" autoUpdate="true" />
                 <table>

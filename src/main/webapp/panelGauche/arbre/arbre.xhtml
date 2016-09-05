@@ -1,0 +1,41 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <div id="divArbreTheso">
+        <h:panelGroup id="panelTree">
+            <h:form id="form">
+                <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
+                        selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true" >
+                    <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
+                    <p:ajax event="select" 
+                            update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                            listener="#{treeBean.onNodeSelect}" />
+
+                    <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close">  
+                        <h:outputText value="#{node}"/>  
+                    </p:treeNode>  
+                    <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                collapsedIcon="ui-icon ui-icon-dossier-close">  
+                        <h:outputText value="#{node}"/>  
+                    </p:treeNode>  
+                    <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                        <h:outputText value="#{node}"/>  
+                    </p:treeNode> 
+                    <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
+                        <h:outputText value="#{node}"/>  
+                    </p:treeNode> 
+                    <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close">  
+                        <h:outputText value="#{node}"/>  
+                    </p:treeNode>
+                </p:tree>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>

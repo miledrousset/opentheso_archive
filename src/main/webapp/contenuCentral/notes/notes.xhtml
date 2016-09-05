@@ -1,0 +1,100 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+
+
+    <h:panelGroup> 
+        <div id="divGenerale">
+            <div class="titreNote">
+                <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
+                <div id="imageEdition">
+                    <h:form id="formEditNote" 
+                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                        
+                        
+                        
+                        <p:selectBooleanCheckbox id="allLangue" value="#{selectedTerme.allLangue}" >
+                            <p:ajax update=":formEditNote, :note" listener="#{selectedTerme.majNotes2}"/>
+                        </p:selectBooleanCheckbox>
+                                
+                                
+                        <!--   
+                        <p:commandButton id="dynaButtonNote2" rendered="#{selectedTerme.type != 1} " styleClass="cbEdit" icon="ui-icon-edit"/>
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote2" my="center top" at="center bottom">
+                            <p:menuitem value="#{langueBean.getMsg('index.serachNotes')}" update=":idVoirNotesDlg" oncomplete="PF('voirNotesDlg').show();" style="font-size: 12px;"/>
+                        </p:menu>
+                        -->
+
+                        <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
+
+                            <p:menuitem value="#{langueBean.getMsg('index.note5')}" update=":idNoteEditDlg" oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.note1')}" update=":idDefinitionEditDlg" oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.note2')}" update=":idNotedApplicationEditDlg" oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.note3')}" update=":idNoteHistoriqueEditDlg" oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.note4')}" update=":idNoteEditorialeEditDlg" oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
+                        </p:menu>
+
+                    </h:form>
+                </div>
+            </div>
+
+            <!-- affichage des notes de la langue en cours -->
+            <div class="contenuNote">
+                <!-- &lt;br/&gt; pour afficher <br/> -->
+                <div id="clean" />
+                <h:panelGroup id="note"  >
+                  
+                    <!--
+                    <h:outputText value="#{langueBean.getMsg('index.note1')} : " escape="false" style="font-weight: bold;"
+                                  rendered="#{selectedTerme.definition != null and selectedTerme.definition != '' }" />
+                    <span itemprop="articleBody">
+                        <h:outputText value="#{selectedTerme.definition} &lt;br/&gt;" escape="false" 
+                                      rendered="#{selectedTerme.definition != null and selectedTerme.definition != '' }"/>
+                    </span>
+
+                    <h:outputText value="#{langueBean.getMsg('index.note5')} : " style="font-weight: bold;"
+                                  rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
+                    <h:outputText value="#{selectedTerme.note} &lt;br/&gt;" escape="false"
+                                  rendered="#{selectedTerme.note != null and selectedTerme.note != ''}" />
+
+                    <h:outputText title="#{langueBean.getMsg('index.note2')}" value="scopeNote : " 
+
+                                  style="font-weight: bold;"
+                                  rendered="#{selectedTerme.noteApplication != null and selectedTerme.noteApplication != ''}" />
+                    <h:outputText value="#{selectedTerme.noteApplication} &lt;br/&gt;" escape="false"
+                                  rendered="#{selectedTerme.noteApplication != null and selectedTerme.noteApplication != ''}" />
+
+                    <h:outputText value="#{langueBean.getMsg('index.note3')} : " style="font-weight: bold;"
+                                  rendered="#{selectedTerme.noteHistorique != null and selectedTerme.noteHistorique != ''}" />
+                    <h:outputText value="#{selectedTerme.noteHistorique} &lt;br/&gt;" escape="false"
+                                  rendered="#{selectedTerme.noteHistorique != null and selectedTerme.noteHistorique != ''}" />
+
+                    <h:outputText value="#{langueBean.getMsg('index.note4')} : " style="font-weight: bold;"
+                                  rendered="#{selectedTerme.noteEditoriale != null and selectedTerme.noteEditoriale != ''}" />
+                    <h:outputText value="#{selectedTerme.noteEditoriale} &lt;br/&gt;" escape="false"
+                                  rendered="#{selectedTerme.noteEditoriale != null and selectedTerme.noteEditoriale != ''}" />
+
+                    -->
+                    <ui:repeat value="#{selectedTerme.nodeNoteTermList}" var="nodeNoteTermListVar">
+                        <h:outputText value="#{nodeNoteTermListVar.notetypecode} : #{nodeNoteTermListVar.lexicalvalue} (#{nodeNoteTermListVar.lang}) " />
+                            <br/>
+                    </ui:repeat>
+                    <ui:repeat value="#{selectedTerme.nodeNoteConceptList}" var="nodeNoteConceptListVar">
+                        <h:outputText value="#{nodeNoteConceptListVar.notetypecode} : #{nodeNoteConceptListVar.lexicalvalue} (#{nodeNoteConceptListVar.lang}) " />
+                        <br/>
+                    </ui:repeat>    
+               </h:panelGroup>
+        </div>
+        </div>     
+    </h:panelGroup>
+
+    <!-- affichage des notes pour toutes les langues -->    
+
+            
+    
+</ui:composition>

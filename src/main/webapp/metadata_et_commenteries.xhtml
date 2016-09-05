@@ -1,0 +1,35 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+        <f:metadata>
+            <f:viewParam name="idc" value="#{theso.idCurl}"/>
+            <f:viewParam name="idt" value="#{theso.idTurl}"/>
+            <f:viewParam name="idg" value="#{theso.idGurl}"/>
+            <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
+        </f:metadata>
+
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
+            <h1>Gestionnaire de thésaurus</h1>
+            <h:outputText value="version :  #{theso.getVersion()}" /><br/>
+            Depuis cette page d'accueil, il vous est possible de parcourir le thésaurus.<br/>
+            <ul>
+                <li>Choisir le thésaurus en haut à gauche de la page (il sera en français par défaut)</li>
+                <li>Choisir la langue du thésaurus parmi la liste située au dessus de l'arbre si une autre langue que le français est souhaitée</li>
+            </ul>
+
+            La catégorie Orphelins présente dans l'arbre "Thésaurus" regroupe les termes qui ne sont plus rattachés au thésaurus (ils pourront y être réinsérés par la suite).<br/>
+
+            Il est possible d'effectuer une recherche en ouvrant l'onglet <h2>"Recherche"</h2> en dessous de l'arbre du "Thésaurus". Le résultat de la recherche apparaîtra dans l'onglet 
+            juste en dessous de ce dernier.<br/><br/>
+
+            Une fois connecté, il est possible de modifier le thésaurus en sélectionnant les termes et en cliquant sur les boutons d'édition 
+            (<img src="images/iconeAjouter.jpg" />). Les domaines sont très peu éditables, il est donc préférable de sélectionner un concept
+            plus bas dans l'arbre pour avoir accès à toutes les fonctionnalités.<br/><br/>
+
+            La gestion des facettes permet de regrouper par thèmes différents concepts (peu importe leur place dans le thésaurus).
+        </p:dialog>  
+</ui:composition>

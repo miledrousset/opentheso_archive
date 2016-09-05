@@ -1027,4 +1027,118 @@ public class NoteHelper {
             }
         return status;
     }
+    /**
+     * pour pouvoir obtener une list des Notes a partir du idTerm
+     * sans conter avec le language
+     * @param ds
+     * @param idTerm
+     * @param idThesaurus
+     * @return 
+     */
+    public ArrayList<NodeNote> getListNotesTerm2(HikariDataSource ds,
+            String idTerm, String idThesaurus) {
+
+        ArrayList<NodeNote> nodeNotes = new ArrayList<>();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT note.id_note, note.lang, note.notetypecode,"
+                            + " note.lexicalvalue, note.created,"
+                            + " note.modified FROM note, note_type"
+                            + " WHERE note.notetypecode = note_type.code"
+                            + " and note_type.isterm = true"
+                            + " and note.id_term = '" + idTerm + "'"
+                            + " and note.id_thesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeNote nodeNote = new NodeNote();
+                        nodeNote.setId_term(idTerm);
+                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
+                        nodeNote.setModified(resultSet.getDate("modified"));
+                        nodeNote.setCreated(resultSet.getDate("created"));
+                        nodeNote.setNotetypecode(resultSet.getString("notetypecode"));
+                        nodeNote.setLang(resultSet.getString("lang"));
+                        nodeNotes.add(nodeNote);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Notes of Term : " + idTerm, sqle);
+        }
+        return nodeNotes;
+    }
+      /**
+     * pour pouvoir obtener une list des Notes a partir du idConcept
+     * sans conter avec le language
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public ArrayList<NodeNote> getListNotesConcept2(HikariDataSource ds, String idConcept,
+            String idThesaurus) {
+
+        ArrayList<NodeNote> nodeNotes = new ArrayList<>();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT note.id_note, note.lang, note.notetypecode,"
+                            + " note.lexicalvalue, note.created,"
+                            + " note.modified FROM note, note_type"
+                            + " WHERE note.notetypecode = note_type.code"
+                            + " and note_type.isconcept = true"
+                            + " and note.id_concept = '" + idConcept + "'"
+                            + " and note.id_thesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeNote nodeNote = new NodeNote();
+                        nodeNote.setId_concept(idConcept);
+                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
+                        nodeNote.setModified(resultSet.getDate("modified"));
+                        nodeNote.setCreated(resultSet.getDate("created"));
+                        nodeNote.setNotetypecode(resultSet.getString("notetypecode"));
+                        nodeNote.setLang(resultSet.getString("lang"));
+                        nodeNotes.add(nodeNote);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Notes of Concept : " + idConcept, sqle);
+        }
+        return nodeNotes;
+    }
+
 }
+

@@ -10,27 +10,28 @@
 
         <fieldset style="overflow-y: auto">
             <legend><h:outputText value="#{langueBean.getMsg('popup.delRel')}" /></legend>
-            <table id="tableRelations">
+            <table id="tableRelations">  
                 <tr>
                     <th><h:outputText value="#{langueBean.getMsg('popup.terms')}" /></th>
-                    <th></th>
+                    <th></th> 
+                    
                 </tr>
-                <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
-                    <tr>
-                        <td><h:outputText value="#{item2.value} (#{item2.key})" /></td>
-                        <td>
-                            <h:form>
-                                <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
-                                                 actionListener="#{selectedTerme.delAsso(item2.key)}" update=":panContenu" oncomplete="PF('termeAssociedeleteEditDlg').hide();" >
-                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid3')}" icon="ui-icon-alert" />  
-                                </p:commandButton>  
+                <ui:repeat  value="#{selectedTerme.termesAssocies}" var="item2" >
+                    <tr>   
+                            <td><h:outputText value="#{item2.value} (#{item2.key})"/></td>
+                            <td>
+                                <h:form>
+                                    <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" 
+                                                     actionListener="#{selectedTerme.delAsso(item2.key)}" update=":panContenu" oncomplete="PF('termeAssociedeleteEditDlg').hide();" >
+                                        <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid3')}" icon="ui-icon-alert" />  
+                                    </p:commandButton>  
 
-                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                                </p:confirmDialog> 
-                            </h:form>
-                        </td>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                        <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                        <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                    </p:confirmDialog> 
+                                </h:form>
+                            </td>
                     </tr>
                 </ui:repeat>
             </table>

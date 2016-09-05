@@ -1,0 +1,22 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idImageDlg"  header="#{langueBean.getMsg('index.picture')}" widgetVar="imageDlg" modal="true" resizable="false" >
+        <!-- Gestion de la note -->
+        <h:panelGroup id="panEditImage" style="background: transparent; box-shadow: none;">
+                <h:form style="text-align: left;">
+                    <p:messages showDetail="true" autoUpdate="true" />
+                    <br/>
+                    <h:outputText value="#{langueBean.getMsg('popup.imgSource')}" /> : <h:inputText value="#{fileBean.source}" /><br/><br/>
+                    <p:fileUpload styleClass="divFileUpload" label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" 
+                                  cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeImage}" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" 
+                                  process="@form" update=":contenuDroite1,:panEditImage,@form" oncomplete="PF('imageDlg').hide();"/>
+                </h:form>
+                <br/>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>

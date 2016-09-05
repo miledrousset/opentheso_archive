@@ -1,0 +1,23 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+    <h:panelGroup id="footer">
+        <footer style="text-align: center">
+            <br />
+            <div style="margin-bottom: 5px; margin-top: -15px;">
+                <!-- <pre> c'est un command que permetre ecrire mais les spaces y le lignes ils sont respecté -->
+                 <pre>
+                <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©Opentheso</a>
+                <h:outputLink  value="copyright.xhtml" style="color: #BD6909; text-decoration: none;"> 
+                    <h:outputText value="   ©#{theso.thisTheso.title}" />
+                    </h:outputLink>
+                </pre> 
+
+            </div>
+        </footer>
+    </h:panelGroup>
+</ui:composition>

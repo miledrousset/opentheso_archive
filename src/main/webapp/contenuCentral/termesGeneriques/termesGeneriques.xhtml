@@ -1,0 +1,43 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+        
+    <div id="divGenerale" >
+        <div class="titreGenerique">
+            <h:outputText value="#{langueBean.getMsg('index.BT') }" rendered="#{(treeBean.browserName != 'agent')}"/> 
+            <h:panelGroup id="panFormEditTGen">
+                <div id="imageEdition">
+                    <h:form id="formEditTGen" 
+                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
+
+                        <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
+                            <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgDlg" oncomplete="PF('addTgDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" update=":idDeleteTgDlg" oncomplete="PF('deleteTgDlg').show();" style="font-size: 12px;"/>
+                            <p:submenu label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
+                                <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgOtherGroupDlg" oncomplete="PF('addTgOtherGroupDlg').show();" style="font-size: 12px;"/>
+                            </p:submenu>
+                        </p:menu>
+                    </h:form>
+                </div>
+            </h:panelGroup>
+        </div>
+        <div class="contenuGenerique">
+            <h:panelGroup id="gene" rendered="#{(treeBean.browserName != 'agent')}">
+                <ui:repeat value="#{selectedTerme.termeGenerique}" var="item0">
+                    <h:form>
+                        <p:commandButton styleClass="termClick" rendered="#{item0.value != ''}" value="#{item0.value}" escape="false"
+                                         actionListener="#{treeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                        <p:commandButton styleClass="termClick" rendered="#{item0.value == ''}" value="#{item0.key}" escape="false"
+                                         actionListener="#{treeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />                                                            
+                    </h:form>
+                </ui:repeat>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

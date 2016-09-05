@@ -1,0 +1,56 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!-- Modifier une terme synonymes -->
+    <p:dialog id="idTermeSynonymesModifyEditDlg"  header="#{langueBean.getMsg('index.dateE')}" widgetVar="termeSynonymesModifyEditDlg" modal="true" resizable="false">
+         <h:panelGroup  id="synoModify">
+            <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
+                <table>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <h:outputText value="#{item3}" />
+                    </td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-edit" 
+                                             actionListener="#{selectedTerme.changeSynonymeEnCour(item3)}" update=":idModifySynonymesDlg,:contenuDroite3,:idTermeSynonymesModifyEditDlg" 
+                                             oncomplete="PF('modifySynonymesDlg').show(); PF('termeSynonymesModifyEditDlg').hide();">
+                                
+                            </p:commandButton>  
+
+                        </h:form>
+                    </td>
+                </tr>
+                </table>
+            </ui:repeat>
+        </h:panelGroup>
+        <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}"
+                      value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+        <h:panelGroup  id="synoP1" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+            <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">  
+                 <table>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <h:outputText value="#{item4}" /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-edit" 
+                                             actionListener="#{selectedTerme.changeSynonymeEnCour(item4)}" update=":idModifySynonymesDlg,:contenuDroite3,:idTermeSynonymesModifyEditDlg" 
+                                             oncomplete="PF('modifySynonymesDlg').show(); PF('termeSynonymesModifyEditDlg').hide();">
+                                
+                            </p:commandButton>  
+
+                        </h:form>
+                    </td>
+                </tr>
+                </table>
+            </ui:repeat>
+        </h:panelGroup>
+        
+    
+    </p:dialog>
+</ui:composition>

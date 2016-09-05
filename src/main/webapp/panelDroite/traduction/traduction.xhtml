@@ -1,0 +1,38 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <div id="langue" style="overflow-y: auto;">
+        <h:panelGroup id="contenuDroite3">
+
+            <div id="titreSplinter">
+                <h:outputText value="#{langueBean.getMsg('index.trad')}" /> 
+
+                <div id="imageEdition">
+                    <h:form id="formEditTrad" 
+                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and (user1.haveRights(2))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                        <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit" />
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('edit.addTrad')}" update=":idAjouterTraductionEditDlg" oncomplete="PF('ajouterTraductionEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" update=":idDeleteTraductionEditDlg" oncomplete="PF('deleteTraductionEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.modifyTrad')}" update=":idModifierTraductionEditDlg" oncomplete="PF('modifierTraductionEditDlg').show();" style="font-size: 12px;"/>
+                        </p:menu>
+
+                    </h:form>
+                </div>
+            </div>
+            <h:panelGroup  id="lang">
+                <ui:repeat value="#{selectedTerme.langues}" var="item5">
+                    <h:form>
+                        <p:commandButton styleClass="termClick" value="#{item5.value} (#{item5.key})" 
+                                         actionListener="#{theso.changeTermeTrad(selectedTerme.idC, item5.key, selectedTerme.type)}" 
+                                         update=":panChoixTheso,:accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                    </h:form>
+                </ui:repeat>
+            </h:panelGroup>
+        </h:panelGroup>
+    </div>
+</ui:composition>

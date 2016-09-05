@@ -1,0 +1,29 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+        <div id="gauche">
+            <p:accordionPanel id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}" rendered="#{(treeBean.browserName != 'agent') }">
+                <p:tab title="#{langueBean.getMsg('theso')}">
+                    <!-- navigation rapide par auto-complétion --> 
+                    <ui:include src="navigationRapide/navigationRapide.xhtml"/>
+                    <hr/>
+                    <!-- ARBRE DEBUT -->  
+                    <ui:include src="arbre/arbre.xhtml"/> 
+                </p:tab>
+                <p:tab title="#{langueBean.getMsg('index.search')}">
+                    <!-- TAB RECHERCHE DEBUT -->
+                    <ui:include  src="tabRecherche/tabRecherche.xhtml"/>
+                </p:tab>
+                <p:tab title="#{langueBean.getMsg('index.searchRes')}">
+                    <!-- TAB RESULTAT RECHERCHE DEBUT -->
+                    <ui:include src="tabResultatRecherche/tabResultatRecherche.xhtml"/>
+                </p:tab>
+                    <!-- SOUS ARBRE DEBUT -->
+                    <ui:include src="sousArbre/sousArbre.xhtml"/>
+            </p:accordionPanel>
+        </div>
+</ui:composition>

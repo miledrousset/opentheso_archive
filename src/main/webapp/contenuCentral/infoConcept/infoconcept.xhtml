@@ -1,0 +1,139 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <div id="divGenerale">
+
+
+        <div class="contenuTerme">
+            <div id="imageEdition">
+                <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
+                    <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
+
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
+
+
+                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
+
+                        <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
+
+
+                        <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
+                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.type != 2) and (selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheToGroup')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
+                        </p:submenu>
+                        <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
+                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroup')}" update=":idMoveBranchToConceptOtherGroupDlg" oncomplete="PF('moveBranchToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
+                        </p:submenu>
+
+                    </p:menu>
+                </h:form>
+                <!--options pour les orphelins -->
+                <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine == 'Orphan')}">
+                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
+                    <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
+
+                        <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idMoveBranchFromOrphanDlg" oncomplete="PF('moveBranchFromOrphanDlg').show();" style="font-size: 12px;"/>
+
+                        <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.addToMT')}" update=":idMoveBranchFromOrphanToGroupDlg" oncomplete="PF('moveBranchFromOrphanToGroupDlg').show();" style="font-size: 12px;"/>
+                    </p:menu>
+                </h:form>
+            </div>
+            <script type="application/ld+json">
+                <h:outputText value="#{theso.getMetaData()}" />
+            </script>
+
+            <h:panelGroup rendered="#{(selectedTerme.idC != null)}">
+                    <span style="font-size: 17px; font-weight: bold;">
+                        <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
+                    </span>
+                    <h:outputText id="idC" value="id : #{selectedTerme.idC}"/><br/>
+                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : #{selectedTerme.notation}"/><br/>
+
+
+
+                    <span>
+                        <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+
+                        <a  href="#{selectedTerme.urlNotice}" target="blanc" >
+                            <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices}"/>
+                        </a>
+                    </span>
+                    <br/>
+
+                    <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
+
+                    <span>
+                        <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
+                    </span>
+                    <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
+                    <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
+                    <span>
+                        <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
+                        <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
+                    </span>
+                    <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
+                        <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
+                            <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
+                            <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
+                        </ui:repeat>
+                    </h:panelGroup>
+
+                    <!-- affichage du nombre total des fils -->
+                    <span>
+                        <p:tooltip />
+                        <h:form>
+                            <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
+                            <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
+                        </h:form>
+                    </span>
+                    <h:outputText value="#{langueBean.getMsg('index.creator')} : #{selectedTerme.creatorName}"/><br/>
+                    <h:outputText value="#{langueBean.getMsg('index.contributor')} :  #{selectedTerme.contributorName}"/><br/>
+
+
+
+
+                    <!-- affichage de l'URL pérenne-->
+
+                    <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
+                    <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                  value="#{langueBean.getMsg('index.link')} :" /> <br />
+
+                    <!-- pour afficher un toolTipText-->
+                    <p:tooltip id="toolTipGrow" for="ark" value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}"
+                               showEffect="clip" hideEffect="explode" />
+
+
+                    <span>
+                        <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                      value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
+                            <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                          value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
+                        </h:outputLink>
+                    </span>
+                    <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
+                    <h:outputText id= "url" rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                  value="#{langueBean.getMsg('index.link')} :" /> <br />
+                    <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
+                        <span>
+                            <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
+                        </span>
+                    </h:outputLink>
+        </h:panelGroup>                                                
+        </div>
+    </div>
+</ui:composition>

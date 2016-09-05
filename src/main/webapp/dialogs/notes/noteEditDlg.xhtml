@@ -14,13 +14,11 @@
             <br/>
                 <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{selectedTerme.editNote()}"
                              update=":panEditNote,:note, :idNoteEditDlg" styleClass="styleButton" oncomplete="PF('noteEditDlg').hide();"/>
-
-               
                     
                 <td colspan="3" style="text-align: center;">
-                    <p:commandButton id="cbDeleteNote" title="#{langueBean.getMsg('edit.tab1Opt3')}" icon="ui-icon-supp"  actionListener="#{selectedTerme.deleteThisNoteOfConcept('note')}"
+                <p:commandButton id="cbDeleteNote" title="#{langueBean.getMsg('edit.tab1Opt3')}" icon="ui-icon-supp"  actionListener="#{selectedTerme.deleteThisNoteOfConcept('note')}"
                                  update=":panEditNote,:note" styleClass="styleButton" oncomplete="PF('noteEditDlg').hide();" > 
-                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.validDelOrphan')}" icon="ui-icon-alert" />  
+                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert" />  
                 </p:commandButton> 
                 </td>
 

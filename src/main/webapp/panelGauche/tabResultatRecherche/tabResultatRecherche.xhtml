@@ -1,0 +1,93 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+        <h:panelGroup id="resultSearch">
+            <h:form id="tableSearch1" rendered="#{search.typeSearch == 1}">
+                <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="460"
+                             emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                    <p:ajax event="rowSelect" listener="#{treeBean.majSearch()}" 
+                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                    <f:facet name="header">
+                        <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
+                    </f:facet>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                        <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />
+                        <h:panelGroup rendered="#{ts.preferredLabel == false}" >
+                            <i><h:outputText value="#{ts.lexical_value}" /></i>
+                        </h:panelGroup>
+                    </p:column>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60">
+                        <h:outputText value="#{ts.groupLabel}" />
+                    </p:column>
+                    <p:column width="10" style="padding-left: 1px;">
+                        <h:form>
+                            <p:graphicImage id="seeTree" value="images/iconeTree.png" styleClass="hierarchicalSearch" />
+                            <p:tooltip id="toolTipContent" for="seeTree">
+                                <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                    <ui:repeat value="#{search.getHierachi(ts.idConcept)}" var="path" >
+                                        <ui:repeat value="#{path}" var="termeS" >
+                                            <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
+                                                <img src="images/conceptOpen.png" />
+                                                <h:outputText value="#{search.getNom(termeS)}" />
+                                            </div>
+                                        </ui:repeat>
+                                        <br/>
+                                    </ui:repeat>
+                                </p:fieldset>
+                            </p:tooltip>
+                        </h:form>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+            <h:form id="tableSearch2" rendered="#{search.typeSearch == 2}">
+                <p:dataTable var="tsp" value="#{search.result2}" selectionMode="single" selection="#{selectedTerme.nodePe}" 
+                             rowKey="#{tsp.idConcept}" scrollable="true" scrollHeight="460"
+                             emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                    <p:ajax event="rowSelect" listener="#{treeBean.majSearchPermute()}" 
+                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                    <f:facet name="header">
+                        <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
+                    </f:facet>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                        <h:outputText rendered="#{tsp.firstColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.firstColumn.trim()}" />
+                        <h:outputText rendered="#{tsp.isPreferredTerm == true}" value="#{tsp.searchedValue}" style="font-weight: bold;" />
+                        <h:outputText rendered="#{tsp.lastColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.lastColumn.trim()}" />
+                        <h:panelGroup rendered="#{tsp.isPreferredTerm == false}" >
+                            <i>
+                                <h:outputText rendered="#{tsp.firstColumn != ''}" value="#{tsp.firstColumn.trim()}" />
+                                <h:outputText value="#{tsp.searchedValue}" style="font-weight: bold;" />
+                                <h:outputText rendered="#{tsp.lastColumn != ''}" value="#{tsp.lastColumn.trim()}" />
+                            </i>
+                        </h:panelGroup>
+
+                    </p:column>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60">
+                        <h:outputText value="#{search.getValueGroup(tsp.idGroup)}" />
+                    </p:column>
+                    <p:column width="10" style="padding-left: 1px;">
+                        <h:form>
+                            <p:graphicImage id="seeTreeP" value="images/iconeTree.png" styleClass="hierarchicalSearch" />
+                            <p:tooltip id="toolTipContent" for="seeTreeP">
+                                <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                    <ui:repeat value="#{search.getHierachi(tsp.idConcept)}" var="pathP" >
+                                        <ui:repeat value="#{pathP}" var="termeSP" >
+                                            <div style="margin-left: #{pathP.indexOf(termeSP)*35}px; margin-top: 4px;">
+                                                <img src="images/conceptOpen.png" />
+                                                <h:outputText value="#{search.getNom(termeSP)}" />
+                                            </div>
+                                        </ui:repeat>
+                                        <br/>
+                                    </ui:repeat>
+                                </p:fieldset>
+                            </p:tooltip>
+                        </h:form>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </h:panelGroup>
+</ui:composition>

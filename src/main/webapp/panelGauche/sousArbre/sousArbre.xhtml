@@ -1,0 +1,43 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+    
+     <p:tab title="#{langueBean.getMsg('index.underTree')}">
+                <div id="imageEdition" style="margin-bottom: 2px; margin-top: 1px; margin-right: 4px; height: 20px;">
+            <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                <p:commandButton id="cbAjFacette" 
+                                 styleClass="cbEdit" icon="ui-icon-edit" 
+                                 actionListener="#{vue.setFacette(true)}"  
+                                 update=":panFacette" />
+            </h:form>
+        </div>
+        <div id="clean" />
+        <h:form>
+            <p:tree id="uTree" value="#{ssTree.root}" var="node" dynamic="true" cache="true" animate="true" 
+                    selectionMode="single"  selection="#{ssTree.selectedNode}" styleClass="styleSSTree" >
+                <p:ajax event="expand" listener="#{ssTree.onNodeExpand}" />  
+                <p:ajax event="select" 
+                        update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                        listener="#{ssTree.onNodeSelect}" /> 
+                <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                            collapsedIcon="ui-icon ui-icon-dossier-close">  
+                    <h:outputText value="#{node}"/>  
+                </p:treeNode>  
+                <p:treeNode type="facette" icon="ui-icon ui-icon-facette">  
+                    <h:outputText value="(#{node})" style="color: #659123;"/>  
+                </p:treeNode>
+                <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                    <h:outputText value="#{node}"/>  
+                </p:treeNode>
+                <p:treeNode>  
+                    <h:outputText value="#{node}"/>  
+                </p:treeNode>
+            </p:tree>
+        </h:form>
+    </p:tab>
+                        <!-- SOUS ARBRE FIN -->
+</ui:composition>

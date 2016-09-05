@@ -34,13 +34,11 @@
     </div>
      <p:panel id="panelMenu"  styleClass="panelNoBorder"> 
     <div style="clear: both;"></div>
-
  
         <div id="onglets">
-
                  
             <ul id="listeMenu" style="alignment-adjust: central"> 
-                <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
+                <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}"/></h:outputLink></li>
                 <!--
                  <li id="itemMenu"><h:outputLink value="/opentheso/openindex.xhtml">OpenIndex</h:outputLink></li>
                 --> 
@@ -49,8 +47,7 @@
                 
                 <li id="itemMenu"><h:outputLink rendered="#{ ((user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus2)) or (user1.haveRights(1))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
                 <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus2)}" value="statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
-            </ul>
-                        
+            </ul>   
         </div>
 </p:panel>
  

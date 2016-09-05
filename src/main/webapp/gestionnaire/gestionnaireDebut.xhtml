@@ -1,0 +1,28 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+        <div id="SplitterVertical1">
+            <ui:include src="panelGauche/panelGauche.xhtml"/>
+            <div>
+                <div id="SplitterVertical2">
+                    <div id="principale">
+
+
+                        <!-- CONTENU CENTRAL DEBUT -->                             
+                        <ui:include src="contenuCentral/contenuCentral.xhtml"/> 
+                        <div id="clean" ></div>
+                    </div>
+                    <div id="droite">
+                        <div id="SplitterHorizDroit1">
+                        <!-- PANEL DROITE -->
+                        <ui:include src="panelDroite/panelDroite.xhtml"/>   
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</ui:composition>

@@ -1,0 +1,39 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <div id="divGenerale">
+        <div class="titreSynonyme">
+            <h:outputText value="#{langueBean.getMsg('index.UF')}" /> 
+            <div id="imageEdition">
+                <h:form id="formEditTSyno" 
+                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
+                    <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                    <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">  
+                        <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" update=":idTermeSynonymesEditDlg" oncomplete="PF('termeSynonymesEditDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem value="#{langueBean.getMsg('popup.delUSE')}" update=":idTermeSynonymesDeleteEditDlg" oncomplete="PF('termeSynonymesDeleteEditDlg').show();" style="font-size: 12px;"/>  
+                        <p:menuitem value="#{langueBean.getMsg('popup.modUSE')}" update=":idTermeSynonymesModifyEditDlg" oncomplete="PF('termeSynonymesModifyEditDlg').show();" style="font-size: 12px;"/>
+                    </p:menu>
+
+                </h:form>
+            </div>
+        </div>
+        <div class="contenuSynonyme">
+            <!--<h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>-->
+            <h:panelGroup  id="synoE">
+                <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
+                    <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
+                </ui:repeat>
+            </h:panelGroup>
+            <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+            <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
+                    <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
+                </ui:repeat>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

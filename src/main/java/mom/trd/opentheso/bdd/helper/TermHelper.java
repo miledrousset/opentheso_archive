@@ -1034,7 +1034,44 @@ public class TermHelper {
         }
         return status;
     }
+    public boolean updateTermSynonyme(HikariDataSource ds,
+            String oldValue, Term term, int idUser) {
 
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+        term.setLexical_value(new StringPlus().convertString(term.getLexical_value()));
+        oldValue = (new StringPlus().convertString(oldValue));
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE non_preferred_term set"
+                            + " lexical_value = '" + term.getLexical_value() + "',"
+                            + " modified = current_date "
+                            + " WHERE lang ='" + term.getLang() + "'"
+                            + " AND id_thesaurus = '" + term.getId_thesaurus() + "'"
+                            + " AND id_term = '" + term.getId_term() + "'"
+                            + " AND lexical_value = '" + oldValue + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                    addNewTermHistorique(conn, term, idUser);
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating Synonym Modification : " + term.getId_term(), sqle);
+        }
+        return status;
+    }
     /**
      * Cette fonction permet de récupérer un Term par son id et son thésaurus et
      * sa langue sous forme de classe Term (sans les relations)
@@ -2293,5 +2330,4 @@ public class TermHelper {
         }
         return existe;
     }
-    
 }

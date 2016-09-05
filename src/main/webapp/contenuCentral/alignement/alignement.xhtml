@@ -1,0 +1,40 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+        <div id="divGenerale">
+        <div class="titreAlign">
+            <h:outputText value="#{langueBean.getMsg('index.align')}" />
+            <div id="imageEdition">
+                <h:form id="formEditAlign"  
+                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                    <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
+                                     styleClass="cbEdit" icon="ui-icon-edit" >
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn1')}" update=":idAjouterManuelEditDlg" oncomplete="PF('AjouterManuelEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('AjouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
+                        </p:menu>
+                    </p:commandButton>
+                </h:form>
+            </div>
+        </div>
+        <div class="contenuAlign">
+            <ui:repeat value="#{selectedTerme.ALignType}" var="allAlign">
+                <h:outputText value="#{allAlign.value} : " /><br/>
+                <ui:repeat value="#{selectedTerme.align}" var="alignVar">
+                    <h:panelGroup rendered="#{allAlign.key == alignVar.alignement_id_type}" styleClass="nomSynonyme">
+                        <h:outputText value="#{alignVar.thesaurus_target} - " />
+                        <a href="#{alignVar.uri_target}" target="_blank">
+                            <h:outputText rendered="#{alignVar.concept_target != null and alignVar.concept_target.trim() != ''}" value="#{alignVar.concept_target}" />
+                            <h:outputText rendered="#{alignVar.concept_target == null or alignVar.concept_target.trim() == ''}" value="#{alignVar.uri_target}" />
+                        </a>
+                        <br/>
+                    </h:panelGroup>
+                </ui:repeat>
+            </ui:repeat>
+        </div>
+    </div>
+</ui:composition>

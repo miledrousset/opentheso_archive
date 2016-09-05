@@ -1,0 +1,67 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+        <div id="image">
+            <h:panelGroup id="contenuDroite1">
+                <div id="titreSplinter">
+                    <h:form style="float: left; width: 45px;"
+                            rendered="#{selectedTerme.images.size() != 0}">
+                        <p:commandButton type="button" onclick="PF('switcher').previous();"
+                                         icon="ui-icon-circle-triangle-w" id="prev" styleClass="stylePix"/>
+                        <p:commandButton type="button" onclick="PF('switcher').next();"
+                                         icon="ui-icon-circle-triangle-e" id="next" styleClass="stylePix"/>
+                    </h:form>
+                    <h:outputText value="#{langueBean.getMsg('index.picture')}" /> 
+                    <div id="imageEdition">
+                        <h:form id="formeEditImage" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                            <p:commandButton id="cbEditThesoImage" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"  
+                                              update=":panPopUp" oncomplete="PF('imageDlg').show();"  />
+                        </h:form>
+                    </div>
+                    <div id="clean" />
+                </div>
+                <p:imageSwitch effect="wipe" widgetVar="switcher" id="manuelSwitcher" slideshowAuto="true">
+
+                    <ui:repeat value="#{selectedTerme.images}" var="image" id="manuelSwitcherImages">
+                        <h:form>
+
+                            <img itemprop="image">
+                                <p:graphicImage value="/pix/#{fileBean.dossierResize}/#{image.imageName}" onclick="PF('dlgPix').show()" 
+                                                style="cursor: pointer;"/>
+                            </img>
+                            <p:commandButton value="Supprimer" actionListener="#{selectedTerme.delImage(image.imageName)}" 
+                                             update=":contenuDroite1" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null)}" 
+                                             styleClass="styleButtonRefus" >
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('index.valid2')}" 
+                                           icon="ui-icon-alert" />  
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" 
+                                                 icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" 
+                                                 icon="ui-icon-close"/>       
+                            </p:confirmDialog>
+                        </h:form>
+                    </ui:repeat>
+
+                </p:imageSwitch>
+                <p:dialog header="Images" widgetVar="dlgPix" modal="true" draggable="false" resizable="false">
+                    <h:form style="float: left;">
+                        <p:commandButton type="button" onclick="PF('fullSwitcher').previous();" icon="ui-icon-circle-triangle-w" 
+                                         id="prev" styleClass="stylePix"/>
+                        <p:commandButton type="button" onclick="PF('fullSwitcher').next();" icon="ui-icon-circle-triangle-e" 
+                                         id="next" styleClass="stylePix"/>
+                    </h:form>
+                    <div id="clean" />
+                    <p:imageSwitch effect="fade" widgetVar="fullSwitcher" slideshowAuto="false">
+                        <ui:repeat value="#{selectedTerme.images}" var="imageFull">
+                            <p:graphicImage value="/pix/#{imageFull.imageName}" />
+                        </ui:repeat>
+                    </p:imageSwitch>
+                </p:dialog>
+            </h:panelGroup>
+        </div>
+</ui:composition>

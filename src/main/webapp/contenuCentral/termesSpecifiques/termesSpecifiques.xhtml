@@ -1,0 +1,40 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+        
+    <div id="divGenerale">
+        <div class="titreSpecifique">
+            <h:outputText value="#{langueBean.getMsg('index.NT')}" rendered="#{(treeBean.browserName != 'agent')}"/> 
+            <div id="imageEdition">
+                <h:form id="formEditTSpe" 
+                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.isHaveWriteToCurrentThesaurus) 
+                                    and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                    <p:commandButton id="cbEditThesoTSpe" styleClass="cbEdit" icon="ui-icon-edit"/>                                                        
+                    <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTSpe" my="left top" at="left bottom">
+                        <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
+                    </p:menu>
+
+                </h:form>
+            </div>
+        </div>
+        <div class="contenuSpecifique">
+            <h:panelGroup  id="speci" rendered="#{(treeBean.browserName != 'agent')}">
+                <ui:repeat value="#{selectedTerme.termesSpecifique}" var="item1">
+                    <h:form>
+                        <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}" escape="false"
+                                         actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                        <p:commandButton styleClass="termClick" rendered="#{item1.value == ''}" value="#{item1.key}" escape="false"
+                                         actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+
+                    </h:form>
+                </ui:repeat>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+        

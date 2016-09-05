@@ -1,0 +1,43 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+        <div id="facette">
+            <h:panelGroup id="contenuDroite2">
+                <div id="titreSplinter">
+                    <h:outputText value="#{langueBean.getMsg('index.facet')}" /> 
+                    <div id="imageEdition">
+                        <h:form id="formEditFacette" target="_blanc"
+                                rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                            <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit" 
+                                             action="#{facetteEditDlg}" update=":panPopUp" oncomplete="PF('facetteEditDlg').show()" />
+                        </h:form>
+                    </div>
+                </div>
+                <h:form>
+                    <p:tree id="facetteTree" value="#{selectedTerme.root}" var="nodeFT" dynamic="true" cache="true" animate="true" 
+                            selectionMode="single"  selection="#{selectedTerme.selectedNode}" styleClass="styleFacetteTerm" >
+                        <p:ajax event="expand" listener="#{selectedTerme.onNodeExpand}" />  
+                        <p:ajax event="select" 
+                                update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                listener="#{selectedTerme.onNodeSelect}" /> 
+                        <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
+                                    collapsedIcon="ui-icon ui-icon-dossier-close">  
+                            <h:outputText value="#{nodeFT}"/>  
+                        </p:treeNode>  
+                        <p:treeNode type="facette" icon="ui-icon ui-icon-retour">  
+                            <h:outputText value="(#{nodeFT})" style="color: #659123;"/>  
+                        </p:treeNode>
+                        <p:treeNode type="fichier" icon="ui-icon ui-icon-fichier">  
+                            <h:outputText value="#{nodeFT}"/>  
+                        </p:treeNode>
+                        <p:treeNode>  
+                            <h:outputText value="#{nodeFT}"/>  
+                        </p:treeNode>
+                    </p:tree>
+                </h:form>
+            </h:panelGroup>
+        </div>
+</ui:composition>

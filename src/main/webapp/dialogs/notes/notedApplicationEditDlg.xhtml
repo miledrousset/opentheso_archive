@@ -16,7 +16,7 @@
                 <td colspan="3" style="text-align: center;">
                 <p:commandButton id="cbDeleteNote" title="#{langueBean.getMsg('edit.tab1Opt3')}" icon="ui-icon-annuler"  actionListener="#{selectedTerme.deleteThisNoteOfConcept('scopeNote')}"
                                  update=":panEditNote,:note" styleClass="styleButton" oncomplete="PF('notedApplicationEditDlg').hide();" > 
-                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.validDelOrphan')}" icon="ui-icon-alert" />  
+                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert" />  
                 </p:commandButton> 
                 </td>
 
