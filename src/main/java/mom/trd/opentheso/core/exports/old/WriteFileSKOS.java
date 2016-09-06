@@ -192,6 +192,12 @@ public class WriteFileSKOS {
 
         SKOSResource concept = new SKOSResource(getUri(nodeConceptExport));
 
+        if(nodeConceptExport == null) {
+            return true;
+        }
+        if(nodeConceptExport.getNodeTermTraductions() == null) {
+            return true;
+        }
         for (int i = 0; i < nodeConceptExport.getNodeTermTraductions().size(); i++) {
             concept.addLabel(
                     nodeConceptExport.getNodeTermTraductions().get(i).getLexicalValue(),

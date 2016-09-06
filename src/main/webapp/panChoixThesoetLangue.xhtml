@@ -1,3 +1,6 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -30,6 +33,7 @@
                                         <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
                                                        itemValue="#{t.id_iso639_1}"  />
                                     </h:selectOneMenu>
+                                    &nbsp;
                                     <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
                                                      update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                                      styleClass="styleButton"/>
