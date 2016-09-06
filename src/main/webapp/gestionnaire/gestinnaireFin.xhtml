@@ -1,3 +1,6 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -10,12 +13,13 @@
             <br />
             <div style="margin-bottom: 5px; margin-top: -15px;">
                 <!-- <pre> c'est un command que permetre ecrire mais les spaces y le lignes ils sont respecté -->
-                 <pre>
-                <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©Opentheso</a>
+                
+                <a href="opentheso.xhtml"  font-family= "Palatino linotype Times serif"  style="color: #BD6909; text-decoration: none ">©Opentheso</a>
                 <h:outputLink  value="copyright.xhtml" style="color: #BD6909; text-decoration: none;"> 
-                    <h:outputText value="   ©#{theso.thisTheso.title}" />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <h:outputText value="    ©#{theso.thisTheso.title }" />
                     </h:outputLink>
-                </pre> 
+                
 
             </div>
         </footer>

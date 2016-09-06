@@ -348,6 +348,17 @@ public class SelectedThesaurus implements Serializable {
                     conn.close();
                     return;
                 }
+                if(editTheso.getTitle().isEmpty()) {
+                     thesaurus.setTitle("theso_" + idThesaurus);
+                }
+                if(editTheso.getLanguage() == null) {
+                    editTheso.setLanguage(workLanguage);
+                }
+                if(!th.addThesaurusTraductionRollBack(conn, editTheso)) {
+                    conn.rollback();
+                    conn.close();
+                    return;
+                 }                
             
                 // ajout de role pour le thésaurus à l'utilisateur en cours
                 UserHelper userHelper = new UserHelper();
@@ -364,7 +375,7 @@ public class SelectedThesaurus implements Serializable {
             } catch (SQLException ex) {
                 Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            maj();
             arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
             vue.setCreat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") +  " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));

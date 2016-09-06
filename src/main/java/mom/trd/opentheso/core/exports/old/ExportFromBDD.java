@@ -421,14 +421,16 @@ public class ExportFromBDD {
 
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
-            writeFileSKOS.writeDescriptor(nodeConcept);
-            if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
-                for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+            if(nodeConcept != null) {
+                writeFileSKOS.writeDescriptor(nodeConcept);
+                if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
 
-                    exportAllConcepts(ds,
-                            nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
-                            idThesaurus, writeFileSKOS);
+                        exportAllConcepts(ds,
+                                nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                                idThesaurus, writeFileSKOS);
 
+                    }
                 }
             }
         }

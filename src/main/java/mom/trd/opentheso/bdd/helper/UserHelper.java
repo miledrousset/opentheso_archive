@@ -110,6 +110,7 @@ public class UserHelper {
 
     /**
      * cette fonction permet de retourner les informations sur l'utilisateur et son role
+     * par rapport à un thésaurus 
      * @param ds
      * @param logName
      * @param idThesaurus
@@ -164,6 +165,60 @@ public class UserHelper {
 
         return nu;
     }
+    
+    /**
+     * cette fonction permet de retourner les informations sur l'utilisateur et son role
+     * @param ds
+     * @param logName
+     * @return 
+     */
+    public NodeUser getInfoUser(HikariDataSource ds, String logName) {
+        NodeUser nu = null;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT roles.name, user_role.id_role,"
+                            + " users.username, users.id_user, users.mail "
+                            + " FROM users, user_role, roles WHERE"
+                            + " users.id_user = user_role.id_user AND"
+                            + " user_role.id_role = roles.id AND" 
+                            + " users.username = '" + logName + "'";
+                            //+ " AND" 
+                            //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
+  
+  
+  
+                /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
+                            + "WHERE users.id_role=roles.id AND username='" + logName + "' and active=true";*/
+                    resultSet = stmt.executeQuery(query);
+
+                    if(resultSet.next()) {
+                        nu = new NodeUser();
+                        nu.setId(resultSet.getInt("id_user"));
+                        nu.setMail(resultSet.getString("mail"));
+                        nu.setIdRole(resultSet.getInt("id_role"));
+                        nu.setName(logName);
+                        nu.setRole(resultSet.getString("name"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return nu;
+    }    
     
     /**
      * cette fonction permet de retourner l'identifiant du role de l'utilisateur

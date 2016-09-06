@@ -119,10 +119,17 @@ public class CurrentUser implements Serializable {
             }
             // on récupère ses droits par rapport au thésaurus en cours
             else { 
-                user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
-                if(user == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
-                    return "";
+                NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                if(nodeUserTemp == null) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
+                    nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
+                    if(nodeUserTemp == null) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+                        return "";
+                    }
+                }
+                else {
+                    user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
                 }
                 authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
             }
@@ -382,6 +389,17 @@ public class CurrentUser implements Serializable {
         if(user.getIdRole() < 1) return false;
         return user.getIdRole() <= min;
     }
+    
+    /**
+     * vérification si l'utilisateur en cours a le droit d'effacer cet utilisateur
+     * @param idUserToDelete
+     * @return 
+     */
+  /*  public boolean haveRightsToDelete(int idUserToDelete) {
+        if(user.getIdRole() < 1) return false;
+        
+        return user.getIdRole() <= idUserToDelete;
+    }*/   
     
     public String afficheEncode() {
         return MD5Password.getEncodedPassword("demo");
