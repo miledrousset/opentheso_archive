@@ -10,37 +10,34 @@
     <h:panelGroup> 
         <div id="divGenerale">
             <div class="titreNote">
-                <h:outputText value="#{langueBean.getMsg('index.note')}" /> 
-                <div id="imageEdition">
-                    <h:form id="formEditNote" 
-                            rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
-                        
-                        
-                        
-                        <p:selectBooleanCheckbox id="allLangue" value="#{selectedTerme.allLangue}" >
-                            <p:ajax update=":formEditNote, :note" listener="#{selectedTerme.majNotes2}"/>
-                        </p:selectBooleanCheckbox>
-                                
-                                
-                        <!--   
-                        <p:commandButton id="dynaButtonNote2" rendered="#{selectedTerme.type != 1} " styleClass="cbEdit" icon="ui-icon-edit"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote2" my="center top" at="center bottom">
-                            <p:menuitem value="#{langueBean.getMsg('index.serachNotes')}" update=":idVoirNotesDlg" oncomplete="PF('voirNotesDlg').show();" style="font-size: 12px;"/>
-                        </p:menu>
-                        -->
-
-                        <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
-
-                            <p:menuitem value="#{langueBean.getMsg('index.note5')}" update=":idNoteEditDlg" oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.note1')}" update=":idDefinitionEditDlg" oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.note2')}" update=":idNotedApplicationEditDlg" oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.note3')}" update=":idNoteHistoriqueEditDlg" oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.note4')}" update=":idNoteEditorialeEditDlg" oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
-                        </p:menu>
-
-                    </h:form>
-                </div>
+                <h:form id="allNotes">
+                    <table>
+                        <tr>
+  
+                            <td style="text-align: left">
+                                <h:outputText value="#{langueBean.getMsg('index.note')}" />
+                            </td>
+                                                        <td style="text-align: right">
+                                <p:commandButton  value = "#{selectedTerme.icon}" title="tout le langues" styleClass="cbEdit" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>
+                            
+                                                        
+                                                        </td> 
+                            <div id="imageEdition">
+                               <h:form id="formEditNote" 
+                                       rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                                   <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                                   <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
+                                       <p:menuitem value="#{langueBean.getMsg('index.note5')}" update=":idNoteEditDlg" oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
+                                       <p:menuitem value="#{langueBean.getMsg('index.note1')}" update=":idDefinitionEditDlg" oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
+                                       <p:menuitem value="#{langueBean.getMsg('index.note2')}" update=":idNotedApplicationEditDlg" oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
+                                       <p:menuitem value="#{langueBean.getMsg('index.note3')}" update=":idNoteHistoriqueEditDlg" oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
+                                       <p:menuitem value="#{langueBean.getMsg('index.note4')}" update=":idNoteEditorialeEditDlg" oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
+                                   </p:menu>
+                               </h:form>
+                            </div>
+                        </tr>
+                    </table>
+                </h:form>
             </div>
 
             <!-- affichage des notes de la langue en cours -->
@@ -92,9 +89,4 @@
         </div>
         </div>     
     </h:panelGroup>
-
-    <!-- affichage des notes pour toutes les langues -->    
-
-            
-    
 </ui:composition>
