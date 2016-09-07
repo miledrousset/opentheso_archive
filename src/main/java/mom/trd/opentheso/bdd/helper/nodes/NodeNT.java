@@ -16,6 +16,8 @@ public class NodeNT implements Comparable {
     private String title;
     private String idConcept;
     private String status;
+    private String dateCreated;
+    private String dateModified;
     
     public NodeNT() {
     }
@@ -34,6 +36,22 @@ public class NodeNT implements Comparable {
 
     public void setIdConcept(String idConcept) {
         this.idConcept = idConcept;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(String dateModified) {
+        this.dateModified = dateModified;
     }
 
     @Override

@@ -63,6 +63,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
+import mom.trd.opentheso.bdd.helper.nodes.NodeNTier;
 import mom.trd.opentheso.bdd.helper.nodes.NodePermute;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
@@ -158,6 +159,7 @@ public class SelectedTerme implements Serializable {
     private NodePermute nodePe;
 
     private String identifierType;
+    public String icon = "+";
 
     // Variables resourcesBundle
     String cheminNotice1;
@@ -510,6 +512,20 @@ public class SelectedTerme implements Serializable {
     private void majTSpeConcept() {
         termesSpecifique = new ArrayList<>();
         ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        for (NodeNT nnt : tempNT) {
+            HashMap<String, String> tempMap1 = new HashMap<>();
+            if (nnt.getStatus().equals("hidden")) {
+                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + "</del>");
+            } else {
+                tempMap1.put(nnt.getIdConcept(), nnt.getTitle());
+            }
+            termesSpecifique.addAll(tempMap1.entrySet());
+        }
+    }
+
+    public void majTSpeConceptOrder() {
+        termesSpecifique = new ArrayList<>();
+        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNTOrderByDate(connect.getPoolConnexion(), idC, idTheso, idlangue);
         for (NodeNT nnt : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             if (nnt.getStatus().equals("hidden")) {
@@ -1348,7 +1364,7 @@ public class SelectedTerme implements Serializable {
         } else {
             new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, definition, "definition", idUser);
         }
-        vue.setAddNote(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
     }
 
@@ -1367,7 +1383,7 @@ public class SelectedTerme implements Serializable {
         } else {
             new NoteHelper().addConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
         }
-        vue.setAddNote(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
     }
     /**
@@ -1468,7 +1484,7 @@ public class SelectedTerme implements Serializable {
         } else {
             new NoteHelper().addConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, noteApplication, "scopeNote", idUser);
         }
-        vue.setAddNote(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
     }
 
@@ -1486,7 +1502,7 @@ public class SelectedTerme implements Serializable {
         } else {
             new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteHistorique, "historyNote", idUser);
         }
-        vue.setAddNote(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
     }
 
@@ -1505,7 +1521,7 @@ public class SelectedTerme implements Serializable {
         } else {
             new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteEditoriale, "editorialNote", idUser);
         }
-        vue.setAddNote(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info5")));
     }
 
@@ -1552,7 +1568,7 @@ public class SelectedTerme implements Serializable {
     public void delTrad(String lang) {
         new TermHelper().deleteTraductionOfTerm(connect.getPoolConnexion(), idT, lang, idTheso, user.getUser().getId());
         majLangueConcept();
-        vue.setAddTrad(0);
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
     }
 
@@ -1944,6 +1960,25 @@ public class SelectedTerme implements Serializable {
 
         return true;
     }
+    
+    /**
+     * Permet de voir les nouvelles notes et changer l'icon pour pouvoir voir 
+     * touts les notes dans les autres langues;
+     */
+        public void valide(){
+        if (allLangue==true){
+            allLangue=false;
+            majNotes();
+            icon="+";
+        }
+        else{  
+            allLangue=true;
+                    
+           majNotes2();
+           icon="-";
+        }
+    }
+
 
     /**
      * Renvoie le type du concept générique
@@ -2798,7 +2833,15 @@ public class SelectedTerme implements Serializable {
 
     public void setAllLangue(boolean allLangue) {
         this.allLangue = allLangue;
+    } 
+
+
+    public String getIcon() {
+        return icon;
     }
 
-
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+   
 }

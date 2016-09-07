@@ -35,9 +35,9 @@ public class RelationsHelper {
     public RelationsHelper() {
     }
 
-    
     /**
-     * Cette fonction permet de rajouter une relation type Groupe ou domaine à un concept
+     * Cette fonction permet de rajouter une relation type Groupe ou domaine à
+     * un concept
      *
      * @param conn
      * @param idConcept
@@ -55,14 +55,14 @@ public class RelationsHelper {
 
         String query;
         Savepoint savepoint = null;
-        
+
         try {
             // Get connection from pool
             savepoint = conn.setSavepoint();
             try {
                 stmt = conn.createStatement();
                 try {
-                  /*  if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "MT", idUser, "ADD")) {
+                    /*  if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "MT", idUser, "ADD")) {
                         return false;
                     }*/
                     query = "Insert into concept"
@@ -73,33 +73,33 @@ public class RelationsHelper {
                             + ",'',"
                             + "false"
                             + ",'" + idGroup + "')";
- 
+
                     stmt.executeUpdate(query);
                     status = true;
                 } finally {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                //    conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
             if (sqle.getSQLState().equalsIgnoreCase("23505")) {
                 try {
-                    if(savepoint != null) {
+                    if (savepoint != null) {
                         conn.rollback(savepoint);
                         status = true;
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-            else
+            } else {
                 log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+            }
         }
-        return status;        
-    }    
-    
+        return status;
+    }
+
     /**
      * Cette fonction permet de rÃ©cupÃ©rer les termes gÃ©nÃ©riques d'un concept
      *
@@ -131,7 +131,7 @@ public class RelationsHelper {
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
-                        nodeListBT = new ArrayList <>();
+                        nodeListBT = new ArrayList<>();
                         while (resultSet.next()) {
                             NodeBT nodeBT = new NodeBT();
                             nodeBT.setIdConcept(resultSet.getString("id_concept2"));
@@ -281,7 +281,7 @@ public class RelationsHelper {
                             + ",'" + idConceptNT + "')";
                     stmt.executeUpdate(query);
                     status = true;
-                   // conn.commit();
+                    // conn.commit();
                 } finally {
                     stmt.close();
                 }
@@ -290,7 +290,7 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-          //  if (sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            //  if (sqle.getMessage().contains("duplicate key value violates unique constraint")) {
 
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding relation BT of Concept : " + idConceptNT, sqle);
@@ -334,7 +334,7 @@ public class RelationsHelper {
 
                     stmt.executeUpdate(query);
                     status = true;
-                  // System.err.println(query);
+                    // System.err.println(query);
                 } finally {
                     stmt.close();
                 }
@@ -343,7 +343,7 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-           // if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            // if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding relation historique of Concept : " + idConcept1, sqle);
             }
@@ -615,7 +615,7 @@ public class RelationsHelper {
         }
         return status;
     }
-    
+
     /**
      * Cette fonction permet de supprimer la relation TT d'un concept
      *
@@ -649,7 +649,7 @@ public class RelationsHelper {
                             + " modified = current_date"
                             + " WHERE id_concept ='" + idConcept + "'"
                             + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'"; 
+                            + " AND id_group = '" + idGroup + "'";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -657,7 +657,7 @@ public class RelationsHelper {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                //    conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
@@ -665,7 +665,7 @@ public class RelationsHelper {
         }
         return status;
     }
-    
+
     /**
      * Cette fonction permet de supprimer la relation MT ou domaine à un concept
      *
@@ -688,15 +688,15 @@ public class RelationsHelper {
                 stmt = conn.createStatement();
                 try {
 
-                /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
+                    /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
                     String query = "UPDATE concept set"
-                            + " id_group = '" + "" + "'," 
+                            + " id_group = '" + "" + "',"
                             + " modified = current_date"
                             + " WHERE id_concept ='" + idConcept + "'"
                             + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'"; 
+                            + " AND id_group = '" + idGroup + "'";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -704,7 +704,7 @@ public class RelationsHelper {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                //    conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
@@ -712,7 +712,7 @@ public class RelationsHelper {
         }
         return status;
     }
-    
+
     /**
      * Cette fonction permet d'ajouter une relation MT ou domaine à un concept
      *
@@ -729,7 +729,7 @@ public class RelationsHelper {
         boolean status = false;
         String query;
         Savepoint savepoint = null;
-        
+
         try {
             // Get connection from pool
             savepoint = conn.setSavepoint();
@@ -737,14 +737,14 @@ public class RelationsHelper {
                 stmt = conn.createStatement();
                 try {
 
-                /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
+                    /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
-                     query = "UPDATE concept set"
-                            + " id_group = '" + idGroup + "'," 
+                    query = "UPDATE concept set"
+                            + " id_group = '" + idGroup + "',"
                             + " modified = now()"
                             + " WHERE id_concept ='" + idConcept + "'"
-                            + " AND id_thesaurus = '" + idThesaurus + "'"; 
+                            + " AND id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -752,25 +752,25 @@ public class RelationsHelper {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                //    conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
             if (sqle.getSQLState().equalsIgnoreCase("23505")) {
                 try {
-                    if(savepoint != null) {
+                    if (savepoint != null) {
                         conn.rollback(savepoint);
                         status = true;
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
-            else
+            } else {
                 log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+            }
         }
         return status;
-    }    
+    }
 
     /**
      * Cette fonction permet d'ajouter une relation TT à un concept
@@ -805,7 +805,7 @@ public class RelationsHelper {
                             + " modified = current_date"
                             + " WHERE id_concept ='" + idConcept + "'"
                             + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'"; 
+                            + " AND id_group = '" + idGroup + "'";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -813,15 +813,15 @@ public class RelationsHelper {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                //    conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
             log.error("Error while adding relation TT of Concept : " + idConcept, sqle);
         }
         return status;
-    }      
-    
+    }
+
     /**
      * Cette fonction permet de supprimer toutes les relations d'un concept
      *
@@ -1030,7 +1030,7 @@ public class RelationsHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList<NodeNT> nodeListNT = null;
+        ArrayList<NodeNT> nodeListNT = new ArrayList<>();
 
         try {
             // Get connection from pool
@@ -1045,7 +1045,6 @@ public class RelationsHelper {
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
-                        nodeListNT = new ArrayList<NodeNT>();
                         while (resultSet.next()) {
                             NodeNT nodeNT = new NodeNT();
                             nodeNT.setIdConcept(resultSet.getString("id_concept2"));
@@ -1093,6 +1092,89 @@ public class RelationsHelper {
             log.error("Error while getting NT of Concept : " + idConcept, sqle);
         }
         Collections.sort(nodeListNT);
+        return nodeListNT;
+    }
+
+    /**
+     * cette fonction est pour trier les concept NT par date chronologique
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @param idLang
+     * @return
+     */
+    public ArrayList<NodeNT> getListNTOrderByDate(HikariDataSource ds,
+            String idConcept, String idThesaurus, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeNT> nodeListNT = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select hierarchical_relationship.id_concept2, concept.modified "
+                            + " FROM concept, hierarchical_relationship"
+                            + " where concept.id_thesaurus = '" + idThesaurus + "'"
+                            + " and hierarchical_relationship.id_thesaurus = concept.id_thesaurus "
+                            + " and concept.id_concept = hierarchical_relationship.id_concept2 "
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role = '" + "NT" + "'"
+                            + " order by modified DESC";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            NodeNT nodeNT = new NodeNT();
+                            nodeNT.setIdConcept(resultSet.getString("id_concept2"));
+                            nodeListNT.add(nodeNT);
+                        }
+                    }
+                    for (NodeNT nodeNT : nodeListNT) {
+                        query = "SELECT term.lexical_value, term.status FROM term, preferred_term"
+                                + " WHERE preferred_term.id_term = term.id_term"
+                                + " and preferred_term.id_concept ='" + nodeNT.getIdConcept() + "'"
+                                + " and term.lang = '" + idLang + "'"
+                                + " and term.id_thesaurus = '" + idThesaurus + "'";
+
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        if (resultSet != null) {
+                            resultSet.next();
+                            if (resultSet.getRow() == 0) {
+                                nodeNT.setTitle("");
+                                nodeNT.setStatus("");
+                            } else {
+                                if (resultSet.getString("lexical_value") == null || resultSet.getString("lexical_value").equals("")) {
+                                    nodeNT.setTitle("");
+                                } else {
+                                    nodeNT.setTitle(resultSet.getString("lexical_value"));
+                                }
+                                if (resultSet.getString("status") == null || resultSet.getString("status").equals("")) {
+                                    nodeNT.setStatus("");
+                                } else {
+                                    nodeNT.setStatus(resultSet.getString("status"));
+                                }
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting NT of Concept : " + idConcept, sqle);
+        }
+
         return nodeListNT;
     }
 
@@ -1202,7 +1284,7 @@ public class RelationsHelper {
         ArrayList<NodeRT> nodeListRT = null;
 
         try {
-            
+
             // Get connection from pool
             conn = ds.getConnection();
             try {
