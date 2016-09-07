@@ -403,7 +403,41 @@ public class SelectedThesaurus implements Serializable {
      */
     public void supprimerTheso(String id) {
         ThesaurusHelper th = new ThesaurusHelper();
+
+        // on vérifie si l'utilisateur n'a plus aucun thésaurus, on garde son dernier role sans thésaurus
+        // cette action est temporaire le temps de mettre en place une gestion complète des users et des groupes
+        UserHelper userHelper = new UserHelper();
+        Connection conn;
+        try {
+            conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if(userHelper.isLastThesoOfUser(
+                    connect.getPoolConnexion(),
+                    tree.getSelectedTerme().getUser().getUser().getId())) {
+                if(!userHelper.deleteOnlyTheThesoFromRole(
+                        conn, id)){
+                    conn.rollback();
+                    conn.close();
+                    return;                    
+                }
+            } 
+            else {
+                if(!userHelper.deleteThisRoleForThisThesaurus(
+                        conn, tree.getSelectedTerme().getUser().getUser().getId(),
+                        id)){
+                    conn.rollback();
+                    conn.close();
+                    return;
+                }
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         th.deleteThesaurus(connect.getPoolConnexion(), id);
+            
         arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
     }
     

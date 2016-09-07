@@ -1034,10 +1034,7 @@ public class ThesaurusHelper {
                             + "delete from concept_orphan where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from proposition where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_fusion where id_thesaurus = '" + idThesaurus + "';"
-                            + "delete from user_role where id_thesaurus = '" + idThesaurus + "';"
                             ;
-                    
-                    
 
                     stmt.executeUpdate(query);
                     state = true;

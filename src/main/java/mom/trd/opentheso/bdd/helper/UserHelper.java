@@ -50,6 +50,44 @@ public class UserHelper {
         return false;
     }
     
+    /**
+     * Permet de savoir si l'utilisateur n'a qu'un seul role
+     * @param ds
+     * @param idUser
+     * @return 
+     */
+    public boolean isLastThesoOfUser (HikariDataSource ds, int idUser){
+        Connection conn;
+        Statement stmt;
+        int count = 0;
+        ResultSet resultSet;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_user FROM user_role WHERE id_user =" + idUser;
+                    resultSet = stmt.executeQuery(query);
+                    while(resultSet.next()) {
+                        count++;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if(count == 1)
+            return true;
+        else 
+            return false;        
+    }
+    
     public boolean isUserLoginExist(HikariDataSource ds, String log) {
         Connection conn;
         Statement stmt;
@@ -818,6 +856,73 @@ public class UserHelper {
                 try {
                     String query = "delete from user_role where"
                             + " id_user =" + idUser;
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }
+    
+    /**
+     * Permet de supprimer le role sur le thésaurus
+     * @param conn
+     * @param idTheso
+     * @return 
+     */
+    public boolean deleteOnlyTheThesoFromRole(Connection conn,
+            String idTheso) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "update user_role set"
+                            + " id_thesaurus =''"
+                            + " where id_thesaurus = '" + idTheso + "'";
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }       
+    
+    /**
+     * Permet de supprimer tous les roles d'un utilisateur
+     * @param conn
+     * @param idUser
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean deleteThisRoleForThisThesaurus(Connection conn, int idUser,
+            String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from user_role where"
+                            + " id_user =" + idUser
+                            + " and id_thesaurus = '" + idThesaurus + "'";
                     stmt.executeUpdate(query);
                     status = true;
 
