@@ -499,15 +499,62 @@ public class WriteSkosBDD {
     }
 
     public String getId(String uri) {
-        if (uri.contains("#")) {
-            uri = uri.substring(uri.indexOf("#") + 1, uri.length());
+        if (uri.contains("idg=")) {
+            if(uri.contains("&")){
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.indexOf("&"));
+            }
+            else {
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.length());
+            }
         }
-        else
-        {
-            uri = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+        else {
+            if (uri.contains("idc=")) {
+                if(uri.contains("&")){
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.indexOf("&"));
+                }
+                else {
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.length());
+                }
+            }
+            else {
+                if (uri.contains("#")) {
+                    uri = uri.substring(uri.indexOf("#") + 1, uri.length());
+                }
+                else
+                {
+                    uri = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+                }
+            }
         }
         return uri;
-    }
+    }    
+    
+    /*
+    public String getId(SKOSResource resource) {
+        
+        String id = "";
+        
+        if(resource.getSdc() != null){
+            if(resource.getSdc().getIdentifier()!= null) {
+                if(!resource.getSdc().getIdentifier().isEmpty()){
+                    id = resource.getSdc().getIdentifier();
+                }
+            }
+        }
+        if(id.isEmpty()) {
+            if (resource.getUri().contains("#")) {
+                id = resource.getUri().substring(resource.getUri().indexOf("#") + 1, resource.getUri().length());
+            }
+            else
+            {
+                id = resource.getUri().substring(resource.getUri().lastIndexOf("/") + 1, resource.getUri().length());
+            }
+        }
+        return id;
+    }*/
+    
+    
+    
 
     /* Pour un concept */
     public ArrayList<NodeTermTraduction> getTraductionConcept(ArrayList<SKOSLabel> labelsList) {

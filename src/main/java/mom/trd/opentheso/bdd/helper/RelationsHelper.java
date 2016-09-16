@@ -123,11 +123,19 @@ public class RelationsHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select DISTINCT (id_concept2), status from hierarchical_relationship, concept"
-                            + " where hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'"
-                            + " and hierarchical_relationship.id_concept2 = concept.id_concept"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and role = '" + "BT" + "'";
+                    String query = "SELECT hierarchical_relationship.id_concept2,"
+                                 + " concept.status FROM hierarchical_relationship,"
+                                 + " concept WHERE "
+                                 + " concept.id_thesaurus = hierarchical_relationship.id_thesaurus"
+                                 + " AND "
+                                 + " concept.id_concept = hierarchical_relationship.id_concept1"
+                                 + " AND"
+                                 + " hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'"
+                                 + " AND"
+                                 + " hierarchical_relationship.id_concept1 = '" + idConcept + "'"
+                                 + " AND"
+                                 + " hierarchical_relationship.role = 'BT'";
+                    
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {

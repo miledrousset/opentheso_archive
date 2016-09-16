@@ -8,7 +8,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.Connexion;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 
 @ManagedBean(name = "langueBean", eager = true)
 @SessionScoped

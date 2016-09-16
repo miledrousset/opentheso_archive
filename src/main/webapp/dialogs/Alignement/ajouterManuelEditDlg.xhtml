@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idAjouterManuelEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="AjouterManuelEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idAjouterManuelEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterManuelEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement manuel -->
         <h:form>
             <p:messages showDetail="true" autoUpdate="true" />
@@ -39,7 +39,7 @@
             </table>
             <br/>
             <p:commandButton id="cbAjAlignManu" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerAlign()}"
-                             update=":panContenu" styleClass="styleButton" oncomplete="PF('AjouterManuelEditDlg').hide();"/>
+                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterManuelEditDlg').hide();"/>
         </h:form>
     </p:dialog>
 </ui:composition>

@@ -1,0 +1,24 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    <div id="reorganizing">
+        
+        <h:panelGroup rendered="#{user1.haveRights(2)}">
+            <fieldset class="fieldPref">
+                
+                <legend><h:outputText value="#{langueBean.getMsg('conf.reorganizing')}" /></legend><br/>
+                <h:form id="formReorganizing">
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.explication')}" />  </td>
+                        </tr>
+                    </table>
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}"  styleClass="styleButton" />
+                </h:form> 
+            </fieldset>
+        </h:panelGroup>
+    </div>
+</ui:composition>

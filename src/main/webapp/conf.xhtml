@@ -167,15 +167,11 @@
                     </h:form> 
                 </fieldset>
             </h:panelGroup>
+
+            <ui:include src ="/admin/reorganizing.xhtml" />
+            
         </div>
-        <footer style="text-align: center;">
-            <br />
-            <div style="margin-bottom: 5px; margin-top: 5px;">
-                <a href="opentheso.xhtml"  style="color: #BD6909; text-decoration: none; ">©OpenTheso</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="copyright.xhtml" style="color: #BD6909; text-decoration: none;">©PACTOLS</a>
-            </div>
-        </footer>
+<ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">

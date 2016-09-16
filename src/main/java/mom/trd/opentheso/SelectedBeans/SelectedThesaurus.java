@@ -324,6 +324,38 @@ public class SelectedThesaurus implements Serializable {
     
 
     /**
+     * Cette fonction permet de nettoyer et réorganiser le thésaurus
+     * @return 
+     */
+    public boolean reorganizing() {
+        if(thesaurus.getId_thesaurus().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
+            return false;
+        }
+        try {
+            ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            if(!thesaurusHelper.reorganizingTheso(conn, thesaurus.getId_thesaurus())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                conn.rollback();
+                conn.close();
+                return false;
+             }                
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing") ));
+            return true;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        return false;
+    }
+    
+    
+    /**
      * Création d'un nouveau thésaurus avec le role
      * @param idUser
      * @param idRole 

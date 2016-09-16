@@ -7,7 +7,7 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
 
-    <p:dialog id="idAjouterAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="AjouterAutomatiqueEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idAjouterAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterAutomatiqueEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
         <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
@@ -27,14 +27,14 @@
                         </h:panelGrid>
                         <h:panelGrid columns="4" style="margin-bottom:10px" cellpadding="5">
                             <p:selectBooleanCheckbox value="#{selectedTerme.opentheso}" />
-                            <h:outputText value=" Opentheso" />
+                            <h:outputText value=" pactols" />
                             
                             <h:inputText a:placeholder="#{langueBean.getMsg('popup.addAlign2')}" value="#{selectedTerme.linkOT}"  title="exp: http://pactols.frantiq.fr/opentheso/" />
                             
                             <h:inputText a:placeholder="Id" value="#{selectedTerme.idOT}" style="width: 25px;" title="Id thesaurus" />
                         </h:panelGrid>
                         <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.creerAlignAuto()}"
-                                         update=":idAjouterAutomatique2EditDlg" styleClass="styleButton" oncomplete="PF('AjouterAutomatique2EditDlg').show(); PF('AjouterAutomatiqueEditDlg').hide();"/>
+                                         update=":idAjouterAutomatique_suiteEditDlg" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg').show(); PF('ajouterAutomatiqueEditDlg').hide();"/>
                     </h:form>
     </p:dialog>
 </ui:composition>

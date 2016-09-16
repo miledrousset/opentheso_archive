@@ -384,7 +384,7 @@ public class AlignmentQuery {
                     NodeAlignment na = new NodeAlignment();
                     na.setInternal_id_concept(idC);
                     na.setInternal_id_thesaurus(idTheso);
-                    na.setThesaurus_target("OpenTheso");
+                    na.setThesaurus_target("Pactols");
                     na.setUri_target(resource.getUri());
                     for(SKOSLabel label : resource.getLabelsList()) {
                         switch (label.getProperty()) {

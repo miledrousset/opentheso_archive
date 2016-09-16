@@ -14,7 +14,7 @@
                         <f:selectItems value="#{theso.languesTheso}"/>
                     </h:selectOneMenu><br/><br/>
                     <p:commandButton id="cbAjTradTradTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerTradterme()}" 
-                                     update=":contenuDroite3" styleClass="styleButton" oncomplete="PF('ajouterTraductionEditDlg').hide();"/>
+                                     update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('ajouterTraductionEditDlg').hide();"/>
                 </h:form>
     </p:dialog>
 </ui:composition>

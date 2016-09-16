@@ -7,7 +7,7 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
 
-    <p:dialog id="idAjouterAutomatique2EditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="AjouterAutomatique2EditDlg" modal="true" resizable="false" >
+    <p:dialog id="idAjouterAutomatique_suiteEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterAutomatique_suiteEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
         Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
         <div style="text-align: left; max-width: 600px; max-height: 500px; overflow: auto;" >
@@ -31,7 +31,7 @@
                     <tr>
                         <td colspan="2" style="text-align: center;">
                             <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
-                                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique2EditDlg.hide()';"  />
+                                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
                         </td>
                     </tr>
                 </table>
