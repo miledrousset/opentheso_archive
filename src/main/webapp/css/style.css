@@ -117,6 +117,21 @@ input[type="button"], input[type="submit"]{
     border: none;
     box-shadow: none;
 }
+.cbEdit2{
+    background: none;
+    height: 5px;
+    width: 5px;
+    border: none;
+    box-shadow: none;
+}
+
+.ui-widget-content .cbEdit2{
+    background: none;
+    height: 5px;
+    width: 5px;
+    border: none;
+    box-shadow: none;
+}
 
 .cbSeparateMenu{
     background: #D9C7BE;

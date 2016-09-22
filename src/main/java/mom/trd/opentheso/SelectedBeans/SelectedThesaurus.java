@@ -1,11 +1,13 @@
 package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,6 +44,9 @@ import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import skos.SKOSXmlDocument;
+import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
+import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
+import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
 @ManagedBean(name = "theso", eager = true)
 @SessionScoped
@@ -89,6 +94,17 @@ public class SelectedThesaurus implements Serializable {
     private boolean arkActive;
     private String serverArk;
     
+    // Backup
+    private ArrayList<String> tablesList;
+    private ArrayList<String> tablesListPrivate;
+    private ArrayList<Table> sortirXml;
+    
+    private String nomdufichier;
+
+
+    
+
+    
     
     // niveaux des classes Beans
     // theso -> treeBean -> selectedTerme -> user1
@@ -101,6 +117,8 @@ public class SelectedThesaurus implements Serializable {
     
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean tree;
+
+
     
     @ManagedProperty(value = "#{ssTree}")
     private UnderTree uTree;
@@ -397,6 +415,13 @@ public class SelectedThesaurus implements Serializable {
         
     }
     
+    public void getAllTables()
+    {
+        ExportPrivatesDatas exportData = new ExportPrivatesDatas();
+        tablesList= exportData.showAllTables(connect.getPoolConnexion());
+        tablesListPrivate = exportData.showPrivateTables(connect.getPoolConnexion());
+    }
+
     /**
      * Suppréssion d'un thésaurus
      * @param id 
@@ -1350,6 +1375,48 @@ public class SelectedThesaurus implements Serializable {
         this.idNaan = idNaan;
     }
 
-    
+    public ArrayList<String> getTablesList() {
+        return tablesList;
+    }
+
+    public void setTablesList(ArrayList<String> tablesList) {
+        this.tablesList = tablesList;
+    }
+
+    public ArrayList<String> getTablesListPrivate() {
+        return tablesListPrivate;
+    }
+
+    public void setTablesListPrivate(ArrayList<String> tablesListPrivate) {
+        this.tablesListPrivate = tablesListPrivate;
+    }
+
+    public ArrayList<Table> getSortirXml() {
+        return sortirXml;
+    }
+
+    public void setSortirXml(ArrayList<Table> sortirXml) {
+        this.sortirXml = sortirXml;
+    }
+
+    public ArrayList <String> getValuesOfTables () {
+        ArrayList <String> values = new ArrayList<>();
+        for (Table tables : sortirXml) {
+            for (LineOfData line : tables.getLineOfDatas()) {
+                values.add(line.getValue());
+            }
+            
+        }
+        return values;
+    }
+
+    public String getNomdufichier() {
+        return nomdufichier;
+    }
+
+    public void setNomdufichier(String nomdufichier) {
+        this.nomdufichier = nomdufichier;
+    }
+
     
 }

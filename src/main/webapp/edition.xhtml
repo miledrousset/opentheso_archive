@@ -40,7 +40,6 @@
         <div id="menuHead">
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
-
             <ui:include src="menuAll.xhtml" />
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -290,7 +289,6 @@
                         </div>
                     </h:panelGroup>
                 </h:panelGroup>
-
                 <h:panelGroup id="panCreer">
                     <h:panelGroup layout="block" rendered="#{vue.creat == true}">
                         <div id="creerTheso">
@@ -552,6 +550,21 @@
                                          update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
                         </p:menu>
                     </h:form>
+                </div>
+                <div style="float: left; margin-left: 40px;">
+                    <h:form>
+                        <p:commandButton id="backupbd"  value="BackUp" title="#{langueBean.getMsg('back.creer')}" action="#{theso.getAllTables()}"  styleClass="styleButton"/> 
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('back.creer')}"  style="font-size: 12px;" ajax="false">
+                                <p:fileDownload  value="#{downloadBean.backUpBaseDonnees(theso.tablesList)}" />
+                            </p:menuitem>
+                            <p:menuitem value="#{langueBean.getMsg('back.CreerPrivate')}"  style="font-size: 12px;" ajax="false">
+                                <p:fileDownload  value="#{downloadBean.backUpBaseDonnees(theso.tablesListPrivate)}" />
+                            </p:menuitem>
+                        </p:menu>
+
+                    </h:form>
+
                 </div>
             </div><br/>
             <footer>

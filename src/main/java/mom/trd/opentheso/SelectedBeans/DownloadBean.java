@@ -1,9 +1,12 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import mom.trd.opentheso.core.exports.privatesdatas.WriteXml;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,9 +17,11 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
+import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -343,6 +348,39 @@ public class DownloadBean implements Serializable {
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_skos.xml");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;        
+    }
+    
+    /**
+     * Cette fonction permet de télécharger les tables et les données
+     * ce qui permet de sauvegarder toutes les données privées pour les mise à jour
+     * @param toutTables
+     * @return 
+     */
+    public StreamedContent backUpBaseDonnees(ArrayList <String> toutTables){
+        ArrayList<Table> sortirXml;
+        ExportPrivatesDatas backUp = new ExportPrivatesDatas();
+        Iterator <String> it1 = toutTables.iterator();
+        WriteXml write = new WriteXml();
+        write.writeHead();
+        String table;
+        
+        // date du jour
+        java.util.Date datetoday = new java.util.Date(); 
+        
+        while(it1.hasNext())
+        {
+            table = it1.next();
+            sortirXml = backUp.getDatasOfTable(connect.getPoolConnexion(), table);
+            write.WriteIntoXML(sortirXml,  table);
+        }
+               InputStream stream;
+        try {
+            stream = new ByteArrayInputStream(write.getXml().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_"+datetoday+".xml");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }

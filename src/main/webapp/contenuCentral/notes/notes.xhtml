@@ -1,3 +1,6 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -13,15 +16,18 @@
                 <h:form id="allNotes">
                     <table>
                         <tr>
-  
+                            <td style="text-align: right">
+                            </td>
+                            <td>
+                                 <p:commandLink  value = "#{selectedTerme.icon}" title="tout le langues" styleClass="cbEdit2" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                     
+                           
+                            </td> 
+                            
+                                     <!-- pour pouvoir utiliser &nbsp; , on besoin les 4 priere lignes -->
                             <td style="text-align: left">
                                 <h:outputText value="#{langueBean.getMsg('index.note')}" />
                             </td>
-                                                        <td style="text-align: right">
-                                <p:commandButton  value = "#{selectedTerme.icon}" title="tout le langues" styleClass="cbEdit" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>
-                            
                                                         
-                                                        </td> 
                             <div id="imageEdition">
                                <h:form id="formEditNote" 
                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
