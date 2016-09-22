@@ -26,11 +26,7 @@
                                      <!-- pour pouvoir utiliser &nbsp; , on besoin les 4 priere lignes -->
                             <td style="text-align: left">
                                 <h:outputText value="#{langueBean.getMsg('index.note')}" />
-                            </td>
-                                                        <td style="text-align: right">
-                                <p:commandButton  value = "#{selectedTerme.icon}" title="toutes les langues" styleClass="cbEdit" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>
-                            
-                                                        
+                            </td>                                                        
                             <div id="imageEdition">
                                <h:form id="formEditNote" 
                                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and ((user1.haveRights(2)) or (user1.haveRights(4))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
