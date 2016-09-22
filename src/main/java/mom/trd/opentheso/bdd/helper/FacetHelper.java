@@ -701,6 +701,7 @@ public class FacetHelper {
                             + "from thesaurus_array, term, preferred_term"
                             + " where thesaurus_array.id_concept_parent=preferred_term.id_concept"
                             + " and preferred_term.id_term=term.id_term"
+                            + " and thesaurus_array.id_thesaurus=term.id_thesaurus"
                             + " and term.lang='" + lang.trim() + "'"
                             + " and thesaurus_array.id_thesaurus = '" + idThesaurus + "'"
                             + " and identifier = '" + idFacet + "'";

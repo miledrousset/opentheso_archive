@@ -1139,11 +1139,25 @@ public class SelectedTerme implements Serializable {
             return;
         }
         boolean tradExist = false;
+        
+        // c'est le cas ou le concept n'a pas de traduction dans la langue en cours, il faut le mettre a jour dans l'arbre
+        boolean newTraduction = false;
+        
+        
         for (Entry<String, String> e : langues) {
             if (e.getKey().equals(langueEdit)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
                 tradExist = true;
                 break;
+            }
+        }
+        ConceptHelper ch = new ConceptHelper();
+        TermHelper termHelper = new TermHelper();
+        if(idT.isEmpty()) {
+            newTraduction = true;
+            String tmp = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), idC, idTheso);
+            if(tmp != null) {
+                idT = tmp;
             }
         }
         // traduction du domaine
@@ -1155,7 +1169,7 @@ public class SelectedTerme implements Serializable {
             cgl.setLang(langueEdit);
 
             GroupHelper cgh = new GroupHelper();
-            if (!cgh.isDomainExist(connect.getPoolConnexion(),
+            if (cgh.isDomainExist(connect.getPoolConnexion(),
                     cgl.getLexicalvalue(),
                     cgl.getIdthesaurus(), cgl.getLang())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
@@ -1172,6 +1186,9 @@ public class SelectedTerme implements Serializable {
             for (NodeGroupTraductions ngt : tempNGT) {
                 tempMapL.put(ngt.getIdLang(), ngt.getTitle());
             }
+            if(newTraduction) {
+                nom = cgh.getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
+            }
             langues.addAll(tempMapL.entrySet());
 
             // traduction du TT
@@ -1181,24 +1198,27 @@ public class SelectedTerme implements Serializable {
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
-            if (new TermHelper().isTermExist(connect.getPoolConnexion(),
+            if (termHelper.isTermExist(connect.getPoolConnexion(),
                     terme.getLexical_value(),
                     terme.getId_thesaurus(), terme.getLang())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
                 return;
             }
 
-            ConceptHelper ch = new ConceptHelper();
+            
             if (!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
 
-            ArrayList<NodeTermTraduction> tempNTT = new TermHelper().getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
+            ArrayList<NodeTermTraduction> tempNTT = termHelper.getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
             langues = new ArrayList<>();
             HashMap<String, String> tempMapL = new HashMap<>();
             for (NodeTermTraduction ntt : tempNTT) {
                 tempMapL.put(ntt.getLang(), ntt.getLexicalValue());
+            }
+            if(newTraduction) {
+                nom = termHelper.getThisTerm(connect.getPoolConnexion(),idC, idTheso, idlangue).getLexical_value();
             }
             langues.addAll(tempMapL.entrySet());
 
@@ -1210,25 +1230,28 @@ public class SelectedTerme implements Serializable {
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
 
-            if (new TermHelper().isTermExist(connect.getPoolConnexion(),
+            if (termHelper.isTermExist(connect.getPoolConnexion(),
                     terme.getLexical_value(),
                     terme.getId_thesaurus(), terme.getLang())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
                 return;
             }
-            ConceptHelper ch = new ConceptHelper();
+
             if (!ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
 
-            ArrayList<NodeTermTraduction> tempNTT = new TermHelper().getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
+            ArrayList<NodeTermTraduction> tempNTT = termHelper.getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
             langues = new ArrayList<>();
             HashMap<String, String> tempMapL = new HashMap<>();
             for (NodeTermTraduction ntt : tempNTT) {
                 tempMapL.put(ntt.getLang(), ntt.getLexicalValue());
             }
             langues.addAll(tempMapL.entrySet());
+            if(newTraduction) {
+                nom = termHelper.getThisTerm(connect.getPoolConnexion(),idC, idTheso, idlangue).getLexical_value();
+            }
         }
 
         langueEdit = "";
@@ -2044,8 +2067,9 @@ public class SelectedTerme implements Serializable {
             } else {
                 dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "dossier", n.getTitle(), root);
             }
-
-            new DefaultTreeNode("fake", dynamicTreeNode);
+            
+            DefaultTreeNode defaultTreeNode = new DefaultTreeNode("fake", dynamicTreeNode);
+            defaultTreeNode.setExpanded(true);
         }
     }
 

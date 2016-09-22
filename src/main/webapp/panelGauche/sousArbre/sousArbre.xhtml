@@ -11,8 +11,7 @@
             <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
                 <p:commandButton id="cbAjFacette" 
                                  styleClass="cbEdit" icon="ui-icon-edit" 
-                                 actionListener="#{vue.setFacette(true)}"  
-                                 update=":panFacette" />
+                                 update=":idFacetteEditDlg,:panFacette" oncomplete="PF('facetteEditDlg').show();" />
             </h:form>
         </div>
         <div id="clean" />

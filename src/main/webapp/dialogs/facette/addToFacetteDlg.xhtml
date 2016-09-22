@@ -1,0 +1,44 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddToFacetteDlg"  header="#{langueBean.getMsg('index.facet')}" widgetVar="addToFacetteDlg" modal="true" resizable="false" >
+        
+        <!-- Add Concept to facette -->
+        <h:panelGroup id="panEditFacette" style="background: transparent; box-shadow: none;">
+
+            <br/>                
+            <fieldset style="float: left; width: 200px;  margin-right: 10px;">
+                <legend><h:outputText value="#{langueBean.getMsg('popup.inc')}" /></legend>
+                <h:form>
+                    <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
+                        <f:selectItems value="#{selectedTerme.arrayFacetteInclure}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
+                    </h:selectOneMenu>
+                    <br/><br/>
+                    <p:commandButton value="#{langueBean.getMsg('btnAdd')}" actionListener="#{ssTree.insertNewConcept()}" update=":idAddToFacetteDlg,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
+                </h:form>
+             </fieldset>
+            <fieldset style="float: left; width: 200px;  margin-right: 10px;">
+                <legend><h:outputText value="#{langueBean.getMsg('popup.ex')}" /></legend>
+                <h:form>
+                    <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
+                        <f:selectItems value="#{selectedTerme.arrayFacette}" var="tft" itemLabel="#{tft.value}" itemValue="#{tft.key}" />
+                    </h:selectOneMenu>
+                    <br/><br/>
+                    
+                    <p:commandButton value="#{langueBean.getMsg('popup.delFrom')}" actionListener="#{ssTree.delConcept()}" update=":idAddToFacetteDlg,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
+                </h:form>
+
+            </fieldset>
+            <br/> <br/> <br/> <br/> 
+                            <h:form>
+                    <p:commandButton icon="ui-icon-retour"  oncomplete="Pf('addToFacetteDlg').hide();" update=":idAddToFacetteDlg" />
+                </h:form>
+        </h:panelGroup>
+
+    </p:dialog>
+
+</ui:composition>

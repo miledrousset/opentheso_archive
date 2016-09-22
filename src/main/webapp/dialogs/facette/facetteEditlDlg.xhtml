@@ -10,11 +10,8 @@
         <!-- facette1 -->
                 <h:panelGroup id="panFacette" style="background: transparent; box-shadow: none;">
 
-                        <div id="divClose">
 
-                    </div>
-                    <br/>
-                    <fieldset style="float: left; margin-right: 10px; width: 225px; height: 120px;">
+                    <fieldset style="float: left; margin-right: 10px; width: 250px; height: 120px;">
                         <legend><h:outputText value="#{langueBean.getMsg('popup.addFacet')}" /></legend>
                         <h:form>
                             <table>
@@ -45,7 +42,7 @@
                                 <td><h:inputText value="#{autoComp.facetEdit}" /></td>
                             </tr>
                         </table>
-                        <br/>
+                        
                         <p:commandButton value="Créer" styleClass="styleButton" actionListener="#{autoComp.newFacette()}" update=":accordeonTree,:panFacette" />
                     </h:form>
                 </fieldset>
@@ -60,7 +57,7 @@
                     </h:form>
                 </fieldset>
                 <div id="clean" style="margin-bottom: 10px;" />
-                <fieldset style="float: left; margin-right: 10px; width: 225px; height: 160px;">
+                <fieldset style="float: left; margin-right: 10px; width: 280px; height: 160px;">
                     <legend><h:outputText value="#{langueBean.getMsg('popup.tradFacet')}" /></legend>
                     <h:form>
                         <table>
@@ -88,7 +85,7 @@
                         <p:commandButton value="Traduire" actionListener="#{theso.tradFacette()}" update=":panFacette" styleClass="styleButton" />
                     </h:form>
                 </fieldset>
-                <fieldset style="float: right; width: 200px; height: 160px;">
+                <fieldset style="float: right; width: 250px; height: 160px;">
                     <legend><h:outputText value="#{langueBean.getMsg('popup.editFacet')}" /></legend>
                     <h:form>
                         <table>
@@ -110,36 +107,8 @@
                 </fieldset>
             </h:panelGroup>       
         
-        
-        <!--facette2 -->
-        <h:panelGroup id="panEditFacette" style="background: transparent; box-shadow: none;">
 
-            <br/>                
-            <fieldset style="float: left; margin-right: 10px;">
-                <legend><h:outputText value="#{langueBean.getMsg('popup.inc')}" /></legend>
-                <h:form>
-                    <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                        <f:selectItems value="#{selectedTerme.arrayFacetteInclure}" var="tf" itemLabel="#{tf.value}" itemValue="#{tf.key}" />
-                    </h:selectOneMenu>
-                    <br/><br/>
-                    <p:commandButton value="#{langueBean.getMsg('btnAdd')}" actionListener="#{ssTree.insertNewConcept()}" update=":panEditFacette,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
-                </h:form>
-            </fieldset>
-            <fieldset style="float: right;">
-                <legend><h:outputText value="#{langueBean.getMsg('popup.ex')}" /></legend>
-                <h:form>
-                    <h:selectOneMenu value="#{selectedTerme.valueEdit}" style="margin-bottom: 4px; margin-top: 15px;" styleClass="listes" >
-                        <f:selectItems value="#{selectedTerme.arrayFacette}" var="tft" itemLabel="#{tft.value}" itemValue="#{tft.key}" />
-                    </h:selectOneMenu>
-                    <br/><br/>
-                    
-                    <p:commandButton value="#{langueBean.getMsg('popup.delFrom')}" actionListener="#{ssTree.delConcept()}" update=":panEditFacette,:contenuDroite2,:accordeonTree" styleClass="styleButton" />
-                </h:form>
-                   
-            </fieldset> 
-        </h:panelGroup>
-        <h:form><p:commandButton icon="ui-icon-retour"  oncomplete="Pf('facetteEditDlg').hide();" update=":idFacetteEditDlg" />
-        </h:form>
+
     </p:dialog>
 
 </ui:composition>

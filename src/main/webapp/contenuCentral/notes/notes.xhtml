@@ -27,10 +27,13 @@
                             <td style="text-align: left">
                                 <h:outputText value="#{langueBean.getMsg('index.note')}" />
                             </td>
+                                                        <td style="text-align: right">
+                                <p:commandButton  value = "#{selectedTerme.icon}" title="toutes les langues" styleClass="cbEdit" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>
+                            
                                                         
                             <div id="imageEdition">
                                <h:form id="formEditNote" 
-                                       rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                                       rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and ((user1.haveRights(2)) or (user1.haveRights(4))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
                                    <p:commandButton id="dynaButtonNote" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
                                    <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
                                        <p:menuitem value="#{langueBean.getMsg('index.note5')}" update=":idNoteEditDlg" oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>

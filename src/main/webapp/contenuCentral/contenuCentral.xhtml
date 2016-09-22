@@ -25,7 +25,7 @@
                     </p:commandButton>
                 </h:form>  
 
-                <h:form  rendered="#{(selectedTerme.idC != null)}" style="float: left; margin-right: 5px;" >
+                <h:form  rendered="#{(selectedTerme.idC != null) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
                     <!-- exporter le concept en SKOS -->
                     <p:commandButton value="Skos" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.conceptToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />

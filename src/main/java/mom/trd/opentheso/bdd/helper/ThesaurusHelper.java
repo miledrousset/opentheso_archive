@@ -269,6 +269,51 @@ public class ThesaurusHelper {
     }    
 
     /**
+     * Cette focntion permet de nettoyer un thésaurus 
+     * @param conn
+     * @param idTheso
+     * @return 
+     */
+    public boolean reorganizingTheso(Connection conn, String idTheso) {
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from term where id_term = ''"
+                            + " and id_thesaurus = '" + idTheso + "'";
+                    stmt.executeUpdate(query);
+
+                    query = "delete from concept_group_label where idgroup = ''"
+                            + " and idthesaurus = '" + idTheso + "'";
+                    stmt.executeUpdate(query);
+                    
+                    query = "UPDATE concept_group SET notation = '' WHERE notation ilike 'null'";
+                    stmt.executeUpdate(query);
+                    
+                    query = "UPDATE concept_group SET idtypecode = 'MT' WHERE idtypecode ilike 'null'";
+                    stmt.executeUpdate(query);
+                    
+                    query = "UPDATE concept SET notation = '' WHERE notation ilike 'null'";
+                    stmt.executeUpdate(query);
+                    
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while reorganizing theso : " + idTheso, sqle);
+        }
+        return status;        
+    }
+    
+    /**
      * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
      * du thésaurus et la langue retourne yes or No si l'opération a réussie ou
      * non

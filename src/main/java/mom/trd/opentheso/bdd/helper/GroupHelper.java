@@ -1482,7 +1482,7 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select idgroup from group_concept_label where "
+                    String query = "select idgroup from concept_group_label where "
                             + "unaccent_string(lexicalvalue) ilike "
                             + "unaccent_string('" + title
                             + "')  and lang = '" + idLang
