@@ -1054,6 +1054,7 @@ public class ThesaurusHelper {
                     String query = "delete from thesaurus where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from thesaurus_label where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from thesaurus_array where id_thesaurus = '" + idThesaurus + "';"
+                            + "delete from node_label where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from thesaurus_array_concept where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_historique where id_thesaurus = '" + idThesaurus + "';"

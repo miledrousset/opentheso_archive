@@ -18,7 +18,6 @@
             <div id="onglets">
                 <ul id="listeMenu"> 
                     <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
-                <!--    <li id="itemMenu"><h:outputLink value="openindex.xhtml">OpenIndex</h:outputLink></li>  -->
                     <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
                     <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
                     <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
