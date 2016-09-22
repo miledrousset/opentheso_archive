@@ -4,7 +4,7 @@
 
     <groupId>mom.trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.0.8</version>
+    <version>4.0.9</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -13,7 +13,7 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+ 
     <dependencies>
         <dependency>
             <groupId>org.glassfish</groupId>
