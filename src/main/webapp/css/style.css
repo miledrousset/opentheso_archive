@@ -369,6 +369,19 @@ input[type="button"], input[type="submit"]{
     font-size: 14px;
 }
 
+.linkSmall {
+    background: none;
+    border: none;
+    font-family: "Palatino linotype",Times,serif;
+    font-size: 11px;
+    text-shadow: none;
+    font-weight: normal;
+    color: green;
+    box-shadow: none;
+    text-align: left; 
+    font-size: 11px;
+}
+
 .termClick.ui-state-hover {
     background-color: threeddarkshadow;
     color: white;

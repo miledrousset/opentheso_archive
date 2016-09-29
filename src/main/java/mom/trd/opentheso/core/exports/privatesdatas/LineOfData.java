@@ -27,6 +27,18 @@ public class LineOfData {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        if(value == null){
+            this.value = "";
+            return;
+        }
+        if(value.isEmpty()){
+            this.value = "";
+            return;
+        }
+        if("null".equals(value)){
+            this.value = "";
+            return;
+        }
+        this.value = value.trim();
     }
 }

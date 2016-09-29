@@ -1,5 +1,9 @@
 package mom.trd.opentheso.core.exports.privatesdatas;
 
+/**
+ *
+ * @author antonio.perez
+ */
 
 import java.util.ArrayList;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
@@ -21,50 +25,55 @@ public class WriteXml {
             }
             endLine();
         }
-        endTable(Tablename);
+        endTable();
     }
     
     private void startTable(String tableName) {
         xml += "\n";
-        xml += "<" + tableName + ">";
+        xml += "    ";
+        xml += "<table nom =\"" + tableName + "\">";
     }
     
-    private String endTable(String tableName) {
+    private String endTable() {
         xml += "\n";
-        xml += "</" + tableName + ">";
+        xml += "    ";
+        xml += "</table>";
         return xml;
     }    
     
     private void startLine() {
         xml += "\n";
-        xml += "    ";
+        xml += "        ";
         xml += "<ligne>";
     }
     
     private void endLine() {
         xml += "\n";
-        xml += "    ";
+        xml += "        ";
         xml += "</ligne>";
     }    
     
     private void writeLine(String colomne, String value) {
         xml += "\n";
-        xml += "        ";
+        xml += "            ";
         xml += "<" + colomne + ">";
-        xml += "\n";
-        xml += "            ";        
-        xml += "<value>";
         xml += value;
-        xml += "</value>";
-        xml += "\n";
-        xml += "        ";
         xml += "</" + colomne + ">";
     }
     
-    public String writeHead(){
+    public void writeHead(){
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        return xml;
+        xml += "\n";
     }
+    
+    public void start(){
+        xml += "<tables>";
+    }
+    
+    public void end(){
+        xml += "\n";
+        xml += "</tables>";
+    }    
     
     public String getXml() {
         return xml;

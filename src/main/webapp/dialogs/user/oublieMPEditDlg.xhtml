@@ -1,0 +1,27 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idOublieMPEditDlg"  header="#{langueBean.getMsg('mot.info')}" widgetVar="oublieMPEditDlg" modal="true" resizable="false" >
+            <!-- Recuperation de Mot de Pass -->
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />   
+            <h:inputTextarea rows="1" value="#{oublie.nomUsu}"  />
+            <h:inputTextarea rows="1" value="#{oublie.email}"  /><br/>
+            <br/>
+            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" icon="ui-icon-valider" actionListener="#{downloadBean.oublieMonPass}"
+                             styleClass="styleButton" oncomplete="PF('oublieMPEditDlg').hide();"/>
+                
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                </p:confirmDialog> 
+                <td colspan="3" style="text-align: center;">
+                <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" update=":idOublieMPEditDlg" oncomplete="PF('oublieMPEditDlg').hide();" styleClass="styleButton" />
+                </td>
+        </h:form>
+    </p:dialog>
+</ui:composition>

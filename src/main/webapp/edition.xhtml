@@ -548,8 +548,11 @@
                                          update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
                                          update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('impBDD.info2')}" actionListener="#{downloadBean.appleInjection()}" 
+                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
                         </p:menu>
                     </h:form>
+                    
                 </div>
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
