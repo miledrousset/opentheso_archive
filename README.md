@@ -5,7 +5,7 @@ Il est développé pour la Fédération et ressources sur l'Antiquité (FRANTIQ,
 
 Ses fonctionnalités actuelles :
 - Gestion avancée des termes et des branches
-- Gestion collaborative avec 3 niveaux d'authentification (admin, user et traducteurs)
+- Gestion collaborative avec 4 niveaux d'authentification (Superadmin, Admin, User et Traducteur)
 - Interopérable : génération automatique d'identifiants ARK (ce service est assuré par le PSIR de la MOM) http://ark.mom.fr 
 - WebServices SOAP, REST
 - import/export SKOS et CSV
