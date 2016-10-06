@@ -58,10 +58,9 @@ public class CreateBDD {
             Statement stmt, stmt2, stmt3;
             Connection conn = conextion();
             try {
-
                 System.out.println(dbName);
                 chaineUpdate = updateBDD();
-                stmt =  conn.createStatement();
+                stmt = conn.createStatement();
                 try {
 
                     String query = "create Database " + dbName + " with owner opentheso";
@@ -69,43 +68,40 @@ public class CreateBDD {
                     System.out.println("BDD hecha)");
                 } finally {
                     stmt.close();
-                    
+                    conn.close();
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
                 Connection connuovelle = conextion2();
-                chaineTables = avoirContentpourTables(connuovelle);
-                System.out.println("archivo transformado Strign");
                 stmt3 = stmt2 = connuovelle.createStatement();
                 try {
-                    stmt2.execute(chaineTables);
-                    System.out.println("tablas dentro");
-                    stmt3.execute(chaineUpdate);
-                    System.out.println("MAJ dentro");
-                } finally {
-                    stmt2.close();
-                    stmt3.close();
-                    connuovelle.close();
+                    chaineTables = avoirContentpourTables(connuovelle);
+                    System.out.println("archivo transformado Strign");
+                    try {
+                        stmt2.execute(chaineTables);
+                        System.out.println("tablas dentro");
+                        stmt3.execute(chaineUpdate);
+                        System.out.println("MAJ dentro");
+                    } finally {
+                        stmt2.close();
+                        stmt3.close();
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                //Connection conn = ds.getConnection();
+                File fichero;
+                System.out.println("pa buscar el fichero");
+                JFileChooser fileChooser = new JFileChooser();
+                int seleccion = fileChooser.showOpenDialog(null);
+                if (seleccion == JFileChooser.APPROVE_OPTION) {
+                    System.out.println("a mandar datos dentro");
+                    fichero = fileChooser.getSelectedFile();
+                    impo.ouvreFichier(connuovelle, fichero);
+                }
+                connuovelle.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
             }
-            HikariDataSource ds = new HikariDataSource();
-            //Connection conn = ds.getConnection();
-            File fichero;
-            System.out.println("pa buscar el fichero");
-            JFileChooser fileChooser = new JFileChooser();
-            int seleccion = fileChooser.showOpenDialog(null);
-            if (seleccion == JFileChooser.APPROVE_OPTION) {
-                System.out.println("a mandar datos dentro");
-                fichero = fileChooser.getSelectedFile();
-                impo.ouvreFichier(conn, fichero);
-            }
-            conn.close();
         }
-
     }
 
     private Connection conextion() throws ClassNotFoundException {
