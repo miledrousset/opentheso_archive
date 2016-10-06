@@ -914,5 +914,6 @@ public class SelectedCandidat implements Serializable {
             selected.setEtat("i");
         return true;
     }
+    
 
 }

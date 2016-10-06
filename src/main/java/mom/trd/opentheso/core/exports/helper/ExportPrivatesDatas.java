@@ -44,7 +44,7 @@ import org.jaxen.function.ConcatFunction;
 
 
 /**
- * Cette fonction permet de récupérer toutes les données de la table Users
+ * Cette fonction permet de récupérer toutes les données de la table tableName
  * @author antonio.perez
  */
 public class ExportPrivatesDatas {

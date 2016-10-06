@@ -28,16 +28,14 @@
                         </td>
                         <td>
                             <p:commandButton id="cbCo" value="#{langueBean.getMsg('co.title')}" action="#{user1.action()}" styleClass="styleButton" /><br/>
-                             <p:commandLink id="cbOU" value="#{langueBean.getMsg('mot.info')}" oncomplete="PF('oublieMPEditDlg').show();" styleClass="linkSmall"  />
+                            <p:commandLink id="cbOU" value="#{langueBean.getMsg('mot.info')}" update=":idOublieMPEditDlg" oncomplete="PF('oublieMPEditDlg').show();" styleClass="linkSmall"  />
                         </td>
-                                            <tr>
+                        <tr>
+                            <td>
+                            </td>
+                        </tr>
 
-                                                <td>
-                           
-                        </td></tr>
-                        
                     </tr>
-
                 </table>
             </h:form>
         </div>

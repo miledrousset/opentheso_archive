@@ -4,9 +4,12 @@ import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
 import mom.trd.opentheso.core.exports.privatesdatas.WriteXml;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -18,9 +21,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import mom.trd.opentheso.bdd.account.OublieMotPass;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.tools.CreateBDD;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
@@ -52,7 +58,14 @@ public class DownloadBean implements Serializable {
     private String serverArk;
     private boolean arkActive;
     private String serverAdress;
+    private String email;
+    private String nomUsu;
+    private String newPass;
+    private String confirmPass;
+    private String ancianPass;
+    private String dbName;
 
+    
     @PostConstruct
     public void initTerme() {
         ResourceBundle bundlePref = getBundlePref();
@@ -572,23 +585,49 @@ public class DownloadBean implements Serializable {
             vue.setThesoToSkosCsvFile(true);
         }
     }
+/**
+ * Applelation de la funtion pour realiser l'injection a la BDD;
+ * on puex choisir le fichier dans une fenetre que se ouvre;
+ */
+  
+/**
+ * Applelation de la funtion avec les parametres pour avoir le motpasstemp
+ */
+    public void oublieMonPass() throws MessagingException {
+        OublieMotPass apple = new OublieMotPass();
+        apple.vide(connect.getPoolConnexion(), nomUsu, email);
+        nomUsu = null;
+        email = null;
 
-    public void appleInjection() {
-        File fichero;
-        importxml apple = new importxml();
-        JFileChooser fileChooser = new JFileChooser();
-        int seleccion = fileChooser.showOpenDialog(null);
-        if(seleccion == JFileChooser.APPROVE_OPTION)
-        {
-            fichero= fileChooser.getSelectedFile();
-            apple.ouvreFichier(connect.getPoolConnexion(), fichero);
-        }
     }
 
-    public void oublieMonPass() {
+    /**
+     * Applelation de la funtion avec les parametres pour changer le mot de
+     * pass.
+     * on fait le comprobation pour voir si tout c'est bon 
+     * @throws SQLException 
+     */
+    public void fchangepass() throws SQLException{
+        boolean sort=false;
         OublieMotPass apple = new OublieMotPass();
-        apple.vide(connect.getPoolConnexion());
-
+        CurrentUser user = new CurrentUser();
+        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass))
+        {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error3")));
+        }
+        if(newPass == null || newPass.equals("") || confirmPass == null || confirmPass.equals("") || ancianPass == null || ancianPass.equals("")) {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error2")));
+        }
+        else if(!sort){ 
+            if(apple.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, ancianPass))
+            {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(languageBean.getMsg("info") + " :", languageBean.getMsg("user.info1")));
+            }
+            else FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("error")));
+        }
+        
     }
 
     public Connexion getConnect() {
@@ -630,5 +669,54 @@ public class DownloadBean implements Serializable {
     public void setLanguageBean(LanguageBean languageBean) {
         this.languageBean = languageBean;
     }
+
+    public String getNewPass() {
+        return newPass;
+    }
+
+    public void setNewPass(String newPass) {
+        this.newPass = newPass;
+    }
+
+    public String getConfirmPass() {
+        return confirmPass;
+    }
+
+    public void setConfirmPass(String confirmPass) {
+        this.confirmPass = confirmPass;
+    }
+
+    public String getAncianPass() {
+        return ancianPass;
+    }
+
+    public void setAncianPass(String ancianPass) {
+        this.ancianPass = ancianPass;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNomUsu() {
+        return nomUsu;
+    }
+
+    public void setNomUsu(String nomUsu) {
+        this.nomUsu = nomUsu;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
+    
 
 }

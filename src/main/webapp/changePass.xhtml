@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>OpenTheso - Edition</title>
+        <link rel="icon" href="images/icoTheso.jpg" />
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <script type="text/javascript">
+            function selectText(containerid) {
+                if (document.selection) {
+                    var range = document.body.createTextRange();
+                    range.moveToElementText(document.getElementById(containerid));
+                    range.select();
+                } else if (window.getSelection) {
+                    var range = document.createRange();
+                    range.selectNode(document.getElementById(containerid));
+                    window.getSelection().addRange(range);
+                }
+            }
+        </script>
+        <script>
+            alert("#{langueBean.getMsg("mot.change")}");
+        </script>
+    </h:head>
+    <h:body>
+        <ui:include src="conceptPopUp.xhtml" />
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
+            <h1>Edition de thésaurus</h1>
+            Cette page permet de changer votre password, C'est obligatoire quand on a perdu/oubliée notre ancian pass.<br/><br/>
+            <ul>
+                <li>Introduire le pass que c'est envoiyer par email a votre direction.</li>
+                <li>Introduire le nouvelle pass pour le enregistrement dans la base de donné.</li>
+                <li>Introduire une deuxieme fois pour verifier que c'est le bon pass.</li>
+
+            </ul>
+        </p:dialog>  
+        <div id="menuHead">
+            <ui:include src="logo.xhtml" />
+            <ui:include src="account.xhtml" />
+            <ui:include src="menuAll.xhtml" />
+        </div>
+        <center>
+            <h:form id="changelePass">
+                <br/><br/><br/><br/>
+                <table width="20%" border="1" align="center">
+                    <tr><td><center>
+                            <br/><br/>
+                            <h:outputText value="#{langueBean.getMsg('conf.currentPwd')}: "/>
+                            <h:inputSecret  value="#{downloadBean.ancianPass}"/> 
+
+                            <br/><br/>
+                            <h:outputText  value="#{langueBean.getMsg('conf.newPwd1')}: "/>
+                            <h:inputSecret  value="#{downloadBean.newPass}"/> 
+
+                            <br/><br/>
+                            <h:outputText value="#{langueBean.getMsg('conf.newPwd2')}: "/>
+                            <h:inputSecret  value="#{downloadBean.confirmPass}"  />
+
+                            <br/><br/><br/><br/>
+                            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" value="#{langueBean.getMsg('conf.btnEditPwd')}" update=":changelePass" action="#{downloadBean.fchangepass()}"
+                                                 styleClass="styleButton"   />
+                            </center><br/><br/>
+                        </td></tr>
+                </table>
+            </h:form>
+            <br/><br/><br/><br/><br/>
+            <h:form>
+                <a href="index.xhtml" target="_self"><input type="button" name="button" value="Index" styleClass="styleButton"/></a>
+            </h:form>
+            <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+        </center>            
+        <ui:insert name="status">
+            <p:ajaxStatus>
+                <f:facet name="start">
+                    <p:graphicImage id="iconeLoading" value="/images/loading.gif" width="200" />
+                </f:facet>
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </ui:insert>
+        <script type="text/javascript" language="Javascript">
+        </script>
+    </h:body>
+</html>
