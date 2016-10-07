@@ -32,7 +32,9 @@ import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 @SessionScoped
 
 public class CreateBDD {
-
+/**
+ * Paremetres fixes 
+ */
     private final String dbDrvr = "org.postgresql.Driver";
     private String dbName = "";
     private final String dbHost = "jdbc:postgresql://localhost:5433/";
@@ -45,7 +47,14 @@ public class CreateBDD {
     public void setDbName(String dbName) {
         this.dbName = dbName;
     }
-
+/**
+ * Funtion principal de la class, creation de toutes les statements et de le connections
+ * faire la BDD avec le nom proporcioné, inyection de les tables, MAJ, et données 
+ * de la basse;
+ * @throws SQLException
+ * @throws ClassNotFoundException
+ * @throws IOException 
+ */
     public void createBdD() throws SQLException, ClassNotFoundException, IOException {
         importxml impo = new importxml();
         if (dbName != null) {
@@ -54,8 +63,7 @@ public class CreateBDD {
             Statement stmt, stmt2, stmt3;
             Connection conn = conextion();
             try {
-                System.out.println(dbName);
-                chaineUpdate = updateBDD();
+                chaineUpdate = updateBDD();// chaineUpdate contiens la information pour faire le MAJ a la dernier version
                 stmt = conn.createStatement();
                 try {
                     String query = "create Database " + dbName + " with owner opentheso";
@@ -64,11 +72,10 @@ public class CreateBDD {
                     stmt.close();
                     conn.close();
                 }
-                
-                Connection connuovelle = conextion2();
+                Connection connuovelle = conextion2();//avec conextion2 il y a une connection a la BDD que on viens de créer
                 stmt3 = stmt2 = connuovelle.createStatement();
                 try {
-                    chaineTables = avoirContentpourTables(connuovelle);
+                    chaineTables = avoirContentpourTables(connuovelle);// tout la information de touts le tables et "Insert into languages_iso639"
                     try {
                         stmt2.execute(chaineTables);
                         stmt3.execute(chaineUpdate);
@@ -86,22 +93,25 @@ public class CreateBDD {
                     fichero = fileChooser.getSelectedFile();
                     impo.ouvreFichier(connuovelle, fichero);
                 }
-
-                changerlaBDD(connuovelle, dbName);//change la basse de donnée est ici
+                changerlaBDD(connuovelle, dbName);// Change la connection a la nouvelle BDD
                 connuovelle.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
-
-    private Connection conextion() throws ClassNotFoundException {
+/**
+ * Funtion que permet de avoir une connection avec la BDD pour pouvoir faire la 
+ * nouvelle BDD; Nous donne un type connection
+ * @return
+ * @throws ClassNotFoundException 
+ */
+    public Connection conextion() throws ClassNotFoundException {
         Connection con = null;
         String usuaire = "postgres";
         String pass = "admin";
         try {
             Class.forName(dbDrvr);
-
             con = DriverManager.getConnection(dbHost, usuaire, pass);
         } catch (SQLException sqle) {
             return null;
@@ -109,7 +119,13 @@ public class CreateBDD {
 
         return con;
     }
-
+/**
+ * Ici nous pouvons avoir une conexion a la BDD que on viens de créer
+ * dbName c'est le nombre que l'utilisateur a donné a la BDD;
+ * nous donne un type connection
+ * @return
+ * @throws ClassNotFoundException 
+ */
     public Connection conextion2() throws ClassNotFoundException {
         Connection con = null;
         String usuaire = "postgres";
@@ -126,6 +142,12 @@ public class CreateBDD {
         return con;
     }
 
+     /**
+     * Avec le fichier de données nous  prendons tout pour faire le 
+     * la creation de tout les tables, se returne une String que se 
+     * utilises dans la funtion principal.
+     * @return 
+     */
     private static String avoirContentpourTables(Connection c) throws IOException, SQLException {
         String sCadena = "";
         String retorno = "";
@@ -139,13 +161,13 @@ public class CreateBDD {
 
             BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
             while ((sCadena = bf.readLine()) != null) {
-                if (!sCadena.contains("--")) {
+                if (!sCadena.contains("--")) {//ne prendre pas le lignes que commence par -- (contiens)
                     if (!sCadena.isEmpty()) {
-                        if (!sCadena.contains("INSERT INTO")) {
+                        if (!sCadena.contains("INSERT INTO")) {//efface toutes les lignes de "INSERT INTO"
                             retorno += sCadena;
                             retorno += "\n";
                         }
-                        if (sCadena.contains("INSERT INTO languages_iso639")) {
+                        if (sCadena.contains("INSERT INTO languages_iso639")) {// moins le languages, ils sont de dont
                             retorno += sCadena;
                             retorno += "\n";
                         }
@@ -160,20 +182,25 @@ public class CreateBDD {
         }
         return retorno;
     }
-        private static String updateBDD() {
+    /**
+     * Avec le fichier de MAJ on prendre lo que besoin pour faire le 
+     * maj, se returne une String que se utilises dans la funtion principal.
+     * @return 
+     */
+    private static String updateBDD() {
         String sCadena = "";
         String retorno = "";
         boolean first = true;
-        File fichier = new File("C:\\Users\\antonio.perez\\Desktop\\maj_BDD.txt");
+        File fichier = new File("C:\\Users\\antonio.perez\\Desktop\\maj_BDD.txt");//Path de le fichier
         if (!fichier.exists()) {
             return null;
         }
         try {
 
-            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));//utf8 pour avoir une bonne reconocenses de le caracters
             while ((sCadena = bf.readLine()) != null) {
-                if (!sCadena.contains("--")) {
-                    if (!sCadena.isEmpty()) {
+                if (!sCadena.contains("--")) {//efface les lignes que contiens "--"
+                    if (!sCadena.isEmpty()) {// et les lignes que ils sont vide
                         retorno += sCadena;
                         retorno += "\n";
                     }
@@ -188,41 +215,48 @@ public class CreateBDD {
 
         return retorno;
     }
-
+/**
+ * Fait la recherche dans le fichier "hikari.properties" pour changer la conexion 
+ * a la BDD; La nouvelle conexion a la BDD serais avec le nom que on a donné;
+ * Atention ne ferme pas la connection c ici!!!!!
+ * @param c
+ * @param namebDD
+ * @throws IOException
+ * @throws SQLException 
+ */
     private static void changerlaBDD(Connection c, String namebDD) throws IOException, SQLException {
         String sCadena = "";
-        String premierparti = "";
-        String ecrit ="dataSource.databaseName="+namebDD;
+        String premierparti = "";//contiens le fichier "hikari.properties" jusqu'à trouver le mot clés de la connection
+        String ecrit ="dataSource.databaseName="+namebDD; //nameBDD c'est le nom donné pour l'administrateur pour la BDD
         String deuxiemeparti="";
-        String envoy="";
         boolean first = true;
         boolean sault= false;
 
-        File fichier = new File("C:\\Users\\antonio.perez\\Documents\\NetBeansProjects\\opentheso\\src\\main\\resources\\hikari.properties");
+        File fichier = new File("C:\\Users\\antonio.perez\\Documents\\NetBeansProjects\\opentheso\\src\\main\\resources\\hikari.properties");//path fichier
         if (fichier.exists()) {
             try {
 
                 BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
-                while ((sCadena = bf.readLine()) != null) {
-                    if (!sCadena.contains("#")) {
+                while ((sCadena = bf.readLine()) != null) {//on fait la comprobation de que la ligne n'est pas vide
+                    if (!sCadena.contains("#")) {//et que la ligne n'est pas commenté (le lignes commentes ne marche pas)
                         
                         if (sCadena.contains("dataSource.databaseName")) {
                             System.out.println(sCadena);
-                            envoy=premierparti;
+                        //quand se trouve les mot clés, c'est fini de incluire dans la premierparti; first=false;
                             first=false;
-                            sault=true;
+                            sault=true;// avec ça, ne introduire pas la ligne de le mot clés
                         }
                     }
-                    if(first)
+                    if(first)//jusqu'à trouver dataSource.databaseName
                     {
                         premierparti+=sCadena;
-                        premierparti+="\r\n";
+                        premierparti+="\r\n";//\r c'est pour le reconosences de le fichier de le \n
                     }
                     else
                     {
                         if(!sault)
                         {
-                            deuxiemeparti+= sCadena;
+                            deuxiemeparti+= sCadena;// apres trouver dataSource.databaseName
                             deuxiemeparti+="\r\n";
                         }
                     }
@@ -236,9 +270,9 @@ public class CreateBDD {
             }
             PrintWriter wr=null;
             try{
-                wr= new PrintWriter(fichier);
+                wr= new PrintWriter(fichier);// ecrit dans le fichier ouvert
                 wr.print(premierparti);
-                wr.println(ecrit);
+                wr.println(ecrit);// il est dans la definition, "dataSource.databaseName=" + nameBDD
                 wr.println(deuxiemeparti);
                 
             }catch(Exception e){

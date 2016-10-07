@@ -600,7 +600,18 @@ public class DownloadBean implements Serializable {
         email = null;
 
     }
-
+    public void inyectionaBDD() throws ClassNotFoundException, SQLException{
+        File fichero;
+        importxml impo = new importxml();
+        JFileChooser fileChooser = new JFileChooser();
+        int seleccion = fileChooser.showOpenDialog(null);
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            fichero = fileChooser.getSelectedFile();
+            impo.ouvreFichier2(connect.getPoolConnexion(), fichero);
+        }
+        System.out.println("saliendo************************************");
+        
+    }
     /**
      * Applelation de la funtion avec les parametres pour changer le mot de
      * pass.
