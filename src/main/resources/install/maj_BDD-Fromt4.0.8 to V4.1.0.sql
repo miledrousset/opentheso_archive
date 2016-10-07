@@ -40,3 +40,4 @@ UPDATE term SET creator = 1 WHERE creator ilike '';
 
 ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
 ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+ALTER TABLE users ADD motpasstemp character varying(100);

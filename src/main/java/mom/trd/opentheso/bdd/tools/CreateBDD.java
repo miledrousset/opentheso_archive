@@ -5,16 +5,15 @@
  */
 package mom.trd.opentheso.bdd.tools;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.swing.JFileChooser;
-import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
@@ -49,12 +47,10 @@ public class CreateBDD {
     }
 
     public void createBdD() throws SQLException, ClassNotFoundException, IOException {
-        DownloadBean injection = new DownloadBean();
         importxml impo = new importxml();
         if (dbName != null) {
-            String chaineTables = "";
-            String chaineUpdate = "";
-            ResultSet resul;
+            String chaineTables;
+            String chaineUpdate;
             Statement stmt, stmt2, stmt3;
             Connection conn = conextion();
             try {
@@ -62,24 +58,20 @@ public class CreateBDD {
                 chaineUpdate = updateBDD();
                 stmt = conn.createStatement();
                 try {
-
                     String query = "create Database " + dbName + " with owner opentheso";
                     stmt.executeUpdate(query);
-                    System.out.println("BDD hecha)");
                 } finally {
                     stmt.close();
                     conn.close();
                 }
+                
                 Connection connuovelle = conextion2();
                 stmt3 = stmt2 = connuovelle.createStatement();
                 try {
                     chaineTables = avoirContentpourTables(connuovelle);
-                    System.out.println("archivo transformado Strign");
                     try {
                         stmt2.execute(chaineTables);
-                        System.out.println("tablas dentro");
                         stmt3.execute(chaineUpdate);
-                        System.out.println("MAJ dentro");
                     } finally {
                         stmt2.close();
                         stmt3.close();
@@ -87,18 +79,15 @@ public class CreateBDD {
                 } catch (SQLException ex) {
                     Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                //Connection conn = ds.getConnection();
                 File fichero;
-                System.out.println("pa buscar el fichero");
                 JFileChooser fileChooser = new JFileChooser();
                 int seleccion = fileChooser.showOpenDialog(null);
                 if (seleccion == JFileChooser.APPROVE_OPTION) {
-                    System.out.println("a mandar datos dentro");
                     fichero = fileChooser.getSelectedFile();
                     impo.ouvreFichier(connuovelle, fichero);
                 }
-                System.out.println("toca cambiar la BNDD");
-                changerlaBDD(connuovelle);
+
+                changerlaBDD(connuovelle, dbName);//change la basse de donnée est ici
                 connuovelle.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,7 +103,6 @@ public class CreateBDD {
             Class.forName(dbDrvr);
 
             con = DriverManager.getConnection(dbHost, usuaire, pass);
-            System.out.println("he entrado conn1");
         } catch (SQLException sqle) {
             return null;
         }
@@ -131,7 +119,6 @@ public class CreateBDD {
             Class.forName(dbDrvr);
 
             con = DriverManager.getConnection(dbHostFinal, usuaire, pass);
-            System.out.println("toy saliendo conn2");
         } catch (SQLException sqle) {
             return null;
         }
@@ -154,8 +141,14 @@ public class CreateBDD {
             while ((sCadena = bf.readLine()) != null) {
                 if (!sCadena.contains("--")) {
                     if (!sCadena.isEmpty()) {
-                        retorno += sCadena;
-                        retorno += "\n";
+                        if (!sCadena.contains("INSERT INTO")) {
+                            retorno += sCadena;
+                            retorno += "\n";
+                        }
+                        if (sCadena.contains("INSERT INTO languages_iso639")) {
+                            retorno += sCadena;
+                            retorno += "\n";
+                        }
                     }
                 }
             }
@@ -167,37 +160,7 @@ public class CreateBDD {
         }
         return retorno;
     }
-     private static String changerlaBDD(Connection c) throws IOException, SQLException {
-        String sCadena = "";
-        String retorno = "";
-        boolean first = true;
-
-        File fichier = new File("C:\\Users\\antonio.perez\\Desktop\\hikari.txt");
-        if (!fichier.exists()) {
-            return null;
-        }
-        try {
-
-            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
-            while ((sCadena = bf.readLine()) != null) {
-                if (!sCadena.contains("#")) {
-                    if(sCadena.contains("databaseName"))
-                    {
-                        System.out.println(sCadena);
-                    }
- 
-                }
-            }
-
-        } catch (FileNotFoundException fnfe) {
-            return null;
-        } catch (IOException ioe) {
-            return null;
-        }
-        return retorno;
-    }
-
-    private static String updateBDD() {
+        private static String updateBDD() {
         String sCadena = "";
         String retorno = "";
         boolean first = true;
@@ -224,5 +187,65 @@ public class CreateBDD {
         }
 
         return retorno;
+    }
+
+    private static void changerlaBDD(Connection c, String namebDD) throws IOException, SQLException {
+        String sCadena = "";
+        String premierparti = "";
+        String ecrit ="dataSource.databaseName="+namebDD;
+        String deuxiemeparti="";
+        String envoy="";
+        boolean first = true;
+        boolean sault= false;
+
+        File fichier = new File("C:\\Users\\antonio.perez\\Documents\\NetBeansProjects\\opentheso\\src\\main\\resources\\hikari.properties");
+        if (fichier.exists()) {
+            try {
+
+                BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
+                while ((sCadena = bf.readLine()) != null) {
+                    if (!sCadena.contains("#")) {
+                        
+                        if (sCadena.contains("dataSource.databaseName")) {
+                            System.out.println(sCadena);
+                            envoy=premierparti;
+                            first=false;
+                            sault=true;
+                        }
+                    }
+                    if(first)
+                    {
+                        premierparti+=sCadena;
+                        premierparti+="\r\n";
+                    }
+                    else
+                    {
+                        if(!sault)
+                        {
+                            deuxiemeparti+= sCadena;
+                            deuxiemeparti+="\r\n";
+                        }
+                    }
+                    sault= false;
+                }
+            bf.close();
+            } catch (FileNotFoundException fnfe) {
+
+            } catch (IOException ioe) {
+
+            }
+            PrintWriter wr=null;
+            try{
+                wr= new PrintWriter(fichier);
+                wr.print(premierparti);
+                wr.println(ecrit);
+                wr.println(deuxiemeparti);
+                
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            wr.close();
+        }
+
     }
 }
