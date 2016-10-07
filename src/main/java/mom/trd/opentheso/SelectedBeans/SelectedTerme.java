@@ -373,7 +373,7 @@ public class SelectedTerme implements Serializable {
             urlNotice = bundlePref.getString("notice.url");
             try {
                 //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
-                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idT, bundlePref.getString("url.encode")));
+                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, bundlePref.getString("url.encode")));
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
             }

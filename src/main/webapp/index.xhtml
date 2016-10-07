@@ -19,6 +19,12 @@
     <!--<h:body style="background-image: url(./images/panda_roue.jpg)">-->
     <!--<h:body style="background-image: url(./images/panda_roue3.jpg)">-->
     <h:body>
+        <f:metadata>
+            <f:viewParam name="idc" value="#{theso.idCurl}"/>
+            <f:viewParam name="idt" value="#{theso.idTurl}"/>
+            <f:viewParam name="idg" value="#{theso.idGurl}"/>
+            <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
+        </f:metadata>
         <ui:include src="metadata_et_commenteries.xhtml"/> <!-- cette archive est dans la racine Web Pages -->
         <div id="menuHead">
             <ui:include src="logo.xhtml" />

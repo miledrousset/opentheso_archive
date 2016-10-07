@@ -1,0 +1,27 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idRegenerateOrphanDlg"  header="#{langueBean.getMsg('tools.regenerateOrphan')}" widgetVar="regenerateOrphanDlg" modal="true" resizable="false" >
+            <p:messages showDetail="true" autoUpdate="true" />
+
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('tools.regenerateOrphan')}" /></legend>
+                <h:form>
+                    <p:messages showDetail="true" autoUpdate="true" />
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('theso.infoRegenerationOrphan')}" /> </td>
+                        </tr>           
+                    </table>
+                    <br/>
+                    <p:commandButton id="cbGenerateOrphan" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.regenerateOrphan()}" 
+                                     update=":idRegenerateOrphanDlg,:accordeonTree" styleClass="styleButton"
+                                     oncomplete="PF('regenerateOrphanDlg').hide();"/>
+                </h:form>
+            </fieldset>
+    </p:dialog>
+</ui:composition>

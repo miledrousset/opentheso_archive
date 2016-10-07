@@ -5,26 +5,26 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
-        <div id="rapidAccess" align="center" >
-            <h:form >
-                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                a:placeholder="#{langueBean.getMsg('index.search')}" >
+    <div id="rapidAccess" align="center" >
+        <h:form >
+            <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
+                            minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
+                            a:placeholder="#{langueBean.getMsg('index.search')}" >
 
-                    <p:ajax event="itemSelect" listener="#{treeBean.majIndexRapidSearch()}" 
-                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
-                            />
-                </p:autoComplete>
-                <!-- gestion des domaines ou groupes --> 
-                <div id="imageEdition">
-                    <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
-                        <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
-                            <p:menuitem  value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('tools.regenerateOrphan')}" actionListener="#{vue.setRegenerateOrphan(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                        </p:menu>
-                    </h:form>
-                </div>
-            </h:form>
-        </div>
+                <p:ajax event="itemSelect" listener="#{treeBean.majIndexRapidSearch()}" 
+                        update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
+                        />
+            </p:autoComplete>
+            <!-- gestion des domaines ou groupes --> 
+            <div id="imageEdition">
+                <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                    <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
+                    <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
+                        <p:menuitem  value="#{langueBean.getMsg('group.add')}" actionListener="#{vue.setSelectedActionDom(1)}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
+
+                    </p:menu>
+                </h:form>
+            </div>
+        </h:form>
+    </div>
 </ui:composition>

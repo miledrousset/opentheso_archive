@@ -5,12 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
-        <f:metadata>
-            <f:viewParam name="idc" value="#{theso.idCurl}"/>
-            <f:viewParam name="idt" value="#{theso.idTurl}"/>
-            <f:viewParam name="idg" value="#{theso.idGurl}"/>
-            <f:event listener="#{theso.preRenderView}" type="preRenderView"/>
-        </f:metadata>
+
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
             <h1>Gestionnaire de thésaurus</h1>
