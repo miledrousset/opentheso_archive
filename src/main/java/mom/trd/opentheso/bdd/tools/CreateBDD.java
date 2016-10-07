@@ -97,6 +97,8 @@ public class CreateBDD {
                     fichero = fileChooser.getSelectedFile();
                     impo.ouvreFichier(connuovelle, fichero);
                 }
+                System.out.println("toca cambiar la BNDD");
+                changerlaBDD(connuovelle);
                 connuovelle.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -155,6 +157,35 @@ public class CreateBDD {
                         retorno += sCadena;
                         retorno += "\n";
                     }
+                }
+            }
+
+        } catch (FileNotFoundException fnfe) {
+            return null;
+        } catch (IOException ioe) {
+            return null;
+        }
+        return retorno;
+    }
+     private static String changerlaBDD(Connection c) throws IOException, SQLException {
+        String sCadena = "";
+        String retorno = "";
+        boolean first = true;
+
+        File fichier = new File("C:\\Users\\antonio.perez\\Desktop\\hikari.txt");
+        if (!fichier.exists()) {
+            return null;
+        }
+        try {
+
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(fichier), "UTF8"));
+            while ((sCadena = bf.readLine()) != null) {
+                if (!sCadena.contains("#")) {
+                    if(sCadena.contains("databaseName"))
+                    {
+                        System.out.println(sCadena);
+                    }
+ 
                 }
             }
 
