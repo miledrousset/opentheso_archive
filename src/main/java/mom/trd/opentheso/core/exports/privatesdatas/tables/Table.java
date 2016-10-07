@@ -14,6 +14,7 @@ import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
  */
 public class Table {
     
+    private String name;
     private ArrayList<LineOfData> lineOfDatas;
     
     public ArrayList<LineOfData> getLineOfDatas() {
@@ -23,6 +24,14 @@ public class Table {
 
     public void setLineOfDatas(ArrayList<LineOfData> lineOfDatas) {
         this.lineOfDatas = lineOfDatas;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
     
 }

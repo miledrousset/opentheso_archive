@@ -1,10 +1,15 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
 import mom.trd.opentheso.core.exports.privatesdatas.WriteXml;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -16,11 +21,17 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.mail.MessagingException;
+import javax.swing.JFileChooser;
+import mom.trd.opentheso.bdd.account.OublieMotPass;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.tools.CreateBDD;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
+import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import org.primefaces.model.DefaultStreamedContent;
@@ -40,14 +51,21 @@ public class DownloadBean implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    
+
     @ManagedProperty(value = "#{langueBean}")
-    private LanguageBean languageBean;    
+    private LanguageBean languageBean;
 
     private String serverArk;
     private boolean arkActive;
     private String serverAdress;
+    private String email;
+    private String nomUsu;
+    private String newPass;
+    private String confirmPass;
+    private String ancianPass;
+    private String dbName;
 
+    
     @PostConstruct
     public void initTerme() {
         ResourceBundle bundlePref = getBundlePref();
@@ -90,7 +108,7 @@ public class DownloadBean implements Serializable {
 
         return exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup).toString();
     }
-    
+
     public String groupJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
@@ -101,11 +119,11 @@ public class DownloadBean implements Serializable {
 
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         return jsonLd.toString();
-    }    
+    }
 
-/*    public void branchSkos(String idC, String idTheso) {
+    /*    public void branchSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -127,7 +145,6 @@ public class DownloadBean implements Serializable {
             vue.setBranchToSkosFile(true);
         }
     }*/
-
     public void branchGroupSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
@@ -149,8 +166,6 @@ public class DownloadBean implements Serializable {
             vue.setBranchToSkosFile(true);
         }
     }
-    
-
 
     /**
      * Cette fonction permet d'exporter un thésaurus au format SKOS à partir de
@@ -160,7 +175,7 @@ public class DownloadBean implements Serializable {
      * second cas l'utilisateur télécharge de fichier.
      *
      * @param idTheso
-     * @return 
+     * @return
      */
     public StreamedContent thesoSkos(String idTheso) {
 
@@ -173,15 +188,11 @@ public class DownloadBean implements Serializable {
          * ici c'est la classe à utiliser pour un export standard au foramt SKOS
          */
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        
-        
-        
+
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
 
-        
-        
         StringBuffer skos_local = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
         InputStream stream;
 
@@ -195,7 +206,7 @@ public class DownloadBean implements Serializable {
         return file;
 
 
-/*        if (temp.length() <= 1500000) {
+        /*        if (temp.length() <= 1500000) {
             skos = temp.toString();
             vue.setThesoToSkosCsv(true);
         } else {
@@ -208,17 +219,17 @@ public class DownloadBean implements Serializable {
             }
             vue.setThesoToSkosCsvFile(true);
         }*/
-
     }
-    
+
     /**
-     * Cette fonction permet d'exporter un concept en SKOS 
-     * en temps réel dans la page principale
+     * Cette fonction permet d'exporter un concept en SKOS en temps réel dans la
+     * page principale
+     *
      * @param idC
      * @param idTheso
-     * @return 
+     * @return
      */
-     public StreamedContent conceptToSkos(String idC, String idTheso) {
+    public StreamedContent conceptToSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
         exportFromBDD.setServerAdress(serverAdress);
@@ -237,15 +248,16 @@ public class DownloadBean implements Serializable {
         return file;
 
         //   new ExportFromBDD().exportConcept(connect.getPoolConnexion(), idTheso, idC).toString();
-    } 
-     
+    }
+
     /**
      * Cette fonction permet d'exporter un concept en JsonLd
+     *
      * @param idC
      * @param idTheso
-     * @return 
+     * @return
      */
-     public StreamedContent conceptToJsonLd(String idC, String idTheso) {
+    public StreamedContent conceptToJsonLd(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
         exportFromBDD.setServerAdress(serverAdress);
@@ -255,11 +267,11 @@ public class DownloadBean implements Serializable {
         InputStream stream;
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso, idC);
-        
+
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
-        if(jsonLd == null){
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
+        if (jsonLd == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("index.exportJsonError")));
             return file;
         }
@@ -274,14 +286,15 @@ public class DownloadBean implements Serializable {
 
         //   new ExportFromBDD().exportConcept(connect.getPoolConnexion(), idTheso, idC).toString();
     }
-     
+
     /**
      * Cette fonction permet de retourner une branche en SKOS
+     *
      * @param idConcept
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent brancheToSkos(String idConcept, String idTheso){
+    public StreamedContent brancheToSkos(String idConcept, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -297,16 +310,17 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
+        return file;
     }
-    
+
     /**
      * Cette fonction permet de retourner une branche en JsonLd
+     *
      * @param idConcept
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent brancheToJsonLd(String idConcept, String idTheso){
+    public StreamedContent brancheToJsonLd(String idConcept, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -316,8 +330,8 @@ public class DownloadBean implements Serializable {
 
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
-        
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
+
         InputStream stream;
 
         try {
@@ -326,16 +340,17 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
+        return file;
     }
-    
+
     /**
      * Cette fonction permet de retourner pour téléchargement un groupe en SKOS
+     *
      * @param idGroup
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent thisGroupToSkos(String idGroup, String idTheso){
+    public StreamedContent thisGroupToSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -351,49 +366,54 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
+        return file;
     }
-    
+
     /**
-     * Cette fonction permet de télécharger les tables et les données
-     * ce qui permet de sauvegarder toutes les données privées pour les mise à jour
+     * Cette fonction permet de télécharger les tables et les données ce qui
+     * permet de sauvegarder toutes les données privées pour les mise à jour
+     *
      * @param toutTables
-     * @return 
+     * @return
      */
-    public StreamedContent backUpBaseDonnees(ArrayList <String> toutTables){
+    public StreamedContent backUpBaseDonnees(ArrayList<String> toutTables) {
         ArrayList<Table> sortirXml;
         ExportPrivatesDatas backUp = new ExportPrivatesDatas();
-        Iterator <String> it1 = toutTables.iterator();
+        Iterator<String> it1 = toutTables.iterator();
         WriteXml write = new WriteXml();
         write.writeHead();
+        write.start();
         String table;
-        
+
         // date du jour
-        java.util.Date datetoday = new java.util.Date(); 
-        
-        while(it1.hasNext())
-        {
+        java.util.Date datetoday = new java.util.Date();
+
+        while (it1.hasNext()) {
             table = it1.next();
             sortirXml = backUp.getDatasOfTable(connect.getPoolConnexion(), table);
-            write.WriteIntoXML(sortirXml,  table);
+            write.WriteIntoXML(sortirXml, table);
         }
-               InputStream stream;
+        write.end();
+        InputStream stream;
+
         try {
             stream = new ByteArrayInputStream(write.getXml().getBytes("UTF-8"));
-            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_"+datetoday+".xml");
+            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_" + datetoday + ".xml");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
+        return file;
     }
-    
+
     /**
-     * Cette fonction permet de retourner pour téléchargement un groupe en JsonLd
+     * Cette fonction permet de retourner pour téléchargement un groupe en
+     * JsonLd
+     *
      * @param idGroup
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent thisGroupToJsonLd(String idGroup, String idTheso){
+    public StreamedContent thisGroupToJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -403,8 +423,8 @@ public class DownloadBean implements Serializable {
 
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);        
-        
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
+
         InputStream stream;
 
         try {
@@ -413,18 +433,17 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
-    }    
-    
-    
-    
+        return file;
+    }
+
     /**
      * Cette fonction permet de retourner la branche antière d'un groupe en SKOS
+     *
      * @param idGroup
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent groupToSkos(String idGroup, String idTheso){
+    public StreamedContent groupToSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -440,16 +459,18 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
-    }    
-    
+        return file;
+    }
+
     /**
-     * Cette fonction permet de retourner la branche entière d'un groupe en JsonLd
+     * Cette fonction permet de retourner la branche entière d'un groupe en
+     * JsonLd
+     *
      * @param idGroup
      * @param idTheso
-     * @return 
+     * @return
      */
-    public StreamedContent groupToJsonLd(String idGroup, String idTheso){
+    public StreamedContent groupToJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -459,8 +480,8 @@ public class DownloadBean implements Serializable {
 
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument); 
-        
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
+
         InputStream stream;
 
         try {
@@ -469,16 +490,15 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return file;        
-    }     
-            
-    
+        return file;
+    }
+
     /**
-     * Cette fonction permet d'exporter un thésaurus au format SKOS2 new Version à partir de
-     * son identifiant. Le résultat est enregistré dans la variable 'skos' du
-     * downloadBean si la taille est petite, ou dans la variable 'file' du
-     * downloadBean sinon. Dans le premier cas on affiche la variable, dans le
-     * second cas l'utilisateur télécharge de fichier.
+     * Cette fonction permet d'exporter un thésaurus au format SKOS2 new Version
+     * à partir de son identifiant. Le résultat est enregistré dans la variable
+     * 'skos' du downloadBean si la taille est petite, ou dans la variable
+     * 'file' du downloadBean sinon. Dans le premier cas on affiche la variable,
+     * dans le second cas l'utilisateur télécharge de fichier.
      *
      * @param idTheso
      */
@@ -492,9 +512,8 @@ public class DownloadBean implements Serializable {
         /**
          * ici c'est la classe à utiliser pour un export standard au foramt SKOS
          */
+    }
 
-    }    
-    
     /**
      * Cette fonction permet d'exporter un thésaurus au format SKOS à partir de
      * son identifiant. Le résultat est enregistré dans la variable 'skos' du
@@ -514,10 +533,8 @@ public class DownloadBean implements Serializable {
         /**
          * ici c'est la classe à utiliser pour un export standard au foramt SKOS
          */
-       // ExportFromBDD exportFromBDD = new ExportFromBDD();
-        
-        
-        
+        // ExportFromBDD exportFromBDD = new ExportFromBDD();
+
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
@@ -568,6 +585,50 @@ public class DownloadBean implements Serializable {
             vue.setThesoToSkosCsvFile(true);
         }
     }
+/**
+ * Applelation de la funtion pour realiser l'injection a la BDD;
+ * on puex choisir le fichier dans une fenetre que se ouvre;
+ */
+  
+/**
+ * Applelation de la funtion avec les parametres pour avoir le motpasstemp
+ */
+    public void oublieMonPass() throws MessagingException {
+        OublieMotPass apple = new OublieMotPass();
+        apple.vide(connect.getPoolConnexion(), nomUsu, email);
+        nomUsu = null;
+        email = null;
+
+    }
+
+    /**
+     * Applelation de la funtion avec les parametres pour changer le mot de
+     * pass.
+     * on fait le comprobation pour voir si tout c'est bon 
+     * @throws SQLException 
+     */
+    public void fchangepass() throws SQLException{
+        boolean sort=false;
+        OublieMotPass apple = new OublieMotPass();
+        CurrentUser user = new CurrentUser();
+        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass))
+        {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error3")));
+        }
+        if(newPass == null || newPass.equals("") || confirmPass == null || confirmPass.equals("") || ancianPass == null || ancianPass.equals("")) {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error2")));
+        }
+        else if(!sort){ 
+            if(apple.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, ancianPass))
+            {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(languageBean.getMsg("info") + " :", languageBean.getMsg("user.info1")));
+            }
+            else FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("error")));
+        }
+        
+    }
 
     public Connexion getConnect() {
         return connect;
@@ -608,6 +669,54 @@ public class DownloadBean implements Serializable {
     public void setLanguageBean(LanguageBean languageBean) {
         this.languageBean = languageBean;
     }
+
+    public String getNewPass() {
+        return newPass;
+    }
+
+    public void setNewPass(String newPass) {
+        this.newPass = newPass;
+    }
+
+    public String getConfirmPass() {
+        return confirmPass;
+    }
+
+    public void setConfirmPass(String confirmPass) {
+        this.confirmPass = confirmPass;
+    }
+
+    public String getAncianPass() {
+        return ancianPass;
+    }
+
+    public void setAncianPass(String ancianPass) {
+        this.ancianPass = ancianPass;
+    }
     
-   
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNomUsu() {
+        return nomUsu;
+    }
+
+    public void setNomUsu(String nomUsu) {
+        this.nomUsu = nomUsu;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
+    
+
 }

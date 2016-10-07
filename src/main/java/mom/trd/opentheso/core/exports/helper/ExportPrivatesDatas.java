@@ -44,7 +44,7 @@ import org.jaxen.function.ConcatFunction;
 
 
 /**
- * Cette fonction permet de récupérer toutes les données de la table Users
+ * Cette fonction permet de récupérer toutes les données de la table tableName
  * @author antonio.perez
  */
 public class ExportPrivatesDatas {
@@ -111,10 +111,16 @@ public class ExportPrivatesDatas {
                             if(tablesColumn.getColumnType().equalsIgnoreCase("character varying")) {
                                 lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
                             }
+                            if(tablesColumn.getColumnType().equalsIgnoreCase("character")) {
+                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                            }
                             if(tablesColumn.getColumnType().equalsIgnoreCase("text")) {
                                 lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
                             }
                             if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp with time zone")) {
+                                lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
+                            }
+                            if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp without time zone")) {
                                 lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
                             }
                             if(tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {

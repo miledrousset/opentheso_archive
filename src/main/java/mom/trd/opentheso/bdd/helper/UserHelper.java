@@ -21,20 +21,22 @@ public class UserHelper {
 
     }
 
-    public boolean isUserExist(HikariDataSource ds, String log, String pwd) {
+    public int isUserExist(HikariDataSource ds, String log, String pwd) {
         Connection conn;
-        Statement stmt;
+        Statement stmt,stmt2;
         ResultSet resultSet;
+        ResultSet resultSet1;
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT username FROM users WHERE username='" + log + "' AND password='" + pwd + "' and active=true";
+                    String query = "SELECT id_user FROM users WHERE username='" + log + "' AND password='" + pwd + "' and active=true";
                     resultSet = stmt.executeQuery(query);
-                    resultSet.next();
-                    if (resultSet.getRow() != 0) {
-                        return true;
+                    //resultSet.first();
+                    //resultSet.next();
+                    if (resultSet.next()) {
+                        return 1;
                     }
                 } finally {
                     stmt.close();
@@ -46,8 +48,29 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt2 = conn.createStatement();
+                try {
+                    String query2 = "SELECT username FROM users WHERE username='" + log + "' AND motpasstemp='" + pwd + "' and active=true";
+                    resultSet1 = stmt2.executeQuery(query2);
+                    resultSet1.next();
+                    if (resultSet1.getRow() != 0) {
+                        return 2;
+                    }
+                    } finally {
+                    stmt2.close();
+                }
+            } finally {
+                conn.close();
+            }
 
-        return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return 0;
     }
     
     /**

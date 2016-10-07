@@ -155,52 +155,52 @@
                     </h:panelGroup>
                 </div>
                 <!-- Section upload SKOS to theso -->
-                
+
                 <!--<ui:include src="skosImport.xhtml" />-->
-                
-               <!-- Section upload SKOS2 to theso -->
-               <h:panelGroup id="panSkos2">
-                   <h:panelGroup layout="block" rendered="#{vue.addSkos2 == true}" >
-                       <div class="importerTheso">
-                           <div id="titreEditTheso">
-                               <h:outputText value="#{langueBean.getMsg('edit.import')} new version" />
-                               <div id="divClose">
-                                   <h:form>
-                                       <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
-                                                        actionListener="#{vue.setAddSkos2(false)}" update=":panSkos2" />
-                                   </h:form>
-                               </div>
-                           </div>
-                           <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+
+                <!-- Section upload SKOS2 to theso -->
+                <h:panelGroup id="panSkos2">
+                    <h:panelGroup layout="block" rendered="#{vue.addSkos2 == true}" >
+                        <div class="importerTheso">
+                            <div id="titreEditTheso">
+                                <h:outputText value="#{langueBean.getMsg('edit.import')} new version" />
+                                <div id="divClose">
+                                    <h:form>
+                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
+                                                         actionListener="#{vue.setAddSkos2(false)}" update=":panSkos2" />
+                                    </h:form>
+                                </div>
+                            </div>
+                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
                                 <p:growl id="growl" /> 
-                               <p:messages showDetail="true" autoUpdate="true" />
-                               <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
-                               <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
-                               <h:inputText id="date" value="#{fileBean.formatDate}" />
-                               <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
-                               <br/><br/>
+                                <p:messages showDetail="true" autoUpdate="true" />
+                                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
+                                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                                <h:inputText id="date" value="#{fileBean.formatDate}" />
+                                <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
+                                <br/><br/>
 
 
-                               <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
-                                             cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
-                                             update="@form,:panSkos2"  />
+                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
+                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
+                                              update="@form,:panSkos2"  />
 
 
-                               <p:commandButton value="Insert into BDD"
-                                                disabled="#{fileBean.desabled}"
-                                                onclick="PF('pbAjax').start();PF('startButton2').disable();" 
-                                                widgetVar="startButton2" 
-                                                actionListener="#{fileBean.addSkosDatas2()}"/>  
+                                <p:commandButton value="Insert into BDD"
+                                                 disabled="#{fileBean.desabled}"
+                                                 onclick="PF('pbAjax').start();PF('startButton2').disable();" 
+                                                 widgetVar="startButton2" 
+                                                 actionListener="#{fileBean.addSkosDatas2()}"/>  
 
 
-                           </h:form>
-                          <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/> 
-                       </div>
-                   </h:panelGroup>
-               </h:panelGroup>                
-                
-                
-                
+                            </h:form>
+                            <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/> 
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>                
+
+
+
                 <h:panelGroup id="panSkos">
                     <h:panelGroup layout="block" rendered="#{vue.addSkos == true}">
                         <div class="importerTheso">
@@ -227,8 +227,8 @@
                         </div>
                     </h:panelGroup>
                 </h:panelGroup>
-                
-                
+
+
 
                 <!-- Section upload CSV to theso -->
                 <h:panelGroup id="panCsv">
@@ -543,13 +543,15 @@
                         <p:commandButton id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')}" actionListener="#{vue.setAddSkos(true)}" 
-                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')} new Version" actionListener="#{vue.setAddSkos2(true)}" 
-                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
+                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
-                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                            
                         </p:menu>
                     </h:form>
+
                 </div>
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
@@ -564,12 +566,32 @@
                         </p:menu>
 
                     </h:form>
-
                 </div>
-            </div><br/>
+                <div style="float: left; margin-left: 40px;">
+                    <h:form>
+                      <!--  <p:commandButton id="backupbd"  value="OptionsBDD" title="#{langueBean.getMsg('back.creer')}"  onclick="PF('creationBDEditDlg').show();" styleClass="styleButton"/> 
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
+                            <p:menuitem id="CBDD" value="CreateBDD" onclick="PF('creationBDEditDlg').show();"/>
+                        </p:menu>
+                      -->
+                      <p:commandButton value="Creation de BDD" type="button" onclick="PF('creationBDEditDlg').show();" />
+                    </h:form>
+                    <p:dialog header="Creation de BDD" widgetVar="creationBDEditDlg" minHeight="40">
+                        <h:form>
+                            <h:outputText value="Nom de la Nouvelle BDD:"/>   
+                            <h:inputText value="#{CreerBD.dbName}" styleClass="areaNote" /><br/>
             
-<ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
-
+                                    <br/>
+                                    <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{CreerBD.createBdD()}"
+                                                     styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"/>
+                            <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"  immediate="true"/>
+                        </h:form>
+                    </p:dialog>
+ 
+                    
+                </div><br/><br/>
+            </div><br/>
+            <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         </center>
         <ui:insert name="status">
             <p:ajaxStatus>
