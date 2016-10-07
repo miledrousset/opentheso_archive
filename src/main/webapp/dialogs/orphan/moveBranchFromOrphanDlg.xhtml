@@ -46,7 +46,7 @@
                             </td>
                         </tr>
                     </table><br/>
-                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromDomain()}"
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBranchFromOrphinToConcept()}"
                                      update=":idMoveBranchFromOrphanDlg,:panContenu,:accordeonTree" styleClass="styleButton" 
                                      oncomplete="PF('moveBranchFromOrphanDlg').hide();"/>
             </fieldset>

@@ -32,8 +32,8 @@
                             </td>
                         </tr>
                     </table><br/>
-                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheToDomain()}"
-                                     update=":idMoveBranchFromOrphanToGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton"
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('popup.btnMove')}" actionListener="#{autoComp.moveBrancheFromOrphinToGroup()}"
+                                      update=":idMoveBranchFromOrphanToGroupDlg,:panContenu,:accordeonTree" styleClass="styleButton"
                                      oncomplete="PF('moveBranchFromOrphanToGroupDlg').hide();"/>
                 </h:form>
             </fieldset>

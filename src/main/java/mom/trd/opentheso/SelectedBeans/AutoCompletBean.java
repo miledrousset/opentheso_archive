@@ -669,6 +669,173 @@ public class AutoCompletBean implements Serializable {
         return false;
     }
 
+    
+    //////////////////////////////////////
+    //////////////////////////////////////
+    /// partie pour les orphelins ////////
+    //////////////////////////////////////
+    //////////////////////////////////////
+    
+    
+    /**
+     * Permet de déplacer une branche des orphelins vers un vers un concept
+     * uniquement
+     *
+     * @return
+     */
+    public boolean moveBranchFromOrphinToConcept() {
+        // idOld = MT actuel, c'est le domaine 
+        // selectedAtt.getIdConcept = l'id du concept de destination
+        // terme.getIdC = le concept sélectionné
+        // List selectedNode (c'est le noeud complet sélectionné)
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+            return false;
+        }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        GroupHelper groupHelper = new GroupHelper();
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            // permet de déplacer une branche simplement, en cas d'erreur, rien n'est écrit 
+            if (!conceptHelper.moveBranchToConceptOtherGroup(conn,
+                    terme.getIdC(),
+                    idOld,
+                    selectedAtt.getIdConcept(),
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                return false;
+            }
+            
+            // on récupère les Ids des concepts à modifier 
+            ArrayList<String> lisIds = new  ArrayList<>();
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);  
+            
+            
+            // on supprime l'ancien Groupe de la branche 
+            ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
+            for (String domsOld1 : domsOld) {
+                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, domsOld1, terme.getIdTheso())) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+
+            // on ajoute le nouveau domaine à la branche
+            ArrayList<String> domsNew = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), selectedAtt.getIdConcept(), terme.getIdTheso());
+            for (String domsNew1 : domsNew) {
+
+                if (!groupHelper.setDomainToBranch(conn,lisIds, domsNew1, terme.getIdTheso())) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
+            
+            OrphanHelper orphanHelper = new OrphanHelper();
+            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;                
+            }
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+            tree.reInit();
+            tree.reExpand();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    ///////// 
+    //// Other Group
+    /////////
+    /**
+     * Déplace la branche vers la racine d'un autre Group
+     * (Groupe/Domaine/Collection), la tete de la branche devient un TT
+     * (TopTerme)
+     *
+     * @return
+     */
+    public boolean moveBrancheFromOrphinToGroup() {
+        // idOld = TG actuel
+        // selectedAtt.getIdGroup() = l'id  domaine de destination
+        // terme.getIdC = le concept sélectionné
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+
+            /*    if (selectedAtt == null || selectedAtt.getIdGroup().equals("")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+                return false;
+            }*/
+            ConceptHelper conceptHelper = new ConceptHelper();
+            GroupHelper groupHelper = new GroupHelper();
+
+            // on déplace la branche au domaine (on coupe les relations BT du concept, puis on afecte 
+            // au concept la relation TT
+            if (!conceptHelper.moveBranchToAnotherMT(conn, terme.getIdC(),
+                    idOld, terme.getIdDomaine(), // ancien Group
+                    selectedAtt.getIdGroup(), // nouveau Group
+                    terme.getIdTheso(),
+                    terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            // on récupère les Ids des concepts à modifier 
+            ArrayList<String> lisIds = new  ArrayList<>();
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);
+            
+            
+            // on supprime l'ancien Groupe de la branche 
+            if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, terme.getIdDomaine(), terme.getIdTheso())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+            // on ajoute le nouveau domaine à la branche
+            if (!groupHelper.setDomainToBranch(conn, lisIds, selectedAtt.getIdGroup(), terme.getIdTheso())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            
+            OrphanHelper orphanHelper = new OrphanHelper();
+            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return false;                
+            }            
+
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("autoComp.info2")));
+
+            tree.reInit();
+            tree.reExpand();
+            selectedAtt = new NodeAutoCompletion();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }    
 
 
     /**

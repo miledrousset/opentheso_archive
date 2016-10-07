@@ -65,39 +65,7 @@
                 </h:panelGroup>
             </h:panelGroup>
         </h:panelGroup>
-        <!-- POP UP regenerate Orphan -->
-        <h:panelGroup id="regenerateOrphan" style="background: transparent; box-shadow: none;">
-            <h:panelGroup rendered="#{vue.regenerateOrphan != 0}" styleClass="overlay" />
-            <h:panelGroup rendered="#{vue.regenerateOrphan != 0}" styleClass="popUp" style="width: 250px;">
-                <div id="titreAllEdit">
-                    <h:outputText value="#{langueBean.getMsg('index.btnMT')}" />
-                    <div id="divClose">
-                        <h:form>
-                            <p:commandButton id="cbCloseGroup" styleClass="cbClose" icon="ui-icon-fermer" 
-                                             actionListener="#{vue.setRegenerateOrphan(0)}" update=":regenerateOrphan" />
-                        </h:form>
-                    </div>
-                </div>
-                <br/>
-                <!-- Re génération des orphelins -->
-                <h:panelGroup rendered="#{vue.regenerateOrphan == 1}">
-                    <fieldset>
-                        <legend><h:outputText value="#{langueBean.getMsg('tools.regenerateOrphan')}" /></legend>
-                        <h:form>
-                            <p:messages showDetail="true" autoUpdate="true" />
-                            <table>
-                                <tr>
-                                    <td><h:outputText value="#{langueBean.getMsg('theso.infoRegenerationOrphan')}" /> </td>
-                                </tr>           
-                            </table>
-                            <br/>
-                            <p:commandButton id="cbGenerateOrphan" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.regenerateOrphan()}" 
-                                             update=":regenerateOrphan,:accordeonTree" styleClass="styleButton"/>
-                        </h:form>
-                    </fieldset>
-                </h:panelGroup>
-            </h:panelGroup>
-        </h:panelGroup>        
+        <!-- POP UP regenerate Orphan -->      
 
 
         <!-- POP UP TERMES GENERIQUES DEBUT -->

@@ -17,7 +17,7 @@ Opentheso est utilisé par les 39 bibliothèques de la Fédération et ressource
 
 ##Licence
 Opentheso est distribué sous licence CeCILL_C, Licence libre de droit français compatible avec la licence GNU GPL
-
+ 
 Contacts : 
 Directeur informatique : miled.rousset[at]mom[dot]fr
 Donnez-nous votre avis : contact[at]frantiq[dot]fr

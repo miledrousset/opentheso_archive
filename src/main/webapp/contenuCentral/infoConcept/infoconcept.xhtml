@@ -47,7 +47,7 @@
 
                         <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idMoveBranchFromOrphanDlg" oncomplete="PF('moveBranchFromOrphanDlg').show();" style="font-size: 12px;"/>
 
-                        <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.addToMT')}" update=":idMoveBranchFromOrphanToGroupDlg" oncomplete="PF('moveBranchFromOrphanToGroupDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{(selectedTerme.type == 3) }"  disabled="true" value="#{langueBean.getMsg('panel.addToMT')}" update=":idMoveBranchFromOrphanToGroupDlg" oncomplete="PF('moveBranchFromOrphanToGroupDlg').show();" style="font-size: 12px;"/>
                     </p:menu>
                 </h:form>
             </div>

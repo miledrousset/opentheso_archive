@@ -364,8 +364,9 @@ public class SelectedThesaurus implements Serializable {
             conn.commit();
             conn.close();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing") ));
-            return true;
 
+            regenerateOrphan();
+            return true;
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
         } 
@@ -824,8 +825,6 @@ public class SelectedThesaurus implements Serializable {
             vue.setRegenerateOrphan(0);
             return false;
         }
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info"),  langueBean.getMsg("theso.statusRegenerateOrphan")));
-        vue.setRegenerateOrphan(0);
         return true;
     }
     

@@ -948,7 +948,7 @@ public class RelationsHelper {
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
-                        listIdBT = new ArrayList<String>();
+                        listIdBT = new ArrayList<>();
                         while (resultSet.next()) {
                             listIdBT.add(resultSet.getString("id_concept2"));
                         }
