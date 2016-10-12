@@ -28,6 +28,7 @@ import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.tools.CreateBDD;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
+import mom.trd.opentheso.core.exports.helper.ExportStatistiques;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
@@ -43,6 +44,7 @@ import skos.SKOSXmlDocument;
 
 public class DownloadBean implements Serializable {
 
+    
     private String skos;
     private StreamedContent file;
 
@@ -600,7 +602,18 @@ public class DownloadBean implements Serializable {
         email = null;
 
     }
-
+    public void inyectionaBDD() throws ClassNotFoundException, SQLException{
+        File fichero;
+        importxml impo = new importxml();
+        JFileChooser fileChooser = new JFileChooser();
+        int seleccion = fileChooser.showOpenDialog(null);
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            fichero = fileChooser.getSelectedFile();
+            impo.ouvreFichier2(connect.getPoolConnexion(), fichero);
+        }
+        System.out.println("saliendo************************************");
+        
+    }
     /**
      * Applelation de la funtion avec les parametres pour changer le mot de
      * pass.

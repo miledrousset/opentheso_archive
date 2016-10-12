@@ -569,14 +569,13 @@
                 </div>
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
-                      <!--  <p:commandButton id="backupbd"  value="OptionsBDD" title="#{langueBean.getMsg('back.creer')}"  onclick="PF('creationBDEditDlg').show();" styleClass="styleButton"/> 
+                        <p:commandButton id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" title="#{langueBean.getMsg('back.creer')}"  actionListener="PF('creationBDEditDlg').show();" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
-                            <p:menuitem id="CBDD" value="CreateBDD" onclick="PF('creationBDEditDlg').show();"/>
+                            <p:menuitem id="CBDD" value="#{langueBean.getMsg('bdd.act')}"  onclick="PF('creationBDEditDlg').show();" />
+                            <p:menuitem id="IBDD" value="#{langueBean.getMsg('impBDD.info2')}" actionListener="#{downloadBean.inyectionaBDD()}"/>
                         </p:menu>
-                      -->
-                      <p:commandButton value="Creation de BDD" type="button" onclick="PF('creationBDEditDlg').show();" />
                     </h:form>
-                    <p:dialog header="Creation de BDD" widgetVar="creationBDEditDlg" minHeight="40">
+                    <p:dialog header="#{langueBean.getMsg('bdd.act')}" widgetVar="creationBDEditDlg" minHeight="40">
                         <h:form>
                             <h:outputText value="Nom de la Nouvelle BDD:"/>   
                             <h:inputText value="#{CreerBD.dbName}" styleClass="areaNote" /><br/>

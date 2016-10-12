@@ -51,7 +51,8 @@ public class ExportPrivatesDatas {
     
     public ArrayList <Table> getDatasOfTable(HikariDataSource ds, String tableName){
         ArrayList <Table> tableList = new ArrayList<>();
-   
+        if(!"languages_iso639".equals(tableName))
+        {
         ArrayList<TablesColumn> tablesColumns = new ArrayList<>();
         Connection conn;
         Statement stmt;
@@ -125,7 +126,10 @@ public class ExportPrivatesDatas {
                             }
                             if(tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {
                                 lineOfData.setValue("" + resultSet.getBoolean(tablesColumn.getColumnName()));
-                            }                             
+                            }  
+                             if(tablesColumn.getColumnType().equalsIgnoreCase("USER-DEFINED")) {
+                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                             }
                             lineOfDatas.add(lineOfData);
                         }
                          
@@ -143,6 +147,8 @@ public class ExportPrivatesDatas {
         } 
         catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        
         }
         return tableList;
     }

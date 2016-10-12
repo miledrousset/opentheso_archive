@@ -105,6 +105,14 @@
                             </p:column>
                         </p:dataTable>
                     </h:form>
+                    <h:form>
+                        <p:commandButton id="backupbd"  value="BackUp" title="#{langueBean.getMsg('back.creer')}" styleClass="styleButton"/> 
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('back.creer')}"  style="font-size: 12px;" ajax="false">
+                                <p:fileDownload  value="#{theso.genererdocument()}" />
+                            </p:menuitem>
+                        </p:menu>
+                    </h:form>
                 </h:panelGroup>
             </h:panelGroup>
             

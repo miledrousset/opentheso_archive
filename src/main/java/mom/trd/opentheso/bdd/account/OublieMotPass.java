@@ -19,19 +19,13 @@ import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.faces.context.FacesContext;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import mom.trd.opentheso.SelectedBeans.SelectedCandidat;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 
 /**
  *
@@ -58,6 +52,7 @@ public class OublieMotPass {
      * @param ds
      * @param nom
      * @param mail
+     * @throws javax.mail.MessagingException
      */
     public void vide(HikariDataSource ds, String nom, String mail) throws MessagingException {
         String nouvellePass = "";
@@ -87,8 +82,8 @@ public class OublieMotPass {
     }
 
     /**
-     * Injection a la BDD de le pass en motpasstemp, del usuaire que la demandé
-     *
+     * Injection a la BDD de le pass en motpasstemp
+     * del usuaire que la demandé
      * @param ds
      * @param nouvellePass
      */
@@ -110,8 +105,8 @@ public class OublieMotPass {
     }
 
     /**
-     * cette funtion on permit de créer une password
-     *
+     * cette funtion on permit de créer une password aleatoire
+     * que on garde en passsansmd5
      * @return
      */
     private String genererNouvellePass() {
@@ -123,8 +118,6 @@ public class OublieMotPass {
             code += alfa[numRandon];
             sum++;
         }
-        System.out.println(code);
-
         passsansmd5 = code;
         return code;
     }
@@ -150,7 +143,6 @@ public class OublieMotPass {
                 try {
                     String query = "SELECT username FROM users WHERE motpasstemp='" + ancianencodify + "' and active=true";
                     resultSet = stmt.executeQuery(query);
-
                     if (resultSet.next()) {
                         sort = true;
                     }
@@ -184,14 +176,14 @@ public class OublieMotPass {
         Statement stmt, stmt1;
         boolean ok = false;
         if (cestlememmepass(ds, ancien)) {
-            ancien = MD5Password.getEncodedPassword(ancien);
+            ancien = MD5Password.getEncodedPassword(ancien);//transform le pass en format encrypt pour la BDD
             try {
                 Connection conn = ds.getConnection();
                 stmt = stmt1 = conn.createStatement();
                 try {
                     System.out.println(Pass);
-                    String queryAjouPass = "update users set password ='" + passwordencoding + "' where motpasstemp ='" + ancien + "'";
-                    String queryEfacepasstemp = "update users set motpasstemp = NULL where motpasstemp ='" + ancien + "'";
+                    String queryAjouPass = "update users set password ='" + passwordencoding + "' where motpasstemp ='" + ancien + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
+                    String queryEfacepasstemp = "update users set motpasstemp = NULL where motpasstemp ='" + ancien + "'";//efface le motpasstemp de l'utilisateur que a  perdu son pass avant
                     stmt.executeUpdate(queryAjouPass);
                     stmt1.executeUpdate(queryEfacepasstemp);
                     ok = true;
@@ -206,13 +198,23 @@ public class OublieMotPass {
         }
         return ok;
     }
-
+/**
+ * 
+ * @return 
+ */
     private ResourceBundle getBundlePref() {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
     }
-
+/**
+ * Envoi une email a "nonUsu" a la direcction "email" pour l'indiquer
+ * son nouvelle "pass"
+ * @param nomUsu
+ * @param email
+ * @param pass
+ * @throws MessagingException 
+ */
     private void envoimail(String nomUsu, String email, String pass) throws MessagingException {
 
         ResourceBundle bundlePref = getBundlePref();
@@ -234,39 +236,11 @@ public class OublieMotPass {
         transport.connect();
         transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
         transport.close();
-
-        /*
-        String host= "localhost";
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class",
-                        "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        Session sesion= Session.getDefaultInstance(props, new javax.mail.Authenticator() 
-        {
-            protected PasswordAuthentication getPasswordAuthentication() 
-            {
-                return new PasswordAuthentication("username","password");
-            }
-        });
-
-        try{
-            MimeMessage message = new MimeMessage(sesion);
-            message.setFrom(new InternetAddress("admin@domaine.fr"));
-            message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-            message.setSubject("recu pass");
-            message.setContent("<h1>test d'essai</h1>","text/html");
-            message.setText("Dear"+ nomUsu+ "your new pass is "+ pass);
-            Transport.send(message);
-            System.out.println("enviado");
-        }
-        catch(MessagingException e){
-            throw new RuntimeException(e);
-        }*/
     }
-
+/**
+ * getter and setter
+ * @return 
+ */
     public LanguageBean getLangueBean() {
         return langueBean;
     }

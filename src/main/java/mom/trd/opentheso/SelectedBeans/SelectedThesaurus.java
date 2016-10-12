@@ -1,8 +1,11 @@
 package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,8 +48,11 @@ import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import skos.SKOSXmlDocument;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
+import mom.trd.opentheso.core.exports.helper.ExportStatistiques;
 import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 @ManagedBean(name = "theso", eager = true)
 @SessionScoped
@@ -100,6 +106,7 @@ public class SelectedThesaurus implements Serializable {
     private ArrayList<Table> sortirXml;
     
     private String nomdufichier;
+    private StreamedContent file;
 
 
     
@@ -1448,6 +1455,20 @@ public class SelectedThesaurus implements Serializable {
     public void setNomdufichier(String nomdufichier) {
         this.nomdufichier = nomdufichier;
     }
+    public StreamedContent genererdocument() throws SQLException
+    {
+        ExportStatistiques expo= new ExportStatistiques();
+        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        InputStream stream;
+        java.util.Date datetoday = new java.util.Date();
 
+        try {
+            stream = new ByteArrayInputStream(expo.getDocument().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_" + datetoday + ".xml");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;
+    }
     
 }
