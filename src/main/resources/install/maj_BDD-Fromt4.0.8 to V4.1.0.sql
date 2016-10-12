@@ -45,5 +45,6 @@ alter table public.concept_group drop column idparentgroup;
 --ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
 
 
+
 ALTER TABLE term ADD COLUMN creator integer;
 ALTER TABLE term ADD COLUMN contributor integer;
