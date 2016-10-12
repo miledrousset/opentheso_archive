@@ -33,10 +33,17 @@ alter table public.concept_group drop column idconcept;
 
 alter table public.concept_group drop column idparentgroup;
 
-UPDATE term SET contributor = 1 WHERE contributor ilike 'null';
-UPDATE term SET contributor = 1 WHERE contributor ilike '';
-UPDATE term SET creator = 1 WHERE creator ilike 'null';
-UPDATE term SET creator = 1 WHERE creator ilike '';
+-- Ajout du contributeur et du créateur à la table Term
 
-ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
-ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+-- ce code est à appliquer au cas où les colonnes existent déjà et en characters
+--UPDATE term SET contributor = 1 WHERE contributor ilike 'null';
+--UPDATE term SET contributor = 1 WHERE contributor ilike '';
+--UPDATE term SET creator = 1 WHERE creator ilike 'null';
+--UPDATE term SET creator = 1 WHERE creator ilike '';
+
+--ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
+--ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+
+
+ALTER TABLE term ADD COLUMN creator integer;
+ALTER TABLE term ADD COLUMN contributor integer;

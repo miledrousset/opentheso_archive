@@ -27,17 +27,26 @@
                                            a:placeholder="#{langueBean.getMsg('co.att2')}" class="inputConnect" />
                         </td>
                         <td>
-                            <p:commandButton id="cbCo" value="#{langueBean.getMsg('co.title')}" action="#{user1.action()}" styleClass="styleButton" /><br/>
-                            <p:commandLink id="cbOU" value="#{langueBean.getMsg('mot.info')}" update=":idOublieMPEditDlg" oncomplete="PF('oublieMPEditDlg').show();" styleClass="linkSmall"  />
+                            <p:commandButton id="cbCo" value="#{langueBean.getMsg('co.title')}" action="#{user1.action()}" styleClass="styleButton" />
+                           
                         </td>
-                        <tr>
-                            <td>
-                            </td>
-                        </tr>
+ 
 
                     </tr>
                 </table>
             </h:form>
-        </div>
+
+
+            <h:form>
+                <table>
+                    <tr>
+                        <td>
+
+                            <p:commandLink id="passForgeted" value="#{langueBean.getMsg('mot.info')}" update=":idOublieMPEditDlg" oncomplete="PF('oublieMPEditDlg').show();" styleClass="linkSmall"  />
+                        </td>
+                    </tr>
+                </table>
+            </h:form>
+        </div>        
     </h:panelGroup>
 </ui:composition>
