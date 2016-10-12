@@ -35,16 +35,27 @@ alter table public.concept_group drop column idparentgroup;
 
 -- Ajout du contributeur et du créateur à la table Term
 
--- ce code est à appliquer au cas où les colonnes existent déjà et en characters
---UPDATE term SET contributor = 1 WHERE contributor ilike 'null';
---UPDATE term SET contributor = 1 WHERE contributor ilike '';
---UPDATE term SET creator = 1 WHERE creator ilike 'null';
---UPDATE term SET creator = 1 WHERE creator ilike '';
-
---ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
---ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
+ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+ALTER TABLE users ADD motpasstemp character varying(100);
 
 
+/*
 
-ALTER TABLE term ADD COLUMN creator integer;
-ALTER TABLE term ADD COLUMN contributor integer;
+MAJ utilise par Zorro
+
+
+--#ALTER TABLE public.concept_group_concept
+OWNER to opentheso;
+
+
+
+UPDATE term SET contributor = 1 WHERE contributor ilike 'null';
+UPDATE term SET contributor = 1 WHERE contributor ilike '';
+UPDATE term SET creator = 1 WHERE creator ilike 'null';
+UPDATE term SET creator = 1 WHERE creator ilike '';
+
+ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
+ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
+ALTER TABLE users ADD motpasstemp character varying(100);
+*/
