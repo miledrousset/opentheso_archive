@@ -44,6 +44,7 @@ import skos.SKOSXmlDocument;
 
 public class DownloadBean implements Serializable {
 
+    
     private String skos;
     private StreamedContent file;
 

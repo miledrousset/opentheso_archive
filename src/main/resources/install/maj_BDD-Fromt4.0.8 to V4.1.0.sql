@@ -33,10 +33,7 @@ alter table public.concept_group drop column idconcept;
 
 alter table public.concept_group drop column idparentgroup;
 
-UPDATE term SET contributor = 1 WHERE contributor ilike 'null';
-UPDATE term SET contributor = 1 WHERE contributor ilike '';
-UPDATE term SET creator = 1 WHERE creator ilike 'null';
-UPDATE term SET creator = 1 WHERE creator ilike '';
+-- Ajout du contributeur et du créateur à la table Term
 
 ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
 ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
