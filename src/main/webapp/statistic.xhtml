@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-	<title>OpenTheso - Statistiques</title>
+        <title>OpenTheso - Statistiques</title>
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
@@ -38,7 +38,7 @@
                                         <td>Langue : </td>
                                         <td>
                                             <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
-                                                <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}"  
                                                                itemValue="#{t.id_iso639_1}" />
                                             </h:selectOneMenu>
                                         </td>
@@ -63,7 +63,7 @@
                                         <td>
                                             <p:commandButton value="#{langueBean.getMsg('btnOk')}" update=":panStatTheso,:panStatConcept"
                                                              actionListener="#{statBean.chooseStat(theso.thesaurus.id_thesaurus, theso.thesaurus.language)}" 
-                                                              styleClass="styleButton" />
+                                                             styleClass="styleButton" />
                                         </td>
                                     </tr>
                                 </table>
@@ -72,7 +72,7 @@
                     </tr>
                 </table>
             </h:panelGroup>
-            
+
             <h:panelGroup id="panStatTheso">
                 <h:panelGroup rendered="#{vue.statTheso == true}">
                     <br/>
@@ -87,7 +87,7 @@
 
                     <h:form>
                         <p:dataTable var="st" value="#{statBean.statTheso}" scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
-                                      styleClass="styleTab">
+                                     styleClass="styleTab">
                             <p:column headerText="#{langueBean.getMsg('stat.statTheso1')}">
                                 <h:outputText value="#{st.group}" />
                             </p:column>
@@ -103,19 +103,18 @@
                             <p:column headerText="#{langueBean.getMsg('stat.statTheso5')}">
                                 <h:outputText value="#{st.nbNotes}" />
                             </p:column>
+                            
                         </p:dataTable>
-                    </h:form>
-                    <h:form>
-                        <p:commandButton id="backupbd"  value="BackUp" title="#{langueBean.getMsg('back.creer')}" styleClass="styleButton"/> 
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('back.creer')}"  style="font-size: 12px;" ajax="false">
+                        <p:commandButton id="ExportET"  value="Export Statistiques Thésaurus" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="ExportET" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('exp.statheso')}"  style="font-size: 12px;" ajax="false">
                                 <p:fileDownload  value="#{theso.genererdocument()}" />
                             </p:menuitem>
                         </p:menu>
                     </h:form>
                 </h:panelGroup>
             </h:panelGroup>
-            
+
             <h:panelGroup id="panStatConcept">
                 <h:panelGroup rendered="#{vue.statCpt == true}">
                     <br/>
@@ -160,27 +159,27 @@
                                 <h:form>
                                     <p:graphicImage id="seeTree" value="images/iconeTree.png" style="border: 1px grey solid; padding: 1px; border-radius: 4px;" />
                                     <p:tooltip id="toolTipContent" for="seeTree">
-                                                    <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
-                                                        <ui:repeat value="#{search.getHierachi(sC.idConcept)}" var="path" >
-                                                            <ui:repeat value="#{path}" var="termeS" >
-                                                                <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
-                                                                    <img src="images/conceptOpen.png" />
-                                                                    <h:outputText value="#{search.getNom(termeS)}" />
-                                                                </div>
-                                                            </ui:repeat>
-                                                            <br/>
-                                                        </ui:repeat>
-                                                     </p:fieldset>
-                                                </p:tooltip>
+                                        <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                            <ui:repeat value="#{search.getHierachi(sC.idConcept)}" var="path" >
+                                                <ui:repeat value="#{path}" var="termeS" >
+                                                    <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
+                                                        <img src="images/conceptOpen.png" />
+                                                        <h:outputText value="#{search.getNom(termeS)}" />
+                                                    </div>
+                                                </ui:repeat>
+                                                <br/>
+                                            </ui:repeat>
+                                        </p:fieldset>
+                                    </p:tooltip>
                                 </h:form>
                             </p:column>
                         </p:dataTable>
                     </h:form>
                 </h:panelGroup>
             </h:panelGroup>
-            
+
         </div>
-<ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+        <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">

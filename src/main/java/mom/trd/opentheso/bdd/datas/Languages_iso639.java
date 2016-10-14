@@ -1,5 +1,7 @@
 package mom.trd.opentheso.bdd.datas;
 
+import mom.trd.opentheso.core.exports.helper.ExportStatistiques;
+
 public class Languages_iso639 {
 
     private String id_iso639_1;
