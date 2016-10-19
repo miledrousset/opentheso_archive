@@ -17,7 +17,7 @@
                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" />  </td>
                     <td>
                         <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                       minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
+                                        minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
 
 
                             <f:facet name="itemtip">
@@ -27,7 +27,7 @@
                                             <td><h:outputText value="#{t1.termLexicalValue} (#{t1.idConcept}) #{t1.groupLexicalValue}" /></td>
                                         </tr>
                                     </ui:repeat>
-                                    
+
                                 </h:panelGrid>
                             </f:facet>
                         </p:autoComplete>
@@ -38,9 +38,15 @@
                         <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{treeBean.editNomT}" 
                                          update=":idConceptEditDlg,:accordeonTree,:panContenu" styleClass="styleButton"
                                          oncomplete="PF('conceptEditDlg').hide();"/>
-                    </td>
-                    <td colspan="3" style="text-align: center;">
-                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>
+                        <p:commandButton id="cbDeleteT" title="#{langueBean.getMsg('edit.tab1Opt3')}" icon="ui-icon-supp"  actionListener="#{treeBean.effaceNotation()}"
+                                          styleClass="styleButton" oncomplete="PF('conceptEditDlg').hide();">
+                            <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert" />  
+                        </p:commandButton> 
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" update=":accordeonTree,:panContenu" immediate="true"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>
                     </td>
                 </tr>
             </table>

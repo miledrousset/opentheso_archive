@@ -216,9 +216,11 @@ public class TermHelper {
                     resultSet = stmt.getResultSet();
                     resultSet.next();
                     int idNumerique = resultSet.getInt(1);
-                    idTerm = "" + (++idNumerique);
-                    term.setId_term(idTerm);
-
+                    do{
+                        idNumerique++;
+                        idTerm = "" + (idNumerique);
+                        term.setId_term(idTerm);
+                    }while(!ilpeux(conn, idTerm));
                     /**
                      * Ajout des informations dans la table Concept
                      */
@@ -251,6 +253,43 @@ public class TermHelper {
         }
 
         return idTerm;
+    }
+    /**
+     * cette funtion permet de savoir si le Id_concept déjà est utilicée
+     * @param conn
+     * @param id_term 
+     * @return
+     * @throws SQLException 
+     */
+    public boolean ilpeux(Connection conn, String id_term) throws SQLException
+    {
+        Statement stmt;
+        ResultSet resultSet;
+        
+        try {
+            // Get connection from pool
+            //     conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                String query;
+                try {
+                    query="SELECT id_term from term where id_term ='"+ id_term +"'";
+                    resultSet = stmt.executeQuery(query);
+                    if(!resultSet.next()) return true;
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //  conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+                log.error("Error while adding Concept : " + id_term, sqle);
+            }
+        }
+        return false;
     }
     
     /**
