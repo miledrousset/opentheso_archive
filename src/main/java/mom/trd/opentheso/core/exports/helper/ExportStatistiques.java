@@ -35,7 +35,7 @@ public class ExportStatistiques {
     private String document;
     private String id_theso = "";
     public String lange = "";
-
+    ArrayList<Integer> concept_orphan = new ArrayList<>();
     /**
      * cette funtion permet de recuperer tout les fils d'un thesaurus on besoin
      * seulement id_theso et language;
@@ -47,7 +47,6 @@ public class ExportStatistiques {
      */
     public void recuperatefils(HikariDataSource ds, String idtheso, String lg) throws SQLException {
 
-        
         id_theso = idtheso;
         lange = lg;
         //Declarations de variables contents
@@ -104,10 +103,11 @@ public class ExportStatistiques {
                         map.put(idgroup, lexical);//introduir dans le map
 
                     }
-                    niveauxterm++;
                     for (Map.Entry e : map.entrySet()) {
                         int combien = 0;
                         int cantitad = 0;
+                        int orphan = 0;
+                        ArrayList <String> conceptOrp=new ArrayList<>();
                         ArrayList<String> id = new ArrayList<>();
                         //ici nous avons le/les fils de chacun domaine
                         String query2 = "Select *  from concept where id_thesaurus = '" + id_theso + "' and id_group ='" + e.getKey() + "' and top_concept ='true'";
@@ -116,27 +116,27 @@ public class ExportStatistiques {
                         rS = stmt2.executeQuery(query4);
                         while (rS.next()) {
                             cantitad++;//on garde toutes le progénitures d'une domaine e.getkey
+                            conceptOrp.add(rS.getString(1));
                         }
-                        combienterm.add(cantitad);
+                        orphan = combianorphan(ds, conceptOrp);
+                        //llamada a la funcion para saber cuantos huerfanos hay
+                        combienterm.add(cantitad-orphan);
                         resultSet = stmt.executeQuery(query2);
                         while (resultSet.next()) {
                             combien++;
+                            niveauxterm++;
                             candidats.add(resultSet.getString(1));
                             id.add(resultSet.getString(1));
                             niveaux.add(niveauxterm);
-                            
-                        }
-                        
-                        for (int z = 0; z < combien; z++) {
-                            niveauxterm++;
                             //on apple a la funtion recursive
-                            genererfils(ds, id_theso, lange, candidats, id.get(z), niveaux, niveauxterm);
+                            genererfils(ds, id_theso, lange, candidats, id.get(id.size() - 1), niveaux, niveauxterm);
                             niveauxterm--;
-                        }
 
+                        }
                     }
+
                     listtraduire = copyarray(candidats);
-                    changenames(ds, listtraduire, lange);// change le id_term pour son lexical_value
+                    candidats =changenames(ds, listtraduire, lange, domines);// change le id_term pour son lexical_value
                     creedocumentatlch(listtraduire, id_theso, lange, niveaux, combienterm, map, domines);//crée le document 
                     nonT = nontraduit(ds, candidats, combienterm, domines, map);
                     avoirnondescripteur(ds, document, map, listtraduire, nonT);//cherche le non descripteur
@@ -152,6 +152,50 @@ public class ExportStatistiques {
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+/**
+ * ici on peus savoir combien de concept ils sont orphan dans chac domaine
+ * @param ds
+ * @param combianOrphan
+ * @return 
+ */
+    private int combianorphan(HikariDataSource ds, ArrayList<String> combianOrphan) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet resultset;
+        ArrayList<String> quisontorphan= new ArrayList<>();
+        int sont_orphan=0;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    for(int i=0; i < combianOrphan.size(); i++)
+                    {
+                        String query ="select id_concept from concept_orphan where id_concept ='"+ combianOrphan.get(i)+"'";
+                        resultset=stmt.executeQuery(query);
+                        if (resultset.next())
+                        {
+                            sont_orphan++;
+                            quisontorphan.add(combianOrphan.get(i));
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        combianOrphan= quisontorphan;
+        concept_orphan.add(sont_orphan);
+        return sont_orphan;
     }
 
     /**
@@ -194,9 +238,10 @@ public class ExportStatistiques {
                     resultset = stmt.executeQuery(query);
                     while (resultset.next()) {
 
+                        niveauxterm++;
                         niveaux.add(niveauxterm);
                         candidats.add(resultset.getString(4));//nous ajoutons le id_concept de chacun enfant
-                        niveauxterm++;
+
                         //on fait l'aplelation recursive
                         genererfils(ds, idTheso, langue, candidats, resultset.getString(4), niveaux, niveauxterm);
                         niveauxterm--;
@@ -220,20 +265,30 @@ public class ExportStatistiques {
      * @param candidats
      * @param lang
      */
-    private void changenames(HikariDataSource ds, ArrayList<String> candidats, String lang) {
+    private ArrayList changenames(HikariDataSource ds, ArrayList<String> candidats, String lang, int domaines) {
         Connection conn = null;
         Statement stmt = null;
         String complet = "";
-        ResultSet resultset;
+        ResultSet resultset, resultset1;
+        ArrayList<String> candidattoterm = new ArrayList<>();
+        for (int dom = 0; dom < domaines; dom++) {
+            candidattoterm.add(candidats.get(dom));
+        }
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    for (int i = 2; i < candidats.size(); i++) {
+                    for (int i = domaines; i < candidats.size(); i++) {
                         int pos;
+                        String query1 = "select id_term from preferred_term where id_concept ='" + candidats.get(i) + "'";
+                        resultset1 = stmt.executeQuery(query1);
+                        if (resultset1.next()) {
+                            candidattoterm.add(resultset1.getString(1));
+                        }
+
                         //pour chac id on prendre son lexical value dan la lang que nous sommes
-                        String query = "select id_term, lexical_value from term where id_term ='" + candidats.get(i) + "' and lang ='" + lang + "'";
+                        String query = "select id_term, lexical_value from term where id_term ='" + candidattoterm.get(i) + "' and lang ='" + lang + "'";
                         resultset = stmt.executeQuery(query);
                         if (resultset.next()) {
                             candidats.remove(i);//efface le id 
@@ -251,6 +306,7 @@ public class ExportStatistiques {
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return candidattoterm;
     }
 
     /**
@@ -272,7 +328,7 @@ public class ExportStatistiques {
         document = "Thésaurus: " + id_theso + "\t" + lg + "\t Nombre total de concept: " + (candidat.size() - map.size()) + "\r\n\r\n";
         //document += langueBean.getMsg("stat.statCpt4")+"\n\n";//ne marche pas et je sais pas pourquoi
         for (Map.Entry e : map.entrySet()) {
-            document += e.getValue() + "   " + cantite.get(quelledomaine) + " \r\n";//combiens term pour chac domaine
+            document += e.getValue() + "   " + cantite.get(quelledomaine) + " +"+ concept_orphan.get(quelledomaine)+ " Orphan \r\n";//combiens term pour chac domaine
             //on commence aprés le domaines a chercher le term (domaines + positionmultipli)
             //cantite.get(quelledomaine) nous donne combiens term pour chac domain
             //+domaines parceque on commence aprés le domaines
@@ -340,8 +396,9 @@ public class ExportStatistiques {
         }
         for (Map.Entry e : map.entrySet()) {
             this.document += "\r\n\r\n" + e.getValue() + "  Non descripteurs: " + ouviens.get(ousont);
-            this.document += "\r\n" + e.getValue() + "  Termes non traduits: " + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
-            this.document += "\r\n" + e.getValue() + "  Notes(définitions): ";//donne error le getMsg
+            this.document += "\r\n\t  Termes non traduits: " + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
+            this.document += "\r\n\t  Notes(définitions): ";//donne error le getMsg
+            this.document += "\r\n\t  Concept Orphan: " +concept_orphan.get(ousont);
             ousont++;
         }
         return this.document;
@@ -392,24 +449,24 @@ public class ExportStatistiques {
         return noTraduit;
 
     }
-    
+
     //getter and setter
     public LanguageBean getLangueBean() {
         return langueBean;
     }
-    
+
     public void setLangueBean(LanguageBean langueBean) {
         this.langueBean = langueBean;
     }
-    
-    
+
     public String getDocument() {
         return document;
     }
-    
+
     public void setDocument(String document) {
         this.document = document;
     }
+
     public void setLange(String lange) {
         this.lange = lange;
     }

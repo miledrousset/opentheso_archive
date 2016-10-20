@@ -105,7 +105,7 @@
                             </p:column>
                             
                         </p:dataTable>
-                        <p:commandButton id="ExportET"  value="Export Statistiques Thésaurus" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
+                        <p:commandButton id="ExportET"  value="#{langueBean.getMsg('exp.statheso')}" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="ExportET" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('exp.statheso')}"  style="font-size: 12px;" ajax="false">
                                 <p:fileDownload  value="#{theso.genererdocument()}" />
