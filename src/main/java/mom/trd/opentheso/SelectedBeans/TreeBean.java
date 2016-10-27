@@ -895,6 +895,13 @@ public class TreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info2")));
         }
     }
+    public void effaceNotation()
+    {
+        String IDC = selectedTerme.getIdC();
+        selectedTerme.delSpe(IDC);
+        
+    }
+
     
     
 /**

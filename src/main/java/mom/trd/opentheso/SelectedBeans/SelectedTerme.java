@@ -1885,7 +1885,6 @@ public class SelectedTerme implements Serializable {
                 return false;
             }
         }
-        vue.setAddTSpe(false);
         return true;
     }
 

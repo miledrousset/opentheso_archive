@@ -17,7 +17,7 @@
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
-
+                        
 
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>

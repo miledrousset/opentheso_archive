@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import mom.trd.opentheso.SelectedBeans.LanguageBean;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
@@ -23,33 +25,38 @@ import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
  *
  * @author antonio.perez
  */
+@ManagedBean(name = "ETT", eager = true)
+@SessionScoped
 public class ExportStatistiques {
-    
+
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
-    
+
     private String document;
-
-
     private String id_theso = "";
-    private String lange="";
-/**
- * cette funtion permet de recuperer tout les fils d'un thesaurus 
- * on besoin seulement id_theso et language;
- * @param ds
- * @param idtheso
- * @param language
- * @throws SQLException 
- */
-    public void recuperatefils(HikariDataSource ds, String idtheso, String language) throws SQLException {
+    public String lange = "";
+
+    /**
+     * cette funtion permet de recuperer tout les fils d'un thesaurus on besoin
+     * seulement id_theso et language;
+     *
+     * @param ds
+     * @param idtheso
+     * @param lg
+     * @throws SQLException
+     */
+    public void recuperatefils(HikariDataSource ds, String idtheso, String lg) throws SQLException {
+
         
-        lange= language;
         id_theso = idtheso;
+        lange = lg;
         //Declarations de variables contents
         HashMap<String, String> map = new HashMap<>();// pour garder id_grupo et son lexivalvalue de les domaines
         ArrayList<String> candidats = new ArrayList<>();// touts le term du theso
         ArrayList<Integer> combienterm = new ArrayList<>();//combian term il y a dans chacun domain
         ArrayList<Integer> niveaux = new ArrayList<>();//savoir combiens niveaux descen de la racine
+        ArrayList<Integer> nonT = new ArrayList<>();
+        ArrayList<String> listtraduire = new ArrayList<>();
         ResultSet resultSet, resultSet1, rS;
         //Variables
         boolean first = true;
@@ -59,10 +66,9 @@ public class ExportStatistiques {
         //Connections a la BDD
         Connection conn, conn2 = null;
         Statement stmt, stmt1, stmt2 = null;
-       
-        
+
         try {
-            conn = conn2= ds.getConnection();
+            conn = conn2 = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 stmt1 = conn2.createStatement();
@@ -96,7 +102,7 @@ public class ExportStatistiques {
                         }
                         group__id = resultSet.getString(1);
                         map.put(idgroup, lexical);//introduir dans le map
-                        
+
                     }
                     niveauxterm++;
                     for (Map.Entry e : map.entrySet()) {
@@ -115,30 +121,29 @@ public class ExportStatistiques {
                         resultSet = stmt.executeQuery(query2);
                         while (resultSet.next()) {
                             combien++;
-                            String query3 = "Select id_term from term where id_term ='" + resultSet.getString(1) + "' and lang ='" + lange + "'";
-                            resultSet1 = stmt1.executeQuery(query3);
-                            if (resultSet1.next()) {
-                                candidats.add(resultSet1.getString(1));
-                                id.add(resultSet1.getString(1));
-                                niveaux.add(niveauxterm);
-                                
-                            }
+                            candidats.add(resultSet.getString(1));
+                            id.add(resultSet.getString(1));
+                            niveaux.add(niveauxterm);
+                            
                         }
+                        
                         for (int z = 0; z < combien; z++) {
                             niveauxterm++;
                             //on apple a la funtion recursive
                             genererfils(ds, id_theso, lange, candidats, id.get(z), niveaux, niveauxterm);
                             niveauxterm--;
                         }
-                        
+
                     }
-                    changenames(ds, candidats, lange);// change le id_term pour son lexical_value
-                    creedocumentatlch(candidats, id_theso, lange, niveaux, combienterm, map, domines);//crée le document 
-                    avoirnondescripteur(ds, document, map);//cherche le non descripteur
+                    listtraduire = copyarray(candidats);
+                    changenames(ds, listtraduire, lange);// change le id_term pour son lexical_value
+                    creedocumentatlch(listtraduire, id_theso, lange, niveaux, combienterm, map, domines);//crée le document 
+                    nonT = nontraduit(ds, candidats, combienterm, domines, map);
+                    avoirnondescripteur(ds, document, map, listtraduire, nonT);//cherche le non descripteur
                 } finally {
                     stmt2.close();
                     stmt1.close();
-                    stmt.close(); 
+                    stmt.close();
                 }
             } finally {
                 conn.close();
@@ -148,18 +153,35 @@ public class ExportStatistiques {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
-     * Avec tout la information que nous avos on va a créer le documen a telecharger
+     * permet de faire une copy de notre
+     *
+     * @param candidats
+     * @return
+     */
+    private ArrayList<String> copyarray(ArrayList<String> candidats) {
+        ArrayList<String> retorno = new ArrayList<>();
+        for (int i = 0; i < candidats.size(); i++) {
+            retorno.add(candidats.get(i));
+        }
+        return retorno;
+    }
+
+    /**
+     * Avec tout la information que nous avos on va a créer le documen a
+     * telecharger
+     *
      * @param ds
      * @param idTheso
      * @param langue
-     * @param candidats  les term que déjà on a garde
+     * @param candidats les term que déjà on a garde
      * @param nom le term que on veux savoir son progéniture
      * @param niveaux le niveaux que on descen pour trouver le term "nom"
      * @param niveauxterm le niveaux ou il est le term nom
      */
     private void genererfils(HikariDataSource ds, String idTheso, String langue, ArrayList<String> candidats, String nom, ArrayList<Integer> niveaux, int niveauxterm) {
-        Connection conn= null;
+        Connection conn = null;
         Statement stmt = null;
         ResultSet resultset;
         try {
@@ -171,7 +193,7 @@ public class ExportStatistiques {
                     String query = "select * from hierarchical_relationship where id_thesaurus ='" + idTheso + "' and id_concept1='" + nom + "' and role ='NT'";
                     resultset = stmt.executeQuery(query);
                     while (resultset.next()) {
-                        
+
                         niveaux.add(niveauxterm);
                         candidats.add(resultset.getString(4));//nous ajoutons le id_concept de chacun enfant
                         niveauxterm++;
@@ -189,17 +211,19 @@ public class ExportStatistiques {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
-     * on cherche dans la BDD le lexical value de chacun id_concept 
-     * que nous avons et on fait le change
+     * on cherche dans la BDD le lexical value de chacun id_concept que nous
+     * avons et on fait le change
+     *
      * @param ds
-     * @param candidats  
-     * @param lang 
+     * @param candidats
+     * @param lang
      */
     private void changenames(HikariDataSource ds, ArrayList<String> candidats, String lang) {
-        Connection conn= null;
-        Statement stmt= null;
-        String complet="";
+        Connection conn = null;
+        Statement stmt = null;
+        String complet = "";
         ResultSet resultset;
         try {
             conn = ds.getConnection();
@@ -209,13 +233,13 @@ public class ExportStatistiques {
                     for (int i = 2; i < candidats.size(); i++) {
                         int pos;
                         //pour chac id on prendre son lexical value dan la lang que nous sommes
-                        String query = "select id_term, lexical_value from term where id_term ='" + candidats.get(i) + "' and lang ='"+lang+"'";
+                        String query = "select id_term, lexical_value from term where id_term ='" + candidats.get(i) + "' and lang ='" + lang + "'";
                         resultset = stmt.executeQuery(query);
                         if (resultset.next()) {
                             candidats.remove(i);//efface le id 
-                            complet+= resultset.getString(2)+" ("+resultset.getString(1)+")";//on ecrit le lexical value et son id
+                            complet += resultset.getString(2) + " (" + resultset.getString(1) + ")";//on ecrit le lexical value et son id
                             candidats.add(i, complet);
-                            complet="";
+                            complet = "";
                         }
                     }
                 } finally {
@@ -228,82 +252,84 @@ public class ExportStatistiques {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-/**
- * on crée le String que apres serais le fichier a telecharger
- * @param candidat tout les term que nous avons apres de chercher toutes les enfants
- * @param id_theso
- * @param lg langue
- * @param niveaux le niveaux correspondat a chacun term
- * @param cantite cantite de term que il y a dans une domaine
- * @param map le hasMap avec le domaines y son id 
- * @param domaines combien domaines on a trouvé
- */
+
+    /**
+     * on crée le String que apres serais le fichier a telecharger
+     *
+     * @param candidat tout les term que nous avons apres de chercher toutes les
+     * enfants
+     * @param id_theso
+     * @param lg langue
+     * @param niveaux le niveaux correspondat a chacun term
+     * @param cantite cantite de term que il y a dans une domaine
+     * @param map le hasMap avec le domaines y son id
+     * @param domaines combien domaines on a trouvé
+     */
     private void creedocumentatlch(ArrayList<String> candidat, String id_theso, String lg, ArrayList<Integer> niveaux, ArrayList<Integer> cantite, HashMap<String, String> map, int domaines) {
         int quelledomaine = 0;// le domaine que on prendre pour commencé a ecrire
-        int positionmultipli=0;//combien de position on besoin avancé pour trouvée le bon term
-        boolean dernier=false;
-        document = "Thésaurus: " + id_theso + "\t"+ lg+"\t Nombre total de concept: " + (candidat.size()-map.size()) + "\n\n";
+        int positionmultipli = 0;//combien de position on besoin avancé pour trouvée le bon term
+        boolean dernier = false;
+        document = "Thésaurus: " + id_theso + "\t" + lg + "\t Nombre total de concept: " + (candidat.size() - map.size()) + "\r\n\r\n";
         //document += langueBean.getMsg("stat.statCpt4")+"\n\n";//ne marche pas et je sais pas pourquoi
         for (Map.Entry e : map.entrySet()) {
-            document += e.getValue() + "   " +cantite.get(quelledomaine)+ " \n";//combiens term pour chac domaine
+            document += e.getValue() + "   " + cantite.get(quelledomaine) + " \r\n";//combiens term pour chac domaine
             //on commence aprés le domaines a chercher le term (domaines + positionmultipli)
             //cantite.get(quelledomaine) nous donne combiens term pour chac domain
             //+domaines parceque on commence aprés le domaines
             //+positionmultipli si ce n'est pas le 1° avances tout les term jusca arriver a le bonne
-            for (int j = (domaines+positionmultipli); j < ((cantite.get(quelledomaine) + domaines)+positionmultipli); j++) {
+            for (int j = (domaines + positionmultipli); j < ((cantite.get(quelledomaine) + domaines) + positionmultipli); j++) {
                 //selon le niveaux du term on fait plus or moins espace en blanche
                 for (int i = 0; i < niveaux.get(j); i++) {
-                    document += "    ";
+                    document += "  ";
                 }
-                document += candidat.get(j) + "\n";//et on ecrit le term
-                if(quelledomaine==(domaines-1))//si quelledomaine arrive a ça, c'est parce que lui est le dernier
+                document += candidat.get(j) + "\r\n";//et on ecrit le term
+                if (quelledomaine == (domaines - 1))//si quelledomaine arrive a ça, c'est parce que lui est le dernier
                 {
-                    dernier =true;
+                    dernier = true;
                 }
             }
-            if(!dernier)//si ce n'est pas le dernier, change pour savoir ou commence les term de le prochain domaine
+            if (!dernier)//si ce n'est pas le dernier, change pour savoir ou commence les term de le prochain domaine
             {
                 quelledomaine++;
-                positionmultipli+=cantite.get(quelledomaine);            
+                positionmultipli += cantite.get(quelledomaine);
             }
         }
     }
+
     /**
-     * on va a chercher  le term que il ne sont pas descripteur
+     * on va a chercher le term que il ne sont pas descripteur
+     *
      * @param ds
      * @param document
      * @param map
-     * @return 
+     * @return
      */
-    private String  avoirnondescripteur(HikariDataSource ds, String document, HashMap<String, String> map)
-    {
+    private String avoirnondescripteur(HikariDataSource ds, String document, HashMap<String, String> map, ArrayList<String> listnonT, ArrayList<Integer> noTraduit) {
         ArrayList<Integer> ouviens = new ArrayList<>();//ArrayList pour savoir combien de term "nondescripteur" il y a dans chac domaine
-        Connection conn= null;
-        Statement stmt= null;
+        Connection conn = null;
+        Statement stmt = null;
         ResultSet resultset;
-        int ousont=0;//pour avancé dans ouviens et savoir le/les term  "nondescripteur"
-        int combien =0;//pour conté combien ils sont
+        int ousont = 0;//pour avancé dans ouviens et savoir le/les term  "nondescripteur"
+        int combien = 0;//pour conté combien ils sont
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
                     for (Map.Entry e : map.entrySet()) {
-        //On cherche "nondescripteur" dans la table permuted avec le id_group, la lange, le theso et la option de ispreferredterm a false
-                        String query="Select id_concept from permuted where id_group = '"+e.getKey()
-                                +"' and id_lang = '"+ lange
-                                +"' and ispreferredterm= 'false'"
-                                + " and id_thesaurus ='"+id_theso+"'";
-                        resultset= stmt.executeQuery(query);
-                        while (resultset.next()) 
-                        {
+                        //On cherche "nondescripteur" dans la table permuted avec le id_group, la lange, le theso et la option de ispreferredterm a false
+                        String query = "Select id_concept from permuted where id_group = '" + e.getKey()
+                                + "' and id_lang = '" + lange
+                                + "' and ispreferredterm= 'false'"
+                                + " and id_thesaurus ='" + id_theso + "'";
+                        resultset = stmt.executeQuery(query);
+                        while (resultset.next()) {
                             combien++;
                         }
-                        ouviens.add(combien);//introduisons combin dans l'ArrayList
-                        combien=0;//reinicialisons le valeur pour le prochaine
+                        ouviens.add(combien);//introduisons combien dans l'ArrayList
+                        combien = 0;//reinicialisons le valeur pour le prochaine
                     }
-                }   
-                finally {
+                } finally {
                     stmt.close();
                 }
             } finally {
@@ -313,21 +339,65 @@ public class ExportStatistiques {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         for (Map.Entry e : map.entrySet()) {
-            this.document+="\n\n"+e.getValue()+"  Non descripteurs: "+ouviens.get(ousont);
-            this.document+="\n\n"+e.getValue()+"  Termes non traduits: ";//manque faire le languageBean.getMsg 
-            this.document+="\n\n"+e.getValue()+"  Notes(définitions): ";//donne error le getMsg
-            this.document+="\n";
-            ousont++;   
+            this.document += "\r\n\r\n" + e.getValue() + "  Non descripteurs: " + ouviens.get(ousont);
+            this.document += "\r\n" + e.getValue() + "  Termes non traduits: " + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
+            this.document += "\r\n" + e.getValue() + "  Notes(définitions): ";//donne error le getMsg
+            ousont++;
         }
         return this.document;
     }
-    
+
+    private ArrayList<Integer> nontraduit(HikariDataSource ds, ArrayList<String> sansnom, ArrayList<Integer> cantite, int domaines, HashMap<String, String> map) {
+
+        ArrayList<Integer> noTraduit = new ArrayList<>();
+        boolean dernier = false;
+        int traduction = 0;
+        int positionmultipli = 0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet resultset;
+        int alle = domaines;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+
+                    for (int quelledomaine = 0; quelledomaine < domaines; quelledomaine++) {
+                        for (int i = alle; i < ((cantite.get(quelledomaine) + domaines) + positionmultipli); i++) {
+                            String query = "Select id_term from term where "
+                                    + " lang = '" + lange
+                                    + "'  and id_thesaurus ='" + id_theso + "'"
+                                    + "  and id_term='" + sansnom.get(i) + "'";
+                            resultset = stmt.executeQuery(query);
+                            while (resultset.next()) {
+                                traduction++;
+                            }
+                        }
+                        int combien = cantite.get(quelledomaine) - traduction;
+                        noTraduit.add(combien);
+                        traduction = 0;
+                        alle = cantite.get(quelledomaine) + domaines;
+                        positionmultipli = cantite.get(quelledomaine);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return noTraduit;
+
+    }
     
     //getter and setter
     public LanguageBean getLangueBean() {
         return langueBean;
     }
-
+    
     public void setLangueBean(LanguageBean langueBean) {
         this.langueBean = langueBean;
     }
@@ -340,5 +410,8 @@ public class ExportStatistiques {
     public void setDocument(String document) {
         this.document = document;
     }
-    
+    public void setLange(String lange) {
+        this.lange = lange;
+    }
+
 }

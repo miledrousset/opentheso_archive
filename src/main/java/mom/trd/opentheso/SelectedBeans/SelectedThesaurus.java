@@ -1,7 +1,9 @@
 package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
+import com.itextpdf.text.DocumentException;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -1468,11 +1470,11 @@ public class SelectedThesaurus implements Serializable {
 
         try {
             stream = new ByteArrayInputStream(expo.getDocument().getBytes("UTF-8"));
-            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_" + datetoday + ".xml");
+            file = new DefaultStreamedContent(stream, "application/xml", "export "+thesaurus.getId_thesaurus() + datetoday + ".txt");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
-    }
+    }   
     
 }
