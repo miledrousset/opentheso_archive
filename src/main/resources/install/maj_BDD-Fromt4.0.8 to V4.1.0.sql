@@ -59,3 +59,12 @@ ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
 ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
 ALTER TABLE users ADD motpasstemp character varying(100);
 */
+
+
+-- ajouté par Miled
+
+/* modification de la clé primaire de la table candidat */
+ALTER TABLE ONLY concept_candidat
+    drop CONSTRAINT concept_candidat_pkey;
+ALTER TABLE ONLY concept_candidat
+    ADD CONSTRAINT concept_candidat_pkey PRIMARY KEY (id_concept, id_thesaurus);

@@ -265,7 +265,9 @@ public class CandidateHelper {
                     resultSet.next();
                     int idNumerique = resultSet.getInt(1);
                     idConcept = "CA_" + (++idNumerique);
-
+                    while (isCandidatExist(conn,  idConcept, idThesaurus)) {                        
+                         idConcept = "CA_" + (++idNumerique);
+                    }
                     /**
                      * Ajout des informations dans la table Concept_candidat
                      */
@@ -320,6 +322,9 @@ public class CandidateHelper {
                     resultSet.next();
                     int idNumerique = resultSet.getInt(1);
                     idConcept = "CA_" + (++idNumerique);
+                    while (isCandidatExist(ds.getConnection(),  idConcept, idThesaurus)) {                        
+                         idConcept = "CA_" + (++idNumerique);
+                    }
 
                     /**
                      * Ajout des informations dans la table Concept_candidat
@@ -1410,7 +1415,7 @@ public class CandidateHelper {
                            NodeTraductionCandidat nodeTraductionCandidat = new NodeTraductionCandidat();
                            nodeTraductionCandidat.setIdLang(resultSet.getString("lang"));
                            nodeTraductionCandidat.setTitle(resultSet.getString("lexical_value"));
-                           nodeTraductionCandidat.setUseId(resultSet.getInt("id"));
+                           nodeTraductionCandidat.setUseId(resultSet.getInt("id_user"));
                            nodeTraductionCandidat.setUser(resultSet.getString("username"));
                            nodeTraductionCandidatList.add(nodeTraductionCandidat);
                         }
@@ -2043,5 +2048,47 @@ public class CandidateHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si l'id du Candidat existe, si oui, on l'incrémente
+     * @param conn
+     * @param idCandidat
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isCandidatExist(Connection conn,
+            String idCandidat, String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false; 
+
+        try {
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept_candidat where "
+                            + "id_concept = '" + idCandidat + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if(resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id of Candidat exist : " + idCandidat, sqle);
+        }
+        return existe;
+    }    
+    
     
 }
