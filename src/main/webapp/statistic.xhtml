@@ -58,11 +58,15 @@
                                             <h:selectOneMenu value="#{statBean.typeStat}">
                                                 <f:selectItem itemLabel="Statistiques thésaurus" itemValue="1" />
                                                 <f:selectItem itemLabel="Statistiques concepts" itemValue="2" />
+
                                             </h:selectOneMenu>
                                         </td>
                                         <td>
-                                            <p:commandButton value="#{langueBean.getMsg('btnOk')}" update=":panStatTheso,:panStatConcept"
+                                            <p:commandButton value="#{langueBean.getMsg('btnOk')}" update=":panStatTheso,:panStatConcept,:panstatPermuted"
                                                              actionListener="#{statBean.chooseStat(theso.thesaurus.id_thesaurus, theso.thesaurus.language)}" 
+                                                             styleClass="styleButton" />
+                                            <p:commandButton value="Table Permuted" update=":panStatTheso,:panStatConcept,:panstatPermuted"
+                                                             actionListener="#{showPermuted.chooseStat(theso.thesaurus.id_thesaurus, theso.thesaurus.language)}" 
                                                              styleClass="styleButton" />
                                         </td>
                                     </tr>
@@ -103,12 +107,15 @@
                             <p:column headerText="#{langueBean.getMsg('stat.statTheso5')}">
                                 <h:outputText value="#{st.nbNotes}" />
                             </p:column>
-                            
+
                         </p:dataTable>
                         <p:commandButton id="ExportET"  value="#{langueBean.getMsg('exp.statheso')}" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="ExportET" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('exp.statheso')}"  style="font-size: 12px;" ajax="false">
                                 <p:fileDownload  value="#{theso.genererdocument()}" />
+                            </p:menuitem>
+                            <p:menuitem id="ExportETDPF" value="#{langueBean.getMsg('exp.stathesoPDF')}" title="#{langueBean.getMsg('exp.stathesoPDF')}"  style="font-size: 12px;" ajax="false">
+                                <p:fileDownload  value="#{theso.pdf()}" />
                             </p:menuitem>
                         </p:menu>
                     </h:form>
@@ -176,6 +183,38 @@
                         </p:dataTable>
                     </h:form>
                 </h:panelGroup>
+            </h:panelGroup>
+            <h:panelGroup id="panstatPermuted">
+                 <h:panelGroup rendered="#{vue.statPermuted == true}">
+                <p:dataTable var="tp" value="#{showPermuted.statTheso}" scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
+                                     styleClass="styleTab">
+                            <p:column headerText="Ord">
+                                <h:outputText value="#{tp.ord}" />
+                            </p:column>
+                            <p:column headerText="Id_concept">
+                                <h:outputText value="#{tp.id_concept}" />
+                            </p:column>
+                            <p:column headerText="Id_group">
+                                <h:outputText value="#{tp.id_group}" />
+                            </p:column>
+                            <p:column headerText="Id_thesaurus">
+                                <h:outputText value="#{tp.id_theso}" />
+                            </p:column>
+                            <p:column headerText="Id_lang">
+                                <h:outputText value="#{tp.id_lang}" />
+                            </p:column>
+                            <p:column headerText="Lexical Value">
+                                <h:outputText value="#{tp.lexical_value}" />
+                            </p:column>
+                            <p:column headerText="Is preferred Term">
+                                <h:outputText value="#{tp.ispreferredterm}" />
+                            </p:column>
+                            <p:column headerText="Original Value">
+                                <h:outputText value="#{tp.original_value}" />
+                            </p:column>
+
+                        </p:dataTable>
+                 </h:panelGroup>
             </h:panelGroup>
 
         </div>

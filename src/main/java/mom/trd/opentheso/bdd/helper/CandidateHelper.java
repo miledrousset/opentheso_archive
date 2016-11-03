@@ -1487,6 +1487,66 @@ public class CandidateHelper {
         }
         return nodeCandidatLists;
     }
+    /**
+     * Permet de retourner une ArrayList de NodeConceptCandidat par
+     * thésaurus et par id_user c'est la liste des candidats en attente (status = a)
+     * Si le Candidat n'est pas traduit dans la langue en cours, on récupère
+     * l'identifiant pour l'afficher à la place
+     * @param ds
+     * @param idThesaurus
+     * @param idLang
+     * @param id_user
+     * @return 
+     */
+    public ArrayList<NodeCandidatValue> getListMyCandidatsWait(HikariDataSource ds,
+            String idThesaurus, String idLang, Integer id_user)
+    {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList <NodeCandidatValue> nodeCandidatLists = null;
+        ArrayList tabIdConcept = new ArrayList();
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select concept_candidat.id_concept from concept_candidat, proposition"
+                            + " where concept_candidat.id_concept = proposition.id_concept and"
+                            + " concept_candidat.id_thesaurus= proposition.id_thesaurus"
+                            + " and proposition.id_user ="+id_user+" and proposition.id_thesaurus ='"+idThesaurus
+                            + "' and concept_candidat.status='a'";
+                            
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while(resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+                    nodeCandidatLists = new ArrayList<>();
+                    for (Object tabIdConcept1 : tabIdConcept) {
+                        NodeCandidatValue nodeCandidatValue;
+                        nodeCandidatValue = getThisCandidat(ds, tabIdConcept1.toString(), idThesaurus, idLang);
+                        if(nodeCandidatValue == null) return null;
+                        nodeCandidatValue.setEtat("a");
+                        nodeCandidatValue.setNbProp(getNbPropCandidat(ds,idThesaurus,tabIdConcept1.toString()));
+                        nodeCandidatLists.add(nodeCandidatValue);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Group or Domain of thesaurus : " + idThesaurus, sqle);
+        }
+        return nodeCandidatLists;
+        
+    }
     
     /**
      * Permet de retourner une ArrayList de NodeConceptCandidat par

@@ -548,7 +548,7 @@
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
-                            
+
                         </p:menu>
                     </h:form>
 
@@ -558,10 +558,10 @@
                         <p:commandButton id="backupbd"  value="BackUp" title="#{langueBean.getMsg('back.creer')}" action="#{theso.getAllTables()}"  styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('back.creer')}"  style="font-size: 12px;" ajax="false">
-                                <p:fileDownload  value="#{downloadBean.backUpBaseDonnees(theso.tablesList)}" />
+                                <p:fileDownload  value="#{baseDeDonnes.backUpBaseDonnees(theso.tablesList)}" />
                             </p:menuitem>
                             <p:menuitem value="#{langueBean.getMsg('back.CreerPrivate')}"  style="font-size: 12px;" ajax="false">
-                                <p:fileDownload  value="#{downloadBean.backUpBaseDonnees(theso.tablesListPrivate)}" />
+                                <p:fileDownload  value="#{baseDeDonnes.backUpBaseDonnees(theso.tablesListPrivate)}" />
                             </p:menuitem>
                         </p:menu>
 
@@ -572,22 +572,47 @@
                         <p:commandButton id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" title="#{langueBean.getMsg('back.creer')}"  actionListener="PF('creationBDEditDlg').show();" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
                             <p:menuitem id="CBDD" value="#{langueBean.getMsg('bdd.act')}"  onclick="PF('creationBDEditDlg').show();" />
-                            <p:menuitem id="IBDD" value="#{langueBean.getMsg('impBDD.info2')}" actionListener="#{downloadBean.inyectionaBDD()}"/>
+                            <p:menuitem id="IBDD" value="#{langueBean.getMsg('impBDD.info2')}" action="#{baseDeDonnes.inyectionaBDD()}"/>
+                                
                         </p:menu>
+
+                        <p:notificationBar position="bottom" effect="fade" styleClass="top" widgetVar="bar">
+                            <h:panelGroup id="panifobd">
+                                <h:panelGroup rendered="#{vue.DBinfoBD == true}">
+                                    <p:dataTable var="in" value="#{baseDeDonnes.loadinfoDB()}" scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
+                                                 styleClass="styleTab">
+                                        <p:column headerText="#{langueBean.getMsg('bdd.ctd')}">
+                                            <h:outputText value="#{in.datecreation}"/>
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('bdd.nom')}">
+                                            <h:outputText value="#{in.DBnameout}" />
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('bdd.vrs')}">
+                                            <h:outputText value="#{in.versionDB}" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </p:notificationBar>
+
+                        <p:commandButton value="infoDB" onclick="PF('bar').show()" type="button" icon="ui-icon-arrow-1-s" styleClass="styleButton"/>
+                        <p:commandButton value="Hide" onclick="PF('bar').hide()" type="button" icon="ui-icon-arrow-1-n" 
+                                         update=":panifobd" styleClass="styleButton"/>
+
                     </h:form>
                     <p:dialog header="#{langueBean.getMsg('bdd.act')}" widgetVar="creationBDEditDlg" minHeight="40">
                         <h:form>
-                            <h:outputText value="Nom de la Nouvelle BDD:"/>   
-                            <h:inputText value="#{CreerBD.dbName}" styleClass="areaNote" /><br/>
-            
-                                    <br/>
-                                    <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{CreerBD.createBdD()}"
-                                                     styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"/>
-                            <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"  immediate="true"/>
+                            <h:outputText value="#{langueBean.getMsg('bdd.nvnom')}:"/>   
+                            <h:inputText value="#{baseDeDonnes.dbName}" styleClass="areaNote" /><br/>
+
+                            <br/>
+                            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{baseDeDonnes.newDB()}"
+                                             styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"/>
+                            <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton"  
+                                             oncomplete="PF('creationBDEditDlg').hide();"  immediate="true"/>
                         </h:form>
                     </p:dialog>
- 
-                    
+
                 </div><br/><br/>
             </div><br/>
             <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->

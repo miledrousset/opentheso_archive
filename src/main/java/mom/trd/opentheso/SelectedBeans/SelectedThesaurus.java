@@ -1,10 +1,12 @@
 package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
-import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -12,7 +14,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -109,7 +111,10 @@ public class SelectedThesaurus implements Serializable {
     
     private String nomdufichier;
     private StreamedContent file;
-
+    private StreamedContent fileDownload;
+    
+    private boolean mesCandidats = false;
+    private boolean tousThesos = true;
 
     
 
@@ -547,12 +552,19 @@ public class SelectedThesaurus implements Serializable {
      */
     public List<NodeCandidatValue> listeCandidats() {
         List<NodeCandidatValue> candidats = new ArrayList<>();
-        if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
-            candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        
+        if (mesCandidats){
+            if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
+                candidats = new CandidateHelper().getListMyCandidatsWait(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(), tree.getSelectedTerme().getUser().getUser().getId());
+            }
+        }
+        else {
+            if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
+                candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            }
         }
         return candidats;
-    }
-    
+    }    
     /**
      * Récupération de la liste des candidats propre au thésaurus courant
      * @return la liste de candidats
@@ -1152,14 +1164,20 @@ public class SelectedThesaurus implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayTheso() {
-        if(connect.getPoolConnexion() != null) {
-         /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
-            p.put("", "");*/
-            if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
-                arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),workLanguage).entrySet());
-            else
-                arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
-                        connect.getPoolConnexion(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+        if (tousThesos){
+            if(connect.getPoolConnexion() != null) {
+             /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
+                p.put("", "");*/
+                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),workLanguage).entrySet());
+                else
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
+                            connect.getPoolConnexion(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+            }
+        }
+        else {
+            arrayTheso = new ArrayList<>( new ThesaurusHelper().getListThesaurusOfUser(
+                            connect.getPoolConnexion(),tree.getSelectedTerme().getUser().getUser().getId(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
         }
         return arrayTheso;
     }
@@ -1460,7 +1478,7 @@ public class SelectedThesaurus implements Serializable {
     public StreamedContent genererdocument() throws SQLException
     {
         ExportStatistiques expo= new ExportStatistiques();
-        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(),1);
         InputStream stream;
         java.util.Date datetoday = new java.util.Date();
 
@@ -1471,6 +1489,44 @@ public class SelectedThesaurus implements Serializable {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
-    }   
+    }
+    public StreamedContent pdf() throws SQLException, Exception
+    {
+        ExportStatistiques expo= new ExportStatistiques();
+        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(),2);
+        Document pdf = new Document(PageSize.LETTER);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter writer;
+        Paragraph para = new Paragraph(expo.getDocument());
+        writer = PdfWriter.getInstance(pdf, baos);
+        if (!pdf.isOpen()) {
+            pdf.open();
+        }
+        pdf.addTitle("theso");
+        pdf.add(para);
+       //Adding content to pdf
+        pdf.close();
+        InputStream stream = new ByteArrayInputStream(baos.toByteArray());
+        fileDownload = new DefaultStreamedContent(stream, "application/pdf", "Thésaurus"+thesaurus.getId_thesaurus()+".pdf");
+
+       return fileDownload;
+    }
+
+    public boolean isMesCandidats() {
+        return mesCandidats;
+    }
+
+    public void setMesCandidats(boolean mesCandidats) {
+        this.mesCandidats = mesCandidats;
+    }
+
+    public boolean isTousThesos() {
+        return tousThesos;
+    }
+
+    public void setTousThesos(boolean tousThesos) {
+        this.tousThesos = tousThesos;
+    }
+    
     
 }

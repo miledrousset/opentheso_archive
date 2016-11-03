@@ -32,10 +32,12 @@ public class ExportStatistiques {
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
 
-    private String document;
+    private String document; //String ou a tout l'information
     private String id_theso = "";
     public String lange = "";
-    ArrayList<Integer> concept_orphan = new ArrayList<>();
+    ArrayList<Integer> concept_orphan = new ArrayList<>();// combien orphan il y a dans chac domaine
+    ArrayList<String> quisontorphan = new ArrayList<>();//les concept qui sont orphan
+
     /**
      * cette funtion permet de recuperer tout les fils d'un thesaurus on besoin
      * seulement id_theso et language;
@@ -43,9 +45,11 @@ public class ExportStatistiques {
      * @param ds
      * @param idtheso
      * @param lg
+     * @param option 1 pour la version txt 2 pour la version PDF (La version TXT
+     * il a non_descripteurs, non traduit, et les Orphan)
      * @throws SQLException
      */
-    public void recuperatefils(HikariDataSource ds, String idtheso, String lg) throws SQLException {
+    public void recuperatefils(HikariDataSource ds, String idtheso, String lg, int option) throws SQLException {
 
         id_theso = idtheso;
         lange = lg;
@@ -74,17 +78,18 @@ public class ExportStatistiques {
                 stmt2 = conn2.createStatement();
                 try {
                     //ici on recupere les domaines 
-                    String query = "SELECT idgroup, lexicalvalue, lang FROM concept_group_label where idthesaurus ='" + id_theso + "'";
+                    String query = "SELECT distinct idgroup, lexicalvalue, lang FROM concept_group_label where idthesaurus ='" + id_theso 
+                            + "'";
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
                         String lexical = "";
                         String lang = "(";
                         String idgroup = resultSet.getString(1);
                         if (group__id == null ? idgroup != null : !group__id.equals(idgroup)) {// c'est unique le domain sans traduction
-                            lexical += resultSet.getString(2);//getString(2) =lexicalvalue.
-                            lang += resultSet.getString(3) + ")";//getString(3) = lang.
-                            lexical += lang;
-                            candidats.add(lexical);
+                            //lexical += resultSet.getString(2);//getString(2) =lexicalvalue.
+                            //lang += resultSet.getString(3) + ")";//getString(3) = lang.
+                            //lexical += lang;
+                            candidats.add(idgroup);
                             niveaux.add(niveauxterm);
                             domines++;
                         } else {// c'est pour si il y a les memme domain en plusieurs lang
@@ -97,17 +102,17 @@ public class ExportStatistiques {
                             lexical = change;
                             int ou = candidats.size();
                             candidats.remove(ou - 1);//efface le/les ancian pour mettre les nouvelles
-                            candidats.add(lexical);
+                            candidats.add(idgroup);
                         }
                         group__id = resultSet.getString(1);
-                        map.put(idgroup, lexical);//introduir dans le map
+                        map.put(idgroup, "");//introduir dans le map
 
                     }
                     for (Map.Entry e : map.entrySet()) {
                         int combien = 0;
                         int cantitad = 0;
                         int orphan = 0;
-                        ArrayList <String> conceptOrp=new ArrayList<>();
+                        ArrayList<String> conceptOrp = new ArrayList<>();
                         ArrayList<String> id = new ArrayList<>();
                         //ici nous avons le/les fils de chacun domaine
                         String query2 = "Select *  from concept where id_thesaurus = '" + id_theso + "' and id_group ='" + e.getKey() + "' and top_concept ='true'";
@@ -119,8 +124,8 @@ public class ExportStatistiques {
                             conceptOrp.add(rS.getString(1));
                         }
                         orphan = combianorphan(ds, conceptOrp);
-                        //llamada a la funcion para saber cuantos huerfanos hay
-                        combienterm.add(cantitad-orphan);
+                        //appelation a la funtion pour savoir combien de concept orphan ils sont
+                        combienterm.add(cantitad - orphan);
                         resultSet = stmt.executeQuery(query2);
                         while (resultSet.next()) {
                             combien++;
@@ -128,7 +133,7 @@ public class ExportStatistiques {
                             candidats.add(resultSet.getString(1));
                             id.add(resultSet.getString(1));
                             niveaux.add(niveauxterm);
-                            //on apple a la funtion recursive
+                            //on appele a la funtion recursive
                             genererfils(ds, id_theso, lange, candidats, id.get(id.size() - 1), niveaux, niveauxterm);
                             niveauxterm--;
 
@@ -136,10 +141,13 @@ public class ExportStatistiques {
                     }
 
                     listtraduire = copyarray(candidats);
-                    candidats =changenames(ds, listtraduire, lange, domines);// change le id_term pour son lexical_value
-                    creedocumentatlch(listtraduire, id_theso, lange, niveaux, combienterm, map, domines);//crée le document 
-                    nonT = nontraduit(ds, candidats, combienterm, domines, map);
-                    avoirnondescripteur(ds, document, map, listtraduire, nonT);//cherche le non descripteur
+                    candidats = changenames(ds, listtraduire, lange, domines);// change le id_term pour son lexical_value
+                    creedocumentatlch(ds, listtraduire, id_theso, lange, niveaux, combienterm, map, domines, candidats);//crée le document 
+                    if (option == 1)// cette part c'est seulement por le version .txt
+                    {
+                        nonT = nontraduit(ds, candidats, combienterm, domines, map);
+                        avoirnondescripteur(ds, document, map, listtraduire, nonT, domines);//cherche le non descripteur
+                    }
                 } finally {
                     stmt2.close();
                     stmt1.close();
@@ -153,35 +161,33 @@ public class ExportStatistiques {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-/**
- * ici on peus savoir combien de concept ils sont orphan dans chac domaine
- * @param ds
- * @param combianOrphan
- * @return 
- */
+
+    /**
+     * ici on peus savoir combien de concept ils sont orphan dans chac domaine
+     *
+     * @param ds
+     * @param combianOrphan
+     * @return
+     */
     private int combianorphan(HikariDataSource ds, ArrayList<String> combianOrphan) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet resultset;
-        ArrayList<String> quisontorphan= new ArrayList<>();
-        int sont_orphan=0;
+
+        int sont_orphan = 0;
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    for(int i=0; i < combianOrphan.size(); i++)
-                    {
-                        String query ="select id_concept from concept_orphan where id_concept ='"+ combianOrphan.get(i)+"'";
-                        resultset=stmt.executeQuery(query);
-                        if (resultset.next())
-                        {
+                    for (int i = 0; i < combianOrphan.size(); i++) {
+                        String query = "select id_concept from concept_orphan where id_concept ='" + combianOrphan.get(i) + "'";
+                        resultset = stmt.executeQuery(query);
+                        if (resultset.next()) {
                             sont_orphan++;
                             quisontorphan.add(combianOrphan.get(i));
-                        }
-                        else
-                        {
-                            
+                        } else {
+
                         }
                     }
                 } finally {
@@ -193,7 +199,6 @@ public class ExportStatistiques {
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
-        combianOrphan= quisontorphan;
         concept_orphan.add(sont_orphan);
         return sont_orphan;
     }
@@ -242,7 +247,7 @@ public class ExportStatistiques {
                         niveaux.add(niveauxterm);
                         candidats.add(resultset.getString(4));//nous ajoutons le id_concept de chacun enfant
 
-                        //on fait l'aplelation recursive
+                        //on fait l'appelation recursive
                         genererfils(ds, idTheso, langue, candidats, resultset.getString(4), niveaux, niveauxterm);
                         niveauxterm--;
                     }
@@ -271,8 +276,33 @@ public class ExportStatistiques {
         String complet = "";
         ResultSet resultset, resultset1;
         ArrayList<String> candidattoterm = new ArrayList<>();
-        for (int dom = 0; dom < domaines; dom++) {
-            candidattoterm.add(candidats.get(dom));
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    for (int dom = 0; dom < domaines; dom++) {
+                        String query = "SELECT lexicalvalue FROM concept_group_label where idthesaurus ='" + id_theso
+                                + "' and lang ='" + lange
+                                + "' and idgroup ='" + candidats.get(dom) + "'";
+                        resultset = stmt.executeQuery(query);
+                        if (resultset.next()) {
+                            candidattoterm.add(resultset.getString(1));
+                            candidats.set(dom, resultset.getString(1));
+
+                        } else {
+                            candidattoterm.add(candidats.get(dom));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             conn = ds.getConnection();
@@ -321,14 +351,16 @@ public class ExportStatistiques {
      * @param map le hasMap avec le domaines y son id
      * @param domaines combien domaines on a trouvé
      */
-    private void creedocumentatlch(ArrayList<String> candidat, String id_theso, String lg, ArrayList<Integer> niveaux, ArrayList<Integer> cantite, HashMap<String, String> map, int domaines) {
+    private void creedocumentatlch(HikariDataSource ds, ArrayList<String> candidat, String id_theso, String lg,
+            ArrayList<Integer> niveaux, ArrayList<Integer> cantite, HashMap<String, String> map, int domaines, ArrayList<String> ids) throws SQLException {
         int quelledomaine = 0;// le domaine que on prendre pour commencé a ecrire
         int positionmultipli = 0;//combien de position on besoin avancé pour trouvée le bon term
         boolean dernier = false;
-        document = "Thésaurus: " + id_theso + "\t" + lg + "\t Nombre total de concept: " + (candidat.size() - map.size()) + "\r\n\r\n";
+        int domaines2 = domaines;
+        document = "Thésaurus: " + id_theso + "  \t  " + lg + "    Nombre total de concept: " + (candidat.size() - map.size()) + "\r\n";
         //document += langueBean.getMsg("stat.statCpt4")+"\n\n";//ne marche pas et je sais pas pourquoi
-        for (Map.Entry e : map.entrySet()) {
-            document += e.getValue() + "   " + cantite.get(quelledomaine) + " +"+ concept_orphan.get(quelledomaine)+ " Orphan \r\n";//combiens term pour chac domaine
+        for (int cont = 0; cont < domaines2; cont++) {
+            document += candidat.get(cont) + "   " + cantite.get(quelledomaine) + " + " + concept_orphan.get(quelledomaine) + " Orphan \r\n";//combiens term pour chac domaine
             //on commence aprés le domaines a chercher le term (domaines + positionmultipli)
             //cantite.get(quelledomaine) nous donne combiens term pour chac domain
             //+domaines parceque on commence aprés le domaines
@@ -336,9 +368,14 @@ public class ExportStatistiques {
             for (int j = (domaines + positionmultipli); j < ((cantite.get(quelledomaine) + domaines) + positionmultipli); j++) {
                 //selon le niveaux du term on fait plus or moins espace en blanche
                 for (int i = 0; i < niveaux.get(j); i++) {
-                    document += "  ";
+                    document += "   ";
                 }
-                document += candidat.get(j) + "\r\n";//et on ecrit le term
+                document += candidat.get(j) + " ";// on ecrit le term
+                ArrayList<String> notesOfTerm = ajouterNotes(ds, ids.get(j), id_theso);// et on cherche ses notes, et on la garde dans notesOfTerm
+                for (int z = 0; z < notesOfTerm.size(); z++) {
+                    document += notesOfTerm.get(z);//on ecrite les notes/note si il y a
+                }
+                document += "\r\n";
                 if (quelledomaine == (domaines - 1))//si quelledomaine arrive a ça, c'est parce que lui est le dernier
                 {
                     dernier = true;
@@ -346,8 +383,8 @@ public class ExportStatistiques {
             }
             if (!dernier)//si ce n'est pas le dernier, change pour savoir ou commence les term de le prochain domaine
             {
-                quelledomaine++;
                 positionmultipli += cantite.get(quelledomaine);
+                quelledomaine++;
             }
         }
     }
@@ -360,7 +397,7 @@ public class ExportStatistiques {
      * @param map
      * @return
      */
-    private String avoirnondescripteur(HikariDataSource ds, String document, HashMap<String, String> map, ArrayList<String> listnonT, ArrayList<Integer> noTraduit) {
+    private String avoirnondescripteur(HikariDataSource ds, String document, HashMap<String, String> map, ArrayList<String> listnonT, ArrayList<Integer> noTraduit, int domaines) {
         ArrayList<Integer> ouviens = new ArrayList<>();//ArrayList pour savoir combien de term "nondescripteur" il y a dans chac domaine
         Connection conn = null;
         Statement stmt = null;
@@ -394,16 +431,82 @@ public class ExportStatistiques {
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
-        for (Map.Entry e : map.entrySet()) {
-            this.document += "\r\n\r\n" + e.getValue() + "  Non descripteurs: " + ouviens.get(ousont);
+        int conttateur = 0;
+        int cont;
+        changenames(ds, quisontorphan, lange, combien);
+        for (int h = 0; h < domaines; h++) {
+            this.document += "\r\n\r\n" + listnonT.get(h) + "  Non descripteurs: " + ouviens.get(ousont);
             this.document += "\r\n\t  Termes non traduits: " + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
             this.document += "\r\n\t  Notes(définitions): ";//donne error le getMsg
-            this.document += "\r\n\t  Concept Orphan: " +concept_orphan.get(ousont);
+            this.document += "\r\n\t  Concept Orphan: ";
+            for (cont = conttateur; cont < concept_orphan.get(ousont) + conttateur; cont++) {
+                this.document += quisontorphan.get(cont) + ", ";
+            }
+            conttateur += concept_orphan.get(ousont);
             ousont++;
         }
         return this.document;
     }
+/**
+ * Cette funtion cherche le/les notes d'un term (ids), que il est dans le thesaurus id_theso
+ * @param ds
+ * @param ids
+ * @param id_theso
+ * @return
+ * @throws SQLException 
+ */
+    private ArrayList<String> ajouterNotes(HikariDataSource ds, String ids, String id_theso) throws SQLException {
+        ArrayList<String> notes = new ArrayList<>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet resultset;
+        String id_term = "";// pour garder la transformation de id_concept a id_term
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {//traduction de id_concept a id_term
+                    String query = "select id_term from preferred_term where id_concept='" + ids
+                            + "' and id_thesaurus= '" + id_theso + "'";
+                    resultset = stmt.executeQuery(query);
+                    if (resultset.next()) {
+                        id_term = resultset.getString("id_term");
+                    }// chercher toutes le notes de une terme
+                    query = "Select notetypecode, lexicalvalue, lang from note "
+                            + " where id_concept ='" + ids + "' OR id_term='" + id_term
+                            + "' and id_thesaurus= '" + id_theso + "'";
+                    resultset = stmt.executeQuery(query);
+                    while (resultset.next()) {
+                            //on garde le/ les notes dans un Array notes
+                        String note = resultset.getString("notetypecode");
+                        note+="("+resultset.getString("lang")+")";
+                        note += "-> " + resultset.getString("lexicalvalue") + ",";
+                        notes.add(note);
 
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return notes;
+    }
+
+    /**
+     * ici on cherche toutes le concept que ne sont pas de traduction dans la
+     * langue que nous sommes
+     *
+     * @param ds
+     * @param sansnom
+     * @param cantite
+     * @param domaines
+     * @param map
+     * @return
+     */
     private ArrayList<Integer> nontraduit(HikariDataSource ds, ArrayList<String> sansnom, ArrayList<Integer> cantite, int domaines, HashMap<String, String> map) {
 
         ArrayList<Integer> noTraduit = new ArrayList<>();
@@ -449,15 +552,7 @@ public class ExportStatistiques {
         return noTraduit;
 
     }
-
     //getter and setter
-    public LanguageBean getLangueBean() {
-        return langueBean;
-    }
-
-    public void setLangueBean(LanguageBean langueBean) {
-        this.langueBean = langueBean;
-    }
 
     public String getDocument() {
         return document;

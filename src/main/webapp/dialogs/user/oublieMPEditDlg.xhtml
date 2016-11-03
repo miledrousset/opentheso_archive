@@ -12,19 +12,14 @@
             <table>
                 <tr>
                     <td>
-                        <h:outputText value="#{langueBean.getMsg('mot.nom')}:"/>   
-                        <h:inputText  value="#{downloadBean.nomUsu}"  /></td>
-                </tr>
-                <tr>
-                    <td>
                         <h:outputText value="#{langueBean.getMsg('conf.mail')}:"/>  
-                        <h:inputText value="#{downloadBean.email}"  />
+                        <h:inputText value="#{baseDeDonnes.email}"  />
                     </td>
                 </tr>
                 <br/>
             </table>
             <br/><br/>
-            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" icon="ui-icon-valider" actionListener="#{downloadBean.oublieMonPass()}"
+            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" icon="ui-icon-valider" actionListener="#{baseDeDonnes.oublieMonPass()}"
                              styleClass="styleButton" oncomplete="PF('oublieMPEditDlg').hide();"/>
 
             <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  

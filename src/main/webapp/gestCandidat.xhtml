@@ -372,20 +372,32 @@
                             <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
                                 <f:selectItems value="#{theso.getThisTrad()}" var="tl" itemLabel="#{tl.french_name}" 
                                                itemValue="#{tl.id_iso639_1}" />
-                            </h:selectOneMenu>&nbsp;
+                            </h:selectOneMenu>
                             <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                             update=":tableCdt,:gestionCandidat" styleClass="styleButton"/>
+                                             update=":tableCdt,:gestionCandidat" styleClass="styleButton"/><br/>
+
                         </h:form>
                     </h:panelGroup>
                 </div>
+
+                <h:form>
+                 <p:growl id="msg" />
+                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                        <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}" />
+                        <p:inputSwitch value="#{theso.mesCandidats}" >
+                            <p:ajax listener="#{theso.listeCandidats()}" update=":panelCdt,:tableCdt,:gestionCandidat" />
+                        </p:inputSwitch>
+                    </h:panelGrid>                    
+                </h:form>
+
                 <div style="clear: both;" />
                 <h:panelGroup id="panelCdt">
                     <h:form id="tableCdt">
                         <p:tabView styleClass="styleTabViewCdt">
                             <p:tab title="#{langueBean.getMsg('cdt.tab1Name')}">
                                 <!-- Liste des candidats DEBUT -->
-                                <p:dataTable var="cdt" value="#{theso.listeCandidats()}" selectionMode="single" selection="#{selectedCandidat.selected}" 
-                                             rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="400" filteredValue="#{theso.filteredCandidats}" 
+                                <p:dataTable id="CnDT" var="cdt" value="#{theso.listeCandidats()}" selectionMode="single" selection="#{selectedCandidat.selected}" 
+                                             rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="300" filteredValue="#{theso.filteredCandidats}" 
                                              emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat">
                                     <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
                                     <f:facet name="header">

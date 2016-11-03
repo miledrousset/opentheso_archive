@@ -78,5 +78,9 @@ public class Connexion implements Serializable {
         if(poolConnexion != null)
             poolConnexion.close();
     }
+
+    void close() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

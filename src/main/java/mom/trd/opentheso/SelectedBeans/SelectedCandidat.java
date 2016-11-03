@@ -28,6 +28,7 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.ForgetPasswordHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
@@ -55,6 +56,10 @@ public class SelectedCandidat implements Serializable {
     private ArrayList<String> tradInsert;
     private NodeAutoCompletion selectedNvx;
     private String msgValid;
+    private String email;
+    private String newPass;
+    private String confirmPass;
+    private String ancianPass;
 
     private String note = "";
     private String niveau = "";
@@ -687,6 +692,46 @@ public class SelectedCandidat implements Serializable {
         noteEdit = "";
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info8")));
     }
+    public boolean needchangerpass() throws SQLException
+    {
+        UserHelper user = new UserHelper();
+        if(user.isneededpass(connect.getPoolConnexion(),email))
+        {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Applelation de la funtion avec les parametres pour changer le mot de
+     * pass.
+     * on fait le comprobation pour voir si tout c'est bon
+     * @return 
+     * @throws SQLException 
+     */
+    public String fchangepass() throws SQLException{
+        boolean sort=false;
+        ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
+        CurrentUser user = new CurrentUser();
+        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass))
+        {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
+        }
+        if(newPass == null || newPass.equals("") || confirmPass == null || confirmPass.equals("") || ancianPass == null || ancianPass.equals("")) {
+            sort=true;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
+        }
+        else if(!sort){ 
+            if(forgetPassword.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, ancianPass, email))
+            {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
+                return "index.xhtml?faces-redirect=true";
+
+            }
+            else FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+        }
+        return "";// nouvelle pass web pour changer le motpasstemp
+    }
 
     /**
      * ************************** AUTRE ****************************
@@ -705,6 +750,7 @@ public class SelectedCandidat implements Serializable {
         }
         return false;
     }
+
 
     /**
      * ************************** GETTERS SETTERS ****************************
@@ -900,6 +946,39 @@ public class SelectedCandidat implements Serializable {
     public String getStatusCandidat() {
         return statusCandidat;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+     public String getNewPass() {
+        return newPass;
+    }
+
+    public void setNewPass(String newPass) {
+        this.newPass = newPass;
+    }
+
+    public String getConfirmPass() {
+        return confirmPass;
+    }
+
+    public void setConfirmPass(String confirmPass) {
+        this.confirmPass = confirmPass;
+    }
+
+    public String getAncianPass() {
+        return ancianPass;
+    }
+
+    public void setAncianPass(String ancianPass) {
+        this.ancianPass = ancianPass;
+    }
+    
+    
 
     public boolean setStatusCandidat(String idCandidat) {
         CandidateHelper candidateHelper = new CandidateHelper();

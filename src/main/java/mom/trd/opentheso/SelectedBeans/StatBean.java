@@ -73,11 +73,14 @@ public class StatBean implements Serializable {
         }
         vue.setStatTheso(true);
         vue.setStatCpt(false);
+        vue.setStatPermuted(false);
+        
     }
     
     public void loadStatCpt(String idTheso) {
         vue.setStatTheso(false);
         vue.setStatCpt(true);
+        vue.setStatPermuted(false);
     }
     
     public void findCpt(String idTheso, String langue) {

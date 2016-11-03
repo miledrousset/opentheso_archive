@@ -83,6 +83,8 @@ public class Vue implements Serializable {
     /*Attributs statistiques*/
     private boolean statTheso = false;
     private boolean statCpt = false;
+    private boolean statPermuted =false;
+    private boolean DBinfoBD = true;
     
     public Vue() {
     }
@@ -483,6 +485,24 @@ public class Vue implements Serializable {
         addCsv = false;
         addSkos = false;
     }
+
+    public boolean isStatPermuted() {
+        return statPermuted;
+    }
+
+    public void setStatPermuted(boolean statPermuted) {
+        this.statPermuted = statPermuted;
+    }
+
+    public boolean isDBinfoBD() {
+        return DBinfoBD;
+    }
+
+    public void setDBinfoBD(boolean DBinfoBD) {
+        this.DBinfoBD = DBinfoBD;
+    }
+
+ 
     
     
 }

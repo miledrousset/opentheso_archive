@@ -36,7 +36,7 @@ public class GroupHelper {
 
     public GroupHelper() {
     }
-    
+
     /**
      * Fonction qui permet de supprimer un domaine de la branche donnée avec un
      * concept de tête un domaine et thesaurus
@@ -77,13 +77,13 @@ public class GroupHelper {
         RelationsHelper relationsHelper = new RelationsHelper();
 
         for (String id : lisIds) {
-           if (!relationsHelper.setRelationMT(conn, id, idGroup, idTheso)) {
-               return false;
-           }              
+            if (!relationsHelper.setRelationMT(conn, id, idGroup, idTheso)) {
+                return false;
+            }
         }
         return true;
     }
-    
+
     /**
      * Fonction qui permet de supprimer un domaine de la branche donnée avec un
      * concept de tête un domaine et thesaurus
@@ -102,12 +102,12 @@ public class GroupHelper {
         RelationsHelper relationsHelper = new RelationsHelper();
 
         for (String id : lisIds) {
-           if (!relationsHelper.addRelationMT(conn, id, idTheso, idGroup, idUser)) {
-               return false;
-           }              
+            if (!relationsHelper.addRelationMT(conn, id, idTheso, idGroup, idUser)) {
+                return false;
+            }
         }
         return true;
-    }    
+    }
 
     /**
      * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
@@ -391,7 +391,7 @@ public class GroupHelper {
      */
     public boolean insertGroup(HikariDataSource ds,
             String idGroup, String idThesaurus,
-            String typeCode, 
+            String typeCode,
             String notation,
             String urlSite, boolean isArkActive,
             int idUser) {
@@ -859,6 +859,56 @@ public class GroupHelper {
         return nodeConceptGroup;
     }
 
+    public ArrayList<NodeGroup> getThisConceptGroup2(HikariDataSource ds,
+            String idConceptGroup, String idThesaurus, String idLang, ArrayList<NodeGroup> nodeConceptGroupList) throws SQLException {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        NodeGroup nodeConceptGroup = null;
+        ConceptGroup conceptGroup = null;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT * from permuted where "
+                             + " id_group = '" + idConceptGroup + "'"
+                            + "  and id_thesaurus = '" + idThesaurus + "'";
+                    resultSet= stmt.executeQuery(query);
+
+                        while( resultSet.next())
+                        {
+                                nodeConceptGroup = new NodeGroup();
+                                int  orden= resultSet.getInt(1);
+                                nodeConceptGroup.setOrde(orden);
+                                nodeConceptGroup.setId_concept(resultSet.getString("id_concept"));
+                                nodeConceptGroup.setId_group(idConceptGroup);
+                                nodeConceptGroup.setId_theso(idThesaurus);
+                                nodeConceptGroup.setIdLang(resultSet.getString("id_lang"));
+                                nodeConceptGroup.setLexicalValue(resultSet.getString("lexical_value"));
+                                nodeConceptGroup.setIspreferredterm(resultSet.getBoolean("ispreferredterm"));
+                                nodeConceptGroup.setOriginal_value(resultSet.getString("original_value"));
+                                nodeConceptGroupList.add(nodeConceptGroup);
+                        }
+                        nodeConceptGroup.setConceptGroup(conceptGroup);
+
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding element : " + idThesaurus, sqle);
+        }
+        return nodeConceptGroupList;
+    }
+
     /**
      * Permet de retourner un NodeGroupLable des Labels d'un Group / idThesaurus
      * Ce qui représente un domaine d'un thésaurus avec toutes les traductions
@@ -1059,6 +1109,22 @@ public class GroupHelper {
 
         return nodeConceptGroupList;
     }
+    
+    
+        public ArrayList<NodeGroup> getListConceptGroup2(HikariDataSource ds,
+            String idThesaurus, String idLang) throws SQLException {
+
+        ArrayList<NodeGroup> nodeConceptGroupList;
+        ArrayList tabIdConceptGroup = getListIdOfGroup(ds, idThesaurus);
+
+        nodeConceptGroupList = new ArrayList<>();
+        for (Object tabIdGroup1 : tabIdConceptGroup) {
+            NodeGroup nodeConceptGroup;
+            getThisConceptGroup2(ds, tabIdGroup1.toString(), idThesaurus, idLang, nodeConceptGroupList);
+        }
+
+        return nodeConceptGroupList;
+    }
 
     /**
      * Cette fonction permet de récupérer la liste des domaines pour
@@ -1122,8 +1188,8 @@ public class GroupHelper {
     }
 
     /**
-     * Cette fonction permet de récupérer la liste des domaines sauf celui en cours pour
-     * l'autocomplétion
+     * Cette fonction permet de récupérer la liste des domaines sauf celui en
+     * cours pour l'autocomplétion
      *
      * @param ds
      * @param idThesaurus
@@ -1133,7 +1199,7 @@ public class GroupHelper {
      * @return Objet class Concept
      */
     public List<NodeAutoCompletion> getAutoCompletionOtherGroup(HikariDataSource ds,
-            String idThesaurus, 
+            String idThesaurus,
             String idGroup, // le Group à ignorer
             String idLang, String text) {
 
@@ -1184,8 +1250,8 @@ public class GroupHelper {
         }
 
         return nodeAutoCompletionList;
-    }    
-    
+    }
+
     /**
      * Permet de retourner une ArrayList de String (idGroup) par thésaurus / ou
      * null si rien
@@ -1458,7 +1524,7 @@ public class GroupHelper {
         }
         return group;
     }
-    
+
     /**
      * Cette fonction permet de savoir si le Domaine existe dans cette langue
      *
@@ -1505,6 +1571,6 @@ public class GroupHelper {
             log.error("Error while asking if Title of Term exist : " + title, sqle);
         }
         return existe;
-    }    
+    }
 
 }

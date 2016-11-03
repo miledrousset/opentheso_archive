@@ -5,6 +5,8 @@
  */
 package mom.trd.opentheso.core.alignment;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import javax.xml.parsers.*;
@@ -15,6 +17,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
@@ -50,11 +55,14 @@ public class AlignmentQuery {
      * @param idThesoTarget
      * @return
      */
-    public ArrayList<NodeAlignment> query(String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) {
+    public ArrayList<NodeAlignment> query(HikariDataSource ds,String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws SQLException {
         listeAlign = new ArrayList<>();
         switch (dest) {
             case "DBP":
-                listeAlign = queryDBPedia(idC, idTheso, lexicalValue, lang);
+                listeAlign = queryDBPedia(ds, idC, idTheso, lexicalValue, lang);
+                break;
+            case "bnf":
+                listeAlign = querybnf(ds, idC, idTheso, lexicalValue, lang);
                 break;
             case "WIKI":
                 listeAlign = queryWikipedia(idC, idTheso, lexicalValue, lang);
@@ -181,30 +189,40 @@ public class AlignmentQuery {
      * @param lang
      * @return
      */
-    private ArrayList<NodeAlignment> queryDBPedia(String idC, String idTheso, String lexicalValue, String lang) {
+    private ArrayList<NodeAlignment> queryDBPedia(HikariDataSource ds,String idC, String idTheso, String lexicalValue, String lang) throws SQLException {
         listeAlign = new ArrayList<>();
         if (lexicalValue.contains(" ")) {
             lexicalValue = lexicalValue.substring(0, lexicalValue.indexOf(" "));
         }
-        lexicalValue = String.valueOf(lexicalValue.charAt(0)).toUpperCase() + lexicalValue.substring(1);
-        String sparqlQueryString1 =
-                
-                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
-                + "PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>"
-                + "PREFIX foaf: <http://xmlns.com/foaf/0.1/>"
-                + "SELECT * WHERE {"
-                + "       ?s rdfs:label ?label ."
-                + "       ?s rdfs:comment ?comment ."
-                + "       ?s dbpedia-owl:thumbnail ?thumbnail ."
-                + "       ?s foaf:isPrimaryTopicOf ?primaryTopicOf ."
-                + "       FILTER(regex(?s,\"resource/" + lexicalValue + "*\"))"
-                + "       FILTER(lang(?label) = \"" + lang + "\")"
-                + "       FILTER(lang(?comment) = \"" + lang + "\")"
-                + "   }";
-                
-                
-        System.out.println(sparqlQueryString1);
-        Query query = QueryFactory.create(sparqlQueryString1);
+        Statement stmt=null;
+        Connection conn=null;
+        java.sql.ResultSet resultSet;
+        String requete="";
+        try{
+            conn= ds.getConnection();
+            try{
+                stmt=conn.createStatement();
+                lexicalValue = String.valueOf(lexicalValue.charAt(0)).toUpperCase() + lexicalValue.substring(1);
+                //String sparqlQueryString1 =
+                String query="select requete, type_rqt,format_donnees from alignement_source"
+                +" where id_thesaurus ='"+idTheso+"'";
+                resultSet= stmt.executeQuery(query);
+                if(resultSet.next())
+                {
+                    requete= resultSet.getString("requete");
+                }
+             }finally{
+                stmt.close();
+            }
+        }catch(SQLException e){
+            conn.close();
+        } 
+        requete=changer(requete, "conceptachercher", lexicalValue);
+        requete=changer(requete, "langueachercher", lang);
+        
+        
+        System.out.println(requete);
+        Query query = QueryFactory.create(requete);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
         ResultSet results = qexec.execSelect();
@@ -223,7 +241,61 @@ public class AlignmentQuery {
         qexec.close();
         return listeAlign;
     }
+    private ArrayList<NodeAlignment> querybnf(HikariDataSource ds,String idC, String idTheso, String lexicalValue, String lang) throws SQLException {
+        listeAlign = new ArrayList<>();
+        if (lexicalValue.contains(" ")) {
+            lexicalValue = lexicalValue.substring(0, lexicalValue.indexOf(" "));
+        }
+        Statement stmt=null;
+        Connection conn=null;
+        java.sql.ResultSet resultSet;
+        String requete="";
+        try{
+            conn= ds.getConnection();
+            try{
+                stmt=conn.createStatement();
+                lexicalValue = String.valueOf(lexicalValue.charAt(0)).toUpperCase() + lexicalValue.substring(1);
+                //String sparqlQueryString1 =
+                String query="select requete, type_rqt,format_donnees from alignement_source"
+                +" where id_thesaurus ='"+idTheso+"'";
+                resultSet= stmt.executeQuery(query);
+                if(resultSet.next())
+                {
+                    requete= resultSet.getString("requete");
+                }
+             }finally{
+                stmt.close();
+            }
+        }catch(SQLException e){
+            conn.close();
+        } 
+        requete=changer(requete, "conceptachercher", lexicalValue);
+        requete=changer(requete, "langueachercher", lang);
+        
+        
+        System.out.println(requete);
+        Query query = QueryFactory.create(requete);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            QuerySolution qs = results.next();
+            NodeAlignment na = new NodeAlignment();
+            na.setInternal_id_concept(idC);
+            na.setInternal_id_thesaurus(idTheso);
+            na.setConcept_target(qs.get("label").toString());
+            na.setDef_target(qs.get("comment").toString());
+            na.setThesaurus_target("DBPedia");
+            na.setUri_target(qs.get("primaryTopicOf").toString());
+            listeAlign.add(na);
+        }
+
+        qexec.close();
+        return listeAlign;
+    }
+    public static String changer(String requete, String chercher, String itemchange) {
+      return requete.replaceAll(chercher, itemchange);
+    }
     /**
      * Cette fonction permet de récupérer les alignements présents sur Agrovoc
      * pour un concept passé en paramètre
@@ -288,11 +360,20 @@ public class AlignmentQuery {
                 + "       ?uri skos:prefLabel ?pl ."
                 + "       FILTER(regex(?pl,\"" + lexicalValue + "*\"))"
                 + "       FILTER ( (lang(?pl)=\"" + lang + "\") )"
-                + "       OPTIONAL { "
-                + "       ?uri skos:scopeNote ?def ."
-                + "       FILTER ( (lang(?def)=\"" + lang + "\") )"
-                + "       }"
                 + "   }";
+        
+        /*
+        
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+                SELECT * WHERE {
+                 ?uri skos:prefLabel ?pl .
+                      FILTER(regex(?pl,"Enseignement"))
+                      FILTER ( (lang(?pl)="fr") )
+
+                  }
+        */
+        
         System.out.println(sparqlQueryString1);
 
         /*String endpointURL = "http://cr.eionet.europa.eu/sparql";

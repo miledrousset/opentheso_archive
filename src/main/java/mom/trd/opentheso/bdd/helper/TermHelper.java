@@ -238,7 +238,7 @@ public class TermHelper {
                             + ", " + idUser + ")";
 
                     stmt.executeUpdate(query);
-
+                    addNewTermHistorique(conn, term, idUser);
 
                 } finally {
                     stmt.close();
@@ -774,14 +774,16 @@ public class TermHelper {
                 try {
                     String query = "Insert into term "
                             + "(id_term, lexical_value, lang, "
-                            + "id_thesaurus, source, status)"
+                            + "id_thesaurus, source, status,contributor, creator)"
                             + " values ("
                             + "'" + term.getId_term() + "'"
                             + ",'" + term.getLexical_value() + "'"
                             + ",'" + term.getLang() + "'"
                             + ",'" + term.getId_thesaurus() + "'"
                             + ",'" + term.getSource() + "'"
-                            + ",'" + term.getStatus() + "')";
+                            + ",'" + term.getStatus() + "'"
+                            + ", "+term.getContributor()
+                            + ", "+term.getCreator()+")";
 
                     stmt.executeUpdate(query);
                     addNewTermHistorique(conn, term, idUser);

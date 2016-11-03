@@ -1,55 +1,66 @@
 <!DOCTYPE html [
     <!ENTITY nbsp "&#160;"> 
-]>
-<ui:composition
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
-    xmlns:p="http://primefaces.org/ui">
-        
-    <h:panelGroup id="panChoixTheso" style="float: left;" >
-        <div id="choixTheso">
-            <h:form id="liste1">
-                <table>
-                    <tr>
-                        <td style="padding-right: 5px;">
-                            <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
-                            <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                            </h:selectOneMenu>
-                        </td>
-                        <td>
-                            <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                             update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu,:footer" 
-                                             styleClass="styleButton" />
-                        </td>
-                        <!-- CHOIX LANGUE DEBUT -->  
-                        <td id="divLangue">
-                            <h:panelGroup id="liste2">
-                                <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
-                                    <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
-                                        <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
-                                                       itemValue="#{t.id_iso639_1}"  />
-                                    </h:selectOneMenu>
-                                    &nbsp;
-                                    <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                                     update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                                     styleClass="styleButton"/>
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+        xmlns:p="http://primefaces.org/ui">
+
+        <h:panelGroup id="panChoixTheso" style="float: left;" >
+            <div id="choixTheso">
+                <h:form id="liste1">
+                    <table>
+                        <tr>
+                            <td style="padding-right: 5px;">
+                                <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
+                                <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
+                                    <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                </h:selectOneMenu>
+                            </td>
+                            <td>
+                                <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
+                                                 update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu,:footer" 
+                                                 styleClass="styleButton" />
+                            </td>
+
+                            <!-- CHOIX LANGUE DEBUT -->  
+                            <td id="divLangue">
+                                <h:panelGroup id="liste2">
+                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
+                                        <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
+                                            <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
+                                                           itemValue="#{t.id_iso639_1}"  />
+                                        </h:selectOneMenu>
+                                        &nbsp;
+                                        <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
+                                                         update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                                         styleClass="styleButton"/>
+                                    </h:form>
+                                </h:panelGroup>
+                            </td>
+                            <td id="thesos">
+                                <h:form rendered="#{theso.thesaurus.language != null}" style="float: right;">
+                                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                        <h:outputText value="#{langueBean.getMsg('theso.my')}" />
+                                        <p:inputSwitch value="#{theso.tousThesos}" >
+                                            <p:ajax listener="#{theso.getArrayTheso()}" update=":liste1"  />
+                                        </p:inputSwitch>
+                                    </h:panelGrid>
                                 </h:form>
-                            </h:panelGroup>
-                        </td>
-                        <!-- 
-                         <td>
-                             <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
-                             <h:outputText value="#{theso.thesaurus.language}" />
-                             <br/>
-                         </td>
-                        -->
-                    </tr>
-                </table>
-            </h:form>
-        </div>
-    </h:panelGroup>
-</ui:composition>
+                            </td>
+                            <!-- 
+                             <td>
+                                 <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
+                                 <h:outputText value="#{theso.thesaurus.language}" />
+                                 <br/>
+                             </td>
+                            -->
+                        </tr>
+                    </table>
+                </h:form>
+            </div>
+        </h:panelGroup>
+    </ui:composition>
