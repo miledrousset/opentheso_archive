@@ -633,7 +633,9 @@ public class SelectedThesaurus implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error4")));
         } else {
             String temp = candidat.getValueEdit();
-            candidat.newCandidat(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            if(! candidat.newCandidat(thesaurus.getId_thesaurus(), thesaurus.getLanguage())){
+                return;
+            }
             vue.setAddCandidat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info2.1") +  " " + temp + " " + langueBean.getMsg("theso.info2.2")));
         }
@@ -675,7 +677,9 @@ public class SelectedThesaurus implements Serializable {
                 }
             }
             String temp = candidat.getValueEdit();
-            candidat.newTradCdt(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            if(!candidat.newTradCdt(thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
+                return;
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info4.1") +  " " + temp + " " + langueBean.getMsg("theso.info4.2")));
         }
         candidat.setValueEdit("");

@@ -224,8 +224,9 @@ public class SelectedCandidat implements Serializable {
      *
      * @param theso
      * @param langue
+     * @return 
      */
-    public void newCandidat(String theso, String langue) {
+    public boolean newCandidat(String theso, String langue) {
         if (selectedNvx != null) {
             niveauEdit = selectedNvx.getIdConcept();
         } else {
@@ -236,12 +237,29 @@ public class SelectedCandidat implements Serializable {
             domaineEdit = "";
         }
 
-        new CandidateHelper().addCandidat(connect.getPoolConnexion(), valueEdit, langue, theso, theUser.getUser().getId(), noteEdit, niveauEdit, domaineEdit);
+        Connection conn;
+        try {
+            conn = connect.getPoolConnexion().getConnection();
+            String id_candidat = new CandidateHelper().addCandidat_rollBack(conn, valueEdit, langue, theso, theUser.getUser().getId(), noteEdit, niveauEdit, domaineEdit);
+            if( id_candidat == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
+                conn.rollback();
+                conn.close();
+                return false;           
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
+            return false;   
+        }
         selectedNvx = new NodeAutoCompletion();
         noteEdit = "";
         domaineEdit = "";
         niveauEdit = "";
         valueEdit = "";
+        return true;
     }
 
     /**
@@ -427,9 +445,13 @@ public class SelectedCandidat implements Serializable {
         return true;
     }
 
-    public void newTradCdt(String idT, String langue) {
-        new CandidateHelper().addTermCandidatTraduction(connect.getPoolConnexion(), selected.getIdConcept(), valueEdit, langueEdit.trim(), idT, theUser.getUser().getId());
+    public boolean newTradCdt(String idT, String langue) {
+        if(!new CandidateHelper().addTermCandidatTraduction(connect.getPoolConnexion(), selected.getIdConcept(), valueEdit, langueEdit.trim(), idT, theUser.getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
+            return false;
+        }
         infoCdt.setNodeTraductions(new CandidateHelper().getNodeTraductionCandidat(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, langue));
+        return true;
     }
 
     /**
