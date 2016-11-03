@@ -3,8 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mom.trd.opentheso.bdd.account;
+package mom.trd.opentheso.bdd.helper;
 
+/**
+ *
+ * @author antonio.perez
+ */
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 import com.sun.mail.smtp.SMTPTransport;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
@@ -16,9 +26,7 @@ import java.util.logging.Logger;
 import mom.trd.opentheso.SelectedBeans.LanguageBean;
 import mom.trd.opentheso.bdd.tools.MD5Password;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
 import java.util.ResourceBundle;
 import javax.faces.context.FacesContext;
 import javax.mail.Message;
@@ -31,19 +39,13 @@ import javax.mail.internet.MimeMessage;
  *
  * @author antonio.perez
  */
-@ManagedBean(name = "oublie", eager = true)
-@SessionScoped
-
-public class OublieMotPass {
+public class ForgetPasswordHelper {
 
     private String email;
     private String nomUsu;
     private String passsansmd5;
     private String newpass;
     private String confirmpass;
-
-    @ManagedProperty(value = "#{langueBean}")
-    private LanguageBean langueBean;
 
     /**
      * s'appeléer depuis donwloadBean ou on pass le nom et le mail del usuaire
@@ -54,36 +56,41 @@ public class OublieMotPass {
      * @param mail
      * @throws javax.mail.MessagingException
      */
-    public void vide(HikariDataSource ds, String nom, String mail) throws MessagingException {
+    public boolean forgotPass(HikariDataSource ds, String mail) throws MessagingException {
         String nouvellePass = "";
         String nouvelleSansMD5 = "";
-        nomUsu = nom;
         email = mail;//change a l'heure de partir ca vien de donwloadBean
+
         Statement stmt;
-        if (email != null && nomUsu != null) {
-            try {
-                Connection conn = ds.getConnection();
-                stmt = conn.createStatement();
+        UserHelper userHelper = new UserHelper();
+        if (userHelper.isUserMailExist(ds, mail)) {
+            if (email != null) {
                 try {
-                    String query = "Select id_user from users where mail ='" + email + "'";
-                    stmt.executeQuery(query);
-                    nouvelleSansMD5 = genererNouvellePass();
-                    nouvellePass = MD5Password.getEncodedPassword(nouvelleSansMD5);
-                    envoimail(nomUsu, email, nouvelleSansMD5); 
-                    insertNP(ds, nouvellePass);
-                } finally {
-                    stmt.close();
-                    conn.close();
+                    Connection conn = ds.getConnection();
+                    stmt = conn.createStatement();
+                    try {
+                        String query = "Select id_user from users where mail ='" + email + "'";
+                        stmt.executeQuery(query);
+                        nouvelleSansMD5 = genererNouvellePass();
+                        nouvellePass = MD5Password.getEncodedPassword(nouvelleSansMD5);
+                        envoimail(email, nouvelleSansMD5);
+                        insertNP(ds, nouvellePass);
+                    } finally {
+                        stmt.close();
+                        conn.close();
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
             }
+            return true;
         }
+        return false;
     }
 
     /**
-     * Injection a la BDD de le pass en motpasstemp
-     * del usuaire que la demandé
+     * Injection a la BDD de le pass en motpasstemp del usuaire que la demandé
+     *
      * @param ds
      * @param nouvellePass
      */
@@ -93,7 +100,7 @@ public class OublieMotPass {
             Connection conn = ds.getConnection();
             stmt = conn.createStatement();
             try {
-                String queryAjouPass = "update users set motpasstemp ='" + nouvellePass + "' where mail = '" + email + "'AND username ='" + nomUsu + "'";
+                String queryAjouPass = "update users set password ='" + nouvellePass + "', passtomodify = true where mail = '" + email + "'";
                 stmt.executeUpdate(queryAjouPass);
             } finally {
                 stmt.close();
@@ -105,8 +112,9 @@ public class OublieMotPass {
     }
 
     /**
-     * cette funtion on permit de créer une password aleatoire
-     * que on garde en passsansmd5
+     * cette funtion on permit de créer une password aleatoire que on garde en
+     * passsansmd5
+     *
      * @return
      */
     private String genererNouvellePass() {
@@ -141,7 +149,7 @@ public class OublieMotPass {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT username FROM users WHERE motpasstemp='" + ancianencodify + "' and active=true";
+                    String query = "SELECT username FROM users WHERE password='" + ancianencodify + "' and active=true";
                     resultSet = stmt.executeQuery(query);
                     if (resultSet.next()) {
                         sort = true;
@@ -171,7 +179,7 @@ public class OublieMotPass {
      * @return
      * @throws SQLException
      */
-    public boolean faireChangePass(HikariDataSource ds, String Pass, String ConfirmPass, String ancien) throws SQLException {
+    public boolean faireChangePass(HikariDataSource ds, String Pass, String ConfirmPass, String ancien, String mail) throws SQLException {
         String passwordencoding = MD5Password.getEncodedPassword(Pass);
         Statement stmt, stmt1;
         boolean ok = false;
@@ -182,10 +190,9 @@ public class OublieMotPass {
                 stmt = stmt1 = conn.createStatement();
                 try {
                     System.out.println(Pass);
-                    String queryAjouPass = "update users set password ='" + passwordencoding + "' where motpasstemp ='" + ancien + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
-                    String queryEfacepasstemp = "update users set motpasstemp = NULL where motpasstemp ='" + ancien + "'";//efface le motpasstemp de l'utilisateur que a  perdu son pass avant
+                    String queryAjouPass = "update users set password ='" + passwordencoding
+                            + "',passtomodify = false where mail ='" + mail + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
                     stmt.executeUpdate(queryAjouPass);
-                    stmt1.executeUpdate(queryEfacepasstemp);
                     ok = true;
                 } finally {
                     stmt.close();
@@ -198,24 +205,25 @@ public class OublieMotPass {
         }
         return ok;
     }
-/**
- * 
- * @return 
- */
+
+    /**
+     *
+     * @return
+     */
     private ResourceBundle getBundlePref() {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
     }
-/**
- * Envoi une email a "nonUsu" a la direcction "email" pour l'indiquer
- * son nouvelle "pass"
- * @param nomUsu
- * @param email
- * @param pass
- * @throws MessagingException 
- */
-    private void envoimail(String nomUsu, String email, String pass) throws MessagingException {
+
+    /**
+     * Envoi une email a "nonUsu" a la direcction "email" pour l'indiquer son
+     * nouvelle "pass"
+     * @param email
+     * @param pass
+     * @throws MessagingException
+     */
+    private void envoimail(String email, String pass) throws MessagingException {
 
         ResourceBundle bundlePref = getBundlePref();
 
@@ -230,24 +238,19 @@ public class OublieMotPass {
         msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         msg.setSubject("Recuperation de Pass");
-        msg.setText("Cher utilisateur " + nomUsu + ". Votre nouvelle pass  c'est " + pass);
+        msg.setText("Cher utilisateur. Votre nouvelle pass  c'est " + pass);
 
         SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
         transport.connect();
         transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
         transport.close();
     }
-/**
- * getter and setter
- * @return 
- */
-    public LanguageBean getLangueBean() {
-        return langueBean;
-    }
 
-    public void setLangueBean(LanguageBean langueBean) {
-        this.langueBean = langueBean;
-    }
+    /**
+     * getter and setter
+     *
+     * @return
+     */
 
     public String getNewpass() {
         return newpass;

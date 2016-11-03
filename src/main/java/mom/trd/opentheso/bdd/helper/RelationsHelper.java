@@ -812,8 +812,7 @@ public class RelationsHelper {
                             + " top_concept = true,"
                             + " modified = current_date"
                             + " WHERE id_concept ='" + idConcept + "'"
-                            + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'";
+                            + " AND id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
                     status = true;

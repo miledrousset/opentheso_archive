@@ -1,5 +1,6 @@
 package mom.trd.opentheso.bdd.helper;
 
+import com.k_int.gen.ESFormat_ExportSpecification.Destination_type;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,22 +22,30 @@ public class UserHelper {
 
     }
 
-    public int isUserExist(HikariDataSource ds, String log, String pwd) {
+    /**
+     * Cette fonction permet de récupérer l'Id de l'utilisateur d'après son
+     * Login et son passe
+     *
+     * @param ds
+     * @param login
+     * @param pwd
+     * @return
+     */
+    public boolean isUserExist(HikariDataSource ds, String login, String pwd) {
         Connection conn;
-        Statement stmt,stmt2;
+        Statement stmt;
         ResultSet resultSet;
-        ResultSet resultSet1;
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_user FROM users WHERE username='" + log + "' AND password='" + pwd + "' and active=true";
+                    String query = "SELECT id_user FROM users WHERE username='" + login + "' AND password='" + pwd + "' and active=true";
                     resultSet = stmt.executeQuery(query);
                     //resultSet.first();
                     //resultSet.next();
                     if (resultSet.next()) {
-                        return 1;
+                        return true;
                     }
                 } finally {
                     stmt.close();
@@ -48,38 +57,17 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        try {
-            conn = ds.getConnection();
-            try {
-                stmt2 = conn.createStatement();
-                try {
-                    String query2 = "SELECT username FROM users WHERE username='" + log + "' AND motpasstemp='" + pwd + "' and active=true";
-                    resultSet1 = stmt2.executeQuery(query2);
-                    resultSet1.next();
-                    if (resultSet1.getRow() != 0) {
-                        return 2;
-                    }
-                    } finally {
-                    stmt2.close();
-                }
-            } finally {
-                conn.close();
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return 0;
+        return false;
     }
-    
+
     /**
      * Permet de savoir si l'utilisateur n'a qu'un seul role
+     *
      * @param ds
      * @param idUser
-     * @return 
+     * @return
      */
-    public boolean isLastThesoOfUser (HikariDataSource ds, int idUser){
+    public boolean isLastThesoOfUser(HikariDataSource ds, int idUser) {
         Connection conn;
         Statement stmt;
         int count = 0;
@@ -91,7 +79,7 @@ public class UserHelper {
                 try {
                     String query = "SELECT id_user FROM user_role WHERE id_user =" + idUser;
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()) {
+                    while (resultSet.next()) {
                         count++;
                     }
                 } finally {
@@ -105,12 +93,13 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if(count == 1)
+        if (count == 1) {
             return true;
-        else 
-            return false;        
+        } else {
+            return false;
+        }
     }
-    
+
     public boolean isUserLoginExist(HikariDataSource ds, String log) {
         Connection conn;
         Statement stmt;
@@ -139,7 +128,7 @@ public class UserHelper {
 
         return false;
     }
-    
+
     public boolean isUserMailExist(HikariDataSource ds, String mail) {
         Connection conn;
         Statement stmt;
@@ -170,12 +159,13 @@ public class UserHelper {
     }
 
     /**
-     * cette fonction permet de retourner les informations sur l'utilisateur et son role
-     * par rapport à un thésaurus 
+     * cette fonction permet de retourner les informations sur l'utilisateur et
+     * son role par rapport à un thésaurus
+     *
      * @param ds
      * @param logName
      * @param idThesaurus
-     * @return 
+     * @return
      */
     public NodeUser getInfoUser(HikariDataSource ds, String logName, String idThesaurus) {
         NodeUser nu = null;
@@ -193,18 +183,16 @@ public class UserHelper {
                             + " users.username, users.id_user, users.mail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id AND" 
+                            + " user_role.id_role = roles.id AND"
                             + " users.username = '" + logName + "'";
-                            //+ " AND" 
-                            //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
-  
-  
-  
-                /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
+                    //+ " AND" 
+                    //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
+
+                    /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND username='" + logName + "' and active=true";*/
                     resultSet = stmt.executeQuery(query);
 
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         nu = new NodeUser();
                         nu.setId(resultSet.getInt("id_user"));
                         nu.setMail(resultSet.getString("mail"));
@@ -226,12 +214,14 @@ public class UserHelper {
 
         return nu;
     }
-    
+
     /**
-     * cette fonction permet de retourner les informations sur l'utilisateur et son role
+     * cette fonction permet de retourner les informations sur l'utilisateur et
+     * son role
+     *
      * @param ds
      * @param logName
-     * @return 
+     * @return
      */
     public NodeUser getInfoUser(HikariDataSource ds, String logName) {
         NodeUser nu = null;
@@ -248,18 +238,16 @@ public class UserHelper {
                             + " users.username, users.id_user, users.mail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id AND" 
+                            + " user_role.id_role = roles.id AND"
                             + " users.username = '" + logName + "'";
-                            //+ " AND" 
-                            //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
-  
-  
-  
-                /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
+                    //+ " AND" 
+                    //+ " user_role.id_thesaurus = '" + idThesaurus + "'";
+
+                    /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND username='" + logName + "' and active=true";*/
                     resultSet = stmt.executeQuery(query);
 
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         nu = new NodeUser();
                         nu.setId(resultSet.getInt("id_user"));
                         nu.setMail(resultSet.getString("mail"));
@@ -279,13 +267,14 @@ public class UserHelper {
         }
 
         return nu;
-    }    
-    
+    }
+
     /**
      * cette fonction permet de retourner l'identifiant du role de l'utilisateur
+     *
      * @param ds
      * @param idUser
-     * @return 
+     * @return
      */
     public int getRoleOfUser(HikariDataSource ds, int idUser) {
         int idRole = -1;
@@ -303,7 +292,7 @@ public class UserHelper {
                             + " user_role.id_user = " + idUser;
                     resultSet = stmt.executeQuery(query);
 
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         idRole = resultSet.getInt("id_role");
                     }
                 } finally {
@@ -318,10 +307,10 @@ public class UserHelper {
         }
 
         return idRole;
-    }    
-    
-    public String getNameUser(HikariDataSource ds, int iden){
-        
+    }
+
+    public String getNameUser(HikariDataSource ds, int iden) {
+
         String name = "";
         Connection conn;
         Statement stmt;
@@ -334,11 +323,11 @@ public class UserHelper {
                 try {
                     String query = "SELECT username from users "
                             + " WHERE id_user =" + iden;
-  
+
                     resultSet = stmt.executeQuery(query);
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         name = resultSet.getString("username");
-                    }                    
+                    }
                 } finally {
                     stmt.close();
                 }
@@ -352,12 +341,14 @@ public class UserHelper {
 
         return name;
     }
-    
+
     /**
-     * cette fonction permet de retourner les informations sur l'utilisateur et son role
+     * cette fonction permet de retourner les informations sur l'utilisateur et
+     * son role
+     *
      * @param ds
      * @param logName
-     * @return 
+     * @return
      */
     public NodeUser getInfoAdmin(HikariDataSource ds, String logName) {
         NodeUser nu = new NodeUser();
@@ -375,16 +366,14 @@ public class UserHelper {
                             + " users.username, users.id_user, users.mail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id AND" 
+                            + " user_role.id_role = roles.id AND"
                             + " users.username = '" + logName + "'";
-  
-  
-  
-                /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
+
+                    /*   String query = "SELECT users.id_user, username, mail, id_role, name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND username='" + logName + "' and active=true";*/
                     resultSet = stmt.executeQuery(query);
 
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         nu.setId(resultSet.getInt("id_user"));
                         nu.setMail(resultSet.getString("mail"));
                         nu.setIdRole(resultSet.getInt("id_role"));
@@ -404,8 +393,7 @@ public class UserHelper {
 
         return nu;
     }
-    
-    
+
     public NodePreference getThesaurusPreference(HikariDataSource ds, String idThesaurus) {
         NodePreference np = null;
         Connection conn;
@@ -420,11 +408,11 @@ public class UserHelper {
                     String query = "SELECT * FROM preferences where id_thesaurus = '" + idThesaurus + "'";
                     resultSet = stmt.executeQuery(query);
 
-                    if(resultSet.next()){
+                    if (resultSet.next()) {
                         np = new NodePreference();
                         np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
                         np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
-                        np.setSourceLang(resultSet.getString("source_lang"));                        
+                        np.setSourceLang(resultSet.getString("source_lang"));
                     }
 
                 } finally {
@@ -439,18 +427,19 @@ public class UserHelper {
         }
         return np;
     }
-    
+
     /**
      * Cette fonction permet de mettre à jour les préférences d'un thésaurus
+     *
      * @param ds
      * @param idThesaurus
-     * @param workLanguage 
-     * @param nb_alert_cdt 
-     * @param alert_cdt 
+     * @param workLanguage
+     * @param nb_alert_cdt
+     * @param alert_cdt
      */
     public void updatePreferences(HikariDataSource ds, String idThesaurus,
             String workLanguage, int nb_alert_cdt,
-            boolean alert_cdt){
+            boolean alert_cdt) {
         Connection conn;
         Statement stmt;
         try {
@@ -474,20 +463,21 @@ public class UserHelper {
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }
-    
+
     /**
      * Cette fonction permet d'initialiser les préférences d'un thésaurus
+     *
      * @param ds
      * @param idThesaurus
-     * @param workLanguage 
-     * @param nb_alert_cdt 
-     * @param alert_cdt 
+     * @param workLanguage
+     * @param nb_alert_cdt
+     * @param alert_cdt
      */
     public void initPreferences(HikariDataSource ds, String idThesaurus,
             String workLanguage, int nb_alert_cdt,
-            boolean alert_cdt){
+            boolean alert_cdt) {
         Connection conn;
         Statement stmt;
         try {
@@ -500,10 +490,10 @@ public class UserHelper {
                     String query = "insert into preferences "
                             + "(id_thesaurus,source_lang,nb_alert_cdt, alert_cdt)"
                             + " values"
-                            + " ('" + idThesaurus + "'," 
-                            + "'" + workLanguage + "'," 
-                            + nb_alert_cdt 
-                            + "," + alert_cdt +")";
+                            + " ('" + idThesaurus + "',"
+                            + "'" + workLanguage + "',"
+                            + nb_alert_cdt
+                            + "," + alert_cdt + ")";
                     stmt.executeUpdate(query);
                 } finally {
                     stmt.close();
@@ -513,16 +503,17 @@ public class UserHelper {
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }
-    
+
     /**
-     * 
-     * permet de retourner la liste des admins pour un thésaurus 
-     * pour leur envoyer des alertes
+     *
+     * permet de retourner la liste des admins pour un thésaurus pour leur
+     * envoyer des alertes
+     *
      * @param ds
      * @param idThesaurus
-     * @return 
+     * @return
      */
     public ArrayList<String> getMailAdmin(HikariDataSource ds,
             String idThesaurus) {
@@ -544,7 +535,7 @@ public class UserHelper {
                             + " user_role.id_thesaurus = '" + idThesaurus + "'";
                     resultSet = stmt.executeQuery(query);
 
-                    while(resultSet.next()) {
+                    while (resultSet.next()) {
                         lesMails.add(resultSet.getString("mail"));
                     }
                 } finally {
@@ -560,15 +551,17 @@ public class UserHelper {
 
         return lesMails;
     }
-    
+
     /**
-     * permet de retourner le mail d'un contributeur (avertissement sur les candidats par mail)
+     * permet de retourner le mail d'un contributeur (avertissement sur les
+     * candidats par mail)
+     *
      * @param ds
      * @param idCdt
      * @param idThesaurus
-     * @return 
+     * @return
      */
-    public ArrayList<String> getMailContributor(HikariDataSource ds, String idCdt, 
+    public ArrayList<String> getMailContributor(HikariDataSource ds, String idCdt,
             String idThesaurus) {
         ArrayList<String> lesMails = new ArrayList<>();
         Connection conn;
@@ -588,7 +581,7 @@ public class UserHelper {
 
                     resultSet.next();
                     lesMails.add(resultSet.getString("mail"));
-                    
+
                 } finally {
                     stmt.close();
                 }
@@ -602,15 +595,16 @@ public class UserHelper {
 
         return lesMails;
     }
- 
+
     /**
      * cette fonction permet de retourner la liste des utlisateurs par thésaurus
-     * mais filtrés par role : exp: un admin peut voir et modifier que les admins et ceux qui sont en dessous
-     * 
+     * mais filtrés par role : exp: un admin peut voir et modifier que les
+     * admins et ceux qui sont en dessous
+     *
      * @param ds
      * @param idThesaurus
      * @param idRoleFrom
-     * @return 
+     * @return
      */
     public ArrayList<NodeUser> getAuthorizedUsers(HikariDataSource ds, String idThesaurus, int idRoleFrom) {
         ArrayList<NodeUser> listUser = new ArrayList<>();
@@ -629,12 +623,12 @@ public class UserHelper {
                             + " users.username, users.id_user, users.mail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id AND" 
+                            + " user_role.id_role = roles.id AND"
                             + " user_role.id_thesaurus = '" + idThesaurus + "'"
-                            + " and roles.id >= " + idRoleFrom 
+                            + " and roles.id >= " + idRoleFrom
                             + " ORDER BY username";
-                    
-                   /*query = "SELECT users.id_user, username, mail, id_role, "
+
+                    /*query = "SELECT users.id_user, username, mail, id_role, "
                             + "name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND active=true ORDER BY username";*/
                     resultSet = stmt.executeQuery(query);
@@ -662,14 +656,15 @@ public class UserHelper {
     }
 
     /**
-     * Permet de retourner la liste des thésaurus autorisées pour un utilisateur 
+     * Permet de retourner la liste des thésaurus autorisées pour un utilisateur
+     *
      * @param ds
      * @param idUser
-     * @return 
+     * @return
      */
     public List<String> getAuthorizedThesaurus(HikariDataSource ds,
             int idUser) {
-        List<String> idThesausus= new ArrayList<>();
+        List<String> idThesausus = new ArrayList<>();
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -680,12 +675,11 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_thesaurus" 
+                    String query = "SELECT id_thesaurus"
                             + " FROM user_role WHERE"
                             + " id_user = " + idUser;
 
-                    
-                   /*query = "SELECT users.id_user, username, mail, id_role, "
+                    /*query = "SELECT users.id_user, username, mail, id_role, "
                             + "name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND active=true ORDER BY username";*/
                     resultSet = stmt.executeQuery(query);
@@ -703,16 +697,16 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return idThesausus;        
-        
-    }
+        return idThesausus;
 
+    }
 
     /**
      * cette fonction permet de retourner la liste des utlisateurs par thésaurus
+     *
      * @param ds
      * @param idThesaurus
-     * @return 
+     * @return
      */
     public ArrayList<NodeUser> getAllUsersOfThesaurus(HikariDataSource ds, String idThesaurus) {
         ArrayList<NodeUser> listUser = new ArrayList<>();
@@ -731,11 +725,11 @@ public class UserHelper {
                             + " users.username, users.id_user, users.mail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id AND" 
+                            + " user_role.id_role = roles.id AND"
                             + " user_role.id_thesaurus = '" + idThesaurus + "'"
                             + " ORDER BY username";
-                    
-                   /*query = "SELECT users.id_user, username, mail, id_role, "
+
+                    /*query = "SELECT users.id_user, username, mail, id_role, "
                             + "name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND active=true ORDER BY username";*/
                     resultSet = stmt.executeQuery(query);
@@ -761,12 +755,13 @@ public class UserHelper {
 
         return listUser;
     }
-    
+
     /**
-     * permet de retourner la liste de tous les utilisateurs sans exception
-     * avec leurs role
+     * permet de retourner la liste de tous les utilisateurs sans exception avec
+     * leurs role
+     *
      * @param ds
-     * @return 
+     * @return
      */
     public ArrayList<NodeUser> getAllUsers(HikariDataSource ds) {
         ArrayList<NodeUser> listUser = new ArrayList<>();
@@ -786,8 +781,8 @@ public class UserHelper {
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id"
                             + " ORDER BY username";
-                    
-                   /*query = "SELECT users.id_user, username, mail, id_role, "
+
+                    /*query = "SELECT users.id_user, username, mail, id_role, "
                             + "name, description FROM users, roles  "
                             + "WHERE users.id_role=roles.id AND active=true ORDER BY username";*/
                     resultSet = stmt.executeQuery(query);
@@ -812,7 +807,7 @@ public class UserHelper {
         }
 
         return listUser;
-    }    
+    }
 
     public void updatePwd(HikariDataSource ds, int idUser, String newPwd) {
         Connection conn;
@@ -837,7 +832,7 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void updateMail(HikariDataSource ds, int idUser, String newMail) {
         Connection conn;
         Statement stmt;
@@ -864,9 +859,10 @@ public class UserHelper {
 
     /**
      * Permet de supprimer tous les roles d'un utilisateur
+     *
      * @param conn
      * @param idUser
-     * @return 
+     * @return
      */
     public boolean deleteAllRoleOfUser(Connection conn, int idUser) {
 
@@ -892,12 +888,13 @@ public class UserHelper {
         }
         return status;
     }
-    
+
     /**
      * Permet de supprimer le role sur le thésaurus
+     *
      * @param conn
      * @param idTheso
-     * @return 
+     * @return
      */
     public boolean deleteOnlyTheThesoFromRole(Connection conn,
             String idTheso) {
@@ -924,14 +921,15 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
-    }       
-    
+    }
+
     /**
      * Permet de supprimer tous les roles d'un utilisateur
+     *
      * @param conn
      * @param idUser
      * @param idThesaurus
-     * @return 
+     * @return
      */
     public boolean deleteThisRoleForThisThesaurus(Connection conn, int idUser,
             String idThesaurus) {
@@ -958,8 +956,8 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
-    }    
-    
+    }
+
     public void deleteUser(HikariDataSource ds, int idUser) {
         Connection conn;
         Statement stmt;
@@ -985,7 +983,7 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void desactivateUser(HikariDataSource ds, int idUser) {
         Connection conn;
         Statement stmt;
@@ -1010,43 +1008,53 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
-    
+    }
+
     /**
-     * Cette fonction permet de changer le role d'un utlisateur et ses droits sur un ou plusieurs thésaurus
+     * Cette fonction permet de changer le role d'un utlisateur et ses droits
+     * sur un ou plusieurs thésaurus
+     *
      * @param conn
      * @param idUser
      * @param newRole
-     * @param roleOnIdThesaurus 
-     * @return  
+     * @param roleOnIdThesaurus
+     * @return
      */
     public boolean updateRoleUser(Connection conn, int idUser, int newRole,
             List<String> roleOnIdThesaurus) {
-        
+
         // suppression de tous les roles avant de les récréer 
-        if(!deleteAllRoleOfUser(conn, idUser)) return false;
-        
-        // cas où l'utilisateur n'a de droits sur aucun thésaurus, on conserve son role seulement
-        if(roleOnIdThesaurus.isEmpty()) {
-            if(!addRole(conn, idUser, newRole, "", "")) return false;
+        if (!deleteAllRoleOfUser(conn, idUser)) {
+            return false;
         }
-        
+
+        // cas où l'utilisateur n'a de droits sur aucun thésaurus, on conserve son role seulement
+        if (roleOnIdThesaurus.isEmpty()) {
+            if (!addRole(conn, idUser, newRole, "", "")) {
+                return false;
+            }
+        }
+
         for (String roleOnIdThesauru : roleOnIdThesaurus) {
-            if(!addRole(conn, idUser, newRole, roleOnIdThesauru, "")) return false;
+            if (!addRole(conn, idUser, newRole, roleOnIdThesauru, "")) {
+                return false;
+            }
         }
         return true;
     }
 
-   /**
-    * Cette fonction permet de savoir si l'utilisateur a deja ce role sur un thésaurus
-    * @param ds
-    * @param idUser
-    * @param role
-    * @param idThesaurus
-    * @return 
-    */ 
-   public boolean isRoleExist(HikariDataSource ds, 
-           int idUser, int role, String idThesaurus) {
+    /**
+     * Cette fonction permet de savoir si l'utilisateur a deja ce role sur un
+     * thésaurus
+     *
+     * @param ds
+     * @param idUser
+     * @param role
+     * @param idThesaurus
+     * @return
+     */
+    public boolean isRoleExist(HikariDataSource ds,
+            int idUser, int role, String idThesaurus) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -1079,15 +1087,16 @@ public class UserHelper {
 
         return false;
     }
-   
+
     /**
-     * On vérifie si le User est suprAdmin 
+     * On vérifie si le User est suprAdmin
+     *
      * @param ds
      * @param userName
-     * @return 
+     * @return
      */
-    public boolean isAdminUser(HikariDataSource ds, 
-           String userName){
+    public boolean isAdminUser(HikariDataSource ds,
+            String userName) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -1119,17 +1128,18 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return false;       
+        return false;
     }
-    
+
     /**
      * On vérifie si le User est suprAdmin par Id
+     *
      * @param ds
      * @param idUser
-     * @return 
+     * @return
      */
-    public boolean isAdminUser(HikariDataSource ds, 
-           int idUser){
+    public boolean isAdminUser(HikariDataSource ds,
+            int idUser) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -1159,16 +1169,18 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return false;       
-    }    
-    
+        return false;
+    }
+
     /**
-     * Cette fonction permet de changer le role d'un utlisateur et ses droits sur un ou plusieurs thésaurus
+     * Cette fonction permet de changer le role d'un utlisateur et ses droits
+     * sur un ou plusieurs thésaurus
+     *
      * @param ds
      * @param idUser
      * @param newRole
-     * @param roleOnIdThesaurus 
-     * @return  
+     * @param roleOnIdThesaurus
+     * @return
      */
     public boolean updateRoleUser(HikariDataSource ds, int idUser, int newRole,
             String roleOnIdThesaurus) {
@@ -1183,13 +1195,13 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                        String query = "update user_role set id_role=" + newRole
-                                + ", id_thesaurus = '" + roleOnIdThesaurus + "'"
-                                + " where"
-                                + " id_user =" + idUser
-                                + " and id_thesaurus = '" + roleOnIdThesaurus + "'";
-                        stmt.executeUpdate(query);  
-                        status = true;
+                    String query = "update user_role set id_role=" + newRole
+                            + ", id_thesaurus = '" + roleOnIdThesaurus + "'"
+                            + " where"
+                            + " id_user =" + idUser
+                            + " and id_thesaurus = '" + roleOnIdThesaurus + "'";
+                    stmt.executeUpdate(query);
+                    status = true;
                 } finally {
                     stmt.close();
                 }
@@ -1201,13 +1213,14 @@ public class UserHelper {
         }
         return status;
     }
-    
+
     /**
      * Permet de mettre à jour la préférence d'un thésaurus
+     *
      * @param ds
-     * @param np 
-     * @param idThesaurus 
-     * @return  
+     * @param np
+     * @param idThesaurus
+     * @return
      */
     public boolean updatePreferenceUser(HikariDataSource ds, NodePreference np, String idThesaurus) {
         Connection conn;
@@ -1220,8 +1233,8 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "update preferences set source_lang='"+np.getSourceLang()+
-                            "', nb_alert_cdt="+np.getNbAlertCdt()+", alert_cdt="+np.isAlertCdt()+" where"
+                    String query = "update preferences set source_lang='" + np.getSourceLang()
+                            + "', nb_alert_cdt=" + np.getNbAlertCdt() + ", alert_cdt=" + np.isAlertCdt() + " where"
                             + " id_thesaurus = '" + idThesaurus + "'";
                     stmt.executeUpdate(query);
                     status = true;
@@ -1237,7 +1250,7 @@ public class UserHelper {
         }
         return status;
     }
-    
+
     public ArrayList<Entry<String, String>> getRoles(HikariDataSource ds) {
         Connection conn;
         Statement stmt;
@@ -1273,14 +1286,15 @@ public class UserHelper {
         ArrayList<Entry<String, String>> listeRoles = new ArrayList<>(map.entrySet());
         return listeRoles;
     }
-    
 
     /**
-     * Cette fonction permet de retourner la liste des roles autorisés
-     * pour un Role donné (c'est la liste qu'un utilisateur a le droit d'attribué à un nouvel utilisateur)
+     * Cette fonction permet de retourner la liste des roles autorisés pour un
+     * Role donné (c'est la liste qu'un utilisateur a le droit d'attribué à un
+     * nouvel utilisateur)
+     *
      * @param ds
      * @param idRoleFrom
-     * @return 
+     * @return
      */
     public ArrayList<Entry<String, String>> getAuthorizedRoles(HikariDataSource ds,
             int idRoleFrom) {
@@ -1288,7 +1302,7 @@ public class UserHelper {
         Statement stmt;
         ResultSet resultSet;
         Map map = new HashMap();
-        
+
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -1318,18 +1332,18 @@ public class UserHelper {
         }
         ArrayList<Entry<String, String>> listeRoles = new ArrayList<>(map.entrySet());
         return listeRoles;
-    } 
-    
-    
+    }
 
     /**
-     * Cette fonction permet d'ajouter un utilisateur (permet le rollBack en cas d'erreur
+     * Cette fonction permet d'ajouter un utilisateur (permet le rollBack en cas
+     * d'erreur
+     *
      * @param conn
      * @param name
      * @param mail
      * @param pwd
      * @param role
-     * @return 
+     * @return
      */
     public boolean addUser(Connection conn, String name, String mail, String pwd, int role) {
 
@@ -1358,17 +1372,19 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return status; 
+        return status;
     }
-    
+
     /**
-     * cette fonction permet de retourner l'identifiant d'un utlisateur suivant son Nom
+     * cette fonction permet de retourner l'identifiant d'un utlisateur suivant
+     * son Nom
+     *
      * @param conn
      * @param userName
-     * @return 
+     * @return
      */
     public int getIdUser(Connection conn, String userName) {
-        int idUser = -1; 
+        int idUser = -1;
         Statement stmt;
         ResultSet resultSet;
         try {
@@ -1379,7 +1395,7 @@ public class UserHelper {
                             + " WHERE"
                             + " username = '" + userName.trim() + "'";
                     resultSet = stmt.executeQuery(query);
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         NodeUser nu = new NodeUser();
                         idUser = resultSet.getInt("id_user");
                     }
@@ -1392,18 +1408,20 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return idUser;
-    }    
-  
+    }
+
     /**
-     * Cette fonction permet d'ajouter un role pour un utilisateur (permet le rollBack en cas d'erreur
+     * Cette fonction permet d'ajouter un role pour un utilisateur (permet le
+     * rollBack en cas d'erreur
+     *
      * @param conn
      * @param idUser
      * @param idRole
      * @param idThesaurus
      * @param idGroup
-     * @return 
+     * @return
      */
-    public boolean addRole(Connection conn, int idUser, int idRole, 
+    public boolean addRole(Connection conn, int idUser, int idRole,
             String idThesaurus, String idGroup) {
 
         Statement stmt;
@@ -1431,7 +1449,59 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return status; 
-    }    
+        return status;
+    }
 
+    public boolean isChangeToPass(HikariDataSource ds, String name) throws SQLException {
+        boolean needchange = false;
+        Statement stmt;
+        Connection conn = ds.getConnection();
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select passtomodify from users where username = '" + name + "'";
+                    ResultSet resultset = stmt.executeQuery(query);
+                    if (resultset.next()) {
+                        needchange = resultset.getBoolean("passtomodify");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return needchange;
+    }
+    public boolean isneededpass(HikariDataSource ds,String email) throws SQLException
+    {
+        Statement stmt;
+        boolean need=false;
+        Connection conn = ds.getConnection();
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select passtomodify from users where mail = '"+email+"'";
+                    ResultSet rs = stmt.executeQuery(query);
+                    if(rs.next())
+                    {
+                        need = rs.getBoolean("passtomodify");
+                    }
+                    }finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return need;
+    }
 }

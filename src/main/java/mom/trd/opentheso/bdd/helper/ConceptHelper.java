@@ -1248,11 +1248,13 @@ public class ConceptHelper {
                         resultSet = stmt.getResultSet();
                         resultSet.next();
                         int idNumerique = resultSet.getInt(1);
-                        do {
-                            idNumerique++;
-                            idConcept = "" + (idNumerique);
-                            concept.setIdConcept(idConcept);
-                        } while (!ilpeux(conn, idConcept));
+                        idNumerique++;
+                        idConcept = "" + (idNumerique);
+                        // si le nouveau Id existe, on l'incrémente
+                        while (isIdExiste(conn, idConcept)) {
+                            idConcept = "" + (++idNumerique);
+                        }
+                        concept.setIdConcept(idConcept);
                     }
 
                     query = "Insert into concept "
@@ -1300,37 +1302,37 @@ public class ConceptHelper {
      * @return
      * @throws SQLException
      */
-    public boolean ilpeux(Connection conn, String id_Concept) throws SQLException {
-        Statement stmt;
-        ResultSet resultSet;
-
-        try {
-            // Get connection from pool
-            //     conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                String query;
-                try {
-                    query = "SELECT id_concept from concept where id_concept ='" + id_Concept + "'";
-                    resultSet = stmt.executeQuery(query);
-                    if (!resultSet.next()) {
-                        return true;
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                //  conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
-                log.error("Error while adding Concept : " + id_Concept, sqle);
-            }
-        }
-        return false;
-    }
+//    public boolean ilPeux(Connection conn, String id_Concept) throws SQLException {
+//        Statement stmt;
+//        ResultSet resultSet;
+//
+//        try {
+//            // Get connection from pool
+//            //     conn = ds.getConnection();
+//            try {
+//                stmt = conn.createStatement();
+//                String query;
+//                try {
+//                    query = "SELECT id_concept from concept where id_concept ='" + id_Concept + "'";
+//                    resultSet = stmt.executeQuery(query);
+//                    if (!resultSet.next()) {
+//                        return true;
+//                    }
+//
+//                } finally {
+//                    stmt.close();
+//                }
+//            } finally {
+//                //  conn.close();
+//            }
+//        } catch (SQLException sqle) {
+//            // Log exception
+//            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+//                log.error("Error while adding Concept : " + id_Concept, sqle);
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
@@ -1417,6 +1419,44 @@ public class ConceptHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non
+     *
+     * @param conn
+     * @param idConcept
+     * @return boolean
+     */
+    public boolean isIdExiste(Connection conn,
+            String idConcept) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id exist : " + idConcept, sqle);
+        }
+        return existe;
+    }    
 
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
@@ -2322,7 +2362,37 @@ public class ConceptHelper {
         }
         return idGroup;
     }
-
+    
+    public void insertID_grouptoPermuted(HikariDataSource ds,String id_thesaurus, String id_concept)
+    {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idGroup = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query ="update permuted set id_group = (select id_group from concept"
+                            + " where id_thesaurus = '"+id_thesaurus
+                            + "' and id_concept = '"+id_concept
+                            + "') where  id_concept ='"+id_concept
+                            + "'";
+                    stmt.execute(query);
+                }finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + id_concept, sqle);
+        }
+ 
+    }
     /**
      * Cette fonction permet de récupérer les identifiants des Group d'un
      * Concept

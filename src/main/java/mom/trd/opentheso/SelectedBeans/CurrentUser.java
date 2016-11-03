@@ -107,11 +107,9 @@ public class CurrentUser implements Serializable {
      * si on fait le login normal (usuaire, pass), une 2 si on fait le login avec
      * le motpasstemp (et nous sommes dirigées a la page web de changer le motpasstemp)
      */
-    public String action() {
-        int init=0;
+    public String action() throws SQLException {
         UserHelper userHelper = new UserHelper();
-        init =userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd));
-        if(init == 1) {
+        if(userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
             // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
             if(userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
                 user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
@@ -140,44 +138,14 @@ public class CurrentUser implements Serializable {
             }
            
             isLogged = true; 
+
+            if (userHelper.isChangeToPass(connect.getPoolConnexion(), name))
+            {
+                return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp 
+            }
             name = null;
             pwd = null;
-            return "index.xhtml?faces-redirect=true";
-        }
-        if(init == 2) {// on a fait le login avec le motpasstemp
-            // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
-            if(userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
-                user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
-                if(user == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
-                    return "";
-                }
-                user.setIdThesaurus(idTheso);
-                authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
-            }
-            // on récupère ses droits par rapport au thésaurus en cours
-            else { 
-                NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
-                if(nodeUserTemp == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
-                    nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
-                    if(nodeUserTemp == null) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
-                        return "";
-                    }
-                }
-                else {
-                    user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
-                }
-                authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
-            }
-           
-            isLogged = true; 
-            name = null;
-            pwd = null;
-            return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp 
-        }else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+            return "index.xhtml?faces-redirect=true";        
         }
         return "";
     }
@@ -237,14 +205,12 @@ public class CurrentUser implements Serializable {
         return new UserHelper().getAuthorizedRoles(connect.getPoolConnexion(), idRoleFrom);
     }    
     
-    public void changePwd() {
-        int comprobation=new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdEdit1));
-        
+    public void changePwd() {        
         if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || pwdEdit3 == null || pwdEdit3.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         } else if (!pwdEdit2.equals(pwdEdit3)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
-        } else if(comprobation ==0) {
+        } else if(new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdEdit1))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error4")));
         } else {
             new UserHelper().updatePwd(connect.getPoolConnexion(), user.getId(), MD5Password.getEncodedPassword(pwdEdit2));
@@ -276,7 +242,7 @@ public class CurrentUser implements Serializable {
     }
     
     public void addUser() {
-        if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || nameEdit == null || nameEdit.equals("")) {
+        if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || nameEdit == null || nameEdit.equals("")|| mailEdit.equals("")|| mailEdit==null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         } else if (!pwdEdit1.equals(pwdEdit2)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));

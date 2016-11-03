@@ -73,6 +73,7 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
+import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -154,7 +155,9 @@ public class SelectedTerme implements Serializable {
     private String linkOT;
     private String idOT;
     private ArrayList<NodeAlignment> listAlignTemp;
+    private String alignementchoissi;
 
+    private ArrayList<AlignementSource> alignementSources;
 
     private NodeSearch nodeSe;
     private NodePermute nodePe;
@@ -652,11 +655,13 @@ public class SelectedTerme implements Serializable {
             terme.setId_thesaurus(idTheso);
             terme.setLang(idlangue);
             terme.setLexical_value(valueEdit);
+            terme.setSource("");
+            terme.setStatus("");
 
             if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, user.getUser().getId()) == null) {
                 return false;
             }
-
+            instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
             ConceptHelper ch = new ConceptHelper();
 
             ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue);
@@ -679,7 +684,8 @@ public class SelectedTerme implements Serializable {
             terme.setId_thesaurus(idTheso);
             terme.setLang(idlangue);
             terme.setLexical_value(valueEdit);
-            terme.setStatus("D");
+            terme.setSource("");
+            terme.setStatus("");
 
             //String idTC = idTopConcept;
             String idP = idC;
@@ -687,6 +693,8 @@ public class SelectedTerme implements Serializable {
             if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, serverAdress, arkActive, user.getUser().getId()) == null) {
                 return false;
             }
+            instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
+            concept.getUserName();
             ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
@@ -1198,6 +1206,10 @@ public class SelectedTerme implements Serializable {
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
+            terme.setContributor(user.getUser().getId());
+            terme.setCreator(user.getUser().getId());
+            terme.setSource("");
+            terme.setStatus("");
             if (termHelper.isTermExist(connect.getPoolConnexion(),
                     terme.getLexical_value(),
                     terme.getId_thesaurus(), terme.getLang())) {
@@ -1229,7 +1241,10 @@ public class SelectedTerme implements Serializable {
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
-
+            terme.setContributor(user.getUser().getId());
+            terme.setCreator(user.getUser().getId());
+            terme.setSource("");
+            terme.setStatus("");
             if (termHelper.isTermExist(connect.getPoolConnexion(),
                     terme.getLexical_value(),
                     terme.getId_thesaurus(), terme.getLang())) {
@@ -1277,12 +1292,17 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    public void creerAlignAuto() {
+    public void creerAlignAuto() throws SQLException {
         listAlignTemp = new ArrayList<>();
-        if (dbp) {
-            listAlignTemp.addAll(new AlignmentQuery().query("DBP", idC, idTheso, nom, idlangue, null));
+        if ("DBPedia".equals(alignementchoissi)) {
+            listAlignTemp.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "DBP", idC, idTheso, nom, idlangue, null));
             dbp = false;
         }
+        if ("bnf".equals(alignementchoissi)) {
+            listAlignTemp.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "bnf", idC, idTheso, nom, idlangue, null));
+            dbp = false;
+        }  
+        /*
         if (wiki) {
             listAlignTemp.addAll(new AlignmentQuery().query("WIKI", idC, idTheso, nom, idlangue, null));
             wiki = false;
@@ -1294,7 +1314,7 @@ public class SelectedTerme implements Serializable {
         if (gemet) {
             listAlignTemp.addAll(new AlignmentQuery().query("GEMET", idC, idTheso, nom, idlangue, null));
             gemet = false;
-        }
+        }*/
         if (opentheso) {
             String lien;
             if (!linkOT.trim().equals("") && !idOT.trim().equals("")) {
@@ -1303,7 +1323,7 @@ public class SelectedTerme implements Serializable {
                 } else {
                     lien = linkOT.trim() + "/webresources/rest/skos/concept/value=" + nom.replaceAll(" ", "_") + "&lang=" + idlangue + "&th=" + idOT;
                 }
-                listAlignTemp.addAll(new AlignmentQuery().query("OPENT", idC, idTheso, nom, idlangue, lien));
+                //listAlignTemp.addAll(new AlignmentQuery().query("OPENT", idC, idTheso, nom, idlangue, lien));
             }
             opentheso = false;
         }
@@ -2175,6 +2195,12 @@ public class SelectedTerme implements Serializable {
         }
         return status1;
     }
+    
+    public ArrayList<AlignementSource> getALignementSource(){
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        alignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(),idTheso);
+        return alignementSources;
+    }
 
     /**
      * *
@@ -2866,6 +2892,22 @@ public class SelectedTerme implements Serializable {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public ArrayList<AlignementSource> getAlignementSources() {
+        return alignementSources;
+    }
+
+    public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
+        this.alignementSources = alignementSources;
+    }
+
+    public String getAlignementchoissi() {
+        return alignementchoissi;
+    }
+
+    public void setAlignementchoissi(String alignementchoissi) {
+        this.alignementchoissi = alignementchoissi;
     }
    
 }

@@ -44,36 +44,52 @@
             <ui:include src="account.xhtml" />
             <ui:include src="menuAll.xhtml" />
         </div>
+
+        <br/><br/><br/><br/>
         <center>
+            <h:form>
+                <h:outputText value="#{langueBean.getMsg('conf.mail')}: "/><br/>
+                <h:inputText  value="#{selectedCandidat.email}"/> 
+                <h:commandButton value="ok" action="#{selectedCandidat.needchangerpass()}"/>
+            </h:form>
+        </center>
+
+        <h:panelGroup rendered="#{selectedCandidat.needchangerpass()}">
             <h:form id="changelePass">
                 <br/><br/><br/><br/>
                 <table width="20%" border="1" align="center">
                     <tr><td><center>
-                            <br/><br/>
-                            <h:outputText value="#{langueBean.getMsg('conf.currentPwd')}: "/>
-                            <h:inputSecret  value="#{downloadBean.ancianPass}"/> 
+                                <br/><br/>
+                                <h:outputText value="#{langueBean.getMsg('conf.currentPwd')}: "/><br/>
+                                <h:inputSecret  value="#{selectedCandidat.ancianPass}"/>
+                                <br/><br/>
+                                <h:outputText  value="#{langueBean.getMsg('conf.newPwd1')}: "/><br/>
+                                <h:inputSecret  value="#{selectedCandidat.newPass}"/> 
 
-                            <br/><br/>
-                            <h:outputText  value="#{langueBean.getMsg('conf.newPwd1')}: "/>
-                            <h:inputSecret  value="#{downloadBean.newPass}"/> 
+                                <br/><br/>
+                                <h:outputText value="#{langueBean.getMsg('conf.newPwd2')}: "/><br/>
+                                <h:inputSecret  value="#{selectedCandidat.confirmPass}"  />
 
-                            <br/><br/>
-                            <h:outputText value="#{langueBean.getMsg('conf.newPwd2')}: "/>
-                            <h:inputSecret  value="#{downloadBean.confirmPass}"  />
-
-                            <br/><br/><br/><br/>
-                            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" value="#{langueBean.getMsg('conf.btnEditPwd')}" update=":changelePass" action="#{downloadBean.fchangepass()}"
+                                <br/><br/><br/><br/>
+                                <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.btnAddTrad')}" value="#{langueBean.getMsg('conf.btnEditPwd')}" 
+                                                 update=":changelePass" action="#{selectedCandidat.fchangepass()}"
                                                  styleClass="styleButton"   />
                             </center><br/><br/>
                         </td></tr>
                 </table>
             </h:form>
-            <br/><br/><br/><br/><br/>
+
+        </h:panelGroup>
+
+        <br/><br/><br/>
+        <center>
             <h:form>
                 <a href="index.xhtml" target="_self"><input type="button" name="button" value="Index" styleClass="styleButton"/></a>
             </h:form>
-            <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
-        </center>            
+        </center>
+        <br/>
+        <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">

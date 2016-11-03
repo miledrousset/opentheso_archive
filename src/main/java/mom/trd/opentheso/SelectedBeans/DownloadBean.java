@@ -1,17 +1,9 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import com.sun.xml.bind.v2.schemagen.xmlschema.Import;
-import mom.trd.opentheso.core.exports.privatesdatas.WriteXml;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,19 +13,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.mail.MessagingException;
-import javax.swing.JFileChooser;
-import mom.trd.opentheso.bdd.account.OublieMotPass;
 import mom.trd.opentheso.bdd.helper.Connexion;
-import mom.trd.opentheso.bdd.helper.UserHelper;
-import mom.trd.opentheso.bdd.tools.CreateBDD;
-import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
-import mom.trd.opentheso.core.exports.helper.ExportStatistiques;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
-import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
-import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -60,12 +43,8 @@ public class DownloadBean implements Serializable {
     private String serverArk;
     private boolean arkActive;
     private String serverAdress;
-    private String email;
     private String nomUsu;
-    private String newPass;
-    private String confirmPass;
-    private String ancianPass;
-    private String dbName;
+
 
     
     @PostConstruct
@@ -371,42 +350,7 @@ public class DownloadBean implements Serializable {
         return file;
     }
 
-    /**
-     * Cette fonction permet de télécharger les tables et les données ce qui
-     * permet de sauvegarder toutes les données privées pour les mise à jour
-     *
-     * @param toutTables
-     * @return
-     */
-    public StreamedContent backUpBaseDonnees(ArrayList<String> toutTables) {
-        ArrayList<Table> sortirXml;
-        ExportPrivatesDatas backUp = new ExportPrivatesDatas();
-        Iterator<String> it1 = toutTables.iterator();
-        WriteXml write = new WriteXml();
-        write.writeHead();
-        write.start();
-        String table;
-
-        // date du jour
-        java.util.Date datetoday = new java.util.Date();
-
-        while (it1.hasNext()) {
-            table = it1.next();
-            sortirXml = backUp.getDatasOfTable(connect.getPoolConnexion(), table);
-            write.WriteIntoXML(sortirXml, table);
-        }
-        write.end();
-        InputStream stream;
-
-        try {
-            stream = new ByteArrayInputStream(write.getXml().getBytes("UTF-8"));
-            file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_" + datetoday + ".xml");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return file;
-    }
-
+    
     /**
      * Cette fonction permet de retourner pour téléchargement un groupe en
      * JsonLd
@@ -595,61 +539,6 @@ public class DownloadBean implements Serializable {
 /**
  * Applelation de la funtion avec les parametres pour avoir le motpasstemp
  */
-    public void oublieMonPass() throws MessagingException {
-        OublieMotPass apple = new OublieMotPass();
-        apple.vide(connect.getPoolConnexion(), nomUsu, email);
-        nomUsu = null;
-        email = null;
-
-    }
-    public void inyectionaBDD() throws ClassNotFoundException, SQLException{
-        File fichero;
-        importxml impo = new importxml();
-        JFileChooser fileChooser = new JFileChooser();
-        int seleccion = fileChooser.showOpenDialog(null);
-        if (seleccion == JFileChooser.APPROVE_OPTION) {
-            fichero = fileChooser.getSelectedFile();
-            impo.ouvreFichier2(connect.getPoolConnexion(), fichero);
-        }
-        System.out.println("saliendo************************************");
-        
-    }
-    /**
-     * Applelation de la funtion avec les parametres pour changer le mot de
-     * pass.
-     * on fait le comprobation pour voir si tout c'est bon 
-     * @throws SQLException 
-     */
-    public void fchangepass() throws SQLException{
-        boolean sort=false;
-        OublieMotPass apple = new OublieMotPass();
-        CurrentUser user = new CurrentUser();
-        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass))
-        {
-            sort=true;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error3")));
-        }
-        if(newPass == null || newPass.equals("") || confirmPass == null || confirmPass.equals("") || ancianPass == null || ancianPass.equals("")) {
-            sort=true;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("user.error2")));
-        }
-        else if(!sort){ 
-            if(apple.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, ancianPass))
-            {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(languageBean.getMsg("info") + " :", languageBean.getMsg("user.info1")));
-            }
-            else FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("error")));
-        }
-        
-    }
-
-    public Connexion getConnect() {
-        return connect;
-    }
-
-    public void setConnect(Connexion connect) {
-        this.connect = connect;
-    }
 
     public String getSkos() {
         return skos;
@@ -682,39 +571,6 @@ public class DownloadBean implements Serializable {
     public void setLanguageBean(LanguageBean languageBean) {
         this.languageBean = languageBean;
     }
-
-    public String getNewPass() {
-        return newPass;
-    }
-
-    public void setNewPass(String newPass) {
-        this.newPass = newPass;
-    }
-
-    public String getConfirmPass() {
-        return confirmPass;
-    }
-
-    public void setConfirmPass(String confirmPass) {
-        this.confirmPass = confirmPass;
-    }
-
-    public String getAncianPass() {
-        return ancianPass;
-    }
-
-    public void setAncianPass(String ancianPass) {
-        this.ancianPass = ancianPass;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getNomUsu() {
         return nomUsu;
     }
@@ -722,14 +578,12 @@ public class DownloadBean implements Serializable {
     public void setNomUsu(String nomUsu) {
         this.nomUsu = nomUsu;
     }
-
-    public String getDbName() {
-        return dbName;
-    }
-
-    public void setDbName(String dbName) {
-        this.dbName = dbName;
-    }
     
+    public Connexion getConnect() {
+        return connect;
+    }
 
+    public void setConnect(Connexion connect) {
+        this.connect = connect;
+    }
 }

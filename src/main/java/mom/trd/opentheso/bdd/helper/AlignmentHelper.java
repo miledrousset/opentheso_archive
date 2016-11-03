@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -367,5 +368,41 @@ public class AlignmentHelper {
         }
         return map;
     }    
-    
+    public ArrayList<AlignementSource> getAlignementSource(HikariDataSource ds, String id_theso)
+    {
+        ArrayList<AlignementSource>alignementSources = new ArrayList<>();
+        
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+         try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select source, requete,type_rqt,format_donnees from alignement_source where id_thesaurus='"+ id_theso+"'";
+                    resultSet=stmt.executeQuery(query);
+                    while(resultSet.next())
+                    {
+                        AlignementSource alignementSource = new AlignementSource();
+                        alignementSource.setSource(resultSet.getString("source"));
+                        alignementSource.setRequete(resultSet.getString("requete"));
+                        alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
+                        alignementSource.setFormatDonnes(resultSet.getString("format_donnees"));
+                        alignementSources.add(alignementSource);
+                    }
+                    resultSet.close();
+                    } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting colection of Type of Alignment : ", sqle);
+        }
+        return alignementSources;
+    }
 }

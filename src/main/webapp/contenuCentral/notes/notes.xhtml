@@ -19,7 +19,9 @@
                             <td style="text-align: right">
                             </td>
                             <td>
-                                 <p:commandLink  value = "#{selectedTerme.icon}" title="Toutes les langues" styleClass="cbEdit2" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                     
+                                <p:commandLink  value = "#{selectedTerme.icon}" title="#{langueBean.getMsg('index.viewAllNotes')}" 
+                                                styleClass="cbEdit2" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>  
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                     
                            
                             </td> 
                             
