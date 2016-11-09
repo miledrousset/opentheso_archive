@@ -1,6 +1,5 @@
 package mom.trd.opentheso.bdd.tools;
 
-import java.util.Vector;
 
 public class StringPlus {
 
@@ -18,8 +17,8 @@ public class StringPlus {
      */
     public String addQuotes(String ligne) {
         String ligne_prete = "";
-        String ligne_temp = "";
-        int index = -1;
+        String ligne_temp;
+        int index;
 
         while (true) {
             index = ligne.indexOf("'");
@@ -30,20 +29,6 @@ public class StringPlus {
             ligne_prete = ligne_prete + ligne_temp.concat("'");
             ligne = ligne.substring(index + 1, ligne.length());
         }
-    }
-
-    public Vector<String> splitPlus(String ligne, String separateur) {
-
-        Vector<String> v = new Vector<String>();
-
-        while (ligne.indexOf(separateur) != -1) {
-            v.addElement(ligne.substring(0, ligne.indexOf(separateur)).trim());
-            ligne = ligne.substring(ligne.indexOf(separateur) + separateur.length());
-        }
-        if (ligne.length() > 0) {
-            v.addElement(ligne.trim());
-        }
-        return v;
     }
 
     /**
