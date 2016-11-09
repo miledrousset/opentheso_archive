@@ -1479,43 +1479,6 @@ public class SelectedThesaurus implements Serializable {
     public void setNomdufichier(String nomdufichier) {
         this.nomdufichier = nomdufichier;
     }
-    public StreamedContent genererdocument() throws SQLException
-    {
-        ExportStatistiques expo= new ExportStatistiques();
-        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(),1);
-        InputStream stream;
-        java.util.Date datetoday = new java.util.Date();
-
-        try {
-            stream = new ByteArrayInputStream(expo.getDocument().getBytes("UTF-8"));
-            file = new DefaultStreamedContent(stream, "application/xml", "export "+thesaurus.getId_thesaurus() + datetoday + ".txt");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return file;
-    }
-    public StreamedContent pdf() throws SQLException, Exception
-    {
-        ExportStatistiques expo= new ExportStatistiques();
-        expo.recuperatefils(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(),2);
-        Document pdf = new Document(PageSize.LETTER);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PdfWriter writer;
-        Paragraph para = new Paragraph(expo.getDocument());
-        writer = PdfWriter.getInstance(pdf, baos);
-        if (!pdf.isOpen()) {
-            pdf.open();
-        }
-        pdf.addTitle("theso");
-        pdf.add(para);
-       //Adding content to pdf
-        pdf.close();
-        InputStream stream = new ByteArrayInputStream(baos.toByteArray());
-        fileDownload = new DefaultStreamedContent(stream, "application/pdf", "Thésaurus"+thesaurus.getId_thesaurus()+".pdf");
-
-       return fileDownload;
-    }
-
     public boolean isMesCandidats() {
         return mesCandidats;
     }

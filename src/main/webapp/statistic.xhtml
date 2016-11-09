@@ -112,10 +112,10 @@
                         <p:commandButton id="ExportET"  value="#{langueBean.getMsg('exp.statheso')}" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="ExportET" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('exp.statheso')}"  style="font-size: 12px;" ajax="false">
-                                <p:fileDownload  value="#{theso.genererdocument()}" />
+                                <p:fileDownload  value="#{baseDeDonnes.genererdocument()}" />
                             </p:menuitem>
                             <p:menuitem id="ExportETDPF" value="#{langueBean.getMsg('exp.stathesoPDF')}" title="#{langueBean.getMsg('exp.stathesoPDF')}"  style="font-size: 12px;" ajax="false">
-                                <p:fileDownload  value="#{theso.pdf()}" />
+                                <p:fileDownload  value="#{baseDeDonnes.pdf()}" />
                             </p:menuitem>
                         </p:menu>
                     </h:form>

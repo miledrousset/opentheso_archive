@@ -210,17 +210,18 @@ public class TermHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from term"
-                            + " where id_thesaurus ='" + term.getId_thesaurus() +"'";
+                    String query = "select max(id) from term";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
-                    int idNumerique = resultSet.getInt(1);
-                    do{
-                        idNumerique++;
-                        idTerm = "" + (idNumerique);
-                        term.setId_term(idTerm);
-                    }while(!ilpeux(conn, idTerm));
+                    int idTermNum = resultSet.getInt(1);
+                    idTermNum++;
+                    idTerm = "" + (idTermNum);
+                    // si le nouveau Id existe, on l'incrémente
+                    while (isIdOfTermExist(conn, idTerm, term.getId_thesaurus())) {
+                        idTerm = "" + (++idTermNum);
+                    }
+                    term.setId_term(idTerm);
                     /**
                      * Ajout des informations dans la table Concept
                      */
@@ -1140,6 +1141,7 @@ public class TermHelper {
                     try {
                         String query = "SELECT term.* FROM term, preferred_term"
                                 + " WHERE preferred_term.id_term = term.id_term"
+                                + " and preferred_term.id_thesaurus = term.id_thesaurus"
                                 + " and preferred_term.id_concept ='" + idConcept + "'"
                                 + " and term.lang = '" + idLang + "'"
                                 + " and term.id_thesaurus = '" + idThesaurus + "'"
@@ -2320,6 +2322,46 @@ public class TermHelper {
         return existe;
     }
 
+    /**
+     * Cette fonction permet de savoir si le terme existe ou non
+     *
+     * @param conn
+     * @param idTerm
+     * @param idThesaurus
+     * @return boolean
+     */
+    public boolean isIdOfTermExist(Connection conn,
+            String idTerm, String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_term from term where "
+                            + " id_term = '" + idTerm + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id of Term exist : " + idTerm, sqle);
+        }
+        return existe;
+    }    
+    
     /**
      * Cette fonction permet de savoir si le terme existe ou non dans le thésaurus
      * mais il faut ignorer le terme lui même; ceci nous permet de faire 

@@ -157,6 +157,32 @@ public class UserHelper {
 
         return false;
     }
+    public boolean isUserMailExist(Connection conn, String mail) {
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT mail FROM users WHERE mail='" + mail + "'";
+                    resultSet = stmt.executeQuery(query);
+                    resultSet.next();
+                    if (resultSet.getRow() != 0) {
+                        return true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
+    }
 
     /**
      * cette fonction permet de retourner les informations sur l'utilisateur et

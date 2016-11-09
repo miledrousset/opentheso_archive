@@ -54,6 +54,7 @@ public class ForgetPasswordHelper {
      * @param ds
      * @param nom
      * @param mail
+     * @return 
      * @throws javax.mail.MessagingException
      */
     public boolean forgotPass(HikariDataSource ds, String mail) throws MessagingException {
@@ -189,7 +190,7 @@ public class ForgetPasswordHelper {
                 Connection conn = ds.getConnection();
                 stmt = stmt1 = conn.createStatement();
                 try {
-                    System.out.println(Pass);
+                    //System.out.println(Pass);
                     String queryAjouPass = "update users set password ='" + passwordencoding
                             + "',passtomodify = false where mail ='" + mail + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
                     stmt.executeUpdate(queryAjouPass);

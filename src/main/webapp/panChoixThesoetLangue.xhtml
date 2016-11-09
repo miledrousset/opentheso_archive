@@ -42,14 +42,16 @@
                                 </h:panelGroup>
                             </td>
                             <td id="thesos">
-                                <h:form rendered="#{theso.thesaurus.language != null}" style="float: right;">
-                                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                        <h:outputText value="#{langueBean.getMsg('theso.my')}" />
-                                        <p:inputSwitch value="#{theso.tousThesos}" >
-                                            <p:ajax listener="#{theso.getArrayTheso()}" update=":liste1"  />
-                                        </p:inputSwitch>
-                                    </h:panelGrid>
-                                </h:form>
+                                <table>
+                                    <h:form rendered="#{theso.thesaurus.language != null}" style="float: right;">
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('theso.my')}" /><br/>
+                                            <p:selectBooleanCheckbox value="#{theso.tousThesos}" >
+                                                <p:ajax listener="#{theso.getArrayTheso()}" update=":liste1"  />
+                                            </p:selectBooleanCheckbox>
+                                        </td>
+                                    </h:form>
+                                </table>
                             </td>
                             <!-- 
                              <td>

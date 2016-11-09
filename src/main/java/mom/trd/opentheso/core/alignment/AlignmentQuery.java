@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mom.trd.opentheso.SelectedBeans.BaseDeDonnesBean;
+import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -55,7 +57,7 @@ public class AlignmentQuery {
      * @param idThesoTarget
      * @return
      */
-    public ArrayList<NodeAlignment> query(HikariDataSource ds,String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws SQLException {
+    public ArrayList<NodeAlignment> query(HikariDataSource ds,String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws SQLException, ClassNotFoundException {
         listeAlign = new ArrayList<>();
         switch (dest) {
             case "DBP":
@@ -221,7 +223,7 @@ public class AlignmentQuery {
         requete=changer(requete, "langueachercher", lang);
         
         
-        System.out.println(requete);
+      //  System.out.println(requete);
         Query query = QueryFactory.create(requete);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
@@ -273,7 +275,7 @@ public class AlignmentQuery {
         requete=changer(requete, "langueachercher", lang);
         
         
-        System.out.println(requete);
+        //System.out.println(requete);
         Query query = QueryFactory.create(requete);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
@@ -319,7 +321,7 @@ public class AlignmentQuery {
                 + "       FILTER ( (lang(?def)=\"" + lang + "\") )"
                 + "       }"
                 + "   }";
-        System.out.println(sparqlQueryString1);
+        //System.out.println(sparqlQueryString1);
         Query query = QueryFactory.create(sparqlQueryString1);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("URL A DEFINIR", query);
 
@@ -374,7 +376,7 @@ public class AlignmentQuery {
                   }
         */
         
-        System.out.println(sparqlQueryString1);
+        //System.out.println(sparqlQueryString1);
 
         /*String endpointURL = "http://cr.eionet.europa.eu/sparql";
          SPARQLRepository crEndpoint = new SPARQLRepository(endpointURL);
@@ -434,7 +436,7 @@ public class AlignmentQuery {
      * @param lang
      * @return
      */
-    private ArrayList<NodeAlignment> queryOpentheso(String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) {
+    public ArrayList<NodeAlignment> queryOpentheso(String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws ClassNotFoundException, SQLException {
         listeAlign = new ArrayList<>();
         try {
             URL url = new URL(idThesoTarget);
@@ -455,9 +457,7 @@ public class AlignmentQuery {
             }
             byte[] bytes = xmlRecord.getBytes();
             xmlRecord = new String(bytes, Charset.forName("UTF-8"));
-
             conn.disconnect();
-
             StringBuffer sb = new StringBuffer(xmlRecord);
             try {
                 SKOSXmlDocument sxd = new ReadFileSKOS().readStringBuffer(sb);

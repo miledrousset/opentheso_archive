@@ -1242,8 +1242,7 @@ public class ConceptHelper {
                         }
                         concept.setIdConcept(idConcept);
                     } else {
-                        query = "select max(id) from concept "
-                                + "where id_thesaurus ='" + concept.getIdThesaurus() + "'";
+                        query = "select max(id) from concept";
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
                         resultSet.next();
@@ -1251,7 +1250,7 @@ public class ConceptHelper {
                         idNumerique++;
                         idConcept = "" + (idNumerique);
                         // si le nouveau Id existe, on l'incrémente
-                        while (isIdExiste(conn, idConcept)) {
+                        while (isIdExiste(conn, idConcept, concept.getIdThesaurus())) {
                             idConcept = "" + (++idNumerique);
                         }
                         concept.setIdConcept(idConcept);
