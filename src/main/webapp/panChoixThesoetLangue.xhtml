@@ -43,7 +43,7 @@
                             </td>
                             <td id="thesos">
                                 <table>
-                                    <h:form rendered="#{theso.thesaurus.language != null}" style="float: right;">
+                                    <h:form rendered="#{(user1.user.name != null)}" style="float: right;">
                                         <td>
                                             <h:outputText value="#{langueBean.getMsg('theso.my')}" /><br/>
                                             <p:selectBooleanCheckbox value="#{theso.tousThesos}" >
