@@ -6,16 +6,15 @@
 package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import static java.lang.Math.log;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -23,16 +22,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import mom.trd.opentheso.SelectedBeans.BaseDeDonnesBean;
+import javax.ws.rs.core.Configuration;
 import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.rdf.model.Property;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  *
@@ -80,7 +81,7 @@ public class BaseDeDoneesHelper implements Serializable {
                 stmt = conn.createStatement();
                 try {
                     String query = "create Database " + dbName + " with owner opentheso";
-                    stmt.executeUpdate(query);
+                    //stmt.executeUpdate(query);
                 } finally {
                     stmt.close();
                     conn.close();
@@ -88,9 +89,9 @@ public class BaseDeDoneesHelper implements Serializable {
                 Connection connuovelle = conextion2();//avec conextion2 il y a une connection a la BDD que on viens de créer
                 stmt2 = connuovelle.createStatement();
                 try {
-                    chaineTables = avoirContentpourTables(aux);// tout la information de touts le tables et "Insert into languages_iso639"
+                    //chaineTables = avoirContentpourTables(aux);// tout la information de touts le tables et "Insert into languages_iso639"
                     try {
-                        stmt2.execute(chaineTables);
+                       // stmt2.execute(chaineTables);
                         //stmt3.execute(chaineUpdate);
                     } finally {
                         stmt2.close();
@@ -108,10 +109,10 @@ public class BaseDeDoneesHelper implements Serializable {
                 int seleccion = fileChooser.showOpenDialog(null);
                 if (seleccion == JFileChooser.APPROVE_OPTION) {
                     fichero = fileChooser.getSelectedFile();
-                    impo.ouvreFichier(connuovelle, fichero);
+                    //impo.ouvreFichier(connuovelle, fichero);
                 }
                 changerlaBDD(dbName);// Change la connection a la nouvelle BDD
-                remplirinfo(connuovelle, aux);
+                //remplirinfo(connuovelle, aux);
                 connuovelle.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -265,7 +266,21 @@ public class BaseDeDoneesHelper implements Serializable {
         String deuxiemeparti = "";
         boolean first = true;
         boolean sault = false;
-
+        String fichi = null;
+        Properties p = new Properties();
+        try {
+            p.load(Configuration.class.getClassLoader().getResourceAsStream("hikari.properties"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        String algo = p.toString();
+        String test2 = p.getProperty("dataSource.databaseName");
+        System.out.println(test2);
+        p.setProperty("dataSource.databaseName", "miled");
+        //FileOutputStream fos = new FileOutputStream(file);
+        //p.store(fos, null);
+        String test1 = p.getProperty("dataSource.databaseName");
+        System.out.println(test1);
         File fichier = new File("C:\\Users\\antonio.perez\\Documents\\NetBeansProjects\\opentheso\\src\\main\\resources\\hikari.properties");//path fichier
         if (fichier.exists()) {
             try {
@@ -339,7 +354,7 @@ public class BaseDeDoneesHelper implements Serializable {
         }
 
     }
-    public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds) throws SQLException
+    public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds) throws SQLException, IOException, XmlPullParserException
     {
         BaseDeDoneesHelper outinfo = new BaseDeDoneesHelper();
         Statement stmt = null;

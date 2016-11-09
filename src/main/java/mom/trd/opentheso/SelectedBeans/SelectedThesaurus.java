@@ -115,7 +115,7 @@ public class SelectedThesaurus implements Serializable {
     private StreamedContent fileDownload;
     
     private boolean mesCandidats = false;
-    private boolean tousThesos = true;
+    private boolean tousThesos = false;
 
     
 
@@ -1169,7 +1169,7 @@ public class SelectedThesaurus implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayTheso() {
-        if (tousThesos){
+        if (!tousThesos){
             if(connect.getPoolConnexion() != null) {
              /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
                 p.put("", "");*/
