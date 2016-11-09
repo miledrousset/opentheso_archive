@@ -260,7 +260,7 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT count(DISTINCT note.id_note) FROM concept, note WHERE"
+                    String query = "SELECT count(DISTINCT note.id) FROM concept, note WHERE"
                             + " concept.id_concept = note.id_concept"
                             + " and concept.id_thesaurus = '" + idThesaurus + "'"
                             + " and concept.id_group = '" + idGroup + "'"

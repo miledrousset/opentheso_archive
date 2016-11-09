@@ -1061,6 +1061,7 @@ public class RelationsHelper {
                     for (NodeNT nodeNT : nodeListNT) {
                         query = "SELECT term.lexical_value, term.status FROM term, preferred_term"
                                 + " WHERE preferred_term.id_term = term.id_term"
+                                + " and preferred_term.id_thesaurus = term.id_thesaurus"
                                 + " and preferred_term.id_concept ='" + nodeNT.getIdConcept() + "'"
                                 + " and term.lang = '" + idLang + "'"
                                 + " and term.id_thesaurus = '" + idThesaurus + "'"
@@ -1145,6 +1146,7 @@ public class RelationsHelper {
                     for (NodeNT nodeNT : nodeListNT) {
                         query = "SELECT term.lexical_value, term.status FROM term, preferred_term"
                                 + " WHERE preferred_term.id_term = term.id_term"
+                                + " and preferred_term.id_thesaurus = term.id_thesaurus"
                                 + " and preferred_term.id_concept ='" + nodeNT.getIdConcept() + "'"
                                 + " and term.lang = '" + idLang + "'"
                                 + " and term.id_thesaurus = '" + idThesaurus + "'";

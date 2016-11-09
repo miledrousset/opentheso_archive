@@ -1293,7 +1293,29 @@ public class SelectedTerme implements Serializable {
     }
 
     public void creerAlignAuto() throws SQLException {
+        if(alignementchoissi == null) return;
+        AlignmentQuery aligquery= new AlignmentQuery();
         listAlignTemp = new ArrayList<>();
+        ArrayList<NodeAlignment> nodealignement = new ArrayList<>();
+        for (AlignementSource alignementSource : alignementSources) {
+            if(alignementchoissi.equalsIgnoreCase(alignementSource.getSource())) {
+                
+                // si type opentheso / skos
+                // action skos
+                if("skos".equals(alignementSource.getTypeRequete()))
+                {
+          //          nodealignement= aligquery.queryOpentheso(idC, idTheso, valueEdit.trim(),idlangue,"http://pactols.frantiq.fr/opentheso/");
+                }
+                
+                //si type Json
+                // action jason
+                
+                //
+                
+                System.out.println(alignementSource.getRequete());
+            }
+        }
+/*
         if ("DBPedia".equals(alignementchoissi)) {
             listAlignTemp.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "DBP", idC, idTheso, nom, idlangue, null));
             dbp = false;
@@ -1315,7 +1337,7 @@ public class SelectedTerme implements Serializable {
             listAlignTemp.addAll(new AlignmentQuery().query("GEMET", idC, idTheso, nom, idlangue, null));
             gemet = false;
         }*/
-        if (opentheso) {
+   /*     if (opentheso) {
             String lien;
             if (!linkOT.trim().equals("") && !idOT.trim().equals("")) {
                 if (linkOT.lastIndexOf("/") == linkOT.length() - 1) {
@@ -1327,7 +1349,7 @@ public class SelectedTerme implements Serializable {
             }
             opentheso = false;
         }
-
+*/
     }
 
     public void ajouterAlignAuto() {

@@ -200,7 +200,7 @@ public void ouvreFichier2(HikariDataSource ds, File archive) throws ClassNotFoun
                 /// mettre à jour la table dans la BDD
             } 
         } catch (IOException | JDOMException io) {
-            System.out.println("error");
+            System.out.println(io.toString());
         }
         //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("impBDD.info1")));
     }
@@ -218,6 +218,9 @@ public void ouvreFichier2(HikariDataSource ds, File archive) throws ClassNotFoun
         String values = "";
         boolean first = true;
         Connection con = ds.getConnection();
+        
+        String temp = "";
+        
         for (LineOfData lineOfData : table) {
             if (!first) {
                 nomcolun += ",";
@@ -234,13 +237,16 @@ public void ouvreFichier2(HikariDataSource ds, File archive) throws ClassNotFoun
                 // récupération des noms des colonnes de la table
                 String query = "INSERT INTO " + nomtable + " ( "
                         + nomcolun + ") VALUES (" + values;
+                temp = query;
                 stmt.executeUpdate(query);
+                
             } finally {
                 stmt.close();
                 con.close();
             }
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(temp);
         }
     } 
     

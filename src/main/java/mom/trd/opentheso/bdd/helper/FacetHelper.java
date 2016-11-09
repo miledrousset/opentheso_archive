@@ -54,7 +54,7 @@ public class FacetHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(identifier) from thesaurus_array where"
+                    String query = "select max(facet_id) from thesaurus_array where"
                             + " id_thesaurus='" + idThesaurus +"'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -63,7 +63,7 @@ public class FacetHelper {
                     idFacet = idFacet + 1;
                     
                     query = "Insert into thesaurus_array "
-                            + "(identifier, id_thesaurus, id_concept_parent, "
+                            + "(facet_id, id_thesaurus, id_concept_parent, "
                             + " notation)"
                             + " values ("
                             + idFacet
@@ -165,7 +165,7 @@ public class FacetHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "Insert into node_label "
-                            + "(id, id_thesaurus, lexical_value, lang)"
+                            + "(facet_id, id_thesaurus, lexical_value, lang)"
                             + " values ("
                             + idFacet
                             + ",'" + idThesaurus + "'"
@@ -220,7 +220,7 @@ public class FacetHelper {
                     String query = "UPDATE node_label set"
                             + " lexical_value = '" + lexicalValue + "',"
                             + " modified = current_date"
-                            + " WHERE id = " + idFacet
+                            + " WHERE facet_id = " + idFacet
                             + " AND id_thesaurus = '" + idThesaurus + "'"
                             + " AND lang = '" + idLang + "'";
                     stmt.executeUpdate(query);
@@ -264,7 +264,7 @@ public class FacetHelper {
                 try {
                     String query = "select id from node_label"
                             + " where"
-                            + " id = " + idFacet
+                            + " facet_id = " + idFacet
                             + " and lang = '" + idLang + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'";
 
@@ -306,8 +306,8 @@ public class FacetHelper {
                 stmt = conn.createStatement();
                 try {
                         String query = "SELECT node_label.lexical_value, thesaurus_array.id_concept_parent FROM node_label, thesaurus_array" 
-                                + " WHERE node_label.id=thesaurus_array.identifier"
-                                + " and node_label.id ='" + idFacet +"'"
+                                + " WHERE node_label.facet_id=thesaurus_array.facet_id"
+                                + " and node_label.facet_id ='" + idFacet +"'"
                                 + " and node_label.lang = '" + lang + "'"
                                 + " and node_label.id_thesaurus = '" + idThesaurus + "'"
                                 + " order by node_label.lexical_value DESC";                        
@@ -402,7 +402,7 @@ public class FacetHelper {
                 try {
                     String query = "delete from thesaurus_array where"
                             + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and identifier  = " + idFacet;
+                            + " and facet_id  = " + idFacet;
                     stmt.executeUpdate(query);
                     
                     query = "delete from thesaurus_array_concept where"
@@ -412,7 +412,7 @@ public class FacetHelper {
                     
                     query = "delete from node_label where"
                             + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and id = " + idFacet;
+                            + " and facet_id = " + idFacet;
                     stmt.executeUpdate(query);
                     
                     status = true;
@@ -453,7 +453,7 @@ public class FacetHelper {
                     String query = "delete from node_label where"
                             + " id_thesaurus = '" + idThesaurus + "'"
                             + " and lang = '" + idLang + "'"
-                            + " and id = " + idFacet;
+                            + " and facet_id = " + idFacet;
                     stmt.executeUpdate(query);
                     
                     status = true;
@@ -649,13 +649,13 @@ public class FacetHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select identifier from thesaurus_array"
+                    String query = "select facet_id from thesaurus_array"
                             + " where id_thesaurus = '" + idThesaurus + "'"
                             + " and id_concept_parent = '" + idConcept + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()){
-                        listIdFacet.add(resultSet.getInt("identifier"));
+                        listIdFacet.add(resultSet.getInt("facet_id"));
                     }
 
                 } finally {
@@ -704,7 +704,7 @@ public class FacetHelper {
                             + " and thesaurus_array.id_thesaurus=term.id_thesaurus"
                             + " and term.lang='" + lang.trim() + "'"
                             + " and thesaurus_array.id_thesaurus = '" + idThesaurus + "'"
-                            + " and identifier = '" + idFacet + "'";
+                            + " and facet_id = '" + idFacet + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
@@ -749,9 +749,9 @@ public class FacetHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT node_label.lexical_value,"
-                            + " node_label.id, thesaurus_array.id_concept_parent FROM "
+                            + " node_label.facet_id, thesaurus_array.id_concept_parent FROM "
                             + " thesaurus_array, node_label WHERE"
-                            + " thesaurus_array.identifier = node_label.id AND"
+                            + " thesaurus_array.facet_id = node_label.facet_id AND"
                             + " thesaurus_array.id_thesaurus = node_label.id_thesaurus"
                             + " and node_label.lang = '" + idLang + "'"
                             + " and node_label.id_thesaurus = '" + idThesaurus + "'";

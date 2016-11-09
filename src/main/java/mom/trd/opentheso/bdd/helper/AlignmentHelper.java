@@ -154,7 +154,7 @@ public class AlignmentHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "delete from alignement "
-                            + " where id_alignement = " + idAlignment
+                            + " where id = " + idAlignment
                             + " and internal_id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
@@ -246,7 +246,7 @@ public class AlignmentHelper {
                             + " uri_target = '" + uriTarget + "',"
                             + " alignement_id_type = " + idTypeAlignment + ","
                             + " thesaurus_target = '" + thesaurusTarget + "'"
-                            + " WHERE id_alignement =" + idAlignment
+                            + " WHERE id =" + idAlignment
                             + " AND internal_id_thesaurus = '" + idThesaurus + "'"
                             + " AND internal_id_concept = '" + idConcept + "'";
                     stmt.executeUpdate(query);
@@ -287,7 +287,7 @@ public class AlignmentHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_alignement, created, modified,"
+                    String query = "SELECT id, created, modified,"
                             + " author, thesaurus_target, concept_target,"
                             + " uri_target, alignement_id_type, internal_id_thesaurus,"
                             + " internal_id_concept FROM alignement"
@@ -299,7 +299,7 @@ public class AlignmentHelper {
                     nodeAlignmentList = new ArrayList<>();
                     while (resultSet.next()) {
                         NodeAlignment nodeAlignment = new NodeAlignment();
-                        nodeAlignment.setId_alignement(resultSet.getInt("id_alignement"));
+                        nodeAlignment.setId_alignement(resultSet.getInt("id"));
                         nodeAlignment.setCreated(resultSet.getDate("created"));
                         nodeAlignment.setModified(resultSet.getDate("modified"));
                         nodeAlignment.setId_author(resultSet.getInt("author"));

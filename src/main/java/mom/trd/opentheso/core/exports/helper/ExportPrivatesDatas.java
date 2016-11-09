@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.bean.ManagedBean;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Concept_Candidat;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Concept_Fusion;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Concept_Group_Historique;
@@ -34,13 +33,11 @@ import mom.trd.opentheso.core.exports.privatesdatas.tables.Term_Historique;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.User_Role;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import mom.trd.opentheso.core.exports.privatesdatas.TablesColumn;
-import org.jaxen.function.ConcatFunction;
 
 /**
  *
  * @author antonio.perez
  */
-@ManagedBean(name = "ExportPrivateD", eager = true)
 
 
 /**
@@ -48,106 +45,123 @@ import org.jaxen.function.ConcatFunction;
  * @author antonio.perez
  */
 public class ExportPrivatesDatas {
+
+    private final ArrayList<String> columnOfTablesToIgnore;
+    private final ArrayList<String> tablesToIgnore;
+
+    public ExportPrivatesDatas() {
+        columnOfTablesToIgnore = new ArrayList<>();
+        columnOfTablesToIgnore.add("id");
+        columnOfTablesToIgnore.add("id_alignement");
+        columnOfTablesToIgnore.add("id");
+        columnOfTablesToIgnore.add("id");
+        columnOfTablesToIgnore.add("id_pref");
+        columnOfTablesToIgnore.add("identifier");
+        
+        tablesToIgnore = new ArrayList<>();
+        tablesToIgnore.add("languages_iso639");
+        tablesToIgnore.add("alignement_type");
+        tablesToIgnore.add("concept_group_type");
+        tablesToIgnore.add("users2");
+        tablesToIgnore.add("note_type");
+    }
+    
+    public boolean isToIgnore(String value) {
+        for (String colomne : columnOfTablesToIgnore) {
+            if(value.equalsIgnoreCase(colomne))
+                return true;
+        }
+        return false;
+    }
+    
+    public boolean isTableToIgnore(String value) {
+        for (String table : tablesToIgnore) {
+            if(value.equalsIgnoreCase(table))
+                return true;
+        }
+        return false;
+    }    
     
     public ArrayList <Table> getDatasOfTable(HikariDataSource ds, String tableName){
         ArrayList <Table> tableList = new ArrayList<>();
-        if(!"languages_iso639".equals(tableName))
+        if(!isTableToIgnore(tableName))
         {
-        ArrayList<TablesColumn> tablesColumns = new ArrayList<>();
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        try {
-            conn = ds.getConnection();
+            ArrayList<TablesColumn> tablesColumns = new ArrayList<>();
+            Connection conn;
+            Statement stmt;
+            ResultSet resultSet;
+            String colomneNameTemp;
             try {
-                stmt = conn.createStatement();
+                conn = ds.getConnection();
                 try {
-                    // récupération des noms des colonnes de la table
-                    String query ="SELECT COLUMN_NAME,"
-                            + " data_type FROM INFORMATION_SCHEMA.COLUMNS"
-                            + " where TABLE_NAME='" + tableName + "'";
-                    resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()) {
-                        TablesColumn tablesColumn = new TablesColumn();
-                        tablesColumn.setColumnName(resultSet.getString("COLUMN_NAME"));
-                        tablesColumn.setColumnType(resultSet.getString("data_type"));
-                        tablesColumns.add(tablesColumn);
-                    }
-                    // récupération des données de la table
-                    query = "SELECT * FROM " + tableName;  
-                    resultSet = stmt.executeQuery(query);
+                    stmt = conn.createStatement();
+                    try {
+                        // récupération des noms des colonnes de la table
+                        String query ="SELECT COLUMN_NAME,"
+                                + " data_type FROM INFORMATION_SCHEMA.COLUMNS"
+                                + " where TABLE_NAME='" + tableName + "'";
+                        resultSet = stmt.executeQuery(query);
+                        while(resultSet.next()) {
+                            colomneNameTemp = resultSet.getString("COLUMN_NAME");
+                            if(!isToIgnore(colomneNameTemp)) {
+                                TablesColumn tablesColumn = new TablesColumn();
+                                tablesColumn.setColumnName(colomneNameTemp);
+                                tablesColumn.setColumnType(resultSet.getString("data_type"));
+                                tablesColumns.add(tablesColumn);                            
+                            }
+                        }
+                        // récupération des données de la table
+                        query = "SELECT * FROM " + tableName;  
+                        resultSet = stmt.executeQuery(query);
 
-                    /*
-                        // type int
-                        if(resultSet.getString("data_type").equalsIgnoreCase("integer")) {
-                            tablesColumn.setColumnType(""+resultSet.getInt("data_type"));
+                        while(resultSet.next()) {
+                            Table table = new Table();
+                            ArrayList<LineOfData> lineOfDatas = new ArrayList<>();
+                            for (TablesColumn tablesColumn : tablesColumns) {
+                                LineOfData lineOfData = new LineOfData();
+                                lineOfData.setColomne(tablesColumn.getColumnName());
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("integer")) {
+                                    lineOfData.setValue("" + resultSet.getInt(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("character varying")) {
+                                    lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("character")) {
+                                    lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("text")) {
+                                    lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp with time zone")) {
+                                    lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp without time zone")) {
+                                    lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
+                                }
+                                if(tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {
+                                    lineOfData.setValue("" + resultSet.getBoolean(tablesColumn.getColumnName()));
+                                }  
+                                 if(tablesColumn.getColumnType().equalsIgnoreCase("USER-DEFINED")) {
+                                    lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
+                                 }
+                                lineOfDatas.add(lineOfData);
+                            }
+
+                            table.setLineOfDatas(lineOfDatas);
+                            tableList.add(table);
                         }
-                        // type String
-                        if(resultSet.getString("data_type").equalsIgnoreCase("character varying")) {
-                            
-                        }
-                        // type String
-                        if(resultSet.getString("data_type").equalsIgnoreCase("text")) {
-                            
-                        }
-                        // type Date --> String
-                        if(resultSet.getString("data_type").equalsIgnoreCase("timestamp with time zone")) {
-                            
-                        }   
-                        // type Boolean
-                        if(resultSet.getString("data_type").equalsIgnoreCase("boolean")) {
-                            
-                        } 
-                    */
-                    
-                    while(resultSet.next()) {
-                        Table table = new Table();
-                        ArrayList<LineOfData> lineOfDatas = new ArrayList<>();
-                        for (TablesColumn tablesColumn : tablesColumns) {
-                            LineOfData lineOfData = new LineOfData();
-                            lineOfData.setColomne(tablesColumn.getColumnName());
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("integer")) {
-                                lineOfData.setValue("" + resultSet.getInt(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("character varying")) {
-                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("character")) {
-                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("text")) {
-                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp with time zone")) {
-                                lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp without time zone")) {
-                                lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
-                            }
-                            if(tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {
-                                lineOfData.setValue("" + resultSet.getBoolean(tablesColumn.getColumnName()));
-                            }  
-                             if(tablesColumn.getColumnType().equalsIgnoreCase("USER-DEFINED")) {
-                                lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
-                             }
-                            lineOfDatas.add(lineOfData);
-                        }
-                         
-                        table.setLineOfDatas(lineOfDatas);
-                        tableList.add(table);
                     }
-                }
+                    finally {
+                        stmt.close();
+                    }
+                } 
                 finally {
-                    stmt.close();
+                    conn.close();
                 }
             } 
-            finally {
-                conn.close();
+            catch (SQLException ex) {
+                Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
             }
-        } 
-        catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
-        }
         
         }
         return tableList;
@@ -251,6 +265,33 @@ public class ExportPrivatesDatas {
         return tablesprivate ;
     }
     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    /**
+     * fonctions pour récupérer toutes données par table
+     * pour une utilisation future
+     */
+        
+        
+        
+        
+        
         
    
     
@@ -612,7 +653,7 @@ public class ExportPrivatesDatas {
                     while(resultSet.next()){
                         Preferences preferences1 = new Preferences();
                         
-                        preferences1.setId_pref(resultSet.getInt("id_pref"));
+                        preferences1.setId_pref(resultSet.getInt("id"));
                         preferences1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         preferences1.setSource_Lang(resultSet.getString("source_lang"));
                         preferences1.setNb_alert_cdt(resultSet.getInt("nb_alert_cdt"));
@@ -693,7 +734,7 @@ public class ExportPrivatesDatas {
                     {
                         Concept_Group_Label_Historique conceptGLH1 = new Concept_Group_Label_Historique();
                         
-                        conceptGLH1.setIdgrouplabel(resultSet.getInt("idgrouplabel"));
+                        conceptGLH1.setIdgrouplabel(resultSet.getInt("id"));
                         conceptGLH1.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         conceptGLH1.setModified(resultSet.getDate("modified"));
                         conceptGLH1.setLang(resultSet.getString("lang"));
@@ -861,7 +902,7 @@ public class ExportPrivatesDatas {
                     {
                         Note_Historique noteHistorique1 = new Note_Historique();
                         
-                        noteHistorique1.setId_note(resultSet.getInt("id_note"));
+                        noteHistorique1.setId_note(resultSet.getInt("id"));
                         noteHistorique1.setNotetypecode(resultSet.getString("notetypecode"));
                         noteHistorique1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         noteHistorique1.setId_term(resultSet.getString("id_term"));

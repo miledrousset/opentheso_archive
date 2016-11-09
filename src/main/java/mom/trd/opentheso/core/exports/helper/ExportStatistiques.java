@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import mom.trd.opentheso.SelectedBeans.BaseDeDonnesBean;
 import mom.trd.opentheso.SelectedBeans.LanguageBean;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
@@ -25,18 +26,20 @@ import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
  *
  * @author antonio.perez
  */
-@ManagedBean(name = "ETT", eager = true)
-@SessionScoped
-public class ExportStatistiques {
 
-    @ManagedProperty(value = "#{langueBean}")
-    private LanguageBean langueBean;
+public class ExportStatistiques {
 
     private String document; //String ou a tout l'information
     private String id_theso = "";
     public String lange = "";
     ArrayList<Integer> concept_orphan = new ArrayList<>();// combien orphan il y a dans chac domaine
     ArrayList<String> quisontorphan = new ArrayList<>();//les concept qui sont orphan
+    public String tete="";
+    public String totalconcept=""; 
+    public String nondescr =""; 
+    public String termesNonTra ="";
+    public String notes = "";
+    public String ConceptOrphan = "";
 
     /**
      * cette funtion permet de recuperer tout les fils d'un thesaurus on besoin
@@ -50,7 +53,7 @@ public class ExportStatistiques {
      * @throws SQLException
      */
     public void recuperatefils(HikariDataSource ds, String idtheso, String lg, int option) throws SQLException {
-
+        
         id_theso = idtheso;
         lange = lg;
         //Declarations de variables contents
@@ -78,7 +81,7 @@ public class ExportStatistiques {
                 stmt2 = conn2.createStatement();
                 try {
                     //ici on recupere les domaines 
-                    String query = "SELECT distinct idgroup, lexicalvalue, lang FROM concept_group_label where idthesaurus ='" + id_theso 
+                    String query = "SELECT distinct idgroup, lexicalvalue, lang FROM concept_group_label where idthesaurus ='" + id_theso
                             + "'";
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
@@ -311,18 +314,22 @@ public class ExportStatistiques {
                 try {
                     for (int i = domaines; i < candidats.size(); i++) {
                         int pos;
-                        String query1 = "select id_term from preferred_term where id_concept ='" + candidats.get(i) + "'";
+                        String query1 = "select id_term from preferred_term where id_concept ='" + candidats.get(i)
+                                + "' and id_thesaurus='" + id_theso + "'";
                         resultset1 = stmt.executeQuery(query1);
                         if (resultset1.next()) {
                             candidattoterm.add(resultset1.getString(1));
                         }
 
                         //pour chac id on prendre son lexical value dan la lang que nous sommes
-                        String query = "select id_term, lexical_value from term where id_term ='" + candidattoterm.get(i) + "' and lang ='" + lang + "'";
+                        String query = "select id_term, lexical_value from term where id_term ='" + candidattoterm.get(i)
+                                + "' and lang ='" + lang + "'and id_thesaurus='" + id_theso + "'";
                         resultset = stmt.executeQuery(query);
                         if (resultset.next()) {
+                            String Idconcetpagarder = "";
+                            Idconcetpagarder = candidats.get(i);
                             candidats.remove(i);//efface le id 
-                            complet += resultset.getString(2) + " (" + resultset.getString(1) + ")";//on ecrit le lexical value et son id
+                            complet += resultset.getString(2) + " (" + Idconcetpagarder + ")";//on ecrit le lexical value et son id
                             candidats.add(i, complet);
                             complet = "";
                         }
@@ -357,7 +364,7 @@ public class ExportStatistiques {
         int positionmultipli = 0;//combien de position on besoin avancé pour trouvée le bon term
         boolean dernier = false;
         int domaines2 = domaines;
-        document = "Thésaurus: " + id_theso + "  \t  " + lg + "    Nombre total de concept: " + (candidat.size() - map.size()) + "\r\n";
+        document = tete + id_theso + "  \t  " + lg + " \t "+ totalconcept + (candidat.size() - map.size()) + "\r\n";
         //document += langueBean.getMsg("stat.statCpt4")+"\n\n";//ne marche pas et je sais pas pourquoi
         for (int cont = 0; cont < domaines2; cont++) {
             document += candidat.get(cont) + "   " + cantite.get(quelledomaine) + " + " + concept_orphan.get(quelledomaine) + " Orphan \r\n";//combiens term pour chac domaine
@@ -435,10 +442,10 @@ public class ExportStatistiques {
         int cont;
         changenames(ds, quisontorphan, lange, combien);
         for (int h = 0; h < domaines; h++) {
-            this.document += "\r\n\r\n" + listnonT.get(h) + "  Non descripteurs: " + ouviens.get(ousont);
-            this.document += "\r\n\t  Termes non traduits: " + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
-            this.document += "\r\n\t  Notes(définitions): ";//donne error le getMsg
-            this.document += "\r\n\t  Concept Orphan: ";
+            this.document += "\r\n\r\n" + listnonT.get(h) + "  "+nondescr + ouviens.get(ousont);
+            this.document += "\r\n\t  "+termesNonTra + noTraduit.get(ousont);//manque faire le languageBean.getMsg 
+            this.document += "\r\n\t  "+notes ;//donne error le getMsg
+            this.document += "\r\n\t  "+ConceptOrphan ;
             for (cont = conttateur; cont < concept_orphan.get(ousont) + conttateur; cont++) {
                 this.document += quisontorphan.get(cont) + ", ";
             }
@@ -447,42 +454,47 @@ public class ExportStatistiques {
         }
         return this.document;
     }
-/**
- * Cette funtion cherche le/les notes d'un term (ids), que il est dans le thesaurus id_theso
- * @param ds
- * @param ids
- * @param id_theso
- * @return
- * @throws SQLException 
- */
+
+    /**
+     * Cette funtion cherche le/les notes d'un term (ids), que il est dans le
+     * thesaurus id_theso
+     *
+     * @param ds
+     * @param ids
+     * @param id_theso
+     * @return
+     * @throws SQLException
+     */
     private ArrayList<String> ajouterNotes(HikariDataSource ds, String ids, String id_theso) throws SQLException {
         ArrayList<String> notes = new ArrayList<>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet resultset;
-        String id_term = "";// pour garder la transformation de id_concept a id_term
+        String id_concept = "";// pour garder la transformation de id_concept a id_term
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {//traduction de id_concept a id_term
-                    String query = "select id_term from preferred_term where id_concept='" + ids
+                    String query = "select id_concept from preferred_term where id_term='" + ids
                             + "' and id_thesaurus= '" + id_theso + "'";
                     resultset = stmt.executeQuery(query);
                     if (resultset.next()) {
-                        id_term = resultset.getString("id_term");
+                        id_concept = resultset.getString("id_concept");
                     }// chercher toutes le notes de une terme
-                    query = "Select notetypecode, lexicalvalue, lang from note "
-                            + " where id_concept ='" + ids + "' OR id_term='" + id_term
-                            + "' and id_thesaurus= '" + id_theso + "'";
-                    resultset = stmt.executeQuery(query);
-                    while (resultset.next()) {
+                    if (id_concept != null) {
+                        query = "Select notetypecode, lexicalvalue, lang from note "
+                                + " where (id_term ='" + ids + "' OR id_concept='" + id_concept
+                                + "') and id_thesaurus= '" + id_theso + "'";
+                        resultset = stmt.executeQuery(query);
+                        while (resultset.next()) {
                             //on garde le/ les notes dans un Array notes
-                        String note = resultset.getString("notetypecode");
-                        note+="("+resultset.getString("lang")+")";
-                        note += "-> " + resultset.getString("lexicalvalue") + ",";
-                        notes.add(note);
+                            String note = resultset.getString("notetypecode");
+                            note += "(" + resultset.getString("lang") + ")";
+                            note += "-> " + resultset.getString("lexicalvalue") + ",";
+                            notes.add(note);
 
+                        }
                     }
                 } finally {
                     stmt.close();
@@ -565,5 +577,54 @@ public class ExportStatistiques {
     public void setLange(String lange) {
         this.lange = lange;
     }
+
+    public String getTete() {
+        return tete;
+    }
+
+    public void setTete(String tete) {
+        this.tete = tete;
+    }
+
+    public String getTotalconcept() {
+        return totalconcept;
+    }
+
+    public void setTotalconcept(String totalconcept) {
+        this.totalconcept = totalconcept;
+    }
+
+    public String getNondescr() {
+        return nondescr;
+    }
+
+    public void setNondescr(String nondescr) {
+        this.nondescr = nondescr;
+    }
+
+    public String getTermesNonTra() {
+        return termesNonTra;
+    }
+
+    public void setTermesNonTra(String termesNonTra) {
+        this.termesNonTra = termesNonTra;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getConceptOrphan() {
+        return ConceptOrphan;
+    }
+
+    public void setConceptOrphan(String ConceptOrphan) {
+        this.ConceptOrphan = ConceptOrphan;
+    }
+    
 
 }

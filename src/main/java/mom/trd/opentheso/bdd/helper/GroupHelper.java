@@ -145,8 +145,7 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from concept_group where idthesaurus = '"
-                            + nodeConceptGroup.getConceptGroup().getIdthesaurus() + "'";
+                    String query = "select max(id) from concept_group";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
@@ -682,7 +681,7 @@ public class GroupHelper {
                 try {
 
                     String query = "select lexicalvalue, modified, idgroup, username from concept_group_label_historique, users "
-                            + "where idgrouplabel = '" + idGroup + "'"
+                            + "where id = '" + idGroup + "'"
                             + " and lang = '" + lang + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
                             + " and concept_group_label_historique.id_user=users.id_user"
@@ -742,7 +741,7 @@ public class GroupHelper {
                 try {
 
                     String query = "select lexicalvalue, modified, idgroup, username from concept_group_label_historique, users "
-                            + "where idgrouplabel = '" + idGroup + "'"
+                            + "where id = '" + idGroup + "'"
                             + " and lang = '" + lang + "'"
                             + " and idthesaurus = '" + idThesaurus + "'"
                             + " and concept_group_label_historique.id_user=users.id_user"

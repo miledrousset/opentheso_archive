@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,13 +26,13 @@ import mom.trd.opentheso.bdd.tools.MD5Password;
 @SessionScoped
 
 public class CurrentUser implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     private String name = null;
     private String pwd = null;
     private NodeUser user;
     private boolean isLogged = false;
-    
+
     private int idEdit;
     private String nameEdit;
     private String mailEdit;
@@ -44,26 +45,25 @@ public class CurrentUser implements Serializable {
     private boolean alertCdtEdit = false;
     private String idTheso;
     private List<String> authorizedTheso;
-    
+
     private List<String> selectedThesaurus;
-    
+
     private boolean isHaveWriteToCurrentThesaurus = false;
     private boolean isHaveWriteToCurrentThesaurus2 = false;
-    
+
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
-    
+
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
-    
+
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-   
-    
+
     @PostConstruct
     public void initUser() {
         user = new NodeUser();
-    /*    if (connect.getPoolConnexion() != null) {
+        /*    if (connect.getPoolConnexion() != null) {
             NodePreference np = new UserHelper().getPreferenceUser(connect.getPoolConnexion());
             langSourceEdit = np.getSourceLang();
             alertNbCdtEdit = np.getNbAlertCdt();
@@ -71,88 +71,88 @@ public class CurrentUser implements Serializable {
             
         }*/
     }
-    
+
     /**
-     * cette fonction permet de retourner les préférences d'un thésaurus, 
-     * s'il y en a pas, on les initialises par les valeurs par defaut
+     * cette fonction permet de retourner les préférences d'un thésaurus, s'il y
+     * en a pas, on les initialises par les valeurs par defaut
+     *
      * @param idThesaurus
-     * @param workLanguage 
-     * @return  
+     * @param workLanguage
+     * @return
      */
     public NodePreference getThesaurusPreferences(String idThesaurus, String workLanguage) {
         UserHelper userHelper = new UserHelper();
         if (connect.getPoolConnexion() != null) {
             NodePreference np = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
-            
-            if(np == null){ // cas où il n'y a pas de préférence pour ce thésaurus, il faut les créer 
+
+            if (np == null) { // cas où il n'y a pas de préférence pour ce thésaurus, il faut les créer 
                 userHelper.initPreferences(connect.getPoolConnexion(),
                         idThesaurus, workLanguage, alertNbCdtEdit, alertCdtEdit);
                 np = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
-            } 
-            else {
+            } else {
                 langSourceEdit = np.getSourceLang();
                 alertNbCdtEdit = np.getNbAlertCdt();
                 alertCdtEdit = np.isAlertCdt();
-                idTheso = idThesaurus;                
+                idTheso = idThesaurus;
             }
             return np;
         }
         return null;
     }
-    
+
     /**
      * Connect l'utilisateur si le compte existe
+     *
      * @return le lien de l'index si le compte existe, un message d'erreur sinon
-     * init c'est une parametre que viens du "isUserExist" ou return une 1
-     * si on fait le login normal (usuaire, pass), une 2 si on fait le login avec
-     * le motpasstemp (et nous sommes dirigées a la page web de changer le motpasstemp)
+     * init c'est une parametre que viens du "isUserExist" ou return une 1 si on
+     * fait le login normal (usuaire, pass), une 2 si on fait le login avec le
+     * motpasstemp (et nous sommes dirigées a la page web de changer le
+     * motpasstemp)
      */
     public String action() throws SQLException {
         UserHelper userHelper = new UserHelper();
-        if(userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
+        if (userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
             // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
-            if(userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
+            if (userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
                 user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
-                if(user == null) {
+                if (user == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
                     return "";
                 }
                 user.setIdThesaurus(idTheso);
                 authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
-            }
-            // on récupère ses droits par rapport au thésaurus en cours
-            else { 
+            } // on récupère ses droits par rapport au thésaurus en cours
+            else {
                 NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
-                if(nodeUserTemp == null) {
+                if (nodeUserTemp == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
                     nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
-                    if(nodeUserTemp == null) {
+                    if (nodeUserTemp == null) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
                         return "";
                     }
-                }
-                else {
+                } else {
                     user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
                 }
                 authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
             }
-           
-            isLogged = true; 
 
-            if (userHelper.isChangeToPass(connect.getPoolConnexion(), name))
-            {
+            isLogged = true;
+
+            if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
                 return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp 
             }
             name = null;
             pwd = null;
-            return "index.xhtml?faces-redirect=true";        
+            return "index.xhtml?faces-redirect=true";
         }
         return "";
     }
-    
+
     /**
      * permet de retourner tous les utilisateurs d'un thésaurus
-     * @return 
+     *
+     * @return
      */
     private ArrayList<NodeUser> selectAllUserOfThesaurus() {
         ArrayList<NodeUser> listeUser = new UserHelper().getAllUsersOfThesaurus(connect.getPoolConnexion(), idTheso);
@@ -161,56 +161,69 @@ public class CurrentUser implements Serializable {
 
     /**
      * Permet de retourner les les utilisateurs sans exception
-     * @return 
+     *
+     * @return
      */
     private ArrayList<NodeUser> selectAllUsers() {
         ArrayList<NodeUser> listeUser = new UserHelper().getAllUsers(connect.getPoolConnexion());
         return listeUser;
     }
-    
+
     /**
      * retoure la liste des utilisateurs suivant leurs droits
-     * @return 
+     *
+     * @return
      */
     public ArrayList<NodeUser> selectAuthorizedUser() {
         UserHelper userHelper = new UserHelper();
         int idRoleFrom = 1;
-        
-        if(user.getIdRole() == 1) {// l'utilisateur est superAdmin
+
+        if (user.getIdRole() == 1) {// l'utilisateur est superAdmin
             return selectAllUsers();
-            
-        } 
-            
-        if(user.getIdRole() == 2) idRoleFrom = 2; // l'utilisateur est admin
-        if(user.getIdRole() > 2) idRoleFrom = 3; // l'utilisateur est autre        
+
+        }
+
+        if (user.getIdRole() == 2) {
+            idRoleFrom = 2; // l'utilisateur est admin
+        }
+        if (user.getIdRole() > 2) {
+            idRoleFrom = 3; // l'utilisateur est autre        
+        }
         ArrayList<NodeUser> listeUser = userHelper.getAuthorizedUsers(connect.getPoolConnexion(), idTheso, idRoleFrom);
         return listeUser;
-    }    
-    
-    public ArrayList<Entry<String,String>> selectAllRoles() {
+    }
+
+    public ArrayList<Entry<String, String>> selectAllRoles() {
         return new UserHelper().getRoles(connect.getPoolConnexion());
     }
-    
+
     /**
-     * Cette fonction permet de retourner la liste des roles autorisés
-     * pour un Role donné (c'est la liste qu'un utilisateur a le droit d'attribué à un nouvel utilisateur)
-     * @return 
+     * Cette fonction permet de retourner la liste des roles autorisés pour un
+     * Role donné (c'est la liste qu'un utilisateur a le droit d'attribué à un
+     * nouvel utilisateur)
+     *
+     * @return
      */
-    public ArrayList<Entry<String,String>> selectAuthorizedRoles() {
+    public ArrayList<Entry<String, String>> selectAuthorizedRoles() {
         int idRoleFrom = 3;
-        if(user.getIdRole() == 1) idRoleFrom = 1; // l'utilisateur est superAdmin
-        if(user.getIdRole() == 2) idRoleFrom = 2; // l'utilisateur est admin
-        if(user.getIdRole() > 2) idRoleFrom = 3; // l'utilisateur est autre
-       
+        if (user.getIdRole() == 1) {
+            idRoleFrom = 1; // l'utilisateur est superAdmin
+        }
+        if (user.getIdRole() == 2) {
+            idRoleFrom = 2; // l'utilisateur est admin
+        }
+        if (user.getIdRole() > 2) {
+            idRoleFrom = 3; // l'utilisateur est autre
+        }
         return new UserHelper().getAuthorizedRoles(connect.getPoolConnexion(), idRoleFrom);
-    }    
-    
-    public void changePwd() {        
-        if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || pwdEdit3 == null || pwdEdit3.equals("")) {
+    }
+
+    public void changePwd() {
+        if (pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || pwdEdit3 == null || pwdEdit3.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         } else if (!pwdEdit2.equals(pwdEdit3)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
-        } else if(new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdEdit1))) {
+        } else if (!new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdEdit1))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error4")));
         } else {
             new UserHelper().updatePwd(connect.getPoolConnexion(), user.getId(), MD5Password.getEncodedPassword(pwdEdit2));
@@ -220,13 +233,13 @@ public class CurrentUser implements Serializable {
         pwdEdit2 = "";
         pwdEdit3 = "";
     }
-    
+
     public void changeMail() {
-        if(mailEdit == null || mailEdit.equals("")) {
+        if (mailEdit == null || mailEdit.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
-        }else if(!mailEdit.contains("@") || mailEdit.lastIndexOf(".") < mailEdit.indexOf("@")) {
+        } else if (!mailEdit.contains("@") || mailEdit.lastIndexOf(".") < mailEdit.indexOf("@")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error7")));
-        } else if(new UserHelper().isUserMailExist(connect.getPoolConnexion(), mailEdit)) {
+        } else if (new UserHelper().isUserMailExist(connect.getPoolConnexion(), mailEdit)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error8")));
         } else {
             new UserHelper().updateMail(connect.getPoolConnexion(), user.getId(), mailEdit);
@@ -240,102 +253,101 @@ public class CurrentUser implements Serializable {
         new UserHelper().deleteUser(connect.getPoolConnexion(), idUser);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info2")));
     }
-    
-    public void addUser() {
-        if(pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || nameEdit == null || nameEdit.equals("")|| mailEdit.equals("")|| mailEdit==null) {
+
+    public void addUser() throws SQLException {
+        if (pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || nameEdit == null || nameEdit.equals("") || mailEdit.equals("") || mailEdit == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         } else if (!pwdEdit1.equals(pwdEdit2)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
         } else if (new UserHelper().isUserLoginExist(connect.getPoolConnexion(), nameEdit)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
         } else {
+            UserHelper userHelper = new UserHelper();
             Connection conn;
-            try {
-                UserHelper userHelper = new UserHelper();
-                conn = connect.getPoolConnexion().getConnection();
-                conn.setAutoCommit(false);
+            conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
 
-                
-                // si l'utilisateur est un superAdmin, il peut créer un superAdmin                
-                
-                
-                // Cas de création de SuperAdmin
-                if(user.getIdRole() == 1) {
-                    // ajout de l'utilisateur
-                    if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
+            if (userHelper.isUserMailExist(conn, mailEdit)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.info7")));
+            } else {
+                try {
+                    // si l'utilisateur est un superAdmin, il peut créer un superAdmin                
+                    // Cas de création de SuperAdmin
+                    if (user.getIdRole() == 1) {
+                        // ajout de l'utilisateur
+                        if (!userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+                        // récupération de l'Id du User
+                        int idUser = userHelper.getIdUser(conn, nameEdit);
+                        if (idUser == -1) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+
+                        // ajout du role 
+                        if (!userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+                        conn.commit();
                         conn.close();
-                        return;
-                    }
-                    // récupération de l'Id du User
-                    int idUser  = userHelper.getIdUser(conn, nameEdit);
-                    if(idUser == -1) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
-                        conn.close();
-                        return;
                     }
 
-                    // ajout du role 
-                    if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
+                    // Cas de création d'admin (par thésaurus)
+                    if (user.getIdRole() == 2) {
+                        // ajout de l'utilisateur
+                        if (!userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+                        // récupération de l'Id du User
+                        int idUser = userHelper.getIdUser(conn, nameEdit);
+                        if (idUser == -1) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+
+                        // ajout du role 
+                        if (!userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                            conn.rollback();
+                            conn.close();
+                            return;
+                        }
+                        conn.commit();
                         conn.close();
-                        return;                    
                     }
-                    conn.commit();
-                    conn.close();
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                // Cas de création d'admin (par thésaurus)
-                if(user.getIdRole() == 2) {
-                    // ajout de l'utilisateur
-                    if(! userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
-                        conn.close();
-                        return;
-                    }
-                    // récupération de l'Id du User
-                    int idUser  = userHelper.getIdUser(conn, nameEdit);
-                    if(idUser == -1) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
-                        conn.close();
-                        return;
-                    }
-
-                    // ajout du role 
-                    if(! userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                        conn.rollback();
-                        conn.close();
-                        return;                    
-                    }
-                    conn.commit();
-                    conn.close();
-                }                
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            
             mailEdit = "";
             pwdEdit1 = "";
             pwdEdit2 = "";
             nameEdit = "";
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info3")));
+            }
         }
     }
-    
+
     public void editUserRole() {
         UserHelper userHelper = new UserHelper();
         try {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-            if(!userHelper.updateRoleUser(conn, idEdit, roleEdit, selectedThesaurus)) {
+            if (!userHelper.updateRoleUser(conn, idEdit, roleEdit, selectedThesaurus)) {
                 conn.rollback();
                 conn.close();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
@@ -351,7 +363,7 @@ public class CurrentUser implements Serializable {
         vue.setEditUser(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info4")));
     }
-    
+
     public void selectUser(NodeUser nu) {
         nameEdit = nu.getName();
         idEdit = nu.getId();
@@ -360,7 +372,7 @@ public class CurrentUser implements Serializable {
         selectedThesaurus = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(),
                 idEdit);
     }
-    
+
     public void reInit() {
         pwdEdit1 = "";
         pwdEdit2 = "";
@@ -369,13 +381,13 @@ public class CurrentUser implements Serializable {
         vue.setEditUser(false);
         vue.setAddUser(false);
     }
-    
+
     public void editPrefUser() {
         NodePreference np = new NodePreference();
         np.setAlertCdt(alertCdtEdit);
         np.setSourceLang(langSourceEdit);
         np.setNbAlertCdt(alertNbCdtEdit);
-        if(!new UserHelper().updatePreferenceUser(connect.getPoolConnexion(), np, idTheso)){
+        if (!new UserHelper().updatePreferenceUser(connect.getPoolConnexion(), np, idTheso)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
             return;
         }
@@ -385,32 +397,33 @@ public class CurrentUser implements Serializable {
 //    public boolean isHaveWriteToCurrentThesaurus() {
 //        return authorizedTheso.contains(idTheso);
 //    }
-
     public boolean isIsHaveWriteToCurrentThesaurus() {
         return authorizedTheso.contains(idTheso);
     }
-    
-    
+
     public boolean haveRights(int min) {
-        if(user.getIdRole() < 1) return false;
+        if (user.getIdRole() < 1) {
+            return false;
+        }
         return user.getIdRole() <= min;
     }
-    
+
     /**
-     * vérification si l'utilisateur en cours a le droit d'effacer cet utilisateur
+     * vérification si l'utilisateur en cours a le droit d'effacer cet
+     * utilisateur
+     *
      * @param idUserToDelete
-     * @return 
+     * @return
      */
-  /*  public boolean haveRightsToDelete(int idUserToDelete) {
+    /*  public boolean haveRightsToDelete(int idUserToDelete) {
         if(user.getIdRole() < 1) return false;
         
         return user.getIdRole() <= idUserToDelete;
-    }*/   
-    
+    }*/
     public String afficheEncode() {
         return MD5Password.getEncodedPassword("demo");
     }
-    
+
     public String getName() {
         return name;
     }
@@ -564,13 +577,14 @@ public class CurrentUser implements Serializable {
     }
 
     public boolean isIsHaveWriteToCurrentThesaurus2() {
-        if(idTheso == null) return false;
+        if (idTheso == null) {
+            return false;
+        }
         return authorizedTheso.contains(idTheso);
     }
 
     public void setIsHaveWriteToCurrentThesaurus2(boolean isHaveWriteToCurrentThesaurus2) {
         this.isHaveWriteToCurrentThesaurus2 = isHaveWriteToCurrentThesaurus2;
     }
-    
-    
+
 }

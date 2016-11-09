@@ -52,7 +52,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.notetypecode,"
+                    String query = "SELECT note.id, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -66,7 +66,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_concept(idConcept);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLang(idLang);
                         nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         nodeNote.setModified(resultSet.getDate("modified"));
@@ -112,7 +112,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.notetypecode,"
+                    String query = "SELECT note.id, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified, note.lang FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -125,7 +125,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_concept(idConcept);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLang(resultSet.getString("lang"));
                         nodeNote.setLexicalvalue(
                             stringPlus.normalizeStringForXml(
@@ -174,7 +174,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.notetypecode,"
+                    String query = "SELECT note.id, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -188,7 +188,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_term(idTerm);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLang(idLang);
                         nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         nodeNote.setModified(resultSet.getDate("modified"));
@@ -234,7 +234,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.notetypecode,"
+                    String query = "SELECT note.id, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified, note.lang FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -247,7 +247,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_term(idTerm);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLang(resultSet.getString("lang"));
                         nodeNote.setLexicalvalue(
                             stringPlus.normalizeStringForXml(
@@ -504,7 +504,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_note, notetypecode, lexicalvalue, modified, username FROM note_historique, users"
+                    String query = "SELECT id, notetypecode, lexicalvalue, modified, username FROM note_historique, users"
                             + " WHERE id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
                             + " and (id_concept = '" + idConcept + "' OR id_term = '" + idTerm + "' )"
@@ -517,7 +517,7 @@ public class NoteHelper {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_concept(idConcept);
                         nodeNote.setId_term(idTerm);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLang(idLang);
                         nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         nodeNote.setModified(resultSet.getDate("modified"));
@@ -566,7 +566,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_note, notetypecode, lexicalvalue, modified, username FROM note_historique, users"
+                    String query = "SELECT id, notetypecode, lexicalvalue, modified, username FROM note_historique, users"
                             + " WHERE id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
                             + " and (id_concept = '" + idConcept + "' OR id_term = '" + idTerm + "' )"
@@ -584,7 +584,7 @@ public class NoteHelper {
                                     NodeNote nodeNote = new NodeNote();
                                     nodeNote.setId_concept(idConcept);
                                     nodeNote.setId_term(idTerm);
-                                    nodeNote.setId_note(resultSet.getInt("id_note"));
+                                    nodeNote.setId_note(resultSet.getInt("id"));
                                     nodeNote.setLang(idLang);
                                     nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                                     nodeNote.setModified(resultSet.getDate("modified"));
@@ -599,7 +599,7 @@ public class NoteHelper {
                             NodeNote nodeNote = new NodeNote();
                             nodeNote.setId_concept(idConcept);
                             nodeNote.setId_term(idTerm);
-                            nodeNote.setId_note(resultSet.getInt("id_note"));
+                            nodeNote.setId_note(resultSet.getInt("id"));
                             nodeNote.setLang(idLang);
                             nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                             nodeNote.setModified(resultSet.getDate("modified"));
@@ -801,7 +801,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_note from note"
+                    String query = "select id from note"
                             + " where id_concept = '" + idConcept + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
@@ -851,7 +851,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_note from note"
+                    String query = "select id from note"
                             + " where id_term = '" + idTerm + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
                             + " and lang ='" + idLang + "'"
@@ -1049,7 +1049,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.lang, note.notetypecode,"
+                    String query = "SELECT note.id, note.lang, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -1062,7 +1062,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_term(idTerm);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         nodeNote.setModified(resultSet.getDate("modified"));
                         nodeNote.setCreated(resultSet.getDate("created"));
@@ -1105,7 +1105,7 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT note.id_note, note.lang, note.notetypecode,"
+                    String query = "SELECT note.id, note.lang, note.notetypecode,"
                             + " note.lexicalvalue, note.created,"
                             + " note.modified FROM note, note_type"
                             + " WHERE note.notetypecode = note_type.code"
@@ -1118,7 +1118,7 @@ public class NoteHelper {
                     while (resultSet.next()) {
                         NodeNote nodeNote = new NodeNote();
                         nodeNote.setId_concept(idConcept);
-                        nodeNote.setId_note(resultSet.getInt("id_note"));
+                        nodeNote.setId_note(resultSet.getInt("id"));
                         nodeNote.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         nodeNote.setModified(resultSet.getDate("modified"));
                         nodeNote.setCreated(resultSet.getDate("created"));

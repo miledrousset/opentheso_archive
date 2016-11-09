@@ -258,8 +258,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from concept_candidat where"
-                            + " id_thesaurus = '" + idThesaurus + "'";
+                    String query = "select max(id) from concept_candidat";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
@@ -315,8 +314,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from concept_candidat where"
-                            + " id_thesaurus = '" + idThesaurus + "'";
+                    String query = "select max(id) from concept_candidat";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
@@ -431,8 +429,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from term_candidat where "
-                            + " id_thesaurus = '" + idThesaurus + "'";
+                    String query = "select max(id) from term_candidat";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();
@@ -494,8 +491,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select max(id) from term_candidat where "
-                            + " id_thesaurus = '" + idThesaurus + "'";
+                    String query = "select max(id) from term_candidat";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     resultSet.next();

@@ -45,7 +45,7 @@ public class TimerExportThesaurus implements Runnable {
 
         StringBuffer stringBuffer = exportFromBDD_Frantiq.exportThesaurus(ds, "1");
         
-        System.out.println(stringBuffer);
+        //System.out.println(stringBuffer);
     }
 
 }
