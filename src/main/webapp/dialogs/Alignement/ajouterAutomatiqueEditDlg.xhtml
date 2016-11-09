@@ -3,18 +3,16 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:p="http://primefaces.org/ui"
-    xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    xmlns:p="http://primefaces.org/ui">
 
 
-    <p:dialog id="idAjouterAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterAutomatiqueEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idAjouterAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="ajouterAutomatiqueEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
         <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
         <h:form>
             <h:panelGrid columns="2">
-                <p:outputLabel  for="alignementchoissi" value="Alignemenet:"/>
-                <p:selectOneRadio id="alignementchoissi"  value="#{selectedTerme.alignementchoissi}" layout="grid" columns="1">
+                <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
                     <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
                 </p:selectOneRadio>
                 

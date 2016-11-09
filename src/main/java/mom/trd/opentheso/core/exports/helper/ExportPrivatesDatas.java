@@ -64,6 +64,7 @@ public class ExportPrivatesDatas {
         tablesToIgnore.add("concept_group_type");
         tablesToIgnore.add("users2");
         tablesToIgnore.add("note_type");
+        tablesToIgnore.add("roles");
     }
     
     public boolean isToIgnore(String value) {

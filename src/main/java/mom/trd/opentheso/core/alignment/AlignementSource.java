@@ -13,7 +13,7 @@ public class AlignementSource {
     private String source;
     private String requete;
     private String typeRequete;
-    private String formatDonnes;
+    private String alignement_format;
 
     public AlignementSource() {
     }
@@ -42,13 +42,12 @@ public class AlignementSource {
         this.typeRequete = typeRequete;
     }
 
-    public String getFormatDonnes() {
-        return formatDonnes;
+    public String getAlignement_format() {
+        return alignement_format;
     }
 
-    public void setFormatDonnes(String formatDonnes) {
-        this.formatDonnes = formatDonnes;
+    public void setAlignement_format(String alignement_format) {
+        this.alignement_format = alignement_format;
     }
-    
-    
+  
 }

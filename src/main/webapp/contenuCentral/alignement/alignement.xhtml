@@ -14,11 +14,11 @@
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn1')}" update=":idAjouterManuelEditDlg" oncomplete="PF('ajouterManuelEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{selectedTerme.getALignementSource()}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('ajouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{selectedTerme.setAlignementSources()}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('ajouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>
-                </h:form>
+                </h:form>    
             </div>
         </div>
         <div class="contenuAlign">

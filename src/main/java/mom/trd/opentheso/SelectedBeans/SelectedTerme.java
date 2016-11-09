@@ -154,8 +154,8 @@ public class SelectedTerme implements Serializable {
     private boolean opentheso;
     private String linkOT;
     private String idOT;
-    private ArrayList<NodeAlignment> listAlignTemp;
-    private String alignementchoissi;
+    private ArrayList<NodeAlignment> listAlignValues;
+    private String selectedAlignement;
 
     private ArrayList<AlignementSource> alignementSources;
 
@@ -1293,18 +1293,27 @@ public class SelectedTerme implements Serializable {
     }
 
     public void creerAlignAuto() throws SQLException {
-        if(alignementchoissi == null) return;
-        AlignmentQuery aligquery= new AlignmentQuery();
-        listAlignTemp = new ArrayList<>();
-        ArrayList<NodeAlignment> nodealignement = new ArrayList<>();
+        if(selectedAlignement == null) return;
+        AlignmentQuery alignmentQuery = new AlignmentQuery();
+        
+        listAlignValues = new ArrayList<>();
+            
         for (AlignementSource alignementSource : alignementSources) {
-            if(alignementchoissi.equalsIgnoreCase(alignementSource.getSource())) {
+            // on se positionne sur la source sélectionnée 
+            if(selectedAlignement.equalsIgnoreCase(alignementSource.getSource())) {
+                // on trouve le type de filtre à appliquer
                 
                 // si type opentheso / skos
                 // action skos
-                if("skos".equals(alignementSource.getTypeRequete()))
+                if("skos".equals(alignementSource.getAlignement_format()))
                 {
           //          nodealignement= aligquery.queryOpentheso(idC, idTheso, valueEdit.trim(),idlangue,"http://pactols.frantiq.fr/opentheso/");
+                }
+                // action xml (wikipédia
+                if("xml".equals(alignementSource.getAlignement_format()))
+                {
+                    //ici il faut appeler le filtre de Wikipédia 
+                    listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
                 }
                 
                 //si type Json
@@ -1316,25 +1325,25 @@ public class SelectedTerme implements Serializable {
             }
         }
 /*
-        if ("DBPedia".equals(alignementchoissi)) {
-            listAlignTemp.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "DBP", idC, idTheso, nom, idlangue, null));
+        if ("DBPedia".equals(selectedAlignement)) {
+            listAlignValues.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "DBP", idC, idTheso, nom, idlangue, null));
             dbp = false;
         }
-        if ("bnf".equals(alignementchoissi)) {
-            listAlignTemp.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "bnf", idC, idTheso, nom, idlangue, null));
+        if ("bnf".equals(selectedAlignement)) {
+            listAlignValues.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "bnf", idC, idTheso, nom, idlangue, null));
             dbp = false;
         }  
         /*
         if (wiki) {
-            listAlignTemp.addAll(new AlignmentQuery().query("WIKI", idC, idTheso, nom, idlangue, null));
+            listAlignValues.addAll(new AlignmentQuery().query("WIKI", idC, idTheso, nom, idlangue, null));
             wiki = false;
         }
         if (agrovoc) {
-            listAlignTemp.addAll(new AlignmentQuery().query("AGROVOC", idC, idTheso, nom, idlangue, null));
+            listAlignValues.addAll(new AlignmentQuery().query("AGROVOC", idC, idTheso, nom, idlangue, null));
             agrovoc = false;
         }
         if (gemet) {
-            listAlignTemp.addAll(new AlignmentQuery().query("GEMET", idC, idTheso, nom, idlangue, null));
+            listAlignValues.addAll(new AlignmentQuery().query("GEMET", idC, idTheso, nom, idlangue, null));
             gemet = false;
         }*/
    /*     if (opentheso) {
@@ -1353,7 +1362,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public void ajouterAlignAuto() {
-        for (NodeAlignment na : listAlignTemp) {
+        for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
                 new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(), idC, idTheso);
             }
@@ -1362,7 +1371,7 @@ public class SelectedTerme implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
         vue.setAddAlign(0);
     }
-
+    
     /**
      * *************************************** EDITION
      * ****************************************
@@ -2218,11 +2227,7 @@ public class SelectedTerme implements Serializable {
         return status1;
     }
     
-    public ArrayList<AlignementSource> getALignementSource(){
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-        alignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(),idTheso);
-        return alignementSources;
-    }
+
 
     /**
      * *
@@ -2811,12 +2816,12 @@ public class SelectedTerme implements Serializable {
         this.idOT = idOT;
     }
 
-    public ArrayList<NodeAlignment> getListAlignTemp() {
-        return listAlignTemp;
+    public ArrayList<NodeAlignment> getListAlignValues() {
+        return listAlignValues;
     }
 
-    public void setListAlignTemp(ArrayList<NodeAlignment> listAlignTemp) {
-        this.listAlignTemp = listAlignTemp;
+    public void setListAlignValues(ArrayList<NodeAlignment> listAlignValues) {
+        this.listAlignValues = listAlignValues;
     }
 
     public int getContributor() {
@@ -2920,16 +2925,25 @@ public class SelectedTerme implements Serializable {
         return alignementSources;
     }
 
-    public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
+ /*   public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
         this.alignementSources = alignementSources;
     }
+   */ 
+    
+    public void setAlignementSources(){
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        alignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(),idTheso);
+    //    return alignementSources;
+    }    
 
-    public String getAlignementchoissi() {
-        return alignementchoissi;
+    public String getSelectedAlignement() {
+        return selectedAlignement;
     }
 
-    public void setAlignementchoissi(String alignementchoissi) {
-        this.alignementchoissi = alignementchoissi;
+    public void setSelectedAlignement(String selectedAlignement) {
+        this.selectedAlignement = selectedAlignement;
     }
+
+
    
 }
