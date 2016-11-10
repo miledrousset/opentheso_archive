@@ -381,7 +381,7 @@ public class AlignmentHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select source, requete,type_rqt,format_donnees from alignement_source where id_thesaurus='"+ id_theso+"'";
+                    String query = "select source, requete,type_rqt,alignement_format from alignement_source where id_thesaurus='"+ id_theso+"'";
                     resultSet=stmt.executeQuery(query);
                     while(resultSet.next())
                     {
@@ -389,7 +389,7 @@ public class AlignmentHelper {
                         alignementSource.setSource(resultSet.getString("source"));
                         alignementSource.setRequete(resultSet.getString("requete"));
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
-                        alignementSource.setFormatDonnes(resultSet.getString("format_donnees"));
+                        alignementSource.setAlignement_format(resultSet.getString("alignement_format"));
                         alignementSources.add(alignementSource);
                     }
                     resultSet.close();

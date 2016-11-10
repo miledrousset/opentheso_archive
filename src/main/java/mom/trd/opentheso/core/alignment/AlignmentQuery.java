@@ -45,42 +45,42 @@ public class AlignmentQuery {
 
     private ArrayList<NodeAlignment> listeAlign;
 
-    /**
-     * Cette fonction permet de récupérer les alignements présents sur une
-     * source de données pour un concept passé en paramètre
-     *
-     * @param dest
-     * @param idC
-     * @param idTheso
-     * @param lexicalValue
-     * @param lang
-     * @param idThesoTarget
-     * @return
-     */
-    public ArrayList<NodeAlignment> query(HikariDataSource ds,String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws SQLException, ClassNotFoundException {
-        listeAlign = new ArrayList<>();
-        switch (dest) {
-            case "DBP":
-                listeAlign = queryDBPedia(ds, idC, idTheso, lexicalValue, lang);
-                break;
-            case "bnf":
-                listeAlign = querybnf(ds, idC, idTheso, lexicalValue, lang);
-                break;
-            case "WIKI":
-                listeAlign = queryWikipedia(idC, idTheso, lexicalValue, lang);
-                break;
-            case "AGROVOC":
-                listeAlign = queryAgrovoc(idC, idTheso, lexicalValue, lang);
-                break;
-            case "GEMET":
-                listeAlign = queryGemet(idC, idTheso, lexicalValue, lang);
-                break;
-            case "OPENT":
-                listeAlign = queryOpentheso(idC, idTheso, lexicalValue, lang, idThesoTarget);
-                break;
-        }
-        return listeAlign;
-    }
+//    /**
+//     * Cette fonction permet de récupérer les alignements présents sur une
+//     * source de données pour un concept passé en paramètre
+//     *
+//     * @param dest
+//     * @param idC
+//     * @param idTheso
+//     * @param lexicalValue
+//     * @param lang
+//     * @param idThesoTarget
+//     * @return
+//     */
+//    public ArrayList<NodeAlignment> query(HikariDataSource ds,String dest, String idC, String idTheso, String lexicalValue, String lang, String idThesoTarget) throws SQLException, ClassNotFoundException {
+//        listeAlign = new ArrayList<>();
+//        switch (dest) {
+//            case "DBP":
+//                listeAlign = queryDBPedia(ds, idC, idTheso, lexicalValue, lang);
+//                break;
+//            case "bnf":
+//                listeAlign = querybnf(ds, idC, idTheso, lexicalValue, lang);
+//                break;
+//            case "WIKI":
+//                listeAlign = queryWikipedia(idC, idTheso, lexicalValue, lang);
+//                break;
+//            case "AGROVOC":
+//                listeAlign = queryAgrovoc(idC, idTheso, lexicalValue, lang);
+//                break;
+//            case "GEMET":
+//                listeAlign = queryGemet(idC, idTheso, lexicalValue, lang);
+//                break;
+//            case "OPENT":
+//                listeAlign = queryOpentheso(idC, idTheso, lexicalValue, lang, idThesoTarget);
+//                break;
+//        }
+//        return listeAlign;
+//    }
 
     /**
      * Cette fonction permet de récupérer les alignements présents sur Wikipedia
@@ -90,13 +90,21 @@ public class AlignmentQuery {
      * @param idTheso
      * @param lexicalValue
      * @param lang
+     * @param requete
      * @return
      */
-    private ArrayList<NodeAlignment> queryWikipedia(String idC, String idTheso, String lexicalValue, String lang) {
+    public ArrayList<NodeAlignment> queryWikipedia(String idC, String idTheso,
+            String lexicalValue, String lang,
+            String requete) {
         listeAlign = new ArrayList<>();
+        
+        lexicalValue = lexicalValue.replaceAll(" ", "%20");
+        requete = requete.replace("$$lang$$", lang);
+        requete = requete.replace("$$value$$", lexicalValue);
         try {
-            lexicalValue = lexicalValue.replaceAll(" ", "%20");
-            URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue + "&srnamespace=0");
+            //URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue + "&srnamespace=0");
+            
+            URL url = new URL(requete);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/xml");

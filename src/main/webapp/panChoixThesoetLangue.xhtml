@@ -29,7 +29,7 @@
                             <!-- CHOIX LANGUE DEBUT -->  
                             <td id="divLangue">
                                 <h:panelGroup id="liste2">
-                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: right;">
+                                    <h:form rendered="#{theso.thesaurus.id_thesaurus != null}" style="float: left;">
                                         <h:selectOneMenu value="#{theso.thesaurus.language}" styleClass="listes">
                                             <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}" 
                                                            itemValue="#{t.id_iso639_1}"  />
@@ -43,7 +43,7 @@
                             </td>
                             <td id="thesos">
                                 <table>
-                                    <h:form rendered="#{(user1.user.name != null)}" style="float: right;">
+                                    <h:form rendered="#{(user1.user.name != null)}" >
                                         <td>
                                             <h:outputText value="#{langueBean.getMsg('theso.my')}" /><br/>
                                             <p:selectBooleanCheckbox value="#{theso.tousThesos}" >
