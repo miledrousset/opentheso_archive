@@ -86,6 +86,7 @@ public class Vue implements Serializable {
     private boolean statPermuted =false;
     private boolean DBinfoBD = true;
     
+    
     public Vue() {
     }
 

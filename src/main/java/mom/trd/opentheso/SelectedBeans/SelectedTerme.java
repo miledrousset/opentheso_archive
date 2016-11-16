@@ -74,6 +74,7 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -158,7 +159,7 @@ public class SelectedTerme implements Serializable {
     private String selectedAlignement;
 
     private ArrayList<AlignementSource> alignementSources;
-
+    public AlignementSource alignementSource;
     private NodeSearch nodeSe;
     private NodePermute nodePe;
 
@@ -2944,6 +2945,12 @@ public class SelectedTerme implements Serializable {
         this.selectedAlignement = selectedAlignement;
     }
 
+    public AlignementSource getAlignementSource() {
+        return alignementSource;
+    }
 
+    public void setAlignementSource(AlignementSource alignementSource) {
+        this.alignementSource = alignementSource;
+    }
    
 }

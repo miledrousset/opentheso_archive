@@ -117,6 +117,7 @@ public class SelectedThesaurus implements Serializable {
     private boolean mesCandidats = false;
     private boolean tousThesos = false;
 
+    //Alignement
     
 
     
