@@ -87,6 +87,7 @@ import org.primefaces.model.TreeNode;
 public class SelectedTerme implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     private String nom;
     private ArrayList<Entry<String, String>> termeGenerique = new ArrayList<>();
     private ArrayList<Entry<String, String>> termesSpecifique = new ArrayList<>();
@@ -1293,7 +1294,7 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    public void creerAlignAuto() throws SQLException {
+    public void creerAlignAuto() {
         if(selectedAlignement == null) return;
         AlignmentQuery alignmentQuery = new AlignmentQuery();
         
@@ -1304,25 +1305,42 @@ public class SelectedTerme implements Serializable {
             if(selectedAlignement.equalsIgnoreCase(alignementSource.getSource())) {
                 // on trouve le type de filtre à appliquer
                 
-                // si type opentheso / skos
-                // action skos
-                if("skos".equals(alignementSource.getAlignement_format()))
+                if("REST".equalsIgnoreCase(alignementSource.getTypeRequete()))
                 {
-          //          nodealignement= aligquery.queryOpentheso(idC, idTheso, valueEdit.trim(),idlangue,"http://pactols.frantiq.fr/opentheso/");
+                    // si type opentheso / skos
+                    // action skos
+                    if("skos".equals(alignementSource.getAlignement_format()))
+                    {
+                        listAlignValues= alignmentQuery.queryOpentheso(idC, idTheso, nom.trim(),idlangue, alignementSource.getRequete());
+                    }
+                    // action xml (wikipédia)
+                    if("xml".equals(alignementSource.getAlignement_format()))
+                    {
+                        //ici il faut appeler le filtre de Wikipédia 
+                        listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
+                    }
                 }
-                // action xml (wikipédia
-                if("xml".equals(alignementSource.getAlignement_format()))
-                {
-                    //ici il faut appeler le filtre de Wikipédia 
-                    listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
-                }
-                
+                if("SPARQL".equalsIgnoreCase(alignementSource.getTypeRequete()))
+                {                
+                    // action SKOS (BNF)
+                    if("skos".equals(alignementSource.getAlignement_format()))
+                    {
+                        //ici il faut appeler le filtre de Wikipédia 
+                        listAlignValues = alignmentQuery.queryBNF(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
+                    }
+                    // action SKOS (BNF)
+                    if("skos".equals(alignementSource.getAlignement_format()))
+                    {
+                        //ici il faut appeler le filtre de Wikipédia 
+               //         listAlignValues = alignmentQuery.queryDBPedia(idC, idTheso, nom.trim(), idlangue);
+                    }
+                    
+                }                
                 //si type Json
                 // action jason
                 
                 //
-                
-                System.out.println(alignementSource.getRequete());
+
             }
         }
 /*
