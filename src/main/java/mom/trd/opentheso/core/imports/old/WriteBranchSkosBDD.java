@@ -6,18 +6,16 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
-import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
@@ -46,7 +44,8 @@ public class WriteBranchSkosBDD {
     }
 
     /**
-     * Cette fonction permet d'importer une branche sous un Concept
+     * Cette fonction permet d'importer une branche sous un Groupe/domaine donné
+     * en intégrant automatiquement les alignements avec la source de la branche
      * @param idThesaurus
      * @param idGroup
      * @param skosDocument
@@ -90,6 +89,142 @@ public class WriteBranchSkosBDD {
 
     }    
     
+    
+    /**
+     * Cette fonction permet d'importer une branche entière avec plusieurs TT sous un domaine / groupe
+     * @param idThesaurus
+     * @param idGroup
+     * @param skosDocument
+     * @param dateFormat
+     * @param useArk
+     * @param adressSite 
+     * @param idUser 
+     */
+    public void importMultiBranchUnderGroup(
+            String idThesaurus,
+            String idGroup,
+            SKOSXmlDocument skosDocument, String dateFormat,
+            boolean useArk, String adressSite, int idUser) {
+        
+        boolean inScheme = false;
+        boolean broader = false; 
+        
+        ArrayList<SKOSResource> resourcesList = skosDocument.getResourcesList();
+
+        
+        // détection de type de concept SKOS (MT / Groupe ou TT ou concept
+        // suivant le type, le traitement est différent.
+        for (SKOSResource resource : resourcesList) {
+            ArrayList<SKOSRelation> relations = resource.getRelationsList();
+            for (SKOSRelation relation1 : relations) {
+                switch (relation1.getProperty()) {
+                    case SKOSProperty.broader:
+                        broader = true;
+                        break;
+                    case SKOSProperty.inScheme:
+                        inScheme = true;
+                        break;                        
+                    default:
+                        break;
+                }
+            }
+            if(!inScheme) { //c'est un MT ou group
+                // écrire un domaine
+                idGroup = writeDomaine(resource, idThesaurus, adressSite, useArk, idUser);
+            }
+            else {
+                if(!broader) { // c'est une TT
+                    //écrire un TT
+                    writeFirstConceptAfterGroup(resource,
+                    idGroup,
+                    idThesaurus,
+                    "fr", dateFormat, adressSite, useArk, idUser);
+                }
+                else {
+                    // écrire un concept
+                    writeConceptAfterGroup(resource,
+                        idGroup,
+                        idThesaurus,
+                        "fr", dateFormat, adressSite, useArk, idUser);
+                }
+            }
+            broader = false;
+            inScheme = false;
+        }
+            // si c'est le premier Concept, on l'accroche à l'attache au concept père 
+            // on ajoute les relations BT et NT pour faire la chaine
+         /*   if(isfirst) {
+                writeFirstConceptAfterGroup(resource,
+                    idGroup,
+                    idThesaurus,
+                    "fr", dateFormat, adressSite, useArk, idUser);
+                isfirst = false;
+                // on insère le premier concept sans les BT
+            }
+            else {
+                writeConceptAfterGroup(resource,
+                    idGroup,
+                    idThesaurus,
+                    "fr", dateFormat, adressSite, useArk, idUser);
+            }*/
+        
+
+    } 
+    
+    private String getId(String uri) {
+        if (uri.contains("idg=")) {
+            if(uri.contains("&")){
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.indexOf("&"));
+            }
+            else {
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.length());
+            }
+        }
+        else {
+            if (uri.contains("idc=")) {
+                if(uri.contains("&")){
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.indexOf("&"));
+                }
+                else {
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.length());
+                }
+            }
+            else {
+                if (uri.contains("#")) {
+                    uri = uri.substring(uri.indexOf("#") + 1, uri.length());
+                }
+                else
+                {
+                    uri = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+                }
+            }
+        }
+        return uri;
+    }      
+    
+    private String writeDomaine(SKOSResource resource, String id_thesaurus,
+            String adressSite, boolean useArk, int idUser) {
+
+        GroupHelper conceptGroupHelper = new GroupHelper();
+
+        String idConceptGroup = getId(resource.getUri());
+        conceptGroupHelper.insertGroup(ds, idConceptGroup,
+                id_thesaurus, "D", "",
+                adressSite, useArk, idUser);
+
+        // ajouter les traductions des Groupes
+        ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
+        for (int i = 0; i < resource.getLabelsList().size(); i++) {
+            conceptGroupLabel.setIdgroup(idConceptGroup);
+            conceptGroupLabel.setIdthesaurus(id_thesaurus);
+            conceptGroupLabel.setLang(resource.getLabelsList().get(i).getLanguage());
+            conceptGroupLabel.setLexicalvalue(resource.getLabelsList().get(i).getLabel());
+            conceptGroupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
+        }
+        return idConceptGroup;
+        
+      
+    }    
     
     private boolean writeFirstConceptAfterGroup(SKOSResource resource,
             String idGroup,
@@ -228,6 +363,7 @@ public class WriteBranchSkosBDD {
      * @param dateFormat
      * @param useArk
      * @param adressSite 
+     * @param idUser 
      */
     public void importBranchAfterConcept(
             String idConcept,
@@ -883,7 +1019,7 @@ public class WriteBranchSkosBDD {
         return nodeEMList;
     }
 
-    public String getId(String uri) {
+/*    public String getId(String uri) {
         if (uri.contains("#")) {
             uri = uri.substring(uri.indexOf("#") + 1, uri.length());
         }
@@ -893,7 +1029,7 @@ public class WriteBranchSkosBDD {
         }
         return uri;
     }
-
+*/
     /* Pour un concept */
     public ArrayList<NodeTermTraduction> getTraductionConcept(ArrayList<SKOSLabel> labelsList) {
         ArrayList<NodeTermTraduction> nodeTermTraductionList = new ArrayList<>();

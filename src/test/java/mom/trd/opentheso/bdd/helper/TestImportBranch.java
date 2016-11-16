@@ -46,76 +46,121 @@ public class TestImportBranch {
     public void tearDown() {
     }
     
+    
+    /**
+     * Test of Tabulate reading.
+     */
+/*    @org.junit.Test
+
+    public void testImportBranchAfterGroup() {    
+        HikariDataSource conn = openConnexionPool();
+        
+        String idTheso = "";
+        String idGroup = "";
+        String path = "/Users/Miled/ownCloud_cnrs/Projets/OpenTheso/artefacts/25.xml";
+       
+        String dateFromat = "yyyy-MM-dd";
+        boolean useArk = false;
+        String adresseSite = "http://localhost";      
+        int idUser = 1;
+
+
+        
+        FileInputStream file = readFile(path); 
+        
+        SKOSXmlDocument sKOSXmlDocument = readSkosFile(conn,
+                file,
+                dateFromat,
+                useArk,
+                adresseSite);
+                
+
+        // permet d'importer une branche entière sous un domaine avec l'alignement automatique à la source
+        WriteBranchSkosBDD writeBranchSkosBDD = new WriteBranchSkosBDD(conn);
+        //idGroup, idThesaurus, sKOSXmlDocument, dateFormat, ark, adressSite, user);
+        writeBranchSkosBDD.importBranchAfterGroup(
+                idGroup,
+                idTheso,
+                sKOSXmlDocument, dateFromat, useArk,
+                adresseSite, idUser);
+    }*/
+    
     /**
      * Test of Tabulate reading.
      */
     @org.junit.Test
 
-    public void testReadSkosFile() {
-    
+    public void TestImportMultiBranchUnderGroup() {    
         HikariDataSource conn = openConnexionPool();
         
-        ReadFileSKOS readFileSKOS = new ReadFileSKOS();
-        
+        String idTheso = "1";
+        String idGroup = "";
+        String path = "/Users/Miled/ownCloud_cnrs/GDS_FRANTIQ/Pactols/2016-11-15/Sujets.xml";
+       
+        String dateFromat = "yyyy-MM-dd";
+        boolean useArk = false;
+        String adresseSite = "http://localhost";      
+        int idUser = 1;
+
 
         
+        FileInputStream file = readFile(path); 
+        
+        SKOSXmlDocument sKOSXmlDocument = readSkosFile(conn,
+                file,
+                dateFromat,
+                useArk,
+                adresseSite);
+                
+
+        // permet d'importer une branche entière avec son domaine en intégrant l'alignement à la source
+        WriteBranchSkosBDD writeBranchSkosBDD = new WriteBranchSkosBDD(conn);
+        //idGroup, idThesaurus, sKOSXmlDocument, dateFormat, ark, adressSite, user);
+        writeBranchSkosBDD.importMultiBranchUnderGroup(
+                idTheso,
+                idGroup,
+                sKOSXmlDocument, dateFromat, useArk,
+                adresseSite, idUser);
+    }    
+
+    /**
+     * lecture du fichier
+     * @param path
+     * @return 
+     */
+    private FileInputStream readFile(String path) {
+
+        FileInputStream file;
         try {
-            
-            FileInputStream file = new FileInputStream(
-                    "/Users/Miled/ownCloud_cnrs/Projets/OpenTheso/artefacts/25.xml");
-            
-            
-            readFileSKOS.readBranchFile(conn,
-                    file,
-                    "yyyy-MM-dd",false, "http://localhost");
-            
-            
-            SKOSXmlDocument sKOSXmlDocument = readFileSKOS.getThesaurus();
-            //System.out.println("test");
-            
-            
-            WriteBranchSkosBDD writeBranchSkosBDD = new WriteBranchSkosBDD(conn);
-            
-            
-            
-            
-            // permet d'iporter une branche externe au thésaurus à partir d'un domaine (toute une branche)
-            
-//            importBranchAfterGroup(
-//            String idGroup,
-//            String idThesaurus,
-//            SKOSXmlDocument skosDocument, String dateFormat,
-//            boolean useArk, String adressSite, int idUser)            
-            writeBranchSkosBDD.importBranchAfterGroup(
-                    "MT_1",
-                    "1",
-                    sKOSXmlDocument, "yyyy-MM-dd", false, "http://localhost",
-                    1);
-            
-            
-            // permet d'importer une branche externe au thésaurus à parti d'un concept
-            //
-//            public void importBranchAfterConcept(
-//            String idConcept,
-//            String idGroup,
-//            String idThesaurus,
-//            SKOSXmlDocument skosDocument, String dateFormat,
-//            boolean useArk, String adressSite, int idUser)
-            //
-          /*  writeBranchSkosBDD.importBranchAfterConcept("1",
-                    "MT_1",
-                    "1",
-                    sKOSXmlDocument, "yyyy-MM-dd", false, "http://localhost",
-                    1);*/
-            
-            
+            file = new FileInputStream(path);
+            return file;
         } catch (Exception ex) {
             Logger.getLogger(TestGetSiteMap.class.getName()).log(Level.SEVERE, null, ex.getMessage());
         }
-        
+        return null;
     }
     
-  
+    private SKOSXmlDocument readSkosFile(HikariDataSource conn,
+            FileInputStream file,
+            String dateFromat,
+            boolean useArk,
+            String adresseSite) {
+        
+        try {
+            ReadFileSKOS readFileSKOS = new ReadFileSKOS();
+            readFileSKOS.readBranchFile(conn,
+                    file,
+                    dateFromat,useArk,
+                    adresseSite);
+            
+            SKOSXmlDocument sKOSXmlDocument = readFileSKOS.getThesaurus();
+            return sKOSXmlDocument;
+        } catch (Exception ex) {
+            Logger.getLogger(TestImportBranch.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
     
         /**
      * Test of Tabulate reading.
@@ -148,7 +193,7 @@ public class TestImportBranch {
         // Zoomathia
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "artefacts");        
+        config.addDataSourceProperty("databaseName", "opentheso_mom");        
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");        
         
