@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.core.alignment.AlignementSource;
@@ -367,7 +368,14 @@ public class AlignmentHelper {
             log.error("Error while getting Map of Type of Alignment : " + map.toString(), sqle);
         }
         return map;
-    }    
+    }
+    
+    /**
+     * cette fonction permet de récupérer les informations de la table des sources d'alignement
+     * @param ds
+     * @param id_theso
+     * @return 
+     */
     public ArrayList<AlignementSource> getAlignementSource(HikariDataSource ds, String id_theso)
     {
         ArrayList<AlignementSource>alignementSources = new ArrayList<>();
@@ -381,7 +389,7 @@ public class AlignmentHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select source, requete,type_rqt,alignement_format from alignement_source where id_thesaurus='"+ id_theso+"'";
+                    String query = "select source, requete,type_rqt,alignement_format, id from alignement_source where id_thesaurus='"+ id_theso+"'";
                     resultSet=stmt.executeQuery(query);
                     while(resultSet.next())
                     {
@@ -390,6 +398,7 @@ public class AlignmentHelper {
                         alignementSource.setRequete(resultSet.getString("requete"));
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
                         alignementSource.setAlignement_format(resultSet.getString("alignement_format"));
+                        alignementSource.setId(resultSet.getInt("id"));
                         alignementSources.add(alignementSource);
                     }
                     resultSet.close();
@@ -405,4 +414,118 @@ public class AlignmentHelper {
         }
         return alignementSources;
     }
+    public ArrayList<String> typesRequetes(HikariDataSource ds, 
+            String cherche) throws SQLException
+    {
+        ArrayList<String> les_types = null;
+        Statement stmt;
+        ResultSet resultSet;
+        Connection conn;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt= conn.createStatement();
+                    String query="select e.enumlabel\n" +
+                                "from pg_type t, pg_enum e\n" +
+                                "where t.oid = e.enumtypid\n" +
+                                "and t.typname = '"+ cherche+"'";
+                    resultSet=stmt.executeQuery(query);
+                    les_types = new ArrayList<>();
+                    while(resultSet.next())
+                    {
+                        les_types.add(resultSet.getString("enumlabel"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while Types : " + cherche, sqle);
+        }
+        return les_types;        
+    }
+    public void injenctdansBDAlignement(HikariDataSource ds, List<String>listThesos,String source,
+            String requete,String type_rqtNouvelle,String typeAlingementFormat)
+    {
+        for (String listTheso : listThesos) {
+            insertAlignementSource(ds, listTheso, source, requete, type_rqtNouvelle, typeAlingementFormat);
+        }
+    }
+    public void insertAlignementSource(HikariDataSource ds, String idTheso, String source, String requete,
+            String type_rqtNou, String typeAlignementFormat)
+    {
+        Statement stmt;
+        Connection conn;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt= conn.createStatement();
+
+                        String query="Insert into alignement_source"
+                            + "(id_thesaurus, source,requete,type_rqt,"
+                            + "alignement_format) values('"
+                            + idTheso +"','"
+                            + source+"','"
+                            + requete+"','"
+                            + type_rqtNou+ "','"
+                            + typeAlignementFormat+"');";
+                    stmt.executeQuery(query);
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while insert new Alignement : ", sqle);
+        } 
+    }
+    public void update_alignementSource(HikariDataSource ds, AlignementSource alig, String rqt, String alig_format, int id)
+    {
+        Statement stmt;
+        Connection conn;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt= conn.createStatement();
+
+                        String query="update alignement_source set "
+                                + "source ='"+alig.getSource()
+                                + "', requete ='"+alig.getRequete()
+                                + "', type_rqt ='"+rqt
+                                + "', alignement_format='"+alig_format
+                                + "' where id ="+ id;
+                    stmt.execute(query);
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while insert new Alignement : ", sqle);
+        } 
+        
+    }
+    
 }

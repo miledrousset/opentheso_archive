@@ -384,9 +384,9 @@
                  <p:growl id="msg" />
                     <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                         <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}" />
-                        <p:inputSwitch value="#{theso.mesCandidats}" >
+                        <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
                             <p:ajax listener="#{theso.listeCandidats()}" update=":panelCdt,:tableCdt,:gestionCandidat" />
-                        </p:inputSwitch>
+                        </p:selectBooleanCheckbox>
                     </h:panelGrid>                    
                 </h:form>
 

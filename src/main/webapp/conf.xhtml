@@ -6,7 +6,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-	<title>OpenTheso - Configurations</title>
+        <title>OpenTheso - Configurations</title>
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
@@ -14,8 +14,8 @@
     <h:body>
         <ui:include src="dialogs/user/addUserDlg.xhtml" />
         <ui:include src="dialogs/user/editUserDlg.xhtml" />
-        
-    
+
+
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
             Depuis cette page, les administrateurs peuvent gérer les utilisateurs. Il leur est possible de créer/désactiver un compte ou de modifier les droit d'un utilisateur.
@@ -60,7 +60,7 @@
                         </p:column>
                         <p:column width="20" >
                             <h:form>
-                               <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
+                                <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('conf.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>  
 
@@ -124,7 +124,6 @@
                     </table>
                 </h:form>
             </fieldset>
-
             <h:panelGroup rendered="#{user1.haveRights(2)}">
                 <fieldset class="fieldPref">
                     <legend><h:outputText value="#{langueBean.getMsg('conf.field3')}" /></legend><br/>
@@ -168,10 +167,22 @@
                 </fieldset>
             </h:panelGroup>
 
-            <ui:include src ="/admin/reorganizing.xhtml" />
-            
+            <ui:include src ="/admin/reorganizing.xhtml" /><br/><br/><br/>
+            <ui:include src="dialogs/Alignement/editAlignementSourceEditDlg.xhtml"/>
+            <fieldset>
+                <legend><h:outputText value="testestestest" /></legend><br/>
+                <h:panelGroup>
+                    <br/>
+                    <h:form>
+                        <p:commandButton id="passForgeted" value="voir alignement" 
+                                         actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
+                                         update=":idEditAlignementSourceEditDlg" 
+                                         oncomplete="PF('editAlignementSourceEditDlg').show()" styleClass="styleButton"/>       
+                    </h:form>
+                </h:panelGroup>
+            </fieldset>
         </div>
-<ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+        <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">

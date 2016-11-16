@@ -39,6 +39,7 @@ import mom.trd.opentheso.core.exports.helper.ExportStatistiques;
 import mom.trd.opentheso.core.exports.privatesdatas.WriteXml;
 import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -153,7 +154,7 @@ public class BaseDeDonnesBean implements Serializable {
 
     }
 
-    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException {
+    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException, XmlPullParserException {
         BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
         info = basedone.info_out(connect.getPoolConnexion());
         return info;

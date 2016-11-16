@@ -557,7 +557,7 @@
 
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
-                        <p:commandButton id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" actionListener="PF('creationBDEditDlg').show();"
+                        <p:commandButton id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" 
                                          oncomplete="#{baseDeDonnes.loadinfoDB()}#{theso.getAllTables()}" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
                             <p:menuitem id="CBDD" value="#{langueBean.getMsg('bdd.act')}"  onclick="PF('creationBDEditDlg').show();" />
@@ -596,12 +596,12 @@
                     <p:dialog header="#{langueBean.getMsg('bdd.act')}" widgetVar="creationBDEditDlg" minHeight="40">
                         <h:form>
                             <h:outputText value="#{langueBean.getMsg('bdd.nvnom')}:"/>   
-                            <h:inputText value="#{baseDeDonnes.dbName}" styleClass="areaNote" /><br/>
+                            <h:inputText value="#{baseDeDonnes.dbName}"  /><br/>
 
                             <br/>
-                            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-retour" actionListener="#{baseDeDonnes.newDB()}"
+                            <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{baseDeDonnes.newDB()}"
                                              styleClass="styleButton"  oncomplete="PF('creationBDEditDlg').hide();"/>
-                            <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-valider" styleClass="styleButton"  
+                            <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton"  
                                              oncomplete="PF('creationBDEditDlg').hide();"  immediate="true"/>
                         </h:form>
                     </p:dialog>

@@ -14,8 +14,16 @@ public class AlignementSource {
     private String requete;
     private String typeRequete;
     private String alignement_format;
+    private  int id;
 
     public AlignementSource() {
+    }
+    public void init_alignementSource()
+    {
+        source="";
+        requete="";
+        alignement_format="";
+        typeRequete="";
     }
 
     public String getSource() {
@@ -49,5 +57,14 @@ public class AlignementSource {
     public void setAlignement_format(String alignement_format) {
         this.alignement_format = alignement_format;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
   
 }
