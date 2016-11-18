@@ -317,7 +317,7 @@ public class AlignmentQuery {
                 " SELECT ?instrument ?prop ?value" +
                 " where {  <http://data.bnf.fr/ark:/12148/cb119367821> skos:narrower+ ?instrument.  ?instrument ?prop ?value.  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, \"cornemuse\",\"i\"))   filter(lang(?value) =\"fr\")} LIMIT 10";
       */  
-        System.out.println(requete);
+    //    System.out.println(requete);
         Query query = QueryFactory.create(requete);
    
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://data.bnf.fr/sparql", query);
@@ -373,7 +373,7 @@ public class AlignmentQuery {
                 + "   }";
                 
                 
-        System.out.println(sparqlQueryString1);
+    //    System.out.println(sparqlQueryString1);
         Query query = QueryFactory.create(sparqlQueryString1);
         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 

@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
     </h:head>
-    <h:body>
+    <h:body rendered="#{(treeBean.browserName != 'agent') }">
         <div id="menuHead">
             <a href="index.xhtml">
                 <div id="titre">

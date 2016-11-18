@@ -80,7 +80,7 @@ public class ConceptHelper {
         ArrayList<String> listIdsOfConceptChildren
                 = getListChildrenOfConcept(hd, idConceptDeTete, idTheso);
 
-        System.out.println("idConcept = " + idConceptDeTete);
+   //     System.out.println("idConcept = " + idConceptDeTete);
 
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             getIdsOfBranch(hd, listIdsOfConceptChildren1,

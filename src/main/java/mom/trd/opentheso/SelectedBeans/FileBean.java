@@ -107,12 +107,12 @@ public class FileBean implements Serializable {
             setProgress(0);
             onComplete();
         }
-        System.out.println("getProgress: " + progress);
+    //    System.out.println("getProgress: " + progress);
         return progress;  
     }  
 
     public void setProgress(Integer progress) { 
-        System.out.println("SetProgress called: " + progress);
+    //    System.out.println("SetProgress called: " + progress);
         this.progress = progress;  
     }  
 
@@ -433,7 +433,7 @@ public class FileBean implements Serializable {
             event.setPhaseId(PhaseId.INVOKE_APPLICATION);
             event.queue();
         } else {
-            System.out.println(sepCol + " " + sepChamps + " " + sepLangue + " " + formatDate);
+     //       System.out.println(sepCol + " " + sepChamps + " " + sepLangue + " " + formatDate);
             UploadedFile file = event.getFile();
             if (sepCol == null || sepCol.equals("") || sepChamps == null || sepChamps.equals("") || sepLangue == null || sepLangue.equals("") || formatDate == null || formatDate.equals("")) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error3")));
@@ -515,7 +515,7 @@ public class FileBean implements Serializable {
                     IOUtils.closeQuietly(output);
                     IOUtils.closeQuietly(input);
 
-                    System.out.println(image.getName());
+            //        System.out.println(image.getName());
 
                     BufferedImage bimg = ImageIO.read(image);
                     int width = bimg.getWidth();

@@ -56,7 +56,7 @@ public class WriteFileSKOS {
     public boolean writeThesaurus(NodeThesaurus nodeThesaurus) {
         //Ecriture de la balise de declaration du thesaurus
 
-        String xml = "    <skos:ConceptScheme rdf:about=\"" + URI + "idt=" +nodeThesaurus.getIdThesaurus() + "\">\n";
+        String xml = "    <skos:ConceptScheme rdf:about=\"" + URI + "?idt=" +nodeThesaurus.getIdThesaurus() + "\">\n";
         
         // balises DublinCore pour le libellé du thésaurus
         for (Thesaurus listThesaurusTraduction : nodeThesaurus.getListThesaurusTraduction()) {
@@ -338,11 +338,11 @@ public class WriteFileSKOS {
         
         
         if(nodeConceptExport == null){
-            System.out.println("nodeConcept = Null");
+      //      System.out.println("nodeConcept = Null");
             return uri;
         }
         if(nodeConceptExport.getConcept() == null){
-            System.out.println("nodeConcept.getConcept = Null");
+        //    System.out.println("nodeConcept.getConcept = Null");
             return uri;
         }
         if(nodeConceptExport.getConcept().getIdArk() == null){

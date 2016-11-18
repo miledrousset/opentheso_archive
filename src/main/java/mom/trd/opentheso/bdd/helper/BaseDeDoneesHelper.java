@@ -275,12 +275,12 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         String algo = p.toString();
         String test2 = p.getProperty("dataSource.databaseName");
-        System.out.println(test2);
+   //     System.out.println(test2);
         p.setProperty("dataSource.databaseName", "miled");
         //FileOutputStream fos = new FileOutputStream(file);
         //p.store(fos, null);
         String test1 = p.getProperty("dataSource.databaseName");
-        System.out.println(test1);
+    //    System.out.println(test1);
         File fichier = new File("C:\\Users\\antonio.perez\\Documents\\NetBeansProjects\\opentheso\\src\\main\\resources\\hikari.properties");//path fichier
         if (fichier.exists()) {
             try {
