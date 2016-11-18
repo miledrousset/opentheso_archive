@@ -137,7 +137,7 @@ public class ReadFileSKOS {
             //
             while (xMLStreamReader.hasNext()) {
                 if (!error) {
-                    System.err.println(xMLStreamReader.toString());
+              //      System.err.println(xMLStreamReader.toString());
                     printEvent(xMLStreamReader);
                 }
                 xMLStreamReader.next();

@@ -128,7 +128,7 @@ public class RelationsHelper {
                                  + " concept WHERE "
                                  + " concept.id_thesaurus = hierarchical_relationship.id_thesaurus"
                                  + " AND "
-                                 + " concept.id_concept = hierarchical_relationship.id_concept1"
+                                 + " concept.id_concept = hierarchical_relationship.id_concept2"
                                  + " AND"
                                  + " hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'"
                                  + " AND"

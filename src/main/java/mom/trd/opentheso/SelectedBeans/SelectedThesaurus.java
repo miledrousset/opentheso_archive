@@ -243,6 +243,7 @@ public class SelectedThesaurus implements Serializable {
             idGurl = null;
             idTurl = null;
             idLurl = null;
+            return;
         }
         // if the URL is for Groups 
         if (idGurl != null && idTurl != null) {
@@ -308,7 +309,74 @@ public class SelectedThesaurus implements Serializable {
             idGurl = null;
             idTurl = null;
             idLurl = null;
+            return;
         }
+        
+        // if the URL is only for thésaurus 
+        if (idTurl != null) {
+            idLurl = Locale.getDefault().toString().substring(0, 2);
+            ArrayList<Languages_iso639> temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), idTurl);
+            if (temp.isEmpty()) {
+                idCurl = null;
+                idGurl = null;
+                idTurl = null;
+                return;
+            } else {
+                boolean lExist = false;
+                for(Languages_iso639 l : temp) {
+                    if(l.getId_iso639_1().trim().equals(idLurl)) {
+                        lExist = true;
+                    }
+                }
+                if(!lExist) {
+                    idLurl = temp.get(0).getId_iso639_1().trim();
+                }
+            }
+         /*   if (new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idGurl, idTurl, idLurl) == null) {
+                idCurl = null;
+                idGurl = null;
+                idTurl = null;
+                return;
+            }*/
+            tree.getSelectedTerme().reInitTerme();
+
+            // Initialisation du thésaurus et de l'arbre
+            thesaurus.setId_thesaurus(idTurl);
+            thesaurus.setLanguage(idLurl);
+
+            tree.getSelectedTerme().reInitTerme();
+            tree.reInit();
+            tree.initTree(null, null);
+            ThesaurusHelper th = new ThesaurusHelper();
+
+            thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+
+            languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+
+            // Initialisation du terme séléctionné et de l'arbre
+            int type = 1;
+            
+       //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
+            /*
+            Concept c = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idCurl, idTurl);
+            if (c.isTopConcept()) {
+                type = 2;
+            } else {
+                type = 3;
+            }*/
+
+            tree.getSelectedTerme().setIdTheso(idTurl);
+            tree.getSelectedTerme().setIdlangue(idLurl);
+
+         //   MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null);
+         //   tree.getSelectedTerme().majTerme(mTN);
+        //    tree.reExpand();
+            idCurl = null;
+            idGurl = null;
+            idTurl = null;
+            idLurl = null;
+        }        
     }
 
     /**
