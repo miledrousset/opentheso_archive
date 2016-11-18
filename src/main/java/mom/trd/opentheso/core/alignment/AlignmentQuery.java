@@ -311,12 +311,12 @@ public class AlignmentQuery {
         }
         
         
-    /*    
-        requete = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
+        
+        /*requete = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>" +
                 " PREFIX xml: <http://www.w3.org/XML/1998/namespace>" +
                 " SELECT ?instrument ?prop ?value" +
                 " where {  <http://data.bnf.fr/ark:/12148/cb119367821> skos:narrower+ ?instrument.  ?instrument ?prop ?value.  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, \"cornemuse\",\"i\"))   filter(lang(?value) =\"fr\")} LIMIT 10";
-      */  
+        */
         System.out.println(requete);
         Query query = QueryFactory.create(requete);
    
@@ -331,7 +331,7 @@ public class AlignmentQuery {
             na.setConcept_target(qs.get("value").toString());
             na.setDef_target("");//qs.get("comment").toString());
             na.setThesaurus_target("BNF");
-            na.setUri_target(qs.get("prop").toString());
+            na.setUri_target(qs.get("instrument").toString());
             listeAlign.add(na);
         }
 

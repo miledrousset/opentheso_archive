@@ -8,7 +8,6 @@
 
 -- # Suppression de tous les thésaurus et des données
 delete from alignement;
-delete from alignement_source;
 delete from concept;
 delete from concept_candidat;
 delete from concept_fusion;

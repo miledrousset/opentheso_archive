@@ -1,159 +1,170 @@
-<ui:composition
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:p="http://primefaces.org/ui">
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
 
 
-    <p:dialog id="idEditAlignementSourceEditDlg"  header="edit alignement source" widgetVar="editAlignementSourceEditDlg" modal="true" resizable="false" >
-        <!-- Ajouter alignement automatique 
-        Cette function appelarais a  editAlignementSourceEditDlg -->
+        <p:dialog id="idEditAlignementSourceEditDlg"  header="#{langueBean.getMsg('alig.edi')}" widgetVar="editAlignementSourceEditDlg" modal="true" resizable="false" >
+            <!-- Ajouter alignement automatique 
+            Cette function appelarais a  editAlignementSourceEditDlg -->
 
-        <h:panelGrid  id="panelAlignement" width="600" columns="2" >
-            
-            <h:form>
-                <p:commandButton value="+"  title="new alignement"  
-                                 action="#{editAlignement.initNewAlignement(theso.authorizedThesaurus)}" 
-                                 update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"/>
-                <p:commandButton  value="Expoter" action="#{editAlignement.exporterSource()}" update=":panelAlignement"/>
+            <h:panelGrid  id="panelAlignement" width="500" columns="1">
+
+                <h:form>
+                    <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="new alignement"  
+                                      action="#{editAlignement.initNewAlignement(theso.authorizedThesaurus)}" 
+                                      update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"/>&nbsp;
+                    &nbsp;
+                    &nbsp;
+
+                    <p:commandButton styleClass="cbEdit" icon="ui-icon-exp" rendered="#{editAlignement.id!= 0}" 
+                                     title="#{langueBean.getMsg('edit.export')}" action="#{editAlignement.exporterSource()}" update=":panelAlignement"/>
                 </h:form>
-                <fieldset><h:form> 
-                    <p:dataTable var="alig" value="#{editAlignement.listeAlignementSources}" selectionMode="single"
-                                 rowKey="#{alig.source}" selection="#{editAlignement.alignementSource}"
-                                 editable="false" 
-                                 scrollable="true" scrollHeight="100"  
-                                 emptyMessage="*******************" >
-                        <p:ajax event="rowSelect"   
-                                update=":creeAlignementSource,:vueAlignementSource"
 
-                                />
-                        <p:column headerText="Sources" >
-                            <h:outputText  value="#{alig.source}" />
-                        </p:column>
-                    </p:dataTable></h:form><br/>
-                </fieldset>
-            
-            <h:panelGroup id="vueAlignementSource" rendered="#{editAlignement.viewAlignement}"   >
-                <fieldset>
-                    <div> <h:form>
-                            <p:commandLink rendered="#{editAlignement.id!=0}" value="edit" action="#{editAlignement.editionSource()}"
-                                           update=":panelAlignement, :panupdate"/><br/>
-
-                            <h:outputText value="Source: "/>
-                            <h:outputText value="#{editAlignement.alignementSource.source}"/><br/>
-                            <h:outputText value="Type Requete: "/>
-                            <h:outputText value="#{editAlignement.alignementSource.typeRequete}"/><br/>
-                            <h:outputText value="Format Alignement: "/>
-                            <h:outputText value="#{editAlignement.alignementSource.alignement_format}"/><br/>
-                            <h:outputText value="Requete"/><br/>
-                            <h:outputText value="(lang=$$lang$$  et  valeur=$$valeur$$: "/><br/>
-                            <h:outputText value="#{editAlignement.alignementSource.requete}"/><br/>                                        
-                        </h:form>
-                    </div> 
-                </fieldset>
-            </h:panelGroup>
-            <h:panelGroup id="creeAlignementSource" rendered="#{editAlignement.newAlignement}" >
-                <fieldset>
-                    <div> 
+                <h:panelGroup rendered="#{!editAlignement.newAlignement}">
+                    <fieldset>
                         <h:form>
-                            <h:outputText value="Source: "/><br/>
-                            <h:inputText value="#{editAlignement.source}"/><br/>
-                            <h:outputText value="Type Requete: "/><br/>
-                            <h:selectOneMenu value="#{editAlignement.type_rqt_nouvelle}" class="inputConnect" >
+                            <p:dataTable   var="alig" value="#{editAlignement.listeAlignementSources}" selectionMode="single"
+                                           rowKey="#{alig.source}" selection="#{editAlignement.alignementSource}"
+                                           editable="false"
+                                           scrollable="true" scrollHeight="100"  
+                                           emptyMessage="*******************" >
+                                <p:ajax event="rowSelect"   
+                                        update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"
+                                        />
+                                <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
+                                    <h:outputText  value="#{alig.source}" />
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>                          
+                <h:panelGroup id="vueAlignementSource" rendered="#{editAlignement.viewAlignement}"  style="text-align-last: start" >
+                    <fieldset>
+                        <div> <h:form>
+                                <p:commandButton styleClass="cbEdit" icon="ui-icon-edi" rendered="#{editAlignement.id!=0}" 
+                                                 title="#{langueBean.getMsg('alig.edit')}" action="#{editAlignement.editionSource()}"
+                                                 update=":panelAlignement, :panupdate"/><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.sou')}: "/>
+                                <h:outputText value="#{editAlignement.alignementSource.source}"/><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.typ')}: "/>
+                                <h:outputText value="#{editAlignement.alignementSource.typeRequete}"/><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.for')}: "/>
+                                <h:outputText value="#{editAlignement.alignementSource.alignement_format}"/><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}: "/>
+                                <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/>
+                                <p:scrollPanel mode="native" style="width:550px;height:60px">
+                                    <h:outputText value="#{editAlignement.alignementSource.requete}"/></p:scrollPanel><br/>                                        
+                            </h:form>
+                        </div> 
+                    </fieldset>
+                </h:panelGroup>
+                <h:panelGroup id="creeAlignementSource" rendered="#{editAlignement.newAlignement}" >
+                    <fieldset>
+                        <div> 
+                            <h:form>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.sou')}: "/><br/>
+                                <h:inputText value="#{editAlignement.alignementSource.source}"/><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.typ')}: "/><br/>
+                                <h:selectOneMenu value="#{editAlignement.alignementSource.typeRequete}" class="inputConnect" >
+                                    <f:selectItems value="#{editAlignement.types_type_requetes}" var="th"  />
+                                </h:selectOneMenu><br/>
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.for')}: "/><br/>
+                                <h:selectOneMenu value="#{editAlignement.alignementSource.alignement_format}" class="inputConnect" >
+                                    <f:selectItems value="#{editAlignement.types_alignement_format}" var="th"  />
+                                </h:selectOneMenu>  <br/>                                      
+                                <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
+                                <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
+                                <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" /><br/>
+
+                                <h:panelGrid>
+                                    <h:outputText value="#{langueBean.getMsg('theso')}" />
+
+                                    <p:scrollPanel  mode="native" style="width:200px;height:100px">
+                                        <p:selectManyCheckbox  id="advanced" value="#{user1.selectedThesaurus}" layout="grid" columns="1" >
+                                            <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                        </p:selectManyCheckbox>
+                                    </p:scrollPanel>
+                                </h:panelGrid>
+                                <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
+                                                 action="#{editAlignement.insertIntoAlignementSource(theso.thesaurus.id_thesaurus, user1.selectedThesaurus)}" 
+                                                 update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
+                                                 />
+                                <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
+                                                 update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" 
+                                                 />
+                            </h:form>
+                        </div> 
+                    </fieldset>
+                </h:panelGroup>
+                <h:panelGroup id="panupdate" rendered="#{editAlignement.editAlignement}">
+                    <fieldset>
+                        <h:form>
+                            <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.sou')}: "/>
+                            <h:inputText value="#{editAlignement.alignementSource.source}"/><br/>
+                            <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.typ')}: "/>
+                            <h:selectOneMenu value="#{editAlignement.alignementSource.typeRequete}" class="inputConnect" >
                                 <f:selectItems value="#{editAlignement.types_type_requetes}" var="th"  />
                             </h:selectOneMenu><br/>
-                            <h:outputText value="Format Alignement: "/><br/>
-                            <h:selectOneMenu value="#{editAlignement.alignement_format_nouvelle}" class="inputConnect" >
+                            <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.for')}: "/>
+                            <h:selectOneMenu value="#{editAlignement.alignementSource.alignement_format}" class="inputConnect" >
                                 <f:selectItems value="#{editAlignement.types_alignement_format}" var="th"  />
-                            </h:selectOneMenu>  <br/>                                      
-                            <h:outputText value="Requete"/><br/>
-                            <h:outputText value="(lang=$$lang$$  et  valeur=$$valeur$$: "/><br/>
-                            <h:inputText value="#{editAlignement.requete}"/><br/>
-                            <br/>
-
-                            <h:panelGrid>
+                            </h:selectOneMenu>  <br/>        
+                            <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
+                            <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
+                            <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" /><br/> 
+                            <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
+                                             action="#{editAlignement.updateSource(theso.thesaurus.id_thesaurus)}"
+                                             update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" />                    
+                            
+                            <p:commandButton title="Effacer" icon="ui-icon-supp" 
+                                             actionListener="#{editAlignement.effaceAlignementSource(theso.thesaurus.id_thesaurus)}" 
+                                             update=":panelAlignement" >
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert"  />  
+                            </p:commandButton> 
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                            
+                            <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
+                                             update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" 
+                                             />
+                        </h:form>
+                    </fieldset>
+                </h:panelGroup>
+                <h:panelGroup id="panChoixTheso2" rendered="#{editAlignement.exporSource}">
+                    <h:panelGrid>
+                        <h:form>
+                            <fieldset>
                                 <h:outputText value="#{langueBean.getMsg('theso')}" />
-
                                 <p:scrollPanel  mode="native" style="width:200px;height:100px">
                                     <p:selectManyCheckbox rendered="#{user1.roleEdit != 1}" id="advanced" value="#{editAlignement.selectedThesaurus}" layout="grid" columns="1" >
                                         <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
                                     </p:selectManyCheckbox>
                                 </p:scrollPanel>
-
-                            </h:panelGrid>
-
-                            <p:commandButton value="dale"
-                                             action="#{editAlignement.insertIntoAlignementSource()}" 
-                                             update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
-                                             oncomplete="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
-                                             />
-                            <p:commandButton value="cancel" action="#{editAlignement.cancel}" 
-                                             update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" 
-                                             />
+                                <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
+                                                 action="#{editAlignement.exportAlignement()}" 
+                                                 update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
+                                                 />
+                                <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
+                                                 update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
+                            </fieldset>
                         </h:form>
-                    </div> 
-                </fieldset>
-            </h:panelGroup>
-            <h:panelGroup id="panupdate" rendered="#{editAlignement.editAlignement}">
-                <fieldset>
-                    <h:form>
-                        <h:outputText value="Source: "/>
-                        <h:inputText value="#{editAlignement.alignementSource.source}"/><br/>
-                        <h:outputText value="Type Requete: (avant: #{editAlignement.alignementSource.typeRequete})"/>
-                        <h:selectOneMenu value="#{editAlignement.type_rqt_nouvelle}" class="inputConnect" >
-                            <f:selectItems value="#{editAlignement.types_type_requetes}" var="th"  />
-                        </h:selectOneMenu><br/>
-                        <h:outputText value="Format Alignement: (avant: #{editAlignement.alignementSource.alignement_format})"/>
-                        <h:selectOneMenu value="#{editAlignement.alignement_format_nouvelle}" class="inputConnect" >
-                            <f:selectItems value="#{editAlignement.types_alignement_format}" var="th"  />
-                        </h:selectOneMenu>  <br/>        
-                        <h:outputText value="Requete"/><br/>
-                        <h:outputText value="(lang=$$lang$$  et  valeur=$$valeur$$: "/><br/>
-                        <h:inputText value="#{editAlignement.alignementSource.requete}"/><br/><br/>
-                        <p:commandButton value="ok" 
-                                         action="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}" 
-                                         actionListener="#{editAlignement.updateSource()}"
-                                         update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
-                                         oncomplete="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
-                                         />
-                        <p:commandButton value="cancel" action="#{editAlignement.cancel}" 
-                                         update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" 
-                                         />
-                    </h:form>
-                </fieldset>
-
-            </h:panelGroup>
-            <h:panelGroup id="panChoixTheso2" rendered="#{editAlignement.exporSource}">
-                <h:panelGrid>
-                    <h:form>
-                        <fieldset>
-                            <h:outputText value="#{langueBean.getMsg('theso')}" />
-                            <p:scrollPanel  mode="native" style="width:200px;height:100px">
-                                <p:selectManyCheckbox rendered="#{user1.roleEdit != 1}" id="advanced" value="#{editAlignement.selectedThesaurus}" layout="grid" columns="1" >
-                                    <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                                </p:selectManyCheckbox>
-                            </p:scrollPanel>
-                            <p:commandButton value="onyva" 
-                                             action="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}" 
-                                             update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
-                                             oncomplete="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
-                                             />
-                            <p:commandButton value="cancel" action="#{editAlignement.cancel}" 
-                                             update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
-                        </fieldset>
-                    </h:form>
-                </h:panelGrid>
-            </h:panelGroup>
-
-        </h:panelGrid>
-
-        <h:form>
-            <center>
-
-                <p:commandButton value="Retour" icon="ui-icon-retour" update=":idEditAlignementSourceEditDlg"  
-                                 action="#{editAlignement.cancel}" oncomplete="PF'(editAlignementSourceEditDlg)'.hide()"/>
-            </center>
-        </h:form>
-    </p:dialog>
-</ui:composition>
+                    </h:panelGrid>
+                </h:panelGroup>
+            </h:panelGrid>
+            <h:form>
+                <center>
+                    <p:commandButton icon="ui-icon-retour" title="Retour" update=":idEditAlignementSourceEditDlg"  
+                                     action="#{editAlignement.cancel}" oncomplete="PF'(editAlignementSourceEditDlg)'.hide()"/>
+                </center>
+            </h:form>
+        </p:dialog>
+    </ui:composition>

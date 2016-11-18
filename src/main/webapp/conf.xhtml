@@ -170,14 +170,13 @@
             <ui:include src ="/admin/reorganizing.xhtml" /><br/><br/><br/>
             <ui:include src="dialogs/Alignement/editAlignementSourceEditDlg.xhtml"/>
             <fieldset>
-                <legend><h:outputText value="testestestest" /></legend><br/>
+                <legend><h:outputText value="#{langueBean.getMsg('alig.tete')}"/></legend><br/>
                 <h:panelGroup>
                     <br/>
                     <h:form>
-                        <p:commandButton id="passForgeted" value="voir alignement" 
+                        <p:commandButton id="passForgeted" value="#{langueBean.getMsg('alig.voi')}" 
                                          actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
-                                         update=":idEditAlignementSourceEditDlg" 
-                                         oncomplete="PF('editAlignementSourceEditDlg').show()" styleClass="styleButton"/>       
+                                         update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show()" styleClass="styleButton"/>       
                     </h:form>
                 </h:panelGroup>
             </fieldset>
