@@ -717,7 +717,7 @@ public class SelectedCandidat implements Serializable {
     public boolean needchangerpass() throws SQLException
     {
         UserHelper user = new UserHelper();
-        if(user.isneededpass(connect.getPoolConnexion(),email))
+        if(user.isneededpass(connect.getPoolConnexion(),theUser.getUser().getId()))
         {
             return true;
         }
@@ -739,12 +739,12 @@ public class SelectedCandidat implements Serializable {
             sort=true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
         }
-        if(newPass == null || newPass.equals("") || confirmPass == null || confirmPass.equals("") || ancianPass == null || ancianPass.equals("")) {
+        if(newPass == null || newPass.trim().equals("") || confirmPass == null || confirmPass.trim().equals("") ) {
             sort=true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         }
         else if(!sort){ 
-            if(forgetPassword.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, ancianPass, email))
+            if(forgetPassword.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, theUser.getUser().getId()))
             {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
                 return "index.xhtml?faces-redirect=true";

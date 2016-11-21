@@ -1503,7 +1503,7 @@ public class UserHelper {
         }
         return needchange;
     }
-    public boolean isneededpass(HikariDataSource ds,String email) throws SQLException
+    public boolean isneededpass(HikariDataSource ds, int id ) throws SQLException
     {
         Statement stmt;
         boolean need=false;
@@ -1512,7 +1512,7 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select passtomodify from users where mail = '"+email+"'";
+                    String query = "Select passtomodify from users where id_user = '"+id+"'";
                     ResultSet rs = stmt.executeQuery(query);
                     if(rs.next())
                     {

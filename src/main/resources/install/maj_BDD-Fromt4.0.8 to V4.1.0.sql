@@ -35,7 +35,6 @@ alter table public.concept_group drop column idparentgroup;
 
 ALTER TABLE term ALTER COLUMN creator TYPE integer USING (creator::integer);
 ALTER TABLE term ALTER COLUMN contributor TYPE integer USING (creator::integer);
-ALTER TABLE users ADD motpasstemp character varying;
 
 
 /*
