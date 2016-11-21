@@ -686,11 +686,8 @@ public class FacetHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        NodeConceptTree nct =  new NodeConceptTree();
 
-        NodeConceptTree nct = new NodeConceptTree();
-        nct.setHaveChildren(true);
-        nct.setIdLang(lang);
-        nct.setIdThesaurus(idThesaurus);
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -707,10 +704,14 @@ public class FacetHelper {
                             + " and facet_id = '" + idFacet + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    resultSet.next();
-                    nct.setIdConcept(resultSet.getString("id_concept_parent"));
-                    nct.setTitle(resultSet.getString("lexical_value"));
-
+                    if(resultSet.next()) {
+                       
+                        nct.setHaveChildren(true);
+                        nct.setIdLang(lang);
+                        nct.setIdThesaurus(idThesaurus);
+                        nct.setIdConcept(resultSet.getString("id_concept_parent"));
+                        nct.setTitle(resultSet.getString("lexical_value"));
+                    }
                 } finally {
                     stmt.close();
                 }
@@ -759,7 +760,7 @@ public class FacetHelper {
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()){
                         NodeFacet nodeFacet = new NodeFacet();
-                        nodeFacet.setIdFacet(resultSet.getInt("id"));
+                        nodeFacet.setIdFacet(resultSet.getInt("facet_id"));
                         nodeFacet.setLexicalValue(resultSet.getString("lexical_value"));
                         nodeFacet.setIdConceptParent(resultSet.getString("id_concept_parent"));
                         nodeFacetlist.add(nodeFacet);

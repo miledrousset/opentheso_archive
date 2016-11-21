@@ -130,6 +130,10 @@ public class BaseDeDonnesBean implements Serializable {
 
     public void oublieMonPass() throws MessagingException {
         ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
+        
+        forgetPassword.setEmailTitle(langueBean.getMsg("mot.titlePass"));
+        forgetPassword.setEmailMessage(langueBean.getMsg("mot.textPass"));
+        
         if(forgetPassword.forgotPass(connect.getPoolConnexion(), email))
         {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("mot.envoy")+ email)); 
@@ -154,11 +158,11 @@ public class BaseDeDonnesBean implements Serializable {
 
     }
 
-    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException, XmlPullParserException {
-        BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
-        info = basedone.info_out(connect.getPoolConnexion());
-        return info;
-    }
+//    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException, XmlPullParserException {
+//        BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
+//        info = basedone.info_out(connect.getPoolConnexion());
+//        return info;
+//    }
     public StreamedContent genererdocument() throws SQLException
     {
         remplirText();

@@ -146,6 +146,8 @@ public class CurrentUser implements Serializable {
             pwd = null;
             return "index.xhtml?faces-redirect=true";
         }
+        // utilisateur ou mot de passe n'existent pas
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
         return "";
     }
 

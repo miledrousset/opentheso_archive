@@ -46,6 +46,9 @@ public class ForgetPasswordHelper {
     private String passsansmd5;
     private String newpass;
     private String confirmpass;
+    
+    private String emailTitle;
+    private String emailMessage; 
 
     /**
      * s'appeléer depuis donwloadBean ou on pass le nom et le mail del usuaire
@@ -238,8 +241,9 @@ public class ForgetPasswordHelper {
         Message msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        msg.setSubject("Recuperation de Pass");
-        msg.setText("Cher utilisateur. Votre nouvelle pass  c'est " + pass);
+        msg.setSubject(emailTitle); /// mot.titlePass
+        
+        msg.setText(emailMessage + pass); //mot.textPass
 
         SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
         transport.connect();
@@ -283,6 +287,30 @@ public class ForgetPasswordHelper {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPasssansmd5() {
+        return passsansmd5;
+    }
+
+    public void setPasssansmd5(String passsansmd5) {
+        this.passsansmd5 = passsansmd5;
+    }
+
+    public String getEmailTitle() {
+        return emailTitle;
+    }
+
+    public void setEmailTitle(String emailTitle) {
+        this.emailTitle = emailTitle;
+    }
+
+    public String getEmailMessage() {
+        return emailMessage;
+    }
+
+    public void setEmailMessage(String emailMessage) {
+        this.emailMessage = emailMessage;
     }
 
 }

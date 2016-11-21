@@ -354,7 +354,7 @@ public class BaseDeDoneesHelper implements Serializable {
         }
 
     }
-    public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds) throws SQLException, IOException, XmlPullParserException
+/*    public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds) throws SQLException, IOException, XmlPullParserException
     {
         BaseDeDoneesHelper outinfo = new BaseDeDoneesHelper();
         Statement stmt = null;
@@ -383,7 +383,7 @@ public class BaseDeDoneesHelper implements Serializable {
                      
          }
         return infodor;
-    }
+    }*/
     public String getDbName() {
         return dbName;//seulement en minuscule!!!!
     }
