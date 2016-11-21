@@ -180,19 +180,19 @@ public class ForgetPasswordHelper {
      * @return
      * @throws SQLException
      */
-    public boolean faireChangePass(HikariDataSource ds, String Pass, String ConfirmPass, String ancien, String mail) throws SQLException {
+    public boolean faireChangePass(HikariDataSource ds, String Pass, String ConfirmPass, int id) throws SQLException {
         String passwordencoding = MD5Password.getEncodedPassword(Pass);
         Statement stmt, stmt1;
         boolean ok = false;
-        if (cestlememmepass(ds, ancien)) {
-            ancien = MD5Password.getEncodedPassword(ancien);//transform le pass en format encrypt pour la BDD
+        //if (cestlememmepass(ds, ancien)) {
+            //ancien = MD5Password.getEncodedPassword(ancien);//transform le pass en format encrypt pour la BDD
             try {
                 Connection conn = ds.getConnection();
                 stmt = stmt1 = conn.createStatement();
                 try {
                     //System.out.println(Pass);
                     String queryAjouPass = "update users set password ='" + passwordencoding
-                            + "',passtomodify = false where mail ='" + mail + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
+                            + "',passtomodify = false where id_user ='" + id + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
                     stmt.executeUpdate(queryAjouPass);
                     ok = true;
                 } finally {
@@ -203,7 +203,7 @@ public class ForgetPasswordHelper {
             } catch (SQLException ex) {
                 Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        //}
         return ok;
     }
 

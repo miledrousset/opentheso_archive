@@ -23,9 +23,6 @@
                 }
             }
         </script>
-        <script>
-            alert("#{langueBean.getMsg("mot.change")}");
-        </script>
     </h:head>
     <h:body>
         <ui:include src="conceptPopUp.xhtml" />
@@ -46,22 +43,13 @@
         </div>
 
         <br/><br/><br/><br/>
-        <center>
-            <h:form>
-                <h:outputText value="#{langueBean.getMsg('conf.mail')}: "/><br/>
-                <h:inputText  value="#{selectedCandidat.email}"/> 
-                <h:commandButton value="ok" action="#{selectedCandidat.needchangerpass()}"/>
-            </h:form>
-        </center>
+
 
         <h:panelGroup rendered="#{selectedCandidat.needchangerpass()}">
             <h:form id="changelePass">
                 <br/><br/><br/><br/>
                 <table width="20%" border="1" align="center">
                     <tr><td><center>
-                                <br/><br/>
-                                <h:outputText value="#{langueBean.getMsg('conf.currentPwd')}: "/><br/>
-                                <h:inputSecret  value="#{selectedCandidat.ancianPass}"/>
                                 <br/><br/>
                                 <h:outputText  value="#{langueBean.getMsg('conf.newPwd1')}: "/><br/>
                                 <h:inputSecret  value="#{selectedCandidat.newPass}"/> 
