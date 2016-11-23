@@ -7,8 +7,10 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
-
-
+--
+--role à définir suivant le role dans votre base
+--
+SET ROLE = opentheso;
 -- 
 -- ajout des nouvelles fonctions
 --
@@ -56,9 +58,7 @@ BEGIN
 			'CREATE TYPE public.alignement_format AS ENUM
 			   (''skos'',
 			    ''json'',
-			    ''xml'');
-			ALTER TYPE public.alignement_format
-			  OWNER TO opentheso;';
+			    ''xml'');';
 			  END IF;
 
 END;
@@ -74,9 +74,7 @@ BEGIN
 		 execute 				
 			'CREATE TYPE public.alignement_type_rqt AS ENUM
 			   (''SPARQL'',
-			    ''REST'');
-			ALTER TYPE public.alignement_type_rqt
-			  OWNER TO opentheso;';
+			    ''REST'');';
 			  END IF;
 
 END;
@@ -94,9 +92,7 @@ BEGIN
 			   (''DB'',
 			    ''LDAP'',
 			    ''FILE'',
-			    ''test'');
-			ALTER TYPE public.auth_method
-			  OWNER TO opentheso;';
+			    ''test'');';
 			  END IF;
 
 END;
@@ -120,10 +116,7 @@ BEGIN
 		    id integer DEFAULT nextval(''alignement_source__id_seq''::regclass) NOT NULL,
 			CONSTRAINT alignement_source_pkey PRIMARY KEY (id),
 			CONSTRAINT alignement_source_id_thesaurus_source_key UNIQUE (id_thesaurus, source)
-		);
-
-
-		ALTER TABLE alignement_source OWNER TO opentheso;';
+		);';
 
     END IF;
 END;
@@ -190,9 +183,6 @@ Begin
 		WITH (
 		  OIDS=FALSE
 		);
-		ALTER TABLE public.user_role
-		  OWNER TO opentheso;
-
 
 		insert into user_role (id_user, id_role)
 		 select id, id_role from users;
@@ -219,10 +209,7 @@ BEGIN
 		  MINVALUE 1
 		  MAXVALUE 9223372036854775807
 		  START 1
-		  CACHE 1;
-		ALTER TABLE '||nom_sequence||'
-		  OWNER TO opentheso;
-		';
+		  CACHE 1;';
 
     END IF;
 END;
@@ -471,9 +458,6 @@ SELECT delete_sequence('definition_note__id_seq');
 SELECT delete_sequence('history_note__id_seq');
 
 
-
-ALTER TABLE pref__id_seq OWNER TO opentheso;
-ALTER TABLE role_id_seq OWNER TO opentheso;
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('role_id_seq'::regclass);
 
 
@@ -505,8 +489,7 @@ CREATE TABLE preferences
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE preferences
-  OWNER TO opentheso;
+
   
 --mise a jour de la table concept_group
 SELECT delete_column('concept_group','idparentgroup');
@@ -527,8 +510,7 @@ CREATE TABLE alignement_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE alignement_type
-  OWNER TO opentheso;
+
 
 INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (1, 'Equivalence exacte', '=EQ', 'exactMatch');
 INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (2, 'Equivalence inexacte', '~EQ', 'closeMatch');
@@ -560,8 +542,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION unaccent_string(text)
-  OWNER TO opentheso;
+
 
 
 
@@ -580,8 +561,7 @@ CREATE TABLE note_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE note_type
-  OWNER TO opentheso;
+
 
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('customNote', false, true);
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('definition', true, false);
