@@ -14,7 +14,7 @@
 --
 
 --
---permet de change tout les identifian a id
+--permet de change tous les identifiants à id
 --
 CREATE OR REPLACE FUNCTION updateID_table() RETURNS VOID AS $$
 BEGIN
@@ -46,7 +46,7 @@ $$ LANGUAGE plpgsql;
 
 
 --
---Permet de creé la fonction si n'exists pas alignement_format
+--Permet de creé la fonction si elle n'existe pas (alignement_format)
 --  
 CREATE OR REPLACE FUNCTION addtype_Alignement_format() RETURNS VOID AS $$
 BEGIN
@@ -65,7 +65,7 @@ END;
 $$ LANGUAGE plpgsql; 
 
 --
---Permet de creé la fonction si n'exists pas alignement_type_rqt
+--Permet de creé la fonction si elle n'existe pas (alignement_type_rqt)
 --
   CREATE OR REPLACE FUNCTION addtype_Alignement_type_rqt() RETURNS VOID AS $$
 BEGIN
@@ -83,7 +83,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 --  
---Permet de creé la fonction si n'exists pas auth_method
+--Permet de creé la fonction si elle n'existe pas (auth_method)
 --
   CREATE OR REPLACE FUNCTION addtype_auth_method() RETURNS VOID AS $$
 BEGIN
@@ -104,7 +104,7 @@ $$ LANGUAGE plpgsql;
 
   
 --
---Permet de creér la table alignement_source si n'exists pas
+--Permet de creér la table alignement_source si elle n'existe pas
 --
 CREATE OR REPLACE FUNCTION create_table_aligenementSources() RETURNS VOID AS $$
 BEGIN
@@ -134,7 +134,7 @@ $$ LANGUAGE plpgsql;
 
 --
 -- permet de supprimer une table 
--- avec condition si elle n'existe ou pas
+-- avec condition si elle existe ou pas
 CREATE OR REPLACE FUNCTION delete_table(TEXT) RETURNS VOID AS $$
 DECLARE
  tableName ALIAS FOR $1;
@@ -150,7 +150,7 @@ $$ LANGUAGE plpgsql;
 
 
 
--- permet de adjuter une colonne dans une table si n'exists pas
+-- permet d'ajouter une colonne dans une table 
 -- exp :  select updatecolumn_table('term','contributor','integer')
 -- (table, colonne, type) 
 
@@ -304,7 +304,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 --
---permet de suprimer une colonne s'exists
+--permet de suprimer une colonne 
 --select('nom_table','colonne')
 --
 CREATE OR REPLACE FUNCTION delete_column(TEXT, TEXT) RETURNS VOID AS $$
@@ -616,28 +616,3 @@ select delete_fonction ('delete_column','TEXT','TEXT');
 select delete_fonction ('delete_fonction','TEXT','TEXT');
 select delete_fonction1 ('delete_fonction','TEXT','TEXT');
 select delete_fonction1 ('delete_fonction1','TEXT','TEXT');
-
-
-
-
-
-
-
-
-
-
-  
-
- 
-
-
-
-
-
-
-
-
-
-
- 
-
