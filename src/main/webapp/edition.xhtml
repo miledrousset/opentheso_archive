@@ -557,8 +557,8 @@
 
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
-                        <p:commandButton id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" 
-                                         oncomplete="" styleClass="styleButton"/> 
+                        <p:commandButton disabled="true" id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" 
+                                         actionListener="#{theso.allTables}" oncomplete="" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
                             <p:menuitem id="CBDD" value="#{langueBean.getMsg('bdd.act')}"  onclick="PF('creationBDEditDlg').show();" />
                             <p:menuitem id="IBDD" value="#{langueBean.getMsg('impBDD.info2')}" action="#{baseDeDonnes.inyectionaBDD()}"/>
@@ -568,29 +568,6 @@
                             <p:menuitem value="#{langueBean.getMsg('back.CreerPrivate')}"  style="font-size: 12px;" ajax="false">
                                 <p:fileDownload  value="#{baseDeDonnes.backUpBaseDonnees(theso.tablesListPrivate)}" />
                             </p:menuitem>
-                            <p:menuitem>
-                                <p:notificationBar position="bottom" effect="fade" styleClass="top" widgetVar="bar">
-                                    <h:panelGroup id="panifbd">
-                                        <h:panelGroup rendered="#{vue.DBinfoBD == true}">
-                                            <p:dataTable var="in" value="#{baseDeDonnes.info}"  scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
-                                                         styleClass="styleTab">
-                                                <p:column headerText="#{langueBean.getMsg('bdd.ctd')}">
-                                                    <h:outputText value="#{in.datecreation}"/>
-                                                </p:column>
-                                                <p:column headerText="#{langueBean.getMsg('bdd.nom')}">
-                                                    <h:outputText value="#{in.DBnameout}" />
-                                                </p:column>
-                                                <p:column headerText="#{langueBean.getMsg('bdd.vrs')}">
-                                                    <h:outputText value="#{in.versionDB}" />
-                                                </p:column>
-                                            </p:dataTable>
-                                        </h:panelGroup>
-                                    </h:panelGroup>
-                                </p:notificationBar>
-                            </p:menuitem>
-                            <p:menuitem onclick="PF('bar').show()"  value="infoDB" icon="ui-icon-arrow-1-s" />
-                            <p:menuitem value="Hide" onclick="PF('bar').hide()"  icon="ui-icon-arrow-1-n" />
-                                          
                         </p:menu>
                     </h:form>
                     <p:dialog header="#{langueBean.getMsg('bdd.act')}" widgetVar="creationBDEditDlg" minHeight="40">

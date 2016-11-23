@@ -568,6 +568,32 @@ INSERT INTO note_type (code, isterm, isconcept) VALUES ('note', false, true);
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('example', true, false);
 INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, false);
 
+--
+--Delete toutes les function
+--
+select delete_fonction ('updatesequencesch','');
+select delete_fonction ('updatesequencesth','');
+select delete_fonction ('updatesequencesnh','');
+select delete_fonction ('updatesequencescgh','');
+select delete_fonction ('updatesequencescglh','');
+select delete_fonction ('updateidusers','');
+select delete_fonction ('updateid_table','');
+select delete_fonction ('updatecolumnterm','TEXT');
+select delete_fonction ('delete_table','TEXT');
+select delete_fonction ('delete_sequence','TEXT');
+select delete_fonction ('createuser_role','');
+select delete_fonction ('create_table_aligenementsources','');
+select delete_fonction ('ajouter_sequence','TEXT');
+select delete_fonction ('addtype_auth_method','');
+select delete_fonction ('addtype_alignement_type_rqt','');
+select delete_fonction ('addtype_alignement_format','');
+select delete_fonction1 ('updatecolumn_table','TEXT','TEXT');
+select delete_fonction ('delete_column','TEXT','TEXT');
+select delete_fonction ('delete_fonction','TEXT','TEXT');
+select delete_fonction1 ('delete_fonction','TEXT','TEXT');
+select delete_fonction1 ('delete_fonction1','TEXT','TEXT');
+
+
 
 
 
