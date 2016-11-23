@@ -256,6 +256,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION delete_fonction(TEXT, TEXT, TEXT) RETURNS VOID AS $$
+DECLARE
+ nom_fonction ALIAS FOR $1;
+ type_function ALIAS for $2;
+ type_function2 ALIAS for $3;
+BEGIN
+    IF EXISTS (SELECT proargtypes FROM pg_proc  WHERE proname = nom_fonction) THEN
+        execute 'Drop function ' || nom_fonction||'('||type_function||','||type_function2||')';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_fonction1(TEXT, TEXT, TEXT) RETURNS VOID AS $$
+DECLARE
+ nom_fonction ALIAS FOR $1;
+ type_function ALIAS for $2;
+ type_function2 ALIAS for $3;
+BEGIN
+    IF EXISTS (SELECT proargtypes FROM pg_proc  WHERE proname = nom_fonction) THEN
+        execute 'Drop function ' || nom_fonction||'('||type_function||','||type_function2||','||type_function2||')';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 --
 --ajoute des colonnes creator et contributor
 --
