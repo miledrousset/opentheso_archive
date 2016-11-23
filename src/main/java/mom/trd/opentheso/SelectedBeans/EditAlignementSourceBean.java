@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -27,127 +28,135 @@ import mom.trd.opentheso.core.alignment.AlignementSource;
 @ManagedBean(name = "editAlignement", eager = true)
 @SessionScoped
 
+public class EditAlignementSourceBean implements Serializable {
 
-public class EditAlignementSourceBean implements Serializable{
-    
- 
     private String source;
     private String type_rqt;
     private String alignement_format;
     private String requete;
     private String idThesaurus;
-    private int id=0;
+    private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
+    private ArrayList<AlignementSource> listeAlignementSourcesToutThesosPermet;
     private AlignementSource alignementSource;
     private ArrayList<NodeAlignment> listAlignValues;
-    private boolean viewAlignement=true;
-    private boolean editAlignement=false;
-    private boolean newAlignement=false;  
-    private boolean exporSource=false;
-    private String type_rqt_nouvelle="";
-    private String alignement_format_nouvelle="";
+    private boolean viewAlignement = true;
+    private boolean editAlignement = false;
+    private boolean newAlignement = false;
+    private boolean exporSource = false;
+    private String type_rqt_nouvelle = "";
+    private String alignement_format_nouvelle = "";
     private ArrayList<String> types_type_requetes;
     private ArrayList<String> types_alignement_format;
     private List<String> selectedThesaurus;
- 
-    
+
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser theUser;
+    @ManagedProperty(value = "#{theso}")
+    private SelectedThesaurus theso; 
 
     public EditAlignementSourceBean() {
     }
 
-    public void setListeAlignementSources(String idTheso){
-        idThesaurus= idTheso;
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-        listeAlignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(),idTheso);
-        cancel();
-    } 
-        public void changeAjouter()
-    {
-        editAlignement=false;
-        
+    public void setListeAlignementSources(String idTheso) {
+        idThesaurus = idTheso;
+        int role = theUser.getUser().getIdRole();
+        if (role == 1) {
+            AlignmentHelper alignmentHelper = new AlignmentHelper();
+            listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
+            cancel();
+        }
+
+        else{
+            AlignmentHelper alignmentHelper = new AlignmentHelper();
+            listeAlignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(), idTheso);
+        }
+                
     }
 
-    public void initNewAlignement(List <String> authorizedThesaurus)
-    {
+    public void changeAjouter() {
+        editAlignement = false;
+
+    }
+
+    public void initNewAlignement(List<String> authorizedThesaurus) {
         initVariables();
         viewAlignement = false;
         editAlignement = false;
-        newAlignement  = true;
-        exporSource=false;
-        selectedThesaurus =authorizedThesaurus;
+        newAlignement = true;
+        exporSource = false;
+        selectedThesaurus = authorizedThesaurus;
     }
-    
-    public void cancel()
-    {
+
+    public void cancel() {
         initVariables();
         viewAlignement = true;
         editAlignement = false;
-        newAlignement  = false;
-        exporSource=false;
-        id=0;
-    }    
-
-    private void initVariables (){
-        source = "";
-        type_rqt ="";
-        alignement_format ="";
-        requete ="";
-        alignementSource = new AlignementSource();
-  
+        newAlignement = false;
+        exporSource = false;
+        id = 0;
     }
+
+    private void initVariables() {
+        source = "";
+        type_rqt = "";
+        alignement_format = "";
+        requete = "";
+        alignementSource = new AlignementSource();
+
+    }
+
     public void insertIntoAlignementSource(String currentIdTheso,
-            List<String> selectedThesaurus)
-    {
+            List<String> selectedThesaurus) {
         AlignmentHelper alignementHelper = new AlignmentHelper();
         alignementHelper.injenctdansBDAlignement(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
         setListeAlignementSources(currentIdTheso);
         cancel();
     }
-    public void editionSource()
-    {
+
+    public void editionSource() {
         viewAlignement = false;
         editAlignement = true;
-        newAlignement  = false;
-        exporSource=false;
+        newAlignement = false;
+        exporSource = false;
     }
-    public void updateSource(String idTheso)
-    {
+
+    public void updateSource(String idTheso) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        alignmentHelper.update_alignementSource(connect.getPoolConnexion(), alignementSource,id);
+        alignmentHelper.update_alignementSource(connect.getPoolConnexion(), alignementSource, id);
         setListeAlignementSources(idTheso);
         cancel();
     }
-    public void exporterSource()
-    {
+
+    public void exporterSource() {
         viewAlignement = false;
         editAlignement = false;
-        newAlignement  = false;
-        exporSource=true;
+        newAlignement = false;
+        exporSource = true;
     }
-    public void exportAlignement()
-    {
-        source=alignementSource.getSource();
-        requete= alignementSource.getRequete();
+
+    public void exportAlignement() {
+        source = alignementSource.getSource();
+        requete = alignementSource.getRequete();
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         alignmentHelper.exportAlignementAthesos(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
         cancel();
     }
-    public void effaceAlignementSource(String idTheso)
-    {
+
+    public void effaceAlignementSource(String idTheso) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         alignmentHelper.efaceAligSour(connect.getPoolConnexion(), id);
         setListeAlignementSources(idTheso);
         cancel();
     }
-    
-  
+
     ///////
     //////
     // getter and setter 
     //////
-    
     public String getSource() {
         return source;
     }
@@ -191,13 +200,14 @@ public class EditAlignementSourceBean implements Serializable{
     public void setConnect(Connexion connect) {
         this.connect = connect;
     }
+
     public AlignementSource getAlignementSource() {
         return alignementSource;
     }
 
     public void setAlignementSource(AlignementSource alignementSource) {
         this.alignementSource = alignementSource;
-        this.id= this.alignementSource.getId();
+        this.id = this.alignementSource.getId();
     }
 
     public ArrayList<NodeAlignment> getListAlignValues() {
@@ -224,7 +234,6 @@ public class EditAlignementSourceBean implements Serializable{
         this.editAlignement = editAlignement;
     }
 
-
     public String getAlignement_format_nouvelle() throws SQLException {
         return alignement_format_nouvelle;
     }
@@ -235,7 +244,7 @@ public class EditAlignementSourceBean implements Serializable{
 
     public ArrayList<String> getTypes_type_requetes() throws SQLException {
         AlignmentHelper aligneAlignmentHelper = new AlignmentHelper();
-        types_type_requetes= aligneAlignmentHelper.typesRequetes(connect.getPoolConnexion(), "alignement_type_rqt");
+        types_type_requetes = aligneAlignmentHelper.typesRequetes(connect.getPoolConnexion(), "alignement_type_rqt");
         return types_type_requetes;
     }
 
@@ -253,7 +262,7 @@ public class EditAlignementSourceBean implements Serializable{
 
     public ArrayList<String> getTypes_alignement_format() throws SQLException {
         AlignmentHelper aligneAlignmentHelper = new AlignmentHelper();
-        types_alignement_format= aligneAlignmentHelper.typesRequetes(connect.getPoolConnexion(), "alignement_format");
+        types_alignement_format = aligneAlignmentHelper.typesRequetes(connect.getPoolConnexion(), "alignement_format");
         return types_alignement_format;
     }
 
@@ -293,5 +302,28 @@ public class EditAlignementSourceBean implements Serializable{
         this.exporSource = exporSource;
     }
 
+    public CurrentUser getTheUser() {
+        return theUser;
+    }
+
+    public void setTheUser(CurrentUser theUser) {
+        this.theUser = theUser;
+    }
+
+    public SelectedThesaurus getTheso() {
+        return theso;
+    }
+
+    public void setTheso(SelectedThesaurus theso) {
+        this.theso = theso;
+    }
+
+    public ArrayList<AlignementSource> getListeAlignementSourcesToutThesosPermet() {
+        return listeAlignementSourcesToutThesosPermet;
+    }
+
+    public void setListeAlignementSourcesToutThesosPermet(ArrayList<AlignementSource> listeAlignementSourcesToutThesosPermet) {
+        this.listeAlignementSourcesToutThesosPermet = listeAlignementSourcesToutThesosPermet;
+    }
 
 }

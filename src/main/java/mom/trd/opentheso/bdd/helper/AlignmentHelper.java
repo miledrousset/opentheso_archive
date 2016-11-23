@@ -383,17 +383,58 @@ public class AlignmentHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        
          try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select source, requete,type_rqt,alignement_format, id from alignement_source where id_thesaurus='"+ id_theso+"'";
+                    String query = "select * from alignement_source where id_thesaurus='"+ id_theso+"'";
                     resultSet=stmt.executeQuery(query);
                     while(resultSet.next())
                     {
                         AlignementSource alignementSource = new AlignementSource();
+                        alignementSource.setId_theso(resultSet.getString("id_thesaurus"));
+                        alignementSource.setSource(resultSet.getString("source"));
+                        alignementSource.setRequete(resultSet.getString("requete"));
+                        alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
+                        alignementSource.setAlignement_format(resultSet.getString("alignement_format"));
+                        alignementSource.setId(resultSet.getInt("id"));
+                        alignementSources.add(alignementSource);
+                    }
+                    resultSet.close();
+                    } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting colection of Type of Alignment : ", sqle);
+        }
+        return alignementSources;
+    }
+    public ArrayList<AlignementSource> getAlignementSourceSAdmin(HikariDataSource ds)
+    {
+        ArrayList<AlignementSource>alignementSources = new ArrayList<>();
+        
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+         try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select  * from alignement_source";
+                    resultSet=stmt.executeQuery(query);
+                    while(resultSet.next())
+                    {
+                        AlignementSource alignementSource = new AlignementSource();
+                        alignementSource.setId_theso(resultSet.getString("id_thesaurus"));
                         alignementSource.setSource(resultSet.getString("source"));
                         alignementSource.setRequete(resultSet.getString("requete"));
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));

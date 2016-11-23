@@ -31,15 +31,18 @@
                     <fieldset>
                         <h:form>
                             <p:dataTable   var="alig" value="#{editAlignement.listeAlignementSources}" selectionMode="single"
-                                           rowKey="#{alig.source}" selection="#{editAlignement.alignementSource}"
+                                           rowKey="#{alig.source}#{alig.id_theso}" selection="#{editAlignement.alignementSource}"
                                            editable="false"
                                            scrollable="true" scrollHeight="100"  
-                                           emptyMessage="*******************" >
+                                           emptyMessage="**************************************" >
                                 <p:ajax event="rowSelect"   
                                         update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"
                                         />
                                 <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
                                     <h:outputText  value="#{alig.source}" />
+                                </p:column>
+                                <p:column headerText="#{langueBean.getMsg('theso')}">
+                                    <h:outputText  value="#{alig.id_theso}"/>
                                 </p:column>
                             </p:dataTable>
                         </h:form>

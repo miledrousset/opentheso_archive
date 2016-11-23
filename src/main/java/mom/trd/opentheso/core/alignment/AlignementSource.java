@@ -10,6 +10,7 @@ package mom.trd.opentheso.core.alignment;
  * @author antonio.perez
  */
 public class AlignementSource {
+    private String id_theso;
     private String source;
     private String requete;
     private String typeRequete;
@@ -64,6 +65,14 @@ public class AlignementSource {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getId_theso() {
+        return id_theso;
+    }
+
+    public void setId_theso(String id_theso) {
+        this.id_theso = id_theso;
     }
     
   
