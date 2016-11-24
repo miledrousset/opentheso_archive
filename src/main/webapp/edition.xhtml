@@ -557,8 +557,8 @@
 
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
-                        <p:commandButton disabled="true" id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" 
-                                         actionListener="#{theso.allTables}" oncomplete="" styleClass="styleButton"/> 
+                        <p:commandButton  id="backupbd"  value="#{langueBean.getMsg('bdd.opt')}" 
+                                         actionListener="#{theso.getAllTables()}" oncomplete="" styleClass="styleButton"/> 
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="backupbd" my="left top" at="left bottom">
                             <p:menuitem id="CBDD" value="#{langueBean.getMsg('bdd.act')}"  onclick="PF('creationBDEditDlg').show();" />
                             <p:menuitem id="IBDD" value="#{langueBean.getMsg('impBDD.info2')}" action="#{baseDeDonnes.inyectionaBDD()}"/>

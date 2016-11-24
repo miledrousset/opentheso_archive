@@ -6,11 +6,12 @@ package mom.trd.opentheso.core.exports.privatesdatas;
  */
 
 import java.util.ArrayList;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
 public class WriteXml {
 
-    private String xml = "";
+    private StringBuilder xml = new StringBuilder();
     
     
     public WriteXml() {
@@ -29,58 +30,63 @@ public class WriteXml {
     }
     
     private void startTable(String tableName) {
-        xml += "\n";
-        xml += "    ";
-        xml += "<table nom =\"" + tableName + "\">";
+        xml.append("\n");
+        xml.append( "    ");
+        xml.append("<table nom =\"" + tableName + "\">");
     }
     
-    private String endTable() {
-        xml += "\n";
-        xml += "    ";
-        xml += "</table>";
+    private StringBuilder endTable() {
+        xml.append("\n");
+        xml.append("    ");
+        xml.append("</table>");
         return xml;
     }    
     
     private void startLine() {
-        xml += "\n";
-        xml += "        ";
-        xml += "<ligne>";
+        xml.append("\n");
+        xml.append("        ");
+        xml.append("<ligne>");
     }
     
     private void endLine() {
-        xml += "\n";
-        xml += "        ";
-        xml += "</ligne>";
+        xml.append("\n");
+        xml.append("        ");
+        xml.append("</ligne>");
     }    
     
     private void writeLine(String colomne, String value) {
-        xml += "\n";
-        xml += "            ";
-        xml += "<" + colomne + ">";
-        xml += value;
-        xml += "</" + colomne + ">";
+        StringPlus stringPlus = new StringPlus();
+        value = stringPlus.normalizeStringForXml(value);
+        xml.append("\n");
+        xml.append("            ");
+        xml.append("<" + colomne + ">");
+        xml.append(value);
+        xml.append("</" + colomne + ">");
     }
     
     public void writeHead(){
-        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        xml += "\n";
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        xml.append("\n");
     }
     
     public void start(){
-        xml += "<tables>";
+        xml.append("<tables>");
     }
     
     public void end(){
-        xml += "\n";
-        xml += "</tables>";
+        xml.append("\n");
+        xml.append("</tables>");
     }    
-    
-    public String getXml() {
+
+    public StringBuilder getXml() {
         return xml;
     }
 
-    public void setXml(String xml) {
+    public void setXml(StringBuilder xml) {
         this.xml = xml;
     }
+
+
+
     
 }
