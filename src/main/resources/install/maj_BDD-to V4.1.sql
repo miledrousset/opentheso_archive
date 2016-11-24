@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 --
---role à définir suivant le role dans votre base
+-- n'oubliez pas de définir le role suivant votre installation 
 --
 SET ROLE = opentheso;
 -- 
