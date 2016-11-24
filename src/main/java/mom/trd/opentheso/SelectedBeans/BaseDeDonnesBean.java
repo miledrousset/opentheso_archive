@@ -92,7 +92,7 @@ public class BaseDeDonnesBean implements Serializable {
         WriteXml write = new WriteXml();
         write.writeHead();
         write.start();
-        String table;
+        String table = "";
 
         // date du jour
         java.util.Date datetoday = new java.util.Date();
@@ -106,7 +106,7 @@ public class BaseDeDonnesBean implements Serializable {
         InputStream stream;
 
         try {
-            stream = new ByteArrayInputStream(write.getXml().getBytes("UTF-8"));
+            stream = new ByteArrayInputStream(write.getXml().toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", "backupOpentheso_" + datetoday + ".xml");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);

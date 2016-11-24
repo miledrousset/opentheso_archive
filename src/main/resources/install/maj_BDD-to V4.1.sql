@@ -406,18 +406,40 @@ $$ LANGUAGE plpgsql;
 -- 
 -- fin des fonctions
 -- 
-
+create or replace function majnote() returns void as $$
+begin
+	if not exists (select * from information_schema.table_constraints where table_name = 'note' and constraint_type = 'UNIQUE') then 
+	execute 
+	'ALTER TABLE ONLY note
+	  ADD CONSTRAINT note_notetypecode_id_thesaurus_id_concept_lang_key UNIQUE (notetypecode, id_thesaurus, id_concept, lang, lexicalvalue);
+	ALTER TABLE ONLY note
+	ADD CONSTRAINT note_notetypecode_id_thesaurus_id_term_lang_key UNIQUE (notetypecode, id_thesaurus, id_term, lang, lexicalvalue);';
+	else 
+	execute
+	'alter table note drop constraint note_notetypecode_id_thesaurus_id_concept_lang_key;
+	alter table note drop constraint note_notetypecode_id_thesaurus_id_term_lang_key;
+	ALTER TABLE ONLY note
+	  ADD CONSTRAINT note_notetypecode_id_thesaurus_id_concept_lang_key UNIQUE (notetypecode, id_thesaurus, id_concept, lang, lexicalvalue);
+	ALTER TABLE ONLY note
+	ADD CONSTRAINT note_notetypecode_id_thesaurus_id_term_lang_key UNIQUE (notetypecode, id_thesaurus, id_term, lang, lexicalvalue);';
+  end if;
+  end;
+  $$LANGUAGE plpgsql;
+  
 
 
 
 --
 -- mises à jour 
 --
+--
+--mise a jour de la table note
+--
 
 
 
 -- création ou mise à jour des séquences 
-
+select majnote();
 SELECT ajouter_sequence('alignement_source__id_seq');
 SELECT ajouter_sequence('concept_group_historique__id_seq');
 SELECT ajouter_sequence('concept_group_label_historique__id_seq');
@@ -575,6 +597,7 @@ INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, fals
 --
 --Delete toutes les function
 --
+select delete_fonction ('majnote', '');
 select delete_fonction ('updatesequencesch','');
 select delete_fonction ('updatesequencesth','');
 select delete_fonction ('updatesequencesnh','');
