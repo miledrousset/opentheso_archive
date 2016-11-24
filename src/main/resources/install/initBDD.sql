@@ -64,7 +64,7 @@ ALTER SEQUENCE term_candidat__id_seq RESTART WITH 1;
 ALTER SEQUENCE term_historique__id_seq RESTART WITH 1;
 ALTER SEQUENCE thesaurus_id_seq RESTART WITH 1;
 ALTER SEQUENCE user__id_seq RESTART WITH 2;
-ALTER SEQUENCE alignement_source__id_seq RESTART WITH 1;
+--ALTER SEQUENCE alignement_source__id_seq RESTART WITH 1;
 
 
 -- # créarion de l'admin pour la première connexion
