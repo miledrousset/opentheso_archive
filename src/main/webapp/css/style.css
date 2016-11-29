@@ -802,6 +802,12 @@ input[type="button"], input[type="submit"]{
     margin-left: 10px;
     border-radius: 5px;
 }
+.install {
+    float: none; 
+    width: 600px; 
+    margin-left: 10px;
+    border-radius: 5px;
+}
 
 .fieldPref {
     float: right; 

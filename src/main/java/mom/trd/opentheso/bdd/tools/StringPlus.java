@@ -71,6 +71,29 @@ public class StringPlus {
     }
     
     /**
+     * Fonction qui permet de normaliser les textes pour un script SQL à appliquer 
+     * en Java
+     * @param s
+     * @return 
+     */
+    public String normalizeStringForSQL(String s) {
+        if (s == null) {
+            return null;
+        }
+        if(s.contains("Estampilles")) {
+            int i = 1;
+        }
+        // normalisation of words for XML
+        s = s.replaceAll("&", "&amp;");
+        s = s.replaceAll("\"", " ");
+        s = s.replace("\"", " ");
+        s = s.replaceAll("\n", " ");
+        s = s.replaceAll("\t", " ");
+//        s = s.replaceAll("'", " ");
+        return s.trim();
+    }    
+    
+    /**
      * Fonction qui permet de normaliser les textes pour les documents XML
      * @param s
      * @return 

@@ -9,11 +9,13 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
@@ -147,15 +149,25 @@ public class BaseDeDonnesBean implements Serializable {
     }
 
     public void newDB() throws SQLException, IOException, ClassNotFoundException {
+        InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_dist_4.1.sql");
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
         if (dbName != null) {
             BaseDeDoneesHelper basedonne = new BaseDeDoneesHelper();
 
-            if (!basedonne.createBdD(dbName)) {
+            if (!basedonne.createBdD(connect.getPoolConnexion(), dbName,"")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("error")));
+            }
+            // le connextion ici;
+            
+            if(!basedonne.insertDonneées(connect.getPoolConnexion(), inputStream, "")){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("error")));
             }
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("bdd.name")));
         }
+
 
     }
 
