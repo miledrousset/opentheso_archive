@@ -599,7 +599,8 @@ public class ThesaurusHelper {
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         while (resultSet.next()) {
-                            tabIdThesaurus.add(resultSet.getString("id_thesaurus"));
+                            if(!resultSet.getString("id_thesaurus").isEmpty())
+                                tabIdThesaurus.add(resultSet.getString("id_thesaurus"));
                         }
                         for (Object tabIdThesauru : tabIdThesaurus) {
                             query = "select title from thesaurus_label where"

@@ -49,13 +49,13 @@ public class ForgetPasswordHelper {
     
     private String emailTitle;
     private String emailMessage; 
+    private String pseudoMessage;
 
     /**
      * s'appeléer depuis donwloadBean ou on pass le nom et le mail del usuaire
      * que a demandé le nouvelle pass
      *
      * @param ds
-     * @param nom
      * @param mail
      * @return 
      * @throws javax.mail.MessagingException
@@ -64,29 +64,15 @@ public class ForgetPasswordHelper {
         String nouvellePass = "";
         String nouvelleSansMD5 = "";
         email = mail;//change a l'heure de partir ca vien de donwloadBean
-
-        Statement stmt;
+        String pseudo;
+        if (email == null) return false;
         UserHelper userHelper = new UserHelper();
         if (userHelper.isUserMailExist(ds, mail)) {
-            if (email != null) {
-                try {
-                    Connection conn = ds.getConnection();
-                    stmt = conn.createStatement();
-                    try {
-                        String query = "Select id_user from users where mail ='" + email + "'";
-                        stmt.executeQuery(query);
-                        nouvelleSansMD5 = genererNouvellePass();
-                        nouvellePass = MD5Password.getEncodedPassword(nouvelleSansMD5);
-                        envoimail(email, nouvelleSansMD5);
-                        insertNP(ds, nouvellePass);
-                    } finally {
-                        stmt.close();
-                        conn.close();
-                    }
-                } catch (SQLException ex) {
-                    Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            nouvelleSansMD5 = genererNouvellePass();
+            nouvellePass = MD5Password.getEncodedPassword(nouvelleSansMD5);
+            pseudo = userHelper.getNameUser(ds, mail);
+            envoiEmail(email, nouvelleSansMD5, pseudo);
+            insertNP(ds, nouvellePass);
             return true;
         }
         return false;
@@ -227,7 +213,7 @@ public class ForgetPasswordHelper {
      * @param pass
      * @throws MessagingException
      */
-    private void envoimail(String email, String pass) throws MessagingException {
+    private void envoiEmail(String email, String pass, String pseudo) throws MessagingException {
 
         ResourceBundle bundlePref = getBundlePref();
 
@@ -243,8 +229,9 @@ public class ForgetPasswordHelper {
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         msg.setSubject(emailTitle); /// mot.titlePass
         
-        msg.setText(emailMessage + pass); //mot.textPass
+        msg.setText(emailMessage + pass +"\n" + pseudoMessage + pseudo); 
 
+        
         SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
         transport.connect();
         transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
@@ -311,6 +298,14 @@ public class ForgetPasswordHelper {
 
     public void setEmailMessage(String emailMessage) {
         this.emailMessage = emailMessage;
+    }
+
+    public String getPseudoMessage() {
+        return pseudoMessage;
+    }
+
+    public void setPseudoMessage(String pseudoMessage) {
+        this.pseudoMessage = pseudoMessage;
     }
 
 }

@@ -133,6 +133,7 @@ public class BaseDeDonnesBean implements Serializable {
         
         forgetPassword.setEmailTitle(langueBean.getMsg("mot.titlePass"));
         forgetPassword.setEmailMessage(langueBean.getMsg("mot.textPass"));
+        forgetPassword.setPseudoMessage(langueBean.getMsg("mot.textPseudo"));
         
         if(forgetPassword.forgotPass(connect.getPoolConnexion(), email))
         {

@@ -275,6 +275,10 @@ public class SelectedTerme implements Serializable {
      * @param sN
      */
     public void majTerme(MyTreeNode sN) {
+        
+        // contrôler si la connexion est toujour valide 
+       // connect.
+        
         reInitTerme();
 
         idC = sN.getIdMot();

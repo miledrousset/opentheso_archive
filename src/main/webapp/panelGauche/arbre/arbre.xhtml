@@ -8,14 +8,30 @@
     
     <div id="divArbreTheso">
         <h:panelGroup id="panelTree">
+            
+            
+            <h:form>
+                <h:panelGrid columns="3">
+                    <h:outputText value="Keyup: " />
+                    <p:inputText id="counter" value="#{treeBean.test}">
+                        <p:ajax event="keyup" update="out" listener="#{treeBean.handleKeyEvent}" />
+                    </p:inputText>
+                    <h:outputText id="out" value="#{treeBean.connect.poolConnexion}" />
+                </h:panelGrid>
+            </h:form>
+
+            
+            
+            <h:outputText value="test" title="#{treeBean.selectedNode.rowKey}" />
             <h:form id="form">
+                
                 <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
                         selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true" >
                     <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
                     <p:ajax event="select" 
                             update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                             listener="#{treeBean.onNodeSelect}" />
-
+            
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  
                         <h:outputText value="#{node}"/>  
@@ -34,7 +50,9 @@
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  
                         <h:outputText value="#{node}"/>  
                     </p:treeNode>
+                    
                 </p:tree>
+
             </h:form>
         </h:panelGroup>
     </div>
