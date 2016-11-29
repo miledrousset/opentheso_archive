@@ -88,7 +88,9 @@
         </resource-bundle>
         <message-bundle>language/site_it</message-bundle>
     </application>
+  
     <Context docBase="/var/www/images" path="/pix" />
+    <Context docBase2="install" pathInstall="install" />
     <filter>
         <filter-name>PrimeFaces FileUpload Filter</filter-name>
         <filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>

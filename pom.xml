@@ -196,13 +196,20 @@
             <artifactId>primefaces</artifactId>  
             <version>5.3</version>  
         </dependency>
+   
         <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.5.1</version>
+            <type>jar</type>
+        </dependency>   
+<!--        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>2.4.3</version>
             <scope>compile</scope>
         </dependency>
-        
+  -->      
         <!-- dépendance pour programmer un cron pour l'export régulier
         <dependency>
             <groupId>it.sauronsoftware.cron4j</groupId>
