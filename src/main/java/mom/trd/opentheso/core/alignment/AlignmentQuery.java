@@ -5,8 +5,6 @@
  */
 package mom.trd.opentheso.core.alignment;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import javax.xml.parsers.*;
@@ -17,13 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.SelectedBeans.BaseDeDonnesBean;
-import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -75,8 +68,8 @@ public class AlignmentQuery {
         listeAlign = new ArrayList<>();
         
         lexicalValue = lexicalValue.replaceAll(" ", "%20");
-        requete = requete.replace("$$lang$$", lang);
-        requete = requete.replace("$$value$$", lexicalValue);
+        requete = requete.replace("##lang##", lang);
+        requete = requete.replace("##value##", lexicalValue);
         try {
             //URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue + "&srnamespace=0");
             
@@ -185,8 +178,8 @@ public class AlignmentQuery {
         // construction de la requête de type (webservices Opentheso)
         
         lexicalValue = lexicalValue.replaceAll(" ", "%20");
-        requete = requete.replace("$$lang$$", lang);
-        requete = requete.replace("$$value$$", lexicalValue);
+        requete = requete.replace("##lang##", lang);
+        requete = requete.replace("##value##", lexicalValue);
         
         try {
             URL url = new URL(requete);
@@ -288,7 +281,7 @@ public class AlignmentQuery {
         listeAlign = new ArrayList<>();
         
     //    lexicalValue = lexicalValue.replaceAll(" ", "%20");
-        requete = requete.replace("$$lang$$", "\"" + lang + "\"");
+        requete = requete.replace("##lang##", "\"" + lang + "\"");
         
         
         if(lexicalValue.contains(" ")) {
@@ -298,7 +291,7 @@ public class AlignmentQuery {
             for (String valuetemp : valueTemp) {
                 requete = requete.substring(0,requete.length()-1);
                 if(first){
-                    requete = requete.replace("$$value$$", valuetemp.trim());
+                    requete = requete.replace("##value##", valuetemp.trim());
                     first = false;
                 } else {
                     requete = requete.concat( " && regex(?value, \"" + valuetemp.trim() + "\",\"i\")");

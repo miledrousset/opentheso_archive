@@ -1304,36 +1304,36 @@ public class SelectedTerme implements Serializable {
         
         listAlignValues = new ArrayList<>();
             
-        for (AlignementSource alignementSource : alignementSources) {
+        for (AlignementSource alignementSource1 : alignementSources) {
             // on se positionne sur la source sélectionnée 
-            if(selectedAlignement.equalsIgnoreCase(alignementSource.getSource())) {
+            if(selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
                 // on trouve le type de filtre à appliquer
                 
-                if("REST".equalsIgnoreCase(alignementSource.getTypeRequete()))
+                if("REST".equalsIgnoreCase(alignementSource1.getTypeRequete()))
                 {
                     // si type opentheso / skos
                     // action skos
-                    if("skos".equals(alignementSource.getAlignement_format()))
+                    if("skos".equals(alignementSource1.getAlignement_format()))
                     {
-                        listAlignValues= alignmentQuery.queryOpentheso(idC, idTheso, nom.trim(),idlangue, alignementSource.getRequete());
+                        listAlignValues= alignmentQuery.queryOpentheso(idC, idTheso, nom.trim(),idlangue, alignementSource1.getRequete());
                     }
                     // action xml (wikipédia)
-                    if("xml".equals(alignementSource.getAlignement_format()))
+                    if("xml".equals(alignementSource1.getAlignement_format()))
                     {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
+                        listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource1.getRequete());
                     }
                 }
-                if("SPARQL".equalsIgnoreCase(alignementSource.getTypeRequete()))
+                if("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete()))
                 {                
                     // action SKOS (BNF)
-                    if("skos".equals(alignementSource.getAlignement_format()))
+                    if("skos".equals(alignementSource1.getAlignement_format()))
                     {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryBNF(idC, idTheso, nom.trim(), idlangue, alignementSource.getRequete());
+                        listAlignValues = alignmentQuery.queryBNF(idC, idTheso, nom.trim(), idlangue, alignementSource1.getRequete());
                     }
                     // action SKOS (BNF)
-                    if("skos".equals(alignementSource.getAlignement_format()))
+                    if("skos".equals(alignementSource1.getAlignement_format()))
                     {
                         //ici il faut appeler le filtre de Wikipédia 
                //         listAlignValues = alignmentQuery.queryDBPedia(idC, idTheso, nom.trim(), idlangue);

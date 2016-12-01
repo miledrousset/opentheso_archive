@@ -34,7 +34,6 @@ public class EditAlignementSourceBean implements Serializable {
     private String type_rqt;
     private String alignement_format;
     private String requete;
-    private String idThesaurus;
     private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
     private ArrayList<AlignementSource> listeAlignementSourcesToutThesosPermet;
@@ -55,26 +54,17 @@ public class EditAlignementSourceBean implements Serializable {
 
     @ManagedProperty(value = "#{user1}")
     private CurrentUser theUser;
-    @ManagedProperty(value = "#{theso}")
-    private SelectedThesaurus theso; 
 
     public EditAlignementSourceBean() {
     }
 
     public void setListeAlignementSources(String idTheso) {
-        idThesaurus = idTheso;
         int role = theUser.getUser().getIdRole();
-        if (role == 1) {
+        if (role == 1 || role == 2) {
             AlignmentHelper alignmentHelper = new AlignmentHelper();
             listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
             cancel();
         }
-
-        else{
-            AlignmentHelper alignmentHelper = new AlignmentHelper();
-            listeAlignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(), idTheso);
-        }
-                
     }
 
     public void changeAjouter() {
@@ -142,7 +132,7 @@ public class EditAlignementSourceBean implements Serializable {
         source = alignementSource.getSource();
         requete = alignementSource.getRequete();
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        alignmentHelper.exportAlignementAthesos(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
+        alignmentHelper.exportAlignementToTheso(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
         cancel();
     }
 
@@ -308,14 +298,6 @@ public class EditAlignementSourceBean implements Serializable {
 
     public void setTheUser(CurrentUser theUser) {
         this.theUser = theUser;
-    }
-
-    public SelectedThesaurus getTheso() {
-        return theso;
-    }
-
-    public void setTheso(SelectedThesaurus theso) {
-        this.theso = theso;
     }
 
     public ArrayList<AlignementSource> getListeAlignementSourcesToutThesosPermet() {
