@@ -26,6 +26,7 @@ import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 
 @ManagedBean (name = "poolConnexionInstall", eager = true)
@@ -335,6 +336,23 @@ public class ConnectInstall implements Serializable {
     
     public void test() {
         int i = 0;
+ //       String contextPath = FacesContext.getCurrentInstance().getExternalContext().getContextName();
+        
+
+        
+        
+    ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();  
+     
+    String serverRealPath = servletContext.getRealPath("/WEB-INF/classes/hikari.properties");
+//    String serverContextPath = servletContext.getContextPath();
+//    servletContext.getRealPath("/intall");
+//            servletContext.getResourcePaths( "/hikari.properties");
+    System.out.println(serverRealPath);
+ //   System.out.println(serverContextPath);
+        
+   //     contextPath = FacesContext.getCurrentInstance().getExternalContext().getResourcePaths("/WEB-INF/test/foo.txt");
+//        String fullPath = context.getRealPath("/WEB-INF/test/foo.txt");
+        
         closeConnexion();
     }
 

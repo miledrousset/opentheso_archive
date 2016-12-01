@@ -390,12 +390,16 @@ public class AlignmentHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select * from alignement_source where id_thesaurus='"+ id_theso+"'";
+                    String query = "select "
+                            + " alignement_source.source, alignement_source.requete,"
+                            + " alignement_source.type_rqt, alignement_source.alignement_format,"
+                            + " alignement_source.id from alignement_source, thesaurus_alignement_source"
+                            + " WHERE thesaurus_alignement_source.id_alignement_source = alignement_source.id"
+                            + " AND thesaurus_alignement_source.id_thesaurus = '" + id_theso + "'";
                     resultSet=stmt.executeQuery(query);
                     while(resultSet.next())
                     {
                         AlignementSource alignementSource = new AlignementSource();
-                        alignementSource.setId_theso(resultSet.getString("id_thesaurus"));
                         alignementSource.setSource(resultSet.getString("source"));
                         alignementSource.setRequete(resultSet.getString("requete"));
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
@@ -434,7 +438,6 @@ public class AlignmentHelper {
                     while(resultSet.next())
                     {
                         AlignementSource alignementSource = new AlignementSource();
-                        alignementSource.setId_theso(resultSet.getString("id_thesaurus"));
                         alignementSource.setSource(resultSet.getString("source"));
                         alignementSource.setRequete(resultSet.getString("requete"));
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
@@ -566,7 +569,7 @@ public class AlignmentHelper {
         } 
         
     }
-    public void exportAlignementAthesos(HikariDataSource ds, List<String> listThesos, AlignementSource alig)
+    public void exportAlignementToTheso(HikariDataSource ds, List<String> listThesos, AlignementSource alig)
     {
         for (String listTheso : listThesos) {
             injectExportationAlignement(ds, listTheso, alig);
@@ -585,14 +588,10 @@ public class AlignmentHelper {
                 try {
                     stmt= conn.createStatement();
 
-                        String query="Insert into alignement_source"
-                            + "(id_thesaurus, source,requete,type_rqt,"
-                            + "alignement_format) values('"
-                            + idTheso +"','"
-                            + alig.getSource()+"','"
-                            + alig.getRequete()+"','"
-                            + alig.getTypeRequete()+ "','"
-                            + alig.getAlignement_format()+"');";
+                        String query="Insert into thesaurus_alignement_source"
+                            + "(id_thesaurus, id_alignement_source) values("
+                            + "'" + idTheso + "',"
+                            + "'" + alig.getId()+"')";
                     stmt.execute(query);
                     
                 } finally {
@@ -603,7 +602,7 @@ public class AlignmentHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while insert new Alignement : ", sqle);
+            log.error("Error while insert new Alignement to theasurus : " + idTheso + " id_alignement : " + alig.getId(), sqle);
         } 
     }
     public void efaceAligSour(HikariDataSource ds, int id)

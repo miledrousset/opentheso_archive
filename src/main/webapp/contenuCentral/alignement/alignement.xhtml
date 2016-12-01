@@ -10,6 +10,12 @@
             <div id="imageEdition">
                 <h:form id="formEditAlign"  
                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                    <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
+                                      update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show()" 
+                                      styleClass="cbEdit" 
+                                      icon="ui-icon-parametre" >
+                    </p:commandButton>
+                                            
                     <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
@@ -18,6 +24,7 @@
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>
+
                 </h:form>    
             </div>
         </div>
