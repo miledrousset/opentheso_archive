@@ -37,4 +37,9 @@
         <error-code>500</error-code>
         <location>/errorPages/error500.xhtml</location>
     </error-page>
+    <error-page>
+        <error-code>4060</error-code>
+        <location>/install.xhtml</location>
+    </error-page>
+
 </web-app>

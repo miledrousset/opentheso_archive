@@ -33,6 +33,7 @@ public class CurrentUser implements Serializable {
     private NodeUser user;
     private boolean isLogged = false;
 
+    private NodeUser userEdit;
     private int idEdit;
     private String nameEdit;
     private String mailEdit;
@@ -50,6 +51,8 @@ public class CurrentUser implements Serializable {
 
     private boolean isHaveWriteToCurrentThesaurus = false;
     private boolean isHaveWriteToCurrentThesaurus2 = false;
+    
+    private boolean isActive = false;
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -138,6 +141,8 @@ public class CurrentUser implements Serializable {
             }
 
             isLogged = true;
+            if(userEdit != null){
+            isActive = userEdit.isIsActive();}
 
             if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
                 return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp 
@@ -335,6 +340,8 @@ public class CurrentUser implements Serializable {
                 } catch (SQLException ex) {
                     Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                conn = connect.getPoolConnexion().getConnection();
+            userHelper.updateAddUserHistorique(conn, nameEdit);
             mailEdit = "";
             pwdEdit1 = "";
             pwdEdit2 = "";
@@ -355,6 +362,14 @@ public class CurrentUser implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                 return;
             }
+            // permet de mettre à jour le status de l'utilisateur (actif ou pas)
+            if (!userHelper.updateStatusUser(conn, idEdit, isActive)) {
+                conn.rollback();
+                conn.close();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                return;
+            }            
+            
             conn.commit();
             conn.close();
         } catch (SQLException ex) {
@@ -373,6 +388,9 @@ public class CurrentUser implements Serializable {
         vue.setEditUser(true);
         selectedThesaurus = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(),
                 idEdit);
+        UserHelper userHelper = new UserHelper();
+        userEdit =  userHelper.getInfoUser(connect.getPoolConnexion(), nameEdit, idTheso);
+        isActive = userEdit.isIsActive();
     }
 
     public void reInit() {
@@ -587,6 +605,14 @@ public class CurrentUser implements Serializable {
 
     public void setIsHaveWriteToCurrentThesaurus2(boolean isHaveWriteToCurrentThesaurus2) {
         this.isHaveWriteToCurrentThesaurus2 = isHaveWriteToCurrentThesaurus2;
+    }
+
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
 }
