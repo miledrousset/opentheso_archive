@@ -266,7 +266,9 @@
 
     </dependencies>
 
-    <build>        
+    <build>     
+
+           
         <!-- décocher pour la version de distribution 
             <resources>
               <resource>

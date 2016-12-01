@@ -38,8 +38,7 @@
         <location>/errorPages/error500.xhtml</location>
     </error-page>
     <error-page>
-        <error-code>4060</error-code>
-        <location>/install.xhtml</location>
-    </error-page>
-
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/errorPages/timeOut.xhtml</location>
+    </error-page>  
 </web-app>

@@ -41,6 +41,9 @@ public class TreeBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    
+    private String test;
+    
     private TreeNode root;
     private TreeNode selectedNode;
     private ArrayList<TreeNode> selectedNodes;
@@ -85,6 +88,20 @@ public class TreeBean implements Serializable {
         //  initTree("TH_44", "fr");
     }
 
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
+    }
+
+
+     
+    public void handleKeyEvent() {
+        connect.getPoolConnexion();
+    }    
+    
     /**
      * RÃ©cupÃ¨re les domaines pour remplir la racine de l'arbre selon la langue
      * et le thÃ©saurus sÃ©lectionnÃ©s

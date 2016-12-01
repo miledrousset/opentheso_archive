@@ -370,6 +370,45 @@ public class UserHelper {
 
         return name;
     }
+    
+    /**
+     * permet de retourner le pseudo de l'utilisateur d'après son Email
+     * @param ds
+     * @param email
+     * @return 
+     */
+    public String getNameUser(HikariDataSource ds, String email) {
+
+        String name = "";
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT username from users "
+                            + " WHERE mail ='" + email + "'";
+
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        name = resultSet.getString("username");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return name;
+    }    
 
     /**
      * cette fonction permet de retourner les informations sur l'utilisateur et
