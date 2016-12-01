@@ -419,6 +419,11 @@ public class SelectedThesaurus implements Serializable {
         } else {
             arrayTheso = new ArrayList<>();
         }
+        if(connect.getPoolConnexion() == null)
+        {
+            System.out.println("ACERCANDONOS**************************");
+            return "install.xhtml?faces-redirect=true";
+        }
         StartDefaultThesauriTree();
     }
     
@@ -795,7 +800,7 @@ public class SelectedThesaurus implements Serializable {
      */
     public void StartDefaultThesauriTree() {
         if(connect.getPoolConnexion() == null){
-            System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données !!!!!!! ");
+            System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données 2!!!!!!! ");
             return;
         }
         tree.getSelectedTerme().reInitTerme();
