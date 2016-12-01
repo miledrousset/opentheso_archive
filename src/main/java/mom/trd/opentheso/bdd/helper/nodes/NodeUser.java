@@ -9,9 +9,9 @@ public class NodeUser implements Serializable {
     private int idRole;
     private String role;
     private String idThesaurus;
+    private boolean isActive;
     
     public NodeUser() {
-        
     }
 
     public int getId() {
@@ -61,5 +61,15 @@ public class NodeUser implements Serializable {
     public void setIdThesaurus(String idThesaurus) {
         this.idThesaurus = idThesaurus;
     }
+
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+    
+    
     
 }

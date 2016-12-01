@@ -35,6 +35,7 @@ public class UserHelper {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        boolean existe = false;
         try {
             conn = ds.getConnection();
             try {
@@ -45,7 +46,7 @@ public class UserHelper {
                     //resultSet.first();
                     //resultSet.next();
                     if (resultSet.next()) {
-                        return true;
+                        existe = true;
                     }
                 } finally {
                     stmt.close();
@@ -57,7 +58,7 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return existe;
     }
 
     /**
@@ -206,7 +207,8 @@ public class UserHelper {
                 try {
                     String query = "SELECT roles.name, user_role.id_role,"
                             + " user_role.id_thesaurus,"
-                            + " users.username, users.id_user, users.mail "
+                            + " users.username, users.id_user, users.mail,"
+                            + " users.active"
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id AND"
@@ -223,6 +225,7 @@ public class UserHelper {
                         nu.setId(resultSet.getInt("id_user"));
                         nu.setMail(resultSet.getString("mail"));
                         nu.setIdRole(resultSet.getInt("id_role"));
+                        nu.setIsActive(resultSet.getBoolean("active"));
                         nu.setName(logName);
                         nu.setRole(resultSet.getString("name"));
                         nu.setIdThesaurus(idThesaurus);
@@ -841,7 +844,7 @@ public class UserHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT DISTINCT roles.name, user_role.id_role,"
-                            + " users.username, users.id_user, users.mail "
+                            + " users.username, users.id_user, users.mail, users.active "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id"
@@ -859,6 +862,7 @@ public class UserHelper {
                         nu.setIdRole(resultSet.getInt("id_role"));
                         nu.setName(resultSet.getString("username"));
                         nu.setRole(resultSet.getString("name"));
+                        nu.setIsActive(resultSet.getBoolean("active")); 
                         listUser.add(nu);
                     }
                 } finally {
@@ -1037,7 +1041,13 @@ public class UserHelper {
                     String query = "delete from users where"
                             + " id_user =" + idUser;
                     stmt.executeUpdate(query);
-
+                    query = "delete from user_role where"
+                            + " id_user = "+idUser;
+                    stmt.executeUpdate(query);
+                    query = "update users_historique "
+                            + " set delete = '" + new ToolsHelper().getDate()
+                            + " ' where id_user = '"+idUser+"'";
+                    stmt.executeUpdate(query);
                 } finally {
                     stmt.close();
                 }
@@ -1516,6 +1526,40 @@ public class UserHelper {
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de mettre à jour le status de l'utilisateur
+     *
+     * @param conn
+     * @param idUser
+     * @param isActive
+     * @return
+     */
+    public boolean updateStatusUser(Connection conn, int idUser, boolean isActive) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Update users set active ="+isActive
+                            + " where  users.id_user = "+ idUser;
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }    
+    
+    
 
     public boolean isChangeToPass(HikariDataSource ds, String name) throws SQLException {
         boolean needchange = false;
@@ -1542,12 +1586,12 @@ public class UserHelper {
         }
         return needchange;
     }
-    public boolean isneededpass(HikariDataSource ds, int id ) throws SQLException
+    public boolean isneededpass(HikariDataSource ds, int id ) 
     {
         Statement stmt;
         boolean need=false;
-        Connection conn = ds.getConnection();
         try {
+            Connection conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
@@ -1568,5 +1612,64 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return need;
+    }
+    
+    /**
+     * permet de savoir si l'utilisateur est désactivé 
+     * @param ds
+     * @param id
+     * @return 
+     */
+    public boolean isActiveUser(HikariDataSource ds, int id)
+    {
+        Statement stmt;
+        boolean active = false;
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select active from users where id_user = '"+id+"'";
+                    ResultSet rs = stmt.executeQuery(query);
+                    if(rs.next())
+                    {
+                        active = rs.getBoolean("active");
+                    }
+                    }
+                finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return active;
+    }
+    public boolean updateAddUserHistorique(Connection conn, String nameEdit)
+    {
+        Statement stmt;
+        boolean update = false;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "INSERT INTO users_historique (id_user, username)" 
+                            + " SELECT id_user, username from users"
+                            + " where username = '"+ nameEdit+"'";
+                    stmt.executeUpdate(query);
+                    update = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return update;
     }
 }

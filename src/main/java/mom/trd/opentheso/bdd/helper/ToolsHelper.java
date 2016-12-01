@@ -4,7 +4,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
@@ -12,6 +14,7 @@ import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.Ark_Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import skos.SKOSProperty;
 
 public class ToolsHelper {
 
@@ -123,6 +126,10 @@ public class ToolsHelper {
            pass.append(chars.charAt(i));
         }
         return pass.toString();
+    }
+    
+    public Date getDate() {
+        return new java.util.Date();
     }
     
 }

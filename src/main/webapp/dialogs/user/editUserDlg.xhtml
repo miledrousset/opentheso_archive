@@ -20,6 +20,9 @@
                             <f:selectItems value="#{user1.selectAuthorizedRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
                         </h:selectOneMenu>
                     </p:panelGrid>
+                    <br/>
+                        <h:outputText value="active"/>
+                        <p:selectBooleanCheckbox value="#{user1.isActive}" />
                 </td>
                 <td>
                     <p:panelGrid columns="1" >

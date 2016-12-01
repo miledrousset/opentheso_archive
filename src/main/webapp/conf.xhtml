@@ -47,8 +47,11 @@
                         <f:facet name="header">
                             <h:outputText value="#{langueBean.getMsg('conf.tabUser')}" />
                         </f:facet>
-                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}">
-                            <h:outputText value="#{u.name}" />
+                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{!u.isActive}">
+                            <h:outputText title="user désactivé" value="#{u.name}" style="color: red; font-style: oblique" />
+                        </p:column>
+                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{u.isActive}">
+                            <h:outputText value="#{u.name}"/>
                         </p:column>
                         <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt2')}">
                             <h:outputText value="#{u.role}" />
@@ -60,7 +63,7 @@
                         </p:column>
                         <p:column width="20" >
                             <h:form>
-                                <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
+                                <p:commandButton id="cbSuppTheso" title="Suprimer l'utilisateur, pour desactive dans edition de l'user" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('conf.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>  
 

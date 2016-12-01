@@ -38,9 +38,18 @@
                                     <td><h:inputText value="#{poolConnexionInstall.dataSourceClassName}" /></td>
                                 </tr>
                                 <tr>
+                                    <td><h:outputText value="IdleTimeout " /></td>
+                                    <td><p:inputText value="#{poolConnexionInstall.idleTimeout}" /></td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="ConnectionTimeout " /></td>
+                                    <td><p:inputText value="#{poolConnexionInstall.connectionTimeout}" /></td>
+                                </tr>
+                                <tr>
                                     <td><h:outputText value="Auto Commit " /></td>
                                     <td><p:selectBooleanCheckbox value="#{poolConnexionInstall.autoCommit}" /></td>
                                 </tr>
+
                             </table>
                         </p:tab>
                     </p:accordionPanel>    
@@ -86,10 +95,10 @@
             </h:form>
             <h:panelGroup id="infomessa">
                 <p:outputPanel id="info">
-                    
+
                     <h:outputText value="#{poolConnexionInstall.messages}" escape="false" />
 
-                    
+
                 </p:outputPanel>
             </h:panelGroup>
         </center>

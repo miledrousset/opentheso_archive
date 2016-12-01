@@ -7,8 +7,8 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version 4.1
--- date : 20/11/2016
+-- version 4.1_1
+-- date : 30/11/2016
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -16,6 +16,20 @@ SET ROLE = opentheso;
 -- 
 -- ajout des nouvelles fonctions
 --
+
+-- avertissement, il faut faire attention, si le script ne pâsse pas,
+-- c'est peut être que les contraintes que nous avons ajouté montrent des doublons interdits
+-- il faut alors les identifier et supprimer le doublon 
+-- voici une requête d'exemple pour repérer les doublons 
+
+--
+-- select notetypecode, id_thesaurus, id_concept, lang, count(*)
+-- from note 
+-- group by notetypecode, id_thesaurus, id_concept, lang
+-- having count(*)>1
+-- 
+
+
 
 --
 --permet de change tous les identifiants à id
@@ -37,6 +51,10 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql; 
+
+--
+--
+--
 
 CREATE OR REPLACE FUNCTION updateIDusers() RETURNS VOID AS $$
 BEGIN
@@ -69,6 +87,7 @@ $$ LANGUAGE plpgsql;
 --
 --Permet de creé la fonction si elle n'existe pas (alignement_type_rqt)
 --
+
   CREATE OR REPLACE FUNCTION addtype_Alignement_type_rqt() RETURNS VOID AS $$
 BEGIN
     IF not exists(SELECT e.enumlabel from pg_type t, pg_enum e
@@ -85,6 +104,7 @@ $$ LANGUAGE plpgsql;
 --  
 --Permet de creé la fonction si elle n'existe pas (auth_method)
 --
+
   CREATE OR REPLACE FUNCTION addtype_auth_method() RETURNS VOID AS $$
 BEGIN
     IF not exists(SELECT e.enumlabel from pg_type t, pg_enum e
@@ -104,6 +124,7 @@ $$ LANGUAGE plpgsql;
 --
 --Permet de creér la table alignement_source si elle n'existe pas
 --
+
 CREATE OR REPLACE FUNCTION create_table_aligenementSources() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'alignement_source') THEN
@@ -118,18 +139,44 @@ BEGIN
 		    id integer DEFAULT nextval(''alignement_source__id_seq''::regclass) NOT NULL,
 			CONSTRAINT alignement_source_pkey PRIMARY KEY (id),
 			CONSTRAINT alignement_source_id_thesaurus_source_key UNIQUE (id_thesaurus, source)
-		);';
+		);
+                INSERT INTO alignement_source (id_thesaurus, source, requete, type_rqt, alignement_format) VALUES (''1'', ''wikipedia'', ''https://##lang##.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=##value##&srnamespace=0"'', ''REST'', ''xml'');
+                INSERT INTO alignement_source (id_thesaurus, source, requete, type_rqt, alignement_format) VALUES (''1'', ''Pactols'', ''http://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1'', ''REST'', ''skos'');
+                INSERT INTO alignement_source (id_thesaurus, source, requete, type_rqt, alignement_format) VALUES (''1'', ''bnf'', ''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX xml: <http://www.w3.org/XML/1998/namespace>
+                SELECT ?instrument ?prop ?value where {
+                  <http://data.bnf.fr/ark:/12148/cb119367821> skos:narrower+ ?instrument.
+                  ?instrument ?prop ?value.
+                  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, ##value##,"i") ) 
+                    filter(lang(?value) =##lang##)
+                } LIMIT 20'', ''SPARQL'', ''skos'');';
 
     END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 
+--
+--Permet de adjuter une nouvelle constraint a la table users
+--
+
+create or replace function adjuteconstraintuser() returns void as $$
+begin
+	if not exists (select * from information_schema.table_constraints where table_name = 'users' and constraint_type = 'UNIQUE'
+	and constraint_name ='users_mail_key1') then 
+	execute
+	'ALTER TABLE ONLY users
+	  ADD CONSTRAINT users_mail_key1 UNIQUE 
+	  (mail);';
+  end if;
+  end;
+  $$LANGUAGE plpgsql;
 
 
 --
 -- permet de supprimer une table 
 -- avec condition si elle existe ou pas
+
 CREATE OR REPLACE FUNCTION delete_table(TEXT) RETURNS VOID AS $$
 DECLARE
  tableName ALIAS FOR $1;
@@ -142,8 +189,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
-
-
 
 -- permet d'ajouter une colonne dans une table 
 -- exp :  select updatecolumn_table('term','contributor','integer')
@@ -164,12 +209,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql; 
 
-
-
-
 -- Table: public.user_role
 -- DROP TABLE public.user_role;
 -- permet de créer la table user_role qui n'existait pas avant la version 4.8
+
 CREATE OR REPLACE FUNCTION createUser_role() RETURNS VOID AS $$
 DECLARE 
 
@@ -196,6 +239,71 @@ Begin
 END;
 $$ LANGUAGE plpgsql;
 
+--
+-- permet d'ajouter la table user_historique
+--
+
+CREATE OR REPLACE FUNCTION create_table_users_historique() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'users_historique') THEN
+
+        execute 
+		'CREATE TABLE users_historique (
+		    id_user integer NOT NULL,
+		    username character varying,
+		    created timestamp(6) with time zone NOT NULL DEFAULT now(),
+		    modified timestamp(6) with time zone NOT NULL DEFAULT now(),
+                    delete timestamp(6) with time zone,
+			CONSTRAINT users_historique_pkey PRIMARY KEY (id_user))
+		WITH (
+		  OIDS=FALSE
+		);
+                INSERT INTO users_historique (id_user, username)
+                SELECT id_user, username from users;
+
+                ';
+
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+--permet d'ajouter la table thesaurus_alignement_source
+--
+
+CREATE OR REPLACE FUNCTION create_table_thesaurus_alignement_source() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'thesaurus_alignement_source') THEN
+
+        execute 
+		'CREATE TABLE public.thesaurus_alignement_source
+		(
+		  id_thesaurus character varying NOT NULL,
+		  id_alignement_source integer NOT NULL,
+		  CONSTRAINT thesaurus_alignement_source_pkey PRIMARY KEY (id_thesaurus, id_alignement_source)
+		)
+		WITH (
+		  OIDS=FALSE
+		);';
+
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+--permet de changer la column de alignemet source
+--
+
+CREATE OR REPLACE FUNCTION updateColumn_alignement_source() RETURNS VOID AS $$
+BEGIN
+    IF  EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'id_thesaurus' AND TABLE_NAME = 'alignement_source') THEN
+	Execute
+	'Alter TABLE alignement_source DROP COLUMN  id_thesaurus;
+	 Alter TABLE alignement_source ADD COLUMN id_user integer;';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
 
 --permet d'ajouter une sequence si elle n'existe pas
 
@@ -314,6 +422,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- term_historique
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequencesTH() RETURNS VOID AS $$
 declare 
 id int;
@@ -336,6 +445,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- users
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequences_user() RETURNS VOID AS $$
 declare 
 id int;
@@ -358,6 +468,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- concept_historique
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequencesCH() RETURNS VOID AS $$
 declare 
 id int;
@@ -379,6 +490,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- concept_group_label_historique
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequencesCGLH() RETURNS VOID AS $$
 declare 
 id int;
@@ -400,6 +512,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- concept_group_historique
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequencesCGH() RETURNS VOID AS $$
 declare 
 id int;
@@ -421,6 +534,7 @@ $$ LANGUAGE plpgsql;
 --
 -- Permet de changer  les sequences de les tables-- note_historique
 -- 
+
 CREATE OR REPLACE FUNCTION updatesequencesNH() RETURNS VOID AS $$
 declare 
 id int;
@@ -494,7 +608,10 @@ SELECT updatesequencesCGH();
 SELECT updatesequencesCGLH();
 SELECT updatesequencesCH();
 SELECT updatesequencesTH();
-SELECT updatesequences_user();
+SELECT adjuteconstraintuser();
+SELECT create_table_users_historique();
+SELECT updateColumn_alignement_source();
+SELECT create_table_thesaurus_alignement_source();
 -- Creation de les types pour alignement_source
 
 select addtype_Alignement_format();
@@ -635,6 +752,8 @@ INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, fals
 --Delete toutes les function
 --
 select delete_fonction ('majnote', '');
+select delete_fonction ('updateColumn_alignement_source','');
+select delete_fonction ('create_table_thesaurus_alignement_source','');
 select delete_fonction ('updatesequencesch','');
 select delete_fonction ('updatesequencesth','');
 select delete_fonction ('updatesequencesnh','');
@@ -642,7 +761,9 @@ select delete_fonction ('updatesequencescgh','');
 select delete_fonction ('updatesequencescglh','');
 select delete_fonction ('updatesequences_user','');
 select delete_fonction ('updateidusers','');
+select delete_fonction ('adjuteconstraintuser','');
 select delete_fonction ('updateid_table','');
+select delete_fonction ('create_table_users_historique','');
 select delete_fonction ('updatecolumnterm','TEXT');
 select delete_fonction ('delete_table','TEXT');
 select delete_fonction ('delete_sequence','TEXT');
