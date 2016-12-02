@@ -64,7 +64,7 @@ public class ConnectInstall implements Serializable {
     public boolean createPropertiesFile() {
         int i = 0;
         ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-        String serverRealPath = servletContext.getRealPath("/WEB-INF/classes/hikari2.properties");
+        String serverRealPath = servletContext.getRealPath("/WEB-INF/classes/hikari.properties");
         File file = new File(serverRealPath);
 
         try {
@@ -251,7 +251,7 @@ public class ConnectInstall implements Serializable {
         messages += "-Connexion en cours a la nouvelle BDD !!!!!";
         messages += "<br>";
 
-        InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_dist_4.1.sql");
+        InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
         if (!baseDeDoneesHelper.insertDonneées(poolConnexionInstall, inputStream, nomAdmin)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages += "<br>";

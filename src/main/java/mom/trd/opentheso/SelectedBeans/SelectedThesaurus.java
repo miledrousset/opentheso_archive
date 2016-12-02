@@ -422,7 +422,6 @@ public class SelectedThesaurus implements Serializable {
         if(connect.getPoolConnexion() == null)
         {
             System.out.println("ACERCANDONOS**************************");
-            return "install.xhtml?faces-redirect=true";
         }
         StartDefaultThesauriTree();
     }
