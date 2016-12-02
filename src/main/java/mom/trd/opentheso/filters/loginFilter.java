@@ -32,6 +32,14 @@ public class loginFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         CurrentUser session = (CurrentUser) req.getSession().getAttribute("user1");
         String url = req.getRequestURI();
+        if(session != null) {
+//            resp.sendRedirect("./install.xhtml");
+            if(session.getConnect().getPoolConnexion() == null) {
+                resp.sendRedirect("./install.xhtml");
+                return;
+            }
+        }
+        
         if(url.contains("deco.xhtml")) {
             CurrentUser temp = (CurrentUser)req.getSession().getAttribute("user1");
             

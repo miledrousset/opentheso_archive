@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -14,20 +13,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.FacetHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
-import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
-import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
-import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
-import mom.trd.opentheso.core.exports.old.WriteFileSKOS;
 import org.primefaces.event.SelectEvent;
 
 @ManagedBean(name = "autoComp", eager = true)

@@ -13,11 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.context.FacesContext;
-import mom.trd.opentheso.SelectedBeans.LanguageBean;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.tools.MD5Password;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import org.junit.After;
@@ -25,7 +20,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

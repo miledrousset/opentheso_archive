@@ -61,12 +61,9 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
-import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
-import mom.trd.opentheso.bdd.helper.nodes.NodeNTier;
 import mom.trd.opentheso.bdd.helper.nodes.NodePermute;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
@@ -74,7 +71,6 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.alignment.AlignementSource;
-import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -2313,6 +2309,7 @@ public class SelectedTerme implements Serializable {
     public ArrayList<Entry<String, String>> getALignType() {
         ArrayList<Entry<String, String>> types = new ArrayList<>();
         ArrayList<Entry<String, String>> temp = new ArrayList<>();
+        //if(connect.getPoolConnexion()==null)return null;
         HashMap<String, String> map = new AlignmentHelper().getAlignmentType(connect.getPoolConnexion());
         temp.addAll(map.entrySet());
         for (Entry<String, String> e : temp) {
@@ -2347,6 +2344,7 @@ public class SelectedTerme implements Serializable {
      */
     public ArrayList<Entry<String, String>> getAllALignType() {
         ArrayList<Entry<String, String>> types = new ArrayList<>();
+        if(connect.getPoolConnexion() == null) return types;
         HashMap<String, String> map = new AlignmentHelper().getAlignmentType(connect.getPoolConnexion());
         types.addAll(map.entrySet());
         return types;
@@ -2697,6 +2695,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayFacette() {
+        if(connect.getPoolConnexion() == null) return null;
         ArrayList<Integer> temp = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();
         for (Integer i : temp) {
@@ -2710,6 +2709,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayFacetteInclure() {
+        if(connect.getPoolConnexion() == null) return null;
         ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), idTheso, idlangue);
         ArrayList<Integer> temp2 = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();

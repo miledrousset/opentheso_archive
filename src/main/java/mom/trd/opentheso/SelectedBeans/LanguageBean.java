@@ -31,13 +31,12 @@ public class LanguageBean implements Serializable {
      * Constructeur
      */
     public LanguageBean() {
-        FacesContext context = FacesContext.getCurrentInstance();
+    //    FacesContext context = FacesContext.getCurrentInstance();
     }
     
     @PostConstruct
     public void InitLanguageBean() {
         if (connect.getPoolConnexion() != null) {
-            
             FacesContext context = FacesContext.getCurrentInstance();
             ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
             String langInit = bundlePref.getString("workLanguage");

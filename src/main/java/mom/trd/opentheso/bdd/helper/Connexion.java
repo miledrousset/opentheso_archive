@@ -18,6 +18,7 @@ import javax.faces.context.FacesContext;
 @ManagedBean (name = "poolConnexion", eager = true)
 @ApplicationScoped
 
+
 public class Connexion implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -26,7 +27,7 @@ public class Connexion implements Serializable {
     
     private HikariDataSource poolConnexion = null;
     
-    public ResourceBundle getBundlePool() {
+    public ResourceBundle getBundlePool(){
         FacesContext context = FacesContext.getCurrentInstance();
         try {
             ResourceBundle bundlePool = context.getApplication().getResourceBundle(context, "conHikari");

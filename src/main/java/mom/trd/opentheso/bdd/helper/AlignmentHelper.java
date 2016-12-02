@@ -343,7 +343,7 @@ public class AlignmentHelper {
         HashMap<String, String> map = new HashMap<>();
         
         try {
-            // Get connection from pool
+            // Get connection from pool--- aqui salta para el install
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
