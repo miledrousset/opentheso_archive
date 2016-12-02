@@ -32,10 +32,11 @@
                         <h:form>
                             <p:dataTable   var="alig" value="#{editAlignement.listeAlignementSources}" selectionMode="single"
                                            rowKey="#{alig.source}" selection="#{editAlignement.alignementSource}"
+                                           
                                            editable="false"
                                            scrollable="true" scrollHeight="100"  
                                            emptyMessage="**************************************" >
-                                <p:ajax event="rowSelect"   
+                                <p:ajax event="rowSelect"   listener="#{editAlignement.onRowSelect}" 
                                         update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"
                                         />
                                 <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
@@ -151,7 +152,7 @@
                                     </p:selectManyCheckbox>
                                 </p:scrollPanel>
                                 <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
-                                                 action="#{editAlignement.exportAlignement()}" 
+                                                 action="#{editAlignement.exportAlignement(theso.authorizedThesaurus)}" 
                                                  update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
                                                  />
                                 <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"

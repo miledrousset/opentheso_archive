@@ -10,16 +10,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
-import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -36,7 +34,7 @@ public class EditAlignementSourceBean implements Serializable {
     private String requete;
     private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
-    private ArrayList<AlignementSource> listeAlignementSourcesToutThesosPermet;
+
     private AlignementSource alignementSource;
     private ArrayList<NodeAlignment> listAlignValues;
     private boolean viewAlignement = true;
@@ -48,6 +46,7 @@ public class EditAlignementSourceBean implements Serializable {
     private ArrayList<String> types_type_requetes;
     private ArrayList<String> types_alignement_format;
     private List<String> selectedThesaurus;
+
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -65,11 +64,6 @@ public class EditAlignementSourceBean implements Serializable {
             listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
             cancel();
         }
-    }
-
-    public void changeAjouter() {
-        editAlignement = false;
-
     }
 
     public void initNewAlignement(List<String> authorizedThesaurus) {
@@ -128,11 +122,15 @@ public class EditAlignementSourceBean implements Serializable {
         exporSource = true;
     }
 
-    public void exportAlignement() {
+    public void exportAlignement(ArrayList<Map.Entry<String, String>> authorizedThesaurus) {
         source = alignementSource.getSource();
         requete = alignementSource.getRequete();
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        alignmentHelper.exportAlignementToTheso(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
+        if(!alignmentHelper.addSourceAlignementToTheso(connect.getPoolConnexion(),
+                authorizedThesaurus,
+                selectedThesaurus, alignementSource.getId())) {
+            
+        }
         cancel();
     }
 
@@ -300,12 +298,13 @@ public class EditAlignementSourceBean implements Serializable {
         this.theUser = theUser;
     }
 
-    public ArrayList<AlignementSource> getListeAlignementSourcesToutThesosPermet() {
-        return listeAlignementSourcesToutThesosPermet;
-    }
-
-    public void setListeAlignementSourcesToutThesosPermet(ArrayList<AlignementSource> listeAlignementSourcesToutThesosPermet) {
-        this.listeAlignementSourcesToutThesosPermet = listeAlignementSourcesToutThesosPermet;
+    public void onRowSelect(SelectEvent event) {
+        if(exporSource) {
+            AlignmentHelper alignmentHelper = new AlignmentHelper();
+            selectedThesaurus = 
+                    alignmentHelper.getSelectedAlignementOfThisTheso
+                    (connect.getPoolConnexion(), ((AlignementSource) event.getObject()).getId());
+        }
     }
 
 }
