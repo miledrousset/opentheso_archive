@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -15,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
@@ -124,6 +126,10 @@ public class CurrentUser implements Serializable {
                 }
                 user.setIdThesaurus(idTheso);
                 authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
+                FacesContext context = FacesContext.getCurrentInstance();
+                String version_Opentheso =context.getExternalContext().getInitParameter("version");
+                BaseDeDoneesHelper baseDeDonnesHelper = new BaseDeDoneesHelper();
+                baseDeDonnesHelper.updateVersionOpentheso(connect.getPoolConnexion(),version_Opentheso);
             } // on récupère ses droits par rapport au thésaurus en cours
             else {
                 NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);

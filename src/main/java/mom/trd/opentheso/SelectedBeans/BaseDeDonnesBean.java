@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
@@ -127,7 +128,42 @@ public class BaseDeDonnesBean implements Serializable {
             impo.ouvreFichier2(connect.getPoolConnexion(), fichero);
         }
     }
+    /**
+     * permet de savoir comme s'appele notre BDD 
+     * @return le nom de la BDD
+     */
+    private String getNameOfBdd(){
+        FacesContext context = FacesContext.getCurrentInstance();
+        ResourceBundle bundlePool = context.getApplication().getResourceBundle(context, "conHikari");
+        return bundlePool.getString("dataSource.databaseName");
+    }
+    
+    
+    /**
+     * permet de faire la mise à jour de la BDD
+     * 
+     */
+    public void maJBdd()
+    {
+        String ownerName="";
+        InputStream inputStream = this.getClass().getResourceAsStream("/install/maj_bdd_current.sql");
+        BaseDeDoneesHelper baseDeDoneesHelper = new BaseDeDoneesHelper();
+        ownerName =baseDeDoneesHelper.getNameOwner(connect.getPoolConnexion(), getNameOfBdd());
+        if(!baseDeDoneesHelper.insertDonneées(connect.getPoolConnexion(),inputStream, ownerName))
+        {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("bdd.error")));
+        }
+        else
+        {
+            baseDeDoneesHelper.updateVersionBdd(connect.getPoolConnexion());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("bdd.fait")));
+        }
+    }
 
+    /**
+     * Permet de recuperer le mot de pass pour faire le login dans Opentheso
+     * @throws MessagingException 
+     */
     public void oublieMonPass() throws MessagingException {
         ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
         
@@ -145,7 +181,12 @@ public class BaseDeDonnesBean implements Serializable {
         }
         email = null;
     }
-
+/**
+ * 
+ * @throws SQLException
+ * @throws IOException
+ * @throws ClassNotFoundException 
+ */
     public void newDB() throws SQLException, IOException, ClassNotFoundException {
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_dist_4.1.sql");
         
@@ -169,11 +210,11 @@ public class BaseDeDonnesBean implements Serializable {
 
     }
 
-//    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException, XmlPullParserException {
-//        BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
-//        info = basedone.info_out(connect.getPoolConnexion());
-//        return info;
-//    }
+    public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException {
+        BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
+        info = basedone.info_out(connect.getPoolConnexion());
+        return info;
+    }
     public StreamedContent genererdocument() throws SQLException
     {
         remplirText();

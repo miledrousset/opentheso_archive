@@ -257,6 +257,12 @@ public class ConnectInstall implements Serializable {
             messages += "-> Erreur lors de l'insertion des tables et données primaires ???";
             return false;
         }
+        if (!baseDeDoneesHelper.updateVersionBdd(poolConnexionInstall))
+        {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
+            messages += "<br>";
+            messages += "-Error update VersionBdd!!!!!";
+        }
         createPropertiesFile();
         messages += "<br>";
         messages += "-> Installation réussie !!!!!";

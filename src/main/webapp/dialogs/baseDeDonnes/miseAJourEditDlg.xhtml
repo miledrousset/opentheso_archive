@@ -1,0 +1,41 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idMiseAJourEditDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="miseAJourEditDlg" modal="true" resizable="false" >
+        <!-- POPUP ADD USER DEBUT -->
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />
+
+            <p:dataTable value="#{baseDeDonnes.info}" var="u"  reflow="true" rows="3"
+                         style="font-family:'Palatino linotype',Times,serif;">
+                <f:facet name="header">
+                    <h:outputText value="versions" />
+                </f:facet>  
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column colspan="2" headerText="Votre actuel"/>
+                        <p:column colspan="1" headerText="Derniere"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column headerText="Opentheso">
+                    <h:outputText value="#{u.version_Opentheso}"/>
+                </p:column>
+                <p:column headerText="Bdd">
+                    <h:outputText value="#{u.version_bdd}" />
+                </p:column>
+                <p:column headerText="Bdd Current">
+                    <h:outputText value="#{u.versionBddCurrent}" />
+                </p:column>
+            </p:dataTable>
+            <center>
+            <p:commandButton value="ok" update=":idMiseAJourEditDlg"
+                             oncomplete="PF('miseAJourEditDlg').hide();" styleClass="styleButton"/>   
+            </center>
+        </h:form>        
+        <!-- POPUP ADD USER FIN --> 
+    </p:dialog>
+</ui:composition>
