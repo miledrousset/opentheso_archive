@@ -7,40 +7,23 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.ws.rs.core.Configuration;
-import mom.trd.opentheso.bdd.tools.StringPlus;
-import mom.trd.opentheso.core.exports.privatesdatas.importxml.importxml;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jena.rdf.model.Property;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+
+
+
 
 /**
  *
@@ -51,6 +34,11 @@ public class BaseDeDoneesHelper implements Serializable {
     /**
      * Paremetres fixes
      */
+
+    public String version_bdd;
+    public String versionBddCurrent;
+    public String version_Opentheso;
+    public ArrayList<BaseDeDoneesHelper> info;
     
     /**
      * Permet de savoir si le nom de le utilisateur déjà exist o pas
@@ -225,6 +213,7 @@ public class BaseDeDoneesHelper implements Serializable {
                 stmt.execute(scriptBdd);
             } finally {
                 stmt.close();
+                conn.close();
             }
         } catch (SQLException ex) {
             Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
@@ -245,23 +234,28 @@ public class BaseDeDoneesHelper implements Serializable {
     public String prepareScript(InputStream inputstream, String userName) {
         String line;
         String retorno = "";
-
+        boolean sault = true;
         BufferedReader bf;
 
         try {
             bf = new BufferedReader(new InputStreamReader(inputstream, "UTF8"));
             while ((line = bf.readLine()) != null) {
-            if (!line.contains("--")) {//ne prendre pas le lignes que commence par -- (contiens)
-                if (!line.isEmpty()) {
-                    if( line.contains("SET role = opentheso"));
-                    {                            
-                        line = line.replace("opentheso", userName);
-                  
-                    }
-                    retorno += line;
-                    retorno += "\n";
+                if(line.contains("-- version=") && sault)
+                {
+                    versionBddCurrent = line.substring(line.indexOf("=")+1, line.length()).trim();
+                    sault=false;
                 }
-            }
+                    if (!line.contains("--")) {//ne prendre pas le lignes que commence par -- (contiens)
+                        if (!line.isEmpty()) {
+                            if( line.contains("SET role = opentheso"));
+                            {                            
+                                line = line.replace("opentheso", userName);
+
+                            }
+                            retorno += line;
+                            retorno += "\n";
+                        }
+                    }
         }
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(BaseDeDoneesHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -270,6 +264,146 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return retorno;
     }
+    public String getNameOwner(HikariDataSource ds, String dbName)
+    {
+        String owner="";
+        Statement stmt;
+        String scriptBdd;
+        ResultSet resultSet;
+        try {
+            Connection conn = ds.getConnection();
+            stmt = conn.createStatement();
+            String query="SELECT pg_user.usename " 
+                        + "FROM pg_catalog.pg_user,"
+                        + "  pg_catalog.pg_database" 
+                        + " WHERE pg_user.usesysid = pg_database.datdba" 
+                        + "  and pg_database.datname ='"+ dbName+"'";
+            resultSet = stmt.executeQuery(query);
+            if (resultSet.next())
+            {
+                owner=resultSet.getString("usename");
+            }
+            stmt.close();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        return owner;
+    }
+    public boolean updateVersionOpentheso(HikariDataSource ds, String version_Opentheso)
+    {
+        boolean ok = true;
+        Statement stmt;
+        try {
+            Connection conn = ds.getConnection();
+            stmt = conn.createStatement();
+            try {
+                String query ="Update info set version_opentheso = '"+ version_Opentheso+"'"; 
+                stmt.execute(query);
+            } finally {
+                stmt.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            ok= false;
+        }
+        return ok;
+    }
+    public boolean updateVersionBdd(HikariDataSource ds)
+    {
+        Statement stmt;
+        try {
+            Connection conn = ds.getConnection();
+            stmt = conn.createStatement();
+            try {
+                String query ="Update info set version_bdd = '"+ versionBddCurrent+"'";
+                stmt.execute(query);
+            } finally {
+                stmt.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
+    public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds)
+    {
+        BaseDeDoneesHelper outinfo = new BaseDeDoneesHelper();
+        info = new ArrayList<>();
+        Statement stmt;
+        ResultSet resultSet;
+        chercherVersionBdd(ds);
+            try {
+                Connection conn = ds.getConnection();
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select * from info ;";
+                    resultSet =stmt.executeQuery(query);
+                    while(resultSet.next())
+                    {
+                        outinfo.setVersion_Opentheso(resultSet.getString("version_Opentheso"));
+                        outinfo.setVersion_bdd(resultSet.getString("version_bdd"));
+                        outinfo.setVersionBddCurrent(versionBddCurrent);
+                        info.add(outinfo);
+                    }
+                } finally {
+                    stmt.close();
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
+            }
+        return info;
+    }
+    public void chercherVersionBdd(HikariDataSource ds)
+    {
+        InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
+        boolean sault = true;
+        BufferedReader bf;
+        String line;
+        try {
+            bf = new BufferedReader(new InputStreamReader(inputStream, "UTF8"));
+            while ((line = bf.readLine()) != null && sault) {
+                if(line.contains("-- version=") && sault)
+                {
+                    versionBddCurrent = line.substring(line.indexOf("=")+1, line.length()).trim();
+                    sault=false;
+                }
+            }
+        }catch(Exception e)
+        {
 
+        }
+    }
 
+    public String getVersion_bdd() {
+        return version_bdd;
+    }
+
+    public void setVersion_bdd(String version_bdd) {
+        this.version_bdd = version_bdd;
+    }
+
+    public String getVersion_Opentheso() {
+        return version_Opentheso;
+    }
+
+    public void setVersion_Opentheso(String version_Opentheso) {
+        this.version_Opentheso = version_Opentheso;
+    }
+
+    public String getVersionBddCurrent() {
+        return versionBddCurrent;
+    }
+
+    public void setVersionBddCurrent(String versionBddCurrent) {
+        this.versionBddCurrent = versionBddCurrent;
+    }
+    
+    
 }

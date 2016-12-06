@@ -7,6 +7,8 @@
 
 -- Started on 2016-12-01 10:25:47
 
+-- version=4.1.1
+
 SET role = opentheso;
 
 SET statement_timeout = 0;
