@@ -27,7 +27,6 @@ import org.primefaces.event.SelectEvent;
 @SessionScoped
 
 public class EditAlignementSourceBean implements Serializable {
-
     private String source;
     private String type_rqt;
     private String alignement_format;
