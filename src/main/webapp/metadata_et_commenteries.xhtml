@@ -7,7 +7,7 @@
     xmlns:p="http://primefaces.org/ui">
 
 
-        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(treeBean.browserName != 'agent')}">
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(poolConnexion.poolConnexion != null) and (treeBean.browserName != 'agent')}">
             <h1>Gestionnaire de thésaurus</h1>
             <h:outputText value="version :  #{theso.getVersion()}" /><br/>
             Depuis cette page d'accueil, il vous est possible de parcourir le thésaurus.<br/>

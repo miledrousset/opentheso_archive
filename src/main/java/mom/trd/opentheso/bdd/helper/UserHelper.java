@@ -1,6 +1,5 @@
 package mom.trd.opentheso.bdd.helper;
 
-import com.k_int.gen.ESFormat_ExportSpecification.Destination_type;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;

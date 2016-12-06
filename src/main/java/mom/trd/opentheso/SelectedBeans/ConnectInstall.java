@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedProperty;
@@ -145,16 +144,16 @@ public class ConnectInstall implements Serializable {
         ord.add("dataSourceClassName");
         
         
-        conf.put("serverName", serverName);
-        ord.add("serverName");
-        conf.put("serverPort", serverPort);
-        ord.add("serverPort");
-        conf.put("user", nomAdmin);
-        ord.add("user");
-        conf.put("password", passwordAdmin);
-        ord.add("password");
-        conf.put("databaseName", databaseName);
-        ord.add("databaseName");
+        conf.put("dataSource.serverName", serverName);
+        ord.add("dataSource.serverName");
+        conf.put("dataSource.serverPort", serverPort);
+        ord.add("dataSource.serverPort");
+        conf.put("dataSource.user", nomAdmin);
+        ord.add("dataSource.user");
+        conf.put("dataSource.password", passwordAdmin);
+        ord.add("dataSource.password");
+        conf.put("dataSource.databaseName", databaseName);
+        ord.add("dataSource.databaseName");
 
         return true;
     }
@@ -200,7 +199,7 @@ public class ConnectInstall implements Serializable {
         if (!validateConf()) {
             return false;
         }
-        messages = "-Connexion en cours !!!!!";
+        messages = "-> Connexion en cours !!!!!";
         if (!openConnexionPoolInstall()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages = langueBean.getMsg("inst.Err1");
@@ -212,7 +211,7 @@ public class ConnectInstall implements Serializable {
         //on fait la comprobation de que l'user n'exist pas
         //Si exist ne le creer pas
         messages += "<br>";
-        messages += "-Conection complete  ";
+        messages += "-> Conection établie";
         if (!baseDeDoneesHelper.isUserExist(poolConnexionInstall, nomAdmin)) {
             if (!baseDeDoneesHelper.createUser(poolConnexionInstall, nomAdmin, passwordAdmin)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("isnt.Err2")));
@@ -221,21 +220,21 @@ public class ConnectInstall implements Serializable {
                 return false;
             }
             messages += "<br>";
-            messages += "-Utilisateur created";
+            messages += "-> Utilisateur créé";
         }
         //on fait la comprobation de que la Bdd n'exist pas
         if (!baseDeDoneesHelper.isBddExist(poolConnexionInstall, databaseName)) {
             if (!baseDeDoneesHelper.createBdD(poolConnexionInstall, databaseName, nomAdmin)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("isnt.Err3")));
                 messages += "<br>";
-                messages += "-" + langueBean.getMsg("isnt.Err3");
+                messages += "-> " + langueBean.getMsg("isnt.Err3");
                 return false;
             }
             messages += "<br>";
-            messages += "-Bdd fait";
+            messages += "-> Bdd installée";
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err4")));
-            messages += "<br>" + "-" + langueBean.getMsg("inst.Err4");
+            messages += "<br>" + "-> " + langueBean.getMsg("inst.Err4");
             return false;
         }
         closeConnexion();
@@ -248,19 +247,22 @@ public class ConnectInstall implements Serializable {
         }
         // injection des tables et initialisation des données dans la base
         messages += "<br>";
-        messages += "-Connexion en cours a la nouvelle BDD !!!!!";
+        messages += "-> Connexion en cours a la nouvelle BDD !!!!!";
         messages += "<br>";
 
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
         if (!baseDeDoneesHelper.insertDonneées(poolConnexionInstall, inputStream, nomAdmin)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages += "<br>";
-            messages += "-Erreur dans la injection de données";
+            messages += "-> Erreur lors de l'insertion des tables et données primaires ???";
             return false;
         }
         createPropertiesFile();
         messages += "<br>";
-        messages += "-C'est tout fait!!!!!";
+        messages += "-> Installation réussie !!!!!";
+        
+        messages += "<br><br>";
+        messages += "-> n'oubliez pas de re-démarrer Tomcat !!!!!";
 
         return true;
     }

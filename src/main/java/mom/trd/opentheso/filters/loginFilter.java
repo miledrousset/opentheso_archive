@@ -35,7 +35,6 @@ public class loginFilter implements Filter {
         if(session != null) {
 //            resp.sendRedirect("./install.xhtml");
             if(session.getConnect().getPoolConnexion() == null) {
-                resp.sendRedirect("./install.xhtml");
                 return;
             }
         }

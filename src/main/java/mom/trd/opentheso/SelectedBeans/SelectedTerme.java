@@ -335,7 +335,14 @@ public class SelectedTerme implements Serializable {
             majSyno();
             majTSpeConcept();
             align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
-            majNotice();
+            ResourceBundle bundlePref = getBundlePref();
+            if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
+                majNoticeZ3950();
+            }
+            if (bundlePref.getString("bdd.active").equalsIgnoreCase("true")) {
+                majNoticeBdd();
+            }            
+
 
             idArk = new ConceptHelper().getIdArkOfConcept(connect.getPoolConnexion(), idC, idTheso);
 
@@ -344,7 +351,7 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    private void majNotice() {
+    private void majNoticeZ3950() {
         ResourceBundle bundlePref = getBundlePref();
         if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
             Properties p = new Properties();
@@ -385,6 +392,17 @@ public class SelectedTerme implements Serializable {
         }
 
     }
+    
+    private void majNoticeBdd() {
+        ResourceBundle bundlePref = getBundlePref();
+        nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
+        urlNotice = bundlePref.getString("url.bdd");
+        try {
+            urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, bundlePref.getString("url.bdd")));
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
 
     private void majTAsso() {
         termesAssocies = new ArrayList<>();
@@ -2307,6 +2325,7 @@ public class SelectedTerme implements Serializable {
      * @return
      */
     public ArrayList<Entry<String, String>> getALignType() {
+        
         ArrayList<Entry<String, String>> types = new ArrayList<>();
         ArrayList<Entry<String, String>> temp = new ArrayList<>();
         //if(connect.getPoolConnexion()==null)return null;
