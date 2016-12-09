@@ -527,6 +527,12 @@ CREATE TABLE hierarchical_relationship_historique (
 );
 
 
+
+CREATE TABLE info (
+    version_Opentheso character varying,
+    version_Bdd character varying
+);
+
 --
 -- TOC entry 209 (class 1259 OID 86778)
 -- Name: images; Type: TABLE; Schema: public; Owner: -

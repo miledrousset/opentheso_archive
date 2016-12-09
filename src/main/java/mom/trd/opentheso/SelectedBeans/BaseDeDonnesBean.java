@@ -114,7 +114,11 @@ public class BaseDeDonnesBean implements Serializable {
         }
         return file;
     }
-
+/**
+ * 
+ * @throws ClassNotFoundException
+ * @throws SQLException 
+ */
     public void inyectionaBDD() throws ClassNotFoundException, SQLException {
         File fichero;
         importxml impo = new importxml();
@@ -209,12 +213,24 @@ public class BaseDeDonnesBean implements Serializable {
 
 
     }
-
+/**
+ * Function que prepare l'information pour le montres apres 
+ * @return
+ * @throws SQLException
+ * @throws IOException 
+ */
     public ArrayList<BaseDeDoneesHelper> loadinfoDB() throws SQLException, IOException {
         BaseDeDoneesHelper basedone = new BaseDeDoneesHelper();
         info = basedone.info_out(connect.getPoolConnexion());
         return info;
     }
+    
+    /**
+     * permet de generer une document pour pouvoir le telecharger
+     * le format c'est xml
+     * @return
+     * @throws SQLException 
+     */
     public StreamedContent genererdocument() throws SQLException
     {
         remplirText();
@@ -232,7 +248,13 @@ public class BaseDeDonnesBean implements Serializable {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
-    }
+    }/**
+     * permet de generer une document pour pouvoir le telecharger
+     * le format c'est pdf
+     * @return
+     * @throws SQLException
+     * @throws Exception 
+     */
     public StreamedContent pdf() throws SQLException, Exception
     {
         Thesaurus thesaurus= new Thesaurus();

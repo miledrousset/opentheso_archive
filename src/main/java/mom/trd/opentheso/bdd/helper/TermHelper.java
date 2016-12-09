@@ -2413,4 +2413,52 @@ public class TermHelper {
         }
         return existe;
     }
+    
+    /**
+     * on recupere le valeur du WKT: ...
+     * C'est le coordonées pour les affiches dans le map
+     * @param ds
+     * @param idT
+     * @param idTheso
+     * @return 
+     */
+/*    public String recuperateDonnesMaps(HikariDataSource ds
+                    ,String idT, String idTheso)
+    {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String coordenadas=null;
+        String fina = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select lexical_value from non_preferred_term where "
+                            + "id_term = '"+idT+"'"
+                            + " and id_thesaurus = '"+idTheso+"'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while(resultSet.next()) {
+                        coordenadas = resultSet.getString("lexical_value");
+                        if(coordenadas.contains("WKT:"))
+                        {
+                            fina = coordenadas.substring(coordenadas.indexOf(":")+1, coordenadas.length()).trim();
+                        }
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking coordinates : " , sqle);
+        }
+        return fina;
+    }*/
 }
