@@ -26,6 +26,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
+/**
+ *
+ * @author antonio.perez
+ */
+
+
 @ManagedBean(name = "poolConnexionInstall", eager = true)
 @SessionScoped
 
@@ -192,13 +198,15 @@ public class ConnectInstall implements Serializable {
     }
 
     /**
-     *
+     * Gross function que permet de créer une BDD à partir du fichier current;
+     * tout c'est automatique
      * @return
      */
     public boolean createBdd() {
         if (!validateConf()) {
             return false;
         }
+        //on fait la connexion avec le parametres donées
         messages = "-> Connexion en cours !!!!!";
         if (!openConnexionPoolInstall()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
@@ -223,6 +231,7 @@ public class ConnectInstall implements Serializable {
             messages += "-> Utilisateur créé";
         }
         //on fait la comprobation de que la Bdd n'exist pas
+        //si exists tout c'est fini, on ne continue pas ERROR!! 
         if (!baseDeDoneesHelper.isBddExist(poolConnexionInstall, databaseName)) {
             if (!baseDeDoneesHelper.createBdD(poolConnexionInstall, databaseName, nomAdmin)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("isnt.Err3")));
@@ -249,7 +258,7 @@ public class ConnectInstall implements Serializable {
         messages += "<br>";
         messages += "-> Connexion en cours a la nouvelle BDD !!!!!";
         messages += "<br>";
-
+        //on prendre tout l'information à partir du fichier current
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
         if (!baseDeDoneesHelper.insertDonneées(poolConnexionInstall, inputStream, nomAdmin)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
@@ -257,12 +266,14 @@ public class ConnectInstall implements Serializable {
             messages += "-> Erreur lors de l'insertion des tables et données primaires ???";
             return false;
         }
-        if (!baseDeDoneesHelper.updateVersionBdd(poolConnexionInstall))
+        //on rempli la table de la BDD pour avoir l'infomation enregistré
+        if (!baseDeDoneesHelper.insertVersionBdd(poolConnexionInstall))
         {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages += "<br>";
             messages += "-Error update VersionBdd!!!!!";
         }
+        //On ecrit le fichier hikari.properties la configuration pour redemarrer
         createPropertiesFile();
         messages += "<br>";
         messages += "-> Installation réussie !!!!!";

@@ -14,11 +14,11 @@
             <h:form id="form">
                 
                 <p:tree id="tree" styleClass="styleTree" value="#{treeBean.root}" var="node" dynamic="true" cache="true" 
-                        selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true" >
+                        selectionMode="single"  selection="#{treeBean.selectedNode}" animate="true"  >
                     <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />  
                     <p:ajax event="select" 
                             update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                            listener="#{treeBean.onNodeSelect}" />
+                            listener="#{treeBean.onNodeSelect}"  />
             
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  

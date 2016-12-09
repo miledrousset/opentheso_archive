@@ -66,7 +66,11 @@ public class ExportPrivatesDatas {
         tablesToIgnore.add("note_type");
         tablesToIgnore.add("roles");
     }
-    
+    /**
+     * nous ignorons le données qui sont dans columnOfTablesToIgnore
+     * @param value
+     * @return 
+     */
     public boolean isToIgnore(String value) {
         for (String colomne : columnOfTablesToIgnore) {
             if(value.equalsIgnoreCase(colomne))
@@ -74,7 +78,11 @@ public class ExportPrivatesDatas {
         }
         return false;
     }
-    
+    /**
+     * on ignore les tables qui sont dans tablesToIgnore
+     * @param value
+     * @return 
+     */
     public boolean isTableToIgnore(String value) {
         for (String table : tablesToIgnore) {
             if(value.equalsIgnoreCase(table))
@@ -98,6 +106,7 @@ public class ExportPrivatesDatas {
                     stmt = conn.createStatement();
                     try {
                         // récupération des noms des colonnes de la table
+                        //et sont type de données
                         String query ="SELECT COLUMN_NAME,"
                                 + " data_type FROM INFORMATION_SCHEMA.COLUMNS"
                                 + " where TABLE_NAME='" + tableName + "'";
@@ -167,6 +176,11 @@ public class ExportPrivatesDatas {
         }
         return tableList;
     }
+    /**
+     * on recupere toutes le tables de la BDD
+     * @param ds
+     * @return 
+     */
     public ArrayList<String> showAllTables(HikariDataSource ds)
     {
         Connection conn;
@@ -199,6 +213,11 @@ public class ExportPrivatesDatas {
         }
         return tables ;
     }
+    /**
+     * On recupere seulement les tables privates
+     * @param ds
+     * @return 
+     */
         public ArrayList<String> showPrivateTables(HikariDataSource ds)
     {
         Connection conn;

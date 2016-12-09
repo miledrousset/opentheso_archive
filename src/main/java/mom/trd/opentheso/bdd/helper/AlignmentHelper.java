@@ -662,7 +662,13 @@ public class AlignmentHelper {
         }
         return status;
     }
-
+    /**
+     * Permet d'effacer le alignement "idAlignement" du theso "idTheso"
+     * @param conn
+     * @param idTheso
+     * @param idAlignement
+     * @return 
+     */
     private boolean deleteSourceAlignementFromTheso(Connection conn, String idTheso, int idAlignement)
     {
         Statement stmt;
@@ -693,7 +699,13 @@ public class AlignmentHelper {
         return status;
     }
     
-    
+    /**
+     * Permet de ajouté un alignement a un theso
+     * @param conn
+     * @param idTheso
+     * @param idAlignement
+     * @return 
+     */
     private boolean insertSourceAlignementToTheso(Connection conn, String idTheso, int idAlignement)
     {
         Statement stmt;
@@ -725,7 +737,11 @@ public class AlignmentHelper {
         return status;
     }
     
-    
+   /**
+    * permet d'effacer une Alignement 
+    * @param ds
+    * @param id 
+    */ 
     public void efaceAligSour(HikariDataSource ds, int id)
     {
         Statement stmt;

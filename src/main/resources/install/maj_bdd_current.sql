@@ -66,6 +66,31 @@ BEGIN
 end;
 $$ LANGUAGE plpgsql;
 
+--
+--Permet de créer la table gps
+--
+
+-- DROP FUNCTION public.table_gps();
+
+CREATE OR REPLACE FUNCTION public.table_gps() RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'gps') THEN
+
+        execute 
+		'CREATE TABLE gps (
+		id_concept character varying,
+		id_theso character varying,
+		latitude float,
+		longitude float,
+		CONSTRAINT gps_pkey PRIMARY KEY (id_concept)
+		);'
+	;
+
+    END IF;
+END;
+
+$$LANGUAGE plpgsql VOLATILE;
+
 
 --
 --Permet de creé la fonction si elle n'existe pas (alignement_format)
@@ -162,7 +187,7 @@ $$ LANGUAGE plpgsql;
 
 create or replace function adjuteconstraintuser() returns void as $$
 begin
-	if not exists (select * from information_schema.table_constraints where table_name = 'users' and constraint_type = 'UNIQUE'
+	if not exists (SELECT * from information_schema.table_constraints where table_name = 'users' and constraint_type = 'UNIQUE'
 	and constraint_name ='users_mail_key1') then 
 	execute
 	'ALTER TABLE ONLY users
@@ -179,13 +204,11 @@ begin
 CREATE OR REPLACE FUNCTION create_table_info() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'info') THEN
-
         execute 
 		'CREATE TABLE info (
 		    version_Opentheso character varying,
 		    version_Bdd character varying
 		);';
-
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -261,7 +284,7 @@ Begin
 		);
 
 		insert into user_role (id_user, id_role)
-		 select id, id_role from users;
+		 SELECT id, id_role from users;
 
 
 		Alter Table users drop id_role;';
@@ -460,7 +483,7 @@ id int;
 BEGIN
 	IF EXISTS (SELECT * FROM term where term.id is not null) THEN
 
-	select max(term.id) from term into id ; 
+	SELECT max(term.id) from term into id ; 
 	id= id+2;
 	Execute
 		'ALTER TABLE ONLY term_historique ALTER COLUMN id SET DEFAULT nextval(''term_historique__id_seq''::regclass);
@@ -483,7 +506,7 @@ id int;
 BEGIN
 	IF EXISTS (SELECT * FROM users where id_user is not null) THEN
 
-	select max(users.id_user) from users into id ; 
+	SELECT max(users.id_user) from users into id ; 
 	id= id+2;
 	Execute
 		'
@@ -505,7 +528,7 @@ declare
 id int;
 BEGIN
 		IF EXISTS (SELECT * FROM concept where concept.id is not null) THEN
-	select max(concept.id) from concept into id ; 
+	SELECT max(concept.id) from concept into id ; 
 	id= id+2;
 	Execute
 		'ALTER TABLE ONLY concept_historique ALTER COLUMN id SET DEFAULT nextval(''concept_historique__id_seq''::regclass);
@@ -527,7 +550,7 @@ declare
 id int;
 BEGIN
 	IF EXISTS (SELECT * FROM concept_group_label where concept_group_label.id is not null) THEN
-	select max(concept_group_label.id) from concept_group_label into id ; 
+	SELECT max(concept_group_label.id) from concept_group_label into id ; 
 	id= id+2;
 	Execute
 		'ALTER TABLE ONLY concept_group_label_historique ALTER COLUMN id SET DEFAULT nextval(''concept_group_label_historique__id_seq''::regclass);
@@ -549,7 +572,7 @@ declare
 id int;
 BEGIN
 	IF EXISTS (SELECT * FROM concept_group where concept_group.id is not null) THEN
-	select max(concept_group.id) from concept_group into id ; 
+	SELECT max(concept_group.id) from concept_group into id ; 
 	id= id+2;
 	Execute
 		'ALTER TABLE ONLY concept_group_historique ALTER COLUMN id SET DEFAULT nextval(''concept_group_historique__id_seq''::regclass);
@@ -571,7 +594,7 @@ declare
 id int;
 BEGIN
 	IF EXISTS (SELECT * FROM note where note.id is not null) THEN
-	select max(note.id) from note into id ; 
+	SELECT max(note.id) from note into id ; 
 	id= id+2;
 	Execute
 		'ALTER TABLE ONLY note_historique ALTER COLUMN id SET DEFAULT nextval(''note_historique__id_seq''::regclass);
@@ -589,7 +612,7 @@ $$ LANGUAGE plpgsql;
 -- 
 create or replace function majnote() returns void as $$
 begin
-	if not exists (select * from information_schema.table_constraints where table_name = 'note' and constraint_type = 'UNIQUE') then 
+	if not exists (SELECT * from information_schema.table_constraints where table_name = 'note' and constraint_type = 'UNIQUE') then 
 	execute 
 	'ALTER TABLE ONLY note
 	  ADD CONSTRAINT note_notetypecode_id_thesaurus_id_concept_lang_key UNIQUE (notetypecode, id_thesaurus, id_concept, lang, lexicalvalue);
@@ -607,7 +630,20 @@ begin
   end;
   $$LANGUAGE plpgsql;
   
+--
+--Permet d'ajouter la column 'gps' dans la table 'concept'
+-- Valeur par default: false
+--
 
+CREATE OR REPLACE FUNCTION ajouter_column_concept() RETURNS VOID AS $$
+BEGIN
+    IF not EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps' AND TABLE_NAME = 'concept') THEN
+	Execute
+	'Alter TABLE concept ADD COLUMN gps boolean default false;';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 
 --
@@ -620,9 +656,11 @@ begin
 
 
 -- création ou mise à jour des séquences 
-select majnote();
-select create_table_info();
-select info_donnes();
+SELECT majnote();
+SELECT create_table_info();
+SELECT info_donnes();
+SELECT table_gps();
+SELECT ajouter_column_concept();
 SELECT ajouter_sequence('alignement_source__id_seq');
 SELECT ajouter_sequence('concept_group_historique__id_seq');
 SELECT ajouter_sequence('concept_group_label_historique__id_seq');
@@ -634,7 +672,7 @@ SELECT ajouter_sequence('term_historique__id_seq');
 SELECT createUser_role();
 SELECT updateColumnTerm('term');
 SELECT updateColumn_table('users','passtomodify','boolean');
-select updateID_table();
+SELECT updateID_table();
 SELECT updateIDusers();
 SELECT updatesequencesNH();
 SELECT updatesequencesCGH();
@@ -647,16 +685,16 @@ SELECT updateColumn_alignement_source();
 SELECT create_table_thesaurus_alignement_source();
 -- Creation de les types pour alignement_source
 
-select addtype_Alignement_format();
+SELECT addtype_Alignement_format();
 
 -- Type: public.alignement_type_rqt
 
 
-select addtype_Alignement_type_rqt();
+SELECT addtype_Alignement_type_rqt();
 
 -- Type: public.auth_method
 
-select addtype_auth_method();
+SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
 
 
@@ -785,33 +823,35 @@ INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, fals
 --Delete toutes les function
 --
 
-select delete_fonction ('create_table_info','');
-select delete_fonction ('majnote', '');
-select delete_fonction ('info_donnes','');
-select delete_fonction ('updateColumn_alignement_source','');
-select delete_fonction ('create_table_thesaurus_alignement_source','');
-select delete_fonction ('updatesequencesch','');
-select delete_fonction ('updatesequencesth','');
-select delete_fonction ('updatesequencesnh','');
-select delete_fonction ('updatesequencescgh','');
-select delete_fonction ('updatesequencescglh','');
-select delete_fonction ('updatesequences_user','');
-select delete_fonction ('updateidusers','');
-select delete_fonction ('adjuteconstraintuser','');
-select delete_fonction ('updateid_table','');
-select delete_fonction ('create_table_users_historique','');
-select delete_fonction ('updatecolumn_alignement_source','');
-select delete_fonction ('updatecolumnterm','TEXT');
-select delete_fonction ('delete_table','TEXT');
-select delete_fonction ('delete_sequence','TEXT');
-select delete_fonction ('createuser_role','');
-select delete_fonction ('create_table_aligenementsources','');
-select delete_fonction ('ajouter_sequence','TEXT');
-select delete_fonction ('addtype_auth_method','');
-select delete_fonction ('addtype_alignement_type_rqt','');
-select delete_fonction ('addtype_alignement_format','');
-select delete_fonction1 ('updatecolumn_table','TEXT','TEXT');
-select delete_fonction ('delete_column','TEXT','TEXT');
-select delete_fonction ('delete_fonction','TEXT','TEXT');
-select delete_fonction1 ('delete_fonction','TEXT','TEXT');
-select delete_fonction1 ('delete_fonction1','TEXT','TEXT');
+SELECT delete_fonction ('create_table_info','');
+SELECT delete_fonction ('majnote', '');
+SELECT delete_fonction ('table_gps','');
+SELECT delete_fonction ('info_donnes','');
+SELECT delete_fonction ('ajouter_column_concept','');
+SELECT delete_fonction ('updateColumn_alignement_source','');
+SELECT delete_fonction ('create_table_thesaurus_alignement_source','');
+SELECT delete_fonction ('updatesequencesch','');
+SELECT delete_fonction ('updatesequencesth','');
+SELECT delete_fonction ('updatesequencesnh','');
+SELECT delete_fonction ('updatesequencescgh','');
+SELECT delete_fonction ('updatesequencescglh','');
+SELECT delete_fonction ('updatesequences_user','');
+SELECT delete_fonction ('updateidusers','');
+SELECT delete_fonction ('adjuteconstraintuser','');
+SELECT delete_fonction ('updateid_table','');
+SELECT delete_fonction ('create_table_users_historique','');
+SELECT delete_fonction ('updatecolumn_alignement_source','');
+SELECT delete_fonction ('updatecolumnterm','TEXT');
+SELECT delete_fonction ('delete_table','TEXT');
+SELECT delete_fonction ('delete_sequence','TEXT');
+SELECT delete_fonction ('createuser_role','');
+SELECT delete_fonction ('create_table_aligenementsources','');
+SELECT delete_fonction ('ajouter_sequence','TEXT');
+SELECT delete_fonction ('addtype_auth_method','');
+SELECT delete_fonction ('addtype_alignement_type_rqt','');
+SELECT delete_fonction ('addtype_alignement_format','');
+SELECT delete_fonction1 ('updatecolumn_table','TEXT','TEXT');
+SELECT delete_fonction ('delete_column','TEXT','TEXT');
+SELECT delete_fonction ('delete_fonction','TEXT','TEXT');
+SELECT delete_fonction1 ('delete_fonction','TEXT','TEXT');
+SELECT delete_fonction1 ('delete_fonction1','TEXT','TEXT');

@@ -5,8 +5,6 @@
  */
 package mom.trd.opentheso.core.exports.privatesdatas;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author antonio.perez

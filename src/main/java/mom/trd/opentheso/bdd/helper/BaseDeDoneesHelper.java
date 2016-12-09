@@ -74,7 +74,12 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return false;
     }
-    
+    /**
+     * Permet de savoir si le nom du BDD déjà exist o pas
+     * @param ds
+     * @param databasename
+     * @return 
+     */
     public boolean isBddExist(HikariDataSource ds, String databasename)
     {
         ResultSet resultSet;
@@ -264,6 +269,14 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return retorno;
     }
+    
+    /**
+     * Permet de savoir qui est le propietaire de la BDD
+     * que on l'envoy comme parametres
+     * @param ds
+     * @param dbName
+     * @return 
+     */
     public String getNameOwner(HikariDataSource ds, String dbName)
     {
         String owner="";
@@ -291,6 +304,13 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return owner;
     }
+    /**
+     * Rempli la tabla "info" dans la BDD pour garder l'information
+     * On garde la version de Opetheso
+     * @param ds
+     * @param version_Opentheso
+     * @return 
+     */
     public boolean updateVersionOpentheso(HikariDataSource ds, String version_Opentheso)
     {
         boolean ok = true;
@@ -311,6 +331,11 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return ok;
     }
+    /**
+     * Permet de avoir la derniere version disponible
+     * @param ds
+     * @return 
+     */
     public boolean updateVersionBdd(HikariDataSource ds)
     {
         Statement stmt;
@@ -330,6 +355,38 @@ public class BaseDeDoneesHelper implements Serializable {
         }
         return true;
     }
+    /**
+     * Permet de inserté la version instalée dans la BDD 
+     * S'utilise seulement pour la premiere instalation
+     * @param ds
+     * @return 
+     */
+        public boolean insertVersionBdd(HikariDataSource ds)
+    {
+        Statement stmt;
+        try {
+            Connection conn = ds.getConnection();
+            stmt = conn.createStatement();
+            try {
+                String query ="INSERT INTO info VALUES( 'xyz','"+ versionBddCurrent+"');";
+                stmt.execute(query);
+            } finally {
+                stmt.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return true;
+    }
+        
+    /**
+     * Permet de savoir l'information 
+     * version_Opentheso versionbdd, versionBddCurrent
+     * @param ds
+     * @return 
+     */
     public ArrayList<BaseDeDoneesHelper> info_out(HikariDataSource ds)
     {
         BaseDeDoneesHelper outinfo = new BaseDeDoneesHelper();
@@ -360,6 +417,10 @@ public class BaseDeDoneesHelper implements Serializable {
             }
         return info;
     }
+    /**
+     * on recupere la derniere version disponible dans le fichier
+     * @param ds 
+     */
     public void chercherVersionBdd(HikariDataSource ds)
     {
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");

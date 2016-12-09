@@ -54,6 +54,7 @@ import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
@@ -75,6 +76,8 @@ import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+
+import org.primefaces.model.map.MapModel;
 
 
 @ManagedBean(name = "selectedTerme", eager = true)
@@ -169,6 +172,10 @@ public class SelectedTerme implements Serializable {
     private boolean arkActive;
     private String serverAdress;
 
+    //maps
+    private String latitudLongitud=null;
+    private MapModel simpleModel=null;    
+    
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
 
@@ -285,6 +292,8 @@ public class SelectedTerme implements Serializable {
         type = sN.getTypeMot();
         status = "";
         notation = "";
+        latitudLongitud = null;
+        simpleModel = null;
         majTAsso();
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
         if (type == 1) {
@@ -333,6 +342,7 @@ public class SelectedTerme implements Serializable {
             majNotes();
             majLangueConcept();
             majSyno();
+            updateGps();
             majTSpeConcept();
             align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
             ResourceBundle bundlePref = getBundlePref();
@@ -518,6 +528,11 @@ public class SelectedTerme implements Serializable {
             tempMapL.put(ntt.getLang(), ntt.getLexicalValue());
         }
         langues.addAll(tempMapL.entrySet());
+    }
+    
+    public void updateGps() {
+        GpsHelper gpsHelper = new GpsHelper();
+        latitudLongitud=gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
     }
 
     private void majSyno() {
@@ -757,12 +772,19 @@ public class SelectedTerme implements Serializable {
             ArrayList<NodeEM> tempEM = new TermHelper().getNonPreferredTerms(connect.getPoolConnexion(), idT, idTheso, idlangue);
             termesSynonymesE = new ArrayList<>();
             termesSynonymesP = new ArrayList<>();
+            latitudLongitud= null;
             for (NodeEM nem : tempEM) {
                 if (nem.getStatus().equalsIgnoreCase("USE")) {
                     termesSynonymesE.add(nem.getLexical_value());
-                } else {
+                }
+                if (nem.getStatus().equalsIgnoreCase("Hidden")) {
                     termesSynonymesP.add(nem.getLexical_value());
                 }
+                if (nem.getLexical_value().contains("WKT:")) {
+                    latitudLongitud = nem.getLexical_value().substring(nem.getLexical_value().indexOf(":")+1,
+                    nem.getLexical_value().length()).trim();
+             
+            }
             }
             valueEdit = "";
             nomEdit = "";
@@ -2992,6 +3014,14 @@ public class SelectedTerme implements Serializable {
 
     public void setAlignementSource(AlignementSource alignementSource) {
         this.alignementSource = alignementSource;
+    }
+
+    public String getLatitudLongitud() {
+        return latitudLongitud;
+    }
+
+    public void setLatitudLongitud(String latitudLongitud) {
+        this.latitudLongitud = latitudLongitud;
     }
    
 }

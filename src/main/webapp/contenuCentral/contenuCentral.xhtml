@@ -4,11 +4,11 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
-    
-                            <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue2.jpg)"> -->
-                            <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue3.jpg)"> --> 
-                            <!-- <div id="contenuPrincipale" style="background-color: #e4dada"> -->  
-                            
+
+    <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue2.jpg)"> -->
+    <!-- <div id="contenuPrincipale" style="background-image: url(./images/panda_roue3.jpg)"> --> 
+    <!-- <div id="contenuPrincipale" style="background-color: #e4dada"> -->  
+
     <div id="contenuPrincipale">
         <h:panelGroup id="panContenu">
             <div style="text-align: center">
@@ -84,6 +84,7 @@
                 <ui:include src="infoConcept/infoconcept.xhtml" />
                 <!--TERMES SPECIFIQUES DEBUT -->
                 <ui:include src="termesSpecifiques/termesSpecifiques.xhtml"/>
+
             </div>
             <div id="alignDroite">
                 <!--TERMES ASSOCIES DEBUT -->
@@ -94,6 +95,10 @@
                 <ui:include src="notes/notes.xhtml" />
                 <!--ALIGNEMENT DEBUT -->
                 <ui:include src="alignement/alignement.xhtml"/>
+                <!--GOOGLE MAPS -->
+                <ui:include src="googleMaps/googleMaps.xhtml"/>
+
+                <input type="submit" src="geolocalitation.xhtml" value="go" /> 
             </div>
         </h:panelGroup>
     </div>

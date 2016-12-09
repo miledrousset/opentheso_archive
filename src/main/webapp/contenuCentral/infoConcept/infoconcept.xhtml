@@ -11,7 +11,7 @@
         <div class="contenuTerme">
             <div id="imageEdition">
                 <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
-                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
+                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" update=":idGpsEditDlg" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
 
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
@@ -21,6 +21,7 @@
 
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="ajouter coordenes" onclick="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
 
                         <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
 
