@@ -31,6 +31,7 @@ public class EditAlignementSourceBean implements Serializable {
     private String type_rqt;
     private String alignement_format;
     private String requete;
+    private String description;
     private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
 
@@ -88,14 +89,15 @@ public class EditAlignementSourceBean implements Serializable {
         type_rqt = "";
         alignement_format = "";
         requete = "";
+        description ="";
         alignementSource = new AlignementSource();
 
     }
 
     public void insertIntoAlignementSource(String currentIdTheso,
-            List<String> selectedThesaurus) {
+            List<String> selectedThesaurus, int id_user ) {
         AlignmentHelper alignementHelper = new AlignmentHelper();
-        alignementHelper.injenctdansBDAlignement(connect.getPoolConnexion(), selectedThesaurus, alignementSource);
+        alignementHelper.injenctdansBDAlignement(connect.getPoolConnexion(), selectedThesaurus, alignementSource, id_user, currentIdTheso);
         setListeAlignementSources(currentIdTheso);
         cancel();
     }
@@ -304,6 +306,14 @@ public class EditAlignementSourceBean implements Serializable {
                     alignmentHelper.getSelectedAlignementOfThisTheso
                     (connect.getPoolConnexion(), ((AlignementSource) event.getObject()).getId());
         }
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

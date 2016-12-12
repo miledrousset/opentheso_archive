@@ -17,7 +17,7 @@
             <h:panelGrid  id="panelAlignement" width="500" columns="1">
 
                 <h:form>
-                    <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="new alignement"  
+                    <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="New Alignement"  
                                       action="#{editAlignement.initNewAlignement(theso.authorizedThesaurus)}" 
                                       update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"/>&nbsp;
                     &nbsp;
@@ -42,7 +42,6 @@
                                 <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
                                     <h:outputText  value="#{alig.source}" />
                                 </p:column>
-
                             </p:dataTable>
                         </h:form>
                     </fieldset>
@@ -62,7 +61,9 @@
                                 <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}: "/>
                                 <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/>
                                 <p:scrollPanel mode="native" style="width:550px;height:60px">
-                                    <h:outputText value="#{editAlignement.alignementSource.requete}"/></p:scrollPanel><br/>                                        
+                                    <h:outputText value="#{editAlignement.alignementSource.requete}"/></p:scrollPanel>     
+                                <h:outputText style="font-weight: bold" value="Description: "/>
+                                <h:outputText value="#{editAlignement.alignementSource.description}"/>
                             </h:form>
                         </div> 
                     </fieldset>
@@ -83,9 +84,9 @@
                                 </h:selectOneMenu>  <br/>                                      
                                 <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
                                 <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
-                                <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" /><br/>
-
-                                <h:panelGrid>
+                                <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" />
+                                <h:outputText style="font-weight: bold" value="Description: "/>
+                                <h:inputTextarea rows="2" cols="65"  value="#{editAlignement.alignementSource.description}"/><br/>                                <h:panelGrid>
                                     <h:outputText value="#{langueBean.getMsg('theso')}" />
 
                                     <p:scrollPanel  mode="native" style="width:200px;height:100px">
@@ -94,8 +95,9 @@
                                         </p:selectManyCheckbox>
                                     </p:scrollPanel>
                                 </h:panelGrid>
+
                                 <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
-                                                 action="#{editAlignement.insertIntoAlignementSource(theso.thesaurus.id_thesaurus, user1.selectedThesaurus)}" 
+                                                 action="#{editAlignement.insertIntoAlignementSource(theso.thesaurus.id_thesaurus, user1.selectedThesaurus, user1.user.id)}" 
                                                  update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
                                                  />
                                 <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
@@ -120,7 +122,9 @@
                             </h:selectOneMenu>  <br/>        
                             <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
                             <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
-                            <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" /><br/> 
+                            <h:inputTextarea rows="4" cols="65" value="#{editAlignement.alignementSource.requete}" />
+                            <h:outputText style="font-weight: bold" value="Description: "/><br/>
+                            <h:inputTextarea rows="2" cols="65"  value="#{editAlignement.alignementSource.description}"/><br/>
                             <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
                                              action="#{editAlignement.updateSource(theso.thesaurus.id_thesaurus)}"
                                              update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" />                    

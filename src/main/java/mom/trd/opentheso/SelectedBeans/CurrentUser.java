@@ -1,13 +1,11 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -99,6 +97,8 @@ public class CurrentUser implements Serializable {
                 alertNbCdtEdit = np.getNbAlertCdt();
                 alertCdtEdit = np.isAlertCdt();
                 idTheso = idThesaurus;
+                selectedThesaurus = new ArrayList<>();
+                selectedThesaurus.add(idTheso);
             }
             return np;
         }

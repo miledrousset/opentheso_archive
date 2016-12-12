@@ -1,6 +1,5 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -13,12 +12,8 @@ import org.geonames.Toponym;
 import org.geonames.ToponymSearchCriteria;
 import org.geonames.ToponymSearchResult;
 import org.geonames.WebService;
-import org.primefaces.event.map.GeocodeEvent;
 import org.primefaces.model.map.DefaultMapModel;
-import org.primefaces.model.map.GeocodeResult;
-import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
-import org.primefaces.model.map.Marker;
 
 @ManagedBean(name = "gps", eager = true)
 @SessionScoped
@@ -37,7 +32,7 @@ public class GpsBeans {
     public void init() {
         geoModel = new DefaultMapModel();
     }
-
+/*
     public void onGeocode(GeocodeEvent event) {
         boolean premiere = true;
         List<GeocodeResult> results = event.getResults();
@@ -57,7 +52,7 @@ public class GpsBeans {
             }
         }
     }
-
+*/
     public boolean addCoordinates(String idConcept, String idTheso) {
         GpsHelper gpshelper = new GpsHelper();
         gpshelper.insertCoordonees(connect.getPoolConnexion(), idConcept, idTheso, latitud, longitud);
