@@ -30,6 +30,7 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(mom.trd.opentheso.ws.rest.Rest.class);
+        resources.add(org.glassfish.jersey.server.wadl.internal.WadlResource.class);
     }
     
 }
