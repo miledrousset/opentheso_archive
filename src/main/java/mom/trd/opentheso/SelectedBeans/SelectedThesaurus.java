@@ -504,6 +504,7 @@ public class SelectedThesaurus implements Serializable {
             }
             maj();
             arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+            tree.getSelectedTerme().getUser().updateAuthorizedTheso();
             vue.setCreat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") +  " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
             editTheso = new Thesaurus();

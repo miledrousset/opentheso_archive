@@ -35,9 +35,9 @@
         </h:panelGroup>
         <h:panelGroup rendered="#{poolConnexion.poolConnexion == null}">
             <div style="margin: auto; width: 1000px; margin-top: 100px;">
-                <h1>Pemière installation </h1>
-                Si c'est votre première installation,<br/><br/>
-                suivez ce lien pour installer la base de données :<br/>
+                <h1>#{langueBean.getMsg('installTitle')} </h1>
+                #{langueBean.getMsg('installTitle2')}<br/><br/>
+                #{langueBean.getMsg('installTitle3')}
                 <h:outputLink value="install.xhtml"><h:outputText value="Installation ...." /> 
                 </h:outputLink>
             </div>        
