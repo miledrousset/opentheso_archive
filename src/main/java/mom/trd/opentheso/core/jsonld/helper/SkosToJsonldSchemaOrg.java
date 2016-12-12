@@ -45,6 +45,9 @@ public class SkosToJsonldSchemaOrg {
         // boucle pour les Groupes (ConceptScheme)
         SKOSConceptScheme sKOSConceptScheme = skosDocument.getConceptScheme();
         if(sKOSConceptScheme == null) return null;
+        else {
+            
+        }
         
         // add this uri to Json
         addIdConcept(sKOSConceptScheme.getUri());
@@ -54,11 +57,11 @@ public class SkosToJsonldSchemaOrg {
             addLabels(sKOSConceptScheme.getSkosLabels());
         }
         
-      /*  if(!sKOSConceptScheme.getTopConceptsList().isEmpty()){
+       if(!sKOSConceptScheme.getTopConceptsList().isEmpty()){
             addElementInScheme(sKOSConceptScheme.getTopConceptsList(),
                     "hasTopConcept");
         }
-        */
+        
         endLastConcept();
         endJson();
         
