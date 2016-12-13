@@ -363,7 +363,7 @@ $$ LANGUAGE plpgsql;
 --Permet d'ajouter la column description dans alignement source
 --
 
-CREATE OR REPLACE FUNCTION ajoutercolumn_alignement_source() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ajouterColumn_alignement_source() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
      WHERE COLUMN_NAME = 'description' AND TABLE_NAME = 'alignement_source') THEN
