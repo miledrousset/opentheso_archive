@@ -868,7 +868,10 @@ SELECT delete_fonction ('addtype_alignement_type_rqt','');
 SELECT delete_fonction ('addtype_alignement_format','');
 SELECT delete_fonction1 ('updatecolumn_table','TEXT','TEXT');
 SELECT delete_fonction ('delete_column','TEXT','TEXT');
+
+
+SELECT delete_fonction ('ajoutercolumn_alignement_source','');
 SELECT delete_fonction ('delete_fonction','TEXT','TEXT');
-SELECT delete_fonction1 ('delete_fonction','TEXT','TEXT');
-SELECT delete_fonction ('ajouterColumn_alignement_source','');
+select delete_fonction1('delete_fonction','TEXT','TEXT');
 SELECT delete_fonction1 ('delete_fonction1','TEXT','TEXT');
+
