@@ -114,54 +114,66 @@ public class CurrentUser implements Serializable {
      * motpasstemp (et nous sommes dirigées a la page web de changer le
      * motpasstemp)
      */
-    public String action() throws SQLException {
+
+    public String connect() {
+        
         UserHelper userHelper = new UserHelper();
         if (userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
-            // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
-            if (userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
-                user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
-                if (user == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
-                    return "";
-                }
-                user.setIdThesaurus(idTheso);
-                authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
-                FacesContext context = FacesContext.getCurrentInstance();
-                String version_Opentheso =context.getExternalContext().getInitParameter("version");
-                BaseDeDoneesHelper baseDeDonnesHelper = new BaseDeDoneesHelper();
-                baseDeDonnesHelper.updateVersionOpentheso(connect.getPoolConnexion(),version_Opentheso);
-            } // on récupère ses droits par rapport au thésaurus en cours
-            else {
-                NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
-                if (nodeUserTemp == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
-                    nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
-                    if (nodeUserTemp == null) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+            try {
+                // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
+                if (userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
+                    user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
+                    if (user == null) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
                         return "";
                     }
-                } else {
-                    user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                    user.setIdThesaurus(idTheso);
+                    authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
+                    FacesContext context = FacesContext.getCurrentInstance();
+                    String version_Opentheso =context.getExternalContext().getInitParameter("version");
+                    BaseDeDoneesHelper baseDeDonnesHelper = new BaseDeDoneesHelper();
+                    baseDeDonnesHelper.updateVersionOpentheso(connect.getPoolConnexion(),version_Opentheso);
+                } // on récupère ses droits par rapport au thésaurus en cours
+                else {
+                    NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                    if (nodeUserTemp == null) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
+                        nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
+                        if (nodeUserTemp == null) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+                            return "";
+                        }
+                    } else {
+                        user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                    }
+                    authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
                 }
-                authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
-            }
 
-            isLogged = true;
-            if(userEdit != null){
-            isActive = userEdit.isIsActive();}
-
-            if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
-                return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp 
+                isLogged = true;
+                if(userEdit != null){
+                    isActive = userEdit.isIsActive();}
+                
+                if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
+                    return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp
+                }
+                name = null;
+                pwd = null;
+                return "index.xhtml?faces-redirect=true";
+            } catch (SQLException ex) {
+                Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             }
-            name = null;
-            pwd = null;
-            return "index.xhtml?faces-redirect=true";
         }
         // utilisateur ou mot de passe n'existent pas
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
         return "";
     }
 
+    public boolean updateAuthorizedTheso(){
+        UserHelper userHelper = new UserHelper();
+        authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
+        return true;
+    }
+    
     /**
      * permet de retourner tous les utilisateurs d'un thésaurus
      *
