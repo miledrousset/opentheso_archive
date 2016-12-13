@@ -260,7 +260,7 @@ public class ConnectInstall implements Serializable {
         messages += "<br>";
         //on prendre tout l'information à partir du fichier current
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
-        if (!baseDeDoneesHelper.insertDonneées(poolConnexionInstall, inputStream, nomAdmin)) {
+        if (!baseDeDoneesHelper.insertDonnees(poolConnexionInstall, inputStream, nomAdmin)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages += "<br>";
             messages += "-> Erreur lors de l'insertion des tables et données primaires ???";

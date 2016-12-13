@@ -153,7 +153,7 @@ public class BaseDeDonnesBean implements Serializable {
         InputStream inputStream = this.getClass().getResourceAsStream("/install/maj_bdd_current.sql");
         BaseDeDoneesHelper baseDeDoneesHelper = new BaseDeDoneesHelper();
         ownerName =baseDeDoneesHelper.getNameOwner(connect.getPoolConnexion(), getNameOfBdd());
-        if(!baseDeDoneesHelper.insertDonneées(connect.getPoolConnexion(),inputStream, ownerName))
+        if(!baseDeDoneesHelper.insertDonnees(connect.getPoolConnexion(),inputStream, ownerName))
         {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("bdd.error")));
         }
@@ -204,7 +204,7 @@ public class BaseDeDonnesBean implements Serializable {
             }
             // le connextion ici;
             
-            if(!basedonne.insertDonneées(connect.getPoolConnexion(), inputStream, "")){
+            if(!basedonne.insertDonnees(connect.getPoolConnexion(), inputStream, "")){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("error")));
             }
         } else {
