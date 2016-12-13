@@ -4,7 +4,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idGpsEditDlg"  header="gps" widgetVar="gpsEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsEditDlg"  header="#{langueBean.getMsg('gps.nom')}" widgetVar="gpsEditDlg" modal="true" resizable="false" >
         <!--<script type="text/javascript">
             function geocode() {
                 PF('geoMap').geocode(document.getElementById('address').value);
@@ -26,13 +26,20 @@
                               update=":panContenu" immediate="true"/>
                </h:form>-->
         <h:form> 
-        <h:outputText value="Latitud :"/>
-        <h:inputText value="#{gps.latitud}"/>
-        <h:outputText value="Longitud :"/>
-        <h:inputText value="#{gps.longitud}"/>
+            <table>
+                <td>
+                <h:outputText value="#{langueBean.getMsg('gps.ltd')}"/><br/>
+                <h:outputText value="#{langueBean.getMsg('gps.lgt')}"/>
+                </td>
+                <td>
+                <h:inputText value="#{gps.latitud}"/><br/>
+                
+                <h:inputText value="#{gps.longitud}"/><br/>
+                </td>
+        </table>
         <p:commandButton id="addCoordinate" actionListener="#{gps.addCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
-                         action="#{selectedTerme.updateGps}" styleClass="cbEdit" 
-                         icon="ui-icon-edit" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
+                         action="#{selectedTerme.updateGps}"
+                         icon="ui-icon-valider" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
         </h:form>
     </p:dialog>
 </ui:composition>

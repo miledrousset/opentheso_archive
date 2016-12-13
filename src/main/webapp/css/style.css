@@ -637,7 +637,13 @@ input[type="button"], input[type="submit"]{
     border-radius: 5px;
     box-shadow:-3px 5px 7px #7D7D7D;
 }
-
+.titreGps {
+    background: linear-gradient(#90C0FD,#CEF0C4);
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow:-3px 5px 7px #7D7D7D;
+}
 .contenuAlign {
     display: block;
     background-color: #EBF7E8;

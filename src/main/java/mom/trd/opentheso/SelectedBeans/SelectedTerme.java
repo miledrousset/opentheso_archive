@@ -61,6 +61,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.NodePermute;
@@ -171,6 +172,8 @@ public class SelectedTerme implements Serializable {
     String cheminNotice2;
     private boolean arkActive;
     private String serverAdress;
+    
+    NodeGps coordonnees;
 
     //maps
     private String latitudLongitud=null;
@@ -190,6 +193,9 @@ public class SelectedTerme implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    @ManagedProperty(value = "#{gps}")
+    private GpsBeans gps;
 
     /**
      * *************************************** INITIALISATION
@@ -530,9 +536,19 @@ public class SelectedTerme implements Serializable {
         langues.addAll(tempMapL.entrySet());
     }
     
-    public void updateGps() {
+    public void updateGps() 
+    {
+        coordonnees = new NodeGps();
         GpsHelper gpsHelper = new GpsHelper();
-        latitudLongitud=gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
+        coordonnees = gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
+        if(coordonnees == null){
+            latitudLongitud = null;
+            return;
+        }
+        gps.latitud = coordonnees.getLatitude();
+        gps.longitud = coordonnees.getLongitude();
+        latitudLongitud=""+coordonnees.getLatitude()+","+coordonnees.getLongitude();    
+        
     }
 
     private void majSyno() {
@@ -3022,6 +3038,14 @@ public class SelectedTerme implements Serializable {
 
     public void setLatitudLongitud(String latitudLongitud) {
         this.latitudLongitud = latitudLongitud;
+    }
+
+    public GpsBeans getGps() {
+        return gps;
+    }
+
+    public void setGps(GpsBeans gps) {
+        this.gps = gps;
     }
    
 }

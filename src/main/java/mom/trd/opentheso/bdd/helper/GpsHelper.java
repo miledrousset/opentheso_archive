@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -193,9 +196,9 @@ public class GpsHelper {
         return existe; 
     }
     
-    public String getCoordinate(HikariDataSource ds, String id_concept, String id_theso)
+    public NodeGps getCoordinate(HikariDataSource ds, String id_concept, String id_theso)
     {
-        String coordenates=null;
+        NodeGps coordonnees = null; 
         if(isHaveCoordinate(ds, id_concept, id_theso)) {
             Connection conn;
             Statement stmt;
@@ -211,10 +214,10 @@ public class GpsHelper {
                             + " where id_concept ='" + id_concept + "'"
                             + " and id_theso = '" + id_theso + "'";
                         resultSet = stmt.executeQuery(query);
-                        while (resultSet.next()) {
-                            coordenates = ""+ resultSet.getDouble("latitude");
-                            coordenates +=",";
-                            coordenates += ""+ resultSet.getDouble("longitude");
+                        if(resultSet.next()) {
+                            coordonnees = new NodeGps();
+                            coordonnees.setLatitude(resultSet.getDouble("latitude"));
+                            coordonnees.setLongitude(resultSet.getDouble("longitude"));
                         }
                     } finally {
                         stmt.close();
@@ -228,7 +231,7 @@ public class GpsHelper {
             }            
         }
 
-        return coordenates;
+        return coordonnees;
     }
     
 

@@ -1,17 +1,11 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
-import org.geonames.Toponym;
-import org.geonames.ToponymSearchCriteria;
-import org.geonames.ToponymSearchResult;
-import org.geonames.WebService;
 import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.MapModel;
 
@@ -21,8 +15,8 @@ public class GpsBeans {
 
     private MapModel geoModel;
     private String centerGeoMap = "41.850033, -87.6500523";
-    private double latitud;
-    private double longitud;
+    public double latitud;
+    public double longitud;
     private String coordennees= null;
     
     @ManagedProperty(value = "#{poolConnexion}")
@@ -60,7 +54,9 @@ public class GpsBeans {
         return true;
     }
 
-        public void test() {
+    
+    // test Géonames
+/*        public void test() {
         try {
             WebService.setUserName("demo"); // add your username here
             
@@ -74,7 +70,7 @@ public class GpsBeans {
             Logger.getLogger(GpsHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+*/    
     public MapModel getGeoModel() {
         return geoModel;
     }

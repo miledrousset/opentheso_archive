@@ -17,7 +17,7 @@
             <h:panelGrid  id="panelAlignement" width="500" columns="1">
 
                 <h:form>
-                    <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="New Alignement"  
+                    <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="#{langueBean.getMsg('alig.new')}"
                                       action="#{editAlignement.initNewAlignement(theso.authorizedThesaurus)}" 
                                       update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"/>&nbsp;
                     &nbsp;
