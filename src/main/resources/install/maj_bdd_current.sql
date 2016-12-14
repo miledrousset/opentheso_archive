@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.2.0
--- date : 30/11/2016
+-- date : 13/12/2016
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
