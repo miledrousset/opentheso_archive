@@ -1,7 +1,7 @@
 
 --  !!!!!!! Attention !!!!!!!!!
 --
--- pour le passage des anciennes versions vers la 4.1
+-- pour le passage des anciennes versions vers la 4.2.0
 -- il faut appliquer ce script à votre BDD actuelle,
 -- il faut faire une sauvegarde avant toute opération
 --
