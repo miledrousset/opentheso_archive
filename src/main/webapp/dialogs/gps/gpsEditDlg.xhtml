@@ -1,3 +1,6 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -28,18 +31,20 @@
         <h:form> 
             <table>
                 <td>
-                <h:outputText value="#{langueBean.getMsg('gps.ltd')}"/><br/>
-                <h:outputText value="#{langueBean.getMsg('gps.lgt')}"/>
+                    <h:outputText value="#{langueBean.getMsg('gps.ltd')}"/><br/>
+                    <h:outputText value="#{langueBean.getMsg('gps.lgt')}"/>
                 </td>
                 <td>
-                <h:inputText value="#{gps.latitud}"/><br/>
-                
-                <h:inputText value="#{gps.longitud}"/><br/>
+                    <h:inputText value="#{gps.latitud}"/><br/>
+
+                    <h:inputText value="#{gps.longitud}"/><br/>
                 </td>
-        </table>
-        <p:commandButton id="addCoordinate" actionListener="#{gps.addCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
-                         action="#{selectedTerme.updateGps}"
-                         icon="ui-icon-valider" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
+            </table>
+                    <p:commandButton id="addCoordinate" actionListener="#{gps.addCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
+                             action="#{selectedTerme.updateGps}"
+                             icon="ui-icon-valider" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <h:outputLink  style="align-items: flex-end" value="http://www.coordonnees-gps.fr/" target="_blank">?</h:outputLink>
         </h:form>
     </p:dialog>
 </ui:composition>
