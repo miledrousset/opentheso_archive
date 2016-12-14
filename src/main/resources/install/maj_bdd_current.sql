@@ -1,14 +1,14 @@
 
 --  !!!!!!! Attention !!!!!!!!!
 --
--- pour le passage des anciennes versions vers la 4.1
+-- pour le passage des anciennes versions vers la 4.2.0
 -- il faut appliquer ce script à votre BDD actuelle,
 -- il faut faire une sauvegarde avant toute opération
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.2.0
--- date : 30/11/2016
+-- date : 13/12/2016
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -363,7 +363,7 @@ $$ LANGUAGE plpgsql;
 --Permet d'ajouter la column description dans alignement source
 --
 
-CREATE OR REPLACE FUNCTION ajouterColumn_alignement_source() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ajoutercolumn_alignement_source() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
      WHERE COLUMN_NAME = 'description' AND TABLE_NAME = 'alignement_source') THEN

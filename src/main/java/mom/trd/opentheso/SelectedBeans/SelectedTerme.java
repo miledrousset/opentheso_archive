@@ -544,7 +544,7 @@ public class SelectedTerme implements Serializable {
         if(coordonnees == null){
             latitudLongitud = null;
             gps.latitud = 0.0;
-            gps.longitud =  0.0;
+            gps.longitud = 0.0;
             return;
         }
         gps.latitud = coordonnees.getLatitude();

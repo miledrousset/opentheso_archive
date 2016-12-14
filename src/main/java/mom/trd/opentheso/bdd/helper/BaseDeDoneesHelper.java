@@ -207,7 +207,7 @@ public class BaseDeDoneesHelper implements Serializable {
      * @param userName
      * @return
      */
-    public boolean insertDonneées(HikariDataSource ds, InputStream inputStream, String userName) {
+    public boolean insertDonnees(HikariDataSource ds, InputStream inputStream, String userName) {
         Statement stmt;
         String scriptBdd;
         try {
