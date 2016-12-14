@@ -28,18 +28,23 @@
         <h:form> 
             <table>
                 <td>
-                <h:outputText value="#{langueBean.getMsg('gps.ltd')}"/><br/>
-                <h:outputText value="#{langueBean.getMsg('gps.lgt')}"/>
+                    <h:outputText value="#{langueBean.getMsg('gps.ltd')}"/><br/>
+                    <h:outputText value="#{langueBean.getMsg('gps.lgt')}"/>
                 </td>
                 <td>
-                <h:inputText value="#{gps.latitud}"/><br/>
-                
-                <h:inputText value="#{gps.longitud}"/><br/>
+                    <h:inputText value="#{gps.latitud}"/><br/>
+
+                    <h:inputText value="#{gps.longitud}"/><br/>
                 </td>
-        </table>
-        <p:commandButton id="addCoordinate" actionListener="#{gps.addCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
-                         action="#{selectedTerme.updateGps}"
-                         icon="ui-icon-valider" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
+            </table>
+
+                    <p:commandButton id="addCoordinate" actionListener="#{gps.addCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
+                                     action="#{selectedTerme.updateGps}"
+                                     icon="ui-icon-valider" update=":panContenu" oncomplete="PF('gpsEditDlg').hide();"  />
+
+                    <a href="http://www.coordonnees-gps.fr/" target="_blank"> <input type="button" name="boton" 
+                                                                                     value="?" style="float: right" /> </a> 
+
         </h:form>
     </p:dialog>
 </ui:composition>

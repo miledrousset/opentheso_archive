@@ -543,6 +543,8 @@ public class SelectedTerme implements Serializable {
         coordonnees = gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
         if(coordonnees == null){
             latitudLongitud = null;
+            gps.latitud = 0.0;
+            gps.longitud =  0.0;
             return;
         }
         gps.latitud = coordonnees.getLatitude();

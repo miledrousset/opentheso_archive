@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -232,6 +233,45 @@ public class GpsHelper {
         }
 
         return coordonnees;
+    }
+    public ArrayList<AlignementSource>getAlignementSource(HikariDataSource ds)
+    {
+        ArrayList<AlignementSource> aligSource = new ArrayList<>();
+        AlignementSource alig = new AlignementSource();
+        
+        Connection conn;
+            Statement stmt;
+            ResultSet resultSet;
+
+            try {
+                // Get connection from pool
+                conn = ds.getConnection();
+                try {
+                    stmt = conn.createStatement();
+                    try {
+                    String query = "select * from alignement_source"
+                            + " where source = 'Geoname'";
+                        resultSet = stmt.executeQuery(query);
+                        if(resultSet.next()) {
+                            alig.setSource(resultSet.getString("source"));
+                            alig.setRequete(resultSet.getString("requete"));
+                            alig.setTypeRequete(resultSet.getString("type_rqt"));
+                            alig.setAlignement_format(resultSet.getString("alignement_format"));
+                            alig.setId(resultSet.getInt("id"));
+                            alig.setDescription(resultSet.getString("description"));
+                        }
+                        aligSource.add(alig);
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while Add coordonnes : ", sqle);
+            }                   
+        return aligSource;
     }
     
 

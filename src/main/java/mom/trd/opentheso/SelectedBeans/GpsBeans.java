@@ -1,11 +1,17 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.core.alignment.AlignementSource;
+import mom.trd.opentheso.core.alignment.AlignmentQuery;
+import mom.trd.opentheso.core.alignment.GpsQuery;
 import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.MapModel;
 
@@ -18,9 +24,16 @@ public class GpsBeans {
     public double latitud;
     public double longitud;
     private String coordennees= null;
+    private ArrayList<AlignementSource> alignementSources;
+    private ArrayList<NodeAlignment> listAlignValues;
+    private String selectedAlignement;
+    private ArrayList<AlignementSource> listeAlignementSources;
+    
     
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser theUser;
 
     @PostConstruct
     public void init() {
@@ -53,7 +66,48 @@ public class GpsBeans {
         
         return true;
     }
+    public boolean getAligGps(String lexicalValue,String idC, String id_Theso, String lange)
+    {
+        boolean status= false;
+        listAlignValues=new ArrayList<>();
+        GpsQuery gpsQuery= new GpsQuery();
+        String requete ="";
+        listAlignValues=gpsQuery.queryGps(idC, id_Theso, lexicalValue, lange, requete);
+        
+        return status;
+    }
+    public void creerAlignAuto(String idC, String idTheso, String nom, String idlangue) {
+        if(selectedAlignement == null) return;
+        GpsQuery gpsQuery =new GpsQuery();
+        
+        listAlignValues = new ArrayList<>();
+            
+        for (AlignementSource alignementSource1 : alignementSources) {
+            // on se positionne sur la source sélectionnée 
+            if(selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
+                // on trouve le type de filtre à appliquer
+                
+                if("REST".equalsIgnoreCase(alignementSource1.getTypeRequete()))
+                {
+                    if("xml".equals(alignementSource1.getAlignement_format()))
+                    {
+                        //ici il faut appeler le filtre de Wikipédia 
+                        listAlignValues = gpsQuery.queryGps(idC, idTheso, nom.trim(), idlangue, alignementSource1.getRequete());
+                    }
+                }
+           }
+        }
 
+    }
+
+    
+    public void setListeAlignementSources(String idTheso) {
+        int role = theUser.getUser().getIdRole();
+        if (role == 1 || role == 2) {
+            AlignmentHelper alignmentHelper = new AlignmentHelper();
+            listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
+        }
+    }
     
     // test Géonames
 /*        public void test() {
@@ -117,6 +171,46 @@ public class GpsBeans {
 
     public void setCoordennees(String coordennees) {
         this.coordennees = coordennees;
+    }
+
+    public ArrayList<AlignementSource> getAlignementSources() {
+        return alignementSources;
+    }
+
+    public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
+        this.alignementSources = alignementSources;
+    }
+    public ArrayList<NodeAlignment> getListAlignValues() {
+        return listAlignValues;
+    }
+
+    public void setListAlignValues(ArrayList<NodeAlignment> listAlignValues) {
+        this.listAlignValues = listAlignValues;
+    }
+
+    public String getSelectedAlignement() {
+        return selectedAlignement;
+    }
+
+    public void setSelectedAlignement(String selectedAlignement) {
+        this.selectedAlignement = selectedAlignement;
+    }
+
+    public ArrayList<AlignementSource> getListeAlignementSources() {
+        return listeAlignementSources;
+    }
+
+    public void setListeAlignementSources() {
+        GpsHelper gpsHelper = new GpsHelper();
+        alignementSources = gpsHelper.getAlignementSource(connect.getPoolConnexion());
+    }
+
+    public CurrentUser getTheUser() {
+        return theUser;
+    }
+
+    public void setTheUser(CurrentUser theUser) {
+        this.theUser = theUser;
     }
 
 }

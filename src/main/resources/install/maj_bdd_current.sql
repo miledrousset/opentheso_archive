@@ -696,8 +696,7 @@ SELECT updatesequencesCH();
 SELECT updatesequencesTH();
 SELECT adjuteconstraintuser();
 SELECT create_table_users_historique();
-SELECT updateColumn_alignement_source();
-SELECT ajouterColumn_alignement_source();
+
 SELECT create_table_thesaurus_alignement_source();
 -- Creation de les types pour alignement_source
 
@@ -712,7 +711,8 @@ SELECT addtype_Alignement_type_rqt();
 
 SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
-
+SELECT updateColumn_alignement_source();
+SELECT ajouterColumn_alignement_source();
 
 -- delete sequences
 SELECT delete_sequence('user_username_seq');
