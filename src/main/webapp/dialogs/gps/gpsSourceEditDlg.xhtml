@@ -6,16 +6,43 @@
     xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="idGpsSourceEditDlg"  header="#{langueBean.getMsg('gps.nom')}" widgetVar="gpsSourceEditDlg" modal="true" resizable="false" >
-        <h:outputText value="source Alignement GPS" /> '<h:outputText value="#{selectedTerme.nom}" />' :
+
         <h:form>
             <h:panelGrid columns="2">
                 <p:selectOneRadio id="alignementSources"  value="#{gps.selectedAlignement}" layout="grid" columns="1">
                     <f:selectItems value="#{gps.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
                 </p:selectOneRadio>
             </h:panelGrid>
+            <table>
+                <tr>
+                    <td>
+                        <h:outputText value="Integrer Traduction"/>
+                    </td>
+                    <td>
+                        <p:selectBooleanCheckbox value="#{gps.integrerTraduction}" /><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h:outputText value="Reemplacer Traduction"/>
+                    </td>
+                    <td>
+                        <p:selectBooleanCheckbox value="#{gps.reemplacerTraduction}" /><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h:outputText value="Alignement Automatique"/>
+                    </td>
+                    <td>
+                        <p:selectBooleanCheckbox value="#{gps.alignementAutomatique}" /><br/>
+                    </td>
+                </tr>
+            </table>
+            <Br/>
             <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
-                             actionListener="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}"
-                         update="idGpsSource_suiteEditDlg" styleClass="styleButton" oncomplete="PF('gpsSource_suiteEditDlg').show(); PF('gpsSourceEditDlg').hide();"/>
+                             actionListener="#{gps.validateParamretagesGps(selectedTerme.idTheso, selectedTerme.idlangue)}"
+                              styleClass="styleButton" oncomplete="PF('gpsSourceEditDlg').hide();"/>
         </h:form>
     </p:dialog>
 </ui:composition>

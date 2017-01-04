@@ -14,13 +14,20 @@
                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and 
                                     (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') 
                                     and (selectedTerme.idDomaine != 'Orphan')}">
-                    <p:commandButton id="buttonParamAlign" disabled="true" title="Paramètre de l'alignement source" actionListener="#{gps.setListeAlignementSources()}"
+                    <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{gps.setListeAlignementSources()}"
                                      update=":idGpsSourceEditDlg" oncomplete="PF('gpsSourceEditDlg').show()" 
                                      styleClass="cbEdit" 
                                      icon="ui-icon-parametre" >
                     </p:commandButton>
-                    <p:commandButton title="#{langueBean.getMsg('gps.nom')}"  styleClass="cbEdit" 
-                                     icon="ui-icon-edit" update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();"/>       
+                    <p:commandButton id="dynaButtonGps" rendered="#{selectedTerme.type != 1}" 
+                                     styleClass="cbEdit" icon="ui-icon-edit" >
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonGps" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('gps.nom')}"  update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="Automatique" actionListener="#{gps.setListeAlignementSources()}" 
+                                        action="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}"
+                                        update=":idGpsSource_suiteEditDlg" oncomplete="PF('gpsSource_suiteEditDlg').show()" style="font-size: 12px;"/>
+                        </p:menu>
+                    </p:commandButton>    
                 </h:form>
             </div>
         </div>

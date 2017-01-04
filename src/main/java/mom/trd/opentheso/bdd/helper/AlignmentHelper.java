@@ -25,8 +25,46 @@ public class AlignmentHelper {
     }
 
     /**
-     * Cette fonction permet d'ajouter un nouvel alignement sur un thésaurus
-     * distant pour ce concept
+     * Permet de savoir si le concept 'id_concept' a déjà une alignement ou pas
+     *
+     * @param ds
+     * @param id_Theso
+     * @param id_Concept
+     * @return
+     */
+    public boolean isExistsAlignement(HikariDataSource ds, String id_Theso, String id_Concept) {
+        boolean status = false;
+        Connection conn;
+        Statement stmt;
+        ResultSet rs;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT internal_id_concept from alignement"
+                            + " where internal_id_concept = '" + id_Concept + "'"
+                            + " and internal_id_thesaurus = '" + id_Theso + "'";
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        status = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while search alignement with target : " + sqle);
+        }
+        return status;
+    }
+
+    /**
+     * Permet de savoir si on besoin faire une update ou un insert dans la BDD
      *
      * @param ds
      * @param author
@@ -43,10 +81,45 @@ public class AlignmentHelper {
             String conceptTarget, String thesaurusTarget,
             String uriTarget, int idTypeAlignment,
             String idConcept, String idThesaurus) {
-
+        boolean status = false;
         Connection conn;
         Statement stmt;
+        if (!isExistsAlignement(ds, idThesaurus, idConcept)) {
+            status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, idConcept, idThesaurus);
+            if (!status) {
+                return false;
+            }
+        } else {
+            status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, idConcept, idThesaurus);
+            if (!status) {
+                return false;
+            }
+        }
 
+        return status;
+    }
+
+    /**
+     * Cette fonction permet d'ajouter un nouvel alignement sur un thésaurus
+     * distant pour ce concept
+     *
+     * @param ds
+     * @param author
+     * @param conceptTarget
+     * @param thesaurusTarget
+     * @param uriTarget
+     * @param idTypeAlignment
+     * @param idConcept
+     * @param idThesaurus
+     * @return
+     */
+    private boolean addNewAlignement2(HikariDataSource ds,
+            int author,
+            String conceptTarget, String thesaurusTarget,
+            String uriTarget, int idTypeAlignment,
+            String idConcept, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
         boolean status = false;
         try {
             // Get connection from pool
@@ -249,10 +322,8 @@ public class AlignmentHelper {
                             + " modified = current_date,"
                             + " thesaurus_target = '" + thesaurusTarget + "',"
                             + " uri_target = '" + uriTarget + "',"
-                            + " alignement_id_type = " + idTypeAlignment + ","
-                            + " thesaurus_target = '" + thesaurusTarget + "'"
-                            + " WHERE id =" + idAlignment
-                            + " AND internal_id_thesaurus = '" + idThesaurus + "'"
+                            + " alignement_id_type = " + idTypeAlignment
+                            + " WHERE internal_id_thesaurus = '" + idThesaurus + "'"
                             + " AND internal_id_concept = '" + idConcept + "'";
                     stmt.executeUpdate(query);
                     status = true;
@@ -401,7 +472,8 @@ public class AlignmentHelper {
                             + " alignement_source.type_rqt, alignement_source.alignement_format,"
                             + " alignement_source.id from alignement_source, thesaurus_alignement_source"
                             + " WHERE thesaurus_alignement_source.id_alignement_source = alignement_source.id"
-                            + " AND thesaurus_alignement_source.id_thesaurus = '" + id_theso + "'";
+                            + " AND thesaurus_alignement_source.id_thesaurus = '" + id_theso + "'"
+                            + " AND gps = false";
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
                         AlignementSource alignementSource = new AlignementSource();
@@ -561,7 +633,7 @@ public class AlignmentHelper {
             }
             for (String listTheso : listThesos) {
                 id_alignement = getId_Alignement(conn, alig.getSource());
-                if(!insertSourceAlignementToTheso(conn, listTheso, id_alignement)){
+                if (!insertSourceAlignementToTheso(conn, listTheso, id_alignement)) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -838,4 +910,72 @@ public class AlignmentHelper {
             log.error("Error while delete Alignement : ", sqle);
         }
     }
+
+    public String getGroupOfConcept(HikariDataSource ds, String id_Theso, String id_concept) {
+        String group = "";
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "select  id_group from concept"
+                            + " where id_thesaurus = '" + id_Theso
+                            + "' and id_concept = '" + id_concept + "'";
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        group = rs.getString("id_group");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while get it back group : ", sqle);
+        }
+        return group;
+    }
+
+    public boolean isHaveChildren(HikariDataSource ds, String idtheso, String idconcept) {
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "select id_concept2 from hierarchical_relationship "
+                            + "where id_thesaurus = '" + idtheso
+                            + "' and id_concept1='" + idconcept
+                            + "' and role ='NT'";
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        status = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while search children", sqle);
+        }
+        return status;
+    }
+
 }

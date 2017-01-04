@@ -79,6 +79,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 import org.primefaces.model.map.MapModel;
+import sun.nio.cs.ext.GB18030;
 
 
 @ManagedBean(name = "selectedTerme", eager = true)
@@ -95,7 +96,7 @@ public class SelectedTerme implements Serializable {
     private ArrayList<String> termesSynonymesE = new ArrayList<>();
     private ArrayList<String> termesSynonymesP = new ArrayList<>();
     private ArrayList<NodeImage> images = new ArrayList<>();
-    private ArrayList<NodeAlignment> align = new ArrayList<>();
+private ArrayList<NodeAlignment> align = new ArrayList<>();
     private ArrayList<NodeNote> listnotes = new ArrayList<>();
 
     private TreeNode root;
@@ -194,8 +195,7 @@ public class SelectedTerme implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
     
-    @ManagedProperty(value = "#{gps}")
-    private GpsBeans gps;
+
 
     /**
      * *************************************** INITIALISATION
@@ -526,7 +526,7 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    private void majLangueConcept() {
+    public void majLangueConcept() {
         langues = new ArrayList<>();
         ArrayList<NodeTermTraduction> tempNTT = new TermHelper().getTraductionsOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
         HashMap<String, String> tempMapL = new HashMap<>();
@@ -538,6 +538,7 @@ public class SelectedTerme implements Serializable {
     
     public void updateGps() 
     {
+        GpsBeans gps = new GpsBeans();
         coordonnees = new NodeGps();
         GpsHelper gpsHelper = new GpsHelper();
         coordonnees = gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
@@ -549,6 +550,7 @@ public class SelectedTerme implements Serializable {
         }
         gps.latitud = coordonnees.getLatitude();
         gps.longitud = coordonnees.getLongitude();
+        gps.reinitBoolean();
         latitudLongitud=""+coordonnees.getLatitude()+","+coordonnees.getLongitude();    
         
     }
@@ -3042,12 +3044,6 @@ public class SelectedTerme implements Serializable {
         this.latitudLongitud = latitudLongitud;
     }
 
-    public GpsBeans getGps() {
-        return gps;
-    }
 
-    public void setGps(GpsBeans gps) {
-        this.gps = gps;
-    }
    
 }

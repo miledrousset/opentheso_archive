@@ -1,14 +1,14 @@
 
 --  !!!!!!! Attention !!!!!!!!!
 --
--- pour le passage des anciennes versions vers la 4.2.0
+-- pour le passage des anciennes versions vers la 4.1
 -- il faut appliquer ce script à votre BDD actuelle,
 -- il faut faire une sauvegarde avant toute opération
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.2.1
--- date : 04/01/2017
+-- date : 30/11/2016
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -345,6 +345,31 @@ END;
 $$ LANGUAGE plpgsql;
 
 --
+--Permet d'ajouter la column id_alignement_source dans alignement
+--et de changer la constraint
+--
+
+CREATE OR REPLACE FUNCTION ajoutercolumn_alignement() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'id_alignement_source' AND TABLE_NAME = 'alignement') THEN
+	Execute
+	'
+	 Alter TABLE alignement ADD COLUMN id_alignement_source integer;
+
+	 ALTER TABLE ONLY alignement DROP CONSTRAINT alignement_concept_target_thesaurus_target_alignement_id_ty_key;
+
+	 ALTER TABLE ONLY alignement ADD CONSTRAINT alignement_uri_target_internal_id_thesaurus_internal_id_con_key 
+	 UNIQUE (uri_target, internal_id_thesaurus, internal_id_concept);
+
+';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
+
+
+
+--
 --permet de changer la column de alignemet source
 --
 
@@ -360,10 +385,25 @@ END;
 $$ LANGUAGE plpgsql; 
 
 --
+--Permet d'ajouter la column gps a la table alignement source
+--
+
+CREATE OR REPLACE FUNCTION ajoutercolumngps_alignement_source() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps' AND TABLE_NAME = 'alignement_source') THEN
+	Execute
+	'
+	 Alter TABLE alignement_source ADD COLUMN gps boolean  default false;';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
+
+--
 --Permet d'ajouter la column description dans alignement source
 --
 
-CREATE OR REPLACE FUNCTION ajoutercolumn_alignement_source() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ajouterColumn_alignement_source() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
      WHERE COLUMN_NAME = 'description' AND TABLE_NAME = 'alignement_source') THEN
@@ -373,25 +413,6 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql; 
-
---
---
---
-CREATE OR REPLACE FUNCTION ajoutercolumn_alignement() RETURNS VOID AS $$
-BEGIN
-    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'id_alignement_source' AND TABLE_NAME = 'alignement') THEN
-	Execute
-	'
-	 Alter TABLE alignement ADD COLUMN id_alignement_source integer;
-	 ALTER TABLE ONLY alignement ADD CONSTRAINT alignement_uri_target_internal_id_thesaurus_internal_id_con_key 
-	 UNIQUE (uri_target, internal_id_thesaurus, internal_id_concept);
-
-';
-    END IF;
-END;
-$$ LANGUAGE plpgsql; 
-
 
 --permet d'ajouter une sequence si elle n'existe pas
 
@@ -680,37 +701,50 @@ END;
 $$ LANGUAGE plpgsql;
 
 --
--- Permet d'ajouter la constraint unique sûr la source dans alignement_source
+--Permet d'ajouter les 3 columns boolean dans la table preferences
 --
-create or replace function adjouteconstraint_alignement_source() returns void as $$
-begin
-	if not exists (SELECT * from information_schema.table_constraints where table_name = 'alignement_source' and constraint_type = 'UNIQUE'
-	and constraint_name ='alignement_source_source_key') then 
-	execute
-	'ALTER TABLE ONLY alignement_source
-	  ADD CONSTRAINT alignement_source_source_key UNIQUE 
-	  (source);';
-  end if;
-  end;
-  $$LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION ajoutercolumn_preferences() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps_integrertraduction' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+         Alter TABLE preferences ADD COLUMN gps_id_source Integer  ;
+	 Alter TABLE preferences ADD COLUMN gps_integrertraduction boolean  default true;
+	 Alter TABLE preferences ADD COLUMN gps_reemplacertraduction boolean  default true;
+	 Alter TABLE preferences ADD COLUMN gps_alignementautomatique boolean  default true;
+	 ';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
 
-
-
---////////////////////////////////à partir Version 4.2.0/////////////////////////////
 --
---Permet d'effacer la constraint dans la table alignement
+--Permet de crée la table de alignement_type si n'exists pas
+-- et de faire ses includes
 --
-create or replace function drop_constraint_alignement_source() returns void as $$
-begin
-	if exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'UNIQUE'
-	and constraint_name ='alignement_concept_target_thesaurus_target_alignement_id_ty_key') then 
-	execute
-	'ALTER TABLE ONLY alignement
-	  DROP CONSTRAINT alignement_concept_target_thesaurus_target_alignement_id_ty_key ;';
-  end if;
-  end;
-  $$LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION create_table_alignement_type()
+  RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'alignement_type') THEN
+        execute 
+		'CREATE TABLE alignement_type
+			(
+			  id integer NOT NULL,
+			  label text NOT NULL,
+			  isocode text NOT NULL,
+			  label_skos character varying,
+			  CONSTRAINT alignment_type_pkey PRIMARY KEY (id)
+			);
+			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (1, ''Equivalence exacte'', ''=EQ'', ''exactMatch'');
+			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (2, ''Equivalence inexacte'', ''~EQ'', ''closeMatch'');
+			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (3, ''Equivalence générique'', ''EQB'', ''broadMatch'');
+			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (4, ''Equivalence associative'', ''EQR'', ''relatedMatch'');
+			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (5, ''Equivalence spécifique'', ''EQS'', ''narrowMatch'');';
+
+    END IF;
+END;
+$$  LANGUAGE plpgsql;
 
 --
 --Permet de crée la table de note_type si n'exists pas
@@ -743,67 +777,6 @@ END;
 $$  LANGUAGE plpgsql;
 
 --
---Permet de crée la table de alignement_type si n'exists pas
--- et de faire ses includes
---
-
-CREATE OR REPLACE FUNCTION create_table_alignement_type()
-  RETURNS void AS $$
-BEGIN
-    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'alignement_type') THEN
-        execute 
-		'CREATE TABLE alignement_type
-			(
-			  id integer NOT NULL,
-			  label text NOT NULL,
-			  isocode text NOT NULL,
-			  label_skos character varying,
-			  CONSTRAINT alignment_type_pkey PRIMARY KEY (id)
-			);
-			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (1, ''Equivalence exacte'', ''=EQ'', ''exactMatch'');
-			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (2, ''Equivalence inexacte'', ''~EQ'', ''closeMatch'');
-			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (3, ''Equivalence générique'', ''EQB'', ''broadMatch'');
-			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (4, ''Equivalence associative'', ''EQR'', ''relatedMatch'');
-			INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (5, ''Equivalence spécifique'', ''EQS'', ''narrowMatch'');';
-
-    END IF;
-END;
-$$  LANGUAGE plpgsql;
-
---
---Permet d'ajouter la column gps a la table alignement source
---
-
-CREATE OR REPLACE FUNCTION ajoutercolumngps_alignement_source() RETURNS VOID AS $$
-BEGIN
-    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'gps' AND TABLE_NAME = 'alignement_source') THEN
-	Execute
-	'
-	 Alter TABLE alignement_source ADD COLUMN gps boolean  default false;';
-    END IF;
-END;
-$$ LANGUAGE plpgsql; 
-
---
---Permet d'ajouter les 3 columns boolean dans la table preferences
---
-CREATE OR REPLACE FUNCTION ajoutercolumn_preferences() RETURNS VOID AS $$
-BEGIN
-    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'gps_integrertraduction' AND TABLE_NAME = 'preferences') THEN
-	Execute
-	'
-         Alter TABLE preferences ADD COLUMN gps_id_source Integer  ;
-	 Alter TABLE preferences ADD COLUMN gps_integrertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_reemplacertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_alignementautomatique boolean  default true;
-	 ';
-    END IF;
-END;
-$$ LANGUAGE plpgsql; 
-
-
 -- mises à jour 
 --
 --
@@ -839,7 +812,9 @@ SELECT updatesequencesTH();
 SELECT adjuteconstraintuser();
 SELECT create_table_users_historique();
 
+SELECT create_table_alignement_type();
 SELECT create_table_thesaurus_alignement_source();
+SELECT create_table_note_type();
 -- Creation de les types pour alignement_source
 
 SELECT addtype_Alignement_format();
@@ -855,13 +830,11 @@ SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
 SELECT updateColumn_alignement_source();
 SELECT ajouterColumn_alignement_source();
-SELECT adjouteconstraint_alignement_source();
 SELECT ajoutercolumngps_alignement_source();
-SELECT ajoutercolumn_alignement();
-SELECT drop_constraint_alignement_source();
-SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
-SELECT create_table_note_type();
+SELECT ajoutercolumn_alignement();
+
+
 -- delete sequences
 SELECT delete_sequence('user_username_seq');
 SELECT delete_sequence('editorial_note__id_seq');
@@ -881,13 +854,19 @@ INSERT INTO roles (id, name, description) VALUES (2, 'admin', 'administrateur pa
 INSERT INTO roles (id, name, description) VALUES (3, 'user', 'utilisateur par thésaurus ou plus');
 INSERT INTO roles (id, name, description) VALUES (4, 'traducteur', 'traducteur par thésaurus ou plus');
 INSERT INTO roles (id, name, description) VALUES (5, 'images', 'gestion des images par thésaurus ou plus');
-   
+ 
+
+
+
+
+  
 --mise a jour de la table concept_group
 SELECT delete_column('concept_group','idparentgroup');
 SELECT delete_column('concept_group','idconcept');
 
-/*
+
 -- Mise à jour de la table de types d'alignement
+/*
 DROP TABLE alignement_type;
 
 CREATE TABLE alignement_type
@@ -938,9 +917,35 @@ $BODY$
 
 
   
+--mise à jour de la table note_type
+/*DROP TABLE note_type;
+
+CREATE TABLE note_type
+(
+  code text NOT NULL,
+  isterm boolean NOT NULL,
+  isconcept boolean NOT NULL,
+  CONSTRAINT pk_note_type PRIMARY KEY (code),
+  CONSTRAINT chk_not_false_values CHECK (NOT (isterm = false AND isconcept = false))
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('customNote', false, true);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('definition', true, false);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('editorialNote', true, false);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('historyNote', true, true);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('scopeNote', false, true);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('note', false, true);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('example', true, false);
+INSERT INTO note_type (code, isterm, isconcept) VALUES ('changeNote', true, false);
+*/
 --
 --Delete toutes les function
 --
+
 
 SELECT delete_fonction ('create_table_info','');
 SELECT delete_fonction ('majnote', '');
@@ -976,8 +981,7 @@ SELECT delete_fonction ('ajoutercolumngps_alignement_source','');
 SELECT delete_fonction ('ajoutercolumn_alignement','');
 SELECT delete_fonction ('create_table_alignement_type','');
 SELECT delete_fonction ('create_table_note_type','');
-SELECT delete_fonction ('adjouteconstraint_alignement_source','');
-SELECT delete_fonction ('drop_constraint_alignement_source','');
+
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');

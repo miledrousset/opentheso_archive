@@ -786,13 +786,13 @@ public class TermHelper {
                             + ", "+term.getContributor()
                             + ", "+term.getCreator()+")";
 
-                    stmt.executeUpdate(query);
+                    stmt.execute(query);
                     addNewTermHistorique(conn, term, idUser);
                 } finally {
                     stmt.close();
                 }
             } finally {
-            //    conn.close();
+                conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
@@ -1030,6 +1030,37 @@ public class TermHelper {
         }
     }    
 
+    public boolean isExitsTraduction(HikariDataSource ds,Term term)
+    {
+        Connection conn;
+        Statement stmt;
+        ResultSet rs;
+        boolean status = false;
+        term.setLexical_value(new StringPlus().convertString(term.getLexical_value()));
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_term from term "
+                            + " where id_term ='"+ term.getId_term()
+                            + "' and lang ='"+term.getLang()+"'";
+                    rs = stmt.executeQuery(query);
+                    if(rs.next())
+                        status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating Term Traduction : " + term.getId_term(), sqle);
+        }
+        return status;
+    }
     /**
      * Cette fonction permet de mettre à jour un Terme à la table Term, en
      * paramètre un objet Classe Term
@@ -1041,7 +1072,20 @@ public class TermHelper {
      */
     public boolean updateTermTraduction(HikariDataSource ds,
             Term term, int idUser) {
-
+        if(isExitsTraduction(ds, term))
+        {
+            if(!updateTermTraduction2(ds, term, idUser))
+                return false;
+        }
+        else
+        {
+            if(!addTraduction(ds, term, idUser))
+                return false;
+        }
+        return true;
+    }
+        public boolean updateTermTraduction2(HikariDataSource ds,
+            Term term, int idUser) {
         Connection conn;
         Statement stmt;
         boolean status = false;
