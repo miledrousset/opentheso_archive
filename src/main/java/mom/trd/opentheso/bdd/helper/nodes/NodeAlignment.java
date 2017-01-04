@@ -6,6 +6,7 @@
 package mom.trd.opentheso.bdd.helper.nodes;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 /**
  *
@@ -28,6 +29,17 @@ public class NodeAlignment {
     private String img_target;
     private boolean save;
 
+// coordonnées GPS
+    private String countryName;
+    private String name;
+    private String idUrl;
+    private Double lat;
+    private Double lng;
+    private String toponymName;
+    private ArrayList<String> traduction;
+    private ArrayList<NodeLang> alltraductions;
+    
+    
     public NodeAlignment() {
         concept_target_alt = "";
     }
@@ -142,6 +154,69 @@ public class NodeAlignment {
 
     public void setSave(boolean save) {
         this.save = save;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
+
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIdUrl() {
+        return idUrl;
+    }
+
+    public void setIdUrl(String idUrl) {
+        this.idUrl = idUrl;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
+    public ArrayList<String> getTraduction() {
+        return traduction;
+    }
+
+    public void setTraduction(ArrayList<String> traduction) {
+        this.traduction = traduction;
+    }
+
+    public String getToponymName() {
+        return toponymName;
+    }
+
+    public void setToponymName(String toponymName) {
+        this.toponymName = toponymName;
+    }
+
+    public ArrayList<NodeLang> getAlltraductions() {
+        return alltraductions;
+    }
+
+    public void setAlltraductions(ArrayList<NodeLang> alltraductions) {
+        this.alltraductions = alltraductions;
     }
 
 }

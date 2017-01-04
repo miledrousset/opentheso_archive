@@ -1,0 +1,53 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+
+    <p:dialog id="idAjouterParLot_suiteEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterParLot_suiteEditDlg" modal="true" resizable="false" >
+        <!-- Ajouter alignement automatique -->
+        <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
+            <p:layoutUnit position="west" resizable="false" size="250" minSize="250" maxSize="250">
+
+                Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
+
+                <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
+                                 update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
+
+                <p:commandButton id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
+                                 action="#{alignementparlot.sumPosition()}" update=":panContenu,:idAjouterParLot_suiteEditDlg" 
+                                 oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
+
+                <p:commandButton id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.sumPosition()}"
+                                 update=":panContenu,:idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
+                                 styleClass="styleButton"  />
+            </p:layoutUnit>
+
+            <p:layoutUnit position="center" resizable="false" size="400" minSize="400" maxSize="550">
+                <h:panelGrid columns="2">
+                    <table>
+                        <ui:repeat value="#{selectedTerme.listAlignValues}" var='nodeAlign'>
+                            <tr>
+                                <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
+                                <td>
+                                    <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
+                                    <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
+                                    <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
+                                    <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
+                                    <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
+                                    <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
+                                        <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
+                                    </h:selectOneMenu><br/><br/>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </h:panelGrid>
+            </p:layoutUnit>
+        </p:layout>
+
+    </p:dialog>
+</ui:composition>

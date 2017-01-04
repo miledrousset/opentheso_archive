@@ -5,30 +5,28 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idGpsSource_suiteEditDlg"  header="#{langueBean.getMsg('gps.nom')}" widgetVar="gpsSource_suiteEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsSource_suiteEditDlg"  header="#{langueBean.getMsg('gps.nom')}  #{selectedTerme.nom}" widgetVar="gpsSource_suiteEditDlg" modal="true" resizable="false" >
         Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
         <div style="text-align: left; max-width: 600px; max-height: 500px; overflow: auto;" >
             <h:form>
                 <table>
-                    <ui:repeat value="#{gps.listAlignValues}" var='nodeAlign'>
-                        <tr>
-                            <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
-                            <td>
-                                <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
-                                <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
-                                <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
-                                <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
-                                <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
-                                <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
-                                    <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
-                                </h:selectOneMenu><br/><br/>
-                            </td>
-                        </tr>
-                    </ui:repeat>
+
+                    <tr>
+                        <h:panelGrid columns="2" style="margin-bottom:10px">
+                            <p:outputLabel for="RadioGps" />
+                            <p:selectOneRadio id="RadioGps" value="#{gps.codeid}"  layout="grid" columns="1">
+                                <f:selectItems value="#{gps.listAlignValues}" var="c" itemLabel="#{c.name}, #{c.toponymName}, #{c.countryName}" itemValue="#{c.idUrl}" />
+                            </p:selectOneRadio>
+                        </h:panelGrid>
+                    </tr>
+
                     <tr>
                         <td colspan="2" style="text-align: center;">
-                            <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
-                                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
+                            <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
+                                             actionListener="#{gps.doAll(selectedTerme.idC, selectedTerme.idTheso, user1.user.id, 
+                                                               selectedTerme.idlangue, selectedTerme.idT)}"
+                                             action="#{selectedTerme.updateGps()}"
+                                             update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('gpsSource_suiteEditDlg.hide()';"  />
                         </td>
                     </tr>
                 </table>

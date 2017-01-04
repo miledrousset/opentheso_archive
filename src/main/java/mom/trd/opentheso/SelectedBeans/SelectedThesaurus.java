@@ -1061,6 +1061,7 @@ public class SelectedThesaurus implements Serializable {
      * @return  true s'il en a au moins une, false sinon
      */
     public boolean haveTrad() {
+        if(languesTheso == null) return false;
         return (languesTheso.length > 0);
     }
     
