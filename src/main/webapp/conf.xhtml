@@ -33,7 +33,8 @@
         </div>
         <center>
 
-
+            
+        <!-- gestion des utilisateurs -->
         </center>
         <div id="principaleConf">
             <h:panelGroup rendered="#{user1.haveRights(2)}">
@@ -76,6 +77,9 @@
                     </p:dataTable>
                 </fieldset>
             </h:panelGroup>
+            
+        <!-- Fin gestion des utilisateurs -->
+            
 
             <fieldset class="fieldMyAccount">
                 <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
@@ -173,9 +177,10 @@
             <ui:include src ="/admin/reorganizing.xhtml" /><br/><br/><br/>
             <ui:include src="dialogs/Alignement/editAlignementSourceEditDlg.xhtml"/>
             <ui:include src="/dialogs/baseDeDonnes/miseAJourEditDlg.xhtml"/>
+            <h:panelGroup rendered="#{user1.haveRights(2)}">
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('bdd.act')}"/></legend><br/>
-                <h:panelGroup>
+                
                     <h:form>
                         <p:commandButton id="chercheMaJ" value="Chercher mise à jours"  update=":idMiseAJourEditDlg" 
                                          actionListener="#{baseDeDonnes.loadinfoDB()}" oncomplete="PF('miseAJourEditDlg').show()" 
@@ -186,8 +191,9 @@
                         <p:commandButton id="passForgeted" value="#{langueBean.getMsg('bdd.act')}" 
                                          actionListener="#{baseDeDonnes.maJBdd}" styleClass="styleButton"/>       
                     </h:form>
-                </h:panelGroup>
+                
             </fieldset>
+            </h:panelGroup>
         </div>
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">

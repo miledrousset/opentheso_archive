@@ -687,7 +687,8 @@ public class UserHelper {
                 try {
                     String query = "SELECT roles.name, user_role.id_role,"
                             + " user_role.id_thesaurus,"
-                            + " users.username, users.id_user, users.mail "
+                            + " users.username, users.id_user, users.mail,"
+                            + " users.active "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id AND"
@@ -707,6 +708,7 @@ public class UserHelper {
                         nu.setIdRole(resultSet.getInt("id_role"));
                         nu.setName(resultSet.getString("username"));
                         nu.setRole(resultSet.getString("name"));
+                        nu.setIsActive(resultSet.getBoolean("active"));
                         listUser.add(nu);
                     }
                 } finally {
