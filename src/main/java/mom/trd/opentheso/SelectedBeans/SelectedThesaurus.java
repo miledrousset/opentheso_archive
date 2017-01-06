@@ -33,6 +33,7 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.VerificationInternet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
@@ -105,6 +106,7 @@ public class SelectedThesaurus implements Serializable {
     private boolean mesCandidats = false;
     private boolean tousThesos = false;
 
+    private boolean internetConection = false;
     //Alignement
     
 
@@ -404,12 +406,9 @@ public class SelectedThesaurus implements Serializable {
             arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), workLanguage).entrySet());
             langues = new LanguageHelper().getSelectItemLanguages(connect.getPoolConnexion());
             //bundlePref.getString("langueSource");
+            internetConection = new VerificationInternet().isConected();
         } else {
             arrayTheso = new ArrayList<>();
-        }
-        if(connect.getPoolConnexion() == null)
-        {
-            System.out.println("ACERCANDONOS**************************");
         }
         StartDefaultThesauriTree();
     }
@@ -1557,6 +1556,14 @@ public class SelectedThesaurus implements Serializable {
 
     public void setTousThesos(boolean tousThesos) {
         this.tousThesos = tousThesos;
+    }
+
+    public boolean isInternetConection() {
+        return internetConection;
+    }
+
+    public void setInternetConection(boolean internetConection) {
+        this.internetConection = internetConection;
     }
     
     

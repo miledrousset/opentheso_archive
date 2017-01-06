@@ -226,7 +226,7 @@ public class ImportTabuleIntoBDD {
                     alignment.getUri(), // URI
                     1,
                     tabulateDocument.getId(),
-                    idThesaurus
+                    idThesaurus,0
                 );
             }
             if(alignment.getType().equalsIgnoreCase("closeMatch")){
@@ -237,7 +237,7 @@ public class ImportTabuleIntoBDD {
                     alignment.getUri(), // URI
                     2,
                     tabulateDocument.getId(),
-                    idThesaurus
+                    idThesaurus,0
                 );
             }
         }

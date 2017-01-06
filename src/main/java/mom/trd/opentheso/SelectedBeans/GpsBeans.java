@@ -108,7 +108,7 @@ public class GpsBeans {
             if (nodePreference.isGps_alignementautomatique()) {
                 AlignmentHelper alignmentHelper = new AlignmentHelper();
                 if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), id_user, alignment_choisi.getName(), alignementPreferences.getSource(),
-                        alignment_choisi.getIdUrl(), 1, idC, id_Theso)) {
+                        alignment_choisi.getIdUrl(), 1, idC, id_Theso, alignment_choisi.getId_alignement())) {
                     if (nodePreference.isGps_integrertraduction()) {
                         LanguageHelper languageHelper = new LanguageHelper();
                         listLanguesInTheso = new ArrayList<>();

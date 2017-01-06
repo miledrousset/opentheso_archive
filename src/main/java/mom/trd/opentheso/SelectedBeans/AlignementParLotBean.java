@@ -31,9 +31,10 @@ public class AlignementParLotBean {
     private String nomduterm;
     private int position=0;
     private boolean fin;
+    private boolean first= true;
     private NodeAlignment nodeAli;
 
-    private String selectedAlignement;
+    private String uriSelection;
 
     private boolean selectedValue;
     
@@ -41,7 +42,11 @@ public class AlignementParLotBean {
     private Connexion connect;
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
-
+/**
+ * Permet de savoir combien d'enfants a le concept selectionnée
+ * @param id_Theso
+ * @param id_Concept 
+ */
     public void combianDepuisRacine(String id_Theso, String id_Concept) {
         total=0;
         String id_group;
@@ -58,6 +63,12 @@ public class AlignementParLotBean {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
     }
 
+    /**
+     * Rempli une ArrayList avec le idC de les fils de le concept 
+     * que nous avons selectionée
+     * @param id_theso
+     * @param id_Concept 
+     */
     private void remplirToutChildren(String id_theso, String id_Concept) {
 
         AlignmentHelper alignmentHelper = new AlignmentHelper();
@@ -68,25 +79,40 @@ public class AlignementParLotBean {
             }
         }
     }
-    public void sumPosition()
+    
+    /**
+     * Cette fonction permet de passer au concept suivant.
+     * et fait l'apelation a la funtion pour créer l'alignement
+     * (la funtion apelé est dans selecteTerme
+     */
+    public void nextPosition()
     {
         ConceptHelper conceptHelper = new ConceptHelper();
-        position= position+1;
-        if (position<=total)
-        {
-            selectedTerme.setIdC(listOfChildrenInConcept.get(position));
-            selectedTerme.setNom(conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(position),
-                    selectedTerme.getIdTheso(),selectedTerme.getIdlangue()));
-            selectedTerme.creerAlignAuto();
-        }
-        if(position > total)
+        position++;
+        String idConcept;
+
+        if(position >= total-1)
         {
             fin = true;
             position=0;
             total=0;
+            return;
         }
-        
+        if (position<total)
+        {
+            idConcept = listOfChildrenInConcept.get(position);
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), idConcept,
+                    selectedTerme.getIdTheso(),selectedTerme.getIdlangue());
+            selectedTerme.creerAlignAuto(idConcept, nomduterm);
+        }
     }
+    /**
+     * function recursive que rempli le ArrayList avec les idC de les fils 
+     * du concept que on a selectionée
+     * @param id_Theso
+     * @param id_concept
+     * @param listOfChildrendeja 
+     */
     private void getiListChildrenOfConcept(String id_Theso, String id_concept, ArrayList<String> listOfChildrendeja) {
 
         ArrayList<String> childrenTmp = new ArrayList<>();
@@ -99,20 +125,56 @@ public class AlignementParLotBean {
                 getiListChildrenOfConcept(id_Theso, conceptFil, listOfChildrenInConcept);
             }
         }
+        if(first)
+        {
+            nomduterm= selectedTerme.nom;
+        }
 
     }
-
+/**
+ * Permet de recuperer le id_group  d'un concept
+ * @param id_Theso
+ * @param id_Concept
+ * @return 
+ */
     public String recuparateGroup(String id_Theso, String id_Concept) {
         AlignmentHelper alignementHelper = new AlignmentHelper();
         String id_group = alignementHelper.getGroupOfConcept(connect.getPoolConnexion(), id_Theso, id_Concept);
         return id_group;
     }
+    /**
+     * reinicialitation du variables
+     */
     public void reinitTotal()
     {
         total=0;
         position= 0;
     }
+    
+    /**
+     * cherche l'alignement que on a selectionée dans l'arrayList d'alignements
+     * et ce fait l'apelation a la funtion pour ajouter l'alignement
+     */
+    public void addAlignement()
+    {
+        for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) 
+        {
+            if( nodeAlignment.getUri_target().equals(uriSelection))
+            {
+                nodeAli=nodeAlignment;
+                selectedTerme.ajouterAlignAutoByLot(nodeAli);
+                nodeAli = null;
+                nextPosition();
+                if(fin) reinitTotal();
+                return;
 
+            }
+        }
+    }
+
+    ///////////////GET & SET////////////////
+    
+    
     public int getTotal() {
         return total;
     }
@@ -177,12 +239,20 @@ public class AlignementParLotBean {
         this.nodeAli = nodeAli;
     }
 
-    public String getSelectedAlignement() {
-        return selectedAlignement;
+    public String getUriSelection() {
+        return uriSelection;
     }
 
-    public void setSelectedAlignement(String selectedAlignement) {
-        this.selectedAlignement = selectedAlignement;
+    public void setUriSelection(String uriSelection) {
+        this.uriSelection = uriSelection;
+    }
+
+    public boolean isFirst() {
+        return first;
+    }
+
+    public void setFirst(boolean first) {
+        this.first = first;
     }
     
 }

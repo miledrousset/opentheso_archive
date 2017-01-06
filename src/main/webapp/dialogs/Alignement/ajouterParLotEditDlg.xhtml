@@ -15,7 +15,8 @@
                     <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
                 </p:selectOneRadio>
             </h:panelGrid>
-        <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.creerAlignAuto()}" styleClass="styleButton"
+        <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
+                         actionListener="#{selectedTerme.creerAlignAuto(selectedTerme.idC, selectedTerme.nom)}" styleClass="styleButton"
                          update=":idAjouterParLot_suiteEditDlg"  oncomplete="PF('ajouterParLot_suiteEditDlg').show(); PF('ajouterParLotEditDlg').hide(); "/>
         </h:form>                                                
     </p:dialog>

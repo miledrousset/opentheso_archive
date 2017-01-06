@@ -81,22 +81,21 @@ import org.primefaces.model.TreeNode;
 import org.primefaces.model.map.MapModel;
 import sun.nio.cs.ext.GB18030;
 
-
 @ManagedBean(name = "selectedTerme", eager = true)
 @SessionScoped
 
 public class SelectedTerme implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private String nom;
+
+    public String nom;
     private ArrayList<Entry<String, String>> termeGenerique = new ArrayList<>();
     private ArrayList<Entry<String, String>> termesSpecifique = new ArrayList<>();
     private ArrayList<Entry<String, String>> termesAssocies = new ArrayList<>();
     private ArrayList<String> termesSynonymesE = new ArrayList<>();
     private ArrayList<String> termesSynonymesP = new ArrayList<>();
     private ArrayList<NodeImage> images = new ArrayList<>();
-private ArrayList<NodeAlignment> align = new ArrayList<>();
+    private ArrayList<NodeAlignment> align = new ArrayList<>();
     private ArrayList<NodeNote> listnotes = new ArrayList<>();
 
     private TreeNode root;
@@ -112,10 +111,10 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
     private String noteApplication;
     private String noteHistorique;
     private String noteEditoriale;
-    
+
     private ArrayList<NodeNote> nodeNoteTermList;
     private ArrayList<NodeNote> nodeNoteConceptList;
-            
+
     private String idT;
     private String idC;
     private String status;
@@ -173,13 +172,13 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
     String cheminNotice2;
     private boolean arkActive;
     private String serverAdress;
-    
+
     NodeGps coordonnees;
 
     //maps
-    private String latitudLongitud=null;
-    private MapModel simpleModel=null;    
-    
+    private String latitudLongitud = null;
+    private MapModel simpleModel = null;
+
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
 
@@ -194,8 +193,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    
-
 
     /**
      * *************************************** INITIALISATION
@@ -214,7 +211,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         serverAdress = bundlePref.getString("cheminSite");
         user.setIdTheso(idTheso);
         identifierType = bundlePref.getString("identifierType");
-        
 
     }
 
@@ -228,7 +224,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
     }
-  
 
     /**
      * Vide toutes les informations du terme
@@ -284,10 +279,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      * @param sN
      */
     public void majTerme(MyTreeNode sN) {
-        
+
         // contrôler si la connexion est toujour valide 
-       // connect.
-        
+        // connect.
         reInitTerme();
 
         idC = sN.getIdMot();
@@ -339,10 +333,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             idT = t.getId_term();
             dateC = dateFormat.format(t.getCreated());
             dateM = dateFormat.format(t.getModified());
-            
+
             creator = t.getCreator();
             contributor = t.getContributor();
-            
 
             images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso, user.getUser().getId());
             majNotes();
@@ -357,8 +350,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             }
             if (bundlePref.getString("bdd.active").equalsIgnoreCase("true")) {
                 majNoticeBdd();
-            }            
-
+            }
 
             idArk = new ConceptHelper().getIdArkOfConcept(connect.getPoolConnexion(), idC, idTheso);
 
@@ -408,7 +400,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         }
 
     }
-    
+
     private void majNoticeBdd() {
         ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
@@ -418,7 +410,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
 
     private void majTAsso() {
         termesAssocies = new ArrayList<>();
@@ -464,8 +456,8 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             }
         }
     }
-    
-    private void initNotes(){
+
+    private void initNotes() {
         noteEditoriale = "";
         definition = "";
         noteHistorique = "";
@@ -535,14 +527,13 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         }
         langues.addAll(tempMapL.entrySet());
     }
-    
-    public void updateGps() 
-    {
+
+    public void updateGps() {
         GpsBeans gps = new GpsBeans();
         coordonnees = new NodeGps();
         GpsHelper gpsHelper = new GpsHelper();
         coordonnees = gpsHelper.getCoordinate(connect.getPoolConnexion(), idC, idTheso);
-        if(coordonnees == null){
+        if (coordonnees == null) {
             latitudLongitud = null;
             gps.latitud = 0.0;
             gps.longitud = 0.0;
@@ -551,8 +542,8 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         gps.latitud = coordonnees.getLatitude();
         gps.longitud = coordonnees.getLongitude();
         gps.reinitBoolean();
-        latitudLongitud=""+coordonnees.getLatitude()+","+coordonnees.getLongitude();    
-        
+        latitudLongitud = "" + coordonnees.getLatitude() + "," + coordonnees.getLongitude();
+
     }
 
     private void majSyno() {
@@ -639,7 +630,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         }
         if (idlangue.isEmpty()) {
             idlangue = idLangue;
-        }        
+        }
         if (nodeSe.isTopConcept()) {
             type = 2;
         } else {
@@ -792,7 +783,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             ArrayList<NodeEM> tempEM = new TermHelper().getNonPreferredTerms(connect.getPoolConnexion(), idT, idTheso, idlangue);
             termesSynonymesE = new ArrayList<>();
             termesSynonymesP = new ArrayList<>();
-            latitudLongitud= null;
+            latitudLongitud = null;
             for (NodeEM nem : tempEM) {
                 if (nem.getStatus().equalsIgnoreCase("USE")) {
                     termesSynonymesE.add(nem.getLexical_value());
@@ -801,10 +792,10 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
                     termesSynonymesP.add(nem.getLexical_value());
                 }
                 if (nem.getLexical_value().contains("WKT:")) {
-                    latitudLongitud = nem.getLexical_value().substring(nem.getLexical_value().indexOf(":")+1,
-                    nem.getLexical_value().length()).trim();
-             
-            }
+                    latitudLongitud = nem.getLexical_value().substring(nem.getLexical_value().indexOf(":") + 1,
+                            nem.getLexical_value().length()).trim();
+
+                }
             }
             valueEdit = "";
             nomEdit = "";
@@ -1209,11 +1200,10 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             return;
         }
         boolean tradExist = false;
-        
+
         // c'est le cas ou le concept n'a pas de traduction dans la langue en cours, il faut le mettre a jour dans l'arbre
         boolean newTraduction = false;
-        
-        
+
         for (Entry<String, String> e : langues) {
             if (e.getKey().equals(langueEdit)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
@@ -1223,10 +1213,10 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         }
         ConceptHelper ch = new ConceptHelper();
         TermHelper termHelper = new TermHelper();
-        if(idT.isEmpty()) {
+        if (idT.isEmpty()) {
             newTraduction = true;
             String tmp = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), idC, idTheso);
-            if(tmp != null) {
+            if (tmp != null) {
                 idT = tmp;
             }
         }
@@ -1256,7 +1246,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             for (NodeGroupTraductions ngt : tempNGT) {
                 tempMapL.put(ngt.getIdLang(), ngt.getTitle());
             }
-            if(newTraduction) {
+            if (newTraduction) {
                 nom = cgh.getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
             }
             langues.addAll(tempMapL.entrySet());
@@ -1279,7 +1269,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
                 return;
             }
 
-            
             if (!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
@@ -1291,8 +1280,8 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             for (NodeTermTraduction ntt : tempNTT) {
                 tempMapL.put(ntt.getLang(), ntt.getLexicalValue());
             }
-            if(newTraduction) {
-                nom = termHelper.getThisTerm(connect.getPoolConnexion(),idC, idTheso, idlangue).getLexical_value();
+            if (newTraduction) {
+                nom = termHelper.getThisTerm(connect.getPoolConnexion(), idC, idTheso, idlangue).getLexical_value();
             }
             langues.addAll(tempMapL.entrySet());
 
@@ -1326,8 +1315,8 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
                 tempMapL.put(ntt.getLang(), ntt.getLexicalValue());
             }
             langues.addAll(tempMapL.entrySet());
-            if(newTraduction) {
-                nom = termHelper.getThisTerm(connect.getPoolConnexion(),idC, idTheso, idlangue).getLexical_value();
+            if (newTraduction) {
+                nom = termHelper.getThisTerm(connect.getPoolConnexion(), idC, idTheso, idlangue).getLexical_value();
             }
         }
 
@@ -1343,7 +1332,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         if (valueEdit == null || valueEdit2 == null || linkEdit == null || /*valueEdit.equals("") || valueEdit2.equals("") ||*/ linkEdit.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error5")));
         } else {
-            new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), valueEdit2.trim(), valueEdit.trim(), linkEdit.trim(), Integer.parseInt(statutEdit), idC, idTheso);
+            new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(),
+                    user.getUser().getId(), valueEdit2.trim(), valueEdit.trim(),
+                    linkEdit.trim(), Integer.parseInt(statutEdit), idC, idTheso, 0);
             valueEdit = "";
             valueEdit2 = "";
             linkEdit = "";
@@ -1353,57 +1344,60 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info9")));
         }
     }
-
-    public void creerAlignAuto() {
-        if(selectedAlignement == null) return;
+    
+    /**
+     * Cette fonction permet de récupérer la liste des alignements par rapport à
+     * une source
+     *
+     * @param idConcept
+     * @param lexicalValue
+     */
+    public void creerAlignAuto(String idConcept, String lexicalValue) {
+        if (selectedAlignement == null) {
+            return;
+        }
         AlignmentQuery alignmentQuery = new AlignmentQuery();
-        
+
         listAlignValues = new ArrayList<>();
-            
+
         for (AlignementSource alignementSource1 : alignementSources) {
             // on se positionne sur la source sélectionnée 
-            if(selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
+            if (selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
                 // on trouve le type de filtre à appliquer
-                
-                if("REST".equalsIgnoreCase(alignementSource1.getTypeRequete()))
-                {
+                alignementSource = alignementSource1;
+
+                if ("REST".equalsIgnoreCase(alignementSource1.getTypeRequete())) {
                     // si type opentheso / skos
                     // action skos
-                    if("skos".equals(alignementSource1.getAlignement_format()))
-                    {
-                        listAlignValues= alignmentQuery.queryOpentheso(idC, idTheso, nom.trim(),idlangue, alignementSource1.getRequete());
+                    if ("skos".equals(alignementSource1.getAlignement_format())) {
+                        listAlignValues = alignmentQuery.queryOpentheso(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
                     }
                     // action xml (wikipédia)
-                    if("xml".equals(alignementSource1.getAlignement_format()))
-                    {
+                    if ("xml".equals(alignementSource1.getAlignement_format())) {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryWikipedia(idC, idTheso, nom.trim(), idlangue, alignementSource1.getRequete());
+                        listAlignValues = alignmentQuery.queryWikipedia(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
                     }
                 }
-                if("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete()))
-                {                
+                if ("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete())) {
                     // action SKOS (BNF)
-                    if("skos".equals(alignementSource1.getAlignement_format()))
-                    {
+                    if ("skos".equals(alignementSource1.getAlignement_format())) {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryBNF(idC, idTheso, nom.trim(), idlangue, alignementSource1.getRequete());
+                        listAlignValues = alignmentQuery.queryBNF(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
                     }
                     // action SKOS (BNF)
-                    if("skos".equals(alignementSource1.getAlignement_format()))
-                    {
+                    if ("skos".equals(alignementSource1.getAlignement_format())) {
                         //ici il faut appeler le filtre de Wikipédia 
-               //         listAlignValues = alignmentQuery.queryDBPedia(idC, idTheso, nom.trim(), idlangue);
+                        //         listAlignValues = alignmentQuery.queryDBPedia(idC, idTheso, nom.trim(), idlangue);
                     }
-                    
-                }                
+
+                }
                 //si type Json
                 // action jason
-                
-                //
 
+                //
             }
         }
-/*
+        /*
         if ("DBPedia".equals(selectedAlignement)) {
             listAlignValues.addAll(new AlignmentQuery().query(connect.getPoolConnexion(), "DBP", idC, idTheso, nom, idlangue, null));
             dbp = false;
@@ -1425,7 +1419,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             listAlignValues.addAll(new AlignmentQuery().query("GEMET", idC, idTheso, nom, idlangue, null));
             gemet = false;
         }*/
-   /*     if (opentheso) {
+ /*     if (opentheso) {
             String lien;
             if (!linkOT.trim().equals("") && !idOT.trim().equals("")) {
                 if (linkOT.lastIndexOf("/") == linkOT.length() - 1) {
@@ -1437,20 +1431,40 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             }
             opentheso = false;
         }
-*/
+         */
     }
 
-    public void ajouterAlignAuto() {
+    public void ajouterAlignAuto() 
+    {
         for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
-                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(), idC, idTheso);
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(),
+                        na.getUri_target(), na.getAlignement_id_type(), idC, idTheso, alignementSource.getId());
             }
         }
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
         vue.setAddAlign(0);
     }
-    
+
+    /**
+     * Permet de creer une alignement, cette funtion s'utilise pour l'alignement par lot
+     * l'apelation de la funtion c'est de AlignementParLotBean
+     * @param nodeAlignment
+     * @return 
+     */
+    public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment)
+    {
+        if (!new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
+                nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
+                nodeAlignment.getAlignement_id_type(), idC, idTheso, nodeAlignment.getId_alignement())) 
+        {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
+            return false;
+        }
+        return true;
+    }
+
     /**
      * *************************************** EDITION
      * ****************************************
@@ -1509,7 +1523,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      */
     public void editDef() {
         int idUser = user.getUser().getId();
-        if(definition.isEmpty()) {
+        if (definition.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
         }
@@ -1523,12 +1537,12 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
     }
 
     /**
-     * Cette fontion permet de modifié l'information du note 
+     * Cette fontion permet de modifié l'information du note
      *
      */
     public void editNote() {
         int idUser = user.getUser().getId();
-        if(note.isEmpty()) {
+        if (note.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
         }
@@ -1540,52 +1554,55 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
     }
+
     /**
-     * Cette fontion permet d'avoir l'information que se besoin 
-     * du term qu'on va changer
+     * Cette fontion permet d'avoir l'information que se besoin du term qu'on va
+     * changer
+     *
      * @param value
-     * @param key 
+     * @param key
      */
-    
-    public void traductionEnCours(String value, String key){
+    public void traductionEnCours(String value, String key) {
         valueOfTraductionToModify = value;
         langEnTraduction = key;
-    
+
     }
-    
-    /**Cette fontion permet d'avoir l'information que se besoin
-     * du Synonyme
-     * @param value 
+
+    /**
+     * Cette fontion permet d'avoir l'information que se besoin du Synonyme
+     *
+     * @param value
      */
-    
-    public void changeSynonymeEnCour(String value){
+    public void changeSynonymeEnCour(String value) {
         oldValue = value;
         valueOfSynonymesToModify = "";
-    } 
-    public void nouveauSynonymeEnCour (String value)
-    {
-      valueOfSynonymesToModify = value;  
     }
-    public void modifierSynonyme(){
-        
+
+    public void nouveauSynonymeEnCour(String value) {
+        valueOfSynonymesToModify = value;
+    }
+
+    public void modifierSynonyme() {
+
         int idUser = user.getUser().getId();
         Term term = new Term();
         term.setLexical_value(valueOfSynonymesToModify);
         term.setId_term(idT);
         term.setId_thesaurus(idTheso);
         term.setLang(idlangue);
-        if(!new TermHelper().updateTermSynonyme(connect.getPoolConnexion(), oldValue, term, idUser)) {
-        //ca va pas
+        if (!new TermHelper().updateTermSynonyme(connect.getPoolConnexion(), oldValue, term, idUser)) {
+            //ca va pas
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifySyn")));
         majSyno();
     }
+
     /**
-     * Cette fontion permet de modifier une Traduction 
-     * 
+     * Cette fontion permet de modifier une Traduction
+     *
      */
-    public void modifierTraduction(){
- 
+    public void modifierTraduction() {
+
         int idUser = user.getUser().getId();
         Term term = new Term();
         term.setLexical_value(valueOfTraductionToModify);
@@ -1593,43 +1610,43 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         term.setId_thesaurus(idTheso);
         term.setLang(langEnTraduction);
 
-        if(!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
+        if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
             //erreur
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
         majLangueConcept();
     }
-        /**
-     * Cette fonction permet de supprimer une note suivant son type 
-     * 
-     * @param noteTypeCode 
+
+    /**
+     * Cette fonction permet de supprimer une note suivant son type
+     *
+     * @param noteTypeCode
      */
     public void deleteThisNoteOfConcept(String noteTypeCode) {
         int idUser = user.getUser().getId();
         new NoteHelper().deletethisNoteOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, noteTypeCode);
 
         majNotes();
-        
+
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info13")));
     }
-    
-    
+
     /**
-     * Cette fonction permet de supprimer une note suivant son type 
-     * 
-     * @param noteTypeCode 
+     * Cette fonction permet de supprimer une note suivant son type
+     *
+     * @param noteTypeCode
      */
     public void deleteThisNoteOfTerm(String noteTypeCode) {
         int idUser = user.getUser().getId();
         new NoteHelper().deleteThisNoteOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, noteTypeCode);
 
-        majNotes();        
+        majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info13")));
-    }      
+    }
 
     public void editNoteApp() {
         int idUser = user.getUser().getId();
-        if(noteApplication.isEmpty()) {
+        if (noteApplication.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
         }
@@ -1647,7 +1664,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      */
     public void editNoteHisto() {
         int idUser = user.getUser().getId();
-        if(noteHistorique.isEmpty()) {
+        if (noteHistorique.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
         }
@@ -1664,9 +1681,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      * Crée ou modifie la note éditoriale du terme courant
      */
     public void editNoteEdit() {
-        
+
         int idUser = user.getUser().getId();
-        if(noteEditoriale.isEmpty()) {
+        if (noteEditoriale.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
         }
@@ -1726,8 +1743,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
     }
 
-    
-    
     /**
      * Supprime la relation d'association qui lie le terme courant au terme dont
      * l'id est passé en paramètre.
@@ -1816,11 +1831,11 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
                         return false;
                     }
                 } else // on coupe la branche de son BT
-                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
-                }
+                 if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                    }
                 conn.commit();
                 conn.close();
 
@@ -2113,25 +2128,23 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
 
         return true;
     }
-    
+
     /**
-     * Permet de voir les nouvelles notes et changer l'icon pour pouvoir voir 
+     * Permet de voir les nouvelles notes et changer l'icon pour pouvoir voir
      * touts les notes dans les autres langues;
      */
-        public void valide(){
-        if (allLangue==true){
-            allLangue=false;
+    public void valide() {
+        if (allLangue == true) {
+            allLangue = false;
             majNotes();
-            icon="+";
-        }
-        else{  
-            allLangue=true;
-                    
-           majNotes2();
-           icon="-";
+            icon = "+";
+        } else {
+            allLangue = true;
+
+            majNotes2();
+            icon = "-";
         }
     }
-
 
     /**
      * Renvoie le type du concept générique
@@ -2196,7 +2209,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
             } else {
                 dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "dossier", n.getTitle(), root);
             }
-            
+
             DefaultTreeNode defaultTreeNode = new DefaultTreeNode("fake", dynamicTreeNode);
             defaultTreeNode.setExpanded(true);
         }
@@ -2305,8 +2318,6 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         }
         return status1;
     }
-    
-
 
     /**
      * *
@@ -2367,7 +2378,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      * @return
      */
     public ArrayList<Entry<String, String>> getALignType() {
-        
+
         ArrayList<Entry<String, String>> types = new ArrayList<>();
         ArrayList<Entry<String, String>> temp = new ArrayList<>();
         //if(connect.getPoolConnexion()==null)return null;
@@ -2389,15 +2400,15 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         // NodeNote contient la note avec le type de note, il faut filtrer pour trouver la bonne note
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote;
-        if(allLangue) {
+        if (allLangue) {
             initNotes();
             nodeNoteTermList = new NoteHelper().getListNotesTerm2(connect.getPoolConnexion(), idT, idTheso);
             nodeNoteConceptList = new NoteHelper().getListNotesConcept2(connect.getPoolConnexion(), idC, idTheso);
-        } 
-        else {
+        } else {
             majNotes();
         }
     }
+
     /**
      * Retourne tous les types d'alignements présents
      *
@@ -2405,7 +2416,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
      */
     public ArrayList<Entry<String, String>> getAllALignType() {
         ArrayList<Entry<String, String>> types = new ArrayList<>();
-        if(connect.getPoolConnexion() == null) return types;
+        if (connect.getPoolConnexion() == null) {
+            return types;
+        }
         HashMap<String, String> map = new AlignmentHelper().getAlignmentType(connect.getPoolConnexion());
         types.addAll(map.entrySet());
         return types;
@@ -2756,7 +2769,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
     }
 
     public ArrayList<Entry<String, String>> getArrayFacette() {
-        if(connect.getPoolConnexion() == null) return null;
+        if (connect.getPoolConnexion() == null) {
+            return null;
+        }
         ArrayList<Integer> temp = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();
         for (Integer i : temp) {
@@ -2770,7 +2785,9 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
     }
 
     public ArrayList<Entry<String, String>> getArrayFacetteInclure() {
-        if(connect.getPoolConnexion() == null) return null;
+        if (connect.getPoolConnexion() == null) {
+            return null;
+        }
         ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), idTheso, idlangue);
         ArrayList<Integer> temp2 = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();
@@ -2924,10 +2941,12 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         UserHelper userHelper = new UserHelper();
         return userHelper.getNameUser(connect.getPoolConnexion(), creator);
     }
+
     public String getContributorName() {
         UserHelper userHelper = new UserHelper();
         return userHelper.getNameUser(connect.getPoolConnexion(), contributor);
     }
+
     public void setCreator(int creator) {
         this.creator = creator;
     }
@@ -2994,8 +3013,7 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
 
     public void setAllLangue(boolean allLangue) {
         this.allLangue = allLangue;
-    } 
-
+    }
 
     public String getIcon() {
         return icon;
@@ -3009,16 +3027,15 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         return alignementSources;
     }
 
- /*   public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
+    /*   public void setAlignementSources(ArrayList<AlignementSource> alignementSources) {
         this.alignementSources = alignementSources;
     }
-   */ 
-    
-    public void setAlignementSources(){
+     */
+    public void setAlignementSources() {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        alignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(),idTheso);
-    //    return alignementSources;
-    }    
+        alignementSources = alignmentHelper.getAlignementSource(connect.getPoolConnexion(), idTheso);
+        //    return alignementSources;
+    }
 
     public String getSelectedAlignement() {
         return selectedAlignement;
@@ -3044,6 +3061,4 @@ private ArrayList<NodeAlignment> align = new ArrayList<>();
         this.latitudLongitud = latitudLongitud;
     }
 
-
-   
 }
