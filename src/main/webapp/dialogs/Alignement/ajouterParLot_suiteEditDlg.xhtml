@@ -35,11 +35,11 @@
 
                     Choix des alignements pour le concept '<h:outputText value="#{alignementparlot.nomduterm}" />' :<br/><br/>
 
-<!--
-                    <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
+
+                    <h:selectOneMenu value="#{alignementparlot.alignement_id_type}" styleClass="listes" style="width: 150px;">
                         <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
                     </h:selectOneMenu><br/><br/>
--->
+
                     <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
                                      update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
 
@@ -51,7 +51,8 @@
                     <p:commandButton rendered="#{!alignementparlot.fin}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
                                      update=":idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
                                      styleClass="styleButton"  />
-                    <p:commandButton rendered="#{alignementparlot.fin}" id="ajouterAllAlignAutofin" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{alignementparlot.addAlignement()}"
+                    <p:commandButton rendered="#{alignementparlot.fin}" id="ajouterAllAlignAutofin" value="#{langueBean.getMsg('conf.btnValid')}"
+                                     actionListener="#{alignementparlot.addAlignement()}" action="#{alignementparlot.reinitTotal()}"
                                      update=":idAjouterParLot_suiteEditDlg" 
                                      oncomplete="PF('ajouterParLot_suiteEditDlg').hide();" styleClass="styleButton" />
 

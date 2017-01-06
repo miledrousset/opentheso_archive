@@ -33,9 +33,10 @@ public class AlignementParLotBean {
     private boolean fin;
     private boolean first= true;
     private NodeAlignment nodeAli;
-
+    
     private String uriSelection;
 
+    private int alignement_id_type;
     private boolean selectedValue;
     
     @ManagedProperty(value = "#{poolConnexion}")
@@ -162,6 +163,7 @@ public class AlignementParLotBean {
             if( nodeAlignment.getUri_target().equals(uriSelection))
             {
                 nodeAli=nodeAlignment;
+                nodeAli.setAlignement_id_type(alignement_id_type);
                 selectedTerme.ajouterAlignAutoByLot(nodeAli);
                 nodeAli = null;
                 nextPosition();
@@ -253,6 +255,14 @@ public class AlignementParLotBean {
 
     public void setFirst(boolean first) {
         this.first = first;
+    }
+
+    public int getAlignement_id_type() {
+        return alignement_id_type;
+    }
+
+    public void setAlignement_id_type(int alignement_id_type) {
+        this.alignement_id_type = alignement_id_type;
     }
     
 }
