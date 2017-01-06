@@ -28,23 +28,14 @@
 
             <p:layoutUnit position="center" resizable="false" size="400" minSize="400" maxSize="550">
                 <h:panelGrid columns="2">
-                    <table>
-                        <ui:repeat value="#{selectedTerme.listAlignValues}" var='nodeAlign'>
-                            <tr>
-                                <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
-                                <td>
-                                    <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
-                                    <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
-                                    <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
-                                    <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
-                                    <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
-                                    <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
-                                        <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
-                                    </h:selectOneMenu><br/><br/>
-                                </td>
-                            </tr>
-                        </ui:repeat>
-                    </table>
+                    
+                    
+                    
+                    
+                    <p:selectOneRadio id="alignementSourcesLot"  value="#{alignementparlot.selectedAlignement}" layout="grid" columns="1">
+                        <f:selectItems itemLabelEscaped ="false" value="#{selectedTerme.listAlignValues}" var="listAlignement" 
+                                       itemLabel="#{listAlignement.concept_target}, #{listAlignement.def_target}&lt;br/&gt;" itemValue="#{listAlignement.concept_target}"/>
+                    </p:selectOneRadio>
                 </h:panelGrid>
             </p:layoutUnit>
         </p:layout>
