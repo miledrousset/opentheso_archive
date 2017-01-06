@@ -480,7 +480,7 @@ public class AutoCompletBean implements Serializable {
 
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -551,7 +551,7 @@ public class AutoCompletBean implements Serializable {
             
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);            
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);            
 
             // on supprime l'ancien Groupe de la branche 
             ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
@@ -624,7 +624,7 @@ public class AutoCompletBean implements Serializable {
             
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);  
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);  
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -703,7 +703,7 @@ public class AutoCompletBean implements Serializable {
             
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);  
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);  
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -788,7 +788,7 @@ public class AutoCompletBean implements Serializable {
 
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), selectedAtt.getIdGroup(), terme.getIdTheso(), lisIds);
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);
             
             
             // on supprime l'ancien Groupe de la branche 

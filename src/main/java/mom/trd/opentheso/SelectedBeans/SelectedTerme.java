@@ -1044,7 +1044,7 @@ public class SelectedTerme implements Serializable {
 
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idGroup, idTheso, lisIds);
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idTheso, lisIds);
 
             // on ajoute le nouveau domaine à la branche
             if (!groupHelper.addDomainToBranch(conn, lisIds, idNewGroup, idTheso, user.getUser().getId())) {
@@ -1457,7 +1457,7 @@ public class SelectedTerme implements Serializable {
     {
         if (!new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
                 nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
-                nodeAlignment.getAlignement_id_type(), idC, idTheso, alignementSource.getId())) 
+                nodeAlignment.getAlignement_id_type(), nodeAlignment.getInternal_id_concept(), idTheso, alignementSource.getId())) 
         {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
             return false;

@@ -72,19 +72,16 @@ public class ConceptHelper {
      */
     public ArrayList<String> getIdsOfBranch(HikariDataSource hd,
             String idConceptDeTete,
-            String idGroup, String idTheso,
+            String idTheso,
             ArrayList<String> lisIds) {
 
         lisIds.add(idConceptDeTete);
 
         ArrayList<String> listIdsOfConceptChildren
                 = getListChildrenOfConcept(hd, idConceptDeTete, idTheso);
-
-   //     System.out.println("idConcept = " + idConceptDeTete);
-
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             getIdsOfBranch(hd, listIdsOfConceptChildren1,
-                    idGroup, idTheso, lisIds);
+                    idTheso, lisIds);
         }
         return lisIds;
     }

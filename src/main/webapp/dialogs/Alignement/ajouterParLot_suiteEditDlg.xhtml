@@ -33,7 +33,11 @@
 
                 <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
 
-                    Choix des alignements pour le concept '<h:outputText value="#{alignementparlot.nomduterm}" />' :<br/><br/>
+                    Choix des alignements pour le concept '<h:outputText rendered="#{alignementparlot.first}" 
+                                                                         value="#{alignementparlot.nomduterm}" />' :
+                                                            <h:outputText rendered="#{!alignementparlot.first}" 
+                                                                         value="#{alignementparlot.nomduterm}" />' : 
+                    <br/><br/>
 
 
                     <h:selectOneMenu value="#{alignementparlot.alignement_id_type}" styleClass="listes" style="width: 150px;">

@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
     
-    <p:dialog id="idAjouterParLotEditDlg"  header="Il y a #{alignementparlot.total} concepts" widgetVar="ajouterParLotEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idAjouterParLotEditDlg"  header="Il y a #{alignementparlot.listOfChildrenInConcept.size()} concepts" widgetVar="ajouterParLotEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
         <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
