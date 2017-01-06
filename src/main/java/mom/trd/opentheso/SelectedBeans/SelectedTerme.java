@@ -1457,7 +1457,7 @@ public class SelectedTerme implements Serializable {
     {
         if (!new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
                 nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
-                nodeAlignment.getAlignement_id_type(), idC, idTheso, nodeAlignment.getId_alignement())) 
+                nodeAlignment.getAlignement_id_type(), idC, idTheso, alignementSource.getId())) 
         {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
             return false;

@@ -19,6 +19,7 @@ delete from concept_group_label_historique;
 delete from concept_historique;
 delete from concept_orphan;
 delete from concept_term_candidat;
+delete from gps;
 delete from hierarchical_relationship;
 delete from hierarchical_relationship_historique;
 delete from images;
