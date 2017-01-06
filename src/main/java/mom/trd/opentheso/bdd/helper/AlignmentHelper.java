@@ -29,17 +29,18 @@ public class AlignmentHelper {
      * Permet de savoir si le concept 'id_concept' a déjà une alignement ou pas
      *
      * @param ds
-     * @param id_Source
+     * @param uri_target
      * @param id_Theso
      * @param id_Concept
      * @return
      */
     public boolean isExistsAlignement(HikariDataSource ds,
-            int id_Source, String id_Theso, String id_Concept) {
+            String uri_target, String id_Theso, String id_Concept) {
         boolean status = false;
         Connection conn;
         Statement stmt;
         ResultSet rs;
+        uri_target = new StringPlus().convertString(uri_target);
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -49,7 +50,7 @@ public class AlignmentHelper {
                     String query = "SELECT internal_id_concept from alignement"
                             + " where internal_id_concept = '" + id_Concept + "'"
                             + " and internal_id_thesaurus = '" + id_Theso + "'"
-                            + " and id_alignement_source = " + id_Source;
+                            + " and uri_target = '" + uri_target + "'";
                     rs = stmt.executeQuery(query);
                     if (rs.next()) {
                         status = true;
@@ -88,7 +89,7 @@ public class AlignmentHelper {
             String idConcept, String idThesaurus, int id_alignement_source) 
     {
         boolean status = false;
-        if (!isExistsAlignement(ds,id_alignement_source, idThesaurus, idConcept)) {
+        if (!isExistsAlignement(ds, uriTarget, idThesaurus, idConcept)) {
             status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus, id_alignement_source);
             if (!status) {
@@ -326,7 +327,8 @@ public class AlignmentHelper {
         Connection conn;
         Statement stmt;
         boolean status = false;
-        
+        uriTarget = new StringPlus().convertString(uriTarget);
+        conceptTarget = new StringPlus().convertString(conceptTarget);
         try {
             // Get connection from pool
             conn = ds.getConnection();
