@@ -9,45 +9,54 @@
 
     <p:dialog id="idAjouterParLot_suiteEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterParLot_suiteEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
-        <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
-            <p:layoutUnit position="west" resizable="false" size="250" minSize="250" maxSize="250">
-
-                Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
-
-                <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
-                                 update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
-
-                <p:commandButton id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
-                                 action="#{alignementparlot.sumPosition()}" update=":panContenu,:idAjouterParLot_suiteEditDlg" 
-                                 oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
-
-                <p:commandButton id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.sumPosition()}"
-                                 update=":panContenu,:idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
-                                 styleClass="styleButton"  />
-            </p:layoutUnit>
-
-            <p:layoutUnit position="center" resizable="false" size="400" minSize="400" maxSize="550">
-                <h:panelGrid columns="2">
+        <h:form >
+            <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
+                <p:layoutUnit position="west" resizable="false" size="400" minSize="400" maxSize="550">
                     <table>
-                        <ui:repeat value="#{selectedTerme.listAlignValues}" var='nodeAlign'>
-                            <tr>
-                                <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
-                                <td>
-                                    <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
-                                    <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
-                                    <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
-                                    <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
-                                    <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
-                                    <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
-                                        <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
-                                    </h:selectOneMenu><br/><br/>
-                                </td>
-                            </tr>
-                        </ui:repeat>
-                    </table>
-                </h:panelGrid>
-            </p:layoutUnit>
-        </p:layout>
 
+                        <tr>
+                            <td><p:selectOneRadio value="#{alignementparlot.uriSelection}" layout="grid" columns="1" plain="true" >
+                                    <td>
+                                        <f:selectItems value="#{selectedTerme.listAlignValues}" var="nodeAlign"
+                                                       itemLabelEscaped="false"
+                                                       itemLabel="#{nodeAlign.concept_target} : #{nodeAlign.def_target}&lt;br/&gt;  "
+                                                       itemValue="#{nodeAlign.uri_target}" /></td>
+                                </p:selectOneRadio>
+
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
+
+                    Choix des alignements pour le concept '<h:outputText value="#{alignementparlot.nomduterm}" />' :<br/><br/>
+
+<!--
+                    <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
+                        <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
+                    </h:selectOneMenu><br/><br/>
+-->
+                    <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
+                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
+
+                    <p:commandButton rendered="#{!alignementparlot.fin}" id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
+                                     action="#{alignementparlot.addAlignement()}"
+                                     update=":idAjouterParLot_suiteEditDlg" 
+                                     oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
+
+                    <p:commandButton rendered="#{!alignementparlot.fin}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
+                                     update=":idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
+                                     styleClass="styleButton"  />
+                    <p:commandButton rendered="#{alignementparlot.fin}" id="ajouterAllAlignAutofin" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{alignementparlot.addAlignement()}"
+                                     update=":idAjouterParLot_suiteEditDlg" 
+                                     oncomplete="PF('ajouterParLot_suiteEditDlg').hide();" styleClass="styleButton" />
+
+                </p:layoutUnit>
+            </p:layout>
+        </h:form>
     </p:dialog>
 </ui:composition>

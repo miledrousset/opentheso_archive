@@ -833,7 +833,8 @@ public class TreeBean implements Serializable {
                 new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
             }
             for (NodeAlignment na : selectedTerme.getConceptFusionAlign()) {
-                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso());
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), 
+                        na.getAlignement_id_type(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), na.getId_alignement());
             }
             new ConceptHelper().addConceptFusion(connect.getPoolConnexion(), selectedTerme.getConceptFusionId(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info6")));

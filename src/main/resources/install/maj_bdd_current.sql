@@ -935,8 +935,9 @@ $BODY$
   COST 100;
 
 
+--Changer id_alignement_source a 0 si est null
 
-
+UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
   
 --
 --Delete toutes les function

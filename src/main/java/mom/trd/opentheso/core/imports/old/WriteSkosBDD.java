@@ -307,7 +307,7 @@ public class WriteSkosBDD {
                     sKOSMapping.getTargetUri(), // URI
                     1,
                     concept.getIdConcept(),
-                    idThesaurus
+                    idThesaurus,0
                 );
             }
             if(sKOSMapping.getProperty() == SKOSProperty.closeMatch){
@@ -318,7 +318,7 @@ public class WriteSkosBDD {
                     sKOSMapping.getTargetUri(), // URI
                     2,
                     concept.getIdConcept(),
-                    idThesaurus
+                    idThesaurus,0
                 );
             }
 

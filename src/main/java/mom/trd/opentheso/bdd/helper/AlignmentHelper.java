@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,23 +75,27 @@ public class AlignmentHelper {
      * @param idTypeAlignment
      * @param idConcept
      * @param idThesaurus
+     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0 c'est alignement manuel
      * @return
      */
     public boolean addNewAlignment(HikariDataSource ds,
             int author,
             String conceptTarget, String thesaurusTarget,
             String uriTarget, int idTypeAlignment,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, int id_alignement_source) 
+    {
         boolean status = false;
         Connection conn;
         Statement stmt;
         if (!isExistsAlignement(ds, idThesaurus, idConcept)) {
-            status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, idConcept, idThesaurus);
+            status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
+                    idConcept, idThesaurus, id_alignement_source);
             if (!status) {
                 return false;
             }
         } else {
-            status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, idConcept, idThesaurus);
+            status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
+                    idConcept, idThesaurus,id_alignement_source);
             if (!status) {
                 return false;
             }
@@ -117,10 +122,13 @@ public class AlignmentHelper {
             int author,
             String conceptTarget, String thesaurusTarget,
             String uriTarget, int idTypeAlignment,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, int id_alignement_source) {
         Connection conn;
         Statement stmt;
         boolean status = false;
+        conceptTarget = new StringPlus().convertString(conceptTarget);
+        uriTarget = new StringPlus().convertString(uriTarget);
+        
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -130,7 +138,8 @@ public class AlignmentHelper {
                     String query = "Insert into alignement "
                             + "(author, concept_target, thesaurus_target,"
                             + " uri_target, alignement_id_type,"
-                            + " internal_id_thesaurus, internal_id_concept)"
+                            + " internal_id_thesaurus, internal_id_concept,"
+                            + " id_alignement_source)"
                             + " values ("
                             + author
                             + ",'" + conceptTarget + "'"
@@ -138,7 +147,8 @@ public class AlignmentHelper {
                             + ",'" + uriTarget + "'"
                             + "," + idTypeAlignment
                             + ",'" + idThesaurus + "'"
-                            + ",'" + idConcept + "')";
+                            + ",'" + idConcept + "',"
+                            +  id_alignement_source + " )";
 
                     stmt.executeUpdate(query);
 
@@ -172,6 +182,9 @@ public class AlignmentHelper {
         Connection conn;
         Statement stmt;
 
+        nodeAlignment.setConcept_target(new StringPlus().convertString(nodeAlignment.getConcept_target()));
+        nodeAlignment.setUri_target(new StringPlus().convertString(nodeAlignment.getUri_target()));     
+        
         boolean status = false;
         try {
             // Get connection from pool
@@ -300,17 +313,19 @@ public class AlignmentHelper {
      * @param idTypeAlignment
      * @param uriTarget
      * @param idThesaurus
+     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0 c'est alignement manuel
      * @return
      */
     public boolean updateAlignment(HikariDataSource ds,
             int idAlignment,
             String conceptTarget, String thesaurusTarget,
             String uriTarget, int idTypeAlignment,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, int id_alignement_source) {
 
         Connection conn;
         Statement stmt;
         boolean status = false;
+        
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -324,7 +339,8 @@ public class AlignmentHelper {
                             + " uri_target = '" + uriTarget + "',"
                             + " alignement_id_type = " + idTypeAlignment
                             + " WHERE internal_id_thesaurus = '" + idThesaurus + "'"
-                            + " AND internal_id_concept = '" + idConcept + "'";
+                            + " AND internal_id_concept = '" + idConcept + "'"
+                            + " AND id_alignement_source = "+ id_alignement_source;
                     stmt.executeUpdate(query);
                     status = true;
 
@@ -722,7 +738,12 @@ public class AlignmentHelper {
         }
         return status;
     }
-
+/**
+ * Permet de faire un update d'un alignement_source
+ * @param ds
+ * @param alig
+ * @param id 
+ */
     public void update_alignementSource(HikariDataSource ds, AlignementSource alig, int id) {
         Statement stmt;
         Connection conn;
@@ -910,7 +931,13 @@ public class AlignmentHelper {
             log.error("Error while delete Alignement : ", sqle);
         }
     }
-
+/**
+ * permet de savoir le group du concept idconcept
+ * @param ds
+ * @param id_Theso
+ * @param id_concept
+ * @return 
+ */
     public String getGroupOfConcept(HikariDataSource ds, String id_Theso, String id_concept) {
         String group = "";
         Statement stmt;
@@ -943,7 +970,13 @@ public class AlignmentHelper {
         }
         return group;
     }
-
+/**
+ * permet de savoir si le concept idconcept a des enfants o pas
+ * @param ds
+ * @param idtheso
+ * @param idconcept
+ * @return 
+ */
     public boolean isHaveChildren(HikariDataSource ds, String idtheso, String idconcept) {
         Statement stmt;
         Connection conn;
