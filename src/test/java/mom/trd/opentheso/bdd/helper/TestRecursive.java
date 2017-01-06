@@ -60,7 +60,7 @@ public class TestRecursive {
 
             
            ArrayList<String> lisIds = new  ArrayList<>();
-           lisIds = conceptHelper.getIdsOfBranch(hd, "12866", "1", "TH_1", lisIds);
+           lisIds = conceptHelper.getIdsOfBranch(hd, "12866", "TH_1", lisIds);
      //      lisIds = printChildren(hd, conn, "13090", "1" , "TH_1",lisIds);
            int j = 0;
         } catch (SQLException ex) {

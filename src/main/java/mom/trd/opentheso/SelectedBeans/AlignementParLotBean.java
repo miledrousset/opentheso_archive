@@ -25,149 +25,94 @@ import org.glassfish.external.statistics.Statistic;
 
 public class AlignementParLotBean {
 
-    private int total;
-    private ArrayList<String> listOfPremierChildren;
     private ArrayList<String> listOfChildrenInConcept;
     private String nomduterm;
-    private int position=0;
+    private int position = 0;
     private boolean fin;
-    private boolean first= true;
+    private boolean first = true;
     private NodeAlignment nodeAli;
-    
+
     private String uriSelection;
 
     private int alignement_id_type;
     private boolean selectedValue;
-    
+
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
-/**
- * Permet de savoir combien d'enfants a le concept selectionnée
- * @param id_Theso
- * @param id_Concept 
- */
-    public void combianDepuisRacine(String id_Theso, String id_Concept) {
-        total=0;
-        String id_group;
-        id_group = recuparateGroup(id_Theso, id_Concept);
-        StatisticHelper statisticHelper = new StatisticHelper();
-        listOfChildrenInConcept = new ArrayList<>();
-        listOfPremierChildren = new ArrayList<>();
-        ConceptHelper conceptHelper = new ConceptHelper();
-        listOfPremierChildren = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(), id_Concept, id_Theso);
-        listOfChildrenInConcept.add(id_Concept);
-        remplirToutChildren(id_Theso, id_Concept);
-        total = listOfChildrenInConcept.size();
-        if(total<0) fin=false;
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-    }
 
     /**
-     * Rempli une ArrayList avec le idC de les fils de le concept 
-     * que nous avons selectionée
-     * @param id_theso
-     * @param id_Concept 
+     * Permet de savoir combien d'enfants a le concept selectionnée
+     *
+     * @param id_Theso
+     * @param id_Concept
      */
-    private void remplirToutChildren(String id_theso, String id_Concept) {
-
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-        for (String concept : listOfPremierChildren) {
-            listOfChildrenInConcept.add(concept);
-            if (alignmentHelper.isHaveChildren(connect.getPoolConnexion(), id_theso, concept)) {
-                getiListChildrenOfConcept(id_theso, concept, listOfChildrenInConcept);
-            }
+    public void combianDepuisRacine(String id_Theso, String id_Concept) {
+        first = true;
+        ConceptHelper conceptHelper = new ConceptHelper();
+        listOfChildrenInConcept = new ArrayList<>();
+        listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
+                connect.getPoolConnexion(), id_Concept, id_Theso, listOfChildrenInConcept);
+        
+//        listOfChildrenInConcept.add(id_Concept);
+//        remplirToutChildren(id_Theso, id_Concept);
+        if(listOfChildrenInConcept.isEmpty()) {
+            fin = true;
+        }
+        if (first) {
+            nomduterm = selectedTerme.nom;
+            first = false;
         }
     }
-    
+
     /**
-     * Cette fonction permet de passer au concept suivant.
-     * et fait l'apelation a la funtion pour créer l'alignement
-     * (la funtion apelé est dans selecteTerme
+     * Cette fonction permet de passer au concept suivant. et fait l'apelation a
+     * la funtion pour créer l'alignement (la funtion apelé est dans
+     * selecteTerme
      */
-    public void nextPosition()
-    {
+    public void nextPosition() {
         ConceptHelper conceptHelper = new ConceptHelper();
         position++;
         String idConcept;
 
-        if(position >= total-1)
-        {
+        if (position >= listOfChildrenInConcept.size() - 1) {
             fin = true;
-            position=0;
-            total=0;
-            return;
         }
-        if (position<total)
-        {
+        if (position < listOfChildrenInConcept.size()) {
             idConcept = listOfChildrenInConcept.get(position);
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), idConcept,
-                    selectedTerme.getIdTheso(),selectedTerme.getIdlangue());
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
             selectedTerme.creerAlignAuto(idConcept, nomduterm);
         }
     }
-    /**
-     * function recursive que rempli le ArrayList avec les idC de les fils 
-     * du concept que on a selectionée
-     * @param id_Theso
-     * @param id_concept
-     * @param listOfChildrendeja 
-     */
-    private void getiListChildrenOfConcept(String id_Theso, String id_concept, ArrayList<String> listOfChildrendeja) {
 
-        ArrayList<String> childrenTmp = new ArrayList<>();
-        ConceptHelper conceptHelper = new ConceptHelper();
-        childrenTmp = conceptHelper.getListChildrenOfConcept(connect.getPoolConnexion(), id_concept, id_Theso);
-        for (String conceptFil : childrenTmp) {
-            listOfChildrenInConcept.add(conceptFil);
-            AlignmentHelper alignmentHelper = new AlignmentHelper();
-            if (alignmentHelper.isHaveChildren(connect.getPoolConnexion(), id_Theso, conceptFil)) {
-                getiListChildrenOfConcept(id_Theso, conceptFil, listOfChildrenInConcept);
-            }
-        }
-        if(first)
-        {
-            nomduterm= selectedTerme.nom;
-        }
-
-    }
-/**
- * Permet de recuperer le id_group  d'un concept
- * @param id_Theso
- * @param id_Concept
- * @return 
- */
-    public String recuparateGroup(String id_Theso, String id_Concept) {
-        AlignmentHelper alignementHelper = new AlignmentHelper();
-        String id_group = alignementHelper.getGroupOfConcept(connect.getPoolConnexion(), id_Theso, id_Concept);
-        return id_group;
-    }
     /**
      * reinicialitation du variables
      */
-    public void reinitTotal()
-    {
-        total=0;
-        position= 0;
+    public void reinitTotal() {
+        listOfChildrenInConcept = null;
+        nomduterm = "";
+        position = 0;
+        fin = false;
+        first = true;
     }
-    
+
     /**
      * cherche l'alignement que on a selectionée dans l'arrayList d'alignements
      * et ce fait l'apelation a la funtion pour ajouter l'alignement
      */
-    public void addAlignement()
-    {
-        for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) 
-        {
-            if( nodeAlignment.getUri_target().equals(uriSelection))
-            {
-                nodeAli=nodeAlignment;
+    public void addAlignement() {
+        for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
+            if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                nodeAli = nodeAlignment;
                 nodeAli.setAlignement_id_type(alignement_id_type);
                 selectedTerme.ajouterAlignAutoByLot(nodeAli);
                 nodeAli = null;
                 nextPosition();
-                if(fin) reinitTotal();
+                if (fin) {
+                    reinitTotal();
+                }
                 return;
 
             }
@@ -175,15 +120,6 @@ public class AlignementParLotBean {
     }
 
     ///////////////GET & SET////////////////
-    
-    
-    public int getTotal() {
-        return total;
-    }
-
-    public void setTotal(int total) {
-        this.total = total;
-    }
 
     public Connexion getConnect() {
         return connect;
@@ -200,7 +136,7 @@ public class AlignementParLotBean {
     public void setListOfChildrenInConcept(ArrayList<String> listOfChildrenInConcept) {
         this.listOfChildrenInConcept = listOfChildrenInConcept;
     }
-    
+
     public String getNomduterm() {
         return nomduterm;
     }
@@ -264,5 +200,5 @@ public class AlignementParLotBean {
     public void setAlignement_id_type(int alignement_id_type) {
         this.alignement_id_type = alignement_id_type;
     }
-    
+
 }
