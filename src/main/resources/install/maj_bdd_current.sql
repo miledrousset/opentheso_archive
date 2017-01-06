@@ -17,17 +17,19 @@ SET ROLE = opentheso;
 -- ajout des nouvelles fonctions
 --
 
--- avertissement, il faut faire attention, si le script ne pâsse pas,
+-- avertissement, il faut faire attention, si le script ne passe pas,
 -- c'est peut être que les contraintes que nous avons ajouté montrent des doublons interdits
--- il faut alors les identifier et supprimer le doublon 
+-- il faut alors les identifier et les supprimer 
 -- voici une requête d'exemple pour repérer les doublons 
 
 --
--- select notetypecode, id_thesaurus, id_concept, lang, count(*)
--- from note 
--- group by notetypecode, id_thesaurus, id_concept, lang
--- having count(*)>1
 -- 
+-- select notetypecode, id_thesaurus, id_term,lexicalvalue, lang, count(*) from note 
+-- where id_term !='' group by notetypecode, lexicalvalue, id_thesaurus, id_term, lang having count(*)>1;
+
+-- select notetypecode, id_thesaurus, id_concept,lexicalvalue, lang, count(*) from note 
+-- where id_concept !='' group by notetypecode, lexicalvalue, id_thesaurus, id_concept, lang having count(*)>1;
+
 
 
 
