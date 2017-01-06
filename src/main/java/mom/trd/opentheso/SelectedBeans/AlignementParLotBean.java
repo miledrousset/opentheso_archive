@@ -9,12 +9,9 @@ import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
-import mom.trd.opentheso.bdd.helper.StatisticHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
-import org.glassfish.external.statistics.Statistic;
 
 /**
  *
@@ -28,14 +25,18 @@ public class AlignementParLotBean {
     private ArrayList<String> listOfChildrenInConcept;
     private String nomduterm;
     private int position = 0;
-    private boolean fin;
+    private boolean fin = false;
+    
     private boolean first = true;
+    private boolean last = false;
+    
     private NodeAlignment nodeAli;
 
-    private String uriSelection;
+    private String uriSelection = null;
 
     private int alignement_id_type;
-    private boolean selectedValue;
+
+    private String erreur = "";
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -48,22 +49,17 @@ public class AlignementParLotBean {
      * @param id_Theso
      * @param id_Concept
      */
-    public void combianDepuisRacine(String id_Theso, String id_Concept) {
-        first = true;
+    public void getListChildren(String id_Theso, String id_Concept) {
+        reinitTotal();
         ConceptHelper conceptHelper = new ConceptHelper();
         listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
                 connect.getPoolConnexion(), id_Concept, id_Theso, listOfChildrenInConcept);
-        
-//        listOfChildrenInConcept.add(id_Concept);
-//        remplirToutChildren(id_Theso, id_Concept);
-        if(listOfChildrenInConcept.isEmpty()) {
-            fin = true;
+
+        if (listOfChildrenInConcept.isEmpty() || listOfChildrenInConcept.size() == 1) {
+            last = true;
         }
-        if (first) {
-            nomduterm = selectedTerme.nom;
-            first = false;
-        }
+        nomduterm = selectedTerme.nom;
     }
 
     /**
@@ -72,18 +68,23 @@ public class AlignementParLotBean {
      * selecteTerme
      */
     public void nextPosition() {
+        if(fin) return;
+        erreur = "";
         ConceptHelper conceptHelper = new ConceptHelper();
         position++;
         String idConcept;
 
-        if (position >= listOfChildrenInConcept.size() - 1) {
-            fin = true;
-        }
         if (position < listOfChildrenInConcept.size()) {
             idConcept = listOfChildrenInConcept.get(position);
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), idConcept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
             selectedTerme.creerAlignAuto(idConcept, nomduterm);
+        }
+        if (position == listOfChildrenInConcept.size() - 1) {
+            last = true;
+        }
+        if (position == listOfChildrenInConcept.size()) {
+            fin = true;
         }
     }
 
@@ -96,6 +97,8 @@ public class AlignementParLotBean {
         position = 0;
         fin = false;
         first = true;
+        last = false;
+        erreur = "";
     }
 
     /**
@@ -103,24 +106,25 @@ public class AlignementParLotBean {
      * et ce fait l'apelation a la funtion pour ajouter l'alignement
      */
     public void addAlignement() {
-        for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
-            if (nodeAlignment.getUri_target().equals(uriSelection)) {
-                nodeAli = nodeAlignment;
-                nodeAli.setAlignement_id_type(alignement_id_type);
-                selectedTerme.ajouterAlignAutoByLot(nodeAli);
-                nodeAli = null;
-                nextPosition();
-                if (fin) {
-                    reinitTotal();
+        erreur = "";
+        if (uriSelection.isEmpty()) {
+            erreur = "no selection d'alignement";
+        } else {
+            for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
+                if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                    nodeAli = nodeAlignment;
+                    nodeAli.setAlignement_id_type(alignement_id_type);
+                    selectedTerme.ajouterAlignAutoByLot(nodeAli);
+                    nodeAli = null;
+                    nextPosition();
+                    uriSelection = null;
+                    return;
                 }
-                return;
-
             }
         }
     }
 
     ///////////////GET & SET////////////////
-
     public Connexion getConnect() {
         return connect;
     }
@@ -199,6 +203,22 @@ public class AlignementParLotBean {
 
     public void setAlignement_id_type(int alignement_id_type) {
         this.alignement_id_type = alignement_id_type;
+    }
+
+    public String getErreur() {
+        return erreur;
+    }
+
+    public void setErreur(String erreur) {
+        this.erreur = erreur;
+    }
+
+    public boolean isLast() {
+        return last;
+    }
+
+    public void setLast(boolean last) {
+        this.last = last;
     }
 
 }

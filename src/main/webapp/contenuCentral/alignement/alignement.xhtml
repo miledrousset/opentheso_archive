@@ -23,7 +23,7 @@
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{selectedTerme.setAlignementSources()}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('ajouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="Alignement par lot" actionListener="#{selectedTerme.setAlignementSources()}" 
-                                        action="#{alignementparlot.combianDepuisRacine(selectedTerme.idTheso, selectedTerme.idC)}"
+                                        action="#{alignementparlot.getListChildren(selectedTerme.idTheso, selectedTerme.idC)}"
                                         update=":idAjouterParLotEditDlg" oncomplete="PF('ajouterParLotEditDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>

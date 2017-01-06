@@ -52,15 +52,14 @@
                                      update=":idAjouterParLot_suiteEditDlg" 
                                      oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
 
-                    <p:commandButton rendered="#{!alignementparlot.fin}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
+                    <p:commandButton rendered="#{!alignementparlot.last}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
                                      update=":idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
                                      styleClass="styleButton"  />
-                    <p:commandButton rendered="#{alignementparlot.fin}" id="ajouterAllAlignAutofin" value="#{langueBean.getMsg('conf.btnValid')}"
-                                     actionListener="#{alignementparlot.addAlignement()}" action="#{alignementparlot.reinitTotal()}"
-                                     update=":idAjouterParLot_suiteEditDlg" 
-                                     oncomplete="PF('ajouterParLot_suiteEditDlg').hide();" styleClass="styleButton" />
-
+                    
+                    <br/><br/><br/><br/><br/>
+                    <h:outputText value="#{alignementparlot.erreur}" style="color: red" />
                 </p:layoutUnit>
+               
             </p:layout>
         </h:form>
     </p:dialog>
