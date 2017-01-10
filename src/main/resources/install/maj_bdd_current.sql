@@ -814,7 +814,7 @@ begin
 	and constraint_name ='alignement_uri_target_internal_id_thesaurus_internal_id_con_key') then 
 	execute
 	'alter table alignement
-            drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;);
+            drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;
         alter table alignement 
             add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique (internal_id_concept, internal_id_thesaurus, id_alignement_source)
 ';

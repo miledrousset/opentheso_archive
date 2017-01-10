@@ -1437,6 +1437,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public void ajouterAlignAuto() {
+        if(listAlignValues.isEmpty()) return;
         for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
                 new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(),
