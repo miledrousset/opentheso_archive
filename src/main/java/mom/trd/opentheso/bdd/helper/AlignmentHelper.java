@@ -20,27 +20,28 @@ import org.apache.commons.logging.LogFactory;
 public class AlignmentHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
-
+    private String message="";
+    
     public AlignmentHelper() {
 
+        
     }
-
+   
     /**
      * Permet de savoir si le concept 'id_concept' a déjà une alignement ou pas
      *
      * @param ds
-     * @param uri_target
+     * @param id_alignement_source
      * @param id_Theso
      * @param id_Concept
      * @return
      */
     public boolean isExistsAlignement(HikariDataSource ds,
-            String uri_target, String id_Theso, String id_Concept) {
+            int id_alignement_source, String id_Theso, String id_Concept) {
         boolean status = false;
         Connection conn;
         Statement stmt;
         ResultSet rs;
-        uri_target = new StringPlus().convertString(uri_target);
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -50,7 +51,7 @@ public class AlignmentHelper {
                     String query = "SELECT internal_id_concept from alignement"
                             + " where internal_id_concept = '" + id_Concept + "'"
                             + " and internal_id_thesaurus = '" + id_Theso + "'"
-                            + " and uri_target = '" + uri_target + "'";
+                            + " and id_alignement_source = '" + id_alignement_source + "'";
                     rs = stmt.executeQuery(query);
                     if (rs.next()) {
                         status = true;
@@ -89,18 +90,22 @@ public class AlignmentHelper {
             String idConcept, String idThesaurus, int id_alignement_source) 
     {
         boolean status = false;
-        if (!isExistsAlignement(ds, uriTarget, idThesaurus, idConcept)) {
+        if (!isExistsAlignement(ds, id_alignement_source, idThesaurus, idConcept)) {
+            message = "Cette alignement n'exits pas, creation en cours <br>";
             status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus, id_alignement_source);
             if (!status) {
                 return false;
             }
+            message += "Creation d'alignement fini";
         } else {
+            message = "Cette alignement exits, updating en cours";
             status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus,id_alignement_source);
             if (!status) {
                 return false;
             }
+            message += "<br> Update fini";
         }
 
         return status;
@@ -1012,6 +1017,49 @@ public class AlignmentHelper {
             log.error("Error while search children", sqle);
         }
         return status;
+    }
+    public boolean dejaAligneParAvecCetteAlignement(HikariDataSource ds, String id_Concept, 
+            String id_Theso, int id_alignement_source)
+    {
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "select id from alignement "
+                            + "where internal_id_thesaurus = '" + id_Theso
+                            + "' and internal_id_concept='" + id_Concept
+                            + "' and id_alignement_source ="+id_alignement_source;
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        status = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                    conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while see it's alignée", sqle);
+        }
+        return status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

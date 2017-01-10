@@ -805,6 +805,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql; 
 
+--
+--Permet de change l'ancian constraint pour autre nouvelle
+--
+create or replace function changeconstraintalignement() returns void as $$
+begin
+	if exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'UNIQUE'
+	and constraint_name ='alignement_uri_target_internal_id_thesaurus_internal_id_con_key') then 
+	execute
+	'alter table alignement
+            drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;);
+        alter table alignement 
+            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique (internal_id_concept, internal_id_thesaurus, id_alignement_source)
+';
+  end if;
+  end;
+  $$LANGUAGE plpgsql;
 
 -- mises à jour 
 --
@@ -840,6 +856,8 @@ SELECT updatesequencesCH();
 SELECT updatesequencesTH();
 SELECT adjuteconstraintuser();
 SELECT create_table_users_historique();
+
+SELECT changeconstraintalignement();
 
 SELECT create_table_thesaurus_alignement_source();
 -- Creation de les types pour alignement_source
@@ -981,6 +999,7 @@ SELECT delete_fonction ('create_table_alignement_type','');
 SELECT delete_fonction ('create_table_note_type','');
 SELECT delete_fonction ('adjouteconstraint_alignement_source','');
 SELECT delete_fonction ('drop_constraint_alignement_source','');
+SELECT delete_fonction ('changeconstraintalignement','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
