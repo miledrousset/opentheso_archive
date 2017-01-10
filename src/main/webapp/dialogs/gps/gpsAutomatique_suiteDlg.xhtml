@@ -7,15 +7,15 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
 
-    <p:dialog id="idAjouterParLot_suiteEditDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="ajouterParLot_suiteEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsAutomatique_suiteDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="gpsAutomatique_suiteDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
-        <h:form rendered="#{!alignementparlot.fin}">
+        <h:form rendered="#{!gps.fin}">
             <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
                 <p:layoutUnit position="west" resizable="false" size="400" minSize="400" maxSize="550">
                     <table>
 
                         <tr>
-                            <td><p:selectOneRadio value="#{alignementparlot.uriSelection}" layout="grid" columns="1" plain="true" >
+                            <td><p:selectOneRadio value="#{gps.uriSelection}" layout="grid" columns="1" plain="true" >
                                     <td>
                                         <f:selectItems value="#{selectedTerme.listAlignValues}" var="nodeAlign"
                                                        itemLabelEscaped="false"
@@ -34,9 +34,9 @@
                 <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
 
                     Choix des alignements pour le concept '<h:outputText rendered="#{alignementparlot.first}" 
-                                                                         value="#{alignementparlot.nomduterm}" style="text-decoration: underline"/>' :
-                    <h:outputText rendered="#{!alignementparlot.first}" 
-                                  value="#{alignementparlot.nomduterm}" />'  
+                                                                         value="#{gps.nomduterm}" style="text-decoration: underline"/>' :
+                    <h:outputText rendered="#{!gps.first}" 
+                                  value="#{gps.nomduterm}" />'  
                     <br/><br/>
 
 
@@ -45,15 +45,15 @@
                     </h:selectOneMenu><br/><br/>
 
                     <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
-                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
+                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteDlg.hide()';"  />
 
                     <p:commandButton rendered="#{!alignementparlot.fin}" id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
                                      action="#{alignementparlot.addAlignement()}"
-                                     update=":idAjouterParLot_suiteEditDlg" 
-                                     oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
+                                     update="idGpsAutomatique_suiteDlg" 
+                                     oncomplete="PF('gpsAutomatique_suiteDlg').show();" styleClass="styleButton" />
 
                     <p:commandButton rendered="#{!alignementparlot.last}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
-                                     update=":idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
+                                     update="idGpsAutomatique_suiteDlg" oncomplete="PF('gpsAutomatique_suiteDlg').show();"
                                      styleClass="styleButton"  />
 
                     <br/><br/><br/><br/><br/>
@@ -66,7 +66,7 @@
         <h:form rendered="#{alignementparlot.fin}">
             <br/><br/>
             <p:commandButton id="finAllAlignAutoFin" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
-                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
+                             update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteDlg.hide()';"  />
                 <br/><br/>
                 <h:outputText value="#{alignementparlot.erreur}" style="color: red" />
                 <h:outputText value="#{alignementparlot.message}" style="color: green" escape="false"/>

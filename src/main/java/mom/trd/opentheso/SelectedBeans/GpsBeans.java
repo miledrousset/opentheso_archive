@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
@@ -30,24 +31,48 @@ import org.xml.sax.SAXException;
 public class GpsBeans {
 
     private MapModel geoModel;
-    private String centerGeoMap = "41.850033, -87.6500523";
+    
     public double latitud;
     public double longitud;
-    private String coordennees = null;
+
+    private ArrayList<AlignementSource> listeAlignementSources;    
     private ArrayList<AlignementSource> alignementSources;
     private ArrayList<NodeAlignment> listAlignValues;
-    private String selectedAlignement;
-    private ArrayList<AlignementSource> listeAlignementSources;
-    private NodeAlignment alignment_choisi;
-    private String codeid;
     private ArrayList<Languages_iso639> listLanguesInTheso;
+    
+    private NodeAlignment alignment_choisi;
+
     private AlignementSource alignementPreferences;
     NodePreference nodePreference;
-
+    
+    private String selectedAlignement;
+    private String centerGeoMap = "41.850033, -87.6500523";
+    private String coordennees = null;
+    private String codeid;
+    
     private boolean integrerTraduction = true;
     private boolean reemplacerTraduction = true;
     private boolean alignementAutomatique = true;
 
+    
+    // variables pour le lot
+    private ArrayList<String>listOfChildrenInConcept;
+    
+    private NodeAlignment nodeAli;
+    
+    private String id_concept;
+    private String id_theso;
+    private String nomduterm;
+    private String message = "";
+    private String erreur = "";
+    private String uriSelection = "";
+    
+    private int position=0;
+    private boolean fin = false;
+    private boolean first = true;
+    private boolean last = false;
+    private boolean mettreAJour = false;
+    //////
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
     @ManagedProperty(value = "#{user1}")
@@ -108,7 +133,7 @@ public class GpsBeans {
             if (nodePreference.isGps_alignementautomatique()) {
                 AlignmentHelper alignmentHelper = new AlignmentHelper();
                 if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), id_user, alignment_choisi.getName(), alignementPreferences.getSource(),
-                        alignment_choisi.getIdUrl(), 1, idC, id_Theso, alignment_choisi.getId_alignement())) {
+                        alignment_choisi.getIdUrl(), 1, idC, id_Theso, nodePreference.getGps_id_source())) {
                     if (nodePreference.isGps_integrertraduction()) {
                         LanguageHelper languageHelper = new LanguageHelper();
                         listLanguesInTheso = new ArrayList<>();
@@ -233,6 +258,150 @@ public class GpsBeans {
         }
     }
      */
+    
+    /////////////////*******************/////////////////////
+    /////////////////*******************/////////////////////
+    /////////////////   GPS PAR LOT     /////////////////////
+    /////////////////*******************/////////////////////
+    /////////////////*******************/////////////////////
+    
+    
+    
+    /**
+     * Permet de savoir combien d'enfants a le concept selectionnée
+     *
+     * @param id_Theso
+     * @param id_Concept
+     */
+    public void getListChildren(String id_Theso, String id_Concept) {
+        reinitTotal();
+        id_concept = id_Concept;
+        id_theso = id_Theso;
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        listOfChildrenInConcept = new ArrayList<>();
+        listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
+                connect.getPoolConnexion(), id_concept, id_Theso, listOfChildrenInConcept);
+
+        if (listOfChildrenInConcept.isEmpty() || listOfChildrenInConcept.size() == 1) {
+            last = true;
+        }
+        nomduterm = selectedTerme.nom;
+    }
+    
+       /**
+     * reinicialitation du variables
+     */
+    public void reinitTotal() {
+        listOfChildrenInConcept = null;
+        nomduterm = "";
+        last =  false;
+    }
+    /**
+     * cherche l'alignement que on a selectionée dans l'arrayList d'alignements
+     * et ce fait l'apelation a la funtion pour ajouter l'alignement
+     
+    public void addAlignement() {
+
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, alignementPreferences.getId())
+                || mettreAJour) {
+            if (uriSelection.isEmpty()) {
+                erreur = "no selection d'alignement";
+                message = "";
+            } else {
+                for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
+                    if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                        nodeAli = nodeAlignment;
+                        message = "l'alignement va se faire <br>";
+                        doAll(id_concept, id_theso, position, erreur, id_theso)
+                        message += selectedTerme.getMessageAlig();
+                        nodeAli = null;
+                        nextPosition();
+                        uriSelection = null;
+                        message += "<br>C'est fini pour cetter concept";
+                        return;
+                    }
+                }
+            }
+        } else {
+            nextPosition();
+        }
+    }*/
+     /**
+     * Cette fonction permet de passer au concept suivant. et fait l'apelation a
+     * la funtion pour créer l'alignement (la funtion apelé est dans
+     * selecteTerme
+     */
+    public void nextPosition() {
+
+        if (fin) {
+            return;
+        }
+        erreur = "";
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        if (!mettreAJour) {
+            position++;
+            if (position < listOfChildrenInConcept.size()) {
+                id_concept = listOfChildrenInConcept.get(position);
+            }
+
+            comprobationFin();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            while (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(),
+                    id_concept, id_theso,alignementPreferences.getId())) {
+                position++;
+                comprobationFin();
+                id_concept = listOfChildrenInConcept.get(position);
+                nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                        selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            }
+        } else {
+            if (position < listOfChildrenInConcept.size()) {
+                id_concept = listOfChildrenInConcept.get(position);
+            }
+            comprobationFin();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        }
+
+        selectedTerme.creerAlignAuto(id_concept, nomduterm);
+        position++;
+    }
+    /**
+     *Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog 
+     */
+    private void comprobationFin() {
+
+        if (position == listOfChildrenInConcept.size() - 1) {
+            last = true;
+        }
+        if (position == listOfChildrenInConcept.size()) {
+            fin = true;
+        }
+
+    }
+    /**
+ * Permet de savoir le premiere element que on besoin montrer
+ * @param id_concept
+ * @param id_theso 
+ */
+    public void getPreliereElement(String id_concept, String idTheso, String nomduterm, String idlangue) {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        if (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, alignementPreferences.getId())) {
+            nextPosition();
+        } else {
+            ConceptHelper conceptHelper = new ConceptHelper();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            selectedTerme.creerAlignAuto(id_concept, nomduterm);
+        }
+    }
+    
+    
+    ///////////////GET & SET////////////////////////////
     public MapModel getGeoModel() {
         return geoModel;
     }
@@ -312,6 +481,9 @@ public class GpsBeans {
     public void setListeAlignementSources() {
         GpsHelper gpsHelper = new GpsHelper();
         alignementSources = gpsHelper.getAlignementSource(connect.getPoolConnexion());
+        if(!alignementSources.isEmpty()) {
+            selectedAlignement = alignementSources.get(0).getSource();
+        }
     }
 
     public CurrentUser getTheUser() {
@@ -392,6 +564,102 @@ public class GpsBeans {
 
     public void setLangueBean(LanguageBean langueBean) {
         this.langueBean = langueBean;
+    }
+
+    public String getId_concept() {
+        return id_concept;
+    }
+
+    public void setId_concept(String id_concept) {
+        this.id_concept = id_concept;
+    }
+
+    public String getId_theso() {
+        return id_theso;
+    }
+
+    public void setId_theso(String id_theso) {
+        this.id_theso = id_theso;
+    }
+
+    public String getNomduterm() {
+        return nomduterm;
+    }
+
+    public void setNomduterm(String nomduterm) {
+        this.nomduterm = nomduterm;
+    }
+
+    public boolean isLast() {
+        return last;
+    }
+
+    public void setLast(boolean last) {
+        this.last = last;
+    }
+
+    public boolean isMettreAJour() {
+        return mettreAJour;
+    }
+
+    public void setMettreAJour(boolean mettreAJour) {
+        this.mettreAJour = mettreAJour;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getErreur() {
+        return erreur;
+    }
+
+    public void setErreur(String erreur) {
+        this.erreur = erreur;
+    }
+
+    public ArrayList<String> getListOfChildrenInConcept() {
+        return listOfChildrenInConcept;
+    }
+
+    public void setListOfChildrenInConcept(ArrayList<String> listOfChildrenInConcept) {
+        this.listOfChildrenInConcept = listOfChildrenInConcept;
+    }
+
+    public String getUriSelection() {
+        return uriSelection;
+    }
+
+    public void setUriSelection(String uriSelection) {
+        this.uriSelection = uriSelection;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public boolean isFin() {
+        return fin;
+    }
+
+    public void setFin(boolean fin) {
+        this.fin = fin;
+    }
+
+    public boolean isFirst() {
+        return first;
+    }
+
+    public void setFirst(boolean first) {
+        this.first = first;
     }
 
 }

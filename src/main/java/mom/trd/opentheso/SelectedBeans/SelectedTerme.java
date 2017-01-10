@@ -166,6 +166,8 @@ public class SelectedTerme implements Serializable {
 
     private String identifierType;
     public String icon = "+";
+    
+    public String messageAlig="";
 
     // Variables resourcesBundle
     String cheminNotice1;
@@ -1344,7 +1346,7 @@ public class SelectedTerme implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info9")));
         }
     }
-    
+
     /**
      * Cette fonction permet de récupérer la liste des alignements par rapport à
      * une source
@@ -1434,8 +1436,7 @@ public class SelectedTerme implements Serializable {
          */
     }
 
-    public void ajouterAlignAuto() 
-    {
+    public void ajouterAlignAuto() {
         for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
                 new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(),
@@ -1448,20 +1449,21 @@ public class SelectedTerme implements Serializable {
     }
 
     /**
-     * Permet de creer une alignement, cette funtion s'utilise pour l'alignement par lot
-     * l'apelation de la funtion c'est de AlignementParLotBean
+     * Permet de creer une alignement, cette funtion s'utilise pour l'alignement
+     * par lot l'apelation de la funtion c'est de AlignementParLotBean
+     *
      * @param nodeAlignment
-     * @return 
+     * @return
      */
-    public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment)
-    {
-        if (!new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
+    public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment) {
+        AlignmentHelper alignmentHelper =new AlignmentHelper();
+        if (!alignmentHelper.addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
                 nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
-                nodeAlignment.getAlignement_id_type(), nodeAlignment.getInternal_id_concept(), idTheso, alignementSource.getId())) 
-        {
+                nodeAlignment.getAlignement_id_type(), nodeAlignment.getInternal_id_concept(), idTheso, alignementSource.getId())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
             return false;
         }
+        messageAlig = alignmentHelper.getMessage();
         return true;
     }
 
@@ -1831,11 +1833,13 @@ public class SelectedTerme implements Serializable {
                         return false;
                     }
                 } else // on coupe la branche de son BT
-                 if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                {
+                    if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
+                }
                 conn.commit();
                 conn.close();
 
@@ -3043,6 +3047,13 @@ public class SelectedTerme implements Serializable {
 
     public void setSelectedAlignement(String selectedAlignement) {
         this.selectedAlignement = selectedAlignement;
+        for (AlignementSource alignementSource1 : alignementSources) {
+            // on se positionne sur la source sélectionnée 
+            if (selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
+                // on trouve le type de filtre à appliquer
+                alignementSource = alignementSource1;
+            }
+        }
     }
 
     public AlignementSource getAlignementSource() {
@@ -3059,6 +3070,14 @@ public class SelectedTerme implements Serializable {
 
     public void setLatitudLongitud(String latitudLongitud) {
         this.latitudLongitud = latitudLongitud;
+    }
+
+    public String getMessageAlig() {
+        return messageAlig;
+    }
+
+    public void setMessageAlig(String messageAlig) {
+        this.messageAlig = messageAlig;
     }
 
 }

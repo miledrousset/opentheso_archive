@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
@@ -26,17 +27,21 @@ public class AlignementParLotBean {
     private String nomduterm;
     private int position = 0;
     private boolean fin = false;
-    
+
     private boolean first = true;
     private boolean last = false;
-    
+
     private NodeAlignment nodeAli;
 
     private String uriSelection = null;
 
     private int alignement_id_type;
+    private String id_concept;
+    private String id_theso;
 
     private String erreur = "";
+    private String message = "";
+    private boolean mettreAJour = false;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -51,10 +56,13 @@ public class AlignementParLotBean {
      */
     public void getListChildren(String id_Theso, String id_Concept) {
         reinitTotal();
+        id_concept = id_Concept;
+        id_theso = id_Theso;
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
         listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
-                connect.getPoolConnexion(), id_Concept, id_Theso, listOfChildrenInConcept);
+                connect.getPoolConnexion(), id_concept, id_Theso, listOfChildrenInConcept);
 
         if (listOfChildrenInConcept.isEmpty() || listOfChildrenInConcept.size() == 1) {
             last = true;
@@ -68,24 +76,54 @@ public class AlignementParLotBean {
      * selecteTerme
      */
     public void nextPosition() {
-        if(fin) return;
-        erreur = "";
-        ConceptHelper conceptHelper = new ConceptHelper();
-        position++;
-        String idConcept;
 
-        if (position < listOfChildrenInConcept.size()) {
-            idConcept = listOfChildrenInConcept.get(position);
-            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), idConcept,
-                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            selectedTerme.creerAlignAuto(idConcept, nomduterm);
+        if (fin) {
+            return;
         }
+        erreur = "";
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        if (!mettreAJour) {
+            position++;
+            if (position < listOfChildrenInConcept.size()) {
+                id_concept = listOfChildrenInConcept.get(position);
+            }
+
+            comprobationFin();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            while (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(),
+                    id_concept, id_theso, selectedTerme.alignementSource.getId())) {
+                position++;
+                comprobationFin();
+                id_concept = listOfChildrenInConcept.get(position);
+                nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                        selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            }
+        } else {
+            if (position < listOfChildrenInConcept.size()) {
+                id_concept = listOfChildrenInConcept.get(position);
+            }
+            comprobationFin();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        }
+
+        selectedTerme.creerAlignAuto(id_concept, nomduterm);
+        position++;
+    }
+    /**
+     *Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog 
+     */
+    private void comprobationFin() {
+
         if (position == listOfChildrenInConcept.size() - 1) {
             last = true;
         }
         if (position == listOfChildrenInConcept.size()) {
             fin = true;
         }
+
     }
 
     /**
@@ -99,6 +137,7 @@ public class AlignementParLotBean {
         first = true;
         last = false;
         erreur = "";
+        message = "";
     }
 
     /**
@@ -107,20 +146,46 @@ public class AlignementParLotBean {
      */
     public void addAlignement() {
         erreur = "";
-        if (uriSelection.isEmpty()) {
-            erreur = "no selection d'alignement";
-        } else {
-            for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
-                if (nodeAlignment.getUri_target().equals(uriSelection)) {
-                    nodeAli = nodeAlignment;
-                    nodeAli.setAlignement_id_type(alignement_id_type);
-                    selectedTerme.ajouterAlignAutoByLot(nodeAli);
-                    nodeAli = null;
-                    nextPosition();
-                    uriSelection = null;
-                    return;
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, selectedTerme.alignementSource.getId())
+                || mettreAJour) {
+            if (uriSelection.isEmpty()) {
+                erreur = "no selection d'alignement";
+                message = "";
+            } else {
+                for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
+                    if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                        nodeAli = nodeAlignment;
+                        nodeAli.setAlignement_id_type(alignement_id_type);
+                        message = "l'alignement va se faire <br>";
+                        selectedTerme.ajouterAlignAutoByLot(nodeAli);
+                        message += selectedTerme.getMessageAlig();
+                        nodeAli = null;
+                        nextPosition();
+                        uriSelection = null;
+                        message += "<br>C'est fini pour cetter concept";
+                        return;
+                    }
                 }
             }
+        } else {
+            nextPosition();
+        }
+    }
+/**
+ * Permet de savoir le premiere element que on besoin montrer
+ * @param id_concept
+ * @param id_theso 
+ */
+    public void getPreliereElement(String id_concept, String id_theso) {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        if (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, selectedTerme.alignementSource.getId())) {
+            nextPosition();
+        } else {
+            ConceptHelper conceptHelper = new ConceptHelper();
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            selectedTerme.creerAlignAuto(id_concept, nomduterm);
         }
     }
 
@@ -219,6 +284,30 @@ public class AlignementParLotBean {
 
     public void setLast(boolean last) {
         this.last = last;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getId_concept() {
+        return id_concept;
+    }
+
+    public void setId_concept(String id_concept) {
+        this.id_concept = id_concept;
+    }
+
+    public boolean isMettreAJour() {
+        return mettreAJour;
+    }
+
+    public void setMettreAJour(boolean mettreAJour) {
+        this.mettreAJour = mettreAJour;
     }
 
 }
