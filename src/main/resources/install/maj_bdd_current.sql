@@ -813,14 +813,32 @@ begin
 	if exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'UNIQUE'
 	and constraint_name ='alignement_uri_target_internal_id_thesaurus_internal_id_con_key') then 
 	execute
-	'alter table alignement
-            drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;);
+	'
+            alter table alignement
+            drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;
         alter table alignement 
             add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique (internal_id_concept, internal_id_thesaurus, id_alignement_source)
 ';
   end if;
   end;
   $$LANGUAGE plpgsql;
+
+--
+--Ajoute la PRIMARY KEY dans alignement si n'exists pas
+--
+create or replace function add_primary_keyalignement() returns void as $$
+begin
+	if not exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'PRIMARY KEY'
+	and constraint_name ='alignement_pkey') then 
+	execute
+	'
+            ALTER TABLE ONLY alignement
+			ADD CONSTRAINT alignement_pkey PRIMARY KEY (id);
+';
+  end if;
+  end;
+  $$LANGUAGE plpgsql;
+
 
 -- mises à jour 
 --
@@ -870,6 +888,8 @@ SELECT addtype_Alignement_format();
 SELECT addtype_Alignement_type_rqt();
 
 -- Type: public.auth_method
+
+SELECT add_primary_keyalignement();
 
 SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
@@ -1000,6 +1020,7 @@ SELECT delete_fonction ('create_table_note_type','');
 SELECT delete_fonction ('adjouteconstraint_alignement_source','');
 SELECT delete_fonction ('drop_constraint_alignement_source','');
 SELECT delete_fonction ('changeconstraintalignement','');
+SELECT delete_fonction ('add_primary_keyalignement','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
