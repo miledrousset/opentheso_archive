@@ -792,7 +792,7 @@ public class TermHelper {
                     stmt.close();
                 }
             } finally {
-                conn.close();
+             //  conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
