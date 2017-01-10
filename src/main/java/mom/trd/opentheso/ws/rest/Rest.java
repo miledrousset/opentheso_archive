@@ -313,7 +313,7 @@ public class Rest {
         StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);        
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);   
         ds.close();
         return jsonLd.toString();
     }

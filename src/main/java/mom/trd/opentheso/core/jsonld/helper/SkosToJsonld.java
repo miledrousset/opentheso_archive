@@ -101,13 +101,14 @@ public class SkosToJsonld {
     public StringBuffer getJsonLdDocument(SKOSXmlDocument skosDocument) {
         
         if(skosDocument == null) return null;
+        if(skosDocument.getResourcesList().isEmpty()) return emptyJson();
+        
         jsonLd = new StringBuffer();
         
         startJson();
         
         boolean first = true;
         
-
         // boucle pour tous les concepts
         for (SKOSResource skosConcept : skosDocument.getResourcesList()) {
             if(!first) {
@@ -157,6 +158,16 @@ public class SkosToJsonld {
         endJson();
         
         return jsonLd;
+    }
+    
+    private StringBuffer emptyJson() {
+        StringBuffer empty = new StringBuffer("{\n" +
+                "  \"@graph\":  [\n" +
+                "    {\n" +                
+                "    }\n" +
+                "  ]\n" +
+                "}");
+        return empty;
     }
  
     private void addIdConcept(String uri){
@@ -333,29 +344,83 @@ public class SkosToJsonld {
     }
     
     private void addDocumentations(ArrayList<SKOSDocumentation> documentations) {
-        for (SKOSDocumentation documentation : documentations) {
-            switch (documentation.getProperty()) {
-                case SKOSProperty.scopeNote:
-                    endElement();
-                    addElementDocumentation(documentation, "scopeNote");
-                    break;
-                case SKOSProperty.historyNote:
-                    endElement();
-                    addElementDocumentation(documentation, "historyNote");
+        ArrayList <SKOSDocumentation> changeNote = new ArrayList<>();
+        ArrayList <SKOSDocumentation> definition = new ArrayList<>();
+        ArrayList <SKOSDocumentation> editorialNote = new ArrayList<>();   
+        ArrayList <SKOSDocumentation> example = new ArrayList<>();
+        ArrayList <SKOSDocumentation> historyNote = new ArrayList<>();
+        ArrayList <SKOSDocumentation> note = new ArrayList<>();
+        ArrayList <SKOSDocumentation> scopeNote = new ArrayList<>();   
+        
+        for (SKOSDocumentation sKOSDocumentation : documentations) {
+            switch (sKOSDocumentation.getProperty()) {
+                case SKOSProperty.changeNote:
+                    changeNote.add(sKOSDocumentation);
                     break;
                 case SKOSProperty.definition:
-                    endElement();
-                    addElementDocumentation(documentation, "definition");
+                    definition.add(sKOSDocumentation);
                     break;
                 case SKOSProperty.editorialNote:
-                    endElement();
-                    addElementDocumentation(documentation, "editorialNote");
+                    editorialNote.add(sKOSDocumentation);
+                    break;
+                case SKOSProperty.example:
+                    example.add(sKOSDocumentation);
+                    break;
+                case SKOSProperty.historyNote:
+                    historyNote.add(sKOSDocumentation);
                     break;                    
+                case SKOSProperty.note:
+                    note.add(sKOSDocumentation);
+                    break;
+                case SKOSProperty.scopeNote:
+                    scopeNote.add(sKOSDocumentation);
+                    break;
                 default:
                     break;
             }
         }
-    }    
+        
+        addNote(changeNote, "changeNote");
+        addNote(definition, "definition");
+        addNote(editorialNote, "editorialNote");
+        addNote(example, "example");
+        addNote(historyNote, "historyNote");
+        addNote(note, "note");
+        addNote(scopeNote, "scopeNote");        
+    }
+    
+    private void addNote(ArrayList <SKOSDocumentation> note, String noteType){
+        
+        StringPlus stringPlus = new StringPlus();
+        String labelString;
+        if(!note.isEmpty()) {
+            if(note.size() > 1) {
+                endElement();
+                labelString = "      \"" + nameSpaceSkosCore + noteType + "\": [\n";
+                boolean first = true;
+                for (SKOSDocumentation sKOSDocumentation : note) {
+                    if(!first)
+                        labelString += ",\n"; 
+                    labelString += "        {\n";
+                    labelString += "          \"@language\": \"" + sKOSDocumentation.getLanguage() + "\",\n";
+                    labelString += "          \"@value\": \"" + stringPlus.normalizeStringForXml(sKOSDocumentation.getText()) + "\"\n";
+                    labelString += "        }";
+                    first = false;
+                }
+                labelString += "\n      ]";
+            } 
+            else {
+                endElement();
+                labelString = "      \"" + nameSpaceSkosCore + noteType + "\": {\n";
+                for (SKOSDocumentation sKOSDocumentation : note) {
+                    labelString += "        \"@language\": \"" + sKOSDocumentation.getLanguage() + "\",\n";
+                    labelString += "        \"@value\": \"" + stringPlus.normalizeStringForXml(sKOSDocumentation.getText()) + "\"\n";            
+                    labelString += "      }";
+                }
+            }
+            jsonLd.append(labelString);
+        }         
+    }
     
     private void addMappings(ArrayList<SKOSMapping> mappings) {
         ArrayList <SKOSMapping> closeMatch = new ArrayList<>();
