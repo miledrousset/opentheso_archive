@@ -2298,7 +2298,8 @@ INSERT INTO users_historique (id_user, username, created, modified, delete) VALU
 -- Data for Name: version_history; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-
+ALTER TABLE ONLY alignement
+    ADD CONSTRAINT alignement_pkey PRIMARY KEY (id);
 
 --
 -- TOC entry 2484 (class 2606 OID 115316)
