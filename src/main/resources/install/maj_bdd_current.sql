@@ -7,7 +7,7 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.2.1
+-- version=4.2.2
 -- date : 04/01/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
@@ -817,7 +817,8 @@ begin
             alter table alignement
             drop constraint alignement_uri_target_internal_id_thesaurus_internal_id_con_key;
         alter table alignement 
-            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique (internal_id_concept, internal_id_thesaurus, id_alignement_source)
+            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique 
+            (internal_id_concept, internal_id_thesaurus, id_alignement_source, alignement_id_type)
 ';
   end if;
   end;

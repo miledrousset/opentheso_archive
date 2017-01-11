@@ -10,12 +10,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static javax.management.Query.lt;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -47,11 +51,23 @@ public class GpsQuery {
 
         ArrayList<NodeLang> nodeLangs;
         lexicalValue = lexicalValue.replaceAll(" ", "%20");
+        
+        
+        try {
+            lexicalValue = URLEncoder.encode(lexicalValue, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GpsQuery.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
         requete = requete.replace("##lang##", lang);
         requete = requete.replace("##value##", lexicalValue);
         try {
             //URL url = new URL("https://" + lang + ".wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=" + lexicalValue + "&srnamespace=0");
 
+
+        //    requete = URLEncoder.encode(requete, "UTF-8");
             URL url = new URL(requete);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");

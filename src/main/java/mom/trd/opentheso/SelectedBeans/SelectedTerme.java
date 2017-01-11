@@ -157,7 +157,7 @@ public class SelectedTerme implements Serializable {
     private String linkOT;
     private String idOT;
     private ArrayList<NodeAlignment> listAlignValues;
-    private String selectedAlignement;
+    public String selectedAlignement;
 
     private ArrayList<AlignementSource> alignementSources;
     public AlignementSource alignementSource;

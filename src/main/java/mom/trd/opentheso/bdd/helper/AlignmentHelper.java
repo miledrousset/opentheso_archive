@@ -37,7 +37,7 @@ public class AlignmentHelper {
      * @return
      */
     public boolean isExistsAlignement(HikariDataSource ds,
-            int id_alignement_source, String id_Theso, String id_Concept) {
+            int id_alignement_source, String id_Theso, String id_Concept, int alignement_id_type) {
         boolean status = false;
         Connection conn;
         Statement stmt;
@@ -51,7 +51,8 @@ public class AlignmentHelper {
                     String query = "SELECT internal_id_concept from alignement"
                             + " where internal_id_concept = '" + id_Concept + "'"
                             + " and internal_id_thesaurus = '" + id_Theso + "'"
-                            + " and id_alignement_source = '" + id_alignement_source + "'";
+                            + " and id_alignement_source = '" + id_alignement_source + "'"
+                            + " and alignement_id_type = '" + alignement_id_type + "'";
                     rs = stmt.executeQuery(query);
                     if (rs.next()) {
                         status = true;
@@ -90,8 +91,8 @@ public class AlignmentHelper {
             String idConcept, String idThesaurus, int id_alignement_source) 
     {
         boolean status = false;
-        if (!isExistsAlignement(ds, id_alignement_source, idThesaurus, idConcept)) {
-          //  message = "<br>";
+        if (!isExistsAlignement(ds, id_alignement_source, idThesaurus, idConcept, idTypeAlignment)) {
+            message = "<br>";//"Cet alignement n'exite pas, création en cours <br>";
             status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus, id_alignement_source);
             if (!status) {
@@ -348,7 +349,8 @@ public class AlignmentHelper {
                             + " alignement_id_type = " + idTypeAlignment
                             + " WHERE internal_id_thesaurus = '" + idThesaurus + "'"
                             + " AND internal_id_concept = '" + idConcept + "'"
-                            + " AND id_alignement_source = "+ id_alignement_source;
+                            + " AND id_alignement_source = "+ id_alignement_source
+                            + " AND alignement_id_type = "+ idTypeAlignment;
                     stmt.executeUpdate(query);
                     status = true;
 
