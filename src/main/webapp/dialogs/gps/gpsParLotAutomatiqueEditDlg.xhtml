@@ -5,15 +5,15 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idGpsAutomatiqueEditDlg"  header="Il y a #{alignementparlot.listOfChildrenInConcept.size()} concepts" widgetVar="gpsAutomatiqueEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsParLotAutomatiqueEditDlg"  header="Il y a #{gps.listOfChildrenInConcept.size()} concepts" widgetVar="gpsParLotAutomatiqueEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
         <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
 
 
         <h:form>
-            <h:outputText value="Mettre a jour  Alignement existante avec cette Alignement(false par defaut)"/><br/>
-            <p:selectBooleanCheckbox value="#{alignementparlot.mettreAJour}"/>
+            <h:outputText value="#{langueBean.getMsg('alig.majAlig')}"/><br/>
+            <p:selectBooleanCheckbox value="#{gps.mettreAJour}"/>
             
             <br/><br/><br/>
             <h:panelGrid columns="2">
@@ -22,8 +22,8 @@
                 </p:selectOneRadio>
             </h:panelGrid>
             <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
-                             actionListener="#{alignementparlot.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso)}" styleClass="styleButton"
-                             update=":idGpsAutomatique_suiteDlg"  oncomplete="PF('gpsAutomatique_suiteDlg').show(); PF('gpsAutomatiqueEditDlg').hide(); "/>
+                             actionListener="#{gps.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.idlangue)}" styleClass="styleButton"
+                             update=":idGpsParLotAutomatique_suiteDlg"  oncomplete="PF('gpsParLotAutomatique_suiteDlg').show(); PF('gpsParLotAutomatiqueEditDlg').hide(); "/>
         </h:form>                                                
     </p:dialog>
 </ui:composition>

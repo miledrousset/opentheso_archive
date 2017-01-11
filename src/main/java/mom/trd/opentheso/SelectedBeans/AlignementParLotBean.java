@@ -88,18 +88,9 @@ public class AlignementParLotBean {
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
             }
-
             comprobationFin();
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            while (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(),
-                    id_concept, id_theso, selectedTerme.alignementSource.getId())) {
-                position++;
-                comprobationFin();
-                id_concept = listOfChildrenInConcept.get(position);
-                nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
-                        selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            }
         } else {
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
@@ -107,13 +98,14 @@ public class AlignementParLotBean {
             comprobationFin();
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            position++;
         }
-
         selectedTerme.creerAlignAuto(id_concept, nomduterm);
-        position++;
+
     }
+
     /**
-     *Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog 
+     * Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog
      */
     private void comprobationFin() {
 
@@ -172,21 +164,42 @@ public class AlignementParLotBean {
             nextPosition();
         }
     }
-/**
- * Permet de savoir le premiere element que on besoin montrer
- * @param id_concept
- * @param id_theso 
- */
-    public void getPreliereElement(String id_concept, String id_theso) {
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-        if (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, selectedTerme.alignementSource.getId())) {
-            nextPosition();
-        } else {
+
+    /**
+     * Permet de savoir le premiere element que on besoin montrer
+     *
+     * @param id_Concept
+     * @param id_theso
+     */
+    public void getPreliereElement(String id_Concept, String id_theso) {
+        if (selectedTerme.selectedAlignement != null) {
+            AlignmentHelper alignmentHelper = new AlignmentHelper();
             ConceptHelper conceptHelper = new ConceptHelper();
-            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
-                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            selectedTerme.creerAlignAuto(id_concept, nomduterm);
+            if (!mettreAJour) {
+                //listOfChildrenInConcept = chercherSansAligne();
+                if (listOfChildrenInConcept != null) {
+                    id_concept = listOfChildrenInConcept.get(0);
+                    nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
+                            selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+                    selectedTerme.creerAlignAuto(listOfChildrenInConcept.get(0), id_theso);
+                }
+            } else {
+                nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                        selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+                selectedTerme.creerAlignAuto(id_concept, nomduterm);
+            }
         }
+    }
+
+    private ArrayList<String> chercherSansAligne() {
+        ArrayList<String> listOfChildrenInConceptSansAligne = new ArrayList<>();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        for (String iterator : listOfChildrenInConcept) {
+            if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), iterator, id_theso, selectedTerme.alignementSource.getId())) {
+                listOfChildrenInConceptSansAligne.add(iterator);
+            }
+        }
+        return listOfChildrenInConceptSansAligne;
     }
 
     ///////////////GET & SET////////////////

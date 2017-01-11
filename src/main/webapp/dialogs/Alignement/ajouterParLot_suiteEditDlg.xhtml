@@ -34,9 +34,9 @@
                 <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
 
                     Choix des alignements pour le concept '<h:outputText rendered="#{alignementparlot.first}" 
-                                                                         value="#{alignementparlot.nomduterm}" style="text-decoration: underline"/>' :
+                                                                         value="#{alignementparlot.nomduterm}'" style="text-decoration: underline"/> :
                     <h:outputText rendered="#{!alignementparlot.first}" 
-                                  value="#{alignementparlot.nomduterm}" />'  
+                                  value="#{alignementparlot.nomduterm}'" />  
                     <br/><br/>
 
 
@@ -44,7 +44,7 @@
                         <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
                     </h:selectOneMenu><br/><br/>
 
-                    <p:commandButton id="finAllAlignAuto" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
+                    <p:commandButton id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" actionListener="#{alignementparlot.reinitTotal()}"
                                      update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
 
                     <p:commandButton rendered="#{!alignementparlot.fin}" id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
@@ -52,7 +52,8 @@
                                      update=":idAjouterParLot_suiteEditDlg" 
                                      oncomplete="PF('ajouterParLot_suiteEditDlg').show();" styleClass="styleButton" />
 
-                    <p:commandButton rendered="#{!alignementparlot.last}" id="proxAllAlignAuto" value="suivant"  actionListener="#{alignementparlot.nextPosition()}"
+                    <p:commandButton rendered="#{!alignementparlot.last}" id="proxAllAlignAuto" value="#{langueBean.getMsg('alig.sui')}"  
+                                     actionListener="#{alignementparlot.nextPosition()}"
                                      update=":idAjouterParLot_suiteEditDlg" oncomplete="PF('ajouterParLot_suiteEditDlg').show();"
                                      styleClass="styleButton"  />
 

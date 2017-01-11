@@ -23,12 +23,12 @@
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonGps" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('gps.nom')}"  update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="Automatique" actionListener="#{gps.setListeAlignementSources()}" 
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{gps.setListeAlignementSources()}" 
                                         action="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}"
                                         update=":idGpsSource_suiteEditDlg" oncomplete="PF('gpsSource_suiteEditDlg').show()" style="font-size: 12px;"/>
-                            <p:menuitem value="Par Lot" actionListener="#{gps.setListeAlignementSources()}" 
-                                        action="#{gps.getListChildren( selectedTerme.idC, selectedTerme.idTheso)}"
-                                        update=":idGpsAutomatiqueEditDlg" oncomplete="PF('gpsAutomatiqueEditDlg').show()" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{gps.setListeAlignementSources()}" 
+                                        action="#{gps.getListChildren(selectedTerme.idTheso, selectedTerme.idC, selectedTerme.idlangue )}"
+                                        update=":idGpsParLotAutomatiqueEditDlg" oncomplete="PF('gpsParLotAutomatiqueEditDlg').show()" style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>    
                 </h:form>

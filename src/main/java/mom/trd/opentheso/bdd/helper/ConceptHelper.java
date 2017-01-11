@@ -85,7 +85,22 @@ public class ConceptHelper {
         }
         return lisIds;
     }
+/*
+        public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
+            String idConceptDeTete,
+            String idTheso,
+            ArrayList<String> lisIds, int id_alignement_source, ArrayList<String> tmp) {
 
+        lisIds.add(idConceptDeTete);
+
+        ArrayList<String> listIdsOfConceptChildren
+                = getListChildrenOfConceptNotExist(hd, idConceptDeTete, idTheso,id_alignement_source);
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            getIdsOfBranchParLot(hd, listIdsOfConceptChildren1,
+                    idTheso, lisIds, id_alignement_source,tmp);
+        }
+        return lisIds;
+    }*/
     /**
      * ************************************************************
      * /**************************************************************
@@ -737,8 +752,8 @@ public class ConceptHelper {
                             + " id_thesaurus ='" + idThesaurus + "'"
                             + " and id_term ='" + idterm + "'";
                     stmt.executeUpdate(query);
-                    
-                    bushenfants(conn,idConcept, idThesaurus);
+
+                    bushenfants(conn, idConcept, idThesaurus);
 
                     query = "delete from hierarchical_relationship where"
                             + " id_thesaurus ='" + idThesaurus + "'"
@@ -759,7 +774,7 @@ public class ConceptHelper {
                             + " id_thesaurus ='" + idThesaurus + "'"
                             + " and id_term ='" + idterm + "'";
                     stmt.executeUpdate(query);
-                    
+
                     query = "delete from hierarchical_relationship where"
                             + " id_thesaurus ='" + idThesaurus + "'"
                             + " and id_concept2 ='" + idConcept + "'";
@@ -783,8 +798,8 @@ public class ConceptHelper {
         }
         return status;
     }
-    private void bushenfants(Connection conn, String idConcept, String idTheso)
-    {   
+
+    private void bushenfants(Connection conn, String idConcept, String idTheso) {
         Statement stmt;
         ArrayList<String> conceptabush = new ArrayList<>();
         ResultSet resulset;
@@ -792,19 +807,17 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query="select id_concept2 from hierarchical_relationship"
-                            + " where id_thesaurus ='"+ idTheso
-                            + "' and id_concept1 ='"+ idConcept
+                    String query = "select id_concept2 from hierarchical_relationship"
+                            + " where id_thesaurus ='" + idTheso
+                            + "' and id_concept1 ='" + idConcept
                             + "' and role ='NT'";
-                    resulset= stmt.executeQuery(query);
-                    while(resulset.next())
-                    {
+                    resulset = stmt.executeQuery(query);
+                    while (resulset.next()) {
                         conceptabush.add(resulset.getString(1));
                     }
-                    for(int i=0; i< conceptabush.size();i++)
-                    {
-                        query ="Insert into concept_orphan (id_concept, id_thesaurus)"
-                                +" values('"+conceptabush.get(i)+"', '"+idTheso+"')";
+                    for (int i = 0; i < conceptabush.size(); i++) {
+                        query = "Insert into concept_orphan (id_concept, id_thesaurus)"
+                                + " values('" + conceptabush.get(i) + "', '" + idTheso + "')";
                         stmt.execute(query);
                     }
                 } finally {
@@ -1329,7 +1342,6 @@ public class ConceptHelper {
 //        }
 //        return false;
 //    }
-
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
      *
@@ -1415,7 +1427,7 @@ public class ConceptHelper {
         }
         return existe;
     }
-    
+
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
      *
@@ -1452,7 +1464,7 @@ public class ConceptHelper {
             log.error("Error while asking if id exist : " + idConcept, sqle);
         }
         return existe;
-    }    
+    }
 
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
@@ -2358,9 +2370,8 @@ public class ConceptHelper {
         }
         return idGroup;
     }
-    
-    public void insertID_grouptoPermuted(HikariDataSource ds,String id_thesaurus, String id_concept)
-    {
+
+    public void insertID_grouptoPermuted(HikariDataSource ds, String id_thesaurus, String id_concept) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -2371,13 +2382,13 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query ="update permuted set id_group = (select id_group from concept"
-                            + " where id_thesaurus = '"+id_thesaurus
-                            + "' and id_concept = '"+id_concept
-                            + "') where  id_concept ='"+id_concept
+                    String query = "update permuted set id_group = (select id_group from concept"
+                            + " where id_thesaurus = '" + id_thesaurus
+                            + "' and id_concept = '" + id_concept
+                            + "') where  id_concept ='" + id_concept
                             + "'";
                     stmt.execute(query);
-                }finally {
+                } finally {
                     stmt.close();
                 }
             } finally {
@@ -2387,8 +2398,9 @@ public class ConceptHelper {
             // Log exception
             log.error("Error while getting Id of group of Concept : " + id_concept, sqle);
         }
- 
+
     }
+
     /**
      * Cette fonction permet de récupérer les identifiants des Group d'un
      * Concept
@@ -2883,6 +2895,54 @@ public class ConceptHelper {
                             + " where id_thesaurus = '" + idThesaurus + "'"
                             + " and id_concept1 = '" + idConcept + "'"
                             + " and role = '" + "NT" + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listIdsOfConcept.add(resultSet.getString("id_concept2"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of Id of Concept : " + idConcept, sqle);
+        }
+        return listIdsOfConcept;
+    }
+
+    public ArrayList<String> getListChildrenOfConceptNotExist(HikariDataSource ds,
+            String idConcept, String idThesaurus, int id_alignement_source) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> listIdsOfConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept2 from hierarchical_relationship"
+                            + " where id_concept2 not in ( SELECT "
+                            + " hierarchical_relationship.id_concept2"
+                            + " FROM "
+                            + " public.alignement,"
+                            + " public.hierarchical_relationship "
+                            + " WHERE "
+                            + " alignement.internal_id_concept = hierarchical_relationship.id_concept2 AND"
+                            + " alignement.internal_id_thesaurus = hierarchical_relationship.id_thesaurus AND"
+                            + " alignement.id_alignement_source = "+id_alignement_source +" AND "
+                            + " hierarchical_relationship.role = 'NT'"
+                            + " AND hierarchical_relationship.id_thesaurus = '"+idThesaurus+"'"
+                            + " and hierarchical_relationship.id_concept1 = '"+idConcept+"')"
+                            + " and id_thesaurus = '"+idThesaurus+"'"
+                            + " and role ='NT'"
+                            + " and id_concept1= '"+idConcept+"'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
