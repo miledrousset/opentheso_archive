@@ -1158,15 +1158,15 @@ SELECT pg_catalog.setval('alignement_id_seq', 1, false);
 -- Data for Name: alignement_source; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('wikipedia', 'https://$$lang$$.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=$$value$$&srnamespace=0"', 'REST', 'xml', 1, NULL, NULL, false);
-INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Pactols', 'http://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=$$value$$&lang=$$lang$$&th=TH_1', 'REST', 'skos', 2, NULL, NULL, false);
+INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('wikipedia', 'https://##lang##.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=##value##&srnamespace=0"', 'REST', 'xml', 1, NULL, NULL, false);
+INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Pactols', 'http://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1', 'REST', 'skos', 2, NULL, NULL, false);
 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('bnf', 'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xml: <http://www.w3.org/XML/1998/namespace>
 SELECT ?instrument ?prop ?value where {
   <http://data.bnf.fr/ark:/12148/cb119367821> skos:narrower+ ?instrument.
   ?instrument ?prop ?value.
-  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, $$value$$,"i") ) 
-    filter(lang(?value) =$$lang$$)
+  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, $##value##,"i") ) 
+    filter(lang(?value) =##lang##)
 } LIMIT 20', 'SPARQL', 'skos', 3, NULL, NULL, false);
 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Geoname', 'http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=demo', 'REST', 'xml', 4, NULL, 'test de geonames', true);
 
