@@ -150,20 +150,20 @@ public class AlignementParLotBean {
         if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_concept, id_theso, selectedTerme.alignementSource.getId())
                 || mettreAJour) {
             if (uriSelection.isEmpty()) {
-                erreur = "no selection d'alignement";
+                erreur = "no selected alignment";
                 message = "";
             } else {
                 for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
                     if (nodeAlignment.getUri_target().equals(uriSelection)) {
                         nodeAli = nodeAlignment;
                         nodeAli.setAlignement_id_type(alignement_id_type);
-                        message = "l'alignement va se faire <br>";
+                       // message = "l'alignement va se faire <br>";
                         selectedTerme.ajouterAlignAutoByLot(nodeAli);
                         message += selectedTerme.getMessageAlig();
                         nodeAli = null;
                         nextPosition();
                         uriSelection = null;
-                        message += "<br>C'est fini pour cetter concept";
+                        message += "<br>Concept aligné ...";
                         return;
                     }
                 }

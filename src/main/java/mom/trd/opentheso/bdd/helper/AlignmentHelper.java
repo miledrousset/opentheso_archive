@@ -91,21 +91,21 @@ public class AlignmentHelper {
     {
         boolean status = false;
         if (!isExistsAlignement(ds, id_alignement_source, idThesaurus, idConcept)) {
-            message = "Cette alignement n'exits pas, creation en cours <br>";
+          //  message = "<br>";
             status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus, id_alignement_source);
             if (!status) {
                 return false;
             }
-            message += "Creation d'alignement fini";
+            message += "<br> New alignment created ... ok";
         } else {
-            message = "Cette alignement exits, updating en cours";
+           // message = "Cette alignement exits, updating en cours";
             status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
                     idConcept, idThesaurus,id_alignement_source);
             if (!status) {
                 return false;
             }
-            message += "<br> Update fini";
+            message += "<br> Alignment updated ... Ok";
         }
 
         return status;
