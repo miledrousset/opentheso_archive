@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.2.2
--- date : 11/01/2017
+-- date : 12/01/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -819,8 +819,19 @@ begin
         alter table alignement 
             add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique 
             (internal_id_concept, internal_id_thesaurus, id_alignement_source, alignement_id_type)
-';
-  end if;
+        ';
+        end if;
+        if exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'UNIQUE'
+	and constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_id_alignem') then 
+	execute
+	'
+            alter table alignement
+            drop constraint alignement_internal_id_concept_internal_id_thesaurus_id_alignem;
+        alter table alignement 
+            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique 
+            (internal_id_concept, internal_id_thesaurus, id_alignement_source, alignement_id_type)
+        ';
+        end if;
   end;
   $$LANGUAGE plpgsql;
 
@@ -840,6 +851,53 @@ begin
   end;
   $$LANGUAGE plpgsql;
 
+--
+-- permet de changer les id du alignement en cass que il est 0;
+--
+create or replace function id_alignements()
+returns void as $$
+declare
+	p_data text[]:='{}';
+	nom text;
+	cherchesource text;
+	source text;
+	source_recuperated text;
+	positio1 integer;
+	positio2 integer;
+	total integer;
+	cherche integer;
+	id integer:=0;
+	begin 
+		for nom in 
+		select uri_target from alignement where id_alignement_source = 0
+		loop
+			 select position ('//' in nom) into positio1;
+			 select substring (nom from positio1+2) into source_recuperated;
+			 select position ('/' in source_recuperated) into positio2;
+			 total := positio2 - positio1;
+			 select substring (source_recuperated from 0 for positio2) into source_recuperated;
+			for cherchesource in 
+			select alignement_source.source from alignement_source
+			loop
+				if(source_recuperated = cherchesource) then
+					select alignement_source.id from alignement_source where alignement_source.source = cherchesource into id;
+					raise notice 'id selectione: %', id;
+				execute
+					'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''' and id_alignement_source = 0;';
+				end if;
+			end loop;
+			if (id=0) then	
+				execute
+				'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format) VALUES ('''||source_recuperated||''', ''null'', ''REST'', ''xml'');';
+				SELECT max(alignement_source.id) from alignement_source  into id;
+				execute
+				'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''';';
+				
+			end if;
+			id:=0;	
+		end loop;
+	end;
+	$$language plpgsql;
 
 -- mises à jour 
 --
@@ -892,13 +950,22 @@ SELECT addtype_Alignement_type_rqt();
 
 SELECT add_primary_keyalignement();
 
+
 SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
 SELECT updateColumn_alignement_source();
 SELECT ajouterColumn_alignement_source();
 SELECT adjouteconstraint_alignement_source();
 SELECT ajoutercolumngps_alignement_source();
+
+-- pas toucher
 SELECT ajoutercolumn_alignement();
+
+UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
+SELECT id_alignements();
+
+
+
 SELECT drop_constraint_alignement_source();
 SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
@@ -978,7 +1045,6 @@ $BODY$
 
 --Changer id_alignement_source a 0 si est null
 
-UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
   
 --
 --Delete toutes les function
@@ -1022,6 +1088,7 @@ SELECT delete_fonction ('adjouteconstraint_alignement_source','');
 SELECT delete_fonction ('drop_constraint_alignement_source','');
 SELECT delete_fonction ('changeconstraintalignement','');
 SELECT delete_fonction ('add_primary_keyalignement','');
+SELECT delete_fonction ('id_alignements','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
