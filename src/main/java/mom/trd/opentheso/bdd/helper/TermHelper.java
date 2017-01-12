@@ -54,7 +54,7 @@ public class TermHelper {
 
         if (idTerm == null) {
             return null;
-        }
+        } 
 
         term.setId_term(idTerm);
         if(!addLinkTerm(conn, term, idConcept, idUser)) {

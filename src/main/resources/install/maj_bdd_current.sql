@@ -643,6 +643,29 @@ BEGIN
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+--
+-- Permet de changer  les sequences de les tables-- note_historique
+-- 
+
+CREATE OR REPLACE FUNCTION updatesequencesalignement_source() RETURNS VOID AS $$
+declare 
+id int;
+BEGIN
+	IF EXISTS (SELECT * FROM alignement_source where alignement_source.id is not null) THEN
+	SELECT max(alignement_source.id) from alignement_source into id ; 
+	id= id+2;
+	Execute
+		'
+		ALTER SEQUENCE alignement_source__id_seq RESTART WITH '|| id||';';
+	
+	else
+	Execute
+		'
+		ALTER SEQUENCE alignement_source__id_seq RESTART WITH 1;';
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
 -- 
 -- fin des fonctions
 -- 
@@ -851,6 +874,18 @@ begin
   end;
   $$LANGUAGE plpgsql;
 
+create or replace function add_primary_keyalignement_source() returns void as $$
+begin
+	if not exists (SELECT * from information_schema.table_constraints where table_name = 'alignement_source' and constraint_type = 'PRIMARY KEY'
+	and constraint_name ='alignement_source_pkey') then 
+	execute
+	'
+            ALTER TABLE ONLY alignement_source
+			ADD CONSTRAINT alignement_source_pkey PRIMARY KEY (id);
+';
+  end if;
+  end;
+  $$LANGUAGE plpgsql;
 --
 -- permet de changer les id du alignement en cass que il est 0;
 --
@@ -933,8 +968,8 @@ SELECT updatesequencesCH();
 SELECT updatesequencesTH();
 SELECT adjuteconstraintuser();
 SELECT create_table_users_historique();
+SELECT add_primary_keyalignement_source();
 
-SELECT changeconstraintalignement();
 
 SELECT create_table_thesaurus_alignement_source();
 -- Creation de les types pour alignement_source
@@ -959,11 +994,13 @@ SELECT adjouteconstraint_alignement_source();
 SELECT ajoutercolumngps_alignement_source();
 
 -- pas toucher
+SELECT updatesequencesalignement_source();
 SELECT ajoutercolumn_alignement();
+
 
 UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
 SELECT id_alignements();
-
+SELECT changeconstraintalignement();
 
 
 SELECT drop_constraint_alignement_source();
@@ -1089,6 +1126,8 @@ SELECT delete_fonction ('drop_constraint_alignement_source','');
 SELECT delete_fonction ('changeconstraintalignement','');
 SELECT delete_fonction ('add_primary_keyalignement','');
 SELECT delete_fonction ('id_alignements','');
+SELECT delete_fonction ('add_primary_keyalignement_source','');
+SELECT delete_fonction ('updatesequencesalignement_source','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
