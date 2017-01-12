@@ -147,6 +147,7 @@ public class AlignementParLotBean {
             } else {
                 for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
                     if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                        message = "";
                         nodeAli = nodeAlignment;
                         nodeAli.setAlignement_id_type(alignement_id_type);
                        // message = "l'alignement va se faire <br>";
