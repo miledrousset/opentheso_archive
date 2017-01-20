@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.2.2
--- date : 12/01/2017
+-- date : 20/01/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1056,6 +1056,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql; 
 
+--
+--
+--
+create or replace function primary_key_info() returns void as 
+$$
+begin	
+if not exists (SELECT * from information_schema.table_constraints where table_name = 'info' and constraint_type = 'PRIMARY KEY'
+	and constraint_name ='info_pkey') then 
+	execute
+	'
+            ALTER TABLE ONLY info
+			ADD CONSTRAINT info_pkey PRIMARY KEY (version_opentheso, version_bdd);
+        ';
+        end if;
+  end;
+  $$LANGUAGE plpgsql;
 
 -- mises à jour 
 --
@@ -1096,7 +1112,8 @@ SELECT create_table_users_historique();
 SELECT add_primary_keyalignement_source();
 SELECT alignement_preferences();
 SELECT gps_preferences();
-SELECT delete_colonne_preferences();
+
+SELECT primary_key_info();
 
 
 SELECT create_table_thesaurus_alignement_source();
@@ -1135,6 +1152,9 @@ SELECT delete_constraint_term_changer_concept_historique();
 SELECT drop_constraint_alignement_source();
 SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
+
+SELECT delete_colonne_preferences();
+
 SELECT create_table_note_type();
 
 -- delete sequences
@@ -1262,6 +1282,7 @@ SELECT delete_fonction ('delete_constraint_term_changer_concept_historique','');
 SELECT delete_fonction ('alignement_preferences','');
 SELECT delete_fonction ('gps_preferences','');
 SELECT delete_fonction ('delete_colonne_preferences','');
+SELECT delete_fonction ('primary_key_info','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
