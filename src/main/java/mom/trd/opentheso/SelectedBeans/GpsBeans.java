@@ -635,7 +635,6 @@ public class GpsBeans {
         }
         selectedAlignement = alignement_source.getRequete();
 
-        System.out.println("mom.trd.opentheso.SelectedBeans.GpsBeans.onRowSelect()");
     }
 
     public void recuperatePreferences() {
