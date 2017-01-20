@@ -8,6 +8,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
+import org.apache.commons.lang3.StringEscapeUtils;
 import skos.SKOSProperty;
 import skos.SKOSResource;
 import skos.SKOSTopConcept;
@@ -263,25 +264,25 @@ public class WriteFileSKOS {
         for (NodeAlignment alignment : nodeConceptExport.getNodeAlignmentsList()) {
             // alignement exactMatch
             if(alignment.getAlignement_id_type() == 1) {
-                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.exactMatch);
+                concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.exactMatch);
             }
 
             // alignement closeMatch
             if(alignment.getAlignement_id_type() == 2) {
-                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.closeMatch);
+                concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.closeMatch);
             }
             
             // alignement broadMatch
             if(alignment.getAlignement_id_type() == 3) {
-                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.broadMatch);
+                concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.broadMatch);
             }
             // alignement relatedMatch
             if(alignment.getAlignement_id_type() == 4) {
-                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.relatedMatch);
+                concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.relatedMatch);
             }      
             // alignement narrowMatch
             if(alignment.getAlignement_id_type() == 5) {
-                concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.narrowMatch);
+                concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.narrowMatch);
             }              
         }
   /*     for (int i = 0; i < nodeConceptExport.getNodeAlignmentsList().size(); i++) {
@@ -319,6 +320,12 @@ public class WriteFileSKOS {
         skosBuff.append("    ").append(concept.toString());
         return true;
     }
+    
+    // fonction qui permet de structurer une URL pour HTML
+    
+    private String prepareUriTohtml(String url) {
+        return StringEscapeUtils.escapeHtml4(url.trim());
+    } 
     
     
     /**

@@ -23,7 +23,6 @@ public class JsonHelper {
         SKOSXmlDocument sKOSXmlDocument;
         try {
             ReadFileSKOS readFileSKOS = new ReadFileSKOS();
-      
             sKOSXmlDocument = readFileSKOS.readStringBuffer(skosStringBuffer);
             return sKOSXmlDocument;
         } catch (Exception ex) {

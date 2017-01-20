@@ -52,6 +52,8 @@ public class CurrentUser implements Serializable {
     private boolean isHaveWriteToCurrentThesaurus = false;
     private boolean isHaveWriteToCurrentThesaurus2 = false;
     
+    private String versionOfOpentheso;
+    
     private boolean isActive = false;
 
     @ManagedProperty(value = "#{langueBean}")
@@ -66,6 +68,10 @@ public class CurrentUser implements Serializable {
     @PostConstruct
     public void initUser() {
         user = new NodeUser();
+        if (connect.getPoolConnexion() != null) {
+            versionOfOpentheso = new BaseDeDoneesHelper().getVersionOfOpentheso(connect.getPoolConnexion());
+        }
+       
         /*    if (connect.getPoolConnexion() != null) {
             NodePreference np = new UserHelper().getPreferenceUser(connect.getPoolConnexion());
             langSourceEdit = np.getSourceLang();
@@ -631,6 +637,14 @@ public class CurrentUser implements Serializable {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public String getVersionOfOpentheso() {
+        return versionOfOpentheso;
+    }
+
+    public void setVersionOfOpentheso(String versionOfOpentheso) {
+        this.versionOfOpentheso = versionOfOpentheso;
     }
 
 }

@@ -382,6 +382,16 @@ input[type="button"], input[type="submit"]{
     font-size: 12px;
 }
 
+.termInfo {
+    background: none;
+    font-size: 13px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left; 
+}
+
 .link {
     background: none;
     border: none;
@@ -1296,7 +1306,29 @@ input[type="button"], input[type="submit"]{
     width: 300px; 
     overflow-y: auto;
     margin-top: 10px;
+    
 }
+
+.textInfoTitle {
+    background: none;
+    font-size: 16px;
+    text-shadow: none;
+    font-weight: bold;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;     
+}
+
+.textInfo {
+    background: none;
+    font-size: 14px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;  
+}
+
 
 .styleText {
     font-family: "Palatino linotype",Times,serif;

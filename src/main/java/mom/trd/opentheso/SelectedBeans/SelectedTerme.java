@@ -80,7 +80,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 import org.primefaces.model.map.MapModel;
-import sun.nio.cs.ext.GB18030;
 
 @ManagedBean(name = "selectedTerme", eager = true)
 @SessionScoped
@@ -175,8 +174,12 @@ public class SelectedTerme implements Serializable {
     String cheminNotice2;
     private boolean arkActive;
     private String serverAdress;
+    private boolean z3950_actif;
 
     NodeGps coordonnees;
+
+    private String totalConceptOfBranch;
+    private String totalNoticesOfBranch;
 
     //maps
     private String latitudLongitud = null;
@@ -208,12 +211,18 @@ public class SelectedTerme implements Serializable {
         ResourceBundle bundlePref = getBundlePref();
         cheminNotice1 = bundlePref.getString("pathNotice1");
         cheminNotice2 = bundlePref.getString("pathNotice2");
-        String temp = bundlePref.getString("useArk");
-        arkActive = temp.equals("true");
+
+        arkActive = bundlePref.getString("useArk").equals("true");
+
         root = (TreeNode) new DefaultTreeNode("Root", null);
         serverAdress = bundlePref.getString("cheminSite");
+
+        z3950_actif = bundlePref.getString("z3950.actif").equals("true");
+
         user.setIdTheso(idTheso);
         identifierType = bundlePref.getString("identifierType");
+        totalConceptOfBranch = "";
+        totalNoticesOfBranch = "";
 
     }
 
@@ -297,6 +306,8 @@ public class SelectedTerme implements Serializable {
         notation = "";
         latitudLongitud = null;
         simpleModel = null;
+        totalConceptOfBranch = "";
+        totalNoticesOfBranch = "";
         majTAsso();
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
         if (type == 1) {
@@ -883,12 +894,52 @@ public class SelectedTerme implements Serializable {
      *
      * @return
      */
-    public int getNbConceptOfBranch() {
+    public String getTheNbConceptOfBranch() {
+        if (totalConceptOfBranch.isEmpty()) {
+            StatisticHelper statisticHelper = new StatisticHelper();
+            int tot = statisticHelper.getConceptCountOfBranch(connect.getPoolConnexion(),
+                    idC, idTheso);
+            totalConceptOfBranch = "" + tot;
+        }
+        return totalConceptOfBranch;
+    }
 
-        StatisticHelper statisticHelper = new StatisticHelper();
-        int tot = statisticHelper.getConceptCountOfBranch(connect.getPoolConnexion(),
-                idC, idTheso);
-        return tot;
+    public String getNbNoticesOfBranch() {
+        int total = 0;
+        if (totalNoticesOfBranch.isEmpty()) {
+            if (z3950_actif) {
+                ConceptHelper conceptHelper = new ConceptHelper();
+                ArrayList<String> lisIds = new ArrayList();
+                lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso, lisIds);
+
+                Properties p = new Properties();
+                p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
+                p.put("RepositoryDataSourceURL", "file:" + "/Users/Miled/NetBeansProjects/opentheso/src/main/webapp/repositories.xml");
+                p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
+                p.put("ConvertorConfigFile", "/Users/Miled/NetBeansProjects/opentheso/src/main/webapp/SchemaMappings.xml");
+                Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
+                federated_search_proxy.init(p);
+                try {
+                    IRQuery e = new IRQuery();
+                    //   e.collections = new Vector<String>();
+                    e.collections.add("KOHA/biblios");
+                    e.hints.put("default_element_set_name", "f");
+                    e.hints.put("small_set_setname", "f");
+                    e.hints.put("record_syntax", "unimarc");
+                    for (String idConcept : lisIds) {
+                        e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idConcept)).append("\"").toString());
+                        SearchTask st = federated_search_proxy.createTask(e, null);
+                        st.evaluate(5000);
+                        total = total + st.getTaskResultSet().getFragmentCount();
+                    }
+
+                } catch (TimeoutExceededException | SearchException srch_e) {
+                    srch_e.printStackTrace();
+                }
+                totalNoticesOfBranch = "" + total;
+            }
+        }
+        return totalNoticesOfBranch;
     }
 
     /**
@@ -3090,6 +3141,38 @@ public class SelectedTerme implements Serializable {
 
     public void setMessageAlig(String messageAlig) {
         this.messageAlig = messageAlig;
+    }
+
+    public boolean isZ3950_actif() {
+        return z3950_actif;
+    }
+
+    public void setZ3950_actif(boolean z3950_actif) {
+        this.z3950_actif = z3950_actif;
+    }
+
+    public String getTotalConceptOfBranch() {
+        if (totalConceptOfBranch.isEmpty()) {
+            return langueBean.getMsg("index.totalOfConcepts");
+        } else {
+            return totalConceptOfBranch;
+        }
+    }
+
+    public void setTotalConceptOfBranch(String totalConceptOfBranch) {
+        this.totalConceptOfBranch = totalConceptOfBranch;
+    }
+
+    public String getTotalNoticesOfBranch() {
+        if (totalNoticesOfBranch.isEmpty()) {
+            return langueBean.getMsg("index.totalOfNotices");
+        } else {
+            return totalNoticesOfBranch;
+        }
+    }
+
+    public void setTotalNoticesOfBranch(String totalNoticesOfBranch) {
+        this.totalNoticesOfBranch = totalNoticesOfBranch;
     }
 
 }
