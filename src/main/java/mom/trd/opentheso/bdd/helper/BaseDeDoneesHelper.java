@@ -442,6 +442,34 @@ public class BaseDeDoneesHelper implements Serializable {
         }
     }
 
+    /**
+     * Cette fonction permet de réupérer la version du logiciel Opentheso
+     * @param ds
+     * @return 
+     */
+    public String getVersionOfOpentheso(HikariDataSource ds) {
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            Connection conn = ds.getConnection();
+            stmt = conn.createStatement();
+            try {
+                String query = "Select version_opentheso from info;";
+                resultSet =stmt.executeQuery(query);
+                if(resultSet.next())
+                {
+                    return resultSet.getString("version_Opentheso");
+                }
+            } finally {
+                stmt.close();
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+    
     public String getVersion_bdd() {
         return version_bdd;
     }

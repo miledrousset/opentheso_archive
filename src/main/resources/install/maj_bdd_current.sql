@@ -916,7 +916,6 @@ declare
 			loop
 				if(source_recuperated = cherchesource) then
 					select alignement_source.id from alignement_source where alignement_source.source = cherchesource into id;
-					raise notice 'id selectione: %', id;
 				execute
 					'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''' and id_alignement_source = 0;';
 				end if;

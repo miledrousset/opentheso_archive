@@ -58,32 +58,35 @@
 
             <h:panelGroup rendered="#{(selectedTerme.idC != null)}">
                     <span style="font-size: 17px; font-weight: bold;">
-                        <h:outputText  id="nom" value="#{selectedTerme.nom}"/><br/>
+                        <h:outputText  id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                     </span>
-                    <h:outputText id="idC" value="id : #{selectedTerme.idC}"/><br/>
-                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : #{selectedTerme.notation}"/><br/>
+                
+                    <h:outputText id="idC" value="id : "/>
+                    <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
+                    
+                    
+                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
+                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
 
-
-
-                    <span>
+                    
+                    <h:panelGroup rendered= "#{(selectedTerme.nbNotices != 0)}">
                         <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
-                        <a  href="#{selectedTerme.urlNotice}" target="blanc" >
-                            <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices}"/>
+                        <a href="#{selectedTerme.urlNotice}" target="blanc" >
+                            <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" />
                         </a>
-                    </span>
-                    <br/>
+                    
+                    </h:panelGroup>
 
                     <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
-
-                    <span>
-                        <h:outputText id="mTheso" value="#{selectedTerme.microTheso}"/><br/>
-                    </span>
+                    <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
+                    
+                    
                     <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
-                    <h:outputText id="dateC" value="#{selectedTerme.dateC}"/><br/>
+                    <h:outputText id="dateC" value="#{selectedTerme.dateC}" styleClass="textInfo"/><br/>
                     <span>
                         <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
-                        <h:outputText id="dateM" value="#{selectedTerme.dateM}"/><br/>
+                        <h:outputText id="dateM" value="#{selectedTerme.dateM}" styleClass="textInfo"/><br/>
                     </span>
                     <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
                         <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
@@ -91,50 +94,62 @@
                             <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
                         </ui:repeat>
                     </h:panelGroup>
-
+                    
+                    <h:outputText rendered="#{selectedTerme.creatorName != ''}" value="#{langueBean.getMsg('index.creator')} : "/>
+                    <h:outputText rendered="#{selectedTerme.creatorName != ''}" value = "#{selectedTerme.creatorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>
+                    
+                    <h:outputText rendered="#{selectedTerme.contributorName != ''}" value="#{langueBean.getMsg('index.contributor')} : "/>
+                    <h:outputText rendered="#{selectedTerme.contributorName != ''}" value = "#{selectedTerme.contributorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>
+                    
+                    
                     <!-- affichage du nombre total des fils -->
-                    <span>
-                        <p:tooltip />
+                    <h:panelGroup id="totalBrancheG">
                         <h:form>
-                            <h:outputText value="#{(langueBean.getMsg('index.totalOfConcepts'))}"/> : 
-                            <h:outputText value="#{selectedTerme.getNbConceptOfBranch()}"/>
+                            
+                            <p:commandButton value="#{selectedTerme.totalConceptOfBranch}" 
+                                             id="ajaxddd" update=":totalBrancheG" actionListener="#{selectedTerme.getTheNbConceptOfBranch()}" styleClass="termInfo" />
                         </h:form>
-                    </span>
-                    <h:outputText value="#{langueBean.getMsg('index.creator')} : #{selectedTerme.creatorName}"/><br/>
-                    <h:outputText value="#{langueBean.getMsg('index.contributor')} :  #{selectedTerme.contributorName}"/><br/>
-
-
-
+                    </h:panelGroup>
+                    
+                    
+                    <!-- affichage du nombre total des notices de la branche -->
+                    <h:panelGroup id="totalNoticesG" rendered="#{selectedTerme.z3950_actif}">
+                        <h:form>
+                            <p:commandButton value="#{selectedTerme.totalNoticesOfBranch}" 
+                                             id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />
+                        </h:form>
+                    </h:panelGroup>
 
                     <!-- affichage de l'URL pérenne-->
+                    <h:form>
+                        <p:commandButton id="urlPerenne" styleClass="termInfo"  value="#{langueBean.getMsg('index.link')}" />
+                        <p:overlayPanel id="getUrlPerenne" for="urlPerenne" hideEffect="fade">
 
-                    <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
-                    <h:outputText id= "ark" rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                  value="#{langueBean.getMsg('index.link')} :" /> <br />
+                        <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
+                            <!-- pour afficher un toolTipText-->
+                           <!-- <p:tooltip id="toolTipGrow" for="ark" value="{theso.getCheminSite()}{selectedTerme.getLienTerme()}"
+                                       showEffect="clip" hideEffect="explode" />
+                           -->
 
-                    <!-- pour afficher un toolTipText-->
-                    <p:tooltip id="toolTipGrow" for="ark" value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}"
-                               showEffect="clip" hideEffect="explode" />
+                            <span>
+                                <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
+                                    <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
+                                </h:outputLink>
+                            </span>
+                            <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
+                            <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
+                                <span>
+                                    <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
 
-
-                    <span>
-                        <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                      value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
-                            <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                          value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
-                        </h:outputLink>
-                    </span>
-                    <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
-                    <h:outputText id= "url" rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                  value="#{langueBean.getMsg('index.link')} :" /> <br />
-                    <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
-                        <span>
-                            <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
-                        </span>
-                    </h:outputLink>
-        </h:panelGroup>                                                
+                                </span>
+                            </h:outputLink>                                
+                        </p:overlayPanel>
+                    </h:form>
+        </h:panelGroup>      
         </div>
     </div>
 </ui:composition>
