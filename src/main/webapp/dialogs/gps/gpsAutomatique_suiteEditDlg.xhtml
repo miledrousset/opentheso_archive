@@ -5,7 +5,7 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idGpsSource_suiteEditDlg"  header="#{langueBean.getMsg('gps.nom')}  #{selectedTerme.nom}" widgetVar="gpsSource_suiteEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsAutomatique_suiteEditDlg"  header="#{langueBean.getMsg('gps.nom')}  #{selectedTerme.nom}" widgetVar="gpsAutomatique_suiteEditDlg" modal="true" resizable="false" >
         Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
         <div style="text-align: left; max-width: 600px; max-height: 500px; overflow: auto;" >
             <h:form>
@@ -26,7 +26,7 @@
                                              actionListener="#{gps.doAll(selectedTerme.idC, selectedTerme.idTheso, user1.user.id, 
                                                                selectedTerme.idlangue, selectedTerme.idT)}"
                                              action="#{selectedTerme.updateGps()}"
-                                             update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('gpsSource_suiteEditDlg.hide()';"  />
+                                             update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg.hide()';"  />
                         </td>
                     </tr>
                 </table>

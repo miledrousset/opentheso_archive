@@ -14,8 +14,8 @@
                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and 
                                     (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') 
                                     and (selectedTerme.idDomaine != 'Orphan')}">
-                    <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{gps.setListeAlignementSources()}"
-                                     update=":idGpsSourceEditDlg" oncomplete="PF('gpsSourceEditDlg').show()" 
+                    <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
+                                     update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show()" 
                                      styleClass="cbEdit" 
                                      icon="ui-icon-parametre" >
                     </p:commandButton>
@@ -23,12 +23,13 @@
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonGps" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('gps.nom')}"  update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{gps.setListeAlignementSources()}" 
-                                        action="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}"
-                                        update=":idGpsSource_suiteEditDlg" oncomplete="PF('gpsSource_suiteEditDlg').show()" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{gps.setListeAlignementSources()}" 
-                                        action="#{gps.getListChildren(selectedTerme.idTheso, selectedTerme.idC, selectedTerme.idlangue )}"
-                                        update=":idGpsParLotAutomatiqueEditDlg" oncomplete="PF('gpsParLotAutomatiqueEditDlg').show()" style="font-size: 12px;"/>
+                            
+                            <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{gps.setListeAlignementSources1(selectedTerme.idTheso, user1.user.id)}" 
+                                        update=":idGpsAutomatiqueEditDlg" oncomplete="PF('gpsAutomatiqueEditDlg').show()" style="font-size: 12px;"/>
+                            
+                            <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{gps.setListeAlignementSources1(selectedTerme.idTheso,user1.user.id)}" 
+                                        action="#{gps.getListChildren(selectedTerme.idTheso, selectedTerme.idC, selectedTerme.idlangue, user1.user.id )}"
+                                        update=":idGpsParLotEditDlg" oncomplete="PF('gpsParLotEditDlg').show()" style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>    
                 </h:form>
@@ -37,7 +38,6 @@
 
 
         <h:form rendered="#{theso.internetConection}">
-            <script src="http://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
             <h:panelGroup id="gpsMaps" rendered="#{selectedTerme.latitudLongitud !=null}">
                 <div>
                     <p:gmap  id="gmap" center="#{selectedTerme.latitudLongitud}"  zoom="10" type="HYBRID" style="width:100%;height:200px" />

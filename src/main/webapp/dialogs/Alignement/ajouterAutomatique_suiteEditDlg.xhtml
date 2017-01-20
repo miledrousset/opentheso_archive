@@ -9,33 +9,40 @@
 
     <p:dialog id="idAjouterAutomatique_suiteEditDlg"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="ajouterAutomatique_suiteEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
-        Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
-        <div style="text-align: left; max-width: 600px; max-height: 500px; overflow: auto;" >
+        
+
             <h:form>
-                <table>
-                    <ui:repeat value="#{selectedTerme.listAlignValues}" var='nodeAlign'>
-                        <tr>
-                            <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
-                            <td>
-                                <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
-                                <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
-                                <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
-                                <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
-                                <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
-                                <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
-                                    <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
-                                </h:selectOneMenu><br/><br/>
-                            </td>
-                        </tr>
-                    </ui:repeat>
-                    <tr>
-                        <td colspan="2" style="text-align: center;">
-                            <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
-                                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
-                        </td>
-                    </tr>
-                </table>
+
+                <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
+                    <p:layoutUnit position="west" resizable="false" size="400" minSize="400" maxSize="550">
+                        <table>
+                            <ui:repeat value="#{selectedTerme.listAlignValues}" var='nodeAlign'>
+                                <tr>
+                                    <td><p:selectBooleanCheckbox value="#{nodeAlign.save}" /></td>
+                                    <td>
+                                        <h:outputText value="#{nodeAlign.thesaurus_target} - " style="font-weight: bold;" />
+                                        <h:outputText value="#{nodeAlign.concept_target} :"/><br/>
+                                        <h:outputText rendered="#{nodeAlign.concept_target_alt.trim() != null and nodeAlign.concept_target_alt.trim() != ''}" value="altLable : #{nodeAlign.concept_target_alt}&lt;br/&gt;" escape="false" />
+                                        <h:outputText rendered="#{nodeAlign.def_target.trim() != null and nodeAlign.def_target.trim() != ''}" value="#{nodeAlign.def_target}&lt;br/&gt;" escape="false" />
+                                        <h:outputLink value="#{nodeAlign.uri_target}" target="_blank" ><h:outputText value="#{nodeAlign.uri_target}" /></h:outputLink><br/>
+                                        <h:selectOneMenu value="#{nodeAlign.alignement_id_type}" styleClass="listes" style="width: 150px;">
+                                            <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
+                                        </h:selectOneMenu><br/><br/>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                    </p:layoutUnit>
+
+                    <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
+                        Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
+
+                        <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
+                                         update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
+
+                    </p:layoutUnit>
+                </p:layout>
             </h:form>
-        </div>
+
     </p:dialog>
 </ui:composition>

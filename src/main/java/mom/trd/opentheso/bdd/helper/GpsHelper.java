@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import mom.trd.opentheso.core.alignment.GpsPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -261,7 +262,7 @@ public class GpsHelper {
                         alig.setDescription(resultSet.getString("description"));
                         aligSource.add(alig);
                     }
-                    
+
                 } finally {
                     stmt.close();
                 }
@@ -274,10 +275,23 @@ public class GpsHelper {
         }
         return aligSource;
     }
-    public boolean updateTablePreferences(HikariDataSource ds, String id_Theso, 
-            boolean integrerTraduction, boolean reemplacerTraduction, boolean alignementAutomatique, Integer id_gps_source)
-    {
-        boolean status= false;
+
+    public boolean garderPreferences(HikariDataSource ds, String id_Theso,
+            boolean integrerTraduction, boolean reemplacerTraduction, boolean alignementAutomatique, Integer id_gps_source, int id_user) {
+        if (!existsPreferences(ds, id_Theso, id_gps_source, id_user)) {
+            if (!insertPreferences(ds, id_Theso, integrerTraduction, reemplacerTraduction, alignementAutomatique, id_gps_source, id_user)) {
+                return false;
+            }
+            return true;
+        } else if (!updateTablePreferences(ds, id_Theso, integrerTraduction, reemplacerTraduction, alignementAutomatique, id_gps_source, id_user)) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean existsPreferences(HikariDataSource ds, String id_Theso,
+            Integer id_gps_source, int id_user) {
+        boolean status = false;
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -288,13 +302,14 @@ public class GpsHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Update preferences set gps_integrertraduction ='" +integrerTraduction
-                            + "', gps_reemplacertraduction = '"+ reemplacerTraduction
-                            + "', gps_alignementautomatique ='"+ alignementAutomatique
-                            + "', gps_id_source ="+id_gps_source
-                            + " where id_thesaurus ='"+id_Theso+"'";
-                    stmt.executeUpdate(query);
-                    status=true;
+                    String query = "SELECT id from gps_preferences"
+                            + " where id_thesaurus ='" + id_Theso
+                            + "' and id_user = " + id_user
+                            + " and id_alignement_source ='" + id_gps_source + "'";
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        status = true;
+                    }
                 } finally {
                     stmt.close();
                 }
@@ -303,13 +318,93 @@ public class GpsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while Add coordonnes : ", sqle);
+            log.error("Error while search preferences Gps : ", sqle);
         }
-        
+
         return status;
     }
-    public AlignementSource find_alignement_gps(HikariDataSource ds, Integer idsource)
-    {
+
+    public boolean insertPreferences(HikariDataSource ds, String id_Theso,
+            boolean integrerTraduction, boolean reemplacerTraduction, boolean alignementAutomatique, int id_gps_source, int id_user) {
+        boolean status = false;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "INSERT INTO gps_preferences"
+                            + "(id_thesaurus, id_user, id_alignement_source, gps_integrertraduction,"
+                            + " gps_reemplacertraduction, gps_alignementautomatique)"
+                            + " values('"
+                            + id_Theso
+                            + "',"
+                            + id_user
+                            + ","
+                            + id_gps_source
+                            + ",'"
+                            + integrerTraduction
+                            + "','"
+                            + reemplacerTraduction
+                            + "','"
+                            + alignementAutomatique + "')";
+
+                    stmt.execute(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while add gps preferences : ", sqle);
+        }
+
+        return status;
+    }
+
+    public boolean updateTablePreferences(HikariDataSource ds, String id_Theso,
+            boolean integrerTraduction, boolean reemplacerTraduction, boolean alignementAutomatique, Integer id_gps_source, int id_user) {
+        boolean status = false;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Update gps_preferences set gps_integrertraduction ='" + integrerTraduction
+                            + "', gps_reemplacertraduction = '" + reemplacerTraduction
+                            + "', gps_alignementautomatique ='" + alignementAutomatique
+                            + " ' where id_thesaurus ='" + id_Theso + "'"
+                            + "  and id_user =" + id_user
+                            + " and id_alignement_source =" + id_gps_source;
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while update gps preferences : ", sqle);
+        }
+
+        return status;
+    }
+
+    public AlignementSource find_alignement_gps(HikariDataSource ds, Integer idsource) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -321,16 +416,15 @@ public class GpsHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "select * from alignement_source"
-                            + " where id = "+idsource;
+                            + " where id = " + idsource;
                     resultSet = stmt.executeQuery(query);
-                    if(resultSet.next())
-                    {
+                    if (resultSet.next()) {
                         alig.setSource(resultSet.getString("source"));
                         alig.setRequete(resultSet.getString("requete"));
                         alig.setTypeRequete(resultSet.getString("type_rqt"));
                         alig.setAlignement_format(resultSet.getString("alignement_format"));
                         alig.setId(resultSet.getInt("id"));
-                        
+
                     }
                 } finally {
                     stmt.close();
@@ -343,5 +437,43 @@ public class GpsHelper {
             log.error("Error while Add coordonnes : ", sqle);
         }
         return alig;
+    }
+    
+    public GpsPreferences getGpsPreferences(HikariDataSource ds, String id_theso, int iduser, int id_source)
+    {
+        GpsPreferences gpsPreferences = new GpsPreferences();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select * from gps_preferences"+
+                            " where id_thesaurus = '" + id_theso +
+                            "' and id_user =" + iduser +
+                            " and id_alignement_source =" + id_source;
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        gpsPreferences.setGps_alignementautomatique(resultSet.getBoolean("gps_alignementautomatique"));
+                        gpsPreferences.setGps_integrertraduction(resultSet.getBoolean("gps_integrertraduction"));
+                        gpsPreferences.setGps_reemplacertraduction(resultSet.getBoolean("gps_reemplacertraduction"));
+                        gpsPreferences.setId_user(resultSet.getInt("id_user"));
+                        gpsPreferences.setId_alignement_source(resultSet.getInt("id_alignement_source"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while Add coordonnes : ", sqle);
+        }
+        return gpsPreferences;
     }
 }

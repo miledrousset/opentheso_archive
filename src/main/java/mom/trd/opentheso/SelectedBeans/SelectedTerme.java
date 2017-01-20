@@ -72,6 +72,7 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -166,8 +167,8 @@ public class SelectedTerme implements Serializable {
 
     private String identifierType;
     public String icon = "+";
-    
-    public String messageAlig="";
+
+    public String messageAlig = "";
 
     // Variables resourcesBundle
     String cheminNotice1;
@@ -1437,7 +1438,9 @@ public class SelectedTerme implements Serializable {
     }
 
     public void ajouterAlignAuto() {
-        if(listAlignValues.isEmpty()) return;
+        if (listAlignValues.isEmpty()) {
+            return;
+        }
         for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
                 new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(),
@@ -1456,13 +1459,23 @@ public class SelectedTerme implements Serializable {
      * @param nodeAlignment
      * @return
      */
-    public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment) {
-        AlignmentHelper alignmentHelper =new AlignmentHelper();
+    public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment, boolean addDefinition, String id_term) {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+
+        NoteHelper noteHelper = new NoteHelper();
         if (!alignmentHelper.addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
                 nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
                 nodeAlignment.getAlignement_id_type(), nodeAlignment.getInternal_id_concept(), idTheso, alignementSource.getId())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
             return false;
+        }
+        if (addDefinition) {
+            StringPlus stringPlus = new StringPlus();
+            String dejaBonString = stringPlus.clearAngles(nodeAlignment.getDef_target());
+            if (!noteHelper.addTermNote(connect.getPoolConnexion(), id_term, idlangue, idTheso, dejaBonString, "definition", user.getUser().getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
+                return false;
+            }
         }
         messageAlig = alignmentHelper.getMessage();
         return true;
@@ -1834,13 +1847,11 @@ public class SelectedTerme implements Serializable {
                         return false;
                     }
                 } else // on coupe la branche de son BT
-                {
-                    if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                 if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
-                }
                 conn.commit();
                 conn.close();
 

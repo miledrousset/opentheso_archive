@@ -3892,5 +3892,36 @@ public class ConceptHelper {
         }
         return group;
     }
-
+    public String getPereConcept(HikariDataSource ds, String id_theso, String id_concept)
+    {
+        String conceptPere="";
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_concept2 FROM hierarchical_relationship"
+                            + " WHERE id_thesaurus='" + id_theso + "'"
+                            + " AND id_concept1='" + id_concept + "'"
+                            + " AND role ='BT'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if(resultSet.next())
+                     conceptPere = resultSet.getString("id_concept2");
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while get le pere du concept : " + id_concept, sqle);
+        }
+        return conceptPere;
+    }
 }

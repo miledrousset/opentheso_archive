@@ -87,7 +87,12 @@ input[type="button"], input[type="submit"]{
     width: 25px;
     border-radius: 0px;
 }
-
+.ui-icon-question {
+    background: url("../images/iconeQuestion.png") no-repeat top left !important;
+    height: 25px;
+    width: 25px;
+    border-radius: 0px;
+}
 .ui-icon-parametre {
     background: url("../images/parametre.png") no-repeat top left !important;
     height: 25px;

@@ -7,7 +7,7 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
 
-    <p:dialog id="idGpsParLotAutomatique_suiteDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="gpsParLotAutomatique_suiteDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsParLot_suiteDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="gpsParLot_suiteDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
         <h:form rendered="#{!gps.fin}">
             <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
@@ -41,16 +41,17 @@
                     </h:selectOneMenu><br/><br/>
 
                     <p:commandButton id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" actionListener="#{gps.reinitTotal()}"
-                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLotAutomatique_suiteDlg.hide()';"  />
+                                     action="#{gps.enregister_Des_Progres(user1.user.id)}"
+                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg.hide()';"  />
 
                     <p:commandButton rendered="#{!gps.fin}" id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
                                      action="#{gps.doForLot(user1.user.id)}"
-                                     update="idGpsParLotAutomatique_suiteDlg" 
-                                     oncomplete="PF('gpsParLotAutomatique_suiteDlg').show();" styleClass="styleButton" />
+                                     update="idGpsParLot_suiteDlg" 
+                                     oncomplete="PF('gpsParLot_suiteDlg').show();" styleClass="styleButton" />
 
                     <p:commandButton rendered="#{!gps.last}" id="proxAllAlignAuto" value="#{langueBean.getMsg('alig.sui')}"  
                                      actionListener="#{gps.nextPosition()}"
-                                     update="idGpsParLotAutomatique_suiteDlg" oncomplete="PF('gpsParLotAutomatique_suiteDlg').show();"
+                                     update="idGpsParLot_suiteDlg" oncomplete="PF('gpsParLot_suiteDlg').show();"
                                      styleClass="styleButton"  />
 
                     <br/><br/><br/><br/><br/>
@@ -62,8 +63,9 @@
         </h:form>
         <h:form rendered="#{alignementparlot.fin}">
             <br/><br/>
-            <p:commandButton id="finAllAlignAutoFin" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
-                             update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLotAutomatique_suiteDlg.hide()';"  />
+            <p:commandButton id="finAllAlignAutoFin" value="fini" actionListener="#{gps.reinitTotal()}"
+                             action="#{gps.enregister_Des_Progres(user1.user.id)}"
+                             update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg.hide()';"  />
             <br/><br/>
             <h:outputText value="#{alignementparlot.erreur}" style="color: red" />
             <h:outputText value="#{alignementparlot.message}" style="color: green" escape="false"/>

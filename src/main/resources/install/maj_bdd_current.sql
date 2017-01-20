@@ -916,7 +916,6 @@ declare
 			loop
 				if(source_recuperated = cherchesource) then
 					select alignement_source.id from alignement_source where alignement_source.source = cherchesource into id;
-					raise notice 'id selectione: %', id;
 				execute
 					'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''' and id_alignement_source = 0;';
 				end if;
@@ -933,6 +932,130 @@ declare
 		end loop;
 	end;
 	$$language plpgsql;
+
+
+
+--
+--Pour effacer les constraint de la BDD de humanum
+--
+create or replace function delete_constraint_term_changer_concept_historique() returns void as $$
+begin
+	if exists (SELECT * from information_schema.table_constraints where table_name = 'term_historique' and constraint_type = 'PRIMARY KEY'
+	and constraint_name ='term_copy_pkey') then 
+	execute
+	'
+            ALTER TABLE ONLY term_historique
+			DROP CONSTRAINT term_copy_pkey ;
+            ALTER TABLE ONLY term_historique
+			ADD CONSTRAINT term_copy_pkey PRIMARY KEY (id, modified, id_user);
+        ';
+        end if;
+	if exists (SELECT * from information_schema.table_constraints where table_name = 'term_historique' and constraint_type = 'UNIQUE'
+	and constraint_name ='term_copy_id_term_lang_id_thesaurus_key') then 
+	execute
+	'
+            ALTER TABLE ONLY term_historique
+			DROP CONSTRAINT term_copy_id_term_lang_id_thesaurus_key ;
+        ';
+        end if;
+	if exists (SELECT * from information_schema.table_constraints where table_name = 'term_historique' and constraint_type = 'UNIQUE'
+	and constraint_name ='term_copy_id_term_lexical_value_lang_id_thesaurus_key') then 
+	execute
+	'
+            ALTER TABLE ONLY term_historique
+			DROP CONSTRAINT term_copy_id_term_lexical_value_lang_id_thesaurus_key ;
+        ';
+        end if;
+	if exists (SELECT * from information_schema.table_constraints where table_name = 'concept_historique' and constraint_type = 'PRIMARY KEY'
+	and constraint_name ='concept_copy_pkey') then 
+	execute
+	'
+            ALTER TABLE ONLY concept_historique
+			DROP CONSTRAINT concept_copy_pkey ;
+            ALTER TABLE ONLY concept_historique
+			ADD CONSTRAINT concept_copy_pkey PRIMARY KEY (id_concept, id_thesaurus, id_group, id_user, modified);
+        ';
+        end if;
+  end;
+  $$LANGUAGE plpgsql;
+
+--
+-- Permet de crée la table alignement_preferences
+--
+CREATE OR REPLACE FUNCTION alignement_preferences() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'alignement_preferences') THEN
+
+        execute 
+		'Create table alignement_preferences (
+                    id integer DEFAULT nextval(''alignement_preferences_id_seq''::regclass)NOT NULL,
+                    id_thesaurus character varying NOT NULL,
+                    id_user integer NOT NULL,
+                    id_concept_depart character varying,
+                    id_concept_tratees character varying,
+                    id_alignement_source integer,
+                    CONSTRAINT alignement_preferences_pkey PRIMARY KEY (id_thesaurus, id_user, id_concept_depart, id_alignement_source)
+                     );';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+--
+--
+CREATE OR REPLACE FUNCTION gps_preferences() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'gps_preferences') THEN
+
+        execute 
+		'Create table gps_preferences (
+                    id integer DEFAULT nextval(''gps_preferences_id_seq''::regclass)NOT NULL,
+                    id_thesaurus character varying NOT NULL,
+                    id_user integer NOT NULL,
+                    gps_integrertraduction boolean DEFAULT true,
+                    gps_reemplacertraduction boolean DEFAULT true,
+                    gps_alignementautomatique boolean DEFAULT true,
+                    id_alignement_source integer,
+                    CONSTRAINT gps_preferences_pkey PRIMARY KEY (id_thesaurus, id_user, id_alignement_source)
+                     );';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION delete_colonne_preferences() RETURNS VOID AS $$
+BEGIN
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps_integrertraduction' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+	 Alter TABLE preferences drop COLUMN gps_integrertraduction;
+        ';
+    END IF;
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps_reemplacertraduction' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+	 Alter TABLE preferences drop COLUMN gps_reemplacertraduction;
+        ';
+    END IF;
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps_alignementautomatique' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+	 Alter TABLE preferences drop COLUMN gps_alignementautomatique;
+        ';
+    END IF;
+    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'gps_id_source' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+	 Alter TABLE preferences drop COLUMN gps_id_source;
+        ';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
+
 
 -- mises à jour 
 --
@@ -956,6 +1079,8 @@ SELECT ajouter_sequence('note_historique__id_seq');
 SELECT ajouter_sequence('pref__id_seq');
 SELECT ajouter_sequence('role_id_seq');
 SELECT ajouter_sequence('term_historique__id_seq');
+SELECT ajouter_sequence('alignement_preferences_id_seq');
+SELECT ajouter_sequence('gps_preferences_id_seq');
 SELECT createUser_role();
 SELECT updateColumnTerm('term');
 SELECT updateColumn_table('users','passtomodify','boolean');
@@ -969,6 +1094,9 @@ SELECT updatesequencesTH();
 SELECT adjuteconstraintuser();
 SELECT create_table_users_historique();
 SELECT add_primary_keyalignement_source();
+SELECT alignement_preferences();
+SELECT gps_preferences();
+SELECT delete_colonne_preferences();
 
 
 SELECT create_table_thesaurus_alignement_source();
@@ -1002,11 +1130,13 @@ UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is n
 SELECT id_alignements();
 SELECT changeconstraintalignement();
 
+SELECT delete_constraint_term_changer_concept_historique();
 
 SELECT drop_constraint_alignement_source();
 SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
 SELECT create_table_note_type();
+
 -- delete sequences
 SELECT delete_sequence('user_username_seq');
 SELECT delete_sequence('editorial_note__id_seq');
@@ -1128,6 +1258,10 @@ SELECT delete_fonction ('add_primary_keyalignement','');
 SELECT delete_fonction ('id_alignements','');
 SELECT delete_fonction ('add_primary_keyalignement_source','');
 SELECT delete_fonction ('updatesequencesalignement_source','');
+SELECT delete_fonction ('delete_constraint_term_changer_concept_historique','');
+SELECT delete_fonction ('alignement_preferences','');
+SELECT delete_fonction ('gps_preferences','');
+SELECT delete_fonction ('delete_colonne_preferences','');
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');

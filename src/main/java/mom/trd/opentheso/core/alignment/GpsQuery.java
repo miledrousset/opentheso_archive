@@ -50,7 +50,7 @@ public class GpsQuery {
             String requete) {
 
         ArrayList<NodeLang> nodeLangs;
-        lexicalValue = lexicalValue.replaceAll(" ", "%20");
+
         
         
         try {
@@ -58,7 +58,7 @@ public class GpsQuery {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GpsQuery.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        lexicalValue = lexicalValue.replaceAll(" ", "%20");
         
         
         requete = requete.replace("##lang##", lang);

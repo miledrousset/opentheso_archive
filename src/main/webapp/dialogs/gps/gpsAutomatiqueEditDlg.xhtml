@@ -1,0 +1,70 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idGpsAutomatiqueEditDlg"  header="Il y a #{gps.listOfChildrenInConcept.size()} concepts" widgetVar="gpsAutomatiqueEditDlg" modal="true" resizable="false" >
+        <!-- Ajouter alignement automatique 
+        Cette function appelarais a  AjouterAutomatique2EditDlg -->
+        <h:outputText value="#{langueBean.getMsg('popup.addAlign2')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
+
+
+        <h:panelGroup id="panelAutomatique" >
+            <!--<h:outputText value="{langueBean.getMsg('alig.majAlig')}"/><br/>
+            <p:selectBooleanCheckbox value="{gps.mettreAJour}"/> -->
+
+            <br/><br/><br/>
+            <h:panelGrid columns="2" >
+
+
+                <p:dataTable   var="alig" value="#{gps.alignementSources}" selectionMode="single"
+                               rowKey="#{alig.source}" selection="#{gps.alignement_source}"
+                               editable="false" style="width: 250px"
+                               scrollable="true" scrollHeight="100"  
+                               emptyMessage="**************************************" >
+                    <p:ajax event="rowSelect"   listener="#{gps.onRowSelect}" 
+                            update=":panelAutomatique"
+                            />
+                    <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
+                        <h:outputText  value="#{alig.source}" />
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <h:form>
+                <br/>
+                <table>
+                    <tr>
+                        <td>
+                            <h:outputText value="Integrer Traduction"/>
+                        </td>
+                        <td>
+                            <p:selectBooleanCheckbox value="#{gps.integrerTraduction}" /><br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h:outputText value="Reemplacer Traduction"/>
+                        </td>
+                        <td>
+                            <p:selectBooleanCheckbox value="#{gps.reemplacerTraduction}" /><br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h:outputText value="Alignement Automatique"/>
+                        </td>
+                        <td>
+                            <p:selectBooleanCheckbox value="#{gps.alignementAutomatique}" /><br/>
+                        </td>
+                    </tr>
+                </table>
+
+                <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
+                                 action="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}" styleClass="styleButton"
+                                 update=":idGpsAutomatique_suiteEditDlg"  oncomplete="PF('gpsAutomatique_suiteEditDlg').show(); PF('gpsAutomatiqueEditDlg').hide(); "/>
+            </h:form>
+        </h:panelGroup>                                                
+    </p:dialog>
+</ui:composition>

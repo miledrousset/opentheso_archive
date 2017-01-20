@@ -2,6 +2,9 @@ package mom.trd.opentheso.SelectedBeans;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -23,8 +26,11 @@ import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
+import mom.trd.opentheso.core.alignment.AlignementPreferences;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import mom.trd.opentheso.core.alignment.GpsPreferences;
 import mom.trd.opentheso.core.alignment.GpsQuery;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.MapModel;
 import org.xml.sax.SAXException;
@@ -46,7 +52,7 @@ public class GpsBeans {
     private NodeAlignment alignment_choisi;
 
     private AlignementSource alignementPreferences;
-    NodePreference nodePreference;
+    GpsPreferences nodePreference;
 
     private String selectedAlignement;
     private String centerGeoMap = "41.850033, -87.6500523";
@@ -58,9 +64,14 @@ public class GpsBeans {
     private boolean alignementAutomatique = true;
 
     // variables pour le lot
-    private ArrayList<String> listOfChildrenInConcept;
+    private AlignementSource alignement_source = new AlignementSource();
 
+    private AlignementPreferences alignementPreferencesAlignement;
+    private ArrayList<String> listConceptTrates = new ArrayList<>();
+    private ArrayList<String> listOfChildrenInConcept;
+    private Map<Integer, String> options;
     private NodeAlignment nodeAli;
+    private Term term;
 
     private String id_concept;
     private String id_theso;
@@ -69,10 +80,15 @@ public class GpsBeans {
     private String message = "";
     private String erreur = "";
     private String uriSelection = "";
+    private String id_concept_depart;
 
+    private int id_user1;
     private int position = 0;
     private int alignement_id_type;
-
+    private static int optionAllBranch = 0;
+    private static int optionNonAligned = 1;
+    private static int optionWorkFlow = 2;
+    private int optionOfAlignement = -1;
     private boolean fin = false;
     private boolean first = true;
     private boolean last = false;
@@ -113,15 +129,35 @@ public class GpsBeans {
         }
     }
      */
+    /**
+     * Ajoute le coordonées a la BDD
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
     public boolean addCoordinates(String idConcept, String idTheso) {
         GpsHelper gpshelper = new GpsHelper();
         gpshelper.insertCoordonees(connect.getPoolConnexion(), idConcept, idTheso, latitud, longitud);
-
         return true;
     }
 
+    /**
+     * permet d'ajouter le coordonées gps automatique
+     *
+     * @param idC
+     * @param id_Theso
+     * @param id_user
+     * @param langEnCour
+     * @param idTerm
+     * @return
+     * @throws ParserConfigurationException
+     */
     public boolean doAll(String idC, String id_Theso,
             int id_user, String langEnCour, String idTerm) throws ParserConfigurationException {
+
+        id_theso = id_Theso;
+        id_concept = idC;
 
         boolean status = false;
         boolean found = false;
@@ -136,48 +172,85 @@ public class GpsBeans {
                 latitud = alignment_choisi.getLat();
                 longitud = alignment_choisi.getLng();
                 addCoordinates(idC, id_Theso);
-                if (nodePreference.isGps_alignementautomatique()) {
-                    AlignmentHelper alignmentHelper = new AlignmentHelper();
-                    if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), id_user, alignment_choisi.getName(), alignementPreferences.getSource(),
-                            alignment_choisi.getIdUrl(), 1, idC, id_Theso, nodePreference.getGps_id_source())) {
-                        if (nodePreference.isGps_integrertraduction()) {
-                            LanguageHelper languageHelper = new LanguageHelper();
-                            listLanguesInTheso = new ArrayList<>();
-                            listLanguesInTheso = languageHelper.getLanguagesOfThesaurus(connect.getPoolConnexion(), id_Theso);
-                            //theso.    languesTheso
-                            for (NodeLang languesOfGps : alignment_choisi.getAlltraductions()) {
-                                for (Languages_iso639 langueTheso : listLanguesInTheso) {
-                                    if (langueTheso.getId_iso639_1().equals(languesOfGps.getCode())) {
-                                        Term term = new Term();
-                                        term.setLexical_value(languesOfGps.getValue());
-                                        term.setId_term(idTerm);
-                                        term.setId_thesaurus(id_Theso);
-                                        term.setLang(languesOfGps.getCode());
-                                        if (nodePreference.isGps_reemplacertraduction()) {
-                                            if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, id_user)) {
-                                                return false;
-                                            }
-                                        } else if (!new TermHelper().isExitsTraduction(connect.getPoolConnexion(), term)) {
-                                            if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, id_user)) {
-                                                return false;
-                                            }
-                                        }
-                                    }
-
-                                }
-
-                            }
-                        }
-                    }
+                if (alignementAutomatique) {
+                    status = alignementautomatique(idTerm);
+                }
+                if (listOfChildrenInConcept != null) {
                     nextPosition();
                 }
+                selectedTerme.majLangueConcept();
+                selectedTerme.setAlign(new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, id_theso));
+                initcoordonees();
             }
-            selectedTerme.majLangueConcept();
-            selectedTerme.setAlign(new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, id_Theso));
-
-            initcoordonees();
         }
         return status;
+    }
+
+    /**
+     * Ajoute de manière automatique un alignement
+     *
+     * @param idTerm
+     * @return
+     */
+    private boolean alignementautomatique(String idTerm) {
+        boolean status = false;
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), theUser.getUser().getId(),
+                alignment_choisi.getName(), alignementPreferences.getSource(),
+                alignment_choisi.getIdUrl(), 1, id_concept, id_theso, alignementPreferences.getId())) {
+            if (integrerTraduction) {
+                status = integreTraduction(idTerm);
+            }
+        }
+        return status;
+    }
+
+    /**
+     * Fait l'intregration du traduction du term
+     *
+     * @param idTerm
+     * @return
+     */
+    private boolean integreTraduction(String idTerm) {
+        boolean status = false;
+        LanguageHelper languageHelper = new LanguageHelper();
+        listLanguesInTheso = new ArrayList<>();
+        listLanguesInTheso = languageHelper.getLanguagesOfThesaurus(connect.getPoolConnexion(), id_theso);
+        if (!alignment_choisi.getAlltraductions().isEmpty()) {
+            for (NodeLang languesOfGps : alignment_choisi.getAlltraductions()) {
+                for (Languages_iso639 langueTheso : listLanguesInTheso) {
+                    if (langueTheso.getId_iso639_1().equals(languesOfGps.getCode())) {
+                        term = new Term();
+                        term.setLexical_value(languesOfGps.getValue());
+                        term.setId_term(idTerm);
+                        term.setId_thesaurus(id_theso);
+                        term.setLang(languesOfGps.getCode());
+                        if (reemplacerTraduction) {
+                            status = reemplacerTraduction(term);
+                        }
+                    }
+                }
+            }
+        }
+        return status;
+    }
+
+    /**
+     * Reemplace les traductions de la BDD pour les nouvelles
+     *
+     * @param term
+     * @return
+     */
+    private boolean reemplacerTraduction(Term term) {
+        if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
+            return false;
+        } else if (!new TermHelper()
+                .isExitsTraduction(connect.getPoolConnexion(), term)) {
+            if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void initcoordonees() {
@@ -191,7 +264,13 @@ public class GpsBeans {
         alignementAutomatique = true;
     }
 
-    public void validateParamretagesGps(String id_Theso, String id_lang) {
+    /**
+     * Permet d'inserte dans la BDD les preferences du GPS pour cette Thesaurus
+     *
+     * @param id_Theso
+     * @param id_lang
+     */
+    public void validateParamretagesGps(String id_Theso, String id_lang, int id_user) {
         boolean status = true;
         if (selectedAlignement != null) {
             for (AlignementSource alignementSource : alignementSources) {
@@ -200,8 +279,8 @@ public class GpsBeans {
                 }
             }
             GpsHelper gpsHelper = new GpsHelper();
-            if (!gpsHelper.updateTablePreferences(connect.getPoolConnexion(), id_Theso,
-                    integrerTraduction, reemplacerTraduction, alignementAutomatique, alignementPreferences.getId())) {
+            if (!gpsHelper.garderPreferences(connect.getPoolConnexion(), id_Theso,
+                    integrerTraduction, reemplacerTraduction, alignementAutomatique, alignementPreferences.getId(), id_user)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
                 //message error
                 status = false;
@@ -217,14 +296,43 @@ public class GpsBeans {
 
     public void creerAlignAuto(String idC, String idTheso, String nom, String idlangue) throws ParserConfigurationException, SAXException {
 
-        UserHelper userHelper = new UserHelper();
-        nodePreference = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        GpsQuery gpsQuery = new GpsQuery();
+        GpsHelper gpsHelper = new GpsHelper();
+        if (selectedAlignement != null) {
+            for (AlignementSource alignementSource : alignementSources) {
+                if (alignementSource.getRequete() == null ? selectedAlignement == null : alignementSource.getRequete().equals(selectedAlignement)) {
+                    alignementPreferences = alignementSource;
+                }
+            }
+            listAlignValues = new ArrayList<>();
+            if ("REST".equalsIgnoreCase(alignementPreferences.getTypeRequete())) {
+                if ("xml".equals(alignementPreferences.getAlignement_format())) {
+
+                    listAlignValues = gpsQuery.queryGps2(idC, idTheso, nom.trim(), idlangue, alignementPreferences.getRequete());
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Crée les alignements Par Lot
+     *
+     * @param idC
+     * @param idTheso
+     * @param nom
+     * @param idlangue
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    public void creerAlignAutoParLot(String idC, String idTheso, String nom, String idlangue) throws ParserConfigurationException, SAXException {
+
+        GpsHelper gpsHelper = new GpsHelper();
+        nodePreference = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, alignementPreferences.getId());
         if (nodePreference != null) {
 
             GpsQuery gpsQuery = new GpsQuery();
-            GpsHelper gpsHelper = new GpsHelper();
-
-            alignementPreferences = gpsHelper.find_alignement_gps(connect.getPoolConnexion(), nodePreference.getGps_id_source());
+            alignementPreferences = gpsHelper.find_alignement_gps(connect.getPoolConnexion(), nodePreference.getId_alignement_source());
             listAlignValues = new ArrayList<>();
 
             if ("REST".equalsIgnoreCase(alignementPreferences.getTypeRequete())) {
@@ -239,6 +347,11 @@ public class GpsBeans {
         }
     }
 
+    /**
+     * fait la recuperation de les alignements du GPS
+     *
+     * @param idTheso
+     */
     public void setListeAlignementSources(String idTheso) {
         int role = theUser.getUser().getIdRole();
         if (role == 1 || role == 2) {
@@ -247,22 +360,6 @@ public class GpsBeans {
         }
     }
 
-    // test Géonames
-/*        public void test() {
-        try {
-            WebService.setUserName("demo"); // add your username here
-            
-            ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();
-            searchCriteria.setQ("zurich");
-            ToponymSearchResult searchResult = WebService.search(searchCriteria);
-            for (Toponym toponym : searchResult.getToponyms()) {
-                System.out.println(toponym.getName()+" "+ toponym.getCountryName());
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(GpsHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-     */
     /////////////////*******************/////////////////////
     /////////////////*******************/////////////////////
     /////////////////   GPS PAR LOT     /////////////////////
@@ -273,13 +370,16 @@ public class GpsBeans {
      *
      * @param id_Theso
      * @param id_Concept
+     * @param id_lang
      */
-    public void getListChildren(String id_Theso, String id_Concept, String id_lang) {
+    public void getListChildren(String id_Theso, String id_Concept, String id_lang, int id_user) {
         reinitTotal();
+        initOption();
+        id_user1 = id_user;
+        id_concept_depart = id_Concept;
         id_concept = id_Concept;
         id_theso = id_Theso;
         id_langue = id_lang;
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
         listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
@@ -289,6 +389,14 @@ public class GpsBeans {
             last = true;
         }
         nomduterm = selectedTerme.nom;
+    }
+
+    private void initOption() {
+        optionOfAlignement = -1;
+        options = new LinkedHashMap<>();
+        options.put(optionAllBranch, langueBean.getMsg("alig.TTB"));
+        options.put(optionNonAligned, langueBean.getMsg("alig.nonA"));
+        options.put(optionWorkFlow, langueBean.getMsg("alig.workF"));
     }
 
     /**
@@ -304,61 +412,55 @@ public class GpsBeans {
         last = false;
     }
 
-    /**
-     * cherche l'alignement que on a selectionée dans l'arrayList d'alignements
-     * et ce fait l'apelation a la funtion pour ajouter l'alignement
-     *
-     * public void addAlignement() {
-     *
-     * AlignmentHelper alignmentHelper = new AlignmentHelper(); if
-     * (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(),
-     * id_concept, id_theso, alignementPreferences.getId()) || mettreAJour) { if
-     * (uriSelection.isEmpty()) { erreur = "no selection d'alignement"; message
-     * = ""; } else { for (NodeAlignment nodeAlignment :
-     * selectedTerme.getListAlignValues()) { if
-     * (nodeAlignment.getUri_target().equals(uriSelection)) { nodeAli =
-     * nodeAlignment; message = "l'alignement va se faire <br>";
-     * doAll(id_concept, id_theso, position, erreur, id_theso) message +=
-     * selectedTerme.getMessageAlig(); nodeAli = null; nextPosition();
-     * uriSelection = null; message += "<br>C'est fini pour cetter concept";
-     * return; } } } } else { nextPosition(); } }
-     */
-    /**
-     * Cette fonction permet de passer au concept suivant. et fait l'apelation a
-     * la funtion pour créer l'alignement (la funtion apelé est dans
-     * selecteTerme
-     */
     public void nextPosition() {
 
         if (fin) {
             return;
         }
+        listConceptTrates.add(id_concept);
         erreur = "";
         AlignmentHelper alignmentHelper = new AlignmentHelper();
+        GpsHelper gpsHelper = new GpsHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
-        if (!mettreAJour) {
+        if (optionAllBranch == optionOfAlignement || optionOfAlignement == optionWorkFlow) {
             position++;
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
             }
             comprobationFin();
+            if (fin) {
+                return;
+            }
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-        } else {
+        }
+        if (optionNonAligned == optionOfAlignement) {
+            position++;
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
             }
             comprobationFin();
+            while (gpsHelper.isHaveCoordinate(connect.getPoolConnexion(),
+                    id_concept, id_theso)) {
+                position++;
+                if (position < listOfChildrenInConcept.size()) {
+                    id_concept = listOfChildrenInConcept.get(position);
+                }
+                comprobationFin();
+            }
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            position++;
         }
         try {
-            creerAlignAuto(id_concept, id_theso, nomduterm, id_langue);
+            creerAlignAutoParLot(id_concept, id_theso, nomduterm, id_langue);
+
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(GpsBeans.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GpsBeans.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
         } catch (SAXException ex) {
-            Logger.getLogger(GpsBeans.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GpsBeans.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -383,29 +485,105 @@ public class GpsBeans {
      * @param id_Concept
      * @param idTheso
      * @param id_lang
+     * @param id_user
      */
-    public void getPreliereElement(String id_Concept, String idTheso, String id_lang) throws ParserConfigurationException, SAXException {
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
+    public void getPreliereElement(String id_Concept, String idTheso, String id_lang, int id_user) throws ParserConfigurationException, SAXException {
         UserHelper userHelper = new UserHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
         GpsHelper gpsHelper = new GpsHelper();
-        nodePreference = userHelper.getThesaurusPreference(connect.getPoolConnexion(), idTheso);
-        alignementPreferences = gpsHelper.find_alignement_gps(connect.getPoolConnexion(), nodePreference.getGps_id_source());
-
-        if (!mettreAJour) {
-            //nextPosition();
-            //listOfChildrenInConcept = chercherSansAligne();
-            if (listOfChildrenInConcept != null) {
-                id_concept = listOfChildrenInConcept.get(0);
-                nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
-                        selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-                creerAlignAuto(listOfChildrenInConcept.get(0), idTheso, nomduterm, id_lang);
+        nodePreference = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), idTheso, id_user, alignementPreferences.getId());
+        alignementPreferences = gpsHelper.find_alignement_gps(connect.getPoolConnexion(), nodePreference.getId_alignement_source());
+        getPreferenceAlignement(idTheso, id_user);
+        if (optionOfAlignement != -1) {
+            if (optionAllBranch == optionOfAlignement) {
+                ismiseAJour(idTheso, id_lang);
             }
-        } else {
-            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
-                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-            creerAlignAuto(id_concept, idTheso, nomduterm, id_lang);
+            if (optionOfAlignement == optionNonAligned) {
+                isNonAligne(id_Concept, id_theso, id_lang);
+            }
+            if (optionWorkFlow == optionOfAlignement) {//reprise de la suite
+                if (alignementPreferencesAlignement.getId_concept_tratees() == null) {
+                    ismiseAJour(idTheso, id_lang);
+                } else {
+                    isSuite();
+                }
+            }
         }
+    }
+
+    public void isSuite() {
+        String dejaTratees[];
+        boolean trouve = false;
+        boolean sort = false;
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        dejaTratees = (alignementPreferencesAlignement.getId_concept_tratees()).split("#");
+        ArrayList<String> conceptFait = new ArrayList<>();
+        conceptFait.addAll(Arrays.asList(dejaTratees));
+        listConceptTrates = conceptFait;
+
+        if (!conceptFait.isEmpty()) {
+            for (String traite : conceptFait) {
+                if (listOfChildrenInConcept.contains(traite)) {
+                    listOfChildrenInConcept.remove(traite);
+                }
+            }
+        }
+        if (listOfChildrenInConcept.isEmpty()) {
+            last = true;
+            fin = true;
+            message = "tout la branche traités";
+            return;
+        }
+        comprobationFin();
+        id_concept = listOfChildrenInConcept.get(0);
+        nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
+                selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.creerAlignAuto(listOfChildrenInConcept.get(0), nomduterm);
+    }
+
+    public void isNonAligne(String id_Concept, String id_theso, String id_lang) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        GpsHelper gpsHelper = new GpsHelper();
+        if (!gpsHelper.isHaveCoordinate(connect.getPoolConnexion(), id_Concept, id_theso)) {//si n'est pas aligne
+            id_concept = listOfChildrenInConcept.get(0);
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+            try {
+                creerAlignAutoParLot(listOfChildrenInConcept.get(0), id_theso, nomduterm, id_lang);
+            } catch (Exception e) {
+            }
+        } else {//si il est déjà aligne
+            nextPosition();
+        }
+    }
+
+    /**
+     * c'est va a faire tout les concept
+     */
+    public void ismiseAJour(String idTheso, String id_lang) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        try {
+            creerAlignAutoParLot(id_concept, idTheso, nomduterm, id_lang);
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
+     * Recuperation des preferences pour alignement
+     *
+     * @param idTheso
+     * @param id_user
+     */
+    public void getPreferenceAlignement(String idTheso, int id_user) {
+        alignementPreferencesAlignement = new AlignementPreferences();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        alignementPreferencesAlignement = alignmentHelper.getListPreferencesAlignement(
+                connect.getPoolConnexion(), idTheso, id_user, id_concept_depart, nodePreference.getId_alignement_source());
     }
 
     public void doForLot(int id_user) {
@@ -414,20 +592,66 @@ public class GpsBeans {
                 id_concept, id_theso, id_langue);
         try {
             doAll(id_concept, id_theso, id_user, id_langue, id_term);
+
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(GpsBeans.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GpsBeans.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private ArrayList<String> chercherSansAligne() {
-        ArrayList<String> listOfChildrenInConceptSansAligne = new ArrayList<>();
+    /**
+     * permet d'ecrire dans la bdd les concept que sont déjà tratées
+     *
+     * @param id_user
+     * @return
+     */
+    public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        for (String iterator : listOfChildrenInConcept) {
-            if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), iterator, id_theso, nodePreference.getGps_id_source())) {
-                listOfChildrenInConceptSansAligne.add(iterator);
+        if (optionWorkFlow == optionOfAlignement) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,
+                    id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));
             }
         }
-        return listOfChildrenInConceptSansAligne;
+        return true;
+    }
+
+    public void onRowSelect(SelectEvent event) {
+
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        GpsHelper gpsHelper = new GpsHelper();
+        GpsPreferences gpsPreferences;
+        gpsPreferences = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, ((AlignementSource) event.getObject()).getId());
+        integrerTraduction = gpsPreferences.isGps_integrertraduction();
+        alignementAutomatique = gpsPreferences.isGps_alignementautomatique();
+        reemplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
+        //   alignement_source = "" + gpsPreferences.getId_alignement_source();
+        for (AlignementSource alignementSource : alignementSources) {
+            if (((AlignementSource) event.getObject()).getId() == alignementSource.getId()) {
+                alignement_source = alignementSource;
+            }
+        }
+        selectedAlignement = alignement_source.getRequete();
+
+        System.out.println("mom.trd.opentheso.SelectedBeans.GpsBeans.onRowSelect()");
+    }
+
+    public void recuperatePreferences() {
+        if (!selectedAlignement.isEmpty()) {
+            GpsHelper gpsHelper = new GpsHelper();
+            GpsPreferences gpsPreferences;
+            for (AlignementSource alignementSource : alignementSources) {
+                if (alignementSource.getSource().equals(selectedAlignement)) {
+                    alignement_source = alignementSource;
+                }
+            }
+            gpsPreferences = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, alignement_source.getId());
+            integrerTraduction = gpsPreferences.isGps_integrertraduction();
+            alignementAutomatique = gpsPreferences.isGps_alignementautomatique();
+            reemplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
+        }
     }
 
     ///////////////GET & SET////////////////////////////
@@ -500,6 +724,7 @@ public class GpsBeans {
     }
 
     public void setSelectedAlignement(String selectedAlignement) {
+
         this.selectedAlignement = selectedAlignement;
     }
 
@@ -507,7 +732,9 @@ public class GpsBeans {
         return listeAlignementSources;
     }
 
-    public void setListeAlignementSources() {
+    public void setListeAlignementSources1(String idtheso, int id_user) {
+        id_theso = idtheso;
+        id_user1 = id_user;
         GpsHelper gpsHelper = new GpsHelper();
         alignementSources = gpsHelper.getAlignementSource(connect.getPoolConnexion());
         if (!alignementSources.isEmpty()) {
@@ -706,4 +933,85 @@ public class GpsBeans {
     public void setAlignement_id_type(int alignement_id_type) {
         this.alignement_id_type = alignement_id_type;
     }
+
+    public Term getTerm() {
+        return term;
+    }
+
+    public void setTerm(Term term) {
+        this.term = term;
+    }
+
+    public Map<Integer, String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<Integer, String> options) {
+        this.options = options;
+    }
+
+    public static int getOptionAllBranch() {
+        return optionAllBranch;
+    }
+
+    public static void setOptionAllBranch(int optionAllBranch) {
+        GpsBeans.optionAllBranch = optionAllBranch;
+    }
+
+    public static int getOptionNonAligned() {
+        return optionNonAligned;
+    }
+
+    public static void setOptionNonAligned(int optionNonAligned) {
+        GpsBeans.optionNonAligned = optionNonAligned;
+    }
+
+    public static int getOptionWorkFlow() {
+        return optionWorkFlow;
+    }
+
+    public static void setOptionWorkFlow(int optionWorkFlow) {
+        GpsBeans.optionWorkFlow = optionWorkFlow;
+    }
+
+    public int getOptionOfAlignement() {
+        return optionOfAlignement;
+    }
+
+    public void setOptionOfAlignement(int optionOfAlignement) {
+        this.optionOfAlignement = optionOfAlignement;
+    }
+
+    public AlignementPreferences getAlignementPreferencesAlignement() {
+        return alignementPreferencesAlignement;
+    }
+
+    public void setAlignementPreferencesAlignement(AlignementPreferences alignementPreferencesAlignement) {
+        this.alignementPreferencesAlignement = alignementPreferencesAlignement;
+    }
+
+    public String getId_concept_depart() {
+        return id_concept_depart;
+    }
+
+    public void setId_concept_depart(String id_concept_depart) {
+        this.id_concept_depart = id_concept_depart;
+    }
+
+    public int getId_user1() {
+        return id_user1;
+    }
+
+    public void setId_user1(int id_user1) {
+        this.id_user1 = id_user1;
+    }
+
+    public AlignementSource getAlignement_source() {
+        return alignement_source;
+    }
+
+    public void setAlignement_source(AlignementSource alignement_source) {
+        this.alignement_source = alignement_source;
+    }
+
 }

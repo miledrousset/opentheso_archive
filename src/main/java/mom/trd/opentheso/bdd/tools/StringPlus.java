@@ -1,6 +1,5 @@
 package mom.trd.opentheso.bdd.tools;
 
-
 public class StringPlus {
 
     public StringPlus() {
@@ -47,17 +46,18 @@ public class StringPlus {
         s = s.replaceAll("\\\\", "\\\\\\\\");
         return s.trim();
     }
-    
+
     /**
      * Fonction qui permet de normaliser les textes pour les documents XML
+     *
      * @param s
-     * @return 
+     * @return
      */
     public String normalizeStringForXml(String s) {
         if (s == null) {
             return null;
         }
-        if(s.contains("Estampilles")) {
+        if (s.contains("Estampilles")) {
             int i = 1;
         }
         // normalisation of words for XML
@@ -69,18 +69,19 @@ public class StringPlus {
         s = s.replaceAll("'", " ");
         return s.trim();
     }
-    
+
     /**
-     * Fonction qui permet de normaliser les textes pour un script SQL à appliquer 
-     * en Java
+     * Fonction qui permet de normaliser les textes pour un script SQL à
+     * appliquer en Java
+     *
      * @param s
-     * @return 
+     * @return
      */
     public String normalizeStringForSQL(String s) {
         if (s == null) {
             return null;
         }
-        if(s.contains("Estampilles")) {
+        if (s.contains("Estampilles")) {
             int i = 1;
         }
         // normalisation of words for XML
@@ -91,12 +92,13 @@ public class StringPlus {
         s = s.replaceAll("\t", " ");
 //        s = s.replaceAll("'", " ");
         return s.trim();
-    }    
-    
+    }
+
     /**
      * Fonction qui permet de normaliser les textes pour les documents XML
+     *
      * @param s
-     * @return 
+     * @return
      */
     public String normalizeStringForIdentifier(String s) {
         if (s == null) {
@@ -105,18 +107,19 @@ public class StringPlus {
         // normalisation of words for identifier 
         // exp : ?idg=MT_10&idt=2
         // devient : idgMT_10idt2
-        
+
         s = s.replaceAll("\\?", "");
         s = s.replaceAll("=", "");
         s = s.replaceAll("&", "");
 
         return s;
-    }    
-    
+    }
+
     /**
      * Fonction qui permet de normaliser les textes pour les documents XML
+     *
      * @param s
-     * @return 
+     * @return
      */
     public String clearStringForSerach(String s) {
         if (s == null) {
@@ -128,10 +131,34 @@ public class StringPlus {
         s = s.replaceAll("_", " ");
         s = s.replaceAll("/", " ");
         s = s.replaceAll("(", " ");
-        s = s.replaceAll(")", " ");        
-        
+        s = s.replaceAll(")", " ");
+
         return s;
-    }    
-    
-    
+    }
+
+    public String clearAngles(String s) {
+        if (s == null) {
+            return null;
+        }
+        boolean premiereAngle = false;
+        boolean deuxiemeAngle = false;
+        String aux = "";
+        char character;
+        for (int i = 0; i < s.length(); i++) {
+            character = s.charAt(i);
+            if (character == '<') {
+                premiereAngle = true;
+            }
+            if (!premiereAngle) {
+                aux += character;
+                deuxiemeAngle = false;
+            }
+            if (character == '>') {
+                deuxiemeAngle = true;
+                premiereAngle = false;
+            }
+        }
+        return aux;
+    }
+
 }

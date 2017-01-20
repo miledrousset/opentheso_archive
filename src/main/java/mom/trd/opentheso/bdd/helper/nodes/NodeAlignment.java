@@ -30,6 +30,7 @@ public class NodeAlignment {
     private boolean save;
 
 // coordonnées GPS
+    private String concept_target_bold;
     private String countryName;
     private String name;
     private String idUrl;
@@ -39,6 +40,7 @@ public class NodeAlignment {
     private ArrayList<String> traduction;
     private ArrayList<NodeLang> alltraductions;
     
+    private String uri_target_url;
     
     public NodeAlignment() {
         concept_target_alt = "";
@@ -76,8 +78,9 @@ public class NodeAlignment {
         this.id_author = id_author;
     }
 
-    public String getConcept_target() {
+    public String getConcept_target() {      
         return concept_target;
+        
     }
 
     public void setConcept_target(String concept_target) {
@@ -133,6 +136,10 @@ public class NodeAlignment {
     }
 
     public String getDef_target() {
+        if(def_target== null)
+            def_target = "";
+        else
+            def_target = "<i>"+def_target+"</i>";
         return def_target;
     }
 
@@ -217,6 +224,25 @@ public class NodeAlignment {
 
     public void setAlltraductions(ArrayList<NodeLang> alltraductions) {
         this.alltraductions = alltraductions;
+    }
+
+    public String getUri_target_url() {
+        uri_target_url = "<a href=\"" + uri_target + 
+                "\" target=\"_blank\"><font color=\"green\"> url</font> </a>";
+        return uri_target_url;
+    }
+
+    public void setUri_target_url(String uri_target_url) {
+        this.uri_target_url = uri_target_url;
+    }
+
+    public String getConcept_target_bold() {
+        concept_target_bold = "<b>"+concept_target+"</b>";
+        return concept_target_bold;
+    }
+
+    public void setConcept_target_bold(String concept_target_bold) {
+        this.concept_target_bold = concept_target_bold;
     }
 
 }

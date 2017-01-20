@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.tools.StringPlus;
+import mom.trd.opentheso.core.alignment.AlignementPreferences;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,13 +21,12 @@ import org.apache.commons.logging.LogFactory;
 public class AlignmentHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
-    private String message="";
-    
+    private String message = "";
+
     public AlignmentHelper() {
 
-        
     }
-   
+
     /**
      * Permet de savoir si le concept 'id_concept' a déjà une alignement ou pas
      *
@@ -81,28 +81,28 @@ public class AlignmentHelper {
      * @param idTypeAlignment
      * @param idConcept
      * @param idThesaurus
-     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0 c'est alignement manuel
+     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0
+     * c'est alignement manuel
      * @return
      */
     public boolean addNewAlignment(HikariDataSource ds,
             int author,
             String conceptTarget, String thesaurusTarget,
             String uriTarget, int idTypeAlignment,
-            String idConcept, String idThesaurus, int id_alignement_source) 
-    {
+            String idConcept, String idThesaurus, int id_alignement_source) {
         boolean status = false;
         if (!isExistsAlignement(ds, id_alignement_source, idThesaurus, idConcept, idTypeAlignment)) {
             message = "<br>";//"Cet alignement n'exite pas, création en cours <br>";
-            status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
+            status = addNewAlignement2(ds, author, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment,
                     idConcept, idThesaurus, id_alignement_source);
             if (!status) {
                 return false;
             }
             message += "<br> New alignment created ... ok";
         } else {
-           // message = "Cette alignement exits, updating en cours";
-            status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment, 
-                    idConcept, idThesaurus,id_alignement_source);
+            // message = "Cette alignement exits, updating en cours";
+            status = updateAlignment(ds, idTypeAlignment, conceptTarget, thesaurusTarget, uriTarget, idTypeAlignment,
+                    idConcept, idThesaurus, id_alignement_source);
             if (!status) {
                 return false;
             }
@@ -136,7 +136,7 @@ public class AlignmentHelper {
         boolean status = false;
         conceptTarget = new StringPlus().convertString(conceptTarget);
         uriTarget = new StringPlus().convertString(uriTarget);
-        
+
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -156,7 +156,7 @@ public class AlignmentHelper {
                             + "," + idTypeAlignment
                             + ",'" + idThesaurus + "'"
                             + ",'" + idConcept + "',"
-                            +  id_alignement_source + " )";
+                            + id_alignement_source + " )";
 
                     stmt.executeUpdate(query);
 
@@ -191,8 +191,8 @@ public class AlignmentHelper {
         Statement stmt;
 
         nodeAlignment.setConcept_target(new StringPlus().convertString(nodeAlignment.getConcept_target()));
-        nodeAlignment.setUri_target(new StringPlus().convertString(nodeAlignment.getUri_target()));     
-        
+        nodeAlignment.setUri_target(new StringPlus().convertString(nodeAlignment.getUri_target()));
+
         boolean status = false;
         try {
             // Get connection from pool
@@ -321,7 +321,8 @@ public class AlignmentHelper {
      * @param idTypeAlignment
      * @param uriTarget
      * @param idThesaurus
-     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0 c'est alignement manuel
+     * @param id_alignement_source parametre que on prende de la BDD, si c'est 0
+     * c'est alignement manuel
      * @return
      */
     public boolean updateAlignment(HikariDataSource ds,
@@ -349,8 +350,8 @@ public class AlignmentHelper {
                             + " alignement_id_type = " + idTypeAlignment
                             + " WHERE internal_id_thesaurus = '" + idThesaurus + "'"
                             + " AND internal_id_concept = '" + idConcept + "'"
-                            + " AND id_alignement_source = "+ id_alignement_source
-                            + " AND alignement_id_type = "+ idTypeAlignment;
+                            + " AND id_alignement_source = " + id_alignement_source
+                            + " AND alignement_id_type = " + idTypeAlignment;
                     stmt.executeUpdate(query);
                     status = true;
 
@@ -748,12 +749,14 @@ public class AlignmentHelper {
         }
         return status;
     }
-/**
- * Permet de faire un update d'un alignement_source
- * @param ds
- * @param alig
- * @param id 
- */
+
+    /**
+     * Permet de faire un update d'un alignement_source
+     *
+     * @param ds
+     * @param alig
+     * @param id
+     */
     public void update_alignementSource(HikariDataSource ds, AlignementSource alig, int id) {
         Statement stmt;
         Connection conn;
@@ -941,13 +944,15 @@ public class AlignmentHelper {
             log.error("Error while delete Alignement : ", sqle);
         }
     }
-/**
- * permet de savoir le group du concept idconcept
- * @param ds
- * @param id_Theso
- * @param id_concept
- * @return 
- */
+
+    /**
+     * permet de savoir le group du concept idconcept
+     *
+     * @param ds
+     * @param id_Theso
+     * @param id_concept
+     * @return
+     */
     public String getGroupOfConcept(HikariDataSource ds, String id_Theso, String id_concept) {
         String group = "";
         Statement stmt;
@@ -980,13 +985,15 @@ public class AlignmentHelper {
         }
         return group;
     }
-/**
- * permet de savoir si le concept idconcept a des enfants o pas
- * @param ds
- * @param idtheso
- * @param idconcept
- * @return 
- */
+
+    /**
+     * permet de savoir si le concept idconcept a des enfants o pas
+     *
+     * @param ds
+     * @param idtheso
+     * @param idconcept
+     * @return
+     */
     public boolean isHaveChildren(HikariDataSource ds, String idtheso, String idconcept) {
         Statement stmt;
         Connection conn;
@@ -1012,7 +1019,7 @@ public class AlignmentHelper {
                     stmt.close();
                 }
             } finally {
-                    conn.close();
+                conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
@@ -1020,9 +1027,9 @@ public class AlignmentHelper {
         }
         return status;
     }
-    public boolean dejaAligneParAvecCetteAlignement(HikariDataSource ds, String id_Concept, 
-            String id_Theso, int id_alignement_source)
-    {
+
+    public boolean dejaAligneParAvecCetteAlignement(HikariDataSource ds, String id_Concept,
+            String id_Theso, int id_alignement_source) {
         Statement stmt;
         Connection conn;
         ResultSet rs;
@@ -1038,7 +1045,7 @@ public class AlignmentHelper {
                     String query = "select id from alignement "
                             + "where internal_id_thesaurus = '" + id_Theso
                             + "' and internal_id_concept='" + id_Concept
-                            + "' and id_alignement_source ="+id_alignement_source;
+                            + "' and id_alignement_source =" + id_alignement_source;
                     rs = stmt.executeQuery(query);
                     if (rs.next()) {
                         status = true;
@@ -1047,13 +1054,220 @@ public class AlignmentHelper {
                     stmt.close();
                 }
             } finally {
-                    conn.close();
+                conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
             log.error("Error while see it's alignée", sqle);
         }
         return status;
+    }
+
+    public AlignementPreferences getListPreferencesAlignement(HikariDataSource ds, 
+            String id_theso, int id_user, String id_concept_depart, int id_alignement_source) {
+        AlignementPreferences alignementPreferences = new AlignementPreferences();
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+                    String query = "select * from alignement_preferences where id_thesaurus = '" + id_theso
+                            + "' and id_user = " + id_user
+                            + " and id_concept_depart ='"+id_concept_depart+"'"
+                            + " and  id_alignement_source="+ id_alignement_source;
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        alignementPreferences.setId_concetp_depart(rs.getString("id_concept_depart"));
+                        alignementPreferences.setId_concept_tratees(rs.getString("id_concept_tratees"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while get alignement's preferences", sqle);
+        }
+        return alignementPreferences;
+    }
+
+    public boolean validate_Preferences(HikariDataSource ds, String id_theso, int id_user,
+            String id_concept_depart, ArrayList<String>listConceptTratees, int id_alignement_source ) {
+        if (!existPreferences(ds, id_theso, id_user, id_concept_depart, id_alignement_source)) {
+            if (!insert_validate_Preferences(ds, id_theso, id_user, id_concept_depart, listConceptTratees, id_alignement_source)) {
+                return false;
+            }
+        } else if (!enregistreProgres(ds, id_theso, id_concept_depart, id_user, listConceptTratees, id_alignement_source))  {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean existPreferences(HikariDataSource ds, String id_theso, int id_user, String id_concept_depart, int id_alignement_source) {
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "SELECT id from alignement_preferences"
+                            + " where id_thesaurus ='" + id_theso + "'"
+                            + " and id_user= " + id_user
+                            + " and id_concept_depart ='"+id_concept_depart+"'"
+                            + " and id_alignement_source ="+ id_alignement_source;
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        status = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while see it's exist", sqle);
+        }
+        return status;
+    }
+
+    private boolean insert_validate_Preferences(HikariDataSource ds, String id_theso, int id_user,
+            String id_concept_depart, ArrayList<String> listConceptTratees, int id_alignement_source) {
+
+        Statement stmt;
+        Connection conn;
+        String conceptstratees = "";
+        for (String id : listConceptTratees) {
+            conceptstratees += id+"#";
+        }
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "insert into alignement_preferences "
+                            + " (id_thesaurus, id_user, id_concept_depart, id_concept_tratees, id_alignement_source )"
+                            + " values('" + id_theso + "'," + id_user + ",'" + id_concept_depart + "',"
+                            + " '"+conceptstratees +"',"+ id_alignement_source+")";
+                    stmt.execute(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while see it's alignée", sqle);
+        }
+        return status;
+    }
+
+    public boolean enregistreProgres(HikariDataSource ds, String id_theso, String id_concept,
+            int id_user, ArrayList<String> listConceptTratees, int id_alignement_source) {
+        Statement stmt;
+        Connection conn;
+        String conceptstratees = "";
+        for (String id : listConceptTratees) {
+            conceptstratees += id+"#";
+        }
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "Update alignement_preferences"
+                            + " SET id_concept_tratees ='" + conceptstratees + "'"
+                            + " where id_thesaurus ='" + id_theso + "'"
+                            + " and id_user =" + id_user
+                            + " and id_concept_depart ='" + id_concept + "'"
+                            + " and  id_alignement_source ="+ id_alignement_source;
+                    stmt.execute(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while save progress", sqle);
+        }
+        return status;
+    }
+
+    /**
+     * public boolean update_IdConceptInTable(HikariDataSource ds, String
+     * id_theso, int id_user) { Statement stmt; Connection conn; ResultSet rs;
+     * boolean status = false; try { // Get connection from pool conn =
+     * ds.getConnection(); try { stmt = conn.createStatement(); try { stmt =
+     * conn.createStatement();
+     *
+     * String query = "Update alignement_preferences set " +" id_concept = '0'"
+     * + " where id_thesaurus = '" + id_theso + "'" + " and id_user = " +
+     * id_user; stmt.executeUpdate(query); status = true; } finally {
+     * stmt.close(); } } finally { conn.close(); } } catch (SQLException sqle) {
+     * // Log exception log.error("Error while reinit id_concept", sqle); }
+     * return status;
+    }
+     */
+    public String getListIdCTrates(HikariDataSource ds, String id_theso, int id_user) {
+        String trates = "";
+        Statement stmt;
+        Connection conn;
+        ResultSet rs;
+        boolean status = false;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+
+                    String query = "SELECT id_concept_tratees from alignement_preferences"
+                            + " where id_thesaurus = '" + id_theso + "'"
+                            + " and id_user = " + id_user;
+                    rs = stmt.executeQuery(query);
+                    if (rs.next()) {
+                        trates = rs.getString("id_concept_tratees");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while reinit id_concept", sqle);
+        }
+        return trates;
     }
 
     public String getMessage() {

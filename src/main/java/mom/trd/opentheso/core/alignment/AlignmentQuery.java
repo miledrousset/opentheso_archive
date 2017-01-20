@@ -300,7 +300,7 @@ public class AlignmentQuery {
             requete = requete + ")";
             
         } else {
-            requete = requete.replace("$$value$$", "\"" +lexicalValue + "\"");
+            requete = requete.replace("##value##", "\"" +lexicalValue + "\"");
         }
         
         

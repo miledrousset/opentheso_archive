@@ -480,10 +480,6 @@ public class UserHelper {
                         np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
                         np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
                         np.setSourceLang(resultSet.getString("source_lang"));
-                        np.setGps_id_source(resultSet.getInt("gps_id_source"));
-                        np.setGps_integrertraduction(resultSet.getBoolean("gps_integrertraduction"));
-                        np.setGps_reemplacertraduction(resultSet.getBoolean("gps_reemplacertraduction"));
-                        np.setGps_alignementautomatique(resultSet.getBoolean("gps_alignementautomatique"));
                     }
 
                 } finally {
