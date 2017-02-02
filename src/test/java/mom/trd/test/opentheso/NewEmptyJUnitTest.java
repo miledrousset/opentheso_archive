@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.util.Pair;
+
 import javax.faces.bean.ManagedProperty;
 import mom.trd.opentheso.SelectedBeans.LanguageBean;
 import mom.trd.opentheso.SelectedBeans.SelectedThesaurus;

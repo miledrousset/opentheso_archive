@@ -56,52 +56,55 @@
                 <h:outputText value="#{theso.getMetaData()}" />
             </script>
 
-            <h:panelGroup rendered="#{(selectedTerme.idC != null)}">
+            <h:panelGroup rendered="#{(selectedTerme.idC != null)}" >
                     <span style="font-size: 17px; font-weight: bold;">
                         <h:outputText  id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                     </span>
-                
-                    <h:outputText id="idC" value="id : "/>
-                    <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
-                    
-                    
-                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
-                    <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
 
-                    
-                    <h:panelGroup rendered= "#{(selectedTerme.nbNotices != 0)}">
-                        <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+                <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
+                    <p:tab title="..."    titleStyleClass="titleAccordion">
+                        <h:panelGroup rendered="#{(user1.user.name != null)}" >
+                            <h:outputText id="idC" value="id : "/>
+                            <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
+                        </h:panelGroup>  
 
-                        <a href="#{selectedTerme.urlNotice}" target="blanc" >
-                            <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" />
-                        </a>
-                    
-                    </h:panelGroup>
+                        <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
+                        <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
 
-                    <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
-                    <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
-                    
-                    
-                    <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
-                    <h:outputText id="dateC" value="#{selectedTerme.dateC}" styleClass="textInfo"/><br/>
-                    <span>
-                        <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
-                        <h:outputText id="dateM" value="#{selectedTerme.dateM}" styleClass="textInfo"/><br/>
-                    </span>
+
+                        <h:panelGroup rendered= "#{(selectedTerme.nbNotices != 0)}">
+                            <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+
+                            <a href="#{selectedTerme.urlNotice}" target="blanc" >
+                                <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" />
+                            </a>
+
+                        </h:panelGroup>
+
+                        <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
+                        <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
+
+
+                        <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
+                        <h:outputText id="dateC" value="#{selectedTerme.dateC}" styleClass="textInfo"/><br/>
+                        <span>
+                            <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 
+                            <h:outputText id="dateM" value="#{selectedTerme.dateM}" styleClass="textInfo"/><br/>
+                        </span>
+                        <h:outputText rendered="#{selectedTerme.creatorName != ''}" value="#{langueBean.getMsg('index.creator')} : "/>
+                        <h:outputText rendered="#{selectedTerme.creatorName != ''}" value = "#{selectedTerme.creatorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>
+
+                        <h:outputText rendered="#{selectedTerme.contributorName != ''}" value="#{langueBean.getMsg('index.contributor')} : "/>
+                        <h:outputText rendered="#{selectedTerme.contributorName != ''}" value = "#{selectedTerme.contributorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>                        
+                    </p:tab>
+                    </p:accordionPanel >
+
                     <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
                         <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
                             <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
                             <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
                         </ui:repeat>
                     </h:panelGroup>
-                    
-                    <h:outputText rendered="#{selectedTerme.creatorName != ''}" value="#{langueBean.getMsg('index.creator')} : "/>
-                    <h:outputText rendered="#{selectedTerme.creatorName != ''}" value = "#{selectedTerme.creatorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>
-                    
-                    <h:outputText rendered="#{selectedTerme.contributorName != ''}" value="#{langueBean.getMsg('index.contributor')} : "/>
-                    <h:outputText rendered="#{selectedTerme.contributorName != ''}" value = "#{selectedTerme.contributorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>
-                    
-                    
                     <!-- affichage du nombre total des fils -->
                     <h:panelGroup id="totalBrancheG">
                         <h:form>
@@ -133,17 +136,17 @@
 
                             <span>
                                 <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" >
+                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall">
                                     <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" />
+                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
                                 </h:outputLink>
                             </span>
                             <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
                             <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" >
+                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
                                 <span>
                                     <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
-                                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" />
+                                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
 
                                 </span>
                             </h:outputLink>                                

@@ -6,7 +6,7 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
         <div id="gauche">
-            <p:accordionPanel id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}" rendered="#{(treeBean.browserName != 'agent') }">
+            <p:accordionPanel id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}"> <!--rendered="{(treeBean.browserName != 'agent') }"> -->
                 <p:tab title="#{langueBean.getMsg('theso')}">
                     <!-- navigation rapide par auto-complétion --> 
                     <ui:include src="navigationRapide/navigationRapide.xhtml"/>

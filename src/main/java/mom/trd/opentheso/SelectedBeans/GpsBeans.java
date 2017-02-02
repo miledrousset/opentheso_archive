@@ -24,6 +24,7 @@ import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.core.alignment.AlignementPreferences;
@@ -141,6 +142,26 @@ public class GpsBeans {
         gpshelper.insertCoordonees(connect.getPoolConnexion(), idConcept, idTheso, latitud, longitud);
         return true;
     }
+    
+    /**
+     * récupère les coordonées de la BDD
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    public boolean getCoordinatesGps(String idConcept, String idTheso) {
+        GpsHelper gpshelper = new GpsHelper();
+        NodeGps nodeGps = gpshelper.getCoordinate(connect.getPoolConnexion(), idConcept, idTheso);
+        if(nodeGps!= null) {
+            latitud = nodeGps.getLatitude();
+            longitud = nodeGps.getLongitude();
+        }
+        else {
+            initcoordonees();
+        }
+        return true;
+    }    
 
     /**
      * permet d'ajouter le coordonées gps automatique
@@ -419,7 +440,6 @@ public class GpsBeans {
         }
         listConceptTrates.add(id_concept);
         erreur = "";
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
         GpsHelper gpsHelper = new GpsHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
         if (optionAllBranch == optionOfAlignement || optionOfAlignement == optionWorkFlow) {
@@ -487,9 +507,7 @@ public class GpsBeans {
      * @param id_lang
      * @param id_user
      */
-    public void getPreliereElement(String id_Concept, String idTheso, String id_lang, int id_user) throws ParserConfigurationException, SAXException {
-        UserHelper userHelper = new UserHelper();
-        ConceptHelper conceptHelper = new ConceptHelper();
+    public void getPreliereElement(String id_Concept, String idTheso, String id_lang, int id_user) {
         GpsHelper gpsHelper = new GpsHelper();
         nodePreference = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), idTheso, id_user, alignementPreferences.getId());
         alignementPreferences = gpsHelper.find_alignement_gps(connect.getPoolConnexion(), nodePreference.getId_alignement_source());

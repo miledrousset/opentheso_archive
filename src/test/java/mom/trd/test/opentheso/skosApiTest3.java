@@ -106,7 +106,7 @@ public class skosApiTest3 {
         try {
             OWLOntologyManager m = OWLManager.createOWLOntologyManager();
             m.getOntologyParsers().set(new RDFXMLParserFactory());
-            OWLOntology ont = m.loadOntologyFromOntologyDocument(IRI.create("file:/Users/Miled/Desktop/test_unesco2.xml"));
+            OWLOntology ont = m.loadOntologyFromOntologyDocument(IRI.create("file:/Users/Miled/Desktop/test_unesco4.rdf"));
         //    OWLNamedIndividual ind = m.getOWLDataFactory().getOWLNamedIndividual(IRI.create("http://skos.um.es/unescothes/COL205"));
     //        OWLNamedIndividual ind = m.getOWLDataFactory().getOWLNamedIndividual(IRI.create("file:/Users/Miled/Desktop/test_unesco2.xml"));
             

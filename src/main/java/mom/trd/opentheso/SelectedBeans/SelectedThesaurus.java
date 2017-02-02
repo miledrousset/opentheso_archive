@@ -345,7 +345,7 @@ public class SelectedThesaurus implements Serializable {
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             // Initialisation du terme séléctionné et de l'arbre
-            int type = 1;
+
             
        //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
             /*
@@ -805,6 +805,8 @@ public class SelectedThesaurus implements Serializable {
             candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             vue.setCreat(false);
             tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+            tree.setIdThesoSelected(thesaurus.getId_thesaurus());
+            tree.setDefaultLanguage(thesaurus.getLanguage());
         }
     }
     

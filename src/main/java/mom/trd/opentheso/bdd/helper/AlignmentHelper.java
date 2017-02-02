@@ -61,7 +61,7 @@ public class AlignmentHelper {
                     stmt.close();
                 }
             } finally {
-                //conn.close();
+                conn.close();
             }
         } catch (SQLException sqle) {
             // Log exception
@@ -1028,7 +1028,7 @@ public class AlignmentHelper {
         return status;
     }
 
-    public boolean dejaAligneParAvecCetteAlignement(HikariDataSource ds, String id_Concept,
+    public boolean isAlignedWithThisSource(HikariDataSource ds, String id_Concept,
             String id_Theso, int id_alignement_source) {
         Statement stmt;
         Connection conn;

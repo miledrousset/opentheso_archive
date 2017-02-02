@@ -21,7 +21,6 @@ import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.core.alignment.AlignementPreferences;
-import sun.util.calendar.CalendarUtils;
 
 /**
  *
@@ -87,7 +86,6 @@ public class AlignementParLotBean {
         id_concept_depart = id_Concept;
         id_concept = id_Concept;
         id_theso = id_Theso;
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
         listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
@@ -105,6 +103,7 @@ public class AlignementParLotBean {
         options.put(optionAllBranch, langueBean.getMsg("alig.TTB"));
         options.put(optionNonAligned, langueBean.getMsg("alig.nonA"));
         options.put(optionWorkFlow, langueBean.getMsg("alig.workF"));
+        position = 0;
     }
 
     /**
@@ -127,21 +126,22 @@ public class AlignementParLotBean {
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
             }
-            comprobationFin();
-            while (alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(),
-                    id_concept, id_theso, alignement_id_type)) {
+            checkEndConcepts();
+            while (alignmentHelper.isAlignedWithThisSource(connect.getPoolConnexion(),
+                    id_concept, id_theso, selectedTerme.alignementSource.getId())) {//alignement_id_type)) {
                 position++;
+                if(fin) return;
                 if (position < listOfChildrenInConcept.size()) {
                     id_concept = listOfChildrenInConcept.get(position);
                 }
-                comprobationFin();
+                checkEndConcepts();
             }
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
         }
         if ((optionAllBranch == optionOfAlignement) || (optionWorkFlow == optionOfAlignement)) {
             position++;
-            comprobationFin();
+            checkEndConcepts();
             if (position < listOfChildrenInConcept.size()) {
                 id_concept = listOfChildrenInConcept.get(position);
             } else {
@@ -159,7 +159,7 @@ public class AlignementParLotBean {
     /**
      * Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog
      */
-    private void comprobationFin() {
+    private void checkEndConcepts() {
 
         if (position == listOfChildrenInConcept.size() - 1) {
             last = true;
@@ -167,6 +167,9 @@ public class AlignementParLotBean {
         if (position == listOfChildrenInConcept.size()) {
             fin = true;
         }
+        if (position > listOfChildrenInConcept.size()) {
+            fin = true;
+        }        
 
     }
 
@@ -192,7 +195,6 @@ public class AlignementParLotBean {
      */
     public void addAlignement() {
         erreur = "";
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
         TermHelper termHelper = new TermHelper();
             if (uriSelection.isEmpty() && uri_manual.isEmpty()) {
                 erreur = "no selected alignment";
@@ -215,7 +217,6 @@ public class AlignementParLotBean {
                     uriSelection = null;
                     uri_manual = null;
                     nextPosition();
-                    return;
                 }else
                 {
                     for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
@@ -232,7 +233,6 @@ public class AlignementParLotBean {
                             message += "<br>Concept aligné ...";
                             uriSelection = null;
                             nextPosition();
-                            return;
                         }
                     }
                 }
@@ -249,8 +249,6 @@ public class AlignementParLotBean {
     public void getPreliereElement(String id_Concept, String id_theso, int id_user) {
         if (!"".equals(selectedTerme.selectedAlignement)) {
             getPreferenceAlignement(id_theso, id_user);
-            AlignmentHelper alignmentHelper = new AlignmentHelper();
-            ConceptHelper conceptHelper = new ConceptHelper();
             if (optionOfAlignement != -1) {
                 if (optionNonAligned==optionOfAlignement) {//reprise de non alignes
                     isNonAligne(id_Concept, id_theso, id_user);
@@ -266,17 +264,15 @@ public class AlignementParLotBean {
                         isSuite();
                 }
             } else {
-                erreur += "besoin choissi une option";
+                erreur += "Veuillez choissir une option";
             }
         } else {
-            erreur += "besoin choissi une source";
+            erreur += "Veuillez choissir une source";
         }
     }
 
     public void isSuite() {
         String dejaTratees[];
-        boolean trouve = false;
-        boolean sort = false;
         ConceptHelper conceptHelper = new ConceptHelper();
 
         dejaTratees = (alignementPreferences.getId_concept_tratees()).split("#");
@@ -297,7 +293,7 @@ public class AlignementParLotBean {
             message = "tout la branche traités";
             return;
         }
-        comprobationFin();
+        checkEndConcepts();
         id_concept = listOfChildrenInConcept.get(0);
         nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
                 selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
@@ -314,7 +310,7 @@ public class AlignementParLotBean {
     public void isNonAligne(String id_Concept, String id_theso, int id_user) {
         ConceptHelper conceptHelper = new ConceptHelper();
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        if (!alignmentHelper.dejaAligneParAvecCetteAlignement(connect.getPoolConnexion(), id_Concept, id_theso,
+        if (!alignmentHelper.isAlignedWithThisSource(connect.getPoolConnexion(), id_Concept, id_theso,
                 selectedTerme.alignementSource.getId())) {//si n'est pas aligne
             id_concept = listOfChildrenInConcept.get(0);
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), listOfChildrenInConcept.get(0),
@@ -350,9 +346,6 @@ public class AlignementParLotBean {
                 connect.getPoolConnexion(), idTheso, id_user, id_concept_depart, selectedTerme.alignementSource.getId());
     }
 
-    public void getConceptTratees(String idTheso, int id_user) {
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
-    }
 
     /**
      * permet d'ecrire dans la bdd les concept que sont déjà tratées

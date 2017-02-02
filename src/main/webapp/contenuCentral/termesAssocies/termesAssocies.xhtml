@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="contenuAssocie">
-            <h:panelGroup  id="asso" rendered="#{(treeBean.browserName != 'agent')}">
+            <h:panelGroup  id="asso" > <!--rendered="{(treeBean.browserName != 'agent')}"> -->
                 <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item2.value != ''}" value="#{item2.value}" escape="false"

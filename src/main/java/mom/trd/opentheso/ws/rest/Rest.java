@@ -16,8 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
@@ -34,9 +32,6 @@ import skos.SKOSXmlDocument;
  */
 @Path("rest")
 public class Rest {
-
-    @Context
-    private UriInfo context;
 
     private HikariDataSource ds;
     private Properties prefs;    
@@ -97,31 +92,24 @@ public class Rest {
         return poolConnexion1;
      }
    
-  /*  
-    @Path("/skos/group/id={id}&th={th}")
-    @GET
-    //@Produces("text/plain")
-    @Produces("application/json")
-    public String getGroup(@PathParam("id") String idGroup,
-            @PathParam("th") String idTheso){
-        return "<test>la valeur du group est : </test>" + idGroup + 
-                " <toto>thesaurus = </toto>" + idTheso;
-    }
-    */
     
     
     
     
     
+/////////////////////////////////////////////////////    
+///////////////////////////////////////////////////// 
+    
+    /*
+     * Partie du REST pour produire du SKOS
+     * 
+     */
+    
+///////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////    
     
     
     
-    
-    
-    
-    /**
-     * La partie REST pour produire du SKOS
-    */
 
     /**
      * Cette fonction renvoie un concept par son id et par l'id du thésaurus 
@@ -249,8 +237,31 @@ public class Rest {
         return skos.toString();
     }     
     
-    /**
+
+    
+    
+    
+    
+    
+    
+    
+    
+/////////////////////////////////////////////////////    
+///////////////////////////////////////////////////// 
+    
+    /*
      * Partie du REST pour produire du JsonLd
+     * 
+     */
+    
+///////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////     
+    
+    
+    
+    
+    /**
+     * permet de récuperer un Concept par son identifiant 
      * @param idConcept
      * @param idTheso
      * @return 
@@ -266,21 +277,15 @@ public class Rest {
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
-                       
+
         ds.close();
         return jsonLd.toString();
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+ 
+ 
     /**
-     * Partie du REST pour produire du JsonLd
+     * retourne un concept à partir de son identifiant Ark
      * @param naan
      * @param ark
      * @return 
@@ -301,6 +306,14 @@ public class Rest {
         return jsonLd.toString();
     }    
     
+    
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus et une langue)
+     * @param value
+     * @param idLang
+     * @param idTheso
+     * @return 
+     */
     @Path("/jsonld/concept/value={value}&lang={lang}&th={th}")
     @GET
     //@Produces("text/plain")
@@ -318,6 +331,14 @@ public class Rest {
         return jsonLd.toString();
     }
 
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus, un doamine et une langue)
+     * @param value
+     * @param idLang
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     */
     @Path("/jsonld/concept/value={value}&lang={lang}&idg={idg}&th={th}")
     @GET
     @Produces("application/json;charset=UTF-8")
@@ -364,15 +385,42 @@ public class Rest {
     */
     @Path("/jsonld/concept/th={th}")
     @GET
-    @Produces("application/xml;charset=UTF-8")
+    @Produces("application/json;charset=UTF-8")
     public String getAllGroupsJson(@PathParam("th") String idTheso){
         StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
-        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);          
+        StringBuffer jsonLd = jsonHelper.getJsonLdForConceptScheme(sKOSXmlDocument);          
         ds.close();
         return jsonLd.toString();
     }    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+////////// Fonctions Privées     //////////////////////////////////////////////   
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////    
+    
+    
     
     /**
      * Fonction qui permet de récupérer un concept skos par identifiant

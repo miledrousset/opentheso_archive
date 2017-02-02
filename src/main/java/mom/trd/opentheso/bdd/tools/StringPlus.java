@@ -57,9 +57,6 @@ public class StringPlus {
         if (s == null) {
             return null;
         }
-        if (s.contains("Estampilles")) {
-            int i = 1;
-        }
         // normalisation of words for XML
         s = s.replaceAll("&", "&amp;");
         s = s.replaceAll("\"", " ");
@@ -80,9 +77,6 @@ public class StringPlus {
     public String normalizeStringForSQL(String s) {
         if (s == null) {
             return null;
-        }
-        if (s.contains("Estampilles")) {
-            int i = 1;
         }
         // normalisation of words for XML
         s = s.replaceAll("&", "&amp;");

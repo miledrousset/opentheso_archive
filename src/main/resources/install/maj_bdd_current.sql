@@ -917,7 +917,7 @@ declare
 				if(source_recuperated = cherchesource) then
 					select alignement_source.id from alignement_source where alignement_source.source = cherchesource into id;
 				execute
-					'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''' and id_alignement_source = 0;';
+					'update alignement set  id_alignement_source = '||id||' where uri_target = '||quote_literal(nom)||' and id_alignement_source = 0;';
 				end if;
 			end loop;
 			if (id=0) then	
@@ -925,7 +925,7 @@ declare
 				'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format) VALUES ('''||source_recuperated||''', ''null'', ''REST'', ''xml'');';
 				SELECT max(alignement_source.id) from alignement_source  into id;
 				execute
-				'update alignement set  id_alignement_source = '||id||' where uri_target = '''||nom||''';';
+				'update alignement set  id_alignement_source = '||id||' where uri_target = '||quote_literal(nom)||';';
 				
 			end if;
 			id:=0;	

@@ -905,6 +905,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public String getNbNoticesOfBranch() {
+        ResourceBundle bundlePref = getBundlePref();
         int total = 0;
         if (totalNoticesOfBranch.isEmpty()) {
             if (z3950_actif) {
@@ -914,15 +915,15 @@ public class SelectedTerme implements Serializable {
 
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-                p.put("RepositoryDataSourceURL", "file:" + "/Users/Miled/NetBeansProjects/opentheso/src/main/webapp/repositories.xml");
+                p.put("RepositoryDataSourceURL", "file:"  + cheminNotice1);
                 p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-                p.put("ConvertorConfigFile", "/Users/Miled/NetBeansProjects/opentheso/src/main/webapp/SchemaMappings.xml");
+                p.put("ConvertorConfigFile", cheminNotice2);
                 Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
                 federated_search_proxy.init(p);
                 try {
                     IRQuery e = new IRQuery();
                     //   e.collections = new Vector<String>();
-                    e.collections.add("KOHA/biblios");
+                    e.collections.add(bundlePref.getString("collection.adresse"));
                     e.hints.put("default_element_set_name", "f");
                     e.hints.put("small_set_setname", "f");
                     e.hints.put("record_syntax", "unimarc");

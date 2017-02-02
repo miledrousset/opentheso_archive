@@ -384,7 +384,7 @@ input[type="button"], input[type="submit"]{
 
 .termInfo {
     background: none;
-    font-size: 13px;
+    font-size: 12px;
     text-shadow: none;
     font-weight: normal;
     color: darkgreen;
@@ -558,7 +558,7 @@ input[type="button"], input[type="submit"]{
 }
 
 .contenuTerme {
-    background-color: #FEE8AC;
+    background-color: #F0E6CB;
     padding: 5px;
     border-radius: 5px;
     box-shadow:-3px 5px 7px #7D7D7D;
@@ -1382,4 +1382,31 @@ pre {
     overflow-x: scroll;
     font-family: "Palatino linotype",Times,serif;
     font-size: 14px;
+}
+
+/* Accordion infos */
+.accordionMenu .ui-menu {
+ width:100% !important; 
+
+}
+.accordionMenu .ui-accordion-content {
+ padding:0 !important;
+ overflow:auto !important;
+ background: #F0E6CB;
+
+}
+
+.accordionMenu .ui-helper-clearfix:after {
+ height:inherit !important;
+ 
+}
+
+.titleAccordion {
+    background: none;
+    font-size: 9px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;  
 }

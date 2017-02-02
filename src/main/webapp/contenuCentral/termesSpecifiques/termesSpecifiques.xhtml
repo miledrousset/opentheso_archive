@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="contenuSpecifique">
-            <h:panelGroup  id="speci" rendered="#{(treeBean.browserName != 'agent')}">
+            <h:panelGroup  id="speci" > <!-- rendered="{(treeBean.browserName != 'agent')}"> -->
                 <ui:repeat value="#{selectedTerme.termesSpecifique}" var="item1">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}" escape="false"

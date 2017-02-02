@@ -66,6 +66,10 @@ public class SkosToJsonld {
     public StringBuffer getJsonLdConceptScheme(SKOSXmlDocument skosDocument) {
         
         if(skosDocument == null) return null;
+        
+        if(skosDocument.getConceptScheme().getTopConceptsList().isEmpty())
+            return emptyJson();
+        
         jsonLd = new StringBuffer();
         
         startJson();
@@ -101,7 +105,8 @@ public class SkosToJsonld {
     public StringBuffer getJsonLdDocument(SKOSXmlDocument skosDocument) {
         
         if(skosDocument == null) return null;
-        if(skosDocument.getResourcesList().isEmpty()) return emptyJson();
+        if(skosDocument.getResourcesList().isEmpty())
+            return emptyJson();
         
         jsonLd = new StringBuffer();
         
@@ -161,17 +166,21 @@ public class SkosToJsonld {
     }
     
     private StringBuffer emptyJson() {
-        StringBuffer empty = new StringBuffer("{\n" +
+        /*StringBuffer empty = new StringBuffer("{\n" +
                 "  \"@graph\":  [\n" +
                 "    {\n" +                
                 "    }\n" +
                 "  ]\n" +
                 "}");
+        */
+        StringBuffer empty = new StringBuffer("{}");
         return empty;
     }
  
     private void addIdConcept(String uri){
         String conceptId;
+        StringPlus stringPlus = new StringPlus();
+        uri = stringPlus.normalizeStringForXml(uri);
         conceptId = "      \"@id\": \"" + uri + "\",\n";
         conceptId += "      \"@type\": \"" + nameSpaceSkosCore + "Concept" + "\"";
         
@@ -452,6 +461,9 @@ public class SkosToJsonld {
     
     private void addElementRelation(ArrayList <SKOSRelation> skosRelation, String nameSpace) {
         String element;
+        String uri;
+        StringPlus stringPlus = new StringPlus();
+
         if(skosRelation.size() > 1) {
             endElement();
 
@@ -461,7 +473,8 @@ public class SkosToJsonld {
                 if(!first)
                     element += "        },\n";
                 element += "        {\n";
-                element += "          \"@id\": \"" + skosRelation1.getTargetUri() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(skosRelation1.getTargetUri());
+                element += "          \"@id\": \"" + uri + "\"\n";
                 first = false;
             }
             element += "        }\n";
@@ -471,7 +484,8 @@ public class SkosToJsonld {
             endElement();
             element = "      \"" + nameSpaceSkosCore + nameSpace + "\": {\n";
             for (SKOSRelation skosRelation1 : skosRelation) {
-                element += "        \"@id\": \"" + skosRelation1.getTargetUri() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(skosRelation1.getTargetUri());
+                element += "        \"@id\": \"" + uri + "\"\n";
                 element += "      }";
             }
         }
@@ -480,6 +494,9 @@ public class SkosToJsonld {
     
     private void addElementInScheme(ArrayList <SKOSTopConcept> sKOSTopConcepts, String nameSpace) {
         String element;
+        String uri;
+        StringPlus stringPlus = new StringPlus();
+        
         if(sKOSTopConcepts.size() > 1) {
             endElement();
 
@@ -489,7 +506,8 @@ public class SkosToJsonld {
                 if(!first)
                     element += "        },\n";
                 element += "        {\n";
-                element += "          \"@id\": \"" + sKOSTopConcept.getTopConcept() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(sKOSTopConcept.getTopConcept());
+                element += "          \"@id\": \"" + uri + "\"\n";
                 first = false;
             }
             element += "        }\n";
@@ -499,7 +517,8 @@ public class SkosToJsonld {
             endElement();
             element = "      \"" + nameSpaceSkosCore + nameSpace + "\": {\n";
             for (SKOSTopConcept sKOSTopConcept : sKOSTopConcepts) {
-                element += "        \"@id\": \"" + sKOSTopConcept.getTopConcept() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(sKOSTopConcept.getTopConcept());
+                element += "        \"@id\": \"" + uri + "\"\n";
                 element += "      }";
             }
         }
@@ -508,6 +527,9 @@ public class SkosToJsonld {
     
     private void addElementMapping(ArrayList <SKOSMapping> skosRelation, String nameSpace) {
         String element;
+        String uri;
+        StringPlus stringPlus = new StringPlus();
+        
         if(skosRelation.size() > 1) {
             boolean first = true;
             endElement();
@@ -516,7 +538,8 @@ public class SkosToJsonld {
                 if(!first)
                     element += "        },\n";
                 element += "        {\n";
-                element += "          \"@id\": \"" + skosRelation1.getTargetUri() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(skosRelation1.getTargetUri());
+                element += "          \"@id\": \"" + uri + "\"\n";
                 first = false;
             }
             element += "        }\n";
@@ -526,7 +549,8 @@ public class SkosToJsonld {
             endElement();
             element = "      \"" + nameSpaceSkosCore + nameSpace + "\": {\n";
             for (SKOSMapping skosRelation1 : skosRelation) {
-                element += "        \"@id\": \"" + skosRelation1.getTargetUri() + "\"\n";
+                uri = stringPlus.normalizeStringForXml(skosRelation1.getTargetUri());
+                element += "        \"@id\": \"" + uri + "\"\n";
                 element += "      }";
             }
         }

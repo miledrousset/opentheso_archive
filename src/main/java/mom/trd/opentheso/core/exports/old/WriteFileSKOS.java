@@ -8,6 +8,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.apache.commons.lang3.StringEscapeUtils;
 import skos.SKOSProperty;
 import skos.SKOSResource;
@@ -324,7 +325,9 @@ public class WriteFileSKOS {
     // fonction qui permet de structurer une URL pour HTML
     
     private String prepareUriTohtml(String url) {
-        return StringEscapeUtils.escapeHtml4(url.trim());
+        StringPlus stringPlus = new StringPlus();
+        url = stringPlus.normalizeStringForXml(url);
+        return url;//StringEscapeUtils.escapeHtml4(url.trim());
     } 
     
     

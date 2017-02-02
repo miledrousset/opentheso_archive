@@ -286,7 +286,7 @@ public class CandidateHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding Concept*_candidat : " + idConcept, sqle);
+            log.error("Error while adding Concept_candidat : " + idConcept, sqle);
             idConcept = null;
         }
         return idConcept;
@@ -1980,7 +1980,8 @@ public class CandidateHelper {
         Statement stmt;
         ResultSet resultSet;
         boolean existe = false; 
-
+        StringPlus stringPlus = new StringPlus();
+        title = stringPlus.addQuotes(title);
         try {
             try {
                 stmt = conn.createStatement();
