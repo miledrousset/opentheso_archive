@@ -65,9 +65,6 @@
                                             <p:commandButton value="#{langueBean.getMsg('btnOk')}" update=":panStatTheso,:panStatConcept,:panstatPermuted"
                                                              actionListener="#{statBean.chooseStat(theso.thesaurus.id_thesaurus, theso.thesaurus.language)}" 
                                                              styleClass="styleButton" />
-                                            <p:commandButton value="Table Permuted" update=":panStatTheso,:panStatConcept,:panstatPermuted"
-                                                             actionListener="#{showPermuted.chooseStat(theso.thesaurus.id_thesaurus, theso.thesaurus.language)}" 
-                                                             styleClass="styleButton" />
                                         </td>
                                     </tr>
                                 </table>

@@ -142,7 +142,7 @@ public class GpsBeans {
         gpshelper.insertCoordonees(connect.getPoolConnexion(), idConcept, idTheso, latitud, longitud);
         return true;
     }
-    
+
     /**
      * récupère les coordonées de la BDD
      *
@@ -153,15 +153,14 @@ public class GpsBeans {
     public boolean getCoordinatesGps(String idConcept, String idTheso) {
         GpsHelper gpshelper = new GpsHelper();
         NodeGps nodeGps = gpshelper.getCoordinate(connect.getPoolConnexion(), idConcept, idTheso);
-        if(nodeGps!= null) {
+        if (nodeGps != null) {
             latitud = nodeGps.getLatitude();
             longitud = nodeGps.getLongitude();
-        }
-        else {
+        } else {
             initcoordonees();
         }
         return true;
-    }    
+    }
 
     /**
      * permet d'ajouter le coordonées gps automatique
@@ -237,17 +236,19 @@ public class GpsBeans {
         LanguageHelper languageHelper = new LanguageHelper();
         listLanguesInTheso = new ArrayList<>();
         listLanguesInTheso = languageHelper.getLanguagesOfThesaurus(connect.getPoolConnexion(), id_theso);
-        if (!alignment_choisi.getAlltraductions().isEmpty()) {
-            for (NodeLang languesOfGps : alignment_choisi.getAlltraductions()) {
-                for (Languages_iso639 langueTheso : listLanguesInTheso) {
-                    if (langueTheso.getId_iso639_1().equals(languesOfGps.getCode())) {
-                        term = new Term();
-                        term.setLexical_value(languesOfGps.getValue());
-                        term.setId_term(idTerm);
-                        term.setId_thesaurus(id_theso);
-                        term.setLang(languesOfGps.getCode());
-                        if (reemplacerTraduction) {
-                            status = reemplacerTraduction(term);
+        if (alignment_choisi.getAlltraductions() != null) {
+            if (!alignment_choisi.getAlltraductions().isEmpty()) {
+                for (NodeLang languesOfGps : alignment_choisi.getAlltraductions()) {
+                    for (Languages_iso639 langueTheso : listLanguesInTheso) {
+                        if (langueTheso.getId_iso639_1().equals(languesOfGps.getCode())) {
+                            term = new Term();
+                            term.setLexical_value(languesOfGps.getValue());
+                            term.setId_term(idTerm);
+                            term.setId_thesaurus(id_theso);
+                            term.setLang(languesOfGps.getCode());
+                            if (reemplacerTraduction) {
+                                status = reemplacerTraduction(term);
+                            }
                         }
                     }
                 }

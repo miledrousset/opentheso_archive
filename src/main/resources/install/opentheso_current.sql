@@ -1705,7 +1705,7 @@ INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id)
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES (NULL, 'gor', 'Gorontalo', 'gorontalo', 167);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES (NULL, 'got', 'Gothic', 'gothique', 168);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES (NULL, 'grb', 'Grebo', 'grebo', 169);
-INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES (NULL, 'grc', 'Greek, Ancient (to 1453)', 'grec ancien (jusqu''à 1453)', 170);
+INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('gr', 'grc', 'Greek, Ancient (to 1453)', 'grec ancien (jusqu''à 1453)', 170);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('el ', 'gre (B)
 ell (T)', 'Greek, Modern (1453-)', 'grec moderne (après 1453)', 171);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('gn ', 'grn', 'Guarani', 'guarani', 172);
