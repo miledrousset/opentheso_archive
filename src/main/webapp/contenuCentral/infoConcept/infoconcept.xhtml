@@ -58,7 +58,7 @@
 
             <h:panelGroup rendered="#{(selectedTerme.idC != null)}" >
                     <span style="font-size: 17px; font-weight: bold;">
-                        <h:outputText  id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
+                        <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                     </span>
 
                 <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
@@ -141,11 +141,13 @@
                                                   value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
                                 </h:outputLink>
                             </span>
+                           
+                           
                             <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
-                            <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                            <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
                                           value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
                                 <span>
-                                    <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idT != null) and (selectedTerme.idT != '')}"
+                                    <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
                                                   value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
 
                                 </span>
