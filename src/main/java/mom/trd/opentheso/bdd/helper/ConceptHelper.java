@@ -22,6 +22,7 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.helper.nodes.NodeTT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
@@ -3188,6 +3189,14 @@ public class ConceptHelper {
         nodeConceptExport.setNodeNoteTerm(new NoteHelper().getListNotesTermAllLang(ds, idTerm, idThesaurus));
         //récupération des Notes du Concept
         nodeConceptExport.setNodeNoteConcept(new NoteHelper().getListNotesConceptAllLang(ds, idConcept, idThesaurus));
+        
+        //récupération des coordonnées GPS
+        GpsHelper gpsHelper = new GpsHelper();
+        NodeGps nodeGps = gpsHelper.getCoordinate(ds, idConcept, idThesaurus);
+        if(nodeGps != null) {
+            nodeConceptExport.setNodeGps(nodeGps);
+        }
+        
 
         return nodeConceptExport;
     }

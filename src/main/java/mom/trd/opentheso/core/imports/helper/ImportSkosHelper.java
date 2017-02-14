@@ -30,6 +30,7 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
@@ -38,6 +39,7 @@ import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
@@ -415,7 +417,11 @@ public class ImportSkosHelper {
         TermHelper termHelper = new TermHelper();
         NoteHelper noteHelper = new NoteHelper();
         Term term = new Term();
-        AlignmentHelper alignmentHelper = new AlignmentHelper();        
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        
+        // pour intégrer les coordonnées GPS 
+        NodeGps nodeGps = new NodeGps();
+        GpsHelper gpsHelper = new GpsHelper();
         
         //ajout des termes et traductions
         NodeTerm nodeTerm = new NodeTerm();
@@ -482,7 +488,17 @@ public class ImportSkosHelper {
                         if(anno.getURI().getFragment().equalsIgnoreCase("notation")) {
                             value = getValue(anno);
                             concept.setNotation(value.getValue());
-                        }                        
+                        }
+                        
+                        // get GPS : long and lat
+                        if(anno.getURI().getFragment().equalsIgnoreCase("long")) {
+                            value = getValue(anno);
+                            nodeGps.setLongitude(Double.parseDouble(value.getValue()));
+                        } 
+                        if(anno.getURI().getFragment().equalsIgnoreCase("lat")) {
+                            value = getValue(anno);
+                            nodeGps.setLatitude(Double.parseDouble(value.getValue()));
+                        }
                         
                         // get altLabels
                         if(anno.getURI().getFragment().equalsIgnoreCase("prefLabel")) {
@@ -771,6 +787,17 @@ public class ImportSkosHelper {
                     term.setStatus(nodeEMList1.getStatus());
                     termHelper.addNonPreferredTerm(ds, term, idUser);                
                 }
+                // intégration des coordonnées GPS
+
+                if(nodeGps.getLatitude() != 0.0) {
+                    if(nodeGps.getLongitude() != 0.0) {
+                        // insertion des données GPS
+                        gpsHelper.insertCoordonees(ds, concept.getIdConcept(),
+                                thesaurus.getId_thesaurus(),
+                                nodeGps.getLatitude(), nodeGps.getLongitude());
+                    }
+                }
+                
             }
             
             
@@ -785,6 +812,7 @@ public class ImportSkosHelper {
             hierarchicalRelationships = new ArrayList<>();
             idGrps = new ArrayList<>();
             isTopConcept = true;
+            nodeGps = new NodeGps();
         }
                
         // insérrer les TopConcepts

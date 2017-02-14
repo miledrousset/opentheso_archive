@@ -1081,6 +1081,9 @@ public class ThesaurusHelper {
                             + "delete from concept_orphan where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from proposition where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_fusion where id_thesaurus = '" + idThesaurus + "';"
+                            + "delete from gps where id_theso = '" + idThesaurus + "';"
+                            + "delete from thesaurus_alignement_source where id_thesaurus = '" + idThesaurus + "';"
+                            
                             ;
 
                     stmt.executeUpdate(query);

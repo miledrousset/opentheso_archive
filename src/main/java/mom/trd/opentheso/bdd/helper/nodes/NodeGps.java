@@ -15,6 +15,8 @@ public class NodeGps {
     private Double longitude;
 
     public NodeGps() {
+        latitude = 0.0;
+        longitude = 0.0;
     }
 
     public Double getLatitude() {

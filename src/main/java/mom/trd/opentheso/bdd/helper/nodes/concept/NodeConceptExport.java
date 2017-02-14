@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
@@ -37,6 +38,7 @@ public class NodeConceptExport {
     
     private ArrayList <NodeAlignment> nodeAlignmentsList;
 
+    private NodeGps nodeGps;
 
     public NodeConceptExport() {
     }
@@ -119,6 +121,14 @@ public class NodeConceptExport {
 
     public void setNodeAlignmentsList(ArrayList<NodeAlignment> nodeAlignmentsList) {
         this.nodeAlignmentsList = nodeAlignmentsList;
+    }
+
+    public NodeGps getNodeGps() {
+        return nodeGps;
+    }
+
+    public void setNodeGps(NodeGps nodeGps) {
+        this.nodeGps = nodeGps;
     }
 
 

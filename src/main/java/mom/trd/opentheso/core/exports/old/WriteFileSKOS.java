@@ -9,7 +9,6 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
 import mom.trd.opentheso.bdd.tools.StringPlus;
-import org.apache.commons.lang3.StringEscapeUtils;
 import skos.SKOSProperty;
 import skos.SKOSResource;
 import skos.SKOSTopConcept;
@@ -17,7 +16,6 @@ import skos.SKOSMapping;
 
 public class WriteFileSKOS {
 
-    private String skos;
     private StringBuffer skosBuff;
 
     private String URI = "";
@@ -48,7 +46,9 @@ public class WriteFileSKOS {
         xml += "    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n";
         xml += "    xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\"\n";
         xml += "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n";
-        xml += "    xmlns:dcterms=\"http://purl.org/dc/terms/\">\n";
+        xml += "    xmlns:dcterms=\"http://purl.org/dc/terms/\"\n";
+        xml += "    xmlns:geo=\"http://www.w3.org/2003/01/geo/wgs84_pos#\"";
+        xml += ">\n";
 
         skosBuff.append(xml);
         return true;
@@ -318,6 +318,11 @@ public class WriteFileSKOS {
             }
         }        
         
+        if(nodeConceptExport.getNodeGps() != null) {
+            concept.addSkosGps(nodeConceptExport.getNodeGps().getLatitude(), SKOSProperty.latitude);
+            concept.addSkosGps(nodeConceptExport.getNodeGps().getLongitude(), SKOSProperty.longitude);
+        }
+        
         skosBuff.append("    ").append(concept.toString());
         return true;
     }
@@ -433,10 +438,6 @@ public class WriteFileSKOS {
     public void endSkos() {
         //skos = skos + "</rdf:RDF>";
         skosBuff.append("</rdf:RDF>");
-    }
-    
-    public String getSkos() {
-        return skos;
     }
 
     public StringBuffer getSkosBuff() {

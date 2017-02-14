@@ -138,9 +138,9 @@
         </dependency>
         -->
         <dependency>
-            <groupId>skosapi_prive</groupId>
-            <artifactId>skosapi_prive</artifactId>
-            <version>1.7</version>
+            <groupId>skosapi_private</groupId>
+            <artifactId>skosapi_private</artifactId>
+            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -192,6 +192,7 @@
             <version>3.4.4</version>
             <type>jar</type>
         </dependency>
+
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

@@ -362,29 +362,29 @@ public class FileBean implements Serializable {
                     int idUser = selectedTerme.getUser().getUser().getId();
                     
                     // lecture du fichier SKOS
-                    ImportSkosHelper importSkosHelper = new ImportSkosHelper();
-                    importSkosHelper.setInfos(connect.getPoolConnexion(), 
+                    ImportSkosHelper importSkosHelper1 = new ImportSkosHelper();
+                    importSkosHelper1.setInfos(connect.getPoolConnexion(), 
                             formatDate, useArk, adressSite, idUser, langueSource);
                     if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
                         FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
                         return;
                     }
                     else {
                         FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));            
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));            
                     }
                     
                     // chargement dans la base de données 
                     
                     //chargement du nom du thesaurus 
-                    if(!importSkosHelper.addThesaurus()){
+                    if(!importSkosHelper1.addThesaurus()){
                         FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
                         
-                        if(!importSkosHelper.addDefaultThesaurus()){
+                        if(!importSkosHelper1.addDefaultThesaurus()){
                             FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
+                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
                         }
                         // echec de l'ajout du nom de thésaurus
                     }
@@ -395,14 +395,14 @@ public class FileBean implements Serializable {
                     }*/
                     
                     // chargement des concepts
-                    if(!importSkosHelper.addConcepts()){
+                    if(!importSkosHelper1.addConcepts()){
                         FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper.getMessage())); 
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
                         
                         // echec de l'ajout des concepts 
                     }
                     FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper.getMessage()));
+                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));
                     
                     vue.setAddSkos2(false);
                     
