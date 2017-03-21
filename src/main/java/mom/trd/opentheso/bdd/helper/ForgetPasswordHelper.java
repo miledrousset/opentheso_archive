@@ -61,23 +61,25 @@ public class ForgetPasswordHelper {
      * @throws javax.mail.MessagingException
      */
     public boolean forgotPass(HikariDataSource ds, String mail) throws MessagingException {
-        String nouvellePass = "";
-        String nouvelleSansMD5 = "";
+        String nouvellePass;
+        String nouvelleSansMD5;
         email = mail;//change a l'heure de partir ca vien de donwloadBean
         String pseudo;
         if (email == null) return false;
         UserHelper userHelper = new UserHelper();
         if (userHelper.isUserMailExist(ds, mail)) {
-            nouvelleSansMD5 = genererNouvellePass();
+            ToolsHelper toolsHelper = new ToolsHelper();
+            nouvelleSansMD5 = toolsHelper.getNewId(10);
+//            genererNouvellePass();
             nouvellePass = MD5Password.getEncodedPassword(nouvelleSansMD5);
             pseudo = userHelper.getNameUser(ds, mail);
             envoiEmail(email, nouvelleSansMD5, pseudo);
             insertNP(ds, nouvellePass);
             return true;
-        }
+        } 
         return false;
     }
-
+    
     /**
      * Injection a la BDD de le pass en motpasstemp del usuaire que la demandé
      *
@@ -102,70 +104,13 @@ public class ForgetPasswordHelper {
     }
 
     /**
-     * cette funtion on permit de créer une password aleatoire que on garde en
-     * passsansmd5
-     *
-     * @return
-     */
-    private String genererNouvellePass() {
-        String code = "";
-        int sum = 0;
-        String[] alfa = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
-        while (sum < 10) {
-            int numRandon = (int) Math.round(Math.random() * 36);
-            code += alfa[numRandon];
-            sum++;
-        }
-        passsansmd5 = code;
-        return code;
-    }
-
-    /**
-     * cette funtion c'est pour verifier que c'est pass que on besoin changer
-     *
-     * @param ds
-     * @param ancien
-     * @return
-     * @throws SQLException
-     */
-    private boolean cestlememmepass(HikariDataSource ds, String ancien) throws SQLException {
-        Statement stmt;
-        Connection conn;
-        ResultSet resultSet;
-        boolean sort = false;
-        String ancianencodify = MD5Password.getEncodedPassword(ancien);
-        try {
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "SELECT username FROM users WHERE password='" + ancianencodify + "' and active=true";
-                    resultSet = stmt.executeQuery(query);
-                    if (resultSet.next()) {
-                        sort = true;
-                    }
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return sort;
-    }
-
-    /**
      * cette funtion c'est la funtion que realise le update dans la table et
      * efface le ancien motpasstemp;
      *
      * @param ds
      * @param Pass
      * @param ConfirmPass
-     * @param ancien
+     * @param id
      * @return
      * @throws SQLException
      */

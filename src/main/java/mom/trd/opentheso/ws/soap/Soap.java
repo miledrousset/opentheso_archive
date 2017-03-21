@@ -59,7 +59,6 @@ public class Soap {
         config.setAutoCommit(true);
         config.setIdleTimeout(Integer.parseInt(properties.getProperty("idleTimeout")));
         config.setConnectionTimeout(Integer.parseInt(properties.getProperty("connectionTimeout")));
-        config.setJdbc4ConnectionTest(false);
         config.setConnectionTestQuery(properties.getProperty("connectionTestQuery"));
         config.setDataSourceClassName(properties.getProperty("dataSourceClassName"));
         

@@ -38,10 +38,9 @@ import mom.trd.opentheso.core.exports.privatesdatas.TablesColumn;
  *
  * @author antonio.perez
  */
-
-
 /**
  * Cette fonction permet de récupérer toutes les données de la table tableName
+ *
  * @author antonio.perez
  */
 public class ExportPrivatesDatas {
@@ -57,7 +56,7 @@ public class ExportPrivatesDatas {
         columnOfTablesToIgnore.add("id");
         columnOfTablesToIgnore.add("id_pref");
         columnOfTablesToIgnore.add("identifier");
-        
+
         tablesToIgnore = new ArrayList<>();
         tablesToIgnore.add("languages_iso639");
         tablesToIgnore.add("alignement_type");
@@ -66,35 +65,40 @@ public class ExportPrivatesDatas {
         tablesToIgnore.add("note_type");
         tablesToIgnore.add("roles");
     }
+
     /**
      * nous ignorons le données qui sont dans columnOfTablesToIgnore
+     *
      * @param value
-     * @return 
+     * @return
      */
     public boolean isToIgnore(String value) {
         for (String colomne : columnOfTablesToIgnore) {
-            if(value.equalsIgnoreCase(colomne))
+            if (value.equalsIgnoreCase(colomne)) {
                 return true;
+            }
         }
         return false;
     }
+
     /**
      * on ignore les tables qui sont dans tablesToIgnore
+     *
      * @param value
-     * @return 
+     * @return
      */
     public boolean isTableToIgnore(String value) {
         for (String table : tablesToIgnore) {
-            if(value.equalsIgnoreCase(table))
+            if (value.equalsIgnoreCase(table)) {
                 return true;
+            }
         }
         return false;
-    }    
-    
-    public ArrayList <Table> getDatasOfTable(HikariDataSource ds, String tableName){
-        ArrayList <Table> tableList = new ArrayList<>();
-        if(!isTableToIgnore(tableName))
-        {
+    }
+
+    public ArrayList<Table> getDatasOfTable(HikariDataSource ds, String tableName) {
+        ArrayList<Table> tableList = new ArrayList<>();
+        if (!isTableToIgnore(tableName)) {
             ArrayList<TablesColumn> tablesColumns = new ArrayList<>();
             Connection conn;
             Statement stmt;
@@ -107,119 +111,114 @@ public class ExportPrivatesDatas {
                     try {
                         // récupération des noms des colonnes de la table
                         //et sont type de données
-                        String query ="SELECT COLUMN_NAME,"
+                        String query = "SELECT COLUMN_NAME,"
                                 + " data_type FROM INFORMATION_SCHEMA.COLUMNS"
                                 + " where TABLE_NAME='" + tableName + "'";
                         resultSet = stmt.executeQuery(query);
-                        while(resultSet.next()) {
+                        while (resultSet.next()) {
                             colomneNameTemp = resultSet.getString("COLUMN_NAME");
-                            if(!isToIgnore(colomneNameTemp)) {
+                            if (!isToIgnore(colomneNameTemp)) {
                                 TablesColumn tablesColumn = new TablesColumn();
                                 tablesColumn.setColumnName(colomneNameTemp);
                                 tablesColumn.setColumnType(resultSet.getString("data_type"));
-                                tablesColumns.add(tablesColumn);                            
+                                tablesColumns.add(tablesColumn);
                             }
                         }
                         // récupération des données de la table
-                        query = "SELECT * FROM " + tableName;  
+                        query = "SELECT * FROM " + tableName;
                         resultSet = stmt.executeQuery(query);
 
-                        while(resultSet.next()) {
+                        while (resultSet.next()) {
                             Table table = new Table();
                             ArrayList<LineOfData> lineOfDatas = new ArrayList<>();
                             for (TablesColumn tablesColumn : tablesColumns) {
                                 LineOfData lineOfData = new LineOfData();
                                 lineOfData.setColomne(tablesColumn.getColumnName());
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("integer")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("integer")) {
                                     lineOfData.setValue("" + resultSet.getInt(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("character varying")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("character varying")) {
                                     lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("character")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("character")) {
                                     lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("text")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("text")) {
                                     lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp with time zone")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("timestamp with time zone")) {
                                     lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("timestamp without time zone")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("timestamp without time zone")) {
                                     lineOfData.setValue("" + resultSet.getDate(tablesColumn.getColumnName()));
                                 }
-                                if(tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("boolean")) {
                                     lineOfData.setValue("" + resultSet.getBoolean(tablesColumn.getColumnName()));
-                                }  
-                                 if(tablesColumn.getColumnType().equalsIgnoreCase("USER-DEFINED")) {
+                                }
+                                if (tablesColumn.getColumnType().equalsIgnoreCase("USER-DEFINED")) {
                                     lineOfData.setValue(resultSet.getString(tablesColumn.getColumnName()));
-                                 }
+                                }
                                 lineOfDatas.add(lineOfData);
                             }
 
                             table.setLineOfDatas(lineOfDatas);
                             tableList.add(table);
                         }
-                    }
-                    finally {
+                    } finally {
                         stmt.close();
                     }
-                } 
-                finally {
+                } finally {
                     conn.close();
                 }
-            } 
-            catch (SQLException ex) {
-                Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
+
         }
         return tableList;
     }
+
     /**
      * on recupere toutes le tables de la BDD
+     *
      * @param ds
-     * @return 
+     * @return
      */
-    public ArrayList<String> showAllTables(HikariDataSource ds)
-    {
+    public ArrayList<String> showAllTables(HikariDataSource ds) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
         ArrayList<String> tables = new ArrayList<>();
-        
+
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query ="SELECT * from Information_Schema.Tables where table_type= 'BASE TABLE' and table_schema ='public'";
-                    resultSet= stmt.executeQuery(query);
-                    while (resultSet.next())
-                    {
+                    String query = "SELECT * from Information_Schema.Tables where table_type= 'BASE TABLE' and table_schema ='public'";
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
                         tables.add(resultSet.getString("table_name"));
                     }
-                } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return tables ;
+        return tables;
     }
+
     /**
      * On recupere seulement les tables privates
+     *
      * @param ds
-     * @return 
+     * @return
      */
-        public ArrayList<String> showPrivateTables(HikariDataSource ds)
-    {
+    public ArrayList<String> showPrivateTables(HikariDataSource ds) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -229,99 +228,88 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query ="SELECT * from Information_Schema.Tables where table_type= 'BASE TABLE' and table_schema ='public'";
-                    resultSet= stmt.executeQuery(query);
-                    while (resultSet.next())
-                    {
-                        if(resultSet.getString("table_name").equalsIgnoreCase("users"))
+                    String query = "SELECT * from Information_Schema.Tables where table_type= 'BASE TABLE' and table_schema ='public'";
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        if (resultSet.getString("table_name").equalsIgnoreCase("users")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("roles"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("roles")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("user_role"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("user_role")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_term_candidat"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_term_candidat")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("proposition"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("proposition")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_candidat"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_candidat")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("term_candidat"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("term_candidat")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_orphan"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_orphan")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_fusion"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_fusion")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("images"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("images")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("preferences"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("preferences")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_group_historique"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_group_historique")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_group_label_historique"))
-                            tablesprivate.add(resultSet.getString("table_name"));                        
-                        if(resultSet.getString("table_name").equalsIgnoreCase("concept_historique"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_group_label_historique")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("hierarchical_relationship_historique"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("concept_historique")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("non_preferred_term"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("hierarchical_relationship_historique")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("note_historique"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("non_preferred_term")) {
                             tablesprivate.add(resultSet.getString("table_name"));
-                        if(resultSet.getString("table_name").equalsIgnoreCase("term_historique"))
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("note_historique")) {
                             tablesprivate.add(resultSet.getString("table_name"));
+                        }
+                        if (resultSet.getString("table_name").equalsIgnoreCase("term_historique")) {
+                            tablesprivate.add(resultSet.getString("table_name"));
+                        }
                     }
-                } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return tablesprivate ;
+        return tablesprivate;
     }
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
     /**
-     * fonctions pour récupérer toutes données par table
-     * pour une utilisation future
+     * fonctions pour récupérer toutes données par table pour une utilisation
+     * future
      */
-        
-        
-        
-        
-        
-        
-   
-    
     /**
      * Cette fonction permet de récupérer toutes les données de la table R
+     *
      * @param ds
-     * @return 
+     * @return
      */
-    public ArrayList <Role> getRoles(HikariDataSource ds){
-        ArrayList <Role> listRoles = new ArrayList<>();
+    public ArrayList<Role> getRoles(HikariDataSource ds) {
+        ArrayList<Role> listRoles = new ArrayList<>();
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -332,31 +320,29 @@ public class ExportPrivatesDatas {
                 try {
                     String query = "SELECT * FROM roles ";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()) {
+                    while (resultSet.next()) {
                         Role role1 = new Role();
-                        
-               /*         role1.setId(resultSet.getInt("id"));
+
+                        /*         role1.setId(resultSet.getInt("id"));
                         role1.setName(resultSet.getString("name"));
                         role1.setDescription(resultSet.getString("description"));
-                        */
+                         */
                         listRoles.add(role1);
-                        }
-                    } 
-                finally {
+                    }
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return listRoles ;
+        return listRoles;
     }
-    public ArrayList <User_Role> getUser_Roles(HikariDataSource ds){
-        ArrayList <User_Role> list_User_Role = new ArrayList<>();
+
+    public ArrayList<User_Role> getUser_Roles(HikariDataSource ds) {
+        ArrayList<User_Role> list_User_Role = new ArrayList<>();
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -365,34 +351,32 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM user_role";
+                    String query = "SELECT * FROM user_role";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
-                        User_Role user_Role1= new User_Role();
-                        
+                    while (resultSet.next()) {
+                        User_Role user_Role1 = new User_Role();
+
                         user_Role1.setId_user(resultSet.getInt("id_user"));
                         user_Role1.setId_role(resultSet.getInt("id_role"));
                         user_Role1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         user_Role1.setId_group(resultSet.getString("id_group"));
-                        
+
                         list_User_Role.add(user_Role1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-        Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);        
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list_User_Role;
     }
-    public ArrayList <Concept_Term_Candidat> getConceptTermCandidat(HikariDataSource ds){
+
+    public ArrayList<Concept_Term_Candidat> getConceptTermCandidat(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -402,32 +386,30 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_term_candidat";
+                    String query = "SELECT * FROM concept_term_candidat";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
-                        Concept_Term_Candidat concetpTC= new Concept_Term_Candidat();
-                        
+                    while (resultSet.next()) {
+                        Concept_Term_Candidat concetpTC = new Concept_Term_Candidat();
+
                         concetpTC.setId_concept(resultSet.getString("id_concept"));
                         concetpTC.setId_term(resultSet.getString("id_term"));
                         concetpTC.setId_thesaurus(resultSet.getString("id_thesaurus"));
-                        
+
                         listConceptTermCandidat.add(concetpTC);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptTermCandidat;
     }
-        public ArrayList <Proposition> getProposition(HikariDataSource ds){
+
+    public ArrayList<Proposition> getProposition(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -437,11 +419,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM proposition ";
+                    String query = "SELECT * FROM proposition ";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
+                    while (resultSet.next()) {
                         Proposition proposition1 = new Proposition();
-                        
+
                         proposition1.setId_concept(resultSet.getString("id_concept"));
                         proposition1.setId_user(resultSet.getInt("id_user"));
                         proposition1.setId_thesaurus(resultSet.getString("id_thesaurus"));
@@ -450,24 +432,22 @@ public class ExportPrivatesDatas {
                         proposition1.setModified(resultSet.getDate("modified"));
                         proposition1.setConcept_parent(resultSet.getString("concept_parent"));
                         proposition1.setId_group(resultSet.getString("id_group"));
-                        
+
                         listProposition.add(proposition1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listProposition;
     }
-    public ArrayList<Concept_Candidat> getconceptCandidat(HikariDataSource ds){
+
+    public ArrayList<Concept_Candidat> getconceptCandidat(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -477,12 +457,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_candidat";
+                    String query = "SELECT * FROM concept_candidat";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Concept_Candidat conceptCandidat1 = new Concept_Candidat();
-                   /*     
+                        /*     
                         conceptCandidat1.setId_concept(resultSet.getString("id_concept"));
                         conceptCandidat1.setId_thesaururs(resultSet.getString("id_thesaurus"));
                         conceptCandidat1.setCreated(resultSet.getDate("created"));
@@ -491,24 +470,22 @@ public class ExportPrivatesDatas {
                         conceptCandidat1.setId(resultSet.getInt("id"));
                         conceptCandidat1.setAdmin_message(resultSet.getString("admin_message"));
                         conceptCandidat1.setAdmin_id(resultSet.getInt("admin_id"));
-                     */   
+                         */
                         listConceptCandidat.add(conceptCandidat1);
-                        }
-                    } 
-                finally {
+                    }
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptCandidat;
     }
-    public ArrayList<Term_Candidat> getTermeCandidat(HikariDataSource ds){
+
+    public ArrayList<Term_Candidat> getTermeCandidat(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -518,72 +495,67 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM term_candidat";
+                    String query = "SELECT * FROM term_candidat";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                        {                    
-                            Term_Candidat termeCandidat1= new Term_Candidat();
-                            
-                            termeCandidat1.setId_term(resultSet.getString("id_term"));
-                            termeCandidat1.setLexical_value(resultSet.getString("lexical_value"));
-                            termeCandidat1.setLang(resultSet.getString("lang"));
-                            termeCandidat1.setId_thesaurus(resultSet.getString("id_thesaurus"));
-                            termeCandidat1.setCreated(resultSet.getDate("created"));
-                            termeCandidat1.setModified(resultSet.getDate("modified"));
-                            termeCandidat1.setContributor(resultSet.getInt("contributor"));
-                            termeCandidat1.setId(resultSet.getInt("id"));
-                            
-                            listTermeCandidat.add(termeCandidat1);
-                        }
-                } 
-                finally {
+                    while (resultSet.next()) {
+                        Term_Candidat termeCandidat1 = new Term_Candidat();
+
+                        termeCandidat1.setId_term(resultSet.getString("id_term"));
+                        termeCandidat1.setLexical_value(resultSet.getString("lexical_value"));
+                        termeCandidat1.setLang(resultSet.getString("lang"));
+                        termeCandidat1.setId_thesaurus(resultSet.getString("id_thesaurus"));
+                        termeCandidat1.setCreated(resultSet.getDate("created"));
+                        termeCandidat1.setModified(resultSet.getDate("modified"));
+                        termeCandidat1.setContributor(resultSet.getInt("contributor"));
+                        termeCandidat1.setId(resultSet.getInt("id"));
+
+                        listTermeCandidat.add(termeCandidat1);
+                    }
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listTermeCandidat;
     }
-    public ArrayList<Concept_orphan> getConceptOrphelin (HikariDataSource ds){
+
+    public ArrayList<Concept_orphan> getConceptOrphelin(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
-        ArrayList <Concept_orphan> listConceptOrphan = new ArrayList<>();
+        ArrayList<Concept_orphan> listConceptOrphan = new ArrayList<>();
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_orphan";
+                    String query = "SELECT * FROM concept_orphan";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
+                    while (resultSet.next()) {
                         Concept_orphan concept_orphan1 = new Concept_orphan();
-                        
+
                         concept_orphan1.setId_concept(resultSet.getString("id_concept"));
                         concept_orphan1.setId_thesaurus(resultSet.getString("id_thesaurus"));
-                        
+
                         listConceptOrphan.add(concept_orphan1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptOrphan;
     }
-    public ArrayList<Concept_Fusion> getconceptFusion(HikariDataSource ds){
+
+    public ArrayList<Concept_Fusion> getconceptFusion(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -593,34 +565,32 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_fusion";
+                    String query = "SELECT * FROM concept_fusion";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
-                        Concept_Fusion conceptFusion1 =  new Concept_Fusion();
-                        
+                    while (resultSet.next()) {
+                        Concept_Fusion conceptFusion1 = new Concept_Fusion();
+
                         conceptFusion1.setId_concept1(resultSet.getString("id_concept1"));
                         conceptFusion1.setId_concept2(resultSet.getString("id_concept2"));
                         conceptFusion1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         conceptFusion1.setModified(resultSet.getDate("modified"));
                         conceptFusion1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listConceptFusion.add(conceptFusion1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptFusion;
     }
-    public ArrayList<Images> getImages(HikariDataSource ds){
+
+    public ArrayList<Images> getImages(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -630,35 +600,33 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM images";
+                    String query = "SELECT * FROM images";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
+                    while (resultSet.next()) {
                         Images images1 = new Images();
-                        
+
                         images1.setId_concept(resultSet.getString("id_concept"));
                         images1.setId_thesaururs(resultSet.getString("id_thesaurus"));
                         images1.setImage_name(resultSet.getString("image_name"));
                         images1.setImage_copyright(resultSet.getString("image_copyright"));
                         images1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listImages.add(images1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listImages;
     }
-    public ArrayList<Preferences> getPreferences(HikariDataSource ds){
+
+    public ArrayList<Preferences> getPreferences(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -668,49 +636,46 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM preferences";
+                    String query = "SELECT * FROM preferences";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next()){
+                    while (resultSet.next()) {
                         Preferences preferences1 = new Preferences();
-                        
+
                         preferences1.setId_pref(resultSet.getInt("id"));
                         preferences1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         preferences1.setSource_Lang(resultSet.getString("source_lang"));
                         preferences1.setNb_alert_cdt(resultSet.getInt("nb_alert_cdt"));
                         preferences1.setAlert_cdt(resultSet.getBoolean("alert_cdt"));
-                        
+
                         listPrefererences.add(preferences1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listPrefererences;
     }
-    public ArrayList<Concept_Group_Historique> getConceptGroupHist(HikariDataSource ds){
+
+    public ArrayList<Concept_Group_Historique> getConceptGroupHist(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
-        ArrayList<Concept_Group_Historique> listConceptGH =new ArrayList<>();
+        ArrayList<Concept_Group_Historique> listConceptGH = new ArrayList<>();
         try {
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_group_historique";
+                    String query = "SELECT * FROM concept_group_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Concept_Group_Historique conceptGroup_H1 = new Concept_Group_Historique();
-                        
+
                         conceptGroup_H1.setIdgroup(resultSet.getString("idgroup"));
                         conceptGroup_H1.setId_ark(resultSet.getString("id_ark"));
                         conceptGroup_H1.setIdthesaurus(resultSet.getString("idthesaurus"));
@@ -721,24 +686,22 @@ public class ExportPrivatesDatas {
                         conceptGroup_H1.setId(resultSet.getInt("id"));
                         conceptGroup_H1.setModified(resultSet.getDate("modified"));
                         conceptGroup_H1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listConceptGH.add(conceptGroup_H1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptGH;
     }
-    public ArrayList<Concept_Group_Label_Historique> getconceptGroupLabelH(HikariDataSource ds){
+
+    public ArrayList<Concept_Group_Label_Historique> getconceptGroupLabelH(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -748,12 +711,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_group_label_historique";
+                    String query = "SELECT * FROM concept_group_label_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Concept_Group_Label_Historique conceptGLH1 = new Concept_Group_Label_Historique();
-                        
+
                         conceptGLH1.setIdgrouplabel(resultSet.getInt("id"));
                         conceptGLH1.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         conceptGLH1.setModified(resultSet.getDate("modified"));
@@ -761,25 +723,23 @@ public class ExportPrivatesDatas {
                         conceptGLH1.setIdthesaurus(resultSet.getString("idthesaurus"));
                         conceptGLH1.setIdgroup(resultSet.getString("idgroup"));
                         conceptGLH1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listConceptGLH.add(conceptGLH1);
                     }
-                    } 
-                finally {
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
 
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConceptGLH;
     }
-    public ArrayList<Concept_Historique> getConceptHistorique(HikariDataSource ds){
+
+    public ArrayList<Concept_Historique> getConceptHistorique(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -789,12 +749,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM concept_historique";
+                    String query = "SELECT * FROM concept_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Concept_Historique conceptHistorique1 = new Concept_Historique();
-                        
+
                         conceptHistorique1.setId_concept(resultSet.getString("id_concept"));
                         conceptHistorique1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         conceptHistorique1.setId_ark(resultSet.getString("id_ark"));
@@ -804,25 +763,23 @@ public class ExportPrivatesDatas {
                         conceptHistorique1.setTop_concept(resultSet.getBoolean("top_concept"));
                         conceptHistorique1.setId(resultSet.getInt("id"));
                         conceptHistorique1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listConcetpHistorique.add(conceptHistorique1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listConcetpHistorique;
     }
-        public ArrayList<Hierarchical_Relationship_Historique> getHierarchicalRelationshipH(HikariDataSource ds){
+
+    public ArrayList<Hierarchical_Relationship_Historique> getHierarchicalRelationshipH(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -832,12 +789,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM hierarchical_relationship_historique";
+                    String query = "SELECT * FROM hierarchical_relationship_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Hierarchical_Relationship_Historique HRelationShipHistorique1 = new Hierarchical_Relationship_Historique();
-                        
+
                         HRelationShipHistorique1.setId_concept1(resultSet.getString("id_concept1"));
                         HRelationShipHistorique1.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         HRelationShipHistorique1.setRole(resultSet.getString("role"));
@@ -845,25 +801,23 @@ public class ExportPrivatesDatas {
                         HRelationShipHistorique1.setModified(resultSet.getDate("modified"));
                         HRelationShipHistorique1.setId_user(resultSet.getInt("id_user"));
                         HRelationShipHistorique1.setAction(resultSet.getString("action"));
-                        
+
                         listHRelationShipH.add(HRelationShipHistorique1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listHRelationShipH;
     }
-    public ArrayList<Non_Preferred_Term> getNonPreferredTerm(HikariDataSource ds){
+
+    public ArrayList<Non_Preferred_Term> getNonPreferredTerm(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -873,12 +827,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM non_preferred_term";
+                    String query = "SELECT * FROM non_preferred_term";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Non_Preferred_Term nonPreferredTerm1 = new Non_Preferred_Term();
-                        
+
                         nonPreferredTerm1.setId_term(resultSet.getString("id_term"));
                         nonPreferredTerm1.setLexical_value(resultSet.getString("lexical_value"));
                         nonPreferredTerm1.setLang(resultSet.getString("lang"));
@@ -888,25 +841,23 @@ public class ExportPrivatesDatas {
                         nonPreferredTerm1.setSource(resultSet.getString("source"));
                         nonPreferredTerm1.setStatus(resultSet.getString("status"));
                         nonPreferredTerm1.setHiden(resultSet.getBoolean("hiden"));
-                        
+
                         listNonPTerm.add(nonPreferredTerm1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listNonPTerm;
     }
-    public ArrayList<Note_Historique> getNoteHistorique(HikariDataSource ds){
+
+    public ArrayList<Note_Historique> getNoteHistorique(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -916,12 +867,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM note_historique";
+                    String query = "SELECT * FROM note_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Note_Historique noteHistorique1 = new Note_Historique();
-                        
+
                         noteHistorique1.setId_note(resultSet.getInt("id"));
                         noteHistorique1.setNotetypecode(resultSet.getString("notetypecode"));
                         noteHistorique1.setId_thesaurus(resultSet.getString("id_thesaurus"));
@@ -931,25 +881,23 @@ public class ExportPrivatesDatas {
                         noteHistorique1.setLexicalvalue(resultSet.getString("lexicalvalue"));
                         noteHistorique1.setModified(resultSet.getDate("modified"));
                         noteHistorique1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listNoteHistorique.add(noteHistorique1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listNoteHistorique;
     }
-    public ArrayList<Term_Historique> getTermHistorique(HikariDataSource ds){
+
+    public ArrayList<Term_Historique> getTermHistorique(HikariDataSource ds) {
         ResultSet resultSet;
         Connection conn;
         Statement stmt;
@@ -959,12 +907,11 @@ public class ExportPrivatesDatas {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query =  "SELECT * FROM term_historique";
+                    String query = "SELECT * FROM term_historique";
                     resultSet = stmt.executeQuery(query);
-                    while(resultSet.next())
-                    {
+                    while (resultSet.next()) {
                         Term_Historique termHistorique1 = new Term_Historique();
-                        
+
                         termHistorique1.setId_term(resultSet.getString("id_term"));
                         termHistorique1.setLexical_value(resultSet.getString("lexical_value"));
                         termHistorique1.setLang(resultSet.getString("lang"));
@@ -974,21 +921,18 @@ public class ExportPrivatesDatas {
                         termHistorique1.setStatus(resultSet.getString("status"));
                         termHistorique1.setId(resultSet.getInt("id"));
                         termHistorique1.setId_user(resultSet.getInt("id_user"));
-                        
+
                         listTermHistorique.add(termHistorique1);
                     }
-                    
-                    } 
-                finally {
+
+                } finally {
                     stmt.close();
                 }
-            } 
-            finally {
+            } finally {
                 conn.close();
             }
-        } 
-        catch (SQLException ex) {
-		Logger.getLogger(Table.class.getName()).log(Level.SEVERE,null,ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listTermHistorique;
     }

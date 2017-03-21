@@ -44,11 +44,11 @@
                         <p:commandButton value="#{langueBean.getMsg('conf.btnAddUser')}"  update=":idAddUserDlg" oncomplete="PF('addUserDlg').show();" styleClass="styleButton" />
 
                     </h:form><br/>
-                    <p:dataTable id="tabUser" value="#{user1.selectAuthorizedUser()}" var="u" scrollable="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                    <p:dataTable id="tabUser" value="#{user1.selectAuthorizedUser()}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
                         <f:facet name="header">
                             <h:outputText value="#{langueBean.getMsg('conf.tabUser')}" />
                         </f:facet>
-                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{!u.isActive}">
+                        <p:column width="150" headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{!u.isActive}">
                             <h:outputText title="user désactivé" value="#{u.name}" style="color: red; font-style: oblique" />
                         </p:column>
                         <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{u.isActive}">

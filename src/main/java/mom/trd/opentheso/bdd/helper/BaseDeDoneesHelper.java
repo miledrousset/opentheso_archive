@@ -361,24 +361,29 @@ public class BaseDeDoneesHelper implements Serializable {
      * @param ds
      * @return 
      */
-        public boolean insertVersionBdd(HikariDataSource ds)
+    public boolean insertVersionBdd(HikariDataSource ds)
     {
         Statement stmt;
+        boolean status = false;
         try {
             Connection conn = ds.getConnection();
-            stmt = conn.createStatement();
             try {
-                String query ="INSERT INTO info VALUES( 'xyz','"+ versionBddCurrent+"');";
-                stmt.execute(query);
+                stmt = conn.createStatement();
+                try {
+                    String query ="INSERT INTO info VALUES( 'xyz','"+ versionBddCurrent+"');";
+                    stmt.execute(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
             } finally {
-                stmt.close();
                 conn.close();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-        return true;
+        } catch (SQLException sqle) {
+            // Log exception
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, sqle);
+        }         
+        return status;
     }
         
     /**
@@ -394,8 +399,10 @@ public class BaseDeDoneesHelper implements Serializable {
         Statement stmt;
         ResultSet resultSet;
         chercherVersionBdd(ds);
+           
+        try {
+            Connection conn = ds.getConnection();
             try {
-                Connection conn = ds.getConnection();
                 stmt = conn.createStatement();
                 try {
                     String query = "Select * from info ;";
@@ -407,14 +414,18 @@ public class BaseDeDoneesHelper implements Serializable {
                         outinfo.setVersionBddCurrent(versionBddCurrent);
                         info.add(outinfo);
                     }
+
                 } finally {
                     stmt.close();
-                    conn.close();
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
+            } finally {
+                conn.close();
             }
+        } catch (SQLException sqle) {
+            // Log exception
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, sqle);
+        }            
+            
         return info;
     }
     /**
@@ -427,6 +438,8 @@ public class BaseDeDoneesHelper implements Serializable {
         boolean sault = true;
         BufferedReader bf;
         String line;
+        
+        
         try {
             bf = new BufferedReader(new InputStreamReader(inputStream, "UTF8"));
             while ((line = bf.readLine()) != null && sault) {
@@ -450,25 +463,33 @@ public class BaseDeDoneesHelper implements Serializable {
     public String getVersionOfOpentheso(HikariDataSource ds) {
         Statement stmt;
         ResultSet resultSet;
+        String version = "";
+        
         try {
             Connection conn = ds.getConnection();
-            stmt = conn.createStatement();
             try {
-                String query = "Select version_opentheso from info;";
-                resultSet =stmt.executeQuery(query);
-                if(resultSet.next())
-                {
-                    return resultSet.getString("version_Opentheso");
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select version_opentheso from info";
+                    resultSet =stmt.executeQuery(query);
+                    if(resultSet.next()) {
+                        version = resultSet.getString("version_opentheso");
+                    }
+                    resultSet.close();
+
+                } finally {
+                    stmt.close();
                 }
             } finally {
-                stmt.close();
                 conn.close();
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException sqle) {
+            // Log exception
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, sqle);
         }
-        return "";
+        return version;
     }
+    
     
     public String getVersion_bdd() {
         return version_bdd;

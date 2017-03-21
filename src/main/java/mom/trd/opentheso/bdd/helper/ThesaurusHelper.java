@@ -404,9 +404,7 @@ public class ThesaurusHelper {
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {
-                        if (resultSet.getString("lang") == null) {
-                            return null;
-                        } else {
+                        if (resultSet.getString("lang") != null) {
                             thesaurus = new Thesaurus();
                             thesaurus.setId_thesaurus(idThesaurus);
                             thesaurus.setContributor(resultSet.getString("contributor"));

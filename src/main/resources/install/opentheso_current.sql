@@ -6,7 +6,7 @@
 -- Dumped by pg_dump version 9.6beta4
 
 -- Started on 2017-02-10 12:55:45
--- version=4.2.3
+-- version=4.2.4
 
 SET role = opentheso;
 

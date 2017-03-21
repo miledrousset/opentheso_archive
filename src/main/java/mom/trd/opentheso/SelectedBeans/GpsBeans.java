@@ -246,6 +246,8 @@ public class GpsBeans {
                             term.setId_term(idTerm);
                             term.setId_thesaurus(id_theso);
                             term.setLang(languesOfGps.getCode());
+                            term.setSource("");
+                            term.setStatus("");
                             if (reemplacerTraduction) {
                                 status = reemplacerTraduction(term);
                             }

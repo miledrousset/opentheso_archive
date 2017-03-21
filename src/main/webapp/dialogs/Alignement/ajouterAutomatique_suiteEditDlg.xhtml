@@ -35,11 +35,16 @@
                     </p:layoutUnit>
 
                     <p:layoutUnit position="center" resizable="false" size="250" minSize="250" maxSize="250">
-                        Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/><br/>
-
-                        <p:commandButton id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
+                        Choix des alignements pour le concept '<h:outputText value="#{selectedTerme.nom}" />' :<br/>
+                        
+                        <h:outputText rendered="#{selectedTerme.listAlignValues.size() == 0}" value="#{langueBean.getMsg('gps.noResult')}" style="color: red; text-align: center" />
+                        <br/>
+                        <p:commandButton rendered="#{selectedTerme.listAlignValues.size() != 0}" id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
                                          update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
 
+                        <p:commandButton rendered="#{selectedTerme.listAlignValues.size() == 0}" id="cbAjAllAlignAuto_cancel" title="#{langueBean.getMsg('btnBack')}" 
+                                         update=":contenuDroite3, :panContenu" icon="ui-icon-annuler" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg.hide()';"  />
+                        
                     </p:layoutUnit>
                 </p:layout>
             </h:form>

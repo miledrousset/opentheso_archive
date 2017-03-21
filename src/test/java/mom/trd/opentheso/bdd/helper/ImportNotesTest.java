@@ -60,7 +60,7 @@ public class ImportNotesTest {
      */
     @org.junit.Test
 
-    public void testExportGroup() {
+    public void testImportNotes() {
         // ouverture de la connexion
         HikariDataSource ds = openConnexionPool();
 
@@ -87,7 +87,7 @@ public class ImportNotesTest {
         ArrayList<String> values = new ArrayList<>();
 
         try {
-            InputStream inputStream = new FileInputStream("/Users/Miled/Desktop/notes22.sql");
+            InputStream inputStream = new FileInputStream("/Users/Miled/Desktop/notes_7.sql");
             isr = new InputStreamReader(inputStream, "UTF-8");
             br = new BufferedReader(isr);
 
@@ -123,7 +123,6 @@ public class ImportNotesTest {
 
                             // on teste si la récupération se passe bien, on écrit les données
                             if (columns.size() == values.size()) {
-
                                 if (!columns.isEmpty()) {
                                     if (!values.isEmpty()) {
                                         // intégration des notes dans la BDD
@@ -170,7 +169,7 @@ public class ImportNotesTest {
 //                                System.out.println(values.toString());
 //                                values.clear();
                             } else {
-                                System.err.println("Erreur à la ligne : " + ligne);
+                                System.err.println("!!!!!! Attention, les champs et valeurs ne sont pas identiques,  Erreur à la ligne : " + ligne);
                             }
                         }
                         //    System.err.println(ligne);
@@ -196,21 +195,23 @@ public class ImportNotesTest {
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
         // Zoomathia
-        config.addDataSourceProperty("user", "opentheso");
+/*        config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
         config.addDataSourceProperty("databaseName", "zoo");
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");
-
+*/
         /*      config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");
         config.addDataSourceProperty("databaseName", "OTW");
          */
- /*
+ 
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "frantiq2014");
-        config.addDataSourceProperty("databaseName", "pactols");
-
+        config.addDataSourceProperty("databaseName", "pactols_test");
+        config.addDataSourceProperty("portNumber", "5432");
+        config.addDataSourceProperty("serverName", "pactols2.mom.fr");
+        
       //  config.addDataSourceProperty("serverName", "localhost");
         /*config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");

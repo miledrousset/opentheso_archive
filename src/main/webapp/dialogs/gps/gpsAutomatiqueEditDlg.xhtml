@@ -37,7 +37,7 @@
                 <table>
                     <tr>
                         <td>
-                            <h:outputText value="Integrer Traduction"/>
+                            <h:outputText title="#{langueBean.getMsg('gps.addTraduction.help')}" value="#{langueBean.getMsg('gps.addTraduction')}"/>
                         </td>
                         <td>
                             <p:selectBooleanCheckbox value="#{gps.integrerTraduction}" /><br/>
@@ -45,7 +45,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <h:outputText value="Reemplacer Traduction"/>
+                            <h:outputText title="#{langueBean.getMsg('gps.replaceTraduction.help')}" value="#{langueBean.getMsg('gps.replaceTraduction')}"/>
                         </td>
                         <td>
                             <p:selectBooleanCheckbox value="#{gps.reemplacerTraduction}" /><br/>
@@ -53,7 +53,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <h:outputText value="Alignement Automatique"/>
+                            <h:outputText title="#{langueBean.getMsg('gps.addAlignment.help')}" value="#{langueBean.getMsg('gps.addAlignment')}"/>
                         </td>
                         <td>
                             <p:selectBooleanCheckbox value="#{gps.alignementAutomatique}" /><br/>

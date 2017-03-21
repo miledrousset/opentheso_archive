@@ -22,7 +22,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.rdf.rdfxml.parser.RDFXMLParserFactory;
+//import org.semanticweb.owlapi.rdf.rdfxml.parser.RDFXMLParserFactory;
 
 
 
@@ -103,7 +103,7 @@ public class skosApiTest3 {
     @Test
     public void testReadSkosOWL() {
         
-        try {
+/*        try {
             OWLOntologyManager m = OWLManager.createOWLOntologyManager();
             m.getOntologyParsers().set(new RDFXMLParserFactory());
             OWLOntology ont = m.loadOntologyFromOntologyDocument(IRI.create("file:/Users/Miled/Desktop/test_unesco4.rdf"));
@@ -147,9 +147,9 @@ public class skosApiTest3 {
             for (OWLAxiom ax : axioms) {
                 System.out.println("ReadSKOSExample.ReadSKOSExample() " + ax);
             }*/
-        } catch (OWLOntologyCreationException ex) {
+/*       } catch (OWLOntologyCreationException ex) {
             Logger.getLogger(skosApiTest3.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
     
 }

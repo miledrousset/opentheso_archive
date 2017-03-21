@@ -3585,16 +3585,11 @@ public class ConceptHelper {
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        resultSet.next();
-                        if (resultSet.getInt(1) != 0) {
+                    if (resultSet.next()) {
+                        if(resultSet.getInt(1) != 0)
                             children = true;
-                        } else {
-                            children = false;
-                        }
-                        resultSet.close();
                     }
-
+                    
                 } finally {
                     stmt.close();
                 }

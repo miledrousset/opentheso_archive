@@ -109,7 +109,7 @@
                     <h:panelGroup id="totalBrancheG">
                         <h:form>
                             
-                            <p:commandButton value="#{selectedTerme.totalConceptOfBranch}" 
+                            <p:commandButton title="#{langueBean.getMsg('index.totalOfConcepts')}" value="#{selectedTerme.totalConceptOfBranch}" 
                                              id="ajaxddd" update=":totalBrancheG" actionListener="#{selectedTerme.getTheNbConceptOfBranch()}" styleClass="termInfo" />
                         </h:form>
                     </h:panelGroup>
@@ -118,7 +118,7 @@
                     <!-- affichage du nombre total des notices de la branche -->
                     <h:panelGroup id="totalNoticesG" rendered="#{selectedTerme.z3950_actif}">
                         <h:form>
-                            <p:commandButton value="#{selectedTerme.totalNoticesOfBranch}" 
+                            <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
                                              id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />
                         </h:form>
                     </h:panelGroup>

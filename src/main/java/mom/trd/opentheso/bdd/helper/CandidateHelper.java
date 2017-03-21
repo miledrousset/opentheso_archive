@@ -796,7 +796,8 @@ public class CandidateHelper {
         Statement stmt;
         ResultSet resultSet;
         String idTermCandidat = null;
-        
+        if(idConceptCandidat == null) return null;
+        if(idConceptCandidat.isEmpty()) return null;
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -812,9 +813,6 @@ public class CandidateHelper {
                     if(resultSet.next()) {
                         idTermCandidat = resultSet.getString("id_term");
                     }
-                    else
-                        return null;
-
                 } finally {
                     stmt.close();
                 }

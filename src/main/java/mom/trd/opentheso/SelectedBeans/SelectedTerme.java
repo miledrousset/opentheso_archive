@@ -414,6 +414,15 @@ public class SelectedTerme implements Serializable {
         }
 
     }
+    
+    public String urlEncodeUtf_8(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return value;
+    }
 
     private void majNoticeBdd() {
         ResourceBundle bundlePref = getBundlePref();
