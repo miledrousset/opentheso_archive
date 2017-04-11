@@ -131,7 +131,7 @@ public class ExportFromBDD_Frantiq {
             
         ArrayList<NodeUri> idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, idGroup, idThesaurus);
         
-        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept);
+        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, null);
         
         writeFileSKOS.endSkos();
         return writeFileSKOS.getSkosBuff();
@@ -194,7 +194,7 @@ public class ExportFromBDD_Frantiq {
         ConceptHelper conceptHelper = new ConceptHelper();
         
         NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
-        writeFileSKOS.writeDescriptor(nodeConcept);
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
         writeFileSKOS.endSkos(); 
 //        System.out.println(writeFileSKOS.getSkosBuff().toString());
         
@@ -225,7 +225,7 @@ public class ExportFromBDD_Frantiq {
         if(idThesaurus == null) return null;
         
         NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
-        writeFileSKOS.writeDescriptor(nodeConcept);
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
         writeFileSKOS.endSkos(); 
 //        System.out.println(writeFileSKOS.getSkosBuff().toString());
         
@@ -256,7 +256,7 @@ public class ExportFromBDD_Frantiq {
         ArrayList<NodeConceptExport> listNodeConcept = conceptHelper.getMultiConceptForExport(ds, value, idThesaurus, lang, isArkActive);
         
         for(NodeConceptExport nodeConcept : listNodeConcept) {
-            writeFileSKOS.writeDescriptor(nodeConcept);
+            writeFileSKOS.writeDescriptor(nodeConcept, null);
         }
         writeFileSKOS.endSkos(); 
         return writeFileSKOS.getSkosBuff();

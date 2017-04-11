@@ -69,7 +69,7 @@ input[type="button"], input[type="submit"]{
     width: 40px;
 }
 .ui-icon-retour {
-    background: url("../images/retour2.png") no-repeat top left !important;
+    background: url("../images/retour.png") no-repeat top left !important;
     height: 25px;
     width: 40px;
 }
@@ -1329,9 +1329,25 @@ input[type="button"], input[type="submit"]{
     text-align: left;  
 }
 
+.textInfoSmall {
+    background: none;
+    font-size: 12px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;  
+}
 
 .styleText {
     font-family: "Palatino linotype",Times,serif;
+}
+
+
+.styleText2 {
+    border: none;
+    font-family: "Palatino linotype",Times,serif;
+    font-size: 13px;
 }
 
 .titreTexte {
@@ -1410,3 +1426,42 @@ pre {
     box-shadow: none;
     text-align: left;  
 }
+
+.titleAccordion2 {
+    background: none;
+    font-size: 12px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;  
+}
+
+/* style de FieldSet*/
+fieldset {
+    background: none;
+    font-size: 12px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left;  
+}
+label
+{
+  margin-bottom:0px;
+  margin-left:16px;
+}
+
+
+/*
+.ui-fieldset .ui-state-default {
+    background: #BFBBA5;
+    font-size: 12px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left; 
+}
+*/

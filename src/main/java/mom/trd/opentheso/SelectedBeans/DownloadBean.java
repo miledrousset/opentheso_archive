@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,6 +15,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
@@ -202,6 +205,41 @@ public class DownloadBean implements Serializable {
         }*/
     }
 
+    
+    /**
+     * Cette fonction permet d'exporter un thésaurus en SKOS
+     * en précisant les langues et les domaines à exporter
+     *
+     * @param idTheso
+     * @param selectedLanguages
+     * @param selectedGroups
+     * @return
+     */
+    public StreamedContent thesoToSkosAdvanced(String idTheso,
+                List<NodeLang> selectedLanguages,
+                List<NodeGroup> selectedGroups) {
+        
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerAdress(serverAdress);
+        exportFromBDD.setServerArk(serverArk);
+        exportFromBDD.setArkActive(arkActive);
+
+        StringBuffer skos_local = exportFromBDD.exportThesaurusAdvanced(
+                connect.getPoolConnexion(), idTheso,
+                selectedLanguages, selectedGroups);
+
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "application/xml", idTheso + "_skos.rdf");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;
+    }
+    
+    
     /**
      * Cette fonction permet d'exporter un concept en SKOS en temps réel dans la
      * page principale

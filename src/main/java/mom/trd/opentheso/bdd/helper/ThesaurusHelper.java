@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
+import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.bdd.tools.StringPlus;
@@ -781,7 +782,60 @@ public class ThesaurusHelper {
 
     /**
      * Cette fonction permet de retourner toutes les langues utilisées par les
-     * Concepts d'un thésaurus
+     * Concepts d'un thésaurus (sous forme de NodeLang, un objet complet)
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return Objet class NodeConceptTree
+     */
+    public ArrayList<NodeLang> getAllUsedLanguagesOfThesaurusNode(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeLang> nodeLangs = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT thesaurus_label.lang, languages_iso639.french_name"
+                            + " FROM thesaurus_label, languages_iso639"
+                            + " WHERE thesaurus_label.lang = languages_iso639.iso639_1"
+                            + " and thesaurus_label.id_thesaurus = '" + idThesaurus + "'"
+                            + " order by languages_iso639.french_name";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    int i=0;
+                    while (resultSet.next()) {
+                        NodeLang nodeLang = new NodeLang();
+                        nodeLang.setId("" + i);
+                        nodeLang.setCode(resultSet.getString("lang"));
+                        nodeLang.setValue(resultSet.getString("french_name"));
+                        nodeLangs.add(nodeLang);
+                        i++;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All Used languages of Concepts of thesaurus  : " + idThesaurus, sqle);
+        }
+        return nodeLangs;
+    }    
+    
+    
+    /**
+     * Cette fonction permet de retourner toutes les langues utilisées par les
+     * Concepts d'un thésaurus  !!! seulement les code iso des langues 
      *
      * @param ds
      * @param idThesaurus

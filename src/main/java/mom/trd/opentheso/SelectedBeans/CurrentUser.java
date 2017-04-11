@@ -106,6 +106,7 @@ public class CurrentUser implements Serializable {
                 selectedThesaurus = new ArrayList<>();
                 selectedThesaurus.add(idTheso);
             }
+            versionOfOpentheso = new BaseDeDoneesHelper().getVersionOfOpentheso(connect.getPoolConnexion());
             return np;
         }
         return null;

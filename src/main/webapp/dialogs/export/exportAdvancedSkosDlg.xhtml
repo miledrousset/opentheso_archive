@@ -1,39 +1,30 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <h:head>
-        <title>OpenTheso - Configurations</title>
-        <link rel="icon" href="images/icoTheso.jpg" />
-        <link rel="stylesheet" type="text/css" href="css/style.css"/>
-        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
-    </h:head>
-    <h:body>
-        <p:dialog modal="true" widgetVar="exportSkos" header="Status" draggable="false" closable="false" resizable="false">
-            <p:graphicImage name="/images/loanding.gif" />
-        </p:dialog>
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
 
-        <h:form>
-            <p:commandButton value="Download" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
-                <p:fileDownload value="#{fileDownloadView.file}" />
-            </p:commandButton>
-        </h:form>
 
-        <script type="text/javascript">
-        function start() {
-            PF('exportSkos').show();
-        }
+    <p:dialog id="idExportAdvancedSkosDlg"  header="#{langueBean.getMsg('edit.exportskosAdvanced')}" styleClass="styleText2" widgetVar="exportAdvancedSkosDlg" modal="true" resizable="false" >
+        <p:graphicImage value="/images/loading.gif" width="50" /> 
+        <!-- Ajouter alignement automatique 
+        Cette function appelarais a  AjouterAutomatique2EditDlg -->
 
-        function stop() {
-            PF('exportSkos').hide();
-        }
-        </script>
-        
-        
-    <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
+        <script type="text/javascript">  
+            function start() {  
+                exportAdvancedSkosDlg.show();  
+            }  
+
+            function stop() {  
+                exportAdvancedSkosDlg.hide();  
+            }  
+        </script>  
+
+        <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
         <h:form >
             <div>
                 <h:panelGroup  id="panelExport" rendered="#{user1.haveRights(2)}">
@@ -105,12 +96,20 @@
                 
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <p:commandButton id="cbAjAlignAuto2" title="#{langueBean.getMsg('btnBack')}" 
-
+                                 update="idExportAdvancedSkosDlg"
+                                 action="PF('exportAdvancedSkosDlg').hide();"
                                  icon="ui-icon-retour"
                                  styleClass="styleButton"  style="align-content: flex-end"/>
             </div>
             <br/>
-        </h:form>         
+        </h:form> 
         
-    </h:body>
-</html>
+    </p:dialog>
+</ui:composition>
+
+
+
+
+
+
+

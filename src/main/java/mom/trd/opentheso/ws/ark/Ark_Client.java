@@ -52,6 +52,20 @@ public final class Ark_Client {
         return returnedArk;
     }
 
+    public String getInfosArkId(String idArk){
+        // compte de Frantiq
+        Account account = login(
+                propertiesArk.getProperty("idNaan"),
+                propertiesArk.getProperty("user"),
+                propertiesArk.getProperty("password"));
+        
+        Ark ark = getArk(account, idArk);
+        if(ark != null) 
+            return ark.getArk();
+        return null;
+        
+    }
+    
     public String getArkId(String date, String url, String title, 
             String creator, ArrayList<DcElement> dcElementsList, String type) {
 
@@ -82,7 +96,9 @@ public final class Ark_Client {
         	System.out.println(dcElement.getName()+" = " +dcElement.getValue());
         }
         */
-        return returnedArk.getArk();
+        if(returnedArk != null)
+            return returnedArk.getArk();
+        return null;
         
         // Liste des DcElements
     /*     
@@ -176,7 +192,9 @@ public final class Ark_Client {
         	System.out.println(dcElement.getName()+" = " +dcElement.getValue());
         }
         */
-        return returnedArk.getArk();
+        if(returnedArk != null)
+            return returnedArk.getArk();
+        return null;
         
         // Liste des DcElements
     /*     

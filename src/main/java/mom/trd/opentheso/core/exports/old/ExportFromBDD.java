@@ -2,11 +2,14 @@ package mom.trd.opentheso.core.exports.old;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
+import java.util.List;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
 
@@ -91,7 +94,7 @@ public class ExportFromBDD {
         for (String tabIdGroup1 : tabIdGroup) {
             NodeGroupLabel nodeGroupLabel = conceptGroupHelper.getNodeGroupLabel(ds, tabIdGroup1, idThesaurus);
             idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, tabIdGroup1, idThesaurus);
-            writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept);
+            writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, null);
         }
         
         for (String tabIdGroup1 : tabIdGroup) {
@@ -103,6 +106,90 @@ public class ExportFromBDD {
         writeFileSKOS.endSkos();
         return writeFileSKOS.getSkosBuff();
     }
+    
+    /**
+     * Fonction récursive permettant d'exporter le thésaurus de la tête jusqu'au
+     * dernier descripteur en filtrant par langues et domaines choisis  
+     *
+     * @param ds
+     * @param idThesaurus 
+     * @param selectedLanguages 
+     * @param selectedGroups 
+     * @return  
+     */
+    public StringBuffer exportThesaurusAdvanced(HikariDataSource ds, String idThesaurus,
+                List<NodeLang> selectedLanguages,
+                List<NodeGroup> selectedGroups  ) {
+        /*
+         * Ecriture du thésaurus
+         */
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        
+        NodeThesaurus nodeThesaurus = thesaurusHelper.getNodeThesaurus(ds, idThesaurus);
+       
+        WriteFileSKOS writeFileSKOS = new WriteFileSKOS();
+        
+        // inititialisation des URI
+        writeFileSKOS.setServerArk(serverArk);
+        writeFileSKOS.setServerAdress(serverAdress);
+        
+        writeFileSKOS.writeHeader();
+
+        
+        String idArk = thesaurusHelper.getIdArkOfThesaurus(ds, idThesaurus);
+        if(idArk ==null || idArk.trim().isEmpty()){
+            writeFileSKOS.setURI(serverAdress);
+        }
+        else {
+            writeFileSKOS.setURI(serverArk);
+        }
+    
+    //    writeFileSKOS.setURI("http://opentheso.frantiq.fr/" + nodeThesaurus.getListThesaurusTraduction().get(0).getTitle());
+        //	thesaurus.description);
+        
+        writeFileSKOS.writeThesaurus(nodeThesaurus);
+
+        // ecriture des TopConcept
+        GroupHelper conceptGroupHelper = new GroupHelper();
+
+        ArrayList <String> tabIdGroup = conceptGroupHelper.getListIdOfGroup(ds, idThesaurus);
+        for (String tabIdGroup1 : tabIdGroup) {
+            writeFileSKOS.writeTopConcepts(tabIdGroup1, idThesaurus);
+        }
+        
+        writeFileSKOS.writeEndOfMicroThesaurusList();
+        // fin du bloc thésaurus et id of TopConcept
+        
+        
+        // écriture des Domaines et Descripteurs avec traductions
+        ArrayList <NodeUri> idOfTopConcept;
+        for (String tabIdGroup1 : tabIdGroup) {
+            for (NodeGroup nodeGroup : selectedGroups) {
+                if(nodeGroup.getConceptGroup().getIdgroup().equalsIgnoreCase(tabIdGroup1)) {
+                    NodeGroupLabel nodeGroupLabel = conceptGroupHelper.getNodeGroupLabel(ds, tabIdGroup1, idThesaurus);
+                    idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, tabIdGroup1, idThesaurus);
+                    writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, selectedLanguages);
+                }
+            }
+        }
+        
+        for (String tabIdGroup1 : tabIdGroup) {
+            for (NodeGroup nodeGroup : selectedGroups) {
+                if(nodeGroup.getConceptGroup().getIdgroup().equalsIgnoreCase(tabIdGroup1)) {
+                    idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, tabIdGroup1, idThesaurus);
+                    for (NodeUri idOfTopConcept1 : idOfTopConcept) {
+                        exportAllConceptsAdvanced(ds, idOfTopConcept1.getIdConcept(),
+                                idThesaurus, writeFileSKOS,
+                                selectedLanguages);
+                    }                    
+                }
+            }
+        }
+        writeFileSKOS.endSkos();
+        return writeFileSKOS.getSkosBuff();
+    }    
+  
+    
     
     /**
      * Fonction récursive permettant d'exporter le thésaurus de la tête jusqu'au
@@ -200,7 +287,7 @@ public class ExportFromBDD {
             
         ArrayList<NodeUri> idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, idGroup, idThesaurus);
         
-        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept);
+        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, null);
         
         writeFileSKOS.endSkos();
         return writeFileSKOS.getSkosBuff();
@@ -233,7 +320,7 @@ public class ExportFromBDD {
         NodeGroupLabel nodeGroupLabel = conceptGroupHelper.getNodeGroupLabel(ds, idGroup, idThesaurus);
             
         ArrayList <NodeUri> idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, idGroup, idThesaurus);
-        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept);
+        writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, null);
         
         //écriture des TopConcepts
         for (NodeUri idOfTopConcept1 : idOfTopConcept) {
@@ -264,7 +351,7 @@ public class ExportFromBDD {
         
         NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
         if(nodeConcept == null) return null;
-        writeFileSKOS.writeDescriptor(nodeConcept);
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
         writeFileSKOS.endSkos(); 
 //        System.out.println(writeFileSKOS.getSkosBuff().toString());
         
@@ -296,7 +383,7 @@ public class ExportFromBDD {
         
         NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
         if(nodeConcept == null) return null;
-        writeFileSKOS.writeDescriptor(nodeConcept);
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
         writeFileSKOS.endSkos(); 
 //        System.out.println(writeFileSKOS.getSkosBuff().toString());
         
@@ -327,7 +414,7 @@ public class ExportFromBDD {
         ArrayList<NodeConceptExport> listNodeConcept = conceptHelper.getMultiConceptForExport(ds, value, idThesaurus, lang, isArkActive);
         
         for(NodeConceptExport nodeConcept : listNodeConcept) {
-            writeFileSKOS.writeDescriptor(nodeConcept);
+            writeFileSKOS.writeDescriptor(nodeConcept, null);
         }
         writeFileSKOS.endSkos(); 
         return writeFileSKOS.getSkosBuff();
@@ -363,7 +450,7 @@ public class ExportFromBDD {
         ArrayList<NodeConceptExport> listNodeConcept = conceptHelper.getMultiConceptForExport(ds, value, lang, idGroup, idThesaurus, isArkActive);
         
         for(NodeConceptExport nodeConcept : listNodeConcept) {
-            writeFileSKOS.writeDescriptor(nodeConcept);
+            writeFileSKOS.writeDescriptor(nodeConcept, null);
         }
         writeFileSKOS.endSkos(); 
         return writeFileSKOS.getSkosBuff();
@@ -417,12 +504,12 @@ public class ExportFromBDD {
         
         
         
-        writeFileSKOS.writeDescriptor(nodeConcept);
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
 
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
             if(nodeConcept != null) {
-                writeFileSKOS.writeDescriptor(nodeConcept);
+                writeFileSKOS.writeDescriptor(nodeConcept, null);
                 if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
                     for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
 
@@ -435,5 +522,47 @@ public class ExportFromBDD {
             }
         }
     }
+    
+    public void exportAllConceptsAdvanced(HikariDataSource ds,
+            String idConcept, String idThesaurus,
+            WriteFileSKOS writeFileSKOS,
+            List<NodeLang> selectedLanguages) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        
+        ArrayList <String> listIdsOfConceptChildren = conceptHelper.getListChildrenOfConcept(ds, idConcept, idThesaurus);
+        
+        NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
+      
+        /// attention il y a un problème ici, il faut vérifier pourquoi nous avons un Concept Null
+        
+        
+        if(nodeConcept.getConcept() == null) {
+            int k = 0;
+            return;
+        }
+        
+        
+        
+        
+        
+        writeFileSKOS.writeDescriptor(nodeConcept, selectedLanguages);
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
+            if(nodeConcept != null) {
+                writeFileSKOS.writeDescriptor(nodeConcept, selectedLanguages);
+                if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+
+                        exportAllConceptsAdvanced(ds,
+                                nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                                idThesaurus, writeFileSKOS, selectedLanguages);
+
+                    }
+                }
+            }
+        }
+    }    
 
 }

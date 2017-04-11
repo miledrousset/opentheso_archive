@@ -15,6 +15,25 @@
     </properties>
     
     <dependencies>
+        
+        
+        
+    <!-- https://mvnrepository.com/artifact/org.dspace/handle 
+    <dependency>
+        <groupId>org.dspace</groupId>
+        <artifactId>handle</artifactId>
+        <version>6.2.5.02</version>
+    </dependency>-->
+       
+        
+        <dependency>
+            <groupId>net.handle</groupId>
+            <artifactId>hdllib</artifactId>
+            <version>7.3.1</version>
+        </dependency>
+       
+
+
         <!-- old jzkit -->
         <dependency>
             <groupId>ki-jzkit-hss</groupId>
@@ -182,11 +201,21 @@
         </dependency>
 
 
+        <!-- old version
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.1-901-1.jdbc4</version>
+        </dependency> -->
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1212.jre7</version>
         </dependency>
+
+
+
 
         <!-- Attention, la version 6.0 de PrimeFaces ne passe pas sur le serveur Debian avec java 1.7.0_85 -->
         <dependency>  

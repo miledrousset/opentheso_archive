@@ -56,14 +56,25 @@ public class ArkeoJUnitTest {
     // @Test
     // public void hello() {}
     
-        /**
+    /**
+     * Test retourne les Métas données d'un IdArk
+     */
+    @org.junit.Test
+    public void testGetInfosArk() {
+        Ark_Client ark_Client = new Ark_Client();
+        String idArk = ark_Client.getInfosArkId("66666/pcrt2mwfPgYzYg");
+        System.out.println(idArk);
+    }
+
+    
+    /**
      * Test of Facet methods.
      */
     @org.junit.Test
     public void testGetCodeArk() {
     
         
-        String idArk = "";
+ /*       String idArk = "";
 
      // String date, String url, String title, String creator, String description, String type
         ArrayList<DcElement> dc = new ArrayList<>();
@@ -136,10 +147,10 @@ public class ArkeoJUnitTest {
     
         
         /**
-     * Test of Facet methods.
+     * Test de création d'identifiant Ark sous Arkéo de la MOM
      */
     @org.junit.Test
-    public void testAddCodeArk() {    
+    public void testCreateArk() {    
     
     /*    HikariDataSource conn = openConnexionPool();
 */
@@ -173,20 +184,21 @@ public class ArkeoJUnitTest {
         // String date, String url, String title, String creator, String description, String type
         String idArk = ark_Client.getArkId(
                 new FileUtilities().getDate(),
-                "http://pactols.frantiq.fr/" + "?idc=" + "334545334340ezaeeza0" + "&idt=" + "TH_35",
+                "http://pactols2.frantiq.fr/" + "?idc=" + "334545334340ezaeeza0" + "&idt=" + "TH_35",
                 "3345453343eeeeza0_modifiés",
                 "Frantiq",
                 dcElementsList,
                 "pcrt"); // pcrt : p= pactols, crt=code DCMI pour collection
 
+        System.out.println(idArk);
 //        conn.close();*/    
     }
    
        /**
-     * Test of Facet methods.
+     * Test permet de modifier les Metas données DC.
      */
     @org.junit.Test
-    public void testUpdateArk() {    
+    public void testUpdateMetaArk() {    
     
     /*    HikariDataSource conn = openConnexionPool();
 */
@@ -198,31 +210,31 @@ public class ArkeoJUnitTest {
         DcElement dcElement1 = new DcElement();
             // cette fonction permet de remplir la table Permutée
         dcElement1.setName("title");
-        dcElement1.setValue("test_valeur1 en francais_modifiés");
+        dcElement1.setValue("test_valeur1 en francais");
         dcElement1.setLanguage("fr");
 
         dcElementsList.add(dcElement1);
         
         DcElement dcElement2 = new DcElement();
         dcElement2.setName("title");
-        dcElement2.setValue("test_valeur2 en anglais modifiés");
+        dcElement2.setValue("test_valeur2 en anglais");
         dcElement2.setLanguage("en");
         
         dcElementsList.add(dcElement2);
         
         DcElement dcElement3 = new DcElement();
         dcElement3.setName("description");
-        dcElement3.setValue("description en francais modifiés");
+        dcElement3.setValue("description en francais");
         dcElement3.setLanguage("fr");
         
         dcElementsList.add(dcElement3);        
             
         // String date, String url, String title, String creator, String description, String type
         String idArk = ark_Client.updateArkId(
-                new FileUtilities().getDate(),
-                "http://patatos.frantiq.fr/" + "?idc=" + "id0000" + "&idt=" + "TH_35",
-                "3345453343eeeeza0_modifiés",
-                "Frantiq",
+                new FileUtilities().getDate(), "http://pactols2.frantiq.fr/?idc=334545334340ezaeeza0&idt=TH_35",
+             //   "http://patatos.frantiq.fr/" + "?idt=" + "id0000" + "&idt=" + "TH_35",
+                "3345453343eeeeza0",
+                "Frantiq2",
                 dcElementsList,
                 "pcrt"); // pcrt : p= pactols, crt=code DCMI pour collection
 

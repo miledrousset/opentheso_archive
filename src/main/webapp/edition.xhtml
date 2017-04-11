@@ -41,6 +41,7 @@
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
             <ui:include src="menuAll.xhtml" />
+            <ui:include src="/dialogs/export/exportAdvancedSkosDlg.xhtml" />
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
@@ -116,17 +117,26 @@
                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{downloadBean.thesoSkos(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
                                                     style="font-size: 12px;"/>
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} New Version" actionListener="#{downloadBean.thesoSkos(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
-                                                    style="font-size: 12px;"/>
+                                        
+                                        
+                                        
+                                        
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskosAdvanced')}"  actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" 
+                                                    outcome="export/skosExport.xhtml" />
+                                                    
+                                                    
+                                        
+                                        
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{downloadBean.thesoCsv(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
                                                     style="font-size: 12px;"/>
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} Frantiq" actionListener="#{downloadBean.thesoSkosFrantiq(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                        <p:menuitem disabled="true" value="#{langueBean.getMsg('edit.exportskos')} Frantiq" actionListener="#{downloadBean.thesoSkosFrantiq(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
                                                     style="font-size: 12px;"/>
                                     </p:menu>
                                 </h:form>
 
                             </h:column>
                             <h:column id="column3">
+                                
                                 <f:facet name="header">
                                     <h:outputText value="#{langueBean.getMsg('edit.tab1Opt2')}" />
                                 </f:facet>
