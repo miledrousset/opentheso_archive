@@ -310,10 +310,12 @@ public class TreeBean implements Serializable {
     public void onNodeSelect(NodeSelectEvent event) {
     //    if (!event.getTreeNode().getType().equals("orphan")) {
         // séparation des cliques entre les orphélins et les concepts
-        if (!((MyTreeNode) event.getTreeNode()).getIdDomaine().equalsIgnoreCase("orphan")) {
-            selectedTerme.majTerme((MyTreeNode) selectedNode);
-        } else {
-            selectedTerme.majTerme((MyTreeNode) selectedNode);
+        if( ((MyTreeNode) event.getTreeNode()).getIdDomaine() != null) {
+            if (!((MyTreeNode) event.getTreeNode()).getIdDomaine().equalsIgnoreCase("orphan")) {
+                selectedTerme.majTerme((MyTreeNode) selectedNode);
+            } else {
+                selectedTerme.majTerme((MyTreeNode) selectedNode);
+            }
         }
         vue.setOnglet(0);
         selectedTerme.setTree(0);

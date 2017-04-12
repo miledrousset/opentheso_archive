@@ -52,7 +52,7 @@ public class skosExportBean {
     }
 
     public void init(String idTheso, String idLang){
-        
+                
         this.idTheso = idTheso;
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         languagesOfTheso = thesaurusHelper.getAllUsedLanguagesOfThesaurusNode(connect.getPoolConnexion(), idTheso);
@@ -70,7 +70,9 @@ public class skosExportBean {
         selectedGroups = new ArrayList<>();
         for (NodeGroup nodeGroup : groupList) {
             selectedGroups.add(nodeGroup);
-        }        
+        }
+
+        
              
     }
 
@@ -130,7 +132,7 @@ public class skosExportBean {
         this.selectedGroups = selectedGroups;
     }
 
-  
+
 
    
     

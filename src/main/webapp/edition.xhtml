@@ -119,12 +119,9 @@
                                                     style="font-size: 12px;"/>
                                         
                                         
-                                        
-                                        
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskosAdvanced')}"  actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" 
-                                                    outcome="export/skosExport.xhtml" />
                                                     
-                                                    
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskosAdvanced')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportAdvancedSkosDlg" oncomplete="PF('exportAdvancedSkosDlg').show();"
+                                                    style="font-size: 12px;"/>
                                         
                                         
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{downloadBean.thesoCsv(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 

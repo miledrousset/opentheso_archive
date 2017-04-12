@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import skos.SKOSXmlDocument;
@@ -47,7 +49,7 @@ public class DownloadBean implements Serializable {
     private boolean arkActive;
     private String serverAdress;
     private String nomUsu;
-
+    
 
     
     @PostConstruct
@@ -219,6 +221,9 @@ public class DownloadBean implements Serializable {
                 List<NodeLang> selectedLanguages,
                 List<NodeGroup> selectedGroups) {
         
+        
+        
+        
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
@@ -230,14 +235,20 @@ public class DownloadBean implements Serializable {
 
         InputStream stream;
 
+        
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idTheso + "_skos.rdf");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+        
         return file;
     }
+
+  
     
     
     /**
