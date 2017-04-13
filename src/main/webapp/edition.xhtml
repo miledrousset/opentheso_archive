@@ -44,6 +44,8 @@
             <ui:include src="/dialogs/export/exportAdvancedSkosDlg.xhtml" />
             <ui:include src="/dialogs/export/exportSkosDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
+            <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
+            
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
@@ -191,13 +193,13 @@
                                 <h:inputText id="date" value="#{fileBean.formatDate}" />
                                 <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
                                 <br/><br/>
-
-
+                            
+                            
                                 <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
                                               cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
                                               update="@form,:panSkos2"  />
-
-
+                            
+                            
                                 <p:commandButton value="Insert into BDD"
                                                  disabled="#{fileBean.desabled}"
                                                  onclick="PF('pbAjax').start();PF('startButton2').disable();" 
@@ -225,16 +227,7 @@
                                     </h:form>
                                 </div>
                             </div>
-                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
-                                <p:messages showDetail="true" autoUpdate="true" />
-                                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
-                                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
-                                <h:inputText value="#{fileBean.formatDate}" />
-                                <br/><br/>
-                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
-                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeSkos}" process="@form"
-                                              update="@form,:panSkos,:tableTheso" />
-                            </h:form>
+                            
                             <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/>
                         </div>
                     </h:panelGroup>
@@ -554,8 +547,12 @@
                     <h:form>
                         <p:commandButton id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')}" actionListener="#{vue.setAddSkos(true)}" 
-                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+
+                            
+                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')}"  update=":idImportSkosDlg" oncomplete="PF('importSkosDlg').show();"
+                                                    style="font-size: 12px;"/> 
+                            
+                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')} new Version" actionListener="#{vue.setAddSkos2(true)}" 
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
