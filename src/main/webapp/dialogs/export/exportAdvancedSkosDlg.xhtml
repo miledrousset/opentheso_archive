@@ -80,13 +80,24 @@
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);PF('pbAjax').start();" > 
 
                             <p:fileDownload value="#{downloadBean.thesoToSkosAdvanced(skosExportBean.idTheso,skosExportBean.selectedLanguages, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>
 
                         <p:dialog modal="true" widgetVar="exportWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
-                            <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/> 
+                            <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
+                            
+
+
+                            <br />
+                            <p:progressBar widgetVar="pbAjax" ajax="true" value="#{downloadBean.progress_per_100}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+                                                           
+                            
+                            
+                            
+                            
+                            
                         </p:dialog>
 
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -100,6 +111,8 @@
 
 
                 </h:panelGroup>
+                
+                
             </h:form> 
         </p:dialog>
         <script type="text/javascript">

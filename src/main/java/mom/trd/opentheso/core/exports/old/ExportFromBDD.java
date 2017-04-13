@@ -3,6 +3,7 @@ package mom.trd.opentheso.core.exports.old;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import java.util.List;
+import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
@@ -20,6 +21,7 @@ public class ExportFromBDD {
     private String serverArk;
     private String serverAdress;
     private boolean isArkActive;
+    DownloadBean downloadBean;
 
     public void setServerArk(String serverArk) {
         this.serverArk = serverArk;
@@ -119,10 +121,13 @@ public class ExportFromBDD {
      */
     public StringBuffer exportThesaurusAdvanced(HikariDataSource ds, String idThesaurus,
                 List<NodeLang> selectedLanguages,
-                List<NodeGroup> selectedGroups  ) {
+                List<NodeGroup> selectedGroups , DownloadBean downloadBean) {
         /*
          * Ecriture du thésaurus
          */
+        
+        this.downloadBean = downloadBean;
+        
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         
         NodeThesaurus nodeThesaurus = thesaurusHelper.getNodeThesaurus(ds, idThesaurus);
@@ -181,6 +186,7 @@ public class ExportFromBDD {
                         exportAllConceptsAdvanced(ds, idOfTopConcept1.getIdConcept(),
                                 idThesaurus, writeFileSKOS,
                                 selectedLanguages);
+                        
                     }                    
                 }
             }
@@ -494,6 +500,8 @@ public class ExportFromBDD {
       
         /// attention il y a un problème ici, il faut vérifier pourquoi nous avons un Concept Null
         
+       
+        
         
         if(nodeConcept.getConcept() == null) {
             int k = 0;
@@ -547,11 +555,12 @@ public class ExportFromBDD {
         
         
         writeFileSKOS.writeDescriptor(nodeConcept, selectedLanguages);
-
+        incrementProgressBar();
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
             if(nodeConcept != null) {
                 writeFileSKOS.writeDescriptor(nodeConcept, selectedLanguages);
+                incrementProgressBar();
                 if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
                     for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
 
@@ -565,4 +574,16 @@ public class ExportFromBDD {
         }
     }    
 
+    private void incrementProgressBar(){
+        if(downloadBean.getProgress_abs() < downloadBean.getSizeOfTheso() ) 
+                    downloadBean.setProgress_abs(downloadBean.getProgress_abs()+1);
+                else
+                    downloadBean.setProgress_abs((int) downloadBean.getSizeOfTheso());
+                
+                downloadBean.setProgress_per_100((int) ((downloadBean.getProgress_abs()/downloadBean.getSizeOfTheso() ) * 100));
+        
+    }
+    
+    
+    
 }

@@ -6,6 +6,7 @@
 package mom.trd.opentheso.core.exports.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
+import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
 
 

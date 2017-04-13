@@ -7,6 +7,7 @@ package mom.trd.opentheso.core.exports.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
+import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
@@ -38,6 +39,7 @@ public class ExportTabulateHelper {
      * @return true or false
      */
     public boolean setThesaurusDatas(HikariDataSource ds, String idThesaurus){
+
         ExportThesaurus exportThesaurus = new ExportThesaurus();
         if(!exportThesaurus.exportAllDatas(ds, idThesaurus))
             return false;
@@ -53,6 +55,7 @@ public class ExportTabulateHelper {
      * @return 
      */
     public boolean exportToTabulate(){
+        
         
     //   System.out.println("Arrive à l'export Tabulé !!! ");
         if(thesaurusDatas == null) return false;
@@ -76,6 +79,8 @@ public class ExportTabulateHelper {
     private boolean writeFields() {
         FieldsSkos fieldsSkos = new FieldsSkos();
         for (String field : fieldsSkos.getFields()) {
+            
+
             tabulateBuff.append(field);
             tabulateBuff.append(";");
         }
@@ -369,7 +374,7 @@ public class ExportTabulateHelper {
     public StringBuffer getTabulateBuff() {
         return tabulateBuff;
     }
-    
+ 
     
     
 }

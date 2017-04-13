@@ -86,8 +86,8 @@ public class TestExportTabulate {
         
         ExportTabulateHelper exportTabulateHelper = new ExportTabulateHelper();
         
-        exportTabulateHelper.setThesaurusDatas(conn, "TH_1");
-        exportTabulateHelper.exportToTabulate();
+        //exportTabulateHelper.setThesaurusDatas(conn, "TH_1");
+        //exportTabulateHelper.exportToTabulate();
         StringBuffer datas = exportTabulateHelper.getTabulateBuff();
 
         System.out.println(datas.toString());

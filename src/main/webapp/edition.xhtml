@@ -42,6 +42,8 @@
             <ui:include src="account.xhtml" />
             <ui:include src="menuAll.xhtml" />
             <ui:include src="/dialogs/export/exportAdvancedSkosDlg.xhtml" />
+            <ui:include src="/dialogs/export/exportSkosDlg.xhtml" />
+            <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
@@ -114,8 +116,10 @@
                                 </f:facet>
                                 <h:form>
                                     <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-exp" />
+                                    
                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{downloadBean.thesoSkos(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                        
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportSkosDlg" oncomplete="PF('exportSkosDlg').show();"
                                                     style="font-size: 12px;"/>
                                         
                                         
@@ -124,10 +128,11 @@
                                                     style="font-size: 12px;"/>
                                         
                                         
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{downloadBean.thesoCsv(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportcsvDlg" oncomplete="PF('exportcsvDlg').show();"
                                                     style="font-size: 12px;"/>
-                                        <p:menuitem disabled="true" value="#{langueBean.getMsg('edit.exportskos')} Frantiq" actionListener="#{downloadBean.thesoSkosFrantiq(entry.value)}" update=":panThesoToSkos,:panThesoToSkosFile" 
-                                                    style="font-size: 12px;"/>
+                                        
+                                        
+                                        
                                     </p:menu>
                                 </h:form>
 

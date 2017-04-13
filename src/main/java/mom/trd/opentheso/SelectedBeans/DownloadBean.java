@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
@@ -49,6 +51,36 @@ public class DownloadBean implements Serializable {
     private boolean arkActive;
     private String serverAdress;
     private String nomUsu;
+    
+    
+    private int progress_per_100 = 0;
+
+    public int getProgress_per_100() {
+        return progress_per_100;
+    }
+
+    public void setProgress_per_100(int progress_per_100) {
+        this.progress_per_100 = progress_per_100;
+    }
+
+    public int getProgress_abs() {
+        return progress_abs;
+    }
+
+    public void setProgress_abs(int progress_abs) {
+        this.progress_abs = progress_abs;
+    }
+
+    public double getSizeOfTheso() {
+        return sizeOfTheso;
+    }
+
+    private int progress_abs = 0;
+    private double sizeOfTheso;
+
+    public int getProgress() {
+        return progress_per_100;
+    }
     
 
     
@@ -221,20 +253,26 @@ public class DownloadBean implements Serializable {
                 List<NodeLang> selectedLanguages,
                 List<NodeGroup> selectedGroups) {
         
+        progress_per_100 = 0;
+        progress_abs = 0;
         
         
+        ConceptHelper conceptHelper = new ConceptHelper();
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(),idTheso).size();
         
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
 
-        StringBuffer skos_local = exportFromBDD.exportThesaurusAdvanced(
+        
+        StringBuffer skos_local  = exportFromBDD.exportThesaurusAdvanced(
                 connect.getPoolConnexion(), idTheso,
-                selectedLanguages, selectedGroups);
+                selectedLanguages, selectedGroups,this);
 
         InputStream stream;
-
+        
+        
         
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
@@ -243,7 +281,7 @@ public class DownloadBean implements Serializable {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
+
         
         return file;
     }
@@ -559,26 +597,27 @@ public class DownloadBean implements Serializable {
      *
      * @param idTheso
      */
-    public void thesoCsv(String idTheso) {
+    public StreamedContent thesoCsv(String idTheso) {
+        
+        progress_per_100 = 0;
+        progress_abs = 0;
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(),idTheso).size();
 
         ExportTabulateHelper exportTabulateHelper = new ExportTabulateHelper();
 
         exportTabulateHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso);
         exportTabulateHelper.exportToTabulate();
         StringBuffer temp = exportTabulateHelper.getTabulateBuff();
-        if (temp.length() <= 1500000) {
-            skos = temp.toString();
-            vue.setThesoToSkosCsv(true);
-        } else {
-            InputStream stream;
-            try {
-                stream = new ByteArrayInputStream(temp.toString().getBytes("UTF-8"));
-                file = new DefaultStreamedContent(stream, "text/csv", "downloadedCsv.csv");
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            vue.setThesoToSkosCsvFile(true);
+        InputStream stream;
+        try {
+            stream = new ByteArrayInputStream(temp.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "downloadedCsv.csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return file;
     }
 /**
  * Applelation de la funtion pour realiser l'injection a la BDD;
