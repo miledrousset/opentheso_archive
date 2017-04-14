@@ -17,7 +17,7 @@
                                 <br/><br/>
                                 <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
                                               cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeSkos}" process="@form"
-                                              update="@form,:panSkos,:tableTheso" onstart="PrimeFaces.monitorDownload(start);PF('pbAjax').start();" oncomplete="PrimeFaces.monitorDownload(stop)"/>
+                                              update="@form,:panSkos,:tableTheso" onstart="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" oncomplete="PrimeFaces.monitorDownload(stop_import)"/>
                 </h:form>
                 
                 <p:dialog modal="true" widgetVar="importWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
@@ -33,11 +33,11 @@
         </p:dialog>
         
         <script type="text/javascript">
-            function start() {
+            function start_import() {
                 PF('importWait').show();
             }
 
-            function stop() {
+            function stop_import() {
                 PF('importWait').hide();
                 PF('importSkosDlg').hide();
 

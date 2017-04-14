@@ -28,7 +28,7 @@
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);PF('pbAjax').start();" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export, stop_export);PF('pbAjax').start();" > 
 
                             <p:fileDownload value="#{downloadBean.thesoCsv(skosExportBean.idTheso)}" />  
                         </p:commandButton>
@@ -64,11 +64,11 @@
             </h:form> 
         </p:dialog>
         <script type="text/javascript">
-            function start() {
+            function start_export() {
                 PF('exportWait').show();
             }
 
-            function stop() {
+            function stop_export() {
                 PF('exportWait').hide();
                 PF('exportcsvDlg').hide();
 

@@ -28,7 +28,7 @@
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);PF('pbAjax').start();" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export, stop_export);PF('pbAjax').start();" > 
 
                             <p:fileDownload value="#{downloadBean.thesoToSkosAdvanced(skosExportBean.idTheso,skosExportBean.selectedLanguages, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>
@@ -58,11 +58,13 @@
             </h:form> 
         </p:dialog>
         <script type="text/javascript">
-            function start() {
+            function start_export() {
+                alert("start")
                 PF('exportWait').show();
             }
 
-            function stop() {
+            function stop_export() {
+                alert("stop")
                 PF('exportWait').hide();
                 PF('exportSkosDlg').hide();
 
