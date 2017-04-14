@@ -80,7 +80,7 @@
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export, stop_export);PF('pbAjax').start();" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_adv, stop_export_adv);PF('pbAjax').start();" > 
 
                             <p:fileDownload value="#{downloadBean.thesoToSkosAdvanced(skosExportBean.idTheso,skosExportBean.selectedLanguages, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>
@@ -116,11 +116,11 @@
             </h:form> 
         </p:dialog>
         <script type="text/javascript">
-            function start_export() {
+            function start_export_adv() {
                 PF('exportWait').show();
             }
 
-            function stop_export() {
+            function stop_export_adv() {
                 PF('exportWait').hide();
                 PF('exportAdvancedSkosDlg').hide();
 
