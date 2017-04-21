@@ -45,6 +45,7 @@
             <ui:include src="/dialogs/export/exportSkosDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
+            <ui:include src="/dialogs/import/importSkosRdf4jDlg.xhtml" />
             
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -552,9 +553,14 @@
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')}"  update=":idImportSkosDlg" oncomplete="PF('importSkosDlg').show();"
                                                     style="font-size: 12px;"/> 
                             
+                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')} RDF4J"  update=":idImportSkosRdf4jDlg" oncomplete="PF('importSkosRdf4jDlg').show();"
+                                                    style="font-size: 12px;"/> 
+                            
                             
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')} new Version" actionListener="#{vue.setAddSkos2(true)}" 
-                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>                            
+                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/> 
+                            
+                            
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
 
@@ -599,7 +605,7 @@
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
-                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="50" />
                 </f:facet>
 
                 <f:facet name="complete">

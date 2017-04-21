@@ -292,7 +292,7 @@ public class ImportSkosHelper {
             if(thesaurus.getLanguage() == null) {
                 thesaurus.setLanguage(langueSource);
             }
-            if( (idTheso = thesaurusHelper.addThesaurusRollBack(conn, thesaurus, adressSite, useArk)) == null){
+            if( (idTheso = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null){
                 conn.rollback();
                 conn.close();
                 return false;
@@ -449,12 +449,12 @@ public class ImportSkosHelper {
 
         conceptsCount = dataSet.getSKOSConcepts().size();
         // i can get all the concepts from this scheme
-        for (SKOSConcept conceptsInScheme : dataSet.getSKOSConcepts()) {
+        for (SKOSConcept skosConcept : dataSet.getSKOSConcepts()) {
             // URI du Concept récupération automatique de l'identifiant
-            String id = getIdFromUri(conceptsInScheme.getURI().toString());
+            String id = getIdFromUri(skosConcept.getURI().toString());
             
             if(id == null || id.isEmpty()) {
-                message = message + "identifiant null pour l'URI : " + conceptsInScheme.getURI().toString();
+                message = message + "identifiant null pour l'URI : " + skosConcept.getURI().toString();
                 continue;
             }
             else {
@@ -474,9 +474,9 @@ public class ImportSkosHelper {
                         }*/              
             
             concept.setStatus("");
-            concept.setIdArk(conceptsInScheme.getURI().toString());
+            concept.setIdArk(skosConcept.getURI().toString());
 
-            for (SKOSAnnotation anno : conceptsInScheme.getSKOSAnnotations(dataSet)) {
+            for (SKOSAnnotation anno : skosConcept.getSKOSAnnotations(dataSet)) {
                 
                 // c'est une valeur
                 if (anno.isAnnotationByConstant()) {

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:uneskos="http://purl.org/umu/uneskos#"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:iso-thes="http://purl.org/iso25964/skos-thes#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+
+    <skos:ConceptScheme rdf:about="http://skos.um.es/unescothes/CS000">
+        <uneskos:hasMicroThesaurus rdf:resource="http://skos.um.es/unescothes/COL001"/>
+        <dcterms:title xml:lang="en">UNESCO Thesaurus</dcterms:title>
+        <dcterms:title xml:lang="es">Tesauro de la UNESCO</dcterms:title>
+        <dcterms:title xml:lang="fr">Thésaurus de l'UNESCO</dcterms:title>
+        <dcterms:title xml:lang="ru">Тезаурус ЮНЕСКО</dcterms:title>
+        <skos:prefLabel xml:lang="en">UNESCO Thesaurus</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Tesauro de la UNESCO</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Thésaurus de l'UNESCO</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Тезаурус ЮНЕСКО</skos:prefLabel>
+        <dcterms:source rdf:resource="http://databases.unesco.org/thesaurus/"/>
+        <dcterms:source rdf:resource="http://www2.ulcc.ac.uk/unesco/"/>
+        <dcterms:creator>UNESCO</dcterms:creator>
+        <dcterms:publisher>Juan Antonio Pastor Sánchez</dcterms:publisher>
+        <dcterms:date rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2015-09-16T00:00:00Z</dcterms:date>
+        <skos:hasTopConcept rdf:resource="http://skos.um.es/unescothes/C00008"/>
+    
+        <skos:hasTopConcept rdf:resource="http://skos.um.es/unescothes/C00016"/>
+    </skos:ConceptScheme>
+
+    <skos:Collection rdf:about="http://skos.um.es/unescothes/COL001">
+        <rdfs:label xml:lang="en">Education</rdfs:label>
+        <rdfs:label xml:lang="fr">Education</rdfs:label>
+        <rdfs:label xml:lang="es">Educación</rdfs:label>
+        <rdfs:label xml:lang="ru">Образование</rdfs:label>
+        <skos:prefLabel xml:lang="en">Education</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Education</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Educación</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Образование</skos:prefLabel>
+        <skos:notation>1</skos:notation>
+        <iso-thes:microThesaurusOf rdf:resource="http://skos.um.es/unescothes/CS000"/>
+        <iso-thes:subGroup rdf:resource="http://skos.um.es/unescothes/COL165"/>
+    </skos:Collection>
+
+
+    <skos:Collection rdf:about="http://skos.um.es/unescothes/COL165">
+        <rdfs:label xml:lang="en">Educational evaluation</rdfs:label>
+        <rdfs:label xml:lang="fr">Evaluation de l'éducation</rdfs:label>
+        <rdfs:label xml:lang="es">Evaluación de la educación</rdfs:label>
+        <rdfs:label xml:lang="ru">Процессы оценки в сфере образования</rdfs:label>
+        <skos:prefLabel xml:lang="en">Educational evaluation</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Evaluation de l'éducation</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Evaluación de la educación</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Процессы оценки в сфере образования</skos:prefLabel>
+        <skos:notation>1.65</skos:notation>
+        <iso-thes:superGroup rdf:resource="http://skos.um.es/unescothes/COL001"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/C00008"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/C00010"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/C01110"/>
+
+        <uneskos:hasMainConcept rdf:resource="http://skos.um.es/unescothes/C00008"/>
+
+    </skos:Collection>
+    
+    <skos:Concept rdf:about="http://ark.frantiq.fr/ark:/26678/pcrtKWS6It1qMw">
+        <skos:prefLabel xml:lang="it">Parigi</skos:prefLabel>
+        <skos:prefLabel xml:lang="nl">Parijs</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">París</skos:prefLabel>
+        <skos:prefLabel xml:lang="ar">باريس</skos:prefLabel>
+        <skos:altLabel xml:lang="fr">75</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Seine Dép</skos:altLabel>
+
+        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
+        <skos:inScheme rdf:resource="http://cchum-kvm-frantiq-pactols.in2p3.fr/opentheso/?idg=5&amp;idt=TH_1"/>
+        <skos:broader rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtsoMTZbebfg"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtt0mXEUFjHw"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtGkmsKwylMo"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtred13Xjdws"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtLTGltZwkr1"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtZ7GRAzpmyT"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtwZXYW02lEj"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtb9LoM5aG6U"/>
+        <dcterms:created>2007-02-08</dcterms:created>
+        <dcterms:modified>2007-02-08</dcterms:modified>
+        <dcterms:identifier>9146</dcterms:identifier>
+        <skos:exactMatch rdf:resource="http://www.geonames.org/2988507"/>
+        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.85341</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.3488</geo:long>
+    </skos:Concept>
+    
+    <skos:Concept rdf:about="http://skos.um.es/unescothes/C00008">
+        <skos:prefLabel xml:lang="en">Academic achievement</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Rendement scolaire</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Rendimiento escolar</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Академическая успеваемость</skos:prefLabel>
+        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
+        <skos:inScheme rdf:resource="http://skos.um.es/unescothes/CS000"/>
+        <skos:altLabel xml:lang="en">Academic performance</skos:altLabel>
+        <skos:altLabel xml:lang="en">Student achievement</skos:altLabel>
+        <skos:altLabel xml:lang="en">Student progress</skos:altLabel>
+        <skos:altLabel xml:lang="es">Progreso académico</skos:altLabel>
+        <skos:altLabel xml:lang="es">Progreso escolar</skos:altLabel>
+        <skos:altLabel xml:lang="es">Progreso estudiantil</skos:altLabel>
+        <skos:altLabel xml:lang="es">Rendimiento académico</skos:altLabel>
+        <skos:altLabel xml:lang="es">Rendimiento del estudiante</skos:altLabel>
+        <skos:altLabel xml:lang="es">Rendimiento estudiantil</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Performance académique</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Performance scolaire</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Rendement académique</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Rendement de l'étudiant</skos:altLabel>
+        <skos:altLabel xml:lang="ru">Характеристики академической работы</skos:altLabel>
+        <skos:altLabel xml:lang="ru">Успеваемость учащихся</skos:altLabel>
+        <skos:altLabel xml:lang="ru">Успехи учащихся</skos:altLabel>
+        <skos:narrower rdf:resource="http://skos.um.es/unescothes/C00010"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C00014"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C00028"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C01271"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C03862"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C03949"/>
+        <uneskos:mainConceptOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
+        <skos:topConceptOf rdf:resource="http://skos.um.es/unescothes/CS000"/>
+    </skos:Concept>
+
+    <skos:Concept rdf:about="http://skos.um.es/unescothes/C00010">
+        <skos:prefLabel xml:lang="en">Academic failure</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Échec scolaire</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Fracaso escolar</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Академическая неуспеваемость</skos:prefLabel>
+        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
+        <skos:inScheme rdf:resource="http://skos.um.es/unescothes/CS000"/>
+        <skos:broader rdf:resource="http://skos.um.es/unescothes/C00008"/>
+        <skos:narrower rdf:resource="http://skos.um.es/unescothes/C01110"/>
+        <skos:narrower rdf:resource="http://skos.um.es/unescothes/C01717"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C01109"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C02336"/>
+    </skos:Concept>
+
+    <skos:Concept rdf:about="http://skos.um.es/unescothes/C01110">
+        <skos:prefLabel xml:lang="en">Dropping out</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Abandon en cours d'études</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Deserción escolar</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Отсев учащихся</skos:prefLabel>
+        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
+        <skos:inScheme rdf:resource="http://skos.um.es/unescothes/CS000"/>
+        <skos:broader rdf:resource="http://skos.um.es/unescothes/C00010"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C01108"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C01109"/>
+        <skos:related rdf:resource="http://skos.um.es/unescothes/C01297"/>
+        <skos:scopeNote xml:lang="es">Partida prematura del colegio antes de haber concluído un ciclo completo o un curso ya iniciado.</skos:scopeNote>
+        <skos:scopeNote xml:lang="fr">Départ prématuré de l'école avant d'avoir complété un cycle ou un cours commencés.</skos:scopeNote>
+        <skos:scopeNote xml:lang="ru">Преждевременное завершение пребывания в школе до окончания начатого цикла или курса обучения.</skos:scopeNote>
+        <skos:altLabel xml:lang="es">Abandono escolar</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Abandon précoce</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Abandon scolaire</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Décrochage scolaire</skos:altLabel>
+    </skos:Concept>
+
+</rdf:RDF>

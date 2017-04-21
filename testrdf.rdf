@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xml:base="http://www.eionet.europa.eu/gemet/"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+
+
+
+
+    <skos:ConceptScheme rdf:about="http://skos.um.es/unescothes/CS000">
+        <skos:prefLabel xml:lang="en">UNESCO Thesaurus</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Tesauro de la UNESCO</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Thésaurus de l'UNESCO</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Тезаурус ЮНЕСКО</skos:prefLabel>
+        <dcterms:title xml:lang="en">UNESCO Thesaurus</dcterms:title>
+        <dcterms:title xml:lang="es">Tesauro de la UNESCO</dcterms:title>
+        <dcterms:title xml:lang="fr">Thésaurus de l'UNESCO</dcterms:title>
+        <dcterms:title xml:lang="ru">Тезаурус ЮНЕСКО</dcterms:title>
+        <dcterms:source rdf:resource="http://databases.unesco.org/thesaurus/"/>
+        <dcterms:source rdf:resource="http://www2.ulcc.ac.uk/unesco/"/>
+        <dcterms:creator>UNESCO</dcterms:creator>
+        <dcterms:publisher>Juan Antonio Pastor Sánchez</dcterms:publisher>
+        <dcterms:date rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-01T00:00:00Z</dcterms:date>
+        <skos:hasTopConcept rdf:resource="http://skos.um.es/unescothes/C00008"/>
+    </skos:ConceptScheme>
+
+
+    <skos:Collection rdf:about="http://skos.um.es/unescothes/COL006">
+        <skos:prefLabel xml:lang="en">Politics, law and economics</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Politique, droit et économie</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">Política, derecho y economía</skos:prefLabel>
+        <skos:prefLabel xml:lang="ru">Политика, право и экономика</skos:prefLabel>
+        <skos:notation>6</skos:notation>
+        <skos:inScheme rdf:resource="http://skos.um.es/unescothes/CS000"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL605"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL610"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL615"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL620"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL625"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL630"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL635"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL640"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL645"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL650"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL655"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL660"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL665"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL670"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL675"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL680"/>
+        <skos:member rdf:resource="http://skos.um.es/unescothes/COL685"/>
+    </skos:Collection>
+  
+    <skos:Concept rdf:about="http://ark.frantiq.fr/ark:/26678/pcrtKWS6It1qMw">
+        <skos:prefLabel xml:lang="it">Parigi</skos:prefLabel>
+        <skos:prefLabel xml:lang="nl">Parijs</skos:prefLabel>
+        <skos:prefLabel xml:lang="de">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="en">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="fr">Paris</skos:prefLabel>
+        <skos:prefLabel xml:lang="es">París</skos:prefLabel>
+        <skos:prefLabel xml:lang="ar">باريس</skos:prefLabel>
+        <skos:altLabel xml:lang="fr">75</skos:altLabel>
+        <skos:altLabel xml:lang="fr">Seine Dép</skos:altLabel>
+        <skos:inScheme rdf:resource="http://cchum-kvm-frantiq-pactols.in2p3.fr/opentheso/?idg=5&amp;idt=TH_1"/>
+        <skos:broader rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtsoMTZbebfg"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtt0mXEUFjHw"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtGkmsKwylMo"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtred13Xjdws"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtLTGltZwkr1"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtZ7GRAzpmyT"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtwZXYW02lEj"/>
+        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtb9LoM5aG6U"/>
+        <dcterms:created>2007-02-08</dcterms:created>
+        <dcterms:modified>2007-02-08</dcterms:modified>
+        <dcterms:identifier>9146</dcterms:identifier>
+        <skos:exactMatch rdf:resource="http://www.geonames.org/2988507"/>
+        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.85341</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.3488</geo:long>
+    </skos:Concept>
+    
+    <skos:Concept rdf:about="concept/7411">
+        <skos:inScheme rdf:resource="gemetThesaurus"/>
+        <skos:relatedMatch rdf:resource="http://dbpedia.org/resource/Sanctions" />
+        <skos:narrower rdf:resource="concept/112" />
+        <skos:narrower rdf:resource="concept/1486" />
+        <skos:narrower rdf:resource="concept/6102" />
+        <skos:narrower rdf:resource="concept/7616" />
+        <skos:narrower rdf:resource="concept/13937" />
+        <skos:exactMatch rdf:resource="http://eurovoc.europa.eu/3862" />
+        <skos:broader rdf:resource="concept/95" />
+    </skos:Concept>
+  
+  
+</rdf:RDF>

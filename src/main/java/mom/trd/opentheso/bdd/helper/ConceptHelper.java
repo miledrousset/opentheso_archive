@@ -1110,7 +1110,7 @@ public class ConceptHelper {
             HierarchicalRelationship hierarchicalRelationship, int idUser) {
 
         //     Connection conn;
-        Statement stmt;
+       Statement stmt;
 
         try {
             //conn.setAutoCommit(false);

@@ -127,12 +127,11 @@ public class ThesaurusHelper {
      * ou null
      *
      * @param conn
-     * @param thesaurus
      * @param urlSite
      * @param isArkActive
      * @return String Id du thésaurus rajouté
      */
-    public String addThesaurusRollBack(Connection conn, Thesaurus thesaurus,
+    public String addThesaurusRollBack(Connection conn,
             String urlSite, boolean isArkActive) {
 
         String idThesaurus = null;
@@ -186,7 +185,7 @@ public class ThesaurusHelper {
                             + "current_date)";
 
                     stmt.executeUpdate(query);
-                    thesaurus.setId_thesaurus(idThesaurus);
+                 //   thesaurus.setId_thesaurus(idThesaurus);
                    /* if(thesaurus.getTitle().isEmpty()) {
                         thesaurus.setTitle("theso_" + idThesaurus);
                     }

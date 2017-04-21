@@ -30,6 +30,7 @@ import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
 import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
 import mom.trd.opentheso.core.imports.helper.ImportTabulateHelper;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
+import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.tabulate.ImportTabuleIntoBDD;
 import mom.trd.opentheso.core.imports.tabulate.ReadFileTabule;
 import net.coobird.thumbnailator.Thumbnails;
@@ -226,6 +227,7 @@ public class FileBean implements Serializable {
             }
         }
     }
+    
 
     
     /**

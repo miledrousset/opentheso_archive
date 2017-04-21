@@ -467,7 +467,7 @@ public class SelectedThesaurus implements Serializable {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
             
-                String idThesaurus = th.addThesaurusRollBack(conn, editTheso, null, arkActive);
+                String idThesaurus = th.addThesaurusRollBack(conn, null, arkActive);
                 if(idThesaurus == null){
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
                     conn.rollback();
