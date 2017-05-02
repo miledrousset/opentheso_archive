@@ -13,6 +13,7 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     private String langue;
     private String idDomaine;
     private String idTopConcept;
+    private boolean isGroup =false;
     
     public MyTreeNode(int type, String id, String idT, String l, String idD, String idTC, String icone, Object value, TreeNode parent)
    {

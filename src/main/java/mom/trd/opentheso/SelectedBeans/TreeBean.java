@@ -110,12 +110,12 @@ public class TreeBean implements Serializable {
      * @param langue
      */
     public void initTree(String idTheso, String langue) {
-
+        //if(langue == null) langue = "fr";//test
         if (connect.getPoolConnexion() == null) {
             System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données !!!!!!! ");
             return;
         }
-        List<NodeGroup> racineNode = new GroupHelper().getListConceptGroup(connect.getPoolConnexion(), idTheso, langue);
+        List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
         for (NodeGroup n : racineNode) {
             if (n.getLexicalValue().trim().isEmpty()) {
@@ -222,15 +222,18 @@ public class TreeBean implements Serializable {
      */
     public void onNodeExpand(NodeExpandEvent event) {
         if (!event.getTreeNode().getType().equals("orphan")) {
-            ArrayList<NodeConceptTree> liste;
+            ArrayList<NodeConceptTree> liste = null;
             ConceptHelper ch = new ConceptHelper();
+            GroupHelper gh = new GroupHelper();
             int type = 3;
 
             //<Retirer noeuds fictifs>
             if (event.getTreeNode().getChildCount() == 1) {
                 event.getTreeNode().getChildren().remove(0);
             }
-
+            
+            /************************ OLD ************************/
+            /*  
             if (((MyTreeNode) event.getTreeNode()).getTypeMot() == 1) {
                 liste = ch.getListTopConcepts(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdMot(),
                         ((MyTreeNode) event.getTreeNode()).getIdTheso(), ((MyTreeNode) event.getTreeNode()).getLangue());
@@ -238,16 +241,45 @@ public class TreeBean implements Serializable {
             } else {
                 liste = ch.getListConcepts(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdMot(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
                         ((MyTreeNode) event.getTreeNode()).getLangue());
+            }*/
+            
+            
+            MyTreeNode myTreeNode = (MyTreeNode) event.getTreeNode();
+            String idNode = myTreeNode.getIdMot();
+            if(gh.isIdOfGroup(connect.getPoolConnexion(), idNode,myTreeNode.getIdTheso())){
+                
+                myTreeNode.setTypeMot(1);//pour group ?
+                
+                
+                liste = gh.getRelationGroupOf(connect.getPoolConnexion(), idNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                
+                if(liste == null || liste.isEmpty()){
+                    liste = ch.getListTopConcepts(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdMot(),
+                        ((MyTreeNode) event.getTreeNode()).getIdTheso(), ((MyTreeNode) event.getTreeNode()).getLangue());
+                }
+                
             }
+            else{
+                liste = ch.getListConcepts(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdMot(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
+                        ((MyTreeNode) event.getTreeNode()).getLangue());
+            }
+            
+            
+            
+            
 
             TreeNode tn;
 
             // Ajout dans l'arbre
             for (NodeConceptTree nct : liste) {
-                ConceptHelper help = new ConceptHelper();
                 String value, idTC, icon;
-                if (help.haveChildren(connect.getPoolConnexion(), nct.getIdThesaurus(), nct.getIdConcept())) {
+                if (ch.haveChildren(connect.getPoolConnexion(), nct.getIdThesaurus(), nct.getIdConcept()) 
+                        || nct.isHaveChildren()  
+                    ) {
                     icon = "dossier";
+                    if(nct.isIsGroup())
+                        icon ="domaine";
+                    
                     if (type == 2) { //CrÃ©ation de topConcepts
                         if (nct.getTitle().trim().isEmpty()) {
                             value = nct.getIdConcept();
@@ -293,7 +325,7 @@ public class TreeBean implements Serializable {
                     if (nct.getStatusConcept().equals("hidden")) {
                         icon = "hidden";
                     }
-                    new MyTreeNode(type, nct.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
+                   new MyTreeNode(type, nct.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
                             ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdDomaine(),
                             idTC, icon, value, event.getTreeNode());
                 }

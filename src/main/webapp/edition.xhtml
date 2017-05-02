@@ -46,6 +46,7 @@
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosRdf4jDlg.xhtml" />
+            <ui:include src="/dialogs/export/exportSkosRdf4jDlg.xhtml" />
             
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -123,6 +124,11 @@
                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
                                         
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportSkosDlg" oncomplete="PF('exportSkosDlg').show();"
+                                                    style="font-size: 12px;"/>
+                                        
+                                        
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} RDF4J"  actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}"
+                                                    update=":idexportSkosRdf4jDlg" oncomplete="PF('exportSkosRdf4jDlg').show();"
                                                     style="font-size: 12px;"/>
                                         
                                         

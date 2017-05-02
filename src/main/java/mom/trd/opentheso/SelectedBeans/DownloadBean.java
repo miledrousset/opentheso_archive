@@ -3,6 +3,7 @@ package mom.trd.opentheso.SelectedBeans;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -23,7 +24,11 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
+import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
+import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -285,6 +290,35 @@ public class DownloadBean implements Serializable {
         
         return file;
     }
+    
+    public StreamedContent thesoToSkosRdf4j(String idTheso,
+                List<NodeLang> selectedLanguages,
+                List<NodeGroup> selectedGroups) {
+        
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        
+        exportRdf4jHelper.setInfos( connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
+        exportRdf4jHelper.addThesaurus(idTheso);
+        exportRdf4jHelper.addGroup(idTheso);
+        exportRdf4jHelper.addConcept(idTheso);
+        
+        
+        WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+        
+        
+        System.out.println("");
+        System.out.println("--------------------------------------");
+        System.out.println("               RDF4J                  ");
+        System.out.println("--------------------------------------");
+        Rio.write(writeRdf4j.getModel(),System.out, RDFFormat.RDFXML);
+        System.out.println("");
+        
+        
+        
+        return file;
+
+    }
+    
 
   
     

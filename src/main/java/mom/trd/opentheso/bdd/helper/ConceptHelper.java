@@ -2494,6 +2494,44 @@ public class ConceptHelper {
         }
         return idGroup;
     }
+    public ArrayList<String> getListGroupParentIdOfGroup(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idGroupParentt = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group1 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group2 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            idGroupParentt.add(resultSet.getString("id_group1"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
+        }
+        return idGroupParentt;
+    }
+    
 
     /**
      * Cette fonction permet de récupérer les identifiants des Group des parents
@@ -2697,6 +2735,7 @@ public class ConceptHelper {
                             nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
                             nodeConceptTree1.setIdThesaurus(idThesaurus);
                             nodeConceptTree1.setIdLang(idLang);
+                            nodeConceptTree1.setIsTopTerm(true);
                             nodeConceptTree.add(nodeConceptTree1);
                         }
                     }
@@ -3062,6 +3101,7 @@ public class ConceptHelper {
                             nodeConceptTree1.setIdConcept(resultSet.getString("id_concept2"));
                             nodeConceptTree1.setIdThesaurus(idThesaurus);
                             nodeConceptTree1.setIdLang(idLang);
+                            nodeConceptTree1.setIsTerm(true);
                             nodeConceptTree.add(nodeConceptTree1);
                         }
                     }

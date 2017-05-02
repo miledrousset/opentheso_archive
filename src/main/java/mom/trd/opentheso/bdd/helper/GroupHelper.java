@@ -17,6 +17,7 @@ import java.util.List;
 import mom.trd.opentheso.bdd.datas.ConceptGroup;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
@@ -35,6 +36,76 @@ public class GroupHelper {
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
     public GroupHelper() {
+    }
+
+    public void addSubGroup(HikariDataSource ds,
+            String fatherNodeID, String childNodeID, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            String relation = "sub";
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into relation_group "
+                            + "(id_group1, id_thesaurus, relation, id_group2)"
+                            + "values ("
+                            + "'" + fatherNodeID + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'" + relation + "'"
+                            + ",'" + childNodeID + "'"
+                            + ")";
+
+                    stmt.executeUpdate(query);
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding relation : " + sqle);
+        }
+
+    }
+
+    public void addConceptGroupConcept(HikariDataSource ds,
+            String groupID, String conceptID, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into concept_group_concept "
+                            + "(idgroup, idthesaurus, idconcept)"
+                            + "values ("
+                            + "'" + groupID + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'" + conceptID + "'"
+                            + ")";
+
+                    stmt.executeUpdate(query);
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while addConceptGroupConcept : " + sqle);
+        }
+
     }
 
     /**
@@ -777,6 +848,63 @@ public class GroupHelper {
         return nodeGroupList;
     }
 
+    public ArrayList<NodeConceptTree> getRelationGroupOf(HikariDataSource ds,
+            String idConceptGroup, String idThesaurus, String idLang) {
+        ArrayList<NodeConceptTree> nodeConceptTrees = null;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        /*
+        Select * from concept_group_label where lang = 'fr' and idgroup = ( select id_group2 
+						from relation_group 
+						where relation ='sub' and id_group1='COL001' and id_thesaurus='8PWENn6esK'
+						)
+         */
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT * FROM concept_group_label WHERE "
+                            + "lang = '" + idLang + "' and "
+                            + "idgroup IN ("
+                            + "SELECT id_group2 FROM relation_group WHERE "
+                            + "relation = 'sub' and "
+                            + "id_group1 = '" + idConceptGroup + "' and "
+                            + "id_thesaurus = '" + idThesaurus + "' "
+                            + ")";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    nodeConceptTrees = new ArrayList<NodeConceptTree>();
+                    while (resultSet.next()) {
+                        NodeConceptTree nodeConceptTree = new NodeConceptTree();
+                        nodeConceptTree.setIdConcept(resultSet.getString("idgroup"));
+                        nodeConceptTree.setIdLang(idLang);
+                        nodeConceptTree.setIdThesaurus(idThesaurus);
+                        nodeConceptTree.setTitle(resultSet.getString("lexicalvalue"));
+                        nodeConceptTree.setStatusConcept("");
+                        nodeConceptTree.setHaveChildren(true);
+                        nodeConceptTree.setIsGroup(true);
+                        nodeConceptTrees.add(nodeConceptTree);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while  getChildrenOf: " + idThesaurus, sqle);
+        }
+
+        return nodeConceptTrees;
+    }
+
     /**
      * Permet de retourner un NodeConceptGroup par identifiant, par thésaurus et
      * par langue / ou null si rien cette fonction ne retourne pas les détails
@@ -874,26 +1002,24 @@ public class GroupHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT * from permuted where "
-                             + " id_group = '" + idConceptGroup + "'"
+                            + " id_group = '" + idConceptGroup + "'"
                             + "  and id_thesaurus = '" + idThesaurus + "'";
-                    resultSet= stmt.executeQuery(query);
+                    resultSet = stmt.executeQuery(query);
 
-                        while( resultSet.next())
-                        {
-                                nodeConceptGroup = new NodeGroup();
-                                int  orden= resultSet.getInt(1);
-                                nodeConceptGroup.setOrde(orden);
-                                nodeConceptGroup.setId_concept(resultSet.getString("id_concept"));
-                                nodeConceptGroup.setId_group(idConceptGroup);
-                                nodeConceptGroup.setId_theso(idThesaurus);
-                                nodeConceptGroup.setIdLang(resultSet.getString("id_lang"));
-                                nodeConceptGroup.setLexicalValue(resultSet.getString("lexical_value"));
-                                nodeConceptGroup.setIspreferredterm(resultSet.getBoolean("ispreferredterm"));
-                                nodeConceptGroup.setOriginal_value(resultSet.getString("original_value"));
-                                nodeConceptGroupList.add(nodeConceptGroup);
-                        }
-                        nodeConceptGroup.setConceptGroup(conceptGroup);
-
+                    while (resultSet.next()) {
+                        nodeConceptGroup = new NodeGroup();
+                        int orden = resultSet.getInt(1);
+                        nodeConceptGroup.setOrde(orden);
+                        nodeConceptGroup.setId_concept(resultSet.getString("id_concept"));
+                        nodeConceptGroup.setId_group(idConceptGroup);
+                        nodeConceptGroup.setId_theso(idThesaurus);
+                        nodeConceptGroup.setIdLang(resultSet.getString("id_lang"));
+                        nodeConceptGroup.setLexicalValue(resultSet.getString("lexical_value"));
+                        nodeConceptGroup.setIspreferredterm(resultSet.getBoolean("ispreferredterm"));
+                        nodeConceptGroup.setOriginal_value(resultSet.getString("original_value"));
+                        nodeConceptGroupList.add(nodeConceptGroup);
+                    }
+                    nodeConceptGroup.setConceptGroup(conceptGroup);
 
                 } finally {
                     stmt.close();
@@ -1108,9 +1234,29 @@ public class GroupHelper {
 
         return nodeConceptGroupList;
     }
-    
-    
-        public ArrayList<NodeGroup> getListConceptGroup2(HikariDataSource ds,
+
+    public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
+            String idThesaurus, String idLang) {
+        
+        ArrayList<NodeGroup> nodeConceptGroupList;
+        ArrayList tabIdConceptGroup = getListIdOfRootGroup(ds, idThesaurus);
+
+        nodeConceptGroupList = new ArrayList<>();
+        for (Object tabIdGroup1 : tabIdConceptGroup) {
+            NodeGroup nodeConceptGroup;
+            nodeConceptGroup = getThisConceptGroup(ds, tabIdGroup1.toString(), idThesaurus, idLang);
+            if (nodeConceptGroup == null) {
+                return null;
+            }
+            nodeConceptGroupList.add(nodeConceptGroup);
+        }
+
+        return nodeConceptGroupList;
+         
+
+    }
+
+    public ArrayList<NodeGroup> getListConceptGroup2(HikariDataSource ds,
             String idThesaurus, String idLang) throws SQLException {
 
         ArrayList<NodeGroup> nodeConceptGroupList;
@@ -1274,6 +1420,41 @@ public class GroupHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    tabIdConceptGroup = new ArrayList();
+                    while (resultSet.next()) {
+                        tabIdConceptGroup.add(resultSet.getString("idgroup"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Id or Groups of thesaurus : " + idThesaurus, sqle);
+        }
+        return tabIdConceptGroup;
+    }
+    public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList tabIdConceptGroup = null;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "'and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();

@@ -18,6 +18,27 @@ public class NodeConceptTree implements Comparable {
         private String idLang;
         private String statusConcept;
 	private boolean haveChildren = false;
+        private boolean isGroup =false;
+        private boolean isTopTerm =false;
+        private boolean isTerm =false;
+
+    public boolean isIsTopTerm() {
+        return isTopTerm;
+    }
+
+    public void setIsTopTerm(boolean isTopTerm) {
+        this.isTopTerm = isTopTerm;
+    }
+
+    public boolean isIsTerm() {
+        return isTerm;
+    }
+
+    public void setIsTerm(boolean isTerm) {
+        this.isTerm = isTerm;
+    }
+        
+
         
     public NodeConceptTree() {
         this.title = "";
@@ -79,6 +100,14 @@ public class NodeConceptTree implements Comparable {
 
     public void setStatusConcept(String statusConcept) {
         this.statusConcept = statusConcept;
+    }
+
+    public boolean isIsGroup() {
+        return isGroup;
+    }
+
+    public void setIsGroup(boolean isGroup) {
+        this.isGroup = isGroup;
     }
 
 

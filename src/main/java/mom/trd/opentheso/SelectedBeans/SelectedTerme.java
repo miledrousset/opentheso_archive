@@ -309,11 +309,14 @@ public class SelectedTerme implements Serializable {
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
         majTAsso();
+        
+        GroupHelper groupHelper = new GroupHelper();
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
-        if (type == 1) {
+        
+        if (groupHelper.isIdOfGroup(connect.getPoolConnexion(),idC,idTheso)) {
             microTheso = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
 
-            NodeGroup ncg = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
+            NodeGroup ncg = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             nom = ncg.getLexicalValue();
             idArk = ncg.getConceptGroup().getIdARk();
@@ -323,6 +326,8 @@ public class SelectedTerme implements Serializable {
                 dateC = dateFormat.format(ncg.getCreated());
                 dateM = dateFormat.format(ncg.getModified());
             }
+            
+            majGroupTGen();
             majLangueGroup();
             majTSpeGroup();
 
@@ -631,7 +636,30 @@ public class SelectedTerme implements Serializable {
             termeGenerique.addAll(tempMap2.entrySet());
         }
     }
+    
+     private void majGroupTGen() {
+        termeGenerique = new ArrayList<>();
+        // On ajoute le domaine
+        ArrayList<String> listIdGroup = new ConceptHelper().getListGroupParentIdOfGroup(connect.getPoolConnexion(), idC, idTheso);
+        HashMap<String, String> tempMap = new HashMap<>();
+        for (String group : listIdGroup) {
+            tempMap.put(group, new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), group, idTheso, idlangue));
+        }
+        termeGenerique.addAll(tempMap.entrySet());
 
+        ArrayList<NodeBT> tempBT = new RelationsHelper().getListBT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        for (NodeBT nbt : tempBT) {
+            HashMap<String, String> tempMap2 = new HashMap<>();
+            if (nbt.getStatus().equals("hidden")) {
+                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + "</del>");
+            } else {
+                tempMap2.put(nbt.getIdConcept(), nbt.getTitle());
+            }
+            termeGenerique.addAll(tempMap2.entrySet());
+        }
+    }
+
+    
     public void majSearch() {
         if (nodeSe.isTopConcept()) {
             type = 2;

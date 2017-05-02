@@ -86,11 +86,10 @@ public class rdf4jFileBean implements Serializable {
         progress =  progress_abs/total *100;
         importRdf4jHelper.addGroups(this);
         importRdf4jHelper.addConcepts(this);
-       
         uploadEnable = true;
         BDDinsertEnable = false;
         uri = null;
-        total = 0;
+        total =0;
     }
 
     public String getFormatDate() {
