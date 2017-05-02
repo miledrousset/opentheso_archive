@@ -94,7 +94,15 @@ public class WriteRdf4j {
 
     private void writeConceptScheme() {
         SKOSResource conceptScheme = xmlDocument.getConceptScheme();
-        builder.subject(vf.createIRI(conceptScheme.getUri()));//createURI(conceptScheme.getUri()));
+        vf.createLiteral("skos:ConceptScheme");
+        vf.createIRI(conceptScheme.getUri());
+        
+
+        builder.subject(vf.createIRI(conceptScheme.getUri()));
+                
+                
+      //  builder.subject(SKOS.CONCEPT_SCHEME);//, conceptScheme.getUri());
+     //   builder.subject(vf.createIRI(conceptScheme.getUri()));//createURI(conceptScheme.getUri()));
         
    //     builder.add(SKOS.CONCEPT_SCHEME, literal);
         
