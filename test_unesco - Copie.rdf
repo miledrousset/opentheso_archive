@@ -36,7 +36,6 @@
         <skos:prefLabel xml:lang="fr">Education</skos:prefLabel>
         <skos:prefLabel xml:lang="es">Educación</skos:prefLabel>
         <skos:prefLabel xml:lang="ru">Образование</skos:prefLabel>
-        <skos:notation>1</skos:notation>
         <iso-thes:microThesaurusOf rdf:resource="http://skos.um.es/unescothes/CS000"/>
         <iso-thes:subGroup rdf:resource="http://skos.um.es/unescothes/COL165"/>
     </skos:Collection>
@@ -51,7 +50,6 @@
         <skos:prefLabel xml:lang="fr">Evaluation de l'éducation</skos:prefLabel>
         <skos:prefLabel xml:lang="es">Evaluación de la educación</skos:prefLabel>
         <skos:prefLabel xml:lang="ru">Процессы оценки в сфере образования</skos:prefLabel>
-        <skos:notation>1.65</skos:notation>
         <iso-thes:superGroup rdf:resource="http://skos.um.es/unescothes/COL001"/>
         <skos:member rdf:resource="http://skos.um.es/unescothes/C00008"/>
         <skos:member rdf:resource="http://skos.um.es/unescothes/C00010"/>
@@ -61,34 +59,7 @@
 
     </skos:Collection>
     
-    <skos:Concept rdf:about="http://ark.frantiq.fr/ark:/26678/pcrtKWS6It1qMw">
-        <skos:prefLabel xml:lang="it">Parigi</skos:prefLabel>
-        <skos:prefLabel xml:lang="nl">Parijs</skos:prefLabel>
-        <skos:prefLabel xml:lang="de">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="en">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="fr">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="es">París</skos:prefLabel>
-        <skos:prefLabel xml:lang="ar">باريس</skos:prefLabel>
-        <skos:altLabel xml:lang="fr">75</skos:altLabel>
-        <skos:altLabel xml:lang="fr">Seine Dép</skos:altLabel>
-
-        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
-        <skos:inScheme rdf:resource="http://cchum-kvm-frantiq-pactols.in2p3.fr/opentheso/?idg=5&amp;idt=TH_1"/>
-        <skos:broader rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtsoMTZbebfg"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtt0mXEUFjHw"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtGkmsKwylMo"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtred13Xjdws"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtLTGltZwkr1"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtZ7GRAzpmyT"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtwZXYW02lEj"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtb9LoM5aG6U"/>
-        <dcterms:created>2007-02-08</dcterms:created>
-        <dcterms:modified>2007-02-08</dcterms:modified>
-        <dcterms:identifier>9146</dcterms:identifier>
-        <skos:exactMatch rdf:resource="http://www.geonames.org/2988507"/>
-        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.85341</geo:lat>
-        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.3488</geo:long>
-    </skos:Concept>
+   
     
     <skos:Concept rdf:about="http://skos.um.es/unescothes/C00008">
         <skos:prefLabel xml:lang="en">Academic achievement</skos:prefLabel>
@@ -119,6 +90,7 @@
         <skos:related rdf:resource="http://skos.um.es/unescothes/C01271"/>
         <skos:related rdf:resource="http://skos.um.es/unescothes/C03862"/>
         <skos:related rdf:resource="http://skos.um.es/unescothes/C03949"/>
+		<skos:notation>1.65</skos:notation>
         <uneskos:mainConceptOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
         <skos:topConceptOf rdf:resource="http://skos.um.es/unescothes/CS000"/>
     </skos:Concept>
@@ -155,6 +127,7 @@
         <skos:altLabel xml:lang="fr">Abandon précoce</skos:altLabel>
         <skos:altLabel xml:lang="fr">Abandon scolaire</skos:altLabel>
         <skos:altLabel xml:lang="fr">Décrochage scolaire</skos:altLabel>
+		<skos:exactMatch rdf:resource="http://www.geonames.org/2988507"/>
     </skos:Concept>
 
 </rdf:RDF>

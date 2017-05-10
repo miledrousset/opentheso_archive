@@ -123,6 +123,17 @@ public class SelectedThesaurus implements Serializable {
     
     @ManagedProperty(value = "#{treeBean}")
     private TreeBean tree;
+    
+    @ManagedProperty(value = "#{newtreeBean}")
+    private NewTreeBean newTree;
+
+    public NewTreeBean getNewTree() {
+        return newTree;
+    }
+
+    public void setNewTree(NewTreeBean newTree) {
+        this.newTree = newTree;
+    }
 
 
     
@@ -165,6 +176,7 @@ public class SelectedThesaurus implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "ark");
         return bundlePref;
+        
     }     
     
     /**
@@ -779,6 +791,11 @@ public class SelectedThesaurus implements Serializable {
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+
+        
+        
+        if(newTree!=null)
+            newTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setCreat(false);
     }
     
@@ -825,6 +842,9 @@ public class SelectedThesaurus implements Serializable {
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setCreat(false);
+        
+        if(newTree!=null)
+            newTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
     }
     
 /***************************************** FACETTES *****************************************/
@@ -1447,6 +1467,7 @@ public class SelectedThesaurus implements Serializable {
 
     public ArrayList<Entry<String, String>> getArrayFacette() {
         if(connect.getPoolConnexion() != null) {
+            
             ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             Map<String, String> mapTemp = new HashMap<>();
             for(NodeFacet nf : temp) {

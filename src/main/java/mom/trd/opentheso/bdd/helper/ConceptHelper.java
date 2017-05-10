@@ -2434,6 +2434,8 @@ public class ConceptHelper {
                             idGroup.add(resultSet.getString("id_group"));
                         }
                     }
+                    
+                    
 
                 } finally {
                     stmt.close();
@@ -2516,6 +2518,44 @@ public class ConceptHelper {
                     if (resultSet != null) {
                         while (resultSet.next()) {
                             idGroupParentt.add(resultSet.getString("id_group1"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
+        }
+        return idGroupParentt;
+    }
+    
+    public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idGroupParentt = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group2 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group1 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            idGroupParentt.add(resultSet.getString("id_group2"));
                         }
                     }
 
@@ -2645,6 +2685,7 @@ public class ConceptHelper {
         }
         return listIdOfTopConcept;
     }
+   
 
     /**
      * Cette fonction permet de récupérer la liste des Ids of Topconcepts pour
@@ -2723,7 +2764,7 @@ public class ConceptHelper {
                 try {
                     String query = "select id_concept, status from concept where id_thesaurus = '"
                             + idThesaurus + "'"
-                            + " and id_group = '" + idGroup + "'"
+                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"+idGroup+ "')" 
                             + " and top_concept = true";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -3674,7 +3715,18 @@ public class ConceptHelper {
             }
         }
         if (resultat.isEmpty()) {
-            path.add(getGroupIdOfConcept(ds, idConcept, idThesaurus));
+            
+            String group;
+            
+            do{
+                group = getGroupIdOfConcept(ds, idConcept, idThesaurus);
+                    if(group == null)
+                        group = new GroupHelper().getIdFather(ds, idConcept, idThesaurus);
+                path.add(group);
+                idConcept = group;
+            }while(new GroupHelper().getIdFather(ds, group, idThesaurus) != null);
+            
+         
             ArrayList<String> pathTemp = new ArrayList<>();
             for (String path2 : firstPath) {
                 pathTemp.add(path2);
@@ -3694,6 +3746,7 @@ public class ConceptHelper {
         }
 
         return tabId;
+        
     }
 
     public ArrayList<ArrayList<String>> getPathOfConcept(HikariDataSource ds,

@@ -7,7 +7,7 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.2.4
+-- version=4.2.6
 -- date : 10/02/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 

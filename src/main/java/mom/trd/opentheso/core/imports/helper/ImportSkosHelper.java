@@ -1712,7 +1712,7 @@ public class ImportSkosHelper {
         return id;
     }
     
-    private String getIdFromUri(String uri) {
+    public String getIdFromUri(String uri) {
         if (uri.contains("idg=")) {
             if(uri.contains("&")){
                 uri = uri.substring(uri.indexOf("idg=") + 4, uri.indexOf("&"));

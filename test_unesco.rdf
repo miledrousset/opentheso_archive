@@ -61,34 +61,7 @@
 
     </skos:Collection>
     
-    <skos:Concept rdf:about="http://ark.frantiq.fr/ark:/26678/pcrtKWS6It1qMw">
-        <skos:prefLabel xml:lang="it">Parigi</skos:prefLabel>
-        <skos:prefLabel xml:lang="nl">Parijs</skos:prefLabel>
-        <skos:prefLabel xml:lang="de">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="en">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="fr">Paris</skos:prefLabel>
-        <skos:prefLabel xml:lang="es">París</skos:prefLabel>
-        <skos:prefLabel xml:lang="ar">باريس</skos:prefLabel>
-        <skos:altLabel xml:lang="fr">75</skos:altLabel>
-        <skos:altLabel xml:lang="fr">Seine Dép</skos:altLabel>
-
-        <uneskos:memberOf rdf:resource="http://skos.um.es/unescothes/COL165"/>
-        <skos:inScheme rdf:resource="http://cchum-kvm-frantiq-pactols.in2p3.fr/opentheso/?idg=5&amp;idt=TH_1"/>
-        <skos:broader rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtsoMTZbebfg"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtt0mXEUFjHw"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtGkmsKwylMo"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtred13Xjdws"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtLTGltZwkr1"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtZ7GRAzpmyT"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtwZXYW02lEj"/>
-        <skos:narrower rdf:resource="http://ark.frantiq.fr/ark:/26678/pcrtb9LoM5aG6U"/>
-        <dcterms:created>2007-02-08</dcterms:created>
-        <dcterms:modified>2007-02-08</dcterms:modified>
-        <dcterms:identifier>9146</dcterms:identifier>
-        <skos:exactMatch rdf:resource="http://www.geonames.org/2988507"/>
-        <geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.85341</geo:lat>
-        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.3488</geo:long>
-    </skos:Concept>
+   
     
     <skos:Concept rdf:about="http://skos.um.es/unescothes/C00008">
         <skos:prefLabel xml:lang="en">Academic achievement</skos:prefLabel>
@@ -135,6 +108,13 @@
         <skos:narrower rdf:resource="http://skos.um.es/unescothes/C01717"/>
         <skos:related rdf:resource="http://skos.um.es/unescothes/C01109"/>
         <skos:related rdf:resource="http://skos.um.es/unescothes/C02336"/>
+		<skos:relatedMatch rdf:resource="http://dbpedia.org/resource/Sanctions" />
+        <skos:narrower rdf:resource="concept/112" />
+        <skos:narrower rdf:resource="concept/1486" />
+        <skos:narrower rdf:resource="concept/6102" />
+        <skos:narrower rdf:resource="concept/7616" />
+        <skos:narrower rdf:resource="concept/13937" />
+        <skos:exactMatch rdf:resource="http://eurovoc.europa.eu/3862" />
     </skos:Concept>
 
     <skos:Concept rdf:about="http://skos.um.es/unescothes/C01110">
@@ -155,6 +135,8 @@
         <skos:altLabel xml:lang="fr">Abandon précoce</skos:altLabel>
         <skos:altLabel xml:lang="fr">Abandon scolaire</skos:altLabel>
         <skos:altLabel xml:lang="fr">Décrochage scolaire</skos:altLabel>
+		<geo:lat rdf:datatype="http://www.w3.org/2001/XMLSchema#double">48.85341</geo:lat>
+        <geo:long rdf:datatype="http://www.w3.org/2001/XMLSchema#double">2.3488</geo:long>
     </skos:Concept>
 
 </rdf:RDF>

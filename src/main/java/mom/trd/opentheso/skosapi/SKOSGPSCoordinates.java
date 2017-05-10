@@ -15,8 +15,27 @@ public class SKOSGPSCoordinates {
     String lon;
 
     public SKOSGPSCoordinates() {
+        
+    }
+    
+    public SKOSGPSCoordinates(String lat,String lon) {
         this.lat = lat;
         this.lon = lon;
+    }
+    
+    public SKOSGPSCoordinates(double lat,double lon) {
+        String la = null;
+        String lo=null;        
+        try{
+            la = Double.toString(lat);
+            lo = Double.toString(lon);
+        }catch(Exception e){
+            return;
+        }
+        
+        
+        this.lat = la;
+        this.lon = lo;
     }
 
     public String getLat() {

@@ -330,6 +330,8 @@ public class SelectedTerme implements Serializable {
             majGroupTGen();
             majLangueGroup();
             majTSpeGroup();
+            
+          
 
         } else {
             Concept concept = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -456,7 +458,7 @@ public class SelectedTerme implements Serializable {
 
     private void majLangueGroup() {
         langues = new ArrayList<>();
-        ArrayList<NodeGroupTraductions> tempNGT = new GroupHelper().getGroupTraduction(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
+        ArrayList<NodeGroupTraductions> tempNGT = new GroupHelper().getGroupTraduction(connect.getPoolConnexion(), idC, idTheso, idlangue);
         HashMap<String, String> tempMapL = new HashMap<>();
         for (NodeGroupTraductions ngt : tempNGT) {
             tempMapL.put(ngt.getIdLang(), ngt.getTitle());
@@ -467,12 +469,21 @@ public class SelectedTerme implements Serializable {
     private void majTSpeGroup() {
         termesSpecifique = new ArrayList<>();
         ConceptHelper ch = new ConceptHelper();
+        GroupHelper gh = new GroupHelper();
         ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue);
         for (NodeConceptTree nct : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             tempMap1.put(nct.getIdConcept(), nct.getTitle());
             termesSpecifique.addAll(tempMap1.entrySet());
         }
+        for(String tGroup : ch.getListGroupChildIdOfGroup(connect.getPoolConnexion(), idC, idTheso)){
+            
+            String value  = gh.getLexicalValueOfGroup(connect.getPoolConnexion(), tGroup, idTheso, idlangue);
+            HashMap<String, String> tempMap1 = new HashMap<>();
+            tempMap1.put(tGroup, value);
+            termesSpecifique.addAll(tempMap1.entrySet());
+        }
+        
     }
 
     private void majGroup() {

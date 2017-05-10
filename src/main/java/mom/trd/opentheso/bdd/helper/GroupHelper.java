@@ -108,6 +108,44 @@ public class GroupHelper {
 
     }
 
+    public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idGroupParentt = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group2 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group1 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            idGroupParentt.add(resultSet.getString("id_group2"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
+        }
+        return idGroupParentt;
+    }
+
     /**
      * Fonction qui permet de supprimer un domaine de la branche donnée avec un
      * concept de tête un domaine et thesaurus
@@ -868,7 +906,8 @@ public class GroupHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT * FROM concept_group_label WHERE "
-                            + "lang = '" + idLang + "' and "
+                            + "lang = '" + idLang + "' and " 
+                            + "idthesaurus = '" + idThesaurus + "' and " 
                             + "idgroup IN ("
                             + "SELECT id_group2 FROM relation_group WHERE "
                             + "relation = 'sub' and "
@@ -903,6 +942,42 @@ public class GroupHelper {
         }
 
         return nodeConceptTrees;
+    }
+
+    public String getIdFather(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idFather = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group1 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group2 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    resultSet.next();
+                    idFather = resultSet.getString("id_group1");
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while  getChildrenOf: " + idThesaurus, sqle);
+        }
+
+        return idFather;
     }
 
     /**
@@ -1237,7 +1312,7 @@ public class GroupHelper {
 
     public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
             String idThesaurus, String idLang) {
-        
+
         ArrayList<NodeGroup> nodeConceptGroupList;
         ArrayList tabIdConceptGroup = getListIdOfRootGroup(ds, idThesaurus);
 
@@ -1252,7 +1327,6 @@ public class GroupHelper {
         }
 
         return nodeConceptGroupList;
-         
 
     }
 
@@ -1440,6 +1514,7 @@ public class GroupHelper {
         }
         return tabIdConceptGroup;
     }
+
     public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
             String idThesaurus) {
 
