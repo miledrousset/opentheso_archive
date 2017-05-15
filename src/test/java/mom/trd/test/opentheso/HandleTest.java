@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -71,6 +72,96 @@ public class HandleTest {
     @After
     public void tearDown() {
     }
+    
+
+    /*********************************
+     *********************************
+     * 
+     * Test OK 
+     * 
+     *********************************
+     *********************************
+    */
+    
+    /**
+     * Fonction pour récupérer l'identifiant Handle non sécurisé
+     * 
+     * OKKKKKK pour la récupération des identifiants 
+     * 
+     */
+    @Test 
+    public void curlGetHandle() {
+                    
+        String output ="";
+        String xmlRecord = "";
+        try {
+         //   String query = "20.500.11942/TEST";
+            String requete = "http://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/TEST";
+            
+            URL myURL = new URL(requete);// + URLEncoder.encode(query, "utf8"));
+            HttpURLConnection myURLConnection = (HttpURLConnection)myURL.openConnection();
+            myURLConnection.setRequestMethod("GET");
+    //        myURLConnection.setRequestProperty("X-Parse-Application-Id", "");
+    //        myURLConnection.setRequestProperty("X-Parse-REST-API-Key", "");
+            myURLConnection.setRequestProperty("Content-Type", "application/json");
+            myURLConnection.setUseCaches(false);
+            myURLConnection.setDoInput(true);
+            myURLConnection.setDoOutput(true);
+            myURLConnection.connect();
+            
+    //        JSONObject jsonParam = new JSONObject();
+    //        jsonParam.put("score", "73453");
+            
+            OutputStream os = myURLConnection.getOutputStream();
+   //        os.write(URLEncoder.encode(jsonParam.toString(),"UTF-8").getBytes());    
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader((myURLConnection.getInputStream())));
+            
+
+            while ((output = br.readLine()) != null) {
+                xmlRecord += output;
+            }
+            byte[] bytes = xmlRecord.getBytes();
+            xmlRecord = new String(bytes, Charset.forName("UTF-8"));
+            
+            os.close();
+        } catch (UnsupportedEncodingException ex) {
+            System.out.println(ex);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+        
+        System.out.println(xmlRecord);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * PUT mais ne marche pas encore.
+     */
+    
 
     @Test
     /*
@@ -138,18 +229,27 @@ public class HandleTest {
              */
             conn.setDoOutput(true);
 
-            
             // -d '{"index":1,"type":"URL",
             // "data":{"format":"string","value":"http://www.huma-num.fr"},"ttl":86400,"permissions":"1110"}'
-            String data = "{\"index\":1,\"type\":\"URL\"," +
-                            "\"data\":{\"format\":\"string\",\"value\":\"http://www.opentheso3.mom.fr\"},\"ttl\":86400,\"permissions\":\"1110\"}";
-            
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-            out.write(data);
-            out.close();
+            String data = "{\"index\":1,\"type\":\"URL\","
+                    + "\"data\":{\"format\":\"string\",\"value\":\"http://www.opentheso3.mom.fr\"},\"ttl\":86400,\"permissions\":\"1110\"}";
 
             OutputStream os = conn.getOutputStream();
-            //        os.write(URLEncoder.encode(jsonParam.toString(),"UTF-8").getBytes());    
+            
+            OutputStreamWriter out = new OutputStreamWriter(os);
+            out.write(data);
+
+
+            System.out.println(out.toString());//Files.copy(Paths.get("/home/myNewFile.txt"), out));
+            
+            InputStream in = conn.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(in); 
+            
+            out.close();
+
+            in.close();
+            
+//            os.write(URLEncoder.encode(jsonParam.toString(),"UTF-8").getBytes());    
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
@@ -162,16 +262,26 @@ public class HandleTest {
             System.out.println(xmlRecord);
             os.close();
 
-       /*     try (OutputStream out = conn.getOutputStream()) {
+            /*     try (OutputStream out = conn.getOutputStream()) {
                 System.out.println(out.toString());//Files.copy(Paths.get("/home/myNewFile.txt"), out));
             }*/
-
         } catch (MalformedURLException ex) {
             Logger.getLogger(HandleTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(HandleTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     public boolean verify(String urlHostName, SSLSession session) {
         System.out.println("Warning: URL Host: " + urlHostName + " vs. " + session.getPeerHost());
@@ -227,53 +337,7 @@ public class HandleTest {
         
 
     }*/
-    /**
-     * Fonction pour récupérer l'identifiant Handle non sécurisé
-     */
-    /*    @Test 
-    public void curlGetHandle() {
-                    
-        String output ="";
-        String xmlRecord = "";
-        try {
-         //   String query = "20.500.11942/TEST";
-            String requete = "http://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/TEST";
-            
-            URL myURL = new URL(requete);// + URLEncoder.encode(query, "utf8"));
-            HttpURLConnection myURLConnection = (HttpURLConnection)myURL.openConnection();
-            myURLConnection.setRequestMethod("GET");
-    //        myURLConnection.setRequestProperty("X-Parse-Application-Id", "");
-    //        myURLConnection.setRequestProperty("X-Parse-REST-API-Key", "");
-            myURLConnection.setRequestProperty("Content-Type", "application/json");
-            myURLConnection.setUseCaches(false);
-            myURLConnection.setDoInput(true);
-            myURLConnection.setDoOutput(true);
-            myURLConnection.connect();
-            
-    //        JSONObject jsonParam = new JSONObject();
-    //        jsonParam.put("score", "73453");
-            
-            OutputStream os = myURLConnection.getOutputStream();
-   //        os.write(URLEncoder.encode(jsonParam.toString(),"UTF-8").getBytes());    
-            
-            BufferedReader br = new BufferedReader(new InputStreamReader((myURLConnection.getInputStream())));
-            
 
-            while ((output = br.readLine()) != null) {
-                xmlRecord += output;
-            }
-            byte[] bytes = xmlRecord.getBytes();
-            xmlRecord = new String(bytes, Charset.forName("UTF-8"));
-            
-            os.close();
-        } catch (UnsupportedEncodingException ex) {
-            System.out.println(ex);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-        
-        System.out.println(xmlRecord);
-    }*/
     /**
      * Fonction pour récupérer l'identifiant Handle ( sécurisé mais ne marche
      * pas encore )

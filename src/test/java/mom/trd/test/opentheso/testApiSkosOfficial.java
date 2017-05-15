@@ -18,7 +18,7 @@ import org.semanticweb.owlapi.io.OWLOntologyDocumentTarget;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.SystemOutDocumentTarget;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLDocumentFormat;
+//import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
@@ -125,7 +125,7 @@ public class testApiSkosOfficial {
             owlxmlFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat()); 
         } 
 
-        manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) owlxmlFormat, IRI.create(file.toURI())); 
+   //     manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) owlxmlFormat, IRI.create(file.toURI())); 
 
         // Dump an ontology to System.out by specifying a different OWLOntologyOutputTarget 
         // Note that we can write an ontology to a stream in a similar way  
@@ -139,7 +139,7 @@ public class testApiSkosOfficial {
         { 
             manSyntaxFormat.copyPrefixesFrom(format.asPrefixOWLOntologyFormat()); 
         } 
-        manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) manSyntaxFormat, documentTarget); 
+   //     manager.saveOntology(skos, (OWLOntologyFormat) (OWLDocumentFormat) manSyntaxFormat, documentTarget); 
     }
     
     

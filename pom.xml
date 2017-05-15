@@ -4,7 +4,7 @@
 
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.2.5</version>
+    <version>4.3.0</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -75,6 +75,12 @@
             <groupId>skos-api-onejar</groupId>
             <artifactId>skos-api-onejar</artifactId>
             <version>4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-model</artifactId>
+            <version>2.1.4</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
