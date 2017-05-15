@@ -6,24 +6,17 @@
 package mom.trd.opentheso.core.imports.rdf4j.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
-import mom.trd.opentheso.bdd.datas.DcElement;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
@@ -44,7 +37,6 @@ import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
-import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSCreator;
@@ -56,13 +48,6 @@ import mom.trd.opentheso.skosapi.SKOSMatch;
 import mom.trd.opentheso.skosapi.SKOSNotation;
 import mom.trd.opentheso.skosapi.SKOSRelation;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.skos.SKOSDataset;
-import org.semanticweb.skosapibinding.SKOSManager;
-import skos.SKOSConceptScheme;
-import uk.ac.manchester.cs.skos.SKOSDatasetImpl;
 
 /**
  *

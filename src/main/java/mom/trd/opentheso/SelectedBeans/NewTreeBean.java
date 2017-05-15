@@ -10,12 +10,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.primefaces.event.NodeExpandEvent;
@@ -30,7 +33,6 @@ import org.primefaces.model.TreeNode;
 @ManagedBean(name = "newtreeBean", eager = true)
 @SessionScoped
 
-
 public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
@@ -42,22 +44,31 @@ public class NewTreeBean implements Serializable {
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
 
+    @ManagedProperty(value = "#{langueBean}")
+    private LanguageBean langueBean;
+
     private TreeNode root;
     private TreeNode selectedNode;
     private ArrayList<TreeNode> selectedNodes;
+    private String idThesoSelected;
+    private String defaultLanguage;
 
     public NewTreeBean() {
         root = (TreeNode) new DefaultTreeNode("Root", null);
         selectedNodes = new ArrayList<>();
     }
 
+    private boolean createValid = false;
+
     /**
      *
      * @param idTheso
      * @param langue
      */
-    public void initTree(String idTheso,String langue) {
-                
+    public void initTree(String idTheso, String langue) {
+
+        //      idThesoSelected = idTheso;
+        //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
 
         if (connect.getPoolConnexion() == null) {
@@ -84,6 +95,18 @@ public class NewTreeBean implements Serializable {
             //loadOrphan(idTheso, langue);
         }
 
+    }
+    
+    public void majSearchPermute() {
+        selectedTerme.majSearchPermute();
+        reInit();
+        reExpand();
+    }
+    
+    public void majSearch() {
+        selectedTerme.majSearch();
+        reInit();
+        reExpand();
     }
 
     public void onNodeExpand(NodeExpandEvent event) {
@@ -121,14 +144,14 @@ public class NewTreeBean implements Serializable {
 
             // Ajout dans l'arbre
             for (NodeConceptTree nodeConceptTree : liste) {
- 
+
                 String value, idTC, icon;
                 if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
                         || nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
                     if (nodeConceptTree.isIsGroup()) {
                         icon = "domaine";
-                       
+
                     }
 
                     if (type == 2) { //CrÃ©ation de topConcepts
@@ -199,11 +222,25 @@ public class NewTreeBean implements Serializable {
         selectedTerme.setTree(0);
 
     }
-    
-    
-    
-    
+
+    /**
+     * Permet de mettre à jour l'arbre et le terme à la sélection d'un index
+     * rapide par autocomplétion
+     */
+    public void majIndexRapidSearch() {
+        selectedTerme.majIndexRapidSearch(idThesoSelected, defaultLanguage);
+        reInit();
+        reExpand();
+    }
+
     public void changeTerme(String id, int type) {
+        
+        selectedNode.setSelected(false);
+        
+        for (TreeNode node : selectedNodes){
+            node.setSelected(false);
+        }
+        
         String idTC;
         if (type == 2) { //On vient d'un domaine
             idTC = id;
@@ -221,15 +258,16 @@ public class NewTreeBean implements Serializable {
 
         MyTreeNode mTN = new MyTreeNode(type, id, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(), selectedTerme.getIdDomaine(), idTC, null, null, null);
         selectedTerme.majTerme(mTN);
+        
         reExpand();
         vue.setOnglet(0);
     }
-    
+
     public void reExpand() {
         if (selectedNode == null) {
-      //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
+            //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
-    //    selectedNode.setSelected(false);
+        //    selectedNode.setSelected(false);
         for (TreeNode tn : selectedNodes) {
             tn.setSelected(false);
         }
@@ -240,7 +278,7 @@ public class NewTreeBean implements Serializable {
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
         reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
     }
-    
+
     /**
      * Expansion automatique de la racine
      *
@@ -249,10 +287,10 @@ public class NewTreeBean implements Serializable {
      * @param langue
      */
     private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue) {
-      //  if(selectedNodes.isEmpty()){
+        //  if(selectedNodes.isEmpty()){
         if (root.getChildCount() == 0) {
             // On recrÃ©e la racine
-            List<NodeGroup> racineNode = new GroupHelper().getListConceptGroup(connect.getPoolConnexion(), idTheso, langue);
+            List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
             Collections.sort(racineNode);
 
             for (NodeGroup n : racineNode) {
@@ -309,7 +347,7 @@ public class NewTreeBean implements Serializable {
             for (TreeNode dynamicTreeNode : racineNode) {
                 if (!dynamicTreeNode.getType().equals("orphan")) {
                     for (ArrayList<String> tabId : listeId) {
-                        // Si c'est le chemin, on Ã©tend
+                        // Si c'est le , on Ã©tend
                         if (tabId.size() > 1 && tabId.get(0) != null) {
                             if (tabId.get(0).equals(((MyTreeNode) dynamicTreeNode).getIdDomaine())) {
                                 reExpandChild(tabId, (MyTreeNode) dynamicTreeNode, 1);
@@ -343,23 +381,19 @@ public class NewTreeBean implements Serializable {
             }
         }
 
-
     }
-    //<Retirer noeuds fictifs>
-            
+
     private void reExpandChild(ArrayList<String> listeId, TreeNode node, int cpt) {
         if (!node.isExpanded()) {
             ArrayList<NodeConceptTree> liste = null;
             ConceptHelper conceptHelper = new ConceptHelper();
             GroupHelper groupHelper = new GroupHelper();
             int type = 3;
-            
+
             if (node.getChildCount() == 1) {
                 node.getChildren().remove(0);
             }
-            
-           
-         
+
             MyTreeNode myTreeNode = (MyTreeNode) node;
             String idConcept = myTreeNode.getIdMot();
             if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso())) {
@@ -381,14 +415,14 @@ public class NewTreeBean implements Serializable {
 
             // Ajout dans l'arbre
             for (NodeConceptTree nodeConceptTree : liste) {
- 
+
                 String value, idTC, icon;
                 if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
                         || nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
                     if (nodeConceptTree.isIsGroup()) {
                         icon = "domaine";
-                       
+
                     }
 
                     if (type == 2) { //CrÃ©ation de topConcepts
@@ -411,10 +445,21 @@ public class NewTreeBean implements Serializable {
                             icon = "hidden";
                         }
                     }
-                    tn = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode)node).getIdTheso(),
+                    tn = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
                             ((MyTreeNode) node).getLangue(), ((MyTreeNode) node).getIdDomaine(),
                             idTC, icon, value, node);
                     new DefaultTreeNode("fake", tn);
+
+                    if (listeId.get(cpt).equals(((MyTreeNode) tn).getIdMot())) {
+                        if (cpt + 1 < listeId.size()) {
+                            tn.setSelected(false);
+                            reExpandChild(listeId, tn, cpt + 1);
+                        } else {
+                            tn.setSelected(true);
+                            selectedNode = tn;
+                            selectedNodes.add(tn);
+                        }
+                    }
                 } else {
                     icon = "fichier";
                     if (type == 2) { //CrÃ©ation de topConcepts
@@ -436,21 +481,20 @@ public class NewTreeBean implements Serializable {
                     if (nodeConceptTree.getStatusConcept().equals("hidden")) {
                         icon = "hidden";
                     }
-                    new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
+                    tn = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
                             ((MyTreeNode) node).getLangue(), ((MyTreeNode) node).getIdDomaine(),
                             idTC, icon, value, node);
-                    
-                    //????
-                    
-                    if(listeId.contains(((MyTreeNode)tn).getIdMot())){
-                        tn.setSelected(true); 
+
+                    if (listeId.get(cpt).equals(((MyTreeNode) tn).getIdMot())) {
+                        tn.setSelected(true);
                         selectedNode = tn;
                         selectedNodes.add(tn);
+                    } else {
+                        tn.setSelected(false);
                     }
-                    
+
                 }
-                
-                
+
 //*/
             }
             node.setExpanded(true);
@@ -470,27 +514,48 @@ public class NewTreeBean implements Serializable {
             }
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+    public void reInit() {
+        root = (TreeNode) new DefaultTreeNode("Root", null);
+    }
+
+    public void newTSpe() {
+        createValid = false;
+        selectedTerme.setValueEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
+        if (selectedTerme.getValueEdit().trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }
+
+        String valueEdit = selectedTerme.getValueEdit().trim();
+
+        // vérification si c'est le même nom, on fait rien
+        if (valueEdit.equalsIgnoreCase(selectedTerme.getNom())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
+            return;
+        }
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if ((idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return;
+        }
+
+        if (!selectedTerme.creerTermeSpe()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        } else {
+            reInit();
+            reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
+        }
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }
 
     public Connexion getConnect() {
         return connect;
@@ -540,6 +605,36 @@ public class NewTreeBean implements Serializable {
         this.vue = vue;
     }
 
+    public LanguageBean getLangueBean() {
+        return langueBean;
+    }
 
+    public void setLangueBean(LanguageBean langueBean) {
+        this.langueBean = langueBean;
+    }
+
+    public boolean isCreateValid() {
+        return createValid;
+    }
+
+    public void setCreateValid(boolean createValid) {
+        this.createValid = createValid;
+    }
+
+    public String getIdThesoSelected() {
+        return idThesoSelected;
+    }
+
+    public void setIdThesoSelected(String idThesoSelected) {
+        this.idThesoSelected = idThesoSelected;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
+    }
 
 }

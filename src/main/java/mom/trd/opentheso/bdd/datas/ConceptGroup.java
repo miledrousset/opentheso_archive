@@ -42,6 +42,7 @@ public class ConceptGroup {
         return idtypecode;
     }
 
+    
     public void setIdtypecode(String idtypecode) {
         this.idtypecode = idtypecode;
     }

@@ -476,13 +476,13 @@ public class SelectedTerme implements Serializable {
             tempMap1.put(nct.getIdConcept(), nct.getTitle());
             termesSpecifique.addAll(tempMap1.entrySet());
         }
-        for(String tGroup : ch.getListGroupChildIdOfGroup(connect.getPoolConnexion(), idC, idTheso)){
+        /*for(String tGroup : ch.getListGroupChildIdOfGroup(connect.getPoolConnexion(), idC, idTheso)){
             
             String value  = gh.getLexicalValueOfGroup(connect.getPoolConnexion(), tGroup, idTheso, idlangue);
             HashMap<String, String> tempMap1 = new HashMap<>();
             tempMap1.put(tGroup, value);
             termesSpecifique.addAll(tempMap1.entrySet());
-        }
+        }*/
         
     }
 
@@ -628,13 +628,13 @@ public class SelectedTerme implements Serializable {
 
     private void majTGen() {
         termeGenerique = new ArrayList<>();
-        // On ajoute le domaine
-        ArrayList<String> listIdGroup = new ConceptHelper().getListGroupParentIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
+        /*// On ajoute le domaine
+        ArrayList<String> listIdGroup = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
         HashMap<String, String> tempMap = new HashMap<>();
         for (String group : listIdGroup) {
             tempMap.put(group, new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), group, idTheso, idlangue));
         }
-        termeGenerique.addAll(tempMap.entrySet());
+        termeGenerique.addAll(tempMap.entrySet());*/
 
         ArrayList<NodeBT> tempBT = new RelationsHelper().getListBT(connect.getPoolConnexion(), idC, idTheso, idlangue);
         for (NodeBT nbt : tempBT) {
@@ -653,10 +653,10 @@ public class SelectedTerme implements Serializable {
         // On ajoute le domaine
         ArrayList<String> listIdGroup = new ConceptHelper().getListGroupParentIdOfGroup(connect.getPoolConnexion(), idC, idTheso);
         HashMap<String, String> tempMap = new HashMap<>();
-        for (String group : listIdGroup) {
+        /*for (String group : listIdGroup) {
             tempMap.put(group, new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), group, idTheso, idlangue));
         }
-        termeGenerique.addAll(tempMap.entrySet());
+        termeGenerique.addAll(tempMap.entrySet());*/
 
         ArrayList<NodeBT> tempBT = new RelationsHelper().getListBT(connect.getPoolConnexion(), idC, idTheso, idlangue);
         for (NodeBT nbt : tempBT) {

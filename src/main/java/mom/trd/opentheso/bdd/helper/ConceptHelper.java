@@ -143,6 +143,8 @@ public class ConceptHelper {
 
             concept.setTopConcept(true);
             String idConcept = addConceptInTable(conn, concept, idUser);
+            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
+            
             if (idConcept == null) {
                 conn.rollback();
                 conn.close();
@@ -280,6 +282,7 @@ public class ConceptHelper {
             concept.setTopConcept(false);
 
             String idConcept = addConceptInTable(conn, concept, idUser);
+            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
             if (idConcept == null) {
                 conn.rollback();
                 conn.close();
@@ -1268,7 +1271,7 @@ public class ConceptHelper {
                     }
 
                     query = "Insert into concept "
-                            + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept, id_group)"
+                            + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept)"
                             + " values ("
                             + "'" + idConcept + "'"
                             + ",'" + concept.getIdThesaurus() + "'"
@@ -1276,7 +1279,7 @@ public class ConceptHelper {
                             + ",'" + concept.getStatus() + "'"
                             + ",'" + concept.getNotation() + "'"
                             + "," + concept.isTopConcept()
-                            + ",'" + concept.getIdGroup() + "')";
+                            +")";
 
                     stmt.executeUpdate(query);
 
@@ -1303,6 +1306,8 @@ public class ConceptHelper {
         }
         return idConcept;
     }
+    
+    
 
     /**
      * cette funtion permet de savoir si le Id_concept déjà est utilicée
@@ -1920,7 +1925,7 @@ public class ConceptHelper {
 
                     if (concept.getCreated() == null || concept.getModified() == null) {
                         query = "Insert into concept "
-                                + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept, id_group)"
+                                + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept)"
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
@@ -1928,10 +1933,10 @@ public class ConceptHelper {
                                 + ",'" + concept.getStatus() + "'"
                                 + ",'" + concept.getNotation() + "'"
                                 + "," + concept.isTopConcept()
-                                + ",'" + concept.getIdGroup() + "')";
+                                 + "')";
                     } else {
                         query = "Insert into concept "
-                                + "(id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept, id_group)"
+                                + "(id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept)"
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
@@ -1940,8 +1945,8 @@ public class ConceptHelper {
                                 + ",'" + concept.getModified() + "'"
                                 + ",'" + concept.getStatus() + "'"
                                 + ",'" + concept.getNotation() + "'"
-                                + "," + concept.isTopConcept()
-                                + ",'" + concept.getIdGroup() + "')";
+                                + ",'" + concept.isTopConcept()
+                                + "')";
                     }
 
                     stmt.executeUpdate(query);
@@ -1961,6 +1966,10 @@ public class ConceptHelper {
         }
         return status;
     }
+    
+    
+    
+    
 
     /**
      * Cette fonction permet de récupérer un Concept par son id et son thésaurus
@@ -1984,7 +1993,7 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select * from concept where id_thesaurus = '"
+                    String query = "select * from concept left join concept_group_concept  on id_concept = idconcept and id_thesaurus = idthesaurus where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and id_concept = '" + idConcept + "'";
                     stmt.executeQuery(query);
@@ -2000,7 +2009,7 @@ public class ConceptHelper {
                         concept.setStatus(resultSet.getString("status"));
                         concept.setNotation(resultSet.getString("notation"));
                         concept.setTopConcept(resultSet.getBoolean("top_concept"));
-                        concept.setIdGroup(resultSet.getString("id_group"));
+                        concept.setIdGroup(resultSet.getString("idgroup"));
                     }
                     resultSet.close();
 
@@ -2348,14 +2357,14 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_group from concept where id_thesaurus = '"
+                    String query = "select idgroup from concept_group_concept where idthesaurus = '"
                             + idThesaurus + "'"
-                            + " and id_concept = '" + idConcept + "'";
+                            + " and idconcept = '" + idConcept + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         if (resultSet.next()) {
-                            idGroup = resultSet.getString("id_group");
+                            idGroup = resultSet.getString("idgroup");
                         }
                     }
 
@@ -2424,14 +2433,18 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
+                    /*
                     String query = "select id_group from concept where id_thesaurus = '"
                             + idThesaurus + "'"
-                            + " and id_concept = '" + idConcept + "'";
+                            + " and id_concept = '" + idConcept + "'";*/
+                     String query = "select idgroup from concept_group_concept where idthesaurus = '"
+                            + idThesaurus + "'"
+                            + " and idconcept = '" + idConcept + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         while (resultSet.next()) {
-                            idGroup.add(resultSet.getString("id_group"));
+                            idGroup.add(resultSet.getString("idgroup"));
                         }
                     }
                     
@@ -2666,7 +2679,9 @@ public class ConceptHelper {
                 try {
                     String query = "select id_concept from concept where id_thesaurus = '"
                             + idThesaurus + "'"
-                            + " and id_group = '" + idGroup + "'"
+                            + " and id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"
+                            +idGroup+"' AND idthesaurus = '"
+                            + idThesaurus+"')"
                             + " and top_concept = true";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -2710,7 +2725,7 @@ public class ConceptHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "select id_concept,"
-                            + "id_ark, id_group from concept where id_thesaurus = '"
+                            + "id_ark, idgroup from concept left join concept_group_concept on id_concept = idconcept and id_thesaurus = idthesaurus where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and top_concept = true";
                     stmt.executeQuery(query);
@@ -2719,7 +2734,7 @@ public class ConceptHelper {
                         NodeTT nodeTT = new NodeTT();
                         nodeTT.setIdConcept(resultSet.getString("id_concept"));
                         nodeTT.setIdArk(resultSet.getString("id_ark"));
-                        nodeTT.setIdGroup(resultSet.getString("id_group"));
+                        nodeTT.setIdGroup(resultSet.getString("idgroup"));
                         listIdOfTopConcept.add(nodeTT);
                     }
 
@@ -2764,7 +2779,7 @@ public class ConceptHelper {
                 try {
                     String query = "select id_concept, status from concept where id_thesaurus = '"
                             + idThesaurus + "'"
-                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"+idGroup+ "')" 
+                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"+idGroup+ "' AND idthesaurus = '"+idThesaurus+"' )" 
                             + " and top_concept = true";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();

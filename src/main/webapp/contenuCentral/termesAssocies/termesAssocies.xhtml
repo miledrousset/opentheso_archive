@@ -24,10 +24,10 @@
                 <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item2.value != ''}" value="#{item2.value}" escape="false"
-                                         actionListener="#{treeBean.changeTerme(item2.key, 0)}" 
+                                         actionListener="#{newtreeBean.changeTerme(item2.key, 0)}" 
                                          update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                         <p:commandButton styleClass="termClick" rendered="#{item2.value == ''}" value="#{item2.key}" escape="false"
-                                         actionListener="#{treeBean.changeTerme(item2.key, 0)}" 
+                                         actionListener="#{newtreeBean.changeTerme(item2.key, 0)}" 
                                          update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     </h:form>
                 </ui:repeat>

@@ -285,7 +285,7 @@ public class GroupHelper {
                             + ",'" + nodeConceptGroup.getConceptGroup().getIdtypecode() + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getNotation() + "'"
                             + ")";
-
+                                                                                
                     stmt.executeUpdate(query);
 
                     ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
@@ -294,15 +294,17 @@ public class GroupHelper {
                     conceptGroupLabel.setLang(nodeConceptGroup.getIdLang());
                     conceptGroupLabel.setLexicalvalue(nodeConceptGroup.getLexicalValue());
                     addGroupTraduction(ds, conceptGroupLabel, idUser);
-
                     addGroupHistorique(ds, nodeConceptGroup, urlSite, idArk, idUser, idConceptGroup);
+                    
+                    
+                    
                 } finally {
                     stmt.close();
                 }
             } finally {
                 conn.close();
             }
-        } catch (SQLException sqle) {
+        } catch (SQLException sqle){
             // Log exception
             log.error("Error while adding ConceptGroup : " + idConceptGroup, sqle);
         }
@@ -906,8 +908,8 @@ public class GroupHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT * FROM concept_group_label WHERE "
-                            + "lang = '" + idLang + "' and " 
-                            + "idthesaurus = '" + idThesaurus + "' and " 
+                            + "lang = '" + idLang + "' and "
+                            + "idthesaurus = '" + idThesaurus + "' and "
                             + "idgroup IN ("
                             + "SELECT id_group2 FROM relation_group WHERE "
                             + "relation = 'sub' and "
@@ -963,8 +965,9 @@ public class GroupHelper {
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    resultSet.next();
-                    idFather = resultSet.getString("id_group1");
+                    if (resultSet.next()) {
+                        idFather = resultSet.getString("id_group1");
+                    }
 
                 } finally {
                     stmt.close();
@@ -1574,15 +1577,18 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_group from concept where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept = '" + idConcept + "'";
+                    /*String query = "select id_group from concept where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept = '" + idConcept + "'";*/
+
+                    String query = "select idgroup from concept_group_concept where idthesaurus = '" + idThesaurus + "'"
+                            + " and idconcept = '" + idConcept + "'";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         tabIdConceptGroup = new ArrayList<>();
                         while (resultSet.next()) {
-                            tabIdConceptGroup.add(resultSet.getString("id_group"));
+                            tabIdConceptGroup.add(resultSet.getString("idgroup"));
                         }
                     }
 
@@ -1826,6 +1832,81 @@ public class GroupHelper {
             log.error("Error while asking if Title of Term exist : " + title, sqle);
         }
         return existe;
+    }
+    
+    
+    /**
+     * 
+     * @param ds
+     * @param listType 
+ * 
+     */
+    public void getPossibleTypeGroupForAdd(HikariDataSource ds,ArrayList<String> listType){
+         Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select label from concept_group_type";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listType.add(resultSet.getString("label"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
+        }
+        
+    }
+    /**
+     * 
+     * @param ds
+     * @param idPere
+     * @param idTheso
+     * @return 
+     */
+    public String geteTypeGroupPere(HikariDataSource ds,String idPere, String idTheso){
+         Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String typeGroupPere = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select idtypecode from concept_group where idgroup = '" + idPere + "' AND idthesaurus = '" + idTheso +"'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        typeGroupPere =resultSet.getString("idtypecode");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
+        }
+        
+        return typeGroupPere;
     }
 
 }

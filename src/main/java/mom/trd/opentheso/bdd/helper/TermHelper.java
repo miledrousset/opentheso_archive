@@ -1782,8 +1782,11 @@ public class TermHelper {
                         }
                     }*/
                     String query
-                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group "
-                            + "FROM preferred_term, term, concept WHERE "
+                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept_group_concept.idgroup "
+                            + "FROM preferred_term, term, concept,concept_group_concept "
+                            + "WHERE "
+                            + "idThesaurus = concept.id_thesaurus AND "
+                            + "concept_group_concept.idconcept = concept.id_concept AND "
                             + "preferred_term.id_term = term.id_term AND "
                             + "preferred_term.id_thesaurus = term.id_thesaurus AND "
                             + "concept.id_concept = preferred_term.id_concept AND "
@@ -1821,8 +1824,8 @@ public class TermHelper {
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
-                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
-                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                                new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
                                 //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
@@ -1883,15 +1886,17 @@ public class TermHelper {
                 stmt = conn.createStatement();
                 try {
                     String query
-                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group "
-                            + "FROM preferred_term, term, concept WHERE "
+                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, idgroup "
+                            + "FROM preferred_term, term, concept,concept_group_concept WHERE "
                             + "preferred_term.id_term = term.id_term AND "
+                            + "concept_group_concept.idconcept = concept.id_concept AND "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus"
                             + "preferred_term.id_thesaurus = term.id_thesaurus AND "
                             + "concept.id_concept = preferred_term.id_concept AND "
                             + "concept.id_thesaurus = preferred_term.id_thesaurus AND "
                             + "term.id_thesaurus = '" + idThesaurus + "' AND "
                             + "term.lang = '" + idLang + "' AND "
-                            + "concept.id_group = '" + idGroup + "' AND "
+                            + "concept_group_concept.idgroup = '" + idGroup + "' AND "
                             + "concept.id_concept != '" + idSelectedConcept + "' AND "
                             + "concept.id_concept not in (" + BT + ") AND "
                             + "concept.status != 'hidden' AND "
@@ -1908,8 +1913,8 @@ public class TermHelper {
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
-                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
-                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
                                 //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
@@ -1960,15 +1965,17 @@ public class TermHelper {
                 stmt = conn.createStatement();
                 try {
                     String query
-                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group "
-                            + "FROM preferred_term, term, concept WHERE "
+                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, idgroup "
+                            + "FROM preferred_term, term, concept,concept_group_concept WHERE "
                             + "preferred_term.id_term = term.id_term AND "
+                            + "concept_group_concept.idconcept = concept.id_concept AND "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus AND "
                             + "preferred_term.id_thesaurus = term.id_thesaurus AND "
                             + "concept.id_concept = preferred_term.id_concept AND "
                             + "concept.id_thesaurus = preferred_term.id_thesaurus AND "
                             + "term.id_thesaurus = '" + idThesaurus + "' AND "
                             + "term.lang = '" + idLang + "' AND "
-                            + "concept.id_group = '" + idGroup + "' AND "
+                            + "idgroup = '" + idGroup + "' AND "
                             + "concept.id_concept != '" + idSelectedConcept + "' AND "
                             + "concept.status != 'hidden' AND "
                             + "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')"
@@ -1984,8 +1991,8 @@ public class TermHelper {
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
-                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
-                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
                                 //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
@@ -2036,15 +2043,17 @@ public class TermHelper {
                 stmt = conn.createStatement();
                 try {
                     String query
-                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept.id_group "
-                            + "FROM preferred_term, term, concept WHERE "
+                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, idgroup "
+                            + "FROM preferred_term, term, concept,concept_group_concept WHERE "
                             + "preferred_term.id_term = term.id_term AND "
+                            + "concept_group_concept.idconcept = concept.id_concept AND "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus"
                             + "preferred_term.id_thesaurus = term.id_thesaurus AND "
                             + "concept.id_concept = preferred_term.id_concept AND "
                             + "concept.id_thesaurus = preferred_term.id_thesaurus AND "
                             + "term.id_thesaurus = '" + idThesaurus + "' AND "
                             + "term.lang = '" + idLang + "' AND "
-                            + "concept.id_group != '" + idGroup + "' AND "
+                            + "concept_group_concept.igroup != '" + idGroup + "' AND "
                             + "concept.id_concept != '" + idSelectedConcept + "' AND "
                             + "concept.status != 'hidden' AND "
                             + "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')"
@@ -2060,8 +2069,8 @@ public class TermHelper {
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
-                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("id_group"), idThesaurus, idLang));
-                                nodeAutoCompletion.setIdGroup(resultSet.getString("id_group"));
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
                                 //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }

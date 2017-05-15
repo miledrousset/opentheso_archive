@@ -10,7 +10,7 @@
                 <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
                              rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="460"
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
-                    <p:ajax event="rowSelect" listener="#{treeBean.majSearch()}" 
+                    <p:ajax event="rowSelect" listener="#{newtreeBean.majSearch()}" 
                             update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <f:facet name="header">
                         <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
@@ -48,7 +48,7 @@
                 <p:dataTable var="tsp" value="#{search.result2}" selectionMode="single" selection="#{selectedTerme.nodePe}" 
                              rowKey="#{tsp.idConcept}" scrollable="true" scrollHeight="460"
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
-                    <p:ajax event="rowSelect" listener="#{treeBean.majSearchPermute()}" 
+                    <p:ajax event="rowSelect" listener="#{newtreeBean.majSearchPermute()}" 
                             update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <f:facet name="header">
                         <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
