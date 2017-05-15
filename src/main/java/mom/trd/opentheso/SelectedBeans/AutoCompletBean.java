@@ -36,8 +36,8 @@ public class AutoCompletBean implements Serializable {
     @ManagedProperty(value = "#{theso}")
     private SelectedThesaurus theso;
 
-    @ManagedProperty(value = "#{treeBean}")
-    private TreeBean tree;
+    @ManagedProperty(value = "#{newtreeBean}")
+    private NewTreeBean tree;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -891,11 +891,11 @@ public class AutoCompletBean implements Serializable {
         this.terme = terme;
     }
 
-    public TreeBean getTree() {
+    public NewTreeBean getTree() {
         return tree;
     }
 
-    public void setTree(TreeBean tree) {
+    public void setTree(NewTreeBean tree) {
         this.tree = tree;
     }
 

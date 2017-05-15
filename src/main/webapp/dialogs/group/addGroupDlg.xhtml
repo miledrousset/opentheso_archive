@@ -15,8 +15,26 @@
                     <td>
                         <h:inputText id="lVDom" value="#{theso.nodeCG.lexicalValue}"/>
                     </td>
-                </tr>           
+                </tr>   
                 <tr>
+                    <td colspan="3" style="text-align: center;">
+                     <p:outputLabel for="type" value="Type: " />
+                    <p:selectOneMenu id="type" value="#{theso.typeDomaineAj}">
+                        <p:ajax  />
+                        <f:selectItem noSelectionOption="false" />
+                        <f:selectItems value="#{theso.typeDomaine}"/>
+                    </p:selectOneMenu>
+                     
+                    </td>
+                </tr>
+                
+                
+                <tr>
+
+
+
+
+
                     <td colspan="3" style="text-align: center;">
                         <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.ajouterDomaine()}" 
                                          update=":ajGroup,:accordeonTree" styleClass="styleButton"

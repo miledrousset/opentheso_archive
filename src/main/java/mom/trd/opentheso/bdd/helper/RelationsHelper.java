@@ -699,12 +699,11 @@ public class RelationsHelper {
                     /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
-                    String query = "UPDATE concept set"
-                            + " id_group = '" + "" + "',"
-                            + " modified = current_date"
-                            + " WHERE id_concept ='" + idConcept + "'"
-                            + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'";
+                    String query = "UPDATE concept_group_concept set"
+                            + " idgroup = '" + "" + "'"
+                            + " WHERE idconcept ='" + idConcept + "'"
+                            + " AND idthesaurus = '" + idThesaurus + "'"
+                            + " AND idgroup = '" + idGroup + "'";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -748,11 +747,10 @@ public class RelationsHelper {
                     /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
-                    query = "UPDATE concept set"
-                            + " id_group = '" + idGroup + "',"
-                            + " modified = now()"
-                            + " WHERE id_concept ='" + idConcept + "'"
-                            + " AND id_thesaurus = '" + idThesaurus + "'";
+                    query = "UPDATE concept_group_concept set"
+                            + " idgroup = '" + idGroup + "'"
+                            + " WHERE idconcept ='" + idConcept + "'"
+                            + " AND idthesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
                     status = true;

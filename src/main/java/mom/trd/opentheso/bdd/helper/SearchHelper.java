@@ -118,7 +118,7 @@ public class SearchHelper {
             group = "";
         }
         else {
-            group = " and concept.id_group = '" + idGroup + "'";
+            group = " and idgroup = '" + idGroup + "'";
         }
         
         
@@ -129,8 +129,10 @@ public class SearchHelper {
                 try {
                     query = "SELECT term.lexical_value, preferred_term.id_concept,"
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept,concept_group_concept WHERE "
+                            + "concept_group_concept.idthesaurus  = term.id_thesaurus AND "
+                            + "concept_group_concept.idconcept = preferred_term.id_concept AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -148,7 +150,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(resultSet.getString("lang"));
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -167,10 +169,11 @@ public class SearchHelper {
                      */
                     query = "SELECT non_preferred_term.id_term, non_preferred_term.lang,"
                         + " non_preferred_term.lexical_value, "
-                        + " concept.id_group, preferred_term.id_concept,"
+                        + " idgroup, preferred_term.id_concept,"
                         + " concept.top_concept"
-                        + " FROM non_preferred_term, preferred_term,"
-                        + " concept WHERE "
+                        + " FROM non_preferred_term, preferred_term,concept_group_concept, concept WHERE "
+                        + "concept_group_concept.idconcept = non_preferred_term.id_term AND "
+                        + "concept_group_concept.idthesaurus = preferred_term.id_thesaurus AND "
                         + " preferred_term.id_term = non_preferred_term.id_term AND"
                         + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND"
                         + " concept.id_concept = preferred_term.id_concept AND"
@@ -188,7 +191,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(resultSet.getString("lang"));
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -207,12 +210,15 @@ public class SearchHelper {
                      */
                     if(withNote) {
                         query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                                " concept.top_concept, concept.id_group," +
+                                " concept.top_concept, idgroup," +
                                 " note.lang, note.lexicalvalue," +
                                 " note.id_term " +
-                                " FROM preferred_term, note, concept" +
+                                " FROM preferred_term, note, concept,concept_group_concept" +
                                 " WHERE" +
-                                " preferred_term.id_term = note.id_term" +
+                                " preferred_term.id_term = note.id_term AND "
+                                + "concept_group_concept.idconcept = concept.id_concept AND "
+                                + "concept.id_thesaurus = concept_group_concept.idthesaurus"
+                                + "" +
                                 " AND" +
                                 " preferred_term.id_thesaurus = note.id_thesaurus" +
                                 " AND" +
@@ -233,7 +239,7 @@ public class SearchHelper {
                             nodeSearch.setLexical_value(resultSet.getString("lexicalvalue"));
                             nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                             nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                            nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                            nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                             nodeSearch.setIdLang(resultSet.getString("lang"));
                             nodeSearch.setIdThesaurus(idThesaurus);
                             nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -247,9 +253,10 @@ public class SearchHelper {
                      */
                     if(withNote) {
                         query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                                " concept.top_concept, concept.id_group," +
+                                " concept.top_concept, idgroup," +
                                 " concept.notation " +
-                                " FROM concept" +
+                                " FROM concept JOIN concept_group_concept ON concept.id_concept = concept_group_concept.idconcept "
+                                + "AND concept.id_thesaurus = concept_group_concept.idthesaurus" +
                                 " WHERE" +
                                 " concept.id_thesaurus = '" + idThesaurus + "'" +
                                 notation +
@@ -263,7 +270,7 @@ public class SearchHelper {
                             nodeSearch.setLexical_value(resultSet.getString("notation"));
                             nodeSearch.setIdConcept(resultSet.getString("id_concept"));
        //                     nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                            nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                            nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                             nodeSearch.setIdLang(idLang);
                             nodeSearch.setIdThesaurus(idThesaurus);
                             nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -341,7 +348,7 @@ public class SearchHelper {
             group = "";
         }
         else {
-            group = " and concept.id_group = '" + idGroup + "'";
+            group = " and idgroup = '" + idGroup + "'";
         }
         
         
@@ -352,11 +359,13 @@ public class SearchHelper {
                 try {
                     // notes des terms
                     query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                            " concept.top_concept, concept.id_group," +
+                            " concept.top_concept, idgroup," +
                             " note.lang, note.lexicalvalue," +
                             " note.id_term " +
-                            " FROM preferred_term, note, concept" +
-                            " WHERE" +
+                            " FROM preferred_term, note, concept,concept_group_concept" +
+                            " WHERE "
+                            + "concept_group_concept.idthesaurus = concept.id_thesaurus AND "
+                            + "concept.id_concept = concept_group_concept.idconcept AND " +
                             " preferred_term.id_term = note.id_term" +
                             " AND" +
                             " preferred_term.id_thesaurus = note.id_thesaurus" +
@@ -378,7 +387,7 @@ public class SearchHelper {
                             nodeSearch.setLexical_value(resultSet.getString("lexicalvalue"));
                             nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                             nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                            nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                            nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                             nodeSearch.setIdLang(resultSet.getString("lang"));
                             nodeSearch.setIdThesaurus(idThesaurus);
                             nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -388,11 +397,13 @@ public class SearchHelper {
                         }
                         // notes des concepts
                    query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                            " concept.top_concept, concept.id_group," +
+                            " concept.top_concept, idgroup," +
                             " note.lang, note.lexicalvalue," +
                             " preferred_term.id_term " +
-                            " FROM preferred_term, note, concept" +
-                            " WHERE" +
+                            " FROM preferred_term, note, concept, concept_group_concept" +
+                            " WHERE "
+                           + "concept_group_concept.idconcept = concept.id_concept AND "
+                           + "concept_group_concept.idthesaurus = concept.id_thesaurus AND " +
                             " preferred_term.id_concept = note.id_concept" +
                             " AND" +
                             " preferred_term.id_thesaurus = note.id_thesaurus" +
@@ -414,7 +425,7 @@ public class SearchHelper {
                             nodeSearch.setLexical_value(resultSet.getString("lexicalvalue"));
                             nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                             nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                            nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                            nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                             nodeSearch.setIdLang(resultSet.getString("lang"));
                             nodeSearch.setIdThesaurus(idThesaurus);
                             nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -469,7 +480,7 @@ public class SearchHelper {
             group = "";
         }
         else {
-            group = " and concept.id_group = '" + idGroup + "'";
+            group = " and idgroup = '" + idGroup + "'";
         }
         
         
@@ -479,9 +490,11 @@ public class SearchHelper {
                 stmt = conn.createStatement();
                 try {
                     query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                            " concept.top_concept, concept.id_group," +
+                            " concept.top_concept, idgroup," +
                             " concept.notation " +
-                            " FROM concept" +
+                            " FROM concept "
+                            + "JOIN concept_group_concept ON concept.id_concept = concept_group_concept.idconcept "
+                            + "AND concept.id_thesaurus = concept_group_concept.idthesaurus " +
                             " WHERE" +
                             " concept.id_thesaurus = '" + idThesaurus + "'" +
                             notation +
@@ -495,7 +508,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("notation"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
    //                     nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -543,8 +556,10 @@ public class SearchHelper {
                 try {
                     String query = "SELECT term.lexical_value, preferred_term.id_concept,"
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept,concept_group_concept WHERE "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus AND"
+                            + "concept_group_concept.idconcept = preferred_term.id_concept AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -563,7 +578,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -615,8 +630,10 @@ public class SearchHelper {
                 try {
                     String query = "SELECT term.lexical_value,"
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept, concept_group_concept WHERE "
+                            + "concept_group_concept.idconcept = preferred_term.id_term AND "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -633,7 +650,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(id);
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -679,8 +696,10 @@ public class SearchHelper {
                 try {
                     String query = "SELECT term.lexical_value,"
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept, concept_group_concept WHERE "
+                            + "concept_group_concept.idconcept = preferred_term.id_term AND "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -696,7 +715,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(id);
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(resultSet.getString("lang"));
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -742,8 +761,10 @@ public class SearchHelper {
                 try {
                     String query = "SELECT term.lexical_value, preferred_term.id_concept,"
                             + " term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept,concept_group_concept WHERE "
+                            + " concept_group_concept.idthesaurus = term.id_thesaurus AND "
+                            + "concept_group_concept.idconcept =preferred_term.id_concept AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -760,7 +781,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(id);
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -807,8 +828,10 @@ public class SearchHelper {
                 try {
                     String query = "SELECT term.lexical_value, preferred_term.id_concept,"
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
-                            + " concept.id_group, concept.top_concept"
-                            + " FROM term, preferred_term, concept WHERE"
+                            + " idgroup, concept.top_concept"
+                            + " FROM term, preferred_term, concept, concept_group_concept WHERE "
+                            + "concept_group_concept.idthesaurus = term.id_thesaurus AND "
+                            + "concept_group_concept.idconcept = preferred_term.id_concept AND "
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
@@ -818,7 +841,7 @@ public class SearchHelper {
                             + " unaccent_string('" + value + "%')"
                             + " and term.id_thesaurus = '" + idThesaurus + "'"
                             + " and term.lang = '" + idLang + "'"
-                            + " and concept.id_group = '" + idGroup + "'"
+                            + " and idgroup = '" + idGroup + "'"
                             + " order by lexical_value ASC LIMIT 100";
 
                     resultSet = stmt.executeQuery(query);
@@ -828,7 +851,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -879,10 +902,12 @@ public class SearchHelper {
                 try {
                     String query = "SELECT non_preferred_term.id_term, "
                             + " non_preferred_term.lexical_value, "
-                            + " concept.id_group, preferred_term.id_concept,"
+                            + " idgroup, preferred_term.id_concept,"
                             + " concept.top_concept"
                             + " FROM non_preferred_term, preferred_term,"
-                            + " concept WHERE "
+                            + " concept,concept_group_concept WHERE "
+                            + " concept_group_concept.idthesaurus = non_preferred_term.id_thesaurus AND"
+                            + " concept_group_concept.idconcept = preferred_term.id_concept AND"
                             + " preferred_term.id_term = non_preferred_term.id_term AND"
                             + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
@@ -901,7 +926,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));
@@ -954,10 +979,12 @@ public class SearchHelper {
                 try {
                     String query = "SELECT non_preferred_term.id_term, "
                             + " non_preferred_term.lexical_value, "
-                            + " concept.id_group, preferred_term.id_concept,"
+                            + " idgroup, preferred_term.id_concept,"
                             + " concept.top_concept"
                             + " FROM non_preferred_term, preferred_term,"
-                            + " concept WHERE "
+                            + " concept,concept_group_concept WHERE "
+                            + " concept_group_concept.idthesaurus = non_preferred_term.id_thesaurus  AND"
+                            + " concept_group_concept.idconcept = non_preferred_term.id_term AND"
                             + " preferred_term.id_term = non_preferred_term.id_term AND"
                             + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
@@ -967,7 +994,7 @@ public class SearchHelper {
                             + " unaccent_string('" + value + "%')"
                             + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
                             + " and non_preferred_term.lang = '" + idLang + "'"
-                            + " and concept.id_group = '" + idGroup + "'"
+                            + " and idgroup = '" + idGroup + "'"
                             + " order by lexical_value ASC LIMIT 100";
 
                     resultSet = stmt.executeQuery(query);
@@ -977,7 +1004,7 @@ public class SearchHelper {
                         nodeSearch.setLexical_value(resultSet.getString("lexical_value"));
                         nodeSearch.setIdConcept(resultSet.getString("id_concept"));
                         nodeSearch.setIdTerm(resultSet.getString("id_term"));
-                        nodeSearch.setIdGroup(resultSet.getString("id_group"));
+                        nodeSearch.setIdGroup(resultSet.getString("idgroup"));
                         nodeSearch.setIdLang(idLang);
                         nodeSearch.setIdThesaurus(idThesaurus);
                         nodeSearch.setTopConcept(resultSet.getBoolean("top_concept"));

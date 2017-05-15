@@ -27,6 +27,18 @@ public class SKOSResource {
      * @param uri un String URI de la ressource
      * @param property le type de ressource
      */
+    public SKOSResource() {
+        labelsList = new ArrayList<SKOSLabel>();
+        relationsList = new ArrayList<SKOSRelation>();
+        documentationsList = new ArrayList<SKOSDocumentation>();
+        dateList = new ArrayList<SKOSDate>();
+        creatorList = new ArrayList<>();
+        GPSCoordinates = new SKOSGPSCoordinates();
+        notationList = new ArrayList<>();
+        matchList = new ArrayList<>();
+
+    }
+
     public SKOSResource(String uri, int property) {
 
         labelsList = new ArrayList<SKOSLabel>();
@@ -192,6 +204,38 @@ public class SKOSResource {
         }
     }
 
+    public void setProperty(int property) {
+        this.property = property;
+    }
+
+    public void setLabelsList(ArrayList<SKOSLabel> labelsList) {
+        this.labelsList = labelsList;
+    }
+
+    public void setRelationsList(ArrayList<SKOSRelation> relationsList) {
+        this.relationsList = relationsList;
+    }
+
+    public void setDocumentationsList(ArrayList<SKOSDocumentation> documentationsList) {
+        this.documentationsList = documentationsList;
+    }
+
+    public void setDateList(ArrayList<SKOSDate> dateList) {
+        this.dateList = dateList;
+    }
+
+    public void setCreatorList(ArrayList<SKOSCreator> creatorList) {
+        this.creatorList = creatorList;
+    }
+
+    public void setNotationList(ArrayList<SKOSNotation> notationList) {
+        this.notationList = notationList;
+    }
+
+    public void setMatchList(ArrayList<SKOSMatch> matchList) {
+        this.matchList = matchList;
+    }
+
     /**
      * Méthode d'ajout des dates de création et de modification à la ressource,
      * dans une ArrayList
@@ -206,6 +250,10 @@ public class SKOSResource {
         } catch (Exception e) {
             e.getMessage();
         }
+    }
+
+    public void setGPSCoordinates(SKOSGPSCoordinates GPSCoordinates) {
+        this.GPSCoordinates = GPSCoordinates;
     }
 
     /**

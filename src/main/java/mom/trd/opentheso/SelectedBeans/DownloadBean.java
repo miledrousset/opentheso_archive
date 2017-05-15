@@ -2,8 +2,12 @@ package mom.trd.opentheso.SelectedBeans;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -27,9 +31,13 @@ import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.output.WriterOutputStream;
+import org.apache.jena.atlas.io.OutStreamUTF8;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.ByteArrayContent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import skos.SKOSXmlDocument;
@@ -38,56 +46,52 @@ import skos.SKOSXmlDocument;
 @SessionScoped
 
 public class DownloadBean implements Serializable {
-
     
     private String skos;
     private StreamedContent file;
-
+    
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
-
+    
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-
+    
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean languageBean;
-
+    
     private String serverArk;
     private boolean arkActive;
     private String serverAdress;
     private String nomUsu;
     
-    
     private int progress_per_100 = 0;
-
+    
     public int getProgress_per_100() {
         return progress_per_100;
     }
-
+    
     public void setProgress_per_100(int progress_per_100) {
         this.progress_per_100 = progress_per_100;
     }
-
+    
     public int getProgress_abs() {
         return progress_abs;
     }
-
+    
     public void setProgress_abs(int progress_abs) {
         this.progress_abs = progress_abs;
     }
-
+    
     public double getSizeOfTheso() {
         return sizeOfTheso;
     }
-
+    
     private int progress_abs = 0;
     private double sizeOfTheso;
-
+    
     public int getProgress() {
         return progress_per_100;
     }
-    
-
     
     @PostConstruct
     public void initTerme() {
@@ -108,38 +112,38 @@ public class DownloadBean implements Serializable {
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
     }
-
+    
     public String conceptSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-
+        
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         return exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso,
                 idC).toString();
 
         //   new ExportFromBDD().exportConcept(connect.getPoolConnexion(), idTheso, idC).toString();
     }
-
+    
     public String groupSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         return exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup).toString();
     }
-
+    
     public String groupJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
-
+        
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
@@ -173,7 +177,7 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer temp = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
         if (temp.length() <= 1500000) {
             skos = temp.toString();
@@ -211,14 +215,14 @@ public class DownloadBean implements Serializable {
          * ici c'est la classe à utiliser pour un export standard au foramt SKOS
          */
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-
+        
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idTheso + "_skos.xml");
@@ -244,10 +248,9 @@ public class DownloadBean implements Serializable {
         }*/
     }
 
-    
     /**
-     * Cette fonction permet d'exporter un thésaurus en SKOS
-     * en précisant les langues et les domaines à exporter
+     * Cette fonction permet d'exporter un thésaurus en SKOS en précisant les
+     * langues et les domaines à exporter
      *
      * @param idTheso
      * @param selectedLanguages
@@ -255,29 +258,25 @@ public class DownloadBean implements Serializable {
      * @return
      */
     public StreamedContent thesoToSkosAdvanced(String idTheso,
-                List<NodeLang> selectedLanguages,
-                List<NodeGroup> selectedGroups) {
+            List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups) {
         
         progress_per_100 = 0;
         progress_abs = 0;
         
-        
         ConceptHelper conceptHelper = new ConceptHelper();
-        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(),idTheso).size();
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
         
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
         
-        StringBuffer skos_local  = exportFromBDD.exportThesaurusAdvanced(
+        StringBuffer skos_local = exportFromBDD.exportThesaurusAdvanced(
                 connect.getPoolConnexion(), idTheso,
-                selectedLanguages, selectedGroups,this);
-
+                selectedLanguages, selectedGroups, this);
+        
         InputStream stream;
-        
-        
         
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
@@ -286,43 +285,48 @@ public class DownloadBean implements Serializable {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-
+        progress_per_100 = 0;
+        progress_abs = 0;
         
         return file;
     }
     
     public StreamedContent thesoToSkosRdf4j(String idTheso,
-                List<NodeLang> selectedLanguages,
-                List<NodeGroup> selectedGroups) {
+            List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups) {
+        
+        
+        progress_per_100 = 0;
+        progress_abs = 0;
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
         
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
         
-        exportRdf4jHelper.setInfos( connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
         exportRdf4jHelper.addThesaurus(idTheso);
         exportRdf4jHelper.addGroup(idTheso);
-        exportRdf4jHelper.addConcept(idTheso);
-        
+        exportRdf4jHelper.addConcept(idTheso,this);
         
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
         
         
-        System.out.println("");
-        System.out.println("--------------------------------------");
-        System.out.println("               RDF4J                  ");
-        System.out.println("--------------------------------------");
-        Rio.write(writeRdf4j.getModel(),System.out, RDFFormat.RDFXML);
-        System.out.println("");
+        ByteArrayOutputStream out;
+        out = new ByteArrayOutputStream();
+        
+        Rio.write(writeRdf4j.getModel(), out, RDFFormat.RDFXML);
+                
+        file =  new ByteArrayContent(out.toByteArray(),"application/xml",  idTheso +"_skos.xml");
         
         
+        progress_per_100 = 0;
+        progress_abs = 0;
         
         return file;
-
+        
     }
-    
 
-  
-    
-    
     /**
      * Cette fonction permet d'exporter un concept en SKOS en temps réel dans la
      * page principale
@@ -333,11 +337,11 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent conceptToSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-
+        
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         InputStream stream;
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso, idC);
@@ -361,15 +365,15 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent conceptToJsonLd(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-
+        
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         InputStream stream;
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso, idC);
-
+        
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
@@ -377,7 +381,7 @@ public class DownloadBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, languageBean.getMsg("error") + " :", languageBean.getMsg("index.exportJsonError")));
             return file;
         }
-
+        
         try {
             stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idC + "_jsonLd.xml");
@@ -401,11 +405,11 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportBranchOfConcept(connect.getPoolConnexion(), idTheso, idConcept);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idConcept + "_Branch_skos.xml");
@@ -427,15 +431,15 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportBranchOfConcept(connect.getPoolConnexion(), idTheso, idConcept);
-
+        
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idConcept + "_Branch_jsonld.xml");
@@ -457,11 +461,11 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_skos.xml");
@@ -471,7 +475,6 @@ public class DownloadBean implements Serializable {
         return file;
     }
 
-    
     /**
      * Cette fonction permet de retourner pour téléchargement un groupe en
      * JsonLd
@@ -485,15 +488,15 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
-
+        
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_jsonld.xml");
@@ -515,11 +518,11 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(skos_local.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_skos.xml");
@@ -542,15 +545,15 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer skos_local = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
-
+        
         JsonHelper jsonHelper = new JsonHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
-
+        
         InputStream stream;
-
+        
         try {
             stream = new ByteArrayInputStream(jsonLd.toString().getBytes("UTF-8"));
             file = new DefaultStreamedContent(stream, "application/xml", idGroup + "_Group_jsonld.xml");
@@ -605,7 +608,7 @@ public class DownloadBean implements Serializable {
         exportFromBDD.setServerAdress(serverAdress);
         exportFromBDD.setServerArk(serverArk);
         exportFromBDD.setArkActive(arkActive);
-
+        
         StringBuffer temp = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
         if (temp.length() <= 1500000) {
             skos = temp.toString();
@@ -637,10 +640,10 @@ public class DownloadBean implements Serializable {
         progress_abs = 0;
         
         ConceptHelper conceptHelper = new ConceptHelper();
-        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(),idTheso).size();
-
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
+        
         ExportTabulateHelper exportTabulateHelper = new ExportTabulateHelper();
-
+        
         exportTabulateHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso);
         exportTabulateHelper.exportToTabulate();
         StringBuffer temp = exportTabulateHelper.getTabulateBuff();
@@ -653,50 +656,51 @@ public class DownloadBean implements Serializable {
         }
         return file;
     }
-/**
- * Applelation de la funtion pour realiser l'injection a la BDD;
- * on puex choisir le fichier dans une fenetre que se ouvre;
- */
-  
-/**
- * Applelation de la funtion avec les parametres pour avoir le motpasstemp
- */
 
+    /**
+     * Applelation de la funtion pour realiser l'injection a la BDD; on puex
+     * choisir le fichier dans une fenetre que se ouvre;
+     */
+
+    /**
+     * Applelation de la funtion avec les parametres pour avoir le motpasstemp
+     */
     public String getSkos() {
         return skos;
     }
-
+    
     public void setSkos(String skos) {
         this.skos = skos;
     }
-
+    
     public Vue getVue() {
         return vue;
     }
-
+    
     public void setVue(Vue vue) {
         this.vue = vue;
     }
-
+    
     public StreamedContent getFile() {
         return file;
     }
-
+    
     public void setFile(StreamedContent file) {
         this.file = file;
     }
-
+    
     public LanguageBean getLanguageBean() {
         return languageBean;
     }
-
+    
     public void setLanguageBean(LanguageBean languageBean) {
         this.languageBean = languageBean;
     }
+
     public String getNomUsu() {
         return nomUsu;
     }
-
+    
     public void setNomUsu(String nomUsu) {
         this.nomUsu = nomUsu;
     }
@@ -704,7 +708,7 @@ public class DownloadBean implements Serializable {
     public Connexion getConnect() {
         return connect;
     }
-
+    
     public void setConnect(Connexion connect) {
         this.connect = connect;
     }

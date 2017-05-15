@@ -108,6 +108,44 @@ public class GroupHelper {
 
     }
 
+    public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idGroupParentt = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group2 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group1 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            idGroupParentt.add(resultSet.getString("id_group2"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
+        }
+        return idGroupParentt;
+    }
+
     /**
      * Fonction qui permet de supprimer un domaine de la branche donnée avec un
      * concept de tête un domaine et thesaurus
@@ -247,7 +285,7 @@ public class GroupHelper {
                             + ",'" + nodeConceptGroup.getConceptGroup().getIdtypecode() + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getNotation() + "'"
                             + ")";
-
+                                                                                
                     stmt.executeUpdate(query);
 
                     ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
@@ -256,15 +294,17 @@ public class GroupHelper {
                     conceptGroupLabel.setLang(nodeConceptGroup.getIdLang());
                     conceptGroupLabel.setLexicalvalue(nodeConceptGroup.getLexicalValue());
                     addGroupTraduction(ds, conceptGroupLabel, idUser);
-
                     addGroupHistorique(ds, nodeConceptGroup, urlSite, idArk, idUser, idConceptGroup);
+                    
+                    
+                    
                 } finally {
                     stmt.close();
                 }
             } finally {
                 conn.close();
             }
-        } catch (SQLException sqle) {
+        } catch (SQLException sqle){
             // Log exception
             log.error("Error while adding ConceptGroup : " + idConceptGroup, sqle);
         }
@@ -869,6 +909,7 @@ public class GroupHelper {
                 try {
                     String query = "SELECT * FROM concept_group_label WHERE "
                             + "lang = '" + idLang + "' and "
+                            + "idthesaurus = '" + idThesaurus + "' and "
                             + "idgroup IN ("
                             + "SELECT id_group2 FROM relation_group WHERE "
                             + "relation = 'sub' and "
@@ -903,6 +944,43 @@ public class GroupHelper {
         }
 
         return nodeConceptTrees;
+    }
+
+    public String getIdFather(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idFather = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_group1 from relation_group where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and id_group2 = '" + idGRoup + "'"
+                            + " and relation='sub'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        idFather = resultSet.getString("id_group1");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while  getChildrenOf: " + idThesaurus, sqle);
+        }
+
+        return idFather;
     }
 
     /**
@@ -1237,7 +1315,7 @@ public class GroupHelper {
 
     public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
             String idThesaurus, String idLang) {
-        
+
         ArrayList<NodeGroup> nodeConceptGroupList;
         ArrayList tabIdConceptGroup = getListIdOfRootGroup(ds, idThesaurus);
 
@@ -1252,7 +1330,6 @@ public class GroupHelper {
         }
 
         return nodeConceptGroupList;
-         
 
     }
 
@@ -1440,6 +1517,7 @@ public class GroupHelper {
         }
         return tabIdConceptGroup;
     }
+
     public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
             String idThesaurus) {
 
@@ -1499,15 +1577,18 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_group from concept where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept = '" + idConcept + "'";
+                    /*String query = "select id_group from concept where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept = '" + idConcept + "'";*/
+
+                    String query = "select idgroup from concept_group_concept where idthesaurus = '" + idThesaurus + "'"
+                            + " and idconcept = '" + idConcept + "'";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         tabIdConceptGroup = new ArrayList<>();
                         while (resultSet.next()) {
-                            tabIdConceptGroup.add(resultSet.getString("id_group"));
+                            tabIdConceptGroup.add(resultSet.getString("idgroup"));
                         }
                     }
 
@@ -1751,6 +1832,81 @@ public class GroupHelper {
             log.error("Error while asking if Title of Term exist : " + title, sqle);
         }
         return existe;
+    }
+    
+    
+    /**
+     * 
+     * @param ds
+     * @param listType 
+ * 
+     */
+    public void getPossibleTypeGroupForAdd(HikariDataSource ds,ArrayList<String> listType){
+         Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select label from concept_group_type";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listType.add(resultSet.getString("label"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
+        }
+        
+    }
+    /**
+     * 
+     * @param ds
+     * @param idPere
+     * @param idTheso
+     * @return 
+     */
+    public String geteTypeGroupPere(HikariDataSource ds,String idPere, String idTheso){
+         Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String typeGroupPere = null;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select idtypecode from concept_group where idgroup = '" + idPere + "' AND idthesaurus = '" + idTheso +"'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        typeGroupPere =resultSet.getString("idtypecode");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
+        }
+        
+        return typeGroupPere;
     }
 
 }

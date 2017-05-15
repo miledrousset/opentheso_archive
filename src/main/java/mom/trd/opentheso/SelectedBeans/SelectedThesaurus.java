@@ -52,13 +52,13 @@ import org.primefaces.model.StreamedContent;
 @SessionScoped
 
 public class SelectedThesaurus implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private Thesaurus thesaurus;
     private Thesaurus editTheso;
     private NodeGroup nodeCG;
-    private String langueTrad ="";
+    private String langueTrad = "";
     private String nomTrad = "";
     private ArrayList<Entry<String, String>> arrayTheso;
     private ArrayList<Entry<String, String>> arrayTrad;
@@ -71,80 +71,83 @@ public class SelectedThesaurus implements Serializable {
     private String idEdit;
     private String langueEdit;
     private String valueEdit;
-    
+
     // Variables URL
     private String idCurl;
     private String idTurl;
     private String idLurl;
     private String idGurl; // id du groupe
-    
-    
+
     // Variables resourcesBundle
     private String langueSource; // la langue de travail par thésaurus (info de la base de données)
     private String workLanguage; // la langue de travail pour démarrer (info du fichier de configuration
     private String cheminSite;
     private String defaultThesaurusId;
     private String identifierType;
-    
-    private String idNaan;    
-    
-    
+
+    private String idNaan;
+
     private NodePreference nodePreference;
     private String version;
     private boolean arkActive;
     private String serverArk;
-    
+
     // Backup
     private ArrayList<String> tablesList;
     private ArrayList<String> tablesListPrivate;
     private ArrayList<Table> sortirXml;
-    
+
     private String nomdufichier;
     private StreamedContent file;
     private StreamedContent fileDownload;
-    
+
     private boolean mesCandidats = false;
     private boolean tousThesos = false;
 
     private boolean internetConection = false;
     //Alignement
-    
 
-    
-    
+    private String typeDomaineAj;
+
+    private String typeDomainePere;
+
+    private ArrayList<String> typeDomaine = new ArrayList<>();
+
     // niveaux des classes Beans
     // theso -> treeBean -> selectedTerme -> user1
     //   4   ->    3     ->      2        ->   1
     // ordre d'initialisation des beans
-    
-    
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    
-    @ManagedProperty(value = "#{treeBean}")
-    private TreeBean tree;
 
 
-    
+
+    @ManagedProperty(value = "#{newtreeBean}")
+    private NewTreeBean tree;
+
+
     @ManagedProperty(value = "#{ssTree}")
     private UnderTree uTree;
-    
+
     @ManagedProperty(value = "#{selectedCandidat}")
     private SelectedCandidat candidat;
-    
+
     @ManagedProperty(value = "#{statBean}")
     private StatBean statBean;
-    
+
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
-    
+
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
-    
+
     @ManagedProperty(value = "#{conceptbean}")
-    private ConceptBean conceptbean;   
-    /************************************** INITIALISATION **************************************/
-    
+    private ConceptBean conceptbean;
+
+    /**
+     * ************************************ INITIALISATION
+     * *************************************
+     */
     /**
      * Récupération des préférences
      *
@@ -165,8 +168,9 @@ public class SelectedThesaurus implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "ark");
         return bundlePref;
-    }     
-    
+
+    }
+
     /**
      * récupère la variable URL et affiche le terme qu'elle désigne
      */
@@ -178,17 +182,17 @@ public class SelectedThesaurus implements Serializable {
             ArrayList<Languages_iso639> temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), idTurl);
             if (temp.isEmpty()) {
                 idCurl = null;
-                idGurl = null;                
+                idGurl = null;
                 idTurl = null;
                 return;
             } else {
                 boolean lExist = false;
-                for(Languages_iso639 l : temp) {
-                    if(l.getId_iso639_1().trim().equals(idLurl)) {
+                for (Languages_iso639 l : temp) {
+                    if (l.getId_iso639_1().trim().equals(idLurl)) {
                         lExist = true;
                     }
                 }
-                if(!lExist) {
+                if (!lExist) {
                     idLurl = temp.get(0).getId_iso639_1().trim();
                 }
             }
@@ -246,12 +250,12 @@ public class SelectedThesaurus implements Serializable {
                 return;
             } else {
                 boolean lExist = false;
-                for(Languages_iso639 l : temp) {
-                    if(l.getId_iso639_1().trim().equals(idLurl)) {
+                for (Languages_iso639 l : temp) {
+                    if (l.getId_iso639_1().trim().equals(idLurl)) {
                         lExist = true;
                     }
                 }
-                if(!lExist) {
+                if (!lExist) {
                     idLurl = temp.get(0).getId_iso639_1().trim();
                 }
             }
@@ -279,8 +283,8 @@ public class SelectedThesaurus implements Serializable {
 
             // Initialisation du terme séléctionné et de l'arbre
             int type = 1;
-            
-       //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
+
+            //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
             /*
             Concept c = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idCurl, idTurl);
             if (c.isTopConcept()) {
@@ -288,7 +292,6 @@ public class SelectedThesaurus implements Serializable {
             } else {
                 type = 3;
             }*/
-
             tree.getSelectedTerme().setIdTheso(idTurl);
             tree.getSelectedTerme().setIdlangue(idLurl);
 
@@ -301,7 +304,7 @@ public class SelectedThesaurus implements Serializable {
             idLurl = null;
             return;
         }
-        
+
         // if the URL is only for thésaurus 
         if (idTurl != null) {
             idLurl = Locale.getDefault().toString().substring(0, 2);
@@ -313,16 +316,16 @@ public class SelectedThesaurus implements Serializable {
                 return;
             } else {
                 boolean lExist = false;
-                for(Languages_iso639 l : temp) {
-                    if(l.getId_iso639_1().trim().equals(idLurl)) {
+                for (Languages_iso639 l : temp) {
+                    if (l.getId_iso639_1().trim().equals(idLurl)) {
                         lExist = true;
                     }
                 }
-                if(!lExist) {
+                if (!lExist) {
                     idLurl = temp.get(0).getId_iso639_1().trim();
                 }
             }
-         /*   if (new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idGurl, idTurl, idLurl) == null) {
+            /*   if (new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idGurl, idTurl, idLurl) == null) {
                 idCurl = null;
                 idGurl = null;
                 idTurl = null;
@@ -345,9 +348,7 @@ public class SelectedThesaurus implements Serializable {
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             // Initialisation du terme séléctionné et de l'arbre
-
-            
-       //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
+            //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
             /*
             Concept c = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idCurl, idTurl);
             if (c.isTopConcept()) {
@@ -355,18 +356,17 @@ public class SelectedThesaurus implements Serializable {
             } else {
                 type = 3;
             }*/
-
             tree.getSelectedTerme().setIdTheso(idTurl);
             tree.getSelectedTerme().setIdlangue(idLurl);
 
-         //   MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null);
-         //   tree.getSelectedTerme().majTerme(mTN);
-        //    tree.reExpand();
+            //   MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null);
+            //   tree.getSelectedTerme().majTerme(mTN);
+            //    tree.reExpand();
             idCurl = null;
             idGurl = null;
             idTurl = null;
             idLurl = null;
-        }        
+        }
     }
 
     /**
@@ -385,24 +385,24 @@ public class SelectedThesaurus implements Serializable {
         workLanguage = bundlePref.getString("workLanguage");
         defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
         identifierType = bundlePref.getString("identifierType");
-        
+
         ResourceBundle bundlePrefArk = getBundlePrefArk();
         idNaan = bundlePrefArk.getString("idNaan");
-        
+
         idCurl = null;
-        idGurl = null;        
+        idGurl = null;
         idTurl = null;
         idLurl = null;
         arrayTrad = new ArrayList<>();
-        
+
     }
 
     @PostConstruct
     public void initTheso() {
         // récupération de la langue de travail préférée à partir du fichier de conf (péférences.properties)
-        
+
         if (connect.getPoolConnexion() != null) {
-           // langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
+            // langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
             arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), workLanguage).entrySet());
             langues = new LanguageHelper().getSelectItemLanguages(connect.getPoolConnexion());
             //bundlePref.getString("langueSource");
@@ -412,16 +412,18 @@ public class SelectedThesaurus implements Serializable {
         }
         StartDefaultThesauriTree();
     }
-    
-    /************************************** EDITION THESO BDD **************************************/
-    
 
     /**
+     * ************************************ EDITION THESO BDD
+     * *************************************
+     */
+    /**
      * Cette fonction permet de nettoyer et réorganiser le thésaurus
-     * @return 
+     *
+     * @return
      */
     public boolean reorganizing() {
-        if(thesaurus.getId_thesaurus().isEmpty()) {
+        if (thesaurus.getId_thesaurus().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
             return false;
         }
@@ -430,74 +432,72 @@ public class SelectedThesaurus implements Serializable {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
 
-            if(!thesaurusHelper.reorganizingTheso(conn, thesaurus.getId_thesaurus())) {
+            if (!thesaurusHelper.reorganizingTheso(conn, thesaurus.getId_thesaurus())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                 conn.rollback();
                 conn.close();
                 return false;
-             }                
+            }
             conn.commit();
             conn.close();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing") ));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing")));
 
             regenerateOrphan();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
         return false;
     }
-    
-    
+
     /**
      * Création d'un nouveau thésaurus avec le role
+     *
      * @param idUser
-     * @param idRole 
+     * @param idRole
      */
     public void ajouterTheso(int idUser, int idRole) {
-        if(editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
+        if (editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
         } else {
-            
+
             ThesaurusHelper th = new ThesaurusHelper();
             th.setIdentifierType(identifierType);
-            
 
             try {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
-            
+
                 String idThesaurus = th.addThesaurusRollBack(conn, null, arkActive);
-                if(idThesaurus == null){
+                if (idThesaurus == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
                     conn.rollback();
                     conn.close();
                     return;
                 }
-                if(editTheso.getTitle().isEmpty()) {
-                     thesaurus.setTitle("theso_" + idThesaurus);
+                if (editTheso.getTitle().isEmpty()) {
+                    thesaurus.setTitle("theso_" + idThesaurus);
                 }
-                if(editTheso.getLanguage() == null) {
+                if (editTheso.getLanguage() == null) {
                     editTheso.setLanguage(workLanguage);
                 }
-                if(!th.addThesaurusTraductionRollBack(conn, editTheso)) {
+                if (!th.addThesaurusTraductionRollBack(conn, editTheso)) {
                     conn.rollback();
                     conn.close();
                     return;
-                 }                
-            
+                }
+
                 // ajout de role pour le thésaurus à l'utilisateur en cours
                 UserHelper userHelper = new UserHelper();
-                if(! userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
+                if (!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                     conn.rollback();
                     conn.close();
-                    return;                    
+                    return;
                 }
                 conn.commit();
                 conn.close();
-            
-                
+
             } catch (SQLException ex) {
                 Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -505,35 +505,35 @@ public class SelectedThesaurus implements Serializable {
             arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
             tree.getSelectedTerme().getUser().updateAuthorizedTheso();
             vue.setCreat(false);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") +  " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
             editTheso = new Thesaurus();
         }
-       // tree.getSelectedTerme().getUser().getUser().getId();
+        // tree.getSelectedTerme().getUser().getUser().getId();
     }
-    
+
     /**
      * Modification d'un thésaurus
      */
     public void editerTheso() {
-        if(editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
+        if (editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
-        }else {
+        } else {
             new ThesaurusHelper().UpdateThesaurus(connect.getPoolConnexion(), editTheso);
             vue.setEdit(false);
         }
-        
+
     }
-    
-    public void getAllTables()
-    {
+
+    public void getAllTables() {
         ExportPrivatesDatas exportData = new ExportPrivatesDatas();
-        tablesList= exportData.showAllTables(connect.getPoolConnexion());
+        tablesList = exportData.showAllTables(connect.getPoolConnexion());
         tablesListPrivate = exportData.showPrivateTables(connect.getPoolConnexion());
     }
 
     /**
      * Suppréssion d'un thésaurus
-     * @param id 
+     *
+     * @param id
      */
     public void supprimerTheso(String id) {
         ThesaurusHelper th = new ThesaurusHelper();
@@ -545,20 +545,19 @@ public class SelectedThesaurus implements Serializable {
         try {
             conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-            if(userHelper.isLastThesoOfUser(
+            if (userHelper.isLastThesoOfUser(
                     connect.getPoolConnexion(),
                     tree.getSelectedTerme().getUser().getUser().getId())) {
-                if(!userHelper.deleteOnlyTheThesoFromRole(
-                        conn, id)){
+                if (!userHelper.deleteOnlyTheThesoFromRole(
+                        conn, id)) {
                     conn.rollback();
                     conn.close();
-                    return;                    
+                    return;
                 }
-            } 
-            else {
-                if(!userHelper.deleteThisRoleForThisThesaurus(
+            } else {
+                if (!userHelper.deleteThisRoleForThisThesaurus(
                         conn, tree.getSelectedTerme().getUser().getUser().getId(),
-                        id)){
+                        id)) {
                     conn.rollback();
                     conn.close();
                     return;
@@ -571,14 +570,17 @@ public class SelectedThesaurus implements Serializable {
         }
 
         th.deleteThesaurus(connect.getPoolConnexion(), id);
-            
+
         arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
     }
-    
-    /************************************** EDITION TRAD BDD **************************************/
-    
+
+    /**
+     * ************************************ EDITION TRAD BDD
+     * *************************************
+     */
     /**
      * Suppréssion d'un traduction d'un thésaurus
+     *
      * @param id l'identifiant du thésaurus
      * @param l la langue de la traduction à supprimer
      */
@@ -586,12 +588,12 @@ public class SelectedThesaurus implements Serializable {
         new ThesaurusHelper().deleteThesaurusTraduction(connect.getPoolConnexion(), id, l);
         remplirArrayTrad(id);
     }
-    
+
     /**
      * Création d'une traduction d'un thésaurus
      */
-    public void ajouterTraduction(){
-        if(nomTrad.trim().equals("")) {
+    public void ajouterTraduction() {
+        if (nomTrad.trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
         } else {
             vue.setTrad(false);
@@ -605,111 +607,115 @@ public class SelectedThesaurus implements Serializable {
         }
         nomTrad = "";
     }
-    
-    /************************************** CANDIDATS **************************************/
-    
+
+    /**
+     * ************************************ CANDIDATS
+     * *************************************
+     */
     /**
      * Récupération de la liste des candidats propre au thésaurus courant
+     *
      * @return la liste de candidats
      */
     public List<NodeCandidatValue> listeCandidats() {
         List<NodeCandidatValue> candidats = new ArrayList<>();
-        
-        if (mesCandidats){
-            if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
+
+        if (mesCandidats) {
+            if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
                 candidats = new CandidateHelper().getListMyCandidatsWait(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(), tree.getSelectedTerme().getUser().getUser().getId());
             }
-        }
-        else {
-            if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
+        } else {
+            if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
                 candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             }
         }
         return candidats;
-    }    
+    }
+
     /**
      * Récupération de la liste des candidats propre au thésaurus courant
+     *
      * @return la liste de candidats
      */
     public List<NodeCandidatValue> listeCdtArchives() {
         List<NodeCandidatValue> candidats = new ArrayList<>();
-        if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
+        if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
             candidats = new CandidateHelper().getListCandidatsArchives(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
         return candidats;
     }
-    
+
     /**
      * Récupération de la liste des candidats propre au thésaurus courant
+     *
      * @return la liste de candidats
      */
     public List<NodeCandidatValue> listeCdtValid() {
         List<NodeCandidatValue> candidats = new ArrayList<>();
-        if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
+        if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null) {
             candidats = new CandidateHelper().getListCandidatsValidated(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
         return candidats;
     }
-    
+
     /**
      * Récupère la liste des domaines du thésaurus courant
-     * @return un tableau de SelectItem contenant les domaine permetant de les 
+     *
+     * @return un tableau de SelectItem contenant les domaine permetant de les
      * afficher dans une liste déroulante
      */
     public SelectItem[] listeDomaine() {
         ArrayList<NodeGroup> lesDomaines = new GroupHelper().getListConceptGroup(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        SelectItem[] laListe = new SelectItem[lesDomaines.size()+1];
+        SelectItem[] laListe = new SelectItem[lesDomaines.size() + 1];
         int i = 1;
         laListe[0] = new SelectItem("", "");
-        for(NodeGroup ncg : lesDomaines) {
+        for (NodeGroup ncg : lesDomaines) {
             laListe[i] = new SelectItem(ncg.getConceptGroup().getIdgroup(), ncg.getLexicalValue() + "(" + ncg.getConceptGroup().getIdgroup() + ")");
             i++;
         }
         return laListe;
     }
-    
+
     /**
      * Création d'un nouveau candidat avec vérification de la valeur en entrée
      */
     public void creerCandidat() {
-        if(candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
+        if (candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error2")));
-        } else 
-            if(new CandidateHelper().isCandidatExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
+        } else if (new CandidateHelper().isCandidatExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error3")));
             vue.setAddCandidat(false);
 
             String idCandidat = new CandidateHelper().getIdCandidatFromTitle(connect.getPoolConnexion(),
                     new StringPlus().addQuotes(candidat.getValueEdit().trim()), thesaurus.getId_thesaurus());
-            if(idCandidat == null) {
+            if (idCandidat == null) {
                 cleanEditCandidat();
                 return;
-            }
-            else {
+            } else {
                 candidat.getSelected().setIdConcept(idCandidat);
                 vue.setAddPropCandidat(true);
-               // creerPropCdt();
+                // creerPropCdt();
                 return;
             }
-        } else if(new TermHelper().isTermExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
+        } else if (new TermHelper().isTermExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error4")));
         } else {
             String temp = candidat.getValueEdit();
-            if(! candidat.newCandidat(thesaurus.getId_thesaurus(), thesaurus.getLanguage())){
+            if (!candidat.newCandidat(thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
                 return;
             }
             vue.setAddCandidat(false);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info2.1") +  " " + temp + " " + langueBean.getMsg("theso.info2.2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info2.1") + " " + temp + " " + langueBean.getMsg("theso.info2.2")));
         }
         cleanEditCandidat();
         List<NodeCandidatValue> candidats = new ArrayList<>();
-        if(thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
+        if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
             candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
     }
-    
+
     public void creerPropCdt() {
-        if(!candidat.newPropCandidat(thesaurus.getLanguage())) {
+        if (!candidat.newPropCandidat(thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             cleanEditCandidat();
             return;
@@ -718,45 +724,48 @@ public class SelectedThesaurus implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info3")));
         cleanEditCandidat();
     }
-    
-    private void cleanEditCandidat(){
-        if(candidat != null) {
+
+    private void cleanEditCandidat() {
+        if (candidat != null) {
             candidat.setValueEdit("");
             candidat.setNoteEdit("");
             candidat.setNiveauEdit("");
             candidat.setDomaineEdit("");
         }
     }
-    
+
     public void creerTradCdt() {
-        if(candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
+        if (candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error5")));
-        }  else {
-            for(NodeTraductionCandidat nt : candidat.getInfoCdt().getNodeTraductions()) {
-                if(nt.getIdLang().trim().equals(candidat.getLangueEdit().trim())) {
+        } else {
+            for (NodeTraductionCandidat nt : candidat.getInfoCdt().getNodeTraductions()) {
+                if (nt.getIdLang().trim().equals(candidat.getLangueEdit().trim())) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error6")));
                     return;
                 }
             }
             String temp = candidat.getValueEdit();
-            if(!candidat.newTradCdt(thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
+            if (!candidat.newTradCdt(thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
                 return;
             }
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info4.1") +  " " + temp + " " + langueBean.getMsg("theso.info4.2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info4.1") + " " + temp + " " + langueBean.getMsg("theso.info4.2")));
         }
         candidat.setValueEdit("");
         candidat.setLangueEdit("");
     }
-    
+
     /**
-     * Met à jour le candidat courant lors d'une sélection dans la table des candidats
+     * Met à jour le candidat courant lors d'une sélection dans la table des
+     * candidats
      */
     public void majCdt() {
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
     }
-    
-    /************************************** MISE A JOUR **************************************/
-    
+
+    /**
+     * ************************************ MISE A JOUR
+     * *************************************
+     */
     /**
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
@@ -767,7 +776,7 @@ public class SelectedThesaurus implements Serializable {
         statBean.reInit();
         ThesaurusHelper th = new ThesaurusHelper();
         nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
-        if(th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang()) != null) {
+        if (th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang()) != null) {
             thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang());
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
@@ -779,14 +788,18 @@ public class SelectedThesaurus implements Serializable {
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+
+        if (tree != null) {
+            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        }
         vue.setCreat(false);
     }
-    
-        /**
+
+    /**
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void StartDefaultThesauriTree() {
-        if(connect.getPoolConnexion() == null){
+        if (connect.getPoolConnexion() == null) {
             System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données 2!!!!!!! ");
             return;
         }
@@ -796,9 +809,11 @@ public class SelectedThesaurus implements Serializable {
         statBean.reInit();
         uTree.reInit();
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
-        if(thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
+        if (thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
             thesaurus = thesaurusHelper.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, workLanguage);
-            if(thesaurus == null) return;
+            if (thesaurus == null) {
+                return;
+            }
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -809,7 +824,7 @@ public class SelectedThesaurus implements Serializable {
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }
     }
-    
+
     /**
      * Met à jour le thésaurus courant lors d'un changement de langue
      */
@@ -825,24 +840,31 @@ public class SelectedThesaurus implements Serializable {
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setCreat(false);
+
+        if (tree != null) {
+            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        }
     }
-    
-/***************************************** FACETTES *****************************************/
-    
+
+    /**
+     * *************************************** FACETTES
+     * ****************************************
+     */
     /**
      * Insère une facette dans le thésaurus
-     * @param idParent 
-     * @param editFacette 
+     *
+     * @param idParent
+     * @param editFacette
      */
     public void creerFacette(String idParent, String editFacette) {
-            new FacetHelper().addNewFacet(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), idParent, editFacette, thesaurus.getLanguage(), "");
-            uTree.reInit();
-            uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-            vue.setFacette(false);
-            vue.setOnglet(3);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", editFacette + " " + langueBean.getMsg("theso.info4.2")));
+        new FacetHelper().addNewFacet(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), idParent, editFacette, thesaurus.getLanguage(), "");
+        uTree.reInit();
+        uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        vue.setFacette(false);
+        vue.setOnglet(3);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", editFacette + " " + langueBean.getMsg("theso.info4.2")));
     }
-    
+
     /**
      * Supprime une facette
      */
@@ -854,12 +876,12 @@ public class SelectedThesaurus implements Serializable {
         vue.setOnglet(3);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info5")));
     }
-    
+
     /**
      * Ajoute une traduction pour une facette
      */
     public void tradFacette() {
-        if(valueEdit == null || valueEdit.trim().equals("")) {
+        if (valueEdit == null || valueEdit.trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error5")));
         } else {
             new FacetHelper().addFacetTraduction(connect.getPoolConnexion(), Integer.parseInt(idEdit), thesaurus.getId_thesaurus(), valueEdit, langueEdit.trim());
@@ -869,12 +891,12 @@ public class SelectedThesaurus implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info6")));
         }
     }
-    
+
     /**
      * Change une traduction pour une facette
      */
     public void updateFacette() {
-        if(valueEdit == null || valueEdit.trim().equals("")) {
+        if (valueEdit == null || valueEdit.trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error8")));
         } else {
             new FacetHelper().updateFacetTraduction(connect.getPoolConnexion(), Integer.parseInt(idEdit), thesaurus.getId_thesaurus(), thesaurus.getLanguage(), valueEdit);
@@ -886,66 +908,79 @@ public class SelectedThesaurus implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info7")));
         }
     }
-    
-    /***************************************** AUTRE *****************************************/
-    
+
     /**
-     *  Récupère le thésaurus courant
+     * *************************************** AUTRE
+     * ****************************************
+     */
+    /**
+     * Récupère le thésaurus courant
+     *
      * @return le thésaurus s'il existe, null sinon
      */
     public Thesaurus getThisTheso() {
         String idTemp = "", lTemp = "";
-        if(thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) return null;
-        if(thesaurus.getLanguage() != null) lTemp = thesaurus.getLanguage();
-        if(thesaurus.getId_thesaurus() != null) idTemp = thesaurus.getId_thesaurus();
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return null;
+        }
+        if (thesaurus.getLanguage() != null) {
+            lTemp = thesaurus.getLanguage();
+        }
+        if (thesaurus.getId_thesaurus() != null) {
+            idTemp = thesaurus.getId_thesaurus();
+        }
         Thesaurus tempT = new ThesaurusHelper().getThisThesaurus(connect.getPoolConnexion(), idTemp, lTemp);
         return tempT;
     }
-    
+
     /**
      * Cette fonction permet de regénérer les Orphelins
-     * @return 
+     *
+     * @return
      */
     public boolean regenerateOrphan() {
-        if(thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) return false;
-        
-        if(!new ToolsHelper().orphanDetect(connect.getPoolConnexion(), thesaurus.getId_thesaurus())){
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"),  "error"));
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+
+        if (!new ToolsHelper().orphanDetect(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
             vue.setRegenerateOrphan(0);
             return false;
         }
         return true;
     }
-    
-    
+
     /**
      * Affiche le thésaurus en cour d'édition (pas le thésaurus courant)
+     *
      * @param type
      * @param nom
      * @param langue
-     * @param id 
+     * @param id
      */
     public void afficheEditTheso(int type, String nom, String langue, String id) {
-        if(type == 1) {
-             vue.setCreat(false);
-             vue.setEdit(false);
-             vue.setTrad(false);
-             vue.setLanguage(true);
-             editTheso.setId_thesaurus(id);
-             editTheso.setTitle(nom);
-             remplirArrayTrad(id);
+        if (type == 1) {
+            vue.setCreat(false);
+            vue.setEdit(false);
+            vue.setTrad(false);
+            vue.setLanguage(true);
+            editTheso.setId_thesaurus(id);
+            editTheso.setTitle(nom);
+            remplirArrayTrad(id);
         } else {
             vue.setEdit(true);
             remplirEditTheso(id, langue);
         }
     }
-    
+
     /**
-     * Met à jour le thésaurus courant, l'arbre et le terme courant lors de la 
+     * Met à jour le thésaurus courant, l'arbre et le terme courant lors de la
      * sélection de la traduction d'un terme dans le gestionnaire de thésaurus
+     *
      * @param id
      * @param l
-     * @param type 
+     * @param type
      */
     public void changeTermeTrad(String id, String l, int type) {
         MyTreeNode mTN = new MyTreeNode(type, id, tree.getSelectedTerme().getIdTheso(), l, tree.getSelectedTerme().getIdDomaine(), tree.getSelectedTerme().getIdTopConcept(), null, null, null);
@@ -955,44 +990,48 @@ public class SelectedThesaurus implements Serializable {
         tree.reExpand();
         vue.setOnglet(0);
     }
-    
+
     /**
      * Récupération des traductions du thésaurus
+     *
      * @return une liste des traductions
      */
     public ArrayList<Languages_iso639> getThisTrad() {
         thesaurus.getLanguage();
         ArrayList<Languages_iso639> languages_iso639s = new ArrayList<>();
-        
+
         ArrayList<Languages_iso639> languages_iso639s_temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
-        
+
         // on replace la langue sélectionnée en premier
         for (Languages_iso639 languages_iso639 : languages_iso639s_temp) {
-            if(languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage()))
+            if (languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage())) {
                 languages_iso639s.add(0, languages_iso639);
-            else
+            } else {
                 languages_iso639s.add(languages_iso639);
+            }
         }
         return languages_iso639s;
         //return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
     }
-    
+
     /**
      * Récupération des traductions du thésaurus
+     *
      * @return une liste des traductions
      */
     public ArrayList<Languages_iso639> getTradForSearch() {
         thesaurus.getLanguage();
         ArrayList<Languages_iso639> languages_iso639s = new ArrayList<>();
-        
+
         ArrayList<Languages_iso639> languages_iso639s_temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
-        
+
         // on replace la langue sélectionnée en premier
         for (Languages_iso639 languages_iso639 : languages_iso639s_temp) {
-            if(languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage()))
+            if (languages_iso639.getId_iso639_1().equalsIgnoreCase(thesaurus.getLanguage())) {
                 languages_iso639s.add(0, languages_iso639);
-            else
+            } else {
                 languages_iso639s.add(languages_iso639);
+            }
         }
         Languages_iso639 languages_iso639_all = new Languages_iso639();
         languages_iso639_all.setFrench_name("");
@@ -1002,37 +1041,72 @@ public class SelectedThesaurus implements Serializable {
         languages_iso639s.add(languages_iso639_all);
         return languages_iso639s;
         //return (new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus()));
-    }    
-    
+    }
+
     public void remplirEditTheso(String id, String langue) {
         editTheso = new ThesaurusHelper().getThisThesaurus(connect.getPoolConnexion(), id, langue);
     }
-    
+
     public void remplirArrayTrad(String id) {
         arrayTrad = new ArrayList<>(new ThesaurusHelper().getMapTraduction(connect.getPoolConnexion(), id).entrySet());
     }
-    
+
     /**
      * Création d'un domaine avec mise à jour dans l'arbre
      */
-    public void ajouterDomaine() {
-        if(nodeCG.getLexicalValue().trim().equals("")) {
+    
+    private String typeDom;
+    public String ajouterDomaine() {
+
+        String idGroup = null;
+
+        if (nodeCG.getLexicalValue().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error7")));
         } else {
             String temp = nodeCG.getLexicalValue();
             nodeCG.setIdLang(thesaurus.getLanguage());
             nodeCG.getConceptGroup().setIdthesaurus(thesaurus.getId_thesaurus());
+            
+            
+            boolean haveFather = false;
+            
+            if(typeDom == null || typeDom.equals("")){
+                 typeDom = getTypeDomainePere();
+                 haveFather = true;
+            }
+            
+
+            if (typeDom != null && haveFather) {
+                nodeCG.getConceptGroup().setIdtypecode(typeDom);
+            } else {
+                nodeCG.getConceptGroup().setIdtypecode(getIDTypeDomaineAj());
+
+            }
+
             GroupHelper cgh = new GroupHelper();
             int idUser = tree.getSelectedTerme().getUser().getUser().getId();
-            cgh.addGroup(connect.getPoolConnexion(), nodeCG, cheminSite, arkActive, idUser);
+            idGroup = cgh.addGroup(connect.getPoolConnexion(), nodeCG, cheminSite, arkActive, idUser);
             nodeCG = new NodeGroup();
             vue.setSelectedActionDom(PropertiesNames.noActionDom);
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("theso.info1.2")));
         }
+
+        return idGroup;
     }
-    
+
+    public void ajouterSubDomaine() {
+        typeDom = "";
+        //si on a bien selectioner un group
+        String idGroup = tree.getSelectedTerme().getIdC();
+        if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), idGroup, thesaurus.getId_thesaurus())) {
+            String idSubGroup = ajouterDomaine();
+            new GroupHelper().addSubGroup(connect.getPoolConnexion(), idGroup, idSubGroup, thesaurus.getId_thesaurus());
+        }
+
+    }
+
     /**
      * Création d'un domaine avec mise à jour dans l'arbre
      */
@@ -1040,8 +1114,8 @@ public class SelectedThesaurus implements Serializable {
         GroupHelper groupHelper = new GroupHelper();
         int idUser = tree.getSelectedTerme().getUser().getUser().getId();
         String temp = nodeCG.getLexicalValue();
-        if(!groupHelper.isEmptyDomain(connect.getPoolConnexion(),
-                nodeCG.getConceptGroup().getIdgroup(), 
+        if (!groupHelper.isEmptyDomain(connect.getPoolConnexion(),
+                nodeCG.getConceptGroup().getIdgroup(),
                 nodeCG.getConceptGroup().getIdthesaurus())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error7")));
             return;
@@ -1055,88 +1129,101 @@ public class SelectedThesaurus implements Serializable {
         tree.reInit();
         tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("theso.info1.2")));
-    }    
-    
+    }
+
     /**
      * Vérifie si le thésaurus courant a des traductions
-     * @return  true s'il en a au moins une, false sinon
+     *
+     * @return true s'il en a au moins une, false sinon
      */
     public boolean haveTrad() {
-        if(languesTheso == null) return false;
+        if (languesTheso == null) {
+            return false;
+        }
         return (languesTheso.length > 0);
     }
-    
-    /************************************** GETTERS SETTERS **************************************/
-    
+
     /**
-     * 
-     * @return 
+     * ************************************ GETTERS SETTERS
+     * *************************************
+     */
+    /**
+     *
+     * @return
      */
     public String getMetaData() {
-        if(this.tree.getSelectedTerme() != null ) {
-            if(this.tree.getSelectedTerme().getIdC() != null ) {
-                if(this.tree.getSelectedTerme().getIdTheso() != null ) {
+        if (this.tree.getSelectedTerme() != null) {
+            if (this.tree.getSelectedTerme().getIdC() != null) {
+                if (this.tree.getSelectedTerme().getIdTheso() != null) {
                     // cas d'un domaine ou  Groupe
-                    if(tree.getSelectedTerme().getType() == 1) {
+                    if (tree.getSelectedTerme().getType() == 1) {
                         ExportFromBDD exportFromBDD = new ExportFromBDD();
                         exportFromBDD.setServerArk(serverArk);
                         exportFromBDD.setServerAdress(cheminSite);
                         StringBuffer skos = exportFromBDD.exportThisGroup(
-                                connect.getPoolConnexion(), 
+                                connect.getPoolConnexion(),
                                 this.tree.getSelectedTerme().getIdTheso(),
                                 this.tree.getSelectedTerme().getIdC());
 
-                    JsonHelper jsonHelper = new JsonHelper();
-                    SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
-                    StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
-                    if(jsonLd != null)
-                        return jsonLd.toString();
-                    else
-                        return "";
-                }
-                // cas d'un concept
-                if(tree.getSelectedTerme().getType() == 2 || tree.getSelectedTerme().getType() == 3) {
-                    ExportFromBDD exportFromBDD = new ExportFromBDD();
-                    exportFromBDD.setServerArk(serverArk);
-                    exportFromBDD.setServerAdress(cheminSite);
-                    StringBuffer skos = exportFromBDD.exportConcept(
-                            connect.getPoolConnexion(), 
-                            this.tree.getSelectedTerme().getIdTheso(),
-                            this.tree.getSelectedTerme().getIdC());
-                    if(skos == null) return "";
+                        JsonHelper jsonHelper = new JsonHelper();
+                        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
+                        StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
+                        if (jsonLd != null) {
+                            return jsonLd.toString();
+                        } else {
+                            return "";
+                        }
+                    }
+                    // cas d'un concept
+                    if (tree.getSelectedTerme().getType() == 2 || tree.getSelectedTerme().getType() == 3) {
+                        ExportFromBDD exportFromBDD = new ExportFromBDD();
+                        exportFromBDD.setServerArk(serverArk);
+                        exportFromBDD.setServerAdress(cheminSite);
+                        StringBuffer skos = exportFromBDD.exportConcept(
+                                connect.getPoolConnexion(),
+                                this.tree.getSelectedTerme().getIdTheso(),
+                                this.tree.getSelectedTerme().getIdC());
+                        if (skos == null) {
+                            return "";
+                        }
 
                         JsonHelper jsonHelper = new JsonHelper();
                         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
-                        if(sKOSXmlDocument == null) return "";
-                        StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
-                        if(jsonLd != null)
-                            return jsonLd.toString();
-                        else
+                        if (sKOSXmlDocument == null) {
                             return "";
+                        }
+                        StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
+                        if (jsonLd != null) {
+                            return jsonLd.toString();
+                        } else {
+                            return "";
+                        }
                     }
                 }
             }
         }
-        
+
         // Envoye les domaines (MT)
-        if(thesaurus.getId_thesaurus() != null) {
-            if(!thesaurus.getId_thesaurus().trim().isEmpty()) {
+        if (thesaurus.getId_thesaurus() != null) {
+            if (!thesaurus.getId_thesaurus().trim().isEmpty()) {
                 ExportFromBDD exportFromBDD = new ExportFromBDD();
                 exportFromBDD.setServerArk(serverArk);
                 exportFromBDD.setServerAdress(cheminSite);
                 StringBuffer skos = exportFromBDD.exportGroupsOfThesaurus(
-                        connect.getPoolConnexion(), 
+                        connect.getPoolConnexion(),
                         thesaurus.getId_thesaurus());
 
                 JsonHelper jsonHelper = new JsonHelper();
                 SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                 StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrgForConceptScheme(sKOSXmlDocument);
-                if(jsonLd == null) return "";
+                if (jsonLd == null) {
+                    return "";
+                }
                 return jsonLd.toString();
             }
         }
-        return "";        
-        
+        return "";
+
         // ancienne version 
 /*        if(this.tree.getSelectedTerme() != null ) {
             if(this.tree.getSelectedTerme().getIdC() != null ) {
@@ -1194,11 +1281,11 @@ public class SelectedThesaurus implements Serializable {
         }
         return ""; */
     }
-    
-    public String getVersion(){
+
+    public String getVersion() {
         return version;
     }
-    
+
     public String getCheminSite() {
         return cheminSite;
     }
@@ -1206,15 +1293,7 @@ public class SelectedThesaurus implements Serializable {
     public String getServerArk() {
         return serverArk;
     }
-   
-    
-    public TreeBean getTree() {
-        return tree;
-    }
 
-    public void setTree(TreeBean tree) {
-        this.tree = tree;
-    }
 
     public Connexion getConnect() {
         return connect;
@@ -1223,7 +1302,7 @@ public class SelectedThesaurus implements Serializable {
     public void setConnect(Connexion connect) {
         this.connect = connect;
     }
-    
+
     public Thesaurus getThesaurus() {
         return thesaurus;
     }
@@ -1233,58 +1312,59 @@ public class SelectedThesaurus implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayTheso() {
-        if (!tousThesos){
-            if(connect.getPoolConnexion() != null) {
-             /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
+        if (!tousThesos) {
+            if (connect.getPoolConnexion() != null) {
+                /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
                 p.put("", "");*/
-                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
-                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),workLanguage).entrySet());
-                else
+                if (tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) {
+                    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), workLanguage).entrySet());
+                } else {
                     arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
                             connect.getPoolConnexion(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+                }
             }
-        }
-        else {
-            arrayTheso = new ArrayList<>( new ThesaurusHelper().getListThesaurusOfUser(
-                            connect.getPoolConnexion(),tree.getSelectedTerme().getUser().getUser().getId(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+        } else {
+            arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfUser(
+                    connect.getPoolConnexion(), tree.getSelectedTerme().getUser().getUser().getId(), tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
         }
         return arrayTheso;
     }
-    
+
     /**
      * Permet de retourner la liste des thésaurus autorisée pour un role
-     * @return 
+     *
+     * @return
      */
     public ArrayList<Entry<String, String>> getAuthorizedThesaurus() {
-        if(connect.getPoolConnexion() != null) {
-         /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
+        if (connect.getPoolConnexion() != null) {
+            /*   Map p = new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), langueSource);
             p.put("", "");*/
-         
-            if(tree.getSelectedTerme().getUser().getUser().getIdRole() == 1){// cas d'un SuperAdmin
-                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+
+            if (tree.getSelectedTerme().getUser().getUser().getIdRole() == 1) {// cas d'un SuperAdmin
+                if (tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) {
                     arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(),
-                             workLanguage).entrySet());
-                else
+                            workLanguage).entrySet());
+                } else {
                     arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(
                             connect.getPoolConnexion(),
-                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());            
-            }
-            else {
-                if(tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) 
+                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+                }
+            } else {
+                if (tree.getSelectedTerme().getUser().getLangSourceEdit() == null || tree.getSelectedTerme().getUser().getLangSourceEdit().equalsIgnoreCase("")) {
                     arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfUser(connect.getPoolConnexion(),
                             tree.getSelectedTerme().getUser().getUser().getId(),
                             workLanguage).entrySet());
-                else
+                } else {
                     arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfUser(
                             connect.getPoolConnexion(),
                             tree.getSelectedTerme().getUser().getUser().getId(),
-                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());                 
+                            tree.getSelectedTerme().getUser().getLangSourceEdit()).entrySet());
+                }
             }
-            
 
         }
         return arrayTheso;
-    }    
+    }
 
     public void setArrayTheso(ArrayList<Entry<String, String>> arrayTheso) {
         this.arrayTheso = arrayTheso;
@@ -1300,7 +1380,7 @@ public class SelectedThesaurus implements Serializable {
 
     public void setVueCreat(boolean creat) {
         vue.setCreat(creat);
-        if(creat) {
+        if (creat) {
             editTheso = new Thesaurus();
         }
     }
@@ -1315,7 +1395,7 @@ public class SelectedThesaurus implements Serializable {
 
     public SelectItem[] getLangues() {
         return langues;
-    }   
+    }
 
     public String getLangueTrad() {
         return langueTrad;
@@ -1428,7 +1508,7 @@ public class SelectedThesaurus implements Serializable {
     public void setIdGurl(String idGurl) {
         this.idGurl = idGurl;
     }
-    
+
     public LanguageBean getLangueBean() {
         return langueBean;
     }
@@ -1446,12 +1526,13 @@ public class SelectedThesaurus implements Serializable {
     }
 
     public ArrayList<Entry<String, String>> getArrayFacette() {
-        if(connect.getPoolConnexion() != null) {
+        if (connect.getPoolConnexion() != null) {
+
             ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             Map<String, String> mapTemp = new HashMap<>();
-            for(NodeFacet nf : temp) {
+            for (NodeFacet nf : temp) {
                 String value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), thesaurus.getId_thesaurus(), thesaurus.getLanguage()).getLexical_value();
-                mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value  + ")");
+                mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value + ")");
             }
             arrayFacette = new ArrayList<>(mapTemp.entrySet());
         }
@@ -1477,7 +1558,7 @@ public class SelectedThesaurus implements Serializable {
     public void setLangueEdit(String langueEdit) {
         this.langueEdit = langueEdit;
     }
-    
+
     public String getValueEdit() {
         return valueEdit;
     }
@@ -1526,13 +1607,13 @@ public class SelectedThesaurus implements Serializable {
         this.sortirXml = sortirXml;
     }
 
-    public ArrayList <String> getValuesOfTables () {
-        ArrayList <String> values = new ArrayList<>();
+    public ArrayList<String> getValuesOfTables() {
+        ArrayList<String> values = new ArrayList<>();
         for (Table tables : sortirXml) {
             for (LineOfData line : tables.getLineOfDatas()) {
                 values.add(line.getValue());
             }
-            
+
         }
         return values;
     }
@@ -1544,6 +1625,7 @@ public class SelectedThesaurus implements Serializable {
     public void setNomdufichier(String nomdufichier) {
         this.nomdufichier = nomdufichier;
     }
+
     public boolean isMesCandidats() {
         return mesCandidats;
     }
@@ -1567,6 +1649,76 @@ public class SelectedThesaurus implements Serializable {
     public void setInternetConection(boolean internetConection) {
         this.internetConection = internetConection;
     }
-    
+
+    public String getTypeDomaineAj() {
+
+        return typeDomaineAj;
+    }
+
+    public String getIDTypeDomaineAj() {
+        String IdType = "";
+        
+        if(typeDomaineAj == null)
+            return "";
+
+        switch (typeDomaineAj) {
+
+            case "Collection":
+                IdType = "C";
+                break;
+            case "Group":
+                IdType = "G";
+                break;
+            case "Microthesaurus":
+                IdType = "MT";
+                break;
+            case "Theme":
+                IdType = "T";
+                break;
+            default : 
+                IdType = "";
+                break;
+
+        }
+
+        return IdType;
+
+    }
+
+    public void setTypeDomaineAj(String typeDomaineAj) {
+        this.typeDomaineAj = typeDomaineAj;
+    }
+
+    public void setTypeDomaine(ArrayList<String> typeDomaine) {
+        this.typeDomaine = typeDomaine;
+    }
+
+    public ArrayList<String> getTypeDomaine() {
+        typeDomaine = new ArrayList<>();
+
+        new GroupHelper().getPossibleTypeGroupForAdd(connect.getPoolConnexion(), typeDomaine);
+
+        return typeDomaine;
+    }
+
+    public String getTypeDomainePere() {
+
+        typeDomainePere = new GroupHelper().geteTypeGroupPere(connect.getPoolConnexion(), tree.getSelectedTerme().getIdC(), thesaurus.getId_thesaurus());
+
+        return typeDomainePere;
+    }
+
+    public void setTypeDomainePere(String typeDomainePere) {
+        this.typeDomainePere = typeDomainePere;
+    }
+
+    public NewTreeBean getTree() {
+        return tree;
+    }
+
+    public void setTree(NewTreeBean tree) {
+        this.tree = tree;
+    }
+
     
 }

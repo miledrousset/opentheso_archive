@@ -27,10 +27,10 @@
                 <ui:repeat value="#{selectedTerme.termesSpecifique}" var="item1">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}" escape="false"
-                                         actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                         actionListener="#{newtreeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
                                          update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                         <p:commandButton styleClass="termClick" rendered="#{item1.value == ''}" value="#{item1.key}" escape="false"
-                                         actionListener="#{treeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
+                                         actionListener="#{newtreeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
                                          update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
 
                     </h:form>

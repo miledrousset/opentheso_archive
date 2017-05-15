@@ -93,7 +93,7 @@ public class ReadRdfFileTest {
         System.out.println("\n-----------");
         */
         
-        
+     /*   
         InputStream is = null;
         try {
             is = new FileInputStream("testrdf.rdf");
@@ -104,7 +104,7 @@ public class ReadRdfFileTest {
         
         ReadRdf4j lect = new ReadRdf4j(is);
         System.out.println(lect);
-        
+       */ 
 
     }
     
@@ -218,13 +218,14 @@ public class ReadRdfFileTest {
     
     }
     
-    public static void test4(){
+    @Test
+    public  void test4(){
         
         // read the file 'example-data-artists.ttl' as an InputStream.
         InputStream is = null;
         
         try {
-            is = new FileInputStream("test_unesco.rdf");
+            is = new FileInputStream("test_unesco - Copie.rdf");
             
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ReadRdfFileTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -306,7 +307,7 @@ public class ReadRdfFileTest {
         }
 
       
-
+       Rio.write(model, System.out, RDFFormat.RDFXML);
         
         
         

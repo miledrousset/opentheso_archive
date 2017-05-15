@@ -14,7 +14,7 @@
                                         minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
                                         a:placeholder="#{langueBean.getMsg('index.search')}" >
 
-                            <p:ajax event="itemSelect" listener="#{treeBean.majIndexRapidSearch()}" 
+                            <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" 
                                     update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
                                     />
                         </p:autoComplete>
@@ -26,6 +26,7 @@
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
 
                             <p:menuitem value="#{langueBean.getMsg('group.add')}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('group.add')} Sub" update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
                     </h:form>
                 </td>

@@ -16,6 +16,7 @@ import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSRelation;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
@@ -25,6 +26,7 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.ModelBuilder;
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.GEOF;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 
 /**
@@ -56,6 +58,8 @@ public class WriteRdf4j {
         builder.setNamespace("dc", "http://purl.org/dc/elements/1.1/");
         builder.setNamespace("dcterms", "http://purl.org/dc/terms/");
         builder.setNamespace("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
+        builder.setNamespace("iso-thes", "http://purl.org/iso25964/skos-thes#");
+
     }
 
     private void writeModel() {
@@ -67,6 +71,7 @@ public class WriteRdf4j {
     private void writeConcept() {
         for (SKOSResource concept : xmlDocument.getConceptList()) {
             builder.subject(vf.createURI(concept.getUri()));
+            builder.add(RDF.TYPE, SKOS.CONCEPT);
             writeLabel(concept);
             writeRelation(concept);
             writeMatch(concept);
@@ -81,6 +86,7 @@ public class WriteRdf4j {
     private void writeGroup() {
         for (SKOSResource group : xmlDocument.getGroupList()) {
             builder.subject(vf.createURI(group.getUri()));
+            builder.add(RDF.TYPE, SKOS.COLLECTION);
             writeLabel(group);
             writeRelation(group);
             writeMatch(group);
@@ -94,18 +100,10 @@ public class WriteRdf4j {
 
     private void writeConceptScheme() {
         SKOSResource conceptScheme = xmlDocument.getConceptScheme();
-        vf.createLiteral("skos:ConceptScheme");
-        vf.createIRI(conceptScheme.getUri());
-        
+        builder.subject(vf.createIRI(conceptScheme.getUri()));//createURI(conceptScheme.getUri()));
 
-        builder.subject(vf.createIRI(conceptScheme.getUri()));
-                
-                
-      //  builder.subject(SKOS.CONCEPT_SCHEME);//, conceptScheme.getUri());
-     //   builder.subject(vf.createIRI(conceptScheme.getUri()));//createURI(conceptScheme.getUri()));
-        
-   //     builder.add(SKOS.CONCEPT_SCHEME, literal);
-        
+        builder.add(RDF.TYPE, SKOS.CONCEPT_SCHEME);
+
         writeLabel(conceptScheme);
         writeRelation(conceptScheme);
         writeMatch(conceptScheme);
@@ -115,51 +113,37 @@ public class WriteRdf4j {
         writeDocumentation(conceptScheme);
         writeGPS(conceptScheme);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private void writeGPS(SKOSResource resource){
+
+    private void writeGPS(SKOSResource resource) {
         SKOSGPSCoordinates gps = resource.getGPSCoordinates();
-        String lat =gps.getLat();
+        String lat = gps.getLat();
         String lon = gps.getLon();
-        if(lat != null && lon != null){
-            builder.add("geo:lat",lat);
-            builder.add("geo:long",lon);
+        if (lat != null && lon != null) {
+            builder.add("geo:lat", lat);
+            builder.add("geo:long", lon);
         }
-        
+
     }
-    
-    private void writeDocumentation(SKOSResource resource){
+
+    private void writeDocumentation(SKOSResource resource) {
         int prop;
-        for(SKOSDocumentation doc : resource.getDocumentationsList()){
+        for (SKOSDocumentation doc : resource.getDocumentationsList()) {
             prop = doc.getProperty();
-            Literal literal = vf.createLiteral(doc.getText(),doc.getLanguage());
-            if(prop == SKOSProperty.definition){
-                builder.add(SKOS.NOTE,literal);
-            }
-            else if(prop == SKOSProperty.scopeNote){
-                builder.add(SKOS.SCOPE_NOTE,literal);
-            }
-            else if(prop == SKOSProperty.example){
-                builder.add(SKOS.EXAMPLE,literal);
-            }
-            else if(prop == SKOSProperty.historyNote){
-                builder.add(SKOS.HISTORY_NOTE,literal);
-            }
-            else if(prop == SKOSProperty.editorialNote){
-                builder.add(SKOS.EDITORIAL_NOTE,literal);
-            }
-            else if(prop == SKOSProperty.changeNote){
-                builder.add(SKOS.CHANGE_NOTE,literal);
-            }
-            else if(prop == SKOSProperty.note){
-                builder.add(SKOS.NOTE,literal);
+            Literal literal = vf.createLiteral(doc.getText(), doc.getLanguage());
+            if (prop == SKOSProperty.definition) {
+                builder.add(SKOS.NOTE, literal);
+            } else if (prop == SKOSProperty.scopeNote) {
+                builder.add(SKOS.SCOPE_NOTE, literal);
+            } else if (prop == SKOSProperty.example) {
+                builder.add(SKOS.EXAMPLE, literal);
+            } else if (prop == SKOSProperty.historyNote) {
+                builder.add(SKOS.HISTORY_NOTE, literal);
+            } else if (prop == SKOSProperty.editorialNote) {
+                builder.add(SKOS.EDITORIAL_NOTE, literal);
+            } else if (prop == SKOSProperty.changeNote) {
+                builder.add(SKOS.CHANGE_NOTE, literal);
+            } else if (prop == SKOSProperty.note) {
+                builder.add(SKOS.NOTE, literal);
             }
         }
     }
@@ -214,7 +198,7 @@ public class WriteRdf4j {
         int prop;
         for (SKOSMatch match : resource.getMatchList()) {
             prop = match.getProperty();
-            URI uri = vf.createURI(match.getValue());
+            IRI uri = vf.createIRI(match.getValue());
             if (prop == SKOSProperty.exactMatch) {
                 builder.add(SKOS.EXACT_MATCH, uri);
             } else if (prop == SKOSProperty.closeMatch) {
@@ -233,7 +217,7 @@ public class WriteRdf4j {
     private void writeRelation(SKOSResource resource) {
         int prop;
         for (SKOSRelation relation : resource.getRelationsList()) {
-            URI uri = vf.createURI(relation.getTargetUri());
+            IRI uri = vf.createIRI(relation.getTargetUri());
             prop = relation.getProperty();
             if (prop == SKOSProperty.member) {
                 builder.add(SKOS.MEMBER, uri);
@@ -249,23 +233,20 @@ public class WriteRdf4j {
                 builder.add(SKOS.IN_SCHEME, uri);
             } else if (prop == SKOSProperty.topConceptOf) {
                 builder.add(SKOS.TOP_CONCEPT_OF, uri);
+            } else if (prop == SKOSProperty.subGroup) {
+                builder.add("iso-thes:subGroup", uri);
+            } else if (prop == SKOSProperty.microThesaurusOf) {
+                builder.add("iso-thes:microThesaurusOf", uri);
+            } else if (prop == SKOSProperty.superGroup) {
+                builder.add("iso-thes:superGroup", uri);
             }
-            /*  //////////////////// PAS DANS SKOS de RDF4J ===> uneskos \\\\\\\\\\\\\\\\\\\\\\\\
-            
-            public static final int microThesaurusOf=7;
-            public static final int subGroup=8;
-            public static final int superGroup=9;
-            public static final int hasMainConcept=10;
-            public static final int memberOf=11;
-            public static final int mainConceptOf=12;
-             */
 
         }
 
     }
 
     //********
-    public  Model getModel() {
+    public Model getModel() {
         return model;
     }
 
