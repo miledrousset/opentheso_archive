@@ -1952,6 +1952,8 @@ public class ConceptHelper {
                     stmt.executeUpdate(query);
                     status = true;
                     conn.commit();
+                    
+                    
                 } finally {
                     stmt.close();
                 }

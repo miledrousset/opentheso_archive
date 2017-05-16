@@ -183,8 +183,18 @@ public class ImportRdf4jHelper {
             conn.commit();
             conn.close();
             idGroupDefault = getNewGroupId();
-            return null;
+            
+            
+            for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList() ) {
+                hasTopConcceptList.add(relation.getTargetUri());
+            }
 
+            
+            
+            
+            
+            return null;
+                    
         } catch (SQLException ex) {
             Logger.getLogger(ImportSkosHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -342,8 +352,9 @@ public class ImportRdf4jHelper {
                 if (acs.idGrps.isEmpty()) {
                     acs.concept.setTopConcept(acs.isTopConcept);
                     acs.concept.setIdGroup(idGroupDefault);
-                    acs.conceptHelper.insertConceptInTable(ds, acs.concept,
-                            adressSite, useArk, idUser);
+                    acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
+                    
+                    new GroupHelper().addConceptGroupConcept(ds, idGroupDefault, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
                 } else {
                     for (String idGrp : acs.idGrps) {
                         acs.concept.setTopConcept(acs.isTopConcept);

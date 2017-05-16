@@ -1532,7 +1532,7 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "'and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')";
+                    String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "' and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();

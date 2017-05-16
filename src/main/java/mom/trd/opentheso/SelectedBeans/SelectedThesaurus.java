@@ -1088,8 +1088,10 @@ public class SelectedThesaurus implements Serializable {
             idGroup = cgh.addGroup(connect.getPoolConnexion(), nodeCG, cheminSite, arkActive, idUser);
             nodeCG = new NodeGroup();
             vue.setSelectedActionDom(PropertiesNames.noActionDom);
+            
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("theso.info1.2")));
         }
 
@@ -1103,6 +1105,8 @@ public class SelectedThesaurus implements Serializable {
         if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), idGroup, thesaurus.getId_thesaurus())) {
             String idSubGroup = ajouterDomaine();
             new GroupHelper().addSubGroup(connect.getPoolConnexion(), idGroup, idSubGroup, thesaurus.getId_thesaurus());
+            tree.reInit();
+            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
 
     }
