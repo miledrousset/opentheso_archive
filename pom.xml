@@ -261,12 +261,7 @@
             <artifactId>smtp</artifactId>
             <version>1.5.2</version>
         </dependency>
-        
-        <dependency>
-          <groupId>org.eclipse.rdf4j</groupId>
-          <artifactId>rdf4j-runtime</artifactId>
-          <version>2.1.4</version>
-        </dependency>
+
         
 
         <dependency>
