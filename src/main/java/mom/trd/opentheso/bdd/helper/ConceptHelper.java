@@ -3194,7 +3194,10 @@ public class ConceptHelper {
                                 nodeConceptTree1.setStatusConcept("");
                             } else {
                                 nodeConceptTree1.setTitle(resultSet.getString("lexical_value"));
-                                nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
+                                if(resultSet.getString("status") == null) 
+                                    nodeConceptTree1.setStatusConcept("");
+                                else
+                                    nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
                             }
                             nodeConceptTree1.setHaveChildren(
                                     haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
