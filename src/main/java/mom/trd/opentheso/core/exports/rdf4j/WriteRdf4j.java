@@ -19,13 +19,10 @@ import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.URI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.ModelBuilder;
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
-import org.eclipse.rdf4j.model.vocabulary.GEOF;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 
@@ -70,7 +67,7 @@ public class WriteRdf4j {
 
     private void writeConcept() {
         for (SKOSResource concept : xmlDocument.getConceptList()) {
-            builder.subject(vf.createURI(concept.getUri()));
+            builder.subject(vf.createIRI(concept.getUri()));
             builder.add(RDF.TYPE, SKOS.CONCEPT);
             writeLabel(concept);
             writeRelation(concept);
@@ -85,7 +82,7 @@ public class WriteRdf4j {
 
     private void writeGroup() {
         for (SKOSResource group : xmlDocument.getGroupList()) {
-            builder.subject(vf.createURI(group.getUri()));
+            builder.subject(vf.createIRI(group.getUri()));
             builder.add(RDF.TYPE, SKOS.COLLECTION);
             writeLabel(group);
             writeRelation(group);
@@ -119,8 +116,8 @@ public class WriteRdf4j {
         String lat = gps.getLat();
         String lon = gps.getLon();
         if (lat != null && lon != null) {
-            builder.add("geo:lat", lat);
-            builder.add("geo:long", lon);
+            builder.add("geo:lat", Double.parseDouble(lat));
+            builder.add("geo:long", Double.parseDouble(lon));
         }
 
     }

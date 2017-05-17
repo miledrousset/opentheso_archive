@@ -6,7 +6,6 @@
 package mom.trd.opentheso.core.exports.rdf4j.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
-import fr.mom.arkeo.soap.DcElement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
@@ -23,7 +22,6 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeTT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -31,12 +29,10 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupTraductions;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
-import mom.trd.opentheso.core.alignment.AlignementSource;
 import mom.trd.opentheso.skosapi.SKOSGPSCoordinates;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
-import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 
 /**
  *

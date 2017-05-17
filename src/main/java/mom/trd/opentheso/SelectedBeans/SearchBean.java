@@ -91,7 +91,7 @@ public class SearchBean implements Serializable {
             String temp = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), ns.getIdGroup(), theso.getThesaurus().getId_thesaurus(), theso.getThesaurus().getLanguage());
             ns.setGroupLabel(temp);
         }
-        theso.getVue().setOnglet(2);
+        theso.getVue().setOnglet(1);
     }
     
     public ArrayList<ArrayList<String>> getHierachi(String idC) {

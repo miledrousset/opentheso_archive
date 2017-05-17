@@ -5,23 +5,21 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
-        <h:panelGroup id="resultSearch">
+    <h:panelGroup id="resultSearch" style="height: 100px">
             <h:form id="tableSearch1" rendered="#{search.typeSearch == 1}">
                 <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
-                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="460"
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="500"
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
                     <p:ajax event="rowSelect" listener="#{newtreeBean.majSearch()}" 
                             update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
-                    <f:facet name="header">
-                        <h:outputText value="#{langueBean.getMsg('index.headerSearch')} - #{search.nbRes}" />
-                    </f:facet>
+                        
                     <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
                         <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />
                         <h:panelGroup rendered="#{ts.preferredLabel == false}" >
-                            <i><h:outputText value="#{ts.lexical_value}" /></i>
+                            <h:outputText value="#{ts.lexical_value}" style="font-style: italic" />
                         </h:panelGroup>
                     </p:column>
-                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60">
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60" >
                         <h:outputText value="#{ts.groupLabel}" />
                     </p:column>
                     <p:column width="10" style="padding-left: 1px;">
@@ -57,12 +55,10 @@
                         <h:outputText rendered="#{tsp.firstColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.firstColumn.trim()}" />
                         <h:outputText rendered="#{tsp.isPreferredTerm == true}" value="#{tsp.searchedValue}" style="font-weight: bold;" />
                         <h:outputText rendered="#{tsp.lastColumn != '' and tsp.isPreferredTerm == true}" value="#{tsp.lastColumn.trim()}" />
-                        <h:panelGroup rendered="#{tsp.isPreferredTerm == false}" >
-                            <i>
+                        <h:panelGroup rendered="#{tsp.isPreferredTerm == false}" style="font-style: italic">
                                 <h:outputText rendered="#{tsp.firstColumn != ''}" value="#{tsp.firstColumn.trim()}" />
                                 <h:outputText value="#{tsp.searchedValue}" style="font-weight: bold;" />
                                 <h:outputText rendered="#{tsp.lastColumn != ''}" value="#{tsp.lastColumn.trim()}" />
-                            </i>
                         </h:panelGroup>
 
                     </p:column>

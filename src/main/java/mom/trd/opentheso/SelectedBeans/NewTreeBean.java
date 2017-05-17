@@ -105,6 +105,7 @@ public class NewTreeBean implements Serializable {
     
     public void majSearch() {
         selectedTerme.majSearch();
+        vue.setOnglet(1);
         reInit();
         reExpand();
     }
