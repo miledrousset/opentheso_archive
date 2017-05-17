@@ -28,7 +28,7 @@
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_rdf4j, stop_export_rdf4j);PF('pbAjax').start();" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" > 
 
                             <p:fileDownload value="#{downloadBean.thesoToSkosRdf4j(skosExportBean.idTheso,skosExportBean.selectedLanguages, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>

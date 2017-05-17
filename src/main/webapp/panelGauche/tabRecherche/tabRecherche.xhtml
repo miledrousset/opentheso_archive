@@ -5,107 +5,126 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
-        <div id="recherche" >
-            <h:form rendered="#{theso.thesaurus.id_thesaurus != null}">
-                <br/>
-                <table>
-                    <tr>
-                        <td colspan="2">
-                            <h:inputText value="#{search.entry}" a:placeholder="#{langueBean.getMsg('index.search')}" class="inputConnect" style="width: 180px;"  /><br/><br/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <p:selectOneRadio value="#{search.startByOrContain}"  >
-                                <f:selectItem itemLabel="#{langueBean.getMsg('index.searchContain')}" itemValue="1" />                                                    
-                                <f:selectItem itemLabel="#{langueBean.getMsg('index.searchStartBy')}" itemValue="2" />
+    <div id="recherche" >
+
+        <h:form rendered="#{theso.thesaurus.id_thesaurus != null}">
+            <br/>
+
+
+            <h:inputText value="#{search.entry}" a:placeholder="#{langueBean.getMsg('index.search')}"  class="inputConnect" style="width: 180px; text-align:left;"   />
+
+            <p:commandButton icon="ui-icon-valider" actionListener="#{search.research()}" id="idSearchcommandButton" 
+                             update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                             styleClass="cbEdit"  rendered="true"/>
+
+
+            <br/>
+            <h:outputText value="#{langueBean.getMsg('index.headerSearch')} :  #{search.nbRes}"  style="color: black; font-weight: bold;"/>
+            <br/>
+            <p:accordionPanel id = "idaccordionPanelRechcerche" styleClass="accordionMenu" activeIndex="-2" >
+                <p:tab title="..."    titleStyleClass="titleAccordion">
+                    <table>
+                        <tr>
+
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <p:selectOneRadio value="#{search.startByOrContain}"  >
+                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchContain')}" itemValue="1" />                                                    
+                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchStartBy')}" itemValue="2" />
+                                </p:selectOneRadio><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="withNote" value="#{search.withNote}" >
+                                    <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchWithNote')}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="onlyNote" value="#{search.onlyNote}" >
+                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"/>
+                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchNoteOnly')}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="onlyNotation" value="#{search.onlyNotation}" >
+                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"  />
+                                    <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchNotationOnly')}"/>
+                                <br/><br/>
+                            </td>
+                        </tr>                                        
+                        <tr>
+                            <td>
+                                <div align="left">
+                                    <h:outputText value="Objet:"  />
+                                </div>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{search.typeValueSearch}" style="width: 180px;">
+                                    <f:selectItem itemValue="0" itemLabel="#{langueBean.getMsg('term')}" />
+                                    <f:selectItem itemValue="1" itemLabel="Id #{langueBean.getMsg('concept')}"  />
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div align="left">
+                                    <h:outputText value="#{langueBean.getMsg('language')}:" /> 
+                                </div>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{search.langue}"  style="width: 180px;">
+                                    <f:selectItems value="#{theso.getTradForSearch()}" var="t" itemLabel="#{t.french_name}" 
+                                                   itemValue="#{t.id_iso639_1}" />
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div align="left">
+                                    <h:outputText value="#{langueBean.getMsg('index.tabSearch2')}:" />
+                                </div>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{search.idGroup}"  style="width: 180px;">
+                                    <f:selectItems value="#{theso.listeDomaine()}"/>
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <p:selectOneRadio value="#{search.typeSearch}" >
+                                <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption1')}" itemValue="1" />
+                                <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption2')}" itemValue="2" />
                             </p:selectOneRadio><br/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" align="left">
-                            
-                            <p:selectBooleanCheckbox id="withNote" value="#{search.withNote}" >
-                                <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
-                                <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
-                            </p:selectBooleanCheckbox>
-                           
-                            <h:outputText value="  #{langueBean.getMsg('index.searchWithNote')}"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" align="left">
-                            
-                            <p:selectBooleanCheckbox id="onlyNote" value="#{search.onlyNote}" >
-                                <p:ajax update="withNote" listener="#{search.setWithNote(false)}"/>
-                                <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
-                            </p:selectBooleanCheckbox>
-                            
-                            <h:outputText value="  #{langueBean.getMsg('index.searchNoteOnly')}"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" align="left">
-                            
-                            <p:selectBooleanCheckbox id="onlyNotation" value="#{search.onlyNotation}" >
-                                <p:ajax update="withNote" listener="#{search.setWithNote(false)}"  />
-                                <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
-                            </p:selectBooleanCheckbox>
-                            
-                            <h:outputText value="  #{langueBean.getMsg('index.searchNotationOnly')}"/>
-                            <br/><br/>
-                        </td>
-                    </tr>                                        
-                    <tr>
-                        <td>
-                            <div align="left">
-                                <h:outputText value="Objet:"  />
-                            </div>
-                        </td>
-                        <td>
-                            <h:selectOneMenu value="#{search.typeValueSearch}" style="width: 180px;">
-                                <f:selectItem itemValue="0" itemLabel="#{langueBean.getMsg('term')}" />
-                                <f:selectItem itemValue="1" itemLabel="Id #{langueBean.getMsg('concept')}"  />
-                            </h:selectOneMenu>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div align="left">
-                                <h:outputText value="#{langueBean.getMsg('language')}:" /> 
-                            </div>
-                        </td>
-                        <td>
-                            <h:selectOneMenu value="#{search.langue}"  style="width: 180px;">
-                                <f:selectItems value="#{theso.getTradForSearch()}" var="t" itemLabel="#{t.french_name}" 
-                                               itemValue="#{t.id_iso639_1}" />
-                            </h:selectOneMenu>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div align="left">
-                                <h:outputText value="#{langueBean.getMsg('index.tabSearch2')}:" />
-                            </div>
-                        </td>
-                        <td>
-                            <h:selectOneMenu value="#{search.idGroup}"  style="width: 180px;">
-                                <f:selectItems value="#{theso.listeDomaine()}"/>
-                            </h:selectOneMenu>
-                        </td>
-                    </tr>
-                    <tr>
-                        <p:selectOneRadio value="#{search.typeSearch}" >
-                            <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption1')}" itemValue="1" />
-                            <f:selectItem itemLabel="#{langueBean.getMsg('index.searchOption2')}" itemValue="2" />
-                        </p:selectOneRadio><br/>
-                    </tr>
-                    <p:commandButton value="#{langueBean.getMsg('index.goSearch')}" actionListener="#{search.research()}"
-                                     update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                     styleClass="styleButton" />
-                </table>
-                <br/>
-            </h:form>
-            <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />
+                        </tr>
+
+                    </table>
+                </p:tab>
+            </p:accordionPanel> 
+
+        </h:form>
+        <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />
+
+        <div>
+            <!-- TAB RESULTAT RECHERCHE DEBUT -->
+            <ui:include src="../tabResultatRecherche/tabResultatRecherche.xhtml"/>
         </div>
+
+    </div>
 </ui:composition>

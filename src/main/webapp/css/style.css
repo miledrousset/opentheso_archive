@@ -51,6 +51,12 @@ input[type="button"], input[type="submit"]{
     width: 25px;
 }
 
+.ui-tree-droppoint{
+    height: 0px;
+    width: 0px;
+    
+}
+
 .ui-icon-ok {
     background: url("../images/ok.jpg") no-repeat top left !important;
     height: 25px;
@@ -213,6 +219,20 @@ input[type="button"], input[type="submit"]{
     font-size: 14px;
 }
 
+#recherche th {
+    font-size : 12px;
+}
+
+#recherche td {
+    font-size : 12px;
+}
+
+#accordeonTree li a {
+    padding: 0;
+    padding-left: 27px;
+    padding-right: 27px;
+}
+
 .styleFacetteTerm {
     border: none;
     font-family: "Palatino linotype",Times,serif;
@@ -312,8 +332,16 @@ input[type="button"], input[type="submit"]{
     background-color: #FFFFFF;
     padding: auto;
     text-align: center;
-    height: 514px;
+    /*height: 514px;*/
 }
+
+.styleTab  {
+    height: 400px;
+}
+ /*
+.ui-datatable .ui-datatable-scrollable-body{
+    height: 399px !important;
+}*/
 
 .panelNoBorder, .panelNoBorder tr, .panelNoBorder td{
     border: hidden;
@@ -322,6 +350,7 @@ input[type="button"], input[type="submit"]{
     font-family:"Palatino linotype",Times,serif;
     font-size: 14px;
 }
+
 
 .cbTree {
     height: 18px;
@@ -454,7 +483,7 @@ input[type="button"], input[type="submit"]{
 }
 
 #accordeonTree .ui-accordion-content .styleTree .ui-tree-container {
-    height: 460px;
+    height: 360px;
     overflow-x: scroll;
 }
 
@@ -462,6 +491,11 @@ input[type="button"], input[type="submit"]{
     height: 485px;
     overflow-x: scroll;
 }
+#accordeonTree{
+    padding: 0;
+    height: 100%;
+}
+
 
 .styleFacetteTerm .ui-tree-container {
     height: 175px;
@@ -476,13 +510,23 @@ input[type="button"], input[type="submit"]{
 
 /*Division arbre thésaurus (haut gauche)*/
 #divArbreTheso {
-    height: 465px;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    height: 530px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+.ui-tabs .ui-tabs-panel{
+    padding: 0;
+    overflow: visible;
+    height: 100%
 }
 
 .ui-tree {
     width: 250px;
+}
+
+.ui-tree .ui-tree-container {
+    overflow: visible;
 }
 
 /*Division sous groupes (bas gauche)*/
@@ -686,6 +730,8 @@ input[type="button"], input[type="submit"]{
 /*Division droite*/
 #droite {
     text-align: left;
+    width: 200px;
+    
 }
 
 /*Division image (bas droit)*/
@@ -1416,6 +1462,15 @@ pre {
  height:inherit !important;
  
 }
+
+#accordeonTree .ui-accordion-content{
+    background:white;
+}
+
+#accordeonTree .ui-accordion-header {
+    text-align: left;
+}
+
 
 .titleAccordion {
     background: none;
