@@ -19,13 +19,11 @@ import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.URI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.ModelBuilder;
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
-import org.eclipse.rdf4j.model.vocabulary.GEOF;
+import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 
@@ -70,7 +68,7 @@ public class WriteRdf4j {
 
     private void writeConcept() {
         for (SKOSResource concept : xmlDocument.getConceptList()) {
-            builder.subject(vf.createURI(concept.getUri()));
+            builder.subject(vf.createIRI(concept.getUri()));
             builder.add(RDF.TYPE, SKOS.CONCEPT);
             writeLabel(concept);
             writeRelation(concept);
@@ -85,7 +83,7 @@ public class WriteRdf4j {
 
     private void writeGroup() {
         for (SKOSResource group : xmlDocument.getGroupList()) {
-            builder.subject(vf.createURI(group.getUri()));
+            builder.subject(vf.createIRI(group.getUri()));
             builder.add(RDF.TYPE, SKOS.COLLECTION);
             writeLabel(group);
             writeRelation(group);
@@ -118,9 +116,14 @@ public class WriteRdf4j {
         SKOSGPSCoordinates gps = resource.getGPSCoordinates();
         String lat = gps.getLat();
         String lon = gps.getLon();
+        Literal literal;
+        
         if (lat != null && lon != null) {
-            builder.add("geo:lat", lat);
-            builder.add("geo:long", lon);
+            literal = vf.createLiteral(lat, XMLSchema.DOUBLE);
+            builder.add("geo:lat" ,literal);
+            
+            literal = vf.createLiteral(lon, XMLSchema.DOUBLE);
+            builder.add("geo:long",literal);
         }
 
     }
@@ -130,20 +133,30 @@ public class WriteRdf4j {
         for (SKOSDocumentation doc : resource.getDocumentationsList()) {
             prop = doc.getProperty();
             Literal literal = vf.createLiteral(doc.getText(), doc.getLanguage());
-            if (prop == SKOSProperty.definition) {
-                builder.add(SKOS.NOTE, literal);
-            } else if (prop == SKOSProperty.scopeNote) {
-                builder.add(SKOS.SCOPE_NOTE, literal);
-            } else if (prop == SKOSProperty.example) {
-                builder.add(SKOS.EXAMPLE, literal);
-            } else if (prop == SKOSProperty.historyNote) {
-                builder.add(SKOS.HISTORY_NOTE, literal);
-            } else if (prop == SKOSProperty.editorialNote) {
-                builder.add(SKOS.EDITORIAL_NOTE, literal);
-            } else if (prop == SKOSProperty.changeNote) {
-                builder.add(SKOS.CHANGE_NOTE, literal);
-            } else if (prop == SKOSProperty.note) {
-                builder.add(SKOS.NOTE, literal);
+            switch (prop) {
+                case SKOSProperty.definition:
+                    builder.add(SKOS.NOTE, literal);
+                    break;
+                case SKOSProperty.scopeNote:
+                    builder.add(SKOS.SCOPE_NOTE, literal);
+                    break;
+                case SKOSProperty.example:
+                    builder.add(SKOS.EXAMPLE, literal);
+                    break;
+                case SKOSProperty.historyNote:
+                    builder.add(SKOS.HISTORY_NOTE, literal);
+                    break;
+                case SKOSProperty.editorialNote:
+                    builder.add(SKOS.EDITORIAL_NOTE, literal);
+                    break;
+                case SKOSProperty.changeNote:
+                    builder.add(SKOS.CHANGE_NOTE, literal);
+                    break;
+                case SKOSProperty.note:
+                    builder.add(SKOS.NOTE, literal);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -151,6 +164,10 @@ public class WriteRdf4j {
     private void writeCreator(SKOSResource resource) {
         int prop;
         for (SKOSCreator creator : resource.getCreatorList()) {
+            if(creator == null) return;
+            if(creator.getCreator() == null) return;
+            if(creator.getCreator().isEmpty()) return;
+            
             prop = creator.getProperty();
             if (prop == SKOSProperty.creator) {
                 builder.add(DCTERMS.CREATOR, creator.getCreator());
@@ -162,14 +179,23 @@ public class WriteRdf4j {
 
     private void writeDate(SKOSResource resource) {
         int prop;
+        Literal literal;
+        
         for (SKOSDate date : resource.getDateList()) {
+            literal = vf.createLiteral(date.getDate(), XMLSchema.DATE);
             prop = date.getProperty();
-            if (prop == SKOSProperty.created) {
-                builder.add(DCTERMS.CREATED, date.getDate());
-            } else if (prop == SKOSProperty.modified) {
-                builder.add(DCTERMS.MODIFIED, date.getDate());
-            } else if (prop == SKOSProperty.date) {
-                builder.add(DCTERMS.DATE, date.getDate());
+            switch (prop) {
+                case SKOSProperty.created:
+                    builder.add(DCTERMS.CREATED, literal);
+                    break;
+                case SKOSProperty.modified:
+                    builder.add(DCTERMS.MODIFIED, literal);
+                    break;
+                case SKOSProperty.date:
+                    builder.add(DCTERMS.DATE, literal);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -177,6 +203,10 @@ public class WriteRdf4j {
 
     private void writeNotation(SKOSResource resource) {
         for (SKOSNotation notation : resource.getNotationList()) {
+            if(notation == null) return;
+            if(notation.getNotation() == null) return;
+            if(notation.getNotation().isEmpty()) return;
+            
             builder.add(SKOS.NOTATION, notation.getNotation());
         }
     }
@@ -199,16 +229,24 @@ public class WriteRdf4j {
         for (SKOSMatch match : resource.getMatchList()) {
             prop = match.getProperty();
             IRI uri = vf.createIRI(match.getValue());
-            if (prop == SKOSProperty.exactMatch) {
-                builder.add(SKOS.EXACT_MATCH, uri);
-            } else if (prop == SKOSProperty.closeMatch) {
-                builder.add(SKOS.CLOSE_MATCH, uri);
-            } else if (prop == SKOSProperty.broadMatch) {
-                builder.add(SKOS.BROAD_MATCH, uri);
-            } else if (prop == SKOSProperty.relatedMatch) {
-                builder.add(SKOS.RELATED_MATCH, uri);
-            } else if (prop == SKOSProperty.narrowMatch) {
-                builder.add(SKOS.NARROW_MATCH, uri);
+            switch (prop) {
+                case SKOSProperty.exactMatch:
+                    builder.add(SKOS.EXACT_MATCH, uri);
+                    break;
+                case SKOSProperty.closeMatch:
+                    builder.add(SKOS.CLOSE_MATCH, uri);
+                    break;
+                case SKOSProperty.broadMatch:
+                    builder.add(SKOS.BROAD_MATCH, uri);
+                    break;
+                case SKOSProperty.relatedMatch:
+                    builder.add(SKOS.RELATED_MATCH, uri);
+                    break;
+                case SKOSProperty.narrowMatch:
+                    builder.add(SKOS.NARROW_MATCH, uri);
+                    break;
+                default:
+                    break;
             }
 
         }
@@ -219,26 +257,39 @@ public class WriteRdf4j {
         for (SKOSRelation relation : resource.getRelationsList()) {
             IRI uri = vf.createIRI(relation.getTargetUri());
             prop = relation.getProperty();
-            if (prop == SKOSProperty.member) {
-                builder.add(SKOS.MEMBER, uri);
-            } else if (prop == SKOSProperty.broader) {
-                builder.add(SKOS.BROADER, uri);
-            } else if (prop == SKOSProperty.narrower) {
-                builder.add(SKOS.NARROWER, uri);
-            } else if (prop == SKOSProperty.related) {
-                builder.add(SKOS.RELATED, uri);
-            } else if (prop == SKOSProperty.hasTopConcept) {
-                builder.add(SKOS.HAS_TOP_CONCEPT, uri);
-            } else if (prop == SKOSProperty.inScheme) {
-                builder.add(SKOS.IN_SCHEME, uri);
-            } else if (prop == SKOSProperty.topConceptOf) {
-                builder.add(SKOS.TOP_CONCEPT_OF, uri);
-            } else if (prop == SKOSProperty.subGroup) {
-                builder.add("iso-thes:subGroup", uri);
-            } else if (prop == SKOSProperty.microThesaurusOf) {
-                builder.add("iso-thes:microThesaurusOf", uri);
-            } else if (prop == SKOSProperty.superGroup) {
-                builder.add("iso-thes:superGroup", uri);
+            switch (prop) {
+                case SKOSProperty.member:
+                    builder.add(SKOS.MEMBER, uri);
+                    break;
+                case SKOSProperty.broader:
+                    builder.add(SKOS.BROADER, uri);
+                    break;
+                case SKOSProperty.narrower:
+                    builder.add(SKOS.NARROWER, uri);
+                    break;
+                case SKOSProperty.related:
+                    builder.add(SKOS.RELATED, uri);
+                    break;
+                case SKOSProperty.hasTopConcept:
+                    builder.add(SKOS.HAS_TOP_CONCEPT, uri);
+                    break;
+                case SKOSProperty.inScheme:
+                    builder.add(SKOS.IN_SCHEME, uri);
+                    break;
+                case SKOSProperty.topConceptOf:
+                    builder.add(SKOS.TOP_CONCEPT_OF, uri);
+                    break;
+                case SKOSProperty.subGroup:
+                    builder.add("iso-thes:subGroup", uri);
+                    break;
+                case SKOSProperty.microThesaurusOf:
+                    builder.add("iso-thes:microThesaurusOf", uri);
+                    break;
+                case SKOSProperty.superGroup:
+                    builder.add("iso-thes:superGroup", uri);
+                    break;
+                default:
+                    break;
             }
 
         }
