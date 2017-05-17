@@ -228,9 +228,10 @@ input[type="button"], input[type="submit"]{
 }
 
 #accordeonTree li a {
-    padding: 0;
+    padding: 2px;
     padding-left: 27px;
     padding-right: 27px;
+    
 }
 
 .styleFacetteTerm {
