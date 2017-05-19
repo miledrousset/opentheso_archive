@@ -41,12 +41,12 @@
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
             <ui:include src="menuAll.xhtml" />
-            <ui:include src="/dialogs/export/exportAdvancedSkosDlg.xhtml" />
-            <ui:include src="/dialogs/export/exportSkosDlg.xhtml" />
+            <ui:include src="/dialogs/export/exportDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosRdf4jDlg.xhtml" />
-            <ui:include src="/dialogs/export/exportSkosRdf4jDlg.xhtml" />
+            <ui:include src="/dialogs/import/importJsonLdRdf4jDlg.xhtml" />
+            <ui:include src="/dialogs/import/importTurtleRdf4jDlg.xhtml" />
             
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -123,17 +123,9 @@
                                     
                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
                                         
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportSkosDlg" oncomplete="PF('exportSkosDlg').show();"
-                                                    style="font-size: 12px;"/>
                                         
                                         
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskos')} RDF4J"  actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}"
-                                                    update=":idexportSkosRdf4jDlg" oncomplete="PF('exportSkosRdf4jDlg').show();"
-                                                    style="font-size: 12px;"/>
-                                        
-                                        
-                                                    
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportskosAdvanced')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportAdvancedSkosDlg" oncomplete="PF('exportAdvancedSkosDlg').show();"
+                                        <p:menuitem value="#{langueBean.getMsg('edit.export')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportDlg" oncomplete="PF('exportDlg').show();"
                                                     style="font-size: 12px;"/>
                                         
                                         
@@ -560,6 +552,12 @@
                                                     style="font-size: 12px;"/> 
                             
                             <p:menuitem value="#{langueBean.getMsg('edit.importskos')} RDF4J"  update=":idImportSkosRdf4jDlg" oncomplete="PF('importSkosRdf4jDlg').show();"
+                                                    style="font-size: 12px;"/> 
+                            
+                            <p:menuitem value="JSON-LD RDF4J"  update=":idImportJsonLdRdf4jDlg" oncomplete="PF('importJsonLdRdf4jDlg').show();"
+                                                    style="font-size: 12px;"/> 
+                            
+                            <p:menuitem value="TURTLE RDF4J"  update=":idImportTurtleRdf4jDlg" oncomplete="PF('importTurtleRdf4jDlg').show();"
                                                     style="font-size: 12px;"/> 
                             
                             

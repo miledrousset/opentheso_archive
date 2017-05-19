@@ -16,6 +16,13 @@
     
     <dependencies>
         
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>fop</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+        
         
         
     <!-- https://mvnrepository.com/artifact/org.dspace/handle 
@@ -63,7 +70,11 @@
         </dependency>       
         
         
-        
+        <dependency>
+            <groupId>com.github.jsonld-java</groupId>
+            <artifactId>jsonld-java</artifactId>
+            <version>0.10.0</version>
+        </dependency>
         
       
         <dependency>
