@@ -25,6 +25,8 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 @ViewScoped
 
 public class skosExportBean {
+    
+    int typeExport;
 
     
     @ManagedProperty(value = "#{langueBean}")
@@ -58,7 +60,7 @@ public class skosExportBean {
         languagesOfTheso = thesaurusHelper.getAllUsedLanguagesOfThesaurusNode(connect.getPoolConnexion(), idTheso);
         
         GroupHelper groupHelper = new GroupHelper();
-        groupList = groupHelper.getListConceptGroup(connect.getPoolConnexion(), idTheso, idLang);
+        groupList = groupHelper.getListRootConceptGroup(connect.getPoolConnexion(), idTheso, idLang);
        selectedLanguages = new ArrayList<>();
        selectedGroups = new ArrayList<>();
         
@@ -130,6 +132,14 @@ public class skosExportBean {
 
     public void setSelectedGroups(List<NodeGroup> selectedGroups) {
         this.selectedGroups = selectedGroups;
+    }
+
+    public int getTypeExport() {
+        return typeExport;
+    }
+
+    public void setTypeExport(int typeExport) {
+        this.typeExport = typeExport;
     }
 
 

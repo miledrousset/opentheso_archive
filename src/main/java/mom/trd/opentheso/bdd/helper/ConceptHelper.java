@@ -2139,7 +2139,8 @@ public class ConceptHelper {
 
         //    System.out.println("IdConcept = " + idConcept);
         /// attention il y a un problème ici, il faut vérifier pourquoi nous avons un Concept Null
-        if (nodeConcept.getConcept() == null) {
+        
+        if (nodeConcept == null || nodeConcept.getConcept() == null) {
             System.err.println("Attention Null proche de = : " + idConcept);
             int k = 0;
             return null;

@@ -62,7 +62,59 @@ public class rdf4jFileBean implements Serializable {
             } catch (IOException ex) {
                 Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ReadRdf4j readRdf4j = new ReadRdf4j(is);
+            ReadRdf4j readRdf4j = new ReadRdf4j(is,0);
+            progress =100;
+            sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+            total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1  ;
+            uri = sKOSXmlDocument.getTitle();    
+            uploadEnable = false;
+            BDDinsertEnable = true;
+
+            
+        }      
+    }
+    
+    public void chargeJsonLd(FileUploadEvent event) {
+        progress =0;
+        
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            InputStream is = null;
+
+            try {
+                is = event.getFile().getInputstream();
+            } catch (IOException ex) {
+                Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            ReadRdf4j readRdf4j = new ReadRdf4j(is,1);
+            progress =100;
+            sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+            total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1  ;
+            uri = sKOSXmlDocument.getTitle();    
+            uploadEnable = false;
+            BDDinsertEnable = true;
+
+            
+        }      
+    }
+    
+    public void chargeTurtle(FileUploadEvent event) {
+        progress =0;
+        
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            InputStream is = null;
+
+            try {
+                is = event.getFile().getInputstream();
+            } catch (IOException ex) {
+                Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            ReadRdf4j readRdf4j = new ReadRdf4j(is,2);
             progress =100;
             sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
             total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1  ;
