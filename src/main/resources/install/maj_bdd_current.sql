@@ -7,8 +7,8 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.2.6
--- date : 10/02/2017
+-- version=4.3.0
+-- date : 19/05/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1116,8 +1116,9 @@ begin
   end if;
   end;
   $$LANGUAGE plpgsql;
+
 --
--- permet de changer les id du alignement en cass que il est 0;
+-- permet de changer les id des alignements s'ils sont à 0;
 --
 create or replace function id_alignements()
 returns void as $$
@@ -1166,7 +1167,7 @@ declare
 
 
 --
---Pour effacer les constraint de la BDD de humanum
+--Pour effacer les contraintes de la BDD Huma-Num
 --
 create or replace function delete_constraint_term_changer_concept_historique() returns void as $$
 begin
@@ -1303,6 +1304,80 @@ if not exists (SELECT * from information_schema.table_constraints where table_na
   end;
   $$LANGUAGE plpgsql;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--
+--
+-- mise à jour de la table Concept pour intégrer la gestion des collections
+--
+--
+
+-- ajout de la table (relation_group)
+
+CREATE OR REPLACE FUNCTION relation_group() RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'relation_group') THEN
+
+        execute 
+		'CREATE TABLE relation_group
+                ( id_group1 character varying NOT NULL,
+                  id_thesaurus character varying NOT NULL,
+                  relation character varying NOT NULL,
+                  id_group2 character varying NOT NULL,
+                  CONSTRAINT pk_relation_group PRIMARY KEY (id_group1, id_thesaurus, relation, id_group2)
+                )'
+	;
+
+    END IF;
+END;
+
+$$LANGUAGE plpgsql VOLATILE;
+
+
+--
+-- fonction de transfert des données de la table Concept à la table (concept_gourp_concept) 
+--
+    create or replace function update_table_concept()
+    returns void as $$
+    declare
+	line RECORD;
+	
+	begin 
+		if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'concept' and COLUMN_NAME = 'id_group') then
+                    for line in select id_group, id_thesaurus, id_concept  from concept
+			loop
+                            execute
+                            'INSERT INTO concept_group_concept (idgroup, idthesaurus, idconcept) VALUES ('''||line.id_group||''', '''||line.id_thesaurus||''', '''||line.id_concept||''');';
+			end loop;
+                    execute
+                    '
+                        ALTER TABLE ONLY concept
+                                    DROP CONSTRAINT concept_pkey ;
+                        ALTER TABLE ONLY concept
+                                    ADD CONSTRAINT concept_pkey PRIMARY KEY (id_concept, id_thesaurus);
+                        Alter TABLE concept DROP COLUMN id_group;
+                    ';
+		end if;
+	end;
+	$$language plpgsql;
+
+
+
+
+
 -- mises à jour 
 --
 --
@@ -1397,6 +1472,10 @@ SELECT delete_sequence('history_note__id_seq');
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('role_id_seq'::regclass);
 
 
+SELECT update_table_concept();
+SELECT relation_group();
+
+
 --
 -- création et mise à jour des tables
 --
@@ -1435,8 +1514,17 @@ INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (4, 'Equival
 INSERT INTO alignement_type (id, label, isocode, label_skos) VALUES (5, 'Equivalence spécifique', 'EQS', 'narrowMatch');
 */
 
--- Mise à jour de la Function: unaccent_string(text)
 
+
+-- Mise à jour de la table concept_group_type 
+DELETE FROM concept_group_type;
+INSERT INTO concept_group_type (code, label, skoslabel) VALUES ('MT', 'Microthesaurus', 'MicroThesaurus');
+INSERT INTO concept_group_type (code, label, skoslabel) VALUES ('G', 'Group', 'ConceptGroup');
+INSERT INTO concept_group_type (code, label, skoslabel) VALUES ('C', 'Collection', 'Collection');
+INSERT INTO concept_group_type (code, label, skoslabel) VALUES ('T', 'Theme', 'Theme');
+
+
+-- Mise à jour de la Function: unaccent_string(text)
 DROP FUNCTION unaccent_string(text);
 
 CREATE OR REPLACE FUNCTION unaccent_string(text)
@@ -1513,6 +1601,9 @@ SELECT delete_fonction ('alignement_preferences','');
 SELECT delete_fonction ('gps_preferences','');
 SELECT delete_fonction ('delete_colonne_preferences','');
 SELECT delete_fonction ('primary_key_info','');
+SELECT delete_fonction('update_table_concept','');
+SELECT delete_fonction('relation_group','');
+
 
 --Ne pas toucher le prochain fonction
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');

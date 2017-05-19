@@ -19,7 +19,8 @@
 
 
             <br/>
-            <h:outputText value="#{langueBean.getMsg('index.headerSearch')} :  #{search.nbRes}"  style="color: black; font-weight: bold;"/>
+            <h:outputText rendered="#{search.nbRes != 0}" value="#{langueBean.getMsg('index.headerSearch')}:"/>
+            <h:outputText rendered="#{search.nbRes != 0}" value=" #{search.nbRes}"  style="color: green; font-weight: bold;"/>
             <br/>
             <p:accordionPanel id = "idaccordionPanelRechcerche" styleClass="accordionMenu" activeIndex="-2" >
                 <p:tab title="..."    titleStyleClass="titleAccordion">

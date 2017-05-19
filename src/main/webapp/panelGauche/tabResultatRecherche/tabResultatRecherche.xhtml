@@ -11,7 +11,7 @@
                              rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="500"
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
                     <p:ajax event="rowSelect" listener="#{newtreeBean.majSearch()}" 
-                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                            update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                         
                     <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
                         <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />

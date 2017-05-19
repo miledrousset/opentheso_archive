@@ -177,12 +177,12 @@
             <ui:include src ="/admin/reorganizing.xhtml" /><br/><br/><br/>
             <ui:include src="dialogs/Alignement/editAlignementSourceEditDlg.xhtml"/>
             <ui:include src="/dialogs/baseDeDonnes/miseAJourEditDlg.xhtml"/>
-            <h:panelGroup rendered="#{user1.haveRights(2)}">
+            <h:panelGroup rendered="#{user1.haveRights(1)}">
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('bdd.act')}"/></legend><br/>
                 
                     <h:form>
-                        <p:commandButton id="chercheMaJ" value="Chercher mise à jours"  update=":idMiseAJourEditDlg" 
+                        <p:commandButton id="chercheMaJ" value="Vérifier la mise à jour"  update=":idMiseAJourEditDlg" 
                                          actionListener="#{baseDeDonnes.loadinfoDB()}" oncomplete="PF('miseAJourEditDlg').show()" 
                                          styleClass="styleButton"/>
                         

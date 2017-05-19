@@ -41,6 +41,7 @@ delete from thesaurus_label;
 delete from user_role;
 delete from users;
 delete from thesaurus_array_concept;
+delete from relation_group;
 
 
 

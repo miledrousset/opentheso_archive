@@ -481,6 +481,8 @@ public class SelectedThesaurus implements Serializable {
                 if (editTheso.getLanguage() == null) {
                     editTheso.setLanguage(workLanguage);
                 }
+                editTheso.setId_thesaurus(idThesaurus);
+
                 if (!th.addThesaurusTraductionRollBack(conn, editTheso)) {
                     conn.rollback();
                     conn.close();
