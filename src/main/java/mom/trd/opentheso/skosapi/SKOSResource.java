@@ -1,7 +1,10 @@
 package mom.trd.opentheso.skosapi;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
  *
@@ -297,4 +300,488 @@ public class SKOSResource {
         return xmlRessource;
     }
 
+    /**
+     * sort par ordre alphabetique par raport a une langue donnée et assosi les
+     * noms au ID ne change pas l'ordre si isTrad est a true
+     *
+     * @param isTrad
+     * @param langCode
+     * @param langCode2
+     * @param idToNameHashMap
+     * @return
+     */
+    public static Comparator<SKOSResource> sortAlphabeticInLang(boolean isTrad, String langCode, String langCode2, HashMap<String, String> idToNameHashMap, HashMap<String, ArrayList<Integer>> idToIsTrad, ArrayList<String> resourceChecked) {
+        return new AlphabeticComparator(isTrad, langCode, langCode2, idToNameHashMap, idToIsTrad, resourceChecked);
+    }
+
+    /**
+     * sort par ordre alphabetique par raport a une langue donnée et assosi les
+     * noms au ID et rempli les assosiation des IDs toutes les information du
+     * term sont stocké dans les hashmaps ne change pas l'ordre si isTrad est a
+     * true
+     *
+     * @param isTrad
+     * @param langCode
+     * @param langCode2
+     * @param idToNameHashMap
+     * @param idToChildId
+     * @param idToDocumentation
+     * @param idToMatch
+     * @param idToGPS
+     * @param resourceChecked
+     * @param idToIsTradDiff
+     * @return
+     */
+    public static Comparator<SKOSResource> sortForHiera(boolean isTrad, String langCode, String langCode2, HashMap<String, String> idToNameHashMap, HashMap<String, ArrayList<String>> idToChildId,
+            HashMap<String, ArrayList<String>> idToDocumentation, HashMap<String, ArrayList<String>> idToMatch, HashMap<String, String> idToGPS, ArrayList<String> resourceChecked, HashMap<String, ArrayList<Integer>> idToIsTradDiff) {
+        return new HieraComparator(isTrad, langCode, langCode2, idToNameHashMap, idToChildId, idToDocumentation, idToMatch, idToGPS, resourceChecked, idToIsTradDiff);
+    }
+
+    private static class HieraComparator implements Comparator<SKOSResource> {
+
+        String langCode;
+        String langCode2;
+        HashMap<String, String> idToNameHashMap;
+        HashMap<String, ArrayList<String>> idToChildId;
+        HashMap<String, ArrayList<String>> idToDocumentation;
+        HashMap<String, ArrayList<String>> idToMatch;
+        HashMap<String, String> idToGPS;
+        boolean isTrad;
+        ArrayList<String> resourceChecked;
+        HashMap<String, ArrayList<Integer>> idToIsTradDiff;
+
+        public HieraComparator(boolean isTrad, String langCode, String langCode2, HashMap<String, String> idToNameHashMap, HashMap<String, ArrayList<String>> idToChildId, HashMap<String, ArrayList<String>> idToDocumentation, HashMap<String, ArrayList<String>> idToMatch, HashMap<String, String> idToGPS, ArrayList<String> resourceChecked, HashMap<String, ArrayList<Integer>> idToIsTradDiff) {
+            this.langCode = langCode;
+            this.langCode2 = langCode2;
+            this.idToNameHashMap = idToNameHashMap;
+            this.idToChildId = idToChildId;
+            this.idToDocumentation = idToDocumentation;
+            this.idToMatch = idToMatch;
+            this.idToGPS = idToGPS;
+            this.isTrad = isTrad;
+            this.resourceChecked = resourceChecked;
+            this.idToIsTradDiff = idToIsTradDiff;
+
+        }
+
+        @Override
+        public int compare(SKOSResource r1, SKOSResource r2) {
+            String r1_name = null;
+            String r2_name = null;
+
+            String id1 = getIdFromUri(r1.getUri());
+            String id2 = getIdFromUri(r2.getUri());
+
+            if (!resourceChecked.contains(id1)) {
+
+                writeIdToChild(r1);
+                writeIdToMatch(r1);
+                writeIdToGPS(r1);
+                checkTrad(r1);
+                resourceChecked.add(id1);
+            }
+            writeIdToDocumentation(r1);
+
+            if (!resourceChecked.contains(id2)) {
+
+                writeIdToChild(r2);
+                writeIdToMatch(r2);
+                writeIdToGPS(r2);
+                checkTrad(r2);
+                resourceChecked.add(id2);
+            }
+            writeIdToDocumentation(r2);
+
+            for (SKOSLabel label : r1.getLabelsList()) {
+                if (label.getProperty() == SKOSProperty.prefLabel && label.getLanguage().equals(langCode)) {
+
+                    r1_name = label.getLabel();
+                    idToNameHashMap.put(id1, r1_name);
+
+                }
+            }
+
+            for (SKOSLabel label2 : r2.getLabelsList()) {
+                if (label2.getProperty() == SKOSProperty.prefLabel && label2.getLanguage().equals(langCode)) {
+                    r2_name = label2.getLabel();
+
+                    idToNameHashMap.put(id2, r2_name);
+
+                }
+            }
+
+            if (isTrad) {
+                return 0;
+            }
+
+            if (r1_name == null) {
+                r1_name = "";
+            }
+            if (r2_name == null) {
+                r2_name = "";
+            }
+
+            if (r1_name.length() == 0) {
+                if (r2_name.length() == 0) {
+                    return 0;               // Both empty - so indicate
+                }
+                return 1;                   // empty string sorts last
+            }
+            if (r2_name.length() == 0) {
+                return -1;                  // empty string sorts last                  
+            }
+
+            return r1_name.compareTo(r2_name);
+
+        }
+
+        private void writeIdToGPS(SKOSResource resource) {
+            String key = getIdFromUri(resource.getUri());
+            SKOSGPSCoordinates gps = resource.getGPSCoordinates();
+            String lat = gps.getLat();
+            String lon = gps.getLon();
+
+            if (lat != null && lon != null) {
+                idToGPS.put(key, "gps : lat =" + lat + " long =" + lon);
+            }
+        }
+
+        private void writeIdToMatch(SKOSResource resource) {
+            for (SKOSMatch match : resource.getMatchList()) {
+                String key = getIdFromUri(resource.getUri());
+                String matchTypeName = null;
+                int prop = match.getProperty();
+                switch (prop) {
+                    case SKOSProperty.exactMatch:
+                        matchTypeName = "exactMatch";
+                        break;
+                    case SKOSProperty.closeMatch:
+                        matchTypeName = "closeMatch";
+                        break;
+                    case SKOSProperty.broadMatch:
+                        matchTypeName = "broadMatch";
+                        break;
+                    case SKOSProperty.relatedMatch:
+                        matchTypeName = "relatedMatch";
+                        break;
+                    case SKOSProperty.narrowMatch:
+                        matchTypeName = "narrowMatch";
+                        break;
+                }
+
+                ArrayList<String> mat = idToMatch.get(key);
+
+                if (mat == null) {
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(matchTypeName + ": " + match.getValue());
+                    idToMatch.put(key, temp);
+                } else {
+                    String matToAdd = matchTypeName + ": " + match.getValue();
+                    if (!mat.contains(matToAdd)) {
+                        mat.add(matToAdd);
+                    }
+                }
+
+            }
+
+        }
+
+        private void writeIdToDocumentation(SKOSResource resource) {
+            for (SKOSDocumentation documentation : resource.getDocumentationsList()) {
+                String documentationText = null;
+
+                if (documentation.getLanguage().equals(langCode)) {
+                    documentationText = documentation.getText();
+                } else {
+                    continue;
+                }
+
+                String key = getIdFromUri(resource.getUri());
+                String docTypeName = null;
+                int prop = documentation.getProperty();
+
+                switch (prop) {
+                    case SKOSProperty.definition:
+                        docTypeName = "definition";
+                        break;
+                    case SKOSProperty.scopeNote:
+                        docTypeName = "scopeNote";
+                        break;
+                    case SKOSProperty.example:
+                        docTypeName = "example";
+                        break;
+                    case SKOSProperty.historyNote:
+                        docTypeName = "historyNote";
+                        break;
+                    case SKOSProperty.editorialNote:
+                        docTypeName = "editorialNote";
+                        break;
+                    case SKOSProperty.changeNote:
+                        docTypeName = "changeNote";
+                        break;
+                    case SKOSProperty.note:
+                        docTypeName = "note";
+                        break;
+                    default:
+                        docTypeName = "note";
+                        break;
+                }
+                ArrayList<String> doc = idToDocumentation.get(key);
+
+                if (doc == null) {
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(docTypeName + ": " + documentationText);
+                    idToDocumentation.put(key, temp);
+                } else {
+                    String docToAdd = docTypeName + ": " + documentationText;
+                    if (!doc.contains(docToAdd)) {
+                        doc.add(docToAdd);
+                    }
+                }
+            }
+        }
+
+        private void writeIdToChild(SKOSResource resource) {
+            for (SKOSRelation relation : resource.getRelationsList()) {
+                String key;
+                if (relation.getProperty() == SKOSProperty.narrower) {
+                    key = getIdFromUri(resource.getUri());
+                    ArrayList<String> child = idToChildId.get(key);
+                    if (child == null) {
+                        ArrayList<String> temp = new ArrayList<>();
+                        temp.add(getIdFromUri(relation.getTargetUri()));
+                        idToChildId.put(key, temp);
+                    } else {
+                        String childId = getIdFromUri(relation.getTargetUri());
+                        if (!child.contains(childId)) {
+                            child.add(childId);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        private void checkTrad(SKOSResource resource) {
+
+            String key = getIdFromUri(resource.getUri());
+
+            int lang1Doc = 0;
+            int lang2Doc = 0;
+
+            for (SKOSDocumentation doc : resource.getDocumentationsList()) {
+
+                if (doc.getLanguage().equals(langCode)) {
+                    lang1Doc++;
+                }
+                if (doc.getLanguage().equals(langCode2)) {
+                    lang2Doc++;
+                }
+
+                int diff = Math.abs(lang1Doc - lang2Doc);
+
+                ArrayList<Integer> newIsTrad = new ArrayList<>();
+
+                for (int i = 0; i < diff; i++) {
+                    newIsTrad.add(SKOSProperty.note);
+                }
+                idToIsTradDiff.put(key, newIsTrad);
+            }
+        }
+    }
+
+    private static class AlphabeticComparator implements Comparator<SKOSResource> {
+
+        String langCode;
+        String langCode2;
+        HashMap<String, String> idToNameHashMap;
+        boolean isTrad;
+        HashMap<String, ArrayList<Integer>> idToIsTrad;
+        ArrayList<String> resourceChecked;
+
+        public AlphabeticComparator(boolean isTrad, String langCode, String langCode2, HashMap<String, String> idToNameHashMap, HashMap<String, ArrayList<Integer>> idToIsTrad, ArrayList<String> resourceChecked) {
+            this.langCode = langCode;
+            this.idToNameHashMap = idToNameHashMap;
+            this.isTrad = isTrad;
+            this.langCode2 = langCode2;
+            this.idToIsTrad = idToIsTrad;
+            this.resourceChecked = resourceChecked;
+        }
+
+        @Override
+        public int compare(SKOSResource r1, SKOSResource r2) {
+
+            String r1_name = null;
+            String r2_name = null;
+
+            String id1 = getIdFromUri(r1.getUri());
+            String id2 = getIdFromUri(r2.getUri());
+
+            if (!resourceChecked.contains(id1)) {
+                checkTrad(r1);
+                resourceChecked.add(id1);
+            }
+            if (!resourceChecked.contains(id2)) {
+                checkTrad(r2);
+                resourceChecked.add(id2);
+
+            }
+
+            for (SKOSLabel label : r1.getLabelsList()) {
+                if (label.getProperty() == SKOSProperty.prefLabel && label.getLanguage().equals(langCode)) { // to test
+                    r1_name = label.getLabel();
+                    idToNameHashMap.put(id1, r1_name);
+
+                }
+            }
+            for (SKOSLabel label2 : r2.getLabelsList()) {
+                if (label2.getProperty() == SKOSProperty.prefLabel && label2.getLanguage().equals(langCode)) {
+                    r2_name = label2.getLabel();
+                    idToNameHashMap.put(id2, r2_name);
+
+                }
+
+            }
+            if (isTrad) {
+                return 0;
+            }
+
+            if (r1_name == null) {
+                r1_name = "";
+            }
+            if (r2_name == null) {
+                r2_name = "";
+            }
+
+            if (r1_name.length() == 0) {
+                if (r2_name.length() == 0) {
+                    return 0;               // Both empty - so indicate
+                }
+                return 1;                   // empty string sorts last
+            }
+            if (r2_name.length() == 0) {
+                return -1;                  // empty string sorts last                  
+            }
+
+            return r1_name.compareTo(r2_name);
+
+        }
+
+        private void checkTrad(SKOSResource resource) {
+
+            int lang1Pref = 0;
+            int lang2Pref = 0;
+
+            int lang1Alt = 0;
+            int lang2Alt = 0;
+
+            int lang1Doc = 0;
+            int lang2Doc = 0;
+
+            //prefLabel
+            for (SKOSLabel label : resource.getLabelsList()) {
+                if (label.getLanguage().equals(langCode) && label.getProperty() == SKOSProperty.prefLabel) {
+                    lang1Pref++;
+                }
+                if (label.getLanguage().equals(langCode2) && label.getProperty() == SKOSProperty.prefLabel) {
+                    lang2Pref++;
+                }
+
+                if (lang1Pref > 0 && lang2Pref > 0) {
+                    lang1Pref--;
+                    lang2Pref--;
+
+                    String key = getIdFromUri(resource.getUri());
+                    ArrayList<Integer> trad = idToIsTrad.get(key);
+                    if (trad == null) {
+                        ArrayList<Integer> newIsTrad = new ArrayList<>();
+                        newIsTrad.add(SKOSProperty.prefLabel);
+                        idToIsTrad.put(key, newIsTrad);
+                    } else {
+                        trad.add(SKOSProperty.prefLabel);
+                    }
+                }
+            }
+            //altLabel
+            for (SKOSLabel label : resource.getLabelsList()) {
+
+                if (label.getLanguage().equals(langCode) && label.getProperty() == SKOSProperty.altLabel) {
+                    lang1Alt++;
+                }
+                if (label.getLanguage().equals(langCode2) && label.getProperty() == SKOSProperty.altLabel) {
+                    lang2Alt++;
+                }
+
+                if (lang1Alt > 0 && lang2Alt > 0) {
+                    lang1Alt--;
+                    lang2Alt--;
+
+                    String key = getIdFromUri(resource.getUri());
+                    ArrayList<Integer> trad = idToIsTrad.get(key);
+                    if (trad == null) {
+                        ArrayList<Integer> newIsTrad = new ArrayList<>();
+                        newIsTrad.add(SKOSProperty.altLabel);
+                        idToIsTrad.put(key, newIsTrad);
+                    } else {
+                        trad.add(SKOSProperty.altLabel);
+                    }
+                }
+
+            }
+
+            for (SKOSDocumentation doc : resource.getDocumentationsList()) {
+
+                if (doc.getLanguage().equals(langCode)) {
+                    lang1Doc++;
+                }
+                if (doc.getLanguage().equals(langCode2)) {
+                    lang2Doc++;
+                }
+
+                if (lang1Doc > 0 && lang2Doc > 0) {
+                    lang1Doc--;
+                    lang2Doc--;
+
+                    String key = getIdFromUri(resource.getUri());
+                    ArrayList<Integer> trad = idToIsTrad.get(key);
+                    if (trad == null) {
+                        ArrayList<Integer> newIsTrad = new ArrayList<>();
+                        newIsTrad.add(SKOSProperty.note);
+                        idToIsTrad.put(key, newIsTrad);
+                    } else {
+                        trad.add(SKOSProperty.note);
+                    }
+                }
+
+            }
+        }
+    }
+
+    public static String getIdFromUri(String uri) {
+        if (uri.contains("idg=")) {
+            if (uri.contains("&")) {
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.indexOf("&"));
+            } else {
+                uri = uri.substring(uri.indexOf("idg=") + 4, uri.length());
+            }
+        } else {
+            if (uri.contains("idc=")) {
+                if (uri.contains("&")) {
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.indexOf("&"));
+                } else {
+                    uri = uri.substring(uri.indexOf("idc=") + 4, uri.length());
+                }
+            } else {
+                if (uri.contains("#")) {
+                    uri = uri.substring(uri.indexOf("#") + 1, uri.length());
+                } else {
+                    uri = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
+                }
+            }
+        }
+
+        StringPlus stringPlus = new StringPlus();
+        uri = stringPlus.normalizeStringForIdentifier(uri);
+        return uri;
+    }
 }

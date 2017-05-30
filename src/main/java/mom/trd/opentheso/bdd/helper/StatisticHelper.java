@@ -151,7 +151,7 @@ public class StatisticHelper {
                 try {
                     String query = "SELECT count(id_concept) FROM concept WHERE"
                             + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_group = '" + idGroup + "'";
+                            + " and id_concept  IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = id_thesaurus)";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -184,11 +184,11 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT count(non_preferred_term.id_term) FROM concept, preferred_term, non_preferred_term WHERE"
+                    String query = "SELECT count(non_preferred_term.id_term) FROM concept, preferred_term,concept_group_concept, non_preferred_term WHERE"
                             + " concept.id_concept=preferred_term.id_concept"
                             + " and preferred_term.id_term=non_preferred_term.id_term"
                             + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_group = '" + idGroup + "'"
+                            + " and concept.id_concept IN ( SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = concept.id_thesaurus)"
                             + " and non_preferred_term.lang = '" + langue + "'";
 
                     stmt.executeQuery(query);
@@ -222,11 +222,11 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT count(DISTINCT term.id_term) FROM concept, preferred_term, term WHERE"
+                    String query = "SELECT count(DISTINCT term.id_term) FROM concept, preferred_term,concept_group_concept, term WHERE"
                             + " concept.id_concept = preferred_term.id_concept"
                             + " and preferred_term.id_term = term.id_term"
                             + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_group = '" + idGroup + "'"
+                            + " and concept.id_concept IN ( SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = concept.id_thesaurus)"
                             + " and term.lang = '" + langue + "'";
 
                     stmt.executeQuery(query);
@@ -263,7 +263,7 @@ public class StatisticHelper {
                     String query = "SELECT count(DISTINCT note.id) FROM concept, note WHERE"
                             + " concept.id_concept = note.id_concept"
                             + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_group = '" + idGroup + "'"
+                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"+ idGroup + "')"
                             + " and note.lang = '" + langue + "'";
 
                     stmt.executeQuery(query);
@@ -298,10 +298,12 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified, concept.id_group, term.lexical_value "
-                            + "FROM concept, preferred_term, term"
+                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified,idgroup, term.lexical_value "
+                            + "FROM concept, preferred_term, term,concept_group_concept"
                             + " WHERE concept.id_concept= preferred_term.id_concept"
                             + " AND  preferred_term.id_term=term.id_term"
+                            + " AND concept_group_concept.idconcept = concept.id_concept"
+                            + " AND concept_group_concept.idthesaurus = concept.id_thesaurus"
                             + " AND concept.id_thesaurus = '" + idThesaurus + "'"
                             + " AND term.created <= '" + end + "'"
                             + " AND term.created >= '" + begin + "'"
@@ -314,8 +316,8 @@ public class StatisticHelper {
                         NodeStatConcept nsc = new NodeStatConcept();
                         nsc.setDateCreat(resultSet.getDate("created"));
                         nsc.setDateEdit(resultSet.getDate("modified"));
-                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("id_group"), idThesaurus, langue).getLexicalValue();
-                        nsc.setGroup(temp + "(" + resultSet.getString("id_group") + ")");
+                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
                         nsc.setIdConcept(resultSet.getString("id_concept"));
                         nsc.setValue(resultSet.getString("lexical_value"));
                         list.add(nsc);
@@ -345,10 +347,12 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified, concept.id_group, term.lexical_value "
-                            + "FROM concept, preferred_term, term"
+                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified, idgroup, term.lexical_value "
+                            + "FROM concept, preferred_term, term,concept_group_concept"
                             + " WHERE concept.id_concept= preferred_term.id_concept"
                             + " AND  preferred_term.id_term=term.id_term"
+                            + " AND concept_group_concept.idconcept = concept.id_concept"
+                            + " AND concept_group_concept.idthesaurus = concept.id_thesaurus"
                             + " AND concept.id_thesaurus = '" + idThesaurus + "'"
                             + " AND term.modified <= '" + end + "'"
                             + " AND term.modified >= '" + begin + "'"
@@ -361,8 +365,8 @@ public class StatisticHelper {
                         NodeStatConcept nsc = new NodeStatConcept();
                         nsc.setDateCreat(resultSet.getDate("created"));
                         nsc.setDateEdit(resultSet.getDate("modified"));
-                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("id_group"), idThesaurus, langue).getLexicalValue();
-                        nsc.setGroup(temp + "(" + resultSet.getString("id_group") + ")");
+                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
                         nsc.setIdConcept(resultSet.getString("id_concept"));
                         nsc.setValue(resultSet.getString("lexical_value"));
                         list.add(nsc);

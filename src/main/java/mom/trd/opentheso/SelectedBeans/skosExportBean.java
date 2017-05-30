@@ -38,6 +38,10 @@ public class skosExportBean {
     private String idTheso;
     private List<NodeLang> selectedLanguages;
     
+    String singleLanguageCodeSelected;
+    
+    String singleLanguageCodeSelected2;
+    
     
     private List<NodeLang> languagesOfTheso;
     private List<NodeGroup> groupList;
@@ -113,6 +117,22 @@ public class skosExportBean {
     public List<NodeLang> getLanguagesOfTheso() {
         return languagesOfTheso;
     }
+    
+    public List<String> getCodesLanguagesOfTheso() {
+        
+        List<String> codes = new ArrayList<>();
+        if(languagesOfTheso == null)
+            return null;
+        
+        for(NodeLang nodeLang :languagesOfTheso){
+            codes.add(nodeLang.getCode());
+        }
+        
+        
+        return codes;
+    }
+    
+
 
     public void setLanguagesOfTheso(List<NodeLang> languagesOfTheso) {
         this.languagesOfTheso = languagesOfTheso;
@@ -140,6 +160,22 @@ public class skosExportBean {
 
     public void setTypeExport(int typeExport) {
         this.typeExport = typeExport;
+    }
+
+    public String getSingleLanguageCodeSelected() {
+        return singleLanguageCodeSelected;
+    }
+
+    public void setSingleLanguageCodeSelected(String sigleLanguageCodeSelected) {
+        this.singleLanguageCodeSelected = sigleLanguageCodeSelected;
+    }
+
+    public String getSingleLanguageCodeSelected2() {
+        return singleLanguageCodeSelected2;
+    }
+
+    public void setSingleLanguageCodeSelected2(String singleLanguageCodeSelected2) {
+        this.singleLanguageCodeSelected2 = singleLanguageCodeSelected2;
     }
 
 

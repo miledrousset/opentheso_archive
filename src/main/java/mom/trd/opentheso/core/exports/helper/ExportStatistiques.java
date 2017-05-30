@@ -113,9 +113,9 @@ public class ExportStatistiques {
                         ArrayList<String> conceptOrp = new ArrayList<>();
                         ArrayList<String> id = new ArrayList<>();
                         //ici nous avons le/les fils de chacun domaine
-                        String query2 = "Select *  from concept where id_thesaurus = '" + id_theso + "' and id_group ='" + e.getKey() + "' and top_concept ='true'";
+                        String query2 = "Select *  from concept where id_thesaurus = '" + id_theso + "' and id_concept IN  (SELECT idconcept FROM concept_group_concept WHERE idgroup ='" + e.getKey() + "') and top_concept ='true'";
                         //ici nous avos toutes les progéniture
-                        String query4 = "Select id_concept from concept where id_group ='" + e.getKey() + "' ";
+                        String query4 = "Select id_concept from concept where id_concept IN (SELECT id_concept FROM concept_group_concept WHERE idgroup ='" + e.getKey() + "') ";
                         rS = stmt2.executeQuery(query4);
                         while (rS.next()) {
                             cantitad++;//on garde toutes le progénitures d'une domaine e.getkey

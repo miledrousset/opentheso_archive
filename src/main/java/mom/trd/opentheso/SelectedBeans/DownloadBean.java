@@ -28,6 +28,7 @@ import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
+import mom.trd.opentheso.core.exports.pdf.WritePdf;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
@@ -709,8 +710,35 @@ public class DownloadBean implements Serializable {
         }
         return file;
     }
+    
+    
+    public StreamedContent thesoPDF(String idTheso,List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups,String codeLang,String codeLang2,int type) {
 
-    /**
+        progress_per_100 = 0;
+        progress_abs = 0;
+        
+
+        
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
+        exportRdf4jHelper.addThesaurus(idTheso,selectedLanguages);
+        exportRdf4jHelper.addGroup(idTheso,selectedLanguages,selectedGroups);
+        exportRdf4jHelper.addConcept(idTheso, this,selectedLanguages );
+        
+    
+     
+        
+        WritePdf writePdf = new WritePdf(exportRdf4jHelper.getSkosXmlDocument(),codeLang,codeLang2,type);
+        
+        InputStream stream;
+        stream = new ByteArrayInputStream(writePdf.getOutput().toByteArray());
+        file = new DefaultStreamedContent(stream, "application/pdf", "test.pdf");
+
+        return file;
+    }
+
+        /**
      * Applelation de la funtion pour realiser l'injection a la BDD; on puex
      * choisir le fichier dans une fenetre que se ouvre;
      */

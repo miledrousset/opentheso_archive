@@ -43,6 +43,7 @@
             <ui:include src="menuAll.xhtml" />
             <ui:include src="/dialogs/export/exportDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
+            <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
             <ui:include src="/dialogs/import/importSkosRdf4jDlg.xhtml" />
             <ui:include src="/dialogs/import/importJsonLdRdf4jDlg.xhtml" />
@@ -130,6 +131,9 @@
                                         
                                         
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportcsvDlg" oncomplete="PF('exportcsvDlg').show();"
+                                                    style="font-size: 12px;"/>
+                                        
+                                        <p:menuitem value="#{langueBean.getMsg('edit.export')} PDF" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportPdfDlg" oncomplete="PF('exportPdfDlg').show();"
                                                     style="font-size: 12px;"/>
                                         
                                         

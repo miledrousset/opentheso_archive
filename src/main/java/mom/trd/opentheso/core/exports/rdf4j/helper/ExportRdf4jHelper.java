@@ -97,11 +97,11 @@ public class ExportRdf4jHelper {
 
         for (String idOfConceptChildren : listIdsOfConceptChildren) {
             concept = new SKOSResource();
-            writeConceptInfo(conceptHelper, concept, idThesaurus, idOfConceptChildren, downloadBean, selectedLanguages);
+            //writeConceptInfo(conceptHelper, concept, idThesaurus, idOfConceptChildren, downloadBean, selectedLanguages);
 
-            if (conceptHelper.haveChildren(ds, idThesaurus, idOfConceptChildren)) {
+            //if (conceptHelper.haveChildren(ds, idThesaurus, idOfConceptChildren)) {
                 addFilsConcpetRecursif(idThesaurus, idOfConceptChildren, concept, downloadBean, selectedLanguages);
-            }
+            //}
         }
 
     }
@@ -237,11 +237,11 @@ public class ExportRdf4jHelper {
         for (String idOfGroupChildren : listIdsOfGroupChildren) {
             group = new SKOSResource();
 
-            writeGroupInfo(groupHelper, group, idThesaurus, idOfGroupChildren, selectedLanguages);
+            //writeGroupInfo(groupHelper, group, idThesaurus, idOfGroupChildren, selectedLanguages);
 
-            if (!groupHelper.getListGroupChildIdOfGroup(ds, idOfGroupChildren, idThesaurus).isEmpty()) {
+            //if (!groupHelper.getListGroupChildIdOfGroup(ds, idOfGroupChildren, idThesaurus).isEmpty()) {
                 addFilsGroupRcursif(idThesaurus, idOfGroupChildren, group, selectedLanguages);
-            }
+            //}
         }
 
     }
@@ -290,7 +290,7 @@ public class ExportRdf4jHelper {
         ArrayList<String> childURI = new GroupHelper().getListGroupChildIdOfGroup(ds, idOfGroupChildren, idThesaurus);
         ArrayList<NodeConceptTree> nodeConceptTrees = new ConceptHelper().getListTopConcepts(ds, idOfGroupChildren, idThesaurus, "fr");
 
-        //top term
+        
         for (NodeConceptTree node : nodeConceptTrees) {
             String id = node.getIdConcept();
             group.addRelation(getUriFromId(id), SKOSProperty.member);
