@@ -6,24 +6,14 @@
 
 package mom.trd.opentheso.bdd.helper;
 
-import fr.mom.arkeo.soap.Account;
-import fr.mom.arkeo.soap.Ark;
-import fr.mom.arkeo.soap.ArkManager;
-import fr.mom.arkeo.soap.ArkManagerService;
 import fr.mom.arkeo.soap.DcElement;
-import fr.mom.arkeo.soap.Login;
-import fr.mom.arkeo.soap.LoginService;
-import java.net.URL;
 import java.util.ArrayList;
-import javax.xml.namespace.QName;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.Ark_Client;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

@@ -58,7 +58,7 @@ public class UnderTree implements Serializable {
     public void initTree(String idTheso, String langue) {
         List<NodeConceptTree> racineNode = new FacetHelper().getIdParentOfFacet(connect.getPoolConnexion(), idTheso, langue);
         for(NodeConceptTree nct : racineNode) {
-            TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nct.getIdConcept(), idTheso, langue, "", "", "dossier", nct.getTitle() + "(" + nct.getIdConcept() + ")", root);
+            TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nct.getIdConcept(), idTheso, langue, "", "","", "dossier", nct.getTitle() + "(" + nct.getIdConcept() + ")", root);
             new DefaultTreeNode("fake", dynamicTreeNode);
         }
     }
@@ -88,7 +88,7 @@ public class UnderTree implements Serializable {
             
         // Récupération et insertion des facettes avec leurs concepts
         for(NodeFacet nf : listFacet) {
-            new MyTreeNode(1, String.valueOf(nf.getIdFacet()), theso, lang, "", "", "facette", nf.getLexicalValue() + "(" + String.valueOf(nf.getIdFacet()) + ")", event.getTreeNode());
+            new MyTreeNode(1, String.valueOf(nf.getIdFacet()), theso, lang, "", "", "", "facette", nf.getLexicalValue() + "(" + String.valueOf(nf.getIdFacet()) + ")", event.getTreeNode());
         
             ArrayList<String> listIdC = new FacetHelper().getIdConceptsOfFacet(connect.getPoolConnexion(), nf.getIdFacet(), theso);
             
@@ -106,7 +106,7 @@ public class UnderTree implements Serializable {
 
             // Ajout dans l'arbre
             for(NodeConceptTree nct : liste) {
-                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "", "fichier", nct.getTitle()+ "(" + nct.getIdConcept() + ")", event.getTreeNode());
+                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "","", "fichier", nct.getTitle()+ "(" + nct.getIdConcept() + ")", event.getTreeNode());
             }
         }
     }

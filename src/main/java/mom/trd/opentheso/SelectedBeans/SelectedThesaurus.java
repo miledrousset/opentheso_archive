@@ -35,6 +35,7 @@ import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.VerificationInternet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGroupType;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
@@ -107,11 +108,6 @@ public class SelectedThesaurus implements Serializable {
     private boolean internetConection = false;
     //Alignement
 
-    private String typeDomaineAj;
-
-    private String typeDomainePere;
-
-    private ArrayList<String> typeDomaine = new ArrayList<>();
 
     // niveaux des classes Beans
     // theso -> treeBean -> selectedTerme -> user1
@@ -230,7 +226,7 @@ public class SelectedThesaurus implements Serializable {
             tree.getSelectedTerme().setIdTheso(idTurl);
             tree.getSelectedTerme().setIdlangue(idLurl);
 
-            MyTreeNode mTN = new MyTreeNode(type, idCurl, idTurl, idLurl, c.getIdGroup(), "", null, null, null);
+            MyTreeNode mTN = new MyTreeNode(type, idCurl, idTurl, idLurl, c.getIdGroup(), "", null, null, null, null);
             tree.getSelectedTerme().majTerme(mTN);
             tree.reExpand();
             idCurl = null;
@@ -295,7 +291,7 @@ public class SelectedThesaurus implements Serializable {
             tree.getSelectedTerme().setIdTheso(idTurl);
             tree.getSelectedTerme().setIdlangue(idLurl);
 
-            MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null);
+            MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null,null);
             tree.getSelectedTerme().majTerme(mTN);
             tree.reExpand();
             idCurl = null;
@@ -985,7 +981,9 @@ public class SelectedThesaurus implements Serializable {
      * @param type
      */
     public void changeTermeTrad(String id, String l, int type) {
-        MyTreeNode mTN = new MyTreeNode(type, id, tree.getSelectedTerme().getIdTheso(), l, tree.getSelectedTerme().getIdDomaine(), tree.getSelectedTerme().getIdTopConcept(), null, null, null);
+        MyTreeNode mTN = new MyTreeNode(type, id, tree.getSelectedTerme().getIdTheso(), l, tree.getSelectedTerme().getIdDomaine(),
+                tree.getSelectedTerme().getTypeDomaine(),
+                tree.getSelectedTerme().getIdTopConcept(), null, null, null);
         tree.getSelectedTerme().majTerme(mTN);
         thesaurus = new ThesaurusHelper().getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), l);
         tree.reInit();
@@ -1055,23 +1053,26 @@ public class SelectedThesaurus implements Serializable {
 
     /**
      * Création d'un domaine avec mise à jour dans l'arbre
+     * @param codeTypeGroup
+     * @param titleGroup
+     * @return 
      */
     
-    private String typeDom;
-    public String ajouterDomaine() {
+ //   private String typeDom;
+    public String addGroup(String codeTypeGroup, String titleGroup) {
 
         String idGroup = null;
 
-        if (nodeCG.getLexicalValue().trim().equals("")) {
+        if (titleGroup.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error7")));
         } else {
-            String temp = nodeCG.getLexicalValue();
+            nodeCG.setLexicalValue(titleGroup);
             nodeCG.setIdLang(thesaurus.getLanguage());
             nodeCG.getConceptGroup().setIdthesaurus(thesaurus.getId_thesaurus());
             
             
-            boolean haveFather = false;
-            
+        //    boolean haveFather = false;
+            /*
             if(typeDom == null || typeDom.equals("")){
                  typeDom = getTypeDomainePere();
                  haveFather = true;
@@ -1081,9 +1082,13 @@ public class SelectedThesaurus implements Serializable {
             if (typeDom != null && haveFather) {
                 nodeCG.getConceptGroup().setIdtypecode(typeDom);
             } else {
-                nodeCG.getConceptGroup().setIdtypecode(getIDTypeDomaineAj());
+                nodeCG.getConceptGroup().setIdtypecode(codeTypeGroup);
 
-            }
+            }*/
+            if(codeTypeGroup.isEmpty())
+                codeTypeGroup = "MT";
+            nodeCG.getConceptGroup().setIdtypecode(codeTypeGroup);
+            
 
             GroupHelper cgh = new GroupHelper();
             int idUser = tree.getSelectedTerme().getUser().getUser().getId();
@@ -1094,18 +1099,26 @@ public class SelectedThesaurus implements Serializable {
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("theso.info1.2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", titleGroup + " " + langueBean.getMsg("theso.info1.2")));
         }
 
         return idGroup;
     }
 
-    public void ajouterSubDomaine() {
-        typeDom = "";
+    /**
+     * permet d'ajouter un sous groupe avec un type défini,
+     * le groupe père doit exister. Le sous-groupe prend le même type que le père
+     * 
+     * @param codeTypeGroupFather
+     * @param titleGroupSubGroup 
+     */
+    public void addSubGroup(String codeTypeGroupFather, String titleGroupSubGroup) {
+       // typeDom = "";
         //si on a bien selectioner un group
         String idGroup = tree.getSelectedTerme().getIdC();
         if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), idGroup, thesaurus.getId_thesaurus())) {
-            String idSubGroup = ajouterDomaine();
+            String idSubGroup = addGroup(codeTypeGroupFather,titleGroupSubGroup);
+            
             new GroupHelper().addSubGroup(connect.getPoolConnexion(), idGroup, idSubGroup, thesaurus.getId_thesaurus());
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -1656,67 +1669,6 @@ public class SelectedThesaurus implements Serializable {
         this.internetConection = internetConection;
     }
 
-    public String getTypeDomaineAj() {
-
-        return typeDomaineAj;
-    }
-
-    public String getIDTypeDomaineAj() {
-        String IdType = "";
-        
-        if(typeDomaineAj == null)
-            return "";
-
-        switch (typeDomaineAj) {
-
-            case "Collection":
-                IdType = "C";
-                break;
-            case "Group":
-                IdType = "G";
-                break;
-            case "Microthesaurus":
-                IdType = "MT";
-                break;
-            case "Theme":
-                IdType = "T";
-                break;
-            default : 
-                IdType = "";
-                break;
-
-        }
-
-        return IdType;
-
-    }
-
-    public void setTypeDomaineAj(String typeDomaineAj) {
-        this.typeDomaineAj = typeDomaineAj;
-    }
-
-    public void setTypeDomaine(ArrayList<String> typeDomaine) {
-        this.typeDomaine = typeDomaine;
-    }
-
-    public ArrayList<String> getTypeDomaine() {
-        typeDomaine = new ArrayList<>();
-
-        new GroupHelper().getPossibleTypeGroupForAdd(connect.getPoolConnexion(), typeDomaine);
-
-        return typeDomaine;
-    }
-
-    public String getTypeDomainePere() {
-
-        typeDomainePere = new GroupHelper().geteTypeGroupPere(connect.getPoolConnexion(), tree.getSelectedTerme().getIdC(), thesaurus.getId_thesaurus());
-
-        return typeDomainePere;
-    }
-
-    public void setTypeDomainePere(String typeDomainePere) {
-        this.typeDomainePere = typeDomainePere;
-    }
 
     public NewTreeBean getTree() {
         return tree;

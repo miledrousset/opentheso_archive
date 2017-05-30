@@ -121,7 +121,8 @@ public class SelectedTerme implements Serializable {
     private String notation;
     private String idTheso;
     private String idlangue;
-    private String idDomaine;
+    private String idDomaine; 
+    private String typeDomaine; // MT, C, Gr ...
     private String idTopConcept;
     private int nbNotices;
     private String urlNotice;
@@ -677,7 +678,8 @@ public class SelectedTerme implements Serializable {
         } else {
             type = 3;
         }
-        MyTreeNode mtn = new MyTreeNode(type, nodeSe.getIdConcept(), nodeSe.getIdThesaurus(), nodeSe.getIdLang(), nodeSe.getIdGroup(), null, null, nodeSe.getLexical_value(), null);
+        MyTreeNode mtn = new MyTreeNode(type, nodeSe.getIdConcept(), nodeSe.getIdThesaurus(),
+                nodeSe.getIdLang(), nodeSe.getIdGroup(), nodeSe.getTypeGroup(), null, null, nodeSe.getLexical_value(), null);
         majTerme(mtn);
     }
 
@@ -700,7 +702,8 @@ public class SelectedTerme implements Serializable {
         }
         String idConcept = getSelectedTermComp().getIdConcept();
         MyTreeNode mtn = new MyTreeNode(type,
-                idConcept, idTheso, idlangue, idDomaine, null, null, getSelectedTermComp(), null);
+                idConcept, idTheso, idlangue, idDomaine,
+                typeDomaine, null, null, getSelectedTermComp(), null);
         //     nodeSe.getIdConcept(), nodeSe.getIdThesaurus(), nodeSe.getIdLang(), nodeSe.getIdGroup(), null, null, nodeSe.getLexical_value(), null);
         majTerme(mtn);
     }
@@ -712,7 +715,8 @@ public class SelectedTerme implements Serializable {
             type = 3;
         }
         String value = (nodePe.getFirstColumn() + " " + nodePe.getSearchedValue() + " " + nodePe.getLastColumn()).trim();
-        MyTreeNode mtn = new MyTreeNode(type, nodePe.getIdConcept(), nodePe.getIdThesaurus(), nodePe.getIdLang(), nodePe.getIdGroup(), null, null, value, null);
+        MyTreeNode mtn = new MyTreeNode(type, nodePe.getIdConcept(), nodePe.getIdThesaurus(), nodePe.getIdLang(), nodePe.getIdGroup(),
+                "", null, null, value, null);
         majTerme(mtn);
     }
 
@@ -2321,9 +2325,9 @@ public class SelectedTerme implements Serializable {
         for (NodeConceptTree n : racineNode) {
             TreeNode dynamicTreeNode;
             if (n.getTitle().trim().isEmpty()) {
-                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "dossier", n.getIdConcept(), root);
+                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "","", "dossier", n.getIdConcept(), root);
             } else {
-                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "dossier", n.getTitle(), root);
+                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "","", "", "dossier", n.getTitle(), root);
             }
 
             DefaultTreeNode defaultTreeNode = new DefaultTreeNode("fake", dynamicTreeNode);
@@ -2356,7 +2360,7 @@ public class SelectedTerme implements Serializable {
         // Récupération et insertion des facettes avec leurs concepts
         for (NodeFacet nf : listFacet) {
             String valeur = nf.getLexicalValue() + "(" + String.valueOf(nf.getIdFacet()) + ")";
-            new MyTreeNode(1, String.valueOf(nf.getIdFacet()), theso, lang, "", "", "facette", valeur, event.getTreeNode());
+            new MyTreeNode(1, String.valueOf(nf.getIdFacet()), theso, lang, "", "", "", "facette", valeur, event.getTreeNode());
 
             ArrayList<String> listIdC = new FacetHelper().getIdConceptsOfFacet(connect.getPoolConnexion(), nf.getIdFacet(), theso);
 
@@ -2374,7 +2378,7 @@ public class SelectedTerme implements Serializable {
 
             // Ajout dans l'arbre
             for (NodeConceptTree nct : liste) {
-                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "", "fichier", nct.getTitle() + "(" + nct.getIdConcept() + ")", event.getTreeNode());
+                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "","", "fichier", nct.getTitle() + "(" + nct.getIdConcept() + ")", event.getTreeNode());
             }
         }
     }
@@ -3222,6 +3226,14 @@ public class SelectedTerme implements Serializable {
 
     public void setTotalNoticesOfBranch(String totalNoticesOfBranch) {
         this.totalNoticesOfBranch = totalNoticesOfBranch;
+    }
+
+    public String getTypeDomaine() {
+        return typeDomaine;
+    }
+
+    public void setTypeDomaine(String typeDomaine) {
+        this.typeDomaine = typeDomaine;
     }
 
 }

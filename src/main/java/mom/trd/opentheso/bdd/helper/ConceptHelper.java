@@ -66,7 +66,6 @@ public class ConceptHelper {
      *
      * @param hd
      * @param idConceptDeTete
-     * @param idGroup
      * @param idTheso
      * @param lisIds
      * @return
@@ -1240,7 +1239,9 @@ public class ConceptHelper {
         //   Connection conn;
         Statement stmt;
         ResultSet resultSet;
-
+        if(concept.getNotation() == null) 
+            concept.setNotation("");
+        
         try {
             // Get connection from pool
             //     conn = ds.getConnection();
@@ -3743,6 +3744,7 @@ public class ConceptHelper {
                 group = getGroupIdOfConcept(ds, idConcept, idThesaurus);
                     if(group == null)
                         group = new GroupHelper().getIdFather(ds, idConcept, idThesaurus);
+
                 path.add(group);
                 idConcept = group;
             }while(new GroupHelper().getIdFather(ds, group, idThesaurus) != null);

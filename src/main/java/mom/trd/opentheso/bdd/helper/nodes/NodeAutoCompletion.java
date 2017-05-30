@@ -9,6 +9,7 @@ public class NodeAutoCompletion implements Serializable {
     private String groupLexicalValue = "";
     private String definition = "";
     private String idGroup = "";
+    private boolean isAltLabel;
     
     // Url pour l'imagette
     private String url;
@@ -64,6 +65,16 @@ public class NodeAutoCompletion implements Serializable {
         this.idGroup = idGroup;
     }
 
+    public boolean isIsAltLabel() {
+        return isAltLabel;
+    }
+
+    public void setIsAltLabel(boolean isAltLabel) {
+        this.isAltLabel = isAltLabel;
+    }
+
+    
+    
     @Override
     public String toString() {
         return termLexicalValue;

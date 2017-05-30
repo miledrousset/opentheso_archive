@@ -1726,8 +1726,8 @@ public class TermHelper {
     }
 
     /**
-     * Cette fonction permet de récupérer un liste des terms pour
-     * l'autocomplétion
+     * Cette fonction permet de récupérer une liste de termes pour
+     * l'autocomplétion avec les synonymes
      *
      * @param ds
      * @param idThesaurus
@@ -1824,12 +1824,44 @@ public class TermHelper {
                                 nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
                                 nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
                                 nodeAutoCompletion.setGroupLexicalValue(
-                                new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
                                 nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
                                 //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                nodeAutoCompletion.setIsAltLabel(false);
                                 nodeAutoCompletionList.add(nodeAutoCompletion);
                             }
                         }
+                    }
+                    query = "SELECT DISTINCT "
+                            + "non_preferred_term.lexical_value,"
+                            + "concept.id_concept,"
+                            + "concept_group_concept.idgroup"
+                            + " FROM preferred_term, non_preferred_term, concept,concept_group_concept"
+                            + "  WHERE"
+                            + "  concept_group_concept.idthesaurus = concept.id_thesaurus "
+                            + "  AND"
+                            + "   concept_group_concept.idconcept = concept.id_concept"
+                            + " AND preferred_term.id_term = non_preferred_term.id_term "
+                            + " AND preferred_term.id_thesaurus = non_preferred_term.id_thesaurus "
+                            + " AND concept.id_concept = preferred_term.id_concept "
+                            + " AND concept.id_thesaurus = preferred_term.id_thesaurus "
+                            + " AND non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
+                            + " AND non_preferred_term.lang = '" + idLang + "'"
+                            + " AND concept.status != 'hidden' "
+                            + " AND unaccent_string(non_preferred_term.lexical_value) ILIKE unaccent_string('" + text +"%') ORDER BY non_preferred_term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+
+                        nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                        nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                        nodeAutoCompletion.setGroupLexicalValue(
+                                new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                        nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                        //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                        nodeAutoCompletion.setIsAltLabel(true);
+                        nodeAutoCompletionList.add(nodeAutoCompletion);
                     }
 
                 } finally {
@@ -1853,7 +1885,7 @@ public class TermHelper {
      *
      * @param ds
      * @param idSelectedConcept
-     * @param idBT
+     * @param idBTs
      * @param idThesaurus
      * @param text
      * @param idGroup

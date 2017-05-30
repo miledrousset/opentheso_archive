@@ -15,6 +15,7 @@ public class NodeSearch {
     private String idConcept;
     private String idTerm;
     private String idGroup;
+    private String typeGroup;
     private String groupLabel;
     private String idLang;
     private String idThesaurus;
@@ -94,6 +95,14 @@ public class NodeSearch {
 
     public void setGroupLabel(String groupLabel) {
         this.groupLabel = groupLabel;
+    }
+
+    public String getTypeGroup() {
+        return typeGroup;
+    }
+
+    public void setTypeGroup(String typeGroup) {
+        this.typeGroup = typeGroup;
     }
     
     

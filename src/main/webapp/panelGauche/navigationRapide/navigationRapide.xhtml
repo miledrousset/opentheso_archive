@@ -11,8 +11,8 @@
                 <td>
                     <h:form >
                         <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                        minQueryLength="3" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                        a:placeholder="#{langueBean.getMsg('index.search')}" >
+                                        minQueryLength="2" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
+                                        a:placeholder="#{langueBean.getMsg('indexSearch')}" >
 
                             <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" 
                                     update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
@@ -23,10 +23,11 @@
                 <td>
                     <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
                         <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom">
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
 
-                            <p:menuitem value="#{langueBean.getMsg('group.add')}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('group.add')} Sub" update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem  value="#{langueBean.getMsg('add.subGroup')}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
+                                        update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
                     </h:form>
                 </td>

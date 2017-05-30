@@ -19,6 +19,7 @@ public class NodeConceptTree implements Comparable {
         private String statusConcept;
 	private boolean haveChildren = false;
         private boolean isGroup =false;
+        private boolean isSubGroup = false;
         private boolean isTopTerm =false;
         private boolean isTerm =false;
 
@@ -104,6 +105,14 @@ public class NodeConceptTree implements Comparable {
 
     public boolean isIsGroup() {
         return isGroup;
+    }
+
+    public boolean isIsSubGroup() {
+        return isSubGroup;
+    }
+
+    public void setIsSubGroup(boolean isSubGroup) {
+        this.isSubGroup = isSubGroup;
     }
 
     public void setIsGroup(boolean isGroup) {

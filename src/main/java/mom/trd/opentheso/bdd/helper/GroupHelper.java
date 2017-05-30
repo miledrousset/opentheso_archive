@@ -14,9 +14,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.datas.ConceptGroup;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGroupType;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -240,6 +242,10 @@ public class GroupHelper {
         nodeConceptGroup.setLexicalValue(
                 new StringPlus().convertString(nodeConceptGroup.getLexicalValue()));
 
+        if (nodeConceptGroup.getConceptGroup().getNotation() == null) {
+            nodeConceptGroup.getConceptGroup().setNotation("");
+        }
+
         /*
          * récupération de l'identifiant Ark pour le ConceptGroup
          * de type : ark:/66666/srvq9a5Ll41sk
@@ -259,7 +265,7 @@ public class GroupHelper {
                     resultSet = stmt.getResultSet();
                     resultSet.next();
                     int idNumeriqueGroup = resultSet.getInt(1);
-                    idConceptGroup = "MT_" + (++idNumeriqueGroup);
+                    idConceptGroup = nodeConceptGroup.getConceptGroup().getIdtypecode() + ++idNumeriqueGroup;
 
                     /**
                      * récupération du code Ark via WebServices
@@ -285,7 +291,7 @@ public class GroupHelper {
                             + ",'" + nodeConceptGroup.getConceptGroup().getIdtypecode() + "'"
                             + ",'" + nodeConceptGroup.getConceptGroup().getNotation() + "'"
                             + ")";
-                                                                                
+
                     stmt.executeUpdate(query);
 
                     ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
@@ -295,16 +301,14 @@ public class GroupHelper {
                     conceptGroupLabel.setLexicalvalue(nodeConceptGroup.getLexicalValue());
                     addGroupTraduction(ds, conceptGroupLabel, idUser);
                     addGroupHistorique(ds, nodeConceptGroup, urlSite, idArk, idUser, idConceptGroup);
-                    
-                    
-                    
+
                 } finally {
                     stmt.close();
                 }
             } finally {
                 conn.close();
             }
-        } catch (SQLException sqle){
+        } catch (SQLException sqle) {
             // Log exception
             log.error("Error while adding ConceptGroup : " + idConceptGroup, sqle);
         }
@@ -835,6 +839,7 @@ public class GroupHelper {
      * @param idGroup
      * @param idThesaurus
      * @param lang
+     * @param date
      * @return
      */
     public ArrayList<NodeGroup> getGroupTraductionsHistoriqueFromDate(HikariDataSource ds,
@@ -888,6 +893,15 @@ public class GroupHelper {
         return nodeGroupList;
     }
 
+    /**
+     * Permet de retourner la liste des sous_groupes d'un Group (type G/C/MT/T)
+     *
+     * @param ds
+     * @param idConceptGroup
+     * @param idThesaurus
+     * @param idLang
+     * @return
+     */
     public ArrayList<NodeConceptTree> getRelationGroupOf(HikariDataSource ds,
             String idConceptGroup, String idThesaurus, String idLang) {
         ArrayList<NodeConceptTree> nodeConceptTrees = null;
@@ -919,7 +933,7 @@ public class GroupHelper {
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    nodeConceptTrees = new ArrayList<NodeConceptTree>();
+                    nodeConceptTrees = new ArrayList<>();
                     while (resultSet.next()) {
                         NodeConceptTree nodeConceptTree = new NodeConceptTree();
                         nodeConceptTree.setIdConcept(resultSet.getString("idgroup"));
@@ -928,7 +942,8 @@ public class GroupHelper {
                         nodeConceptTree.setTitle(resultSet.getString("lexicalvalue"));
                         nodeConceptTree.setStatusConcept("");
                         nodeConceptTree.setHaveChildren(true);
-                        nodeConceptTree.setIsGroup(true);
+                        nodeConceptTree.setIsGroup(false);
+                        nodeConceptTree.setIsSubGroup(true);
                         nodeConceptTrees.add(nodeConceptTree);
                     }
 
@@ -1313,6 +1328,15 @@ public class GroupHelper {
         return nodeConceptGroupList;
     }
 
+    /**
+     * permet de retournner la liste des domaines de premier niveau (MT, G, C, T
+     * )
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param idLang
+     * @return
+     */
     public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
             String idThesaurus, String idLang) {
 
@@ -1833,29 +1857,33 @@ public class GroupHelper {
         }
         return existe;
     }
-    
-    
+
     /**
-     * 
+     * Fonction qui permet de retourner la liste des Type de Groupe
+     *
      * @param ds
-     * @param listType 
- * 
+     * @return
      */
-    public void getPossibleTypeGroupForAdd(HikariDataSource ds,ArrayList<String> listType){
-         Connection conn;
+    public List<SelectItem> getAllGroupType(HikariDataSource ds) {
+        Connection conn;
         Statement stmt;
         ResultSet resultSet;
+        List<SelectItem> nodeGroupTypes = new ArrayList<>();
+
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select label from concept_group_type";
+                    String query = "Select code, label, skoslabel from concept_group_type";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
-                        listType.add(resultSet.getString("label"));
+                        SelectItem nodeGroupType = new SelectItem();
+                        nodeGroupType.setValue(resultSet.getString("code"));
+                        nodeGroupType.setLabel(resultSet.getString("label"));
+                        nodeGroupTypes.add(nodeGroupType);
                     }
 
                 } finally {
@@ -1866,19 +1894,21 @@ public class GroupHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
+            log.error("Error while getting list of Group Type : " + sqle);
         }
-        
+        return nodeGroupTypes;
     }
+
     /**
-     * 
+     * permet de retourner le type de group du père uniquement
+     *
      * @param ds
      * @param idPere
      * @param idTheso
-     * @return 
+     * @return
      */
-    public String geteTypeGroupPere(HikariDataSource ds,String idPere, String idTheso){
-         Connection conn;
+    public String getTypeGroupPere(HikariDataSource ds, String idPere, String idTheso) {
+        Connection conn;
         Statement stmt;
         ResultSet resultSet;
         String typeGroupPere = null;
@@ -1888,11 +1918,11 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "Select idtypecode from concept_group where idgroup = '" + idPere + "' AND idthesaurus = '" + idTheso +"'";
+                    String query = "Select idtypecode from concept_group where idgroup = '" + idPere + "' AND idthesaurus = '" + idTheso + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {
-                        typeGroupPere =resultSet.getString("idtypecode");
+                        typeGroupPere = resultSet.getString("idtypecode");
                     }
 
                 } finally {
@@ -1905,8 +1935,59 @@ public class GroupHelper {
             // Log exception
             log.error("Error while getPossibleTypeGroupForAdd : " + sqle);
         }
-        
+
         return typeGroupPere;
+    }
+
+    /**
+     * Cette fonction permet de savoir si un group ou sous_group a des
+     * sous_group ou non suivant l'id du Group ou sous_group et l'id du
+     * thésaurus
+     * #MR.
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param idGroup
+     * @return
+     */
+    public boolean haveSubGroup(HikariDataSource ds,
+            String idThesaurus, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean subGroup = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(*)  from relation_group"
+                            + " where id_thesaurus ='" + idThesaurus + "'"
+                            + " and id_group1 ='" + idGroup + "'"
+                            + " and relation ='sub'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        if (resultSet.getInt(1) != 0) {
+                            subGroup = true;
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while testing if haveSubGroup of Group : " + idGroup, sqle);
+        }
+        return subGroup;
     }
 
 }

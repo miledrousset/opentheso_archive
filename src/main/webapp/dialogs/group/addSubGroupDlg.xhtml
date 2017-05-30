@@ -5,44 +5,32 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idSubGroupAddDlg"  header="#{langueBean.getMsg('group.add')}" widgetVar="subGroupAddDlg" modal="true" resizable="false" >
+    <p:dialog id="idSubGroupAddDlg"  header="#{langueBean.getMsg('add.subGroup')}" widgetVar="subGroupAddDlg" modal="true" resizable="false" >
         <!-- Ajout d'un domaine/ group -->
         <h:form >
             <p:messages showDetail="true" autoUpdate="true" />
             <table>
-
                 <tr>
-                    <td><h:outputText value="#{newtreeBean.selectedTerme.nom}" /> </td>
+                    <td><h:outputText value="#{langueBean.getMsg('add.subGroup')} : " /> <h:outputText value="#{newtreeBean.selectedTerme.nom}" /> </td>
                     <td>
                     </td>
                 </tr>   
-
-
                 <tr>
                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                     <td>
-                        <h:inputText id="lVDom" value="#{theso.nodeCG.lexicalValue}"/>
+                        <h:inputText id="lVDom" value="#{addSubGroup.titleGroup}"/>
                     </td>
                 </tr>   
-                
                 <tr>
-                    <td><h:outputText value="#{theso.typeDomainePere}" /> </td>
+                    <td><h:outputText value="#{langueBean.getMsg('add.groupType')} : " /> <h:outputText value="#{addSubGroup.typeDomainePere}" /> </td>
                     <td>
                     </td>
                 </tr>   
-
-
                 <tr>
-
-
-
-
-
                     <td colspan="3" style="text-align: center;">
-                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.ajouterSubDomaine()}" 
+                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.addSubGroup(addSubGroup.typeDomainePere, addSubGroup.titleGroup)}" 
                                          update=":ajGroup,:accordeonTree" styleClass="styleButton"
-                                         oncomplete="PF('groupAddDlg').hide();"/>
-
+                                         oncomplete="PF('subGroupAddDlg').hide();"/>
                     </td>
                     <td colspan="3" style="text-align: center;">
                         <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').hide();"  immediate="true"/>
