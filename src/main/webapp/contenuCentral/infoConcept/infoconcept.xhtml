@@ -17,11 +17,11 @@
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
-                        
+
 
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
-                        
+
 
                         <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{treeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
 
@@ -57,11 +57,22 @@
             </script>
 
             <h:panelGroup rendered="#{(selectedTerme.idC != null)}" >
-                    <span style="font-size: 17px; font-weight: bold;">
-                        <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
-                    </span>
+                <span style="font-size: 17px; font-weight: bold;">
+                    <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
+                </span>
+                <h:panelGroup rendered= "#{(selectedTerme.z3950_actif) or (selectedTerme.bdd_active)}">
+                    <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
+                    <a href="#{selectedTerme.urlNotice}" target="blanc"  >
+                        <h:outputText rendered="#{(selectedTerme.nbNotices == 0)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(selectedTerme.nbNotices != 0)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                    </a>
+
+                </h:panelGroup>
+                <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
+                <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
                 <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
+
                     <p:tab title="..."    titleStyleClass="titleAccordion">
                         <h:panelGroup rendered="#{(user1.user.name != null)}" >
                             <h:outputText id="idC" value="id : "/>
@@ -72,17 +83,9 @@
                         <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
 
 
-                        <h:panelGroup rendered= "#{(selectedTerme.nbNotices != 0)}">
-                            <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
-                            <a href="#{selectedTerme.urlNotice}" target="blanc" >
-                                <h:outputText id="nbNoti1" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" />
-                            </a>
 
-                        </h:panelGroup>
 
-                        <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
-                        <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
 
 
                         <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
@@ -97,64 +100,64 @@
                         <h:outputText rendered="#{selectedTerme.contributorName != ''}" value="#{langueBean.getMsg('index.contributor')} : "/>
                         <h:outputText rendered="#{selectedTerme.contributorName != ''}" value = "#{selectedTerme.contributorName} &lt;br/&gt;" escape="false" styleClass="textInfo"/>                        
                     </p:tab>
-                    </p:accordionPanel >
+                </p:accordionPanel >
 
-                    <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
-                        <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
-                            <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
-                            <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
-                        </ui:repeat>
-                    </h:panelGroup>
-                    <!-- affichage du nombre total des fils -->
-                    <h:panelGroup id="totalBrancheG">
-                        <h:form>
-                            
-                            <p:commandButton title="#{langueBean.getMsg('index.totalOfConcepts')}" value="#{selectedTerme.totalConceptOfBranch}" 
-                                             id="ajaxddd" update=":totalBrancheG" actionListener="#{selectedTerme.getTheNbConceptOfBranch()}" styleClass="termInfo" />
-                        </h:form>
-                    </h:panelGroup>
-                    
-                    
-                    <!-- affichage du nombre total des notices de la branche -->
-                    <h:panelGroup id="totalNoticesG" rendered="#{selectedTerme.z3950_actif}">
-                        <h:form>
-                            <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
-                                             id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />
-                        </h:form>
-                    </h:panelGroup>
-
-                    <!-- affichage de l'URL pérenne-->
+                <h:panelGroup rendered="#{selectedTerme.idC != null and selectedTerme.fusions.size() > 0}">
+                    <ui:repeat value="#{selectedTerme.fusions}" var="fu" >
+                        <h:outputText rendered="#{fu.idConcept1 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec1')} #{fu.lexicalValue2} &lt;br/&gt;" escape="false" />
+                        <h:outputText rendered="#{fu.idConcept2 == selectedTerme.idC}" value="#{langueBean.getMsg('index.deprec2')} #{fu.lexicalValue1} &lt;br/&gt;" escape="false" />
+                    </ui:repeat>
+                </h:panelGroup>
+                <!-- affichage du nombre total des fils -->
+                <h:panelGroup id="totalBrancheG">
                     <h:form>
-                        <p:commandButton id="urlPerenne" styleClass="termInfo"  value="#{langueBean.getMsg('index.link')}" />
-                        <p:overlayPanel id="getUrlPerenne" for="urlPerenne" hideEffect="fade">
+
+                        <p:commandButton title="#{langueBean.getMsg('index.totalOfConcepts')}" value="#{selectedTerme.totalConceptOfBranch}" 
+                                         id="ajaxddd" update=":totalBrancheG" actionListener="#{selectedTerme.getTheNbConceptOfBranch()}" styleClass="termInfo" />
+                    </h:form>
+                </h:panelGroup>
+
+
+                <!-- affichage du nombre total des notices de la branche -->
+                <h:panelGroup id="totalNoticesG" rendered="#{selectedTerme.z3950_actif}">
+                    <h:form>
+                        <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
+                                          id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />
+                    </h:form>
+                </h:panelGroup>
+
+                <!-- affichage de l'URL pérenne-->
+                <h:form>
+                    <p:commandButton id="urlPerenne" styleClass="termInfo"  value="#{langueBean.getMsg('index.link')}" />
+                    <p:overlayPanel id="getUrlPerenne" for="urlPerenne" hideEffect="fade">
 
                         <!-- cas où l'Id Ark est renseigné, alors on affiche l'Id Ark -->
-                            <!-- pour afficher un toolTipText-->
-                           <!-- <p:tooltip id="toolTipGrow" for="ark" value="{theso.getCheminSite()}{selectedTerme.getLienTerme()}"
-                                       showEffect="clip" hideEffect="explode" />
-                           -->
+                        <!-- pour afficher un toolTipText-->
+                        <!-- <p:tooltip id="toolTipGrow" for="ark" value="{theso.getCheminSite()}{selectedTerme.getLienTerme()}"
+                                    showEffect="clip" hideEffect="explode" />
+                        -->
 
+                        <span>
+                            <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                          value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall">
+                                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
+                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
+                            </h:outputLink>
+                        </span>
+
+
+                        <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
+                        <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
+                                      value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
                             <span>
-                                <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall">
-                                    <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                                  value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
-                                </h:outputLink>
-                            </span>
-                           
-                           
-                            <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
-                            <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
-                                          value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
-                                <span>
-                                    <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
-                                                  value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
+                                <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
+                                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
 
-                                </span>
-                            </h:outputLink>                                
-                        </p:overlayPanel>
-                    </h:form>
-        </h:panelGroup>      
+                            </span>
+                        </h:outputLink>                                
+                    </p:overlayPanel>
+                </h:form>
+            </h:panelGroup>      
         </div>
     </div>
 </ui:composition>

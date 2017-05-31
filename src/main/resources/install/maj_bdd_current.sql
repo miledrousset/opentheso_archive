@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.3.0
--- date : 19/05/2017
+-- date : 01/06/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1348,28 +1348,86 @@ $$LANGUAGE plpgsql VOLATILE;
 
 
 --
+--permet d'ajouter la table thesaurus_alignement_source
+--
+
+CREATE OR REPLACE FUNCTION create_table_concept_group_concept() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'concept_group_concept') THEN
+
+        execute 
+		'CREATE TABLE concept_group_concept
+                (
+                  idgroup text NOT NULL,
+                  idthesaurus text NOT NULL,
+                  idconcept text NOT NULL,
+                  CONSTRAINT concept_group_concept_pkey PRIMARY KEY (idgroup, idthesaurus, idconcept)
+                )
+                WITH (
+                  OIDS=FALSE
+                );';
+
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--
 -- fonction de transfert des données de la table Concept à la table (concept_gourp_concept) 
+-- #MR
 --
     create or replace function update_table_concept()
     returns void as $$
     declare
 	line RECORD;
-	
+
 	begin 
 		if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'concept' and COLUMN_NAME = 'id_group') then
                     for line in select id_group, id_thesaurus, id_concept  from concept
 			loop
-                            execute
-                            'INSERT INTO concept_group_concept (idgroup, idthesaurus, idconcept) VALUES ('''||line.id_group||''', '''||line.id_thesaurus||''', '''||line.id_concept||''');';
+                            begin
+				INSERT INTO concept_group_concept (idgroup, idthesaurus, idconcept) VALUES (line.id_group, line.id_thesaurus,line.id_concept);
+			    EXCEPTION WHEN unique_violation THEN continue;
+			    end;
 			end loop;
                     execute
-                    '
-                        ALTER TABLE ONLY concept
-                                    DROP CONSTRAINT concept_pkey ;
-                        ALTER TABLE ONLY concept
-                                    ADD CONSTRAINT concept_pkey PRIMARY KEY (id_concept, id_thesaurus);
-                        Alter TABLE concept DROP COLUMN id_group;
+                    '  CREATE TABLE concepttemp
+			(
+			  id_concept character varying NOT NULL,
+			  id_thesaurus character varying NOT NULL,
+			  id_ark character varying,
+			  created timestamp with time zone NOT NULL DEFAULT now(),
+			  modified timestamp with time zone NOT NULL DEFAULT now(),
+			  status character varying,
+			  notation character varying DEFAULT ''''::character varying,
+			  top_concept boolean,
+			  id integer DEFAULT nextval(''concept__id_seq''::regclass) NOT NULL,
+			  gps boolean DEFAULT false,
+			  CONSTRAINT concept_theso_pkey PRIMARY KEY (id_concept, id_thesaurus))
+		  	WITH (OIDS=FALSE);
                     ';
+                    
+                    for line in select id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept, id, gps from concept
+                        loop
+                                IF line.id_ark is null THEN line.id_ark = '' RETURN;
+                                END IF;
+                                IF line.status is null THEN line.status = '' RETURN;
+                                END IF;									
+                                IF line.notation is null THEN line.notation = '' RETURN;
+                                END IF;										
+                                IF line.top_concept is null THEN line.top_concept = false RETURN;
+                                END IF;										
+                            begin
+                                INSERT INTO concepttemp (id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept, id, gps)
+                                     VALUES (line.id_concept,line.id_thesaurus,line.id_ark,line.created, line.modified,
+                                     line.status,line.notation,line.top_concept,line.id,line.gps);
+                             EXCEPTION WHEN unique_violation THEN continue;
+                             end;
+                        end loop;
+                    begin
+                        drop TABLE concept;
+                        ALTER TABLE concepttemp RENAME TO concept;
+                    end;
 		end if;
 	end;
 	$$language plpgsql;
@@ -1471,7 +1529,7 @@ SELECT delete_sequence('history_note__id_seq');
 
 ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('role_id_seq'::regclass);
 
-
+SELECT create_table_concept_group_concept();
 SELECT update_table_concept();
 SELECT relation_group();
 
@@ -1603,9 +1661,10 @@ SELECT delete_fonction ('delete_colonne_preferences','');
 SELECT delete_fonction ('primary_key_info','');
 SELECT delete_fonction('update_table_concept','');
 SELECT delete_fonction('relation_group','');
+SELECT delete_fonction('create_table_concept_group_concept','');
 
 
---Ne pas toucher le prochain fonction
+--Ne pas toucher les prochaines fonctions
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
 SELECT delete_fonction ('delete_fonction','TEXT','TEXT');
 select delete_fonction1('delete_fonction','TEXT','TEXT');
