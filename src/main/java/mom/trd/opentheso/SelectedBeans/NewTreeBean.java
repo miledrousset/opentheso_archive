@@ -78,6 +78,7 @@ public class NewTreeBean implements Serializable {
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
         for (NodeGroup nodegroup : racineNode) {
+            
             if (nodegroup.getLexicalValue().trim().isEmpty()) {
                 TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdthesaurus(),
@@ -97,7 +98,7 @@ public class NewTreeBean implements Serializable {
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
                 new DefaultTreeNode("facette", dynamicTreeNode);
             }
-
+            
         }
         if (idTheso != null) {
             //loadOrphan(idTheso, langue);
@@ -143,8 +144,8 @@ public class NewTreeBean implements Serializable {
             // id du concept ou group sélectionné qu'il faut déployer
             String idSelectedNode = myTreeNode.getIdMot();
 
-            // if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso())) {
-            if (myTreeNode.isIsGroup()) { //pour détecter les noeuds type Group/collecton/MT/Thèmes ...
+             if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso())) {
+           // if (myTreeNode.isIsGroup() || myTreeNode.isIsSubGroup()) { //pour détecter les noeuds type Group/collecton/MT/Thèmes ...
                 myTreeNode.setTypeMot(1);//pour group ?
                 //      myTreeNode.setIsGroup(true);
 
@@ -157,7 +158,10 @@ public class NewTreeBean implements Serializable {
                 // pour récupérer les concepts mélangés avec les Sous_Groupes
                 listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
 
-            } else {
+            }
+
+            
+            else {
                 listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
             }
 
@@ -177,11 +181,12 @@ public class NewTreeBean implements Serializable {
                 if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
                     icon = "subgroup";
-
+                    
                     treeNode = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
                             ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdDomaine(),
                             ((MyTreeNode) event.getTreeNode()).getTypeDomaine(),
                             idTC, icon, value, event.getTreeNode());
+                    ((MyTreeNode)treeNode).setIsSubGroup(true);
                     new DefaultTreeNode("fake", treeNode);
                 }
             }
@@ -220,8 +225,9 @@ public class NewTreeBean implements Serializable {
                     new DefaultTreeNode("fake", treeNode);
                 } else {
                     icon = "fichier";
-                    //if (type == 2) { //Création des topConcepts
+                   // if (type == 2) { //Création des topConcepts
                     if (nodeConceptTree.isIsTopTerm()) { // cas de TT
+                        //type=2;
                         idTC = nodeConceptTree.getIdConcept();
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
@@ -230,6 +236,7 @@ public class NewTreeBean implements Serializable {
                         }
 
                     } else { //Création de concepts
+                        //type=3;
                         idTC = ((MyTreeNode) event.getTreeNode()).getIdTopConcept();
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
@@ -342,11 +349,13 @@ public class NewTreeBean implements Serializable {
                     dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getConceptGroup().getIdgroup(), n.getConceptGroup().getIdthesaurus(),
                             n.getIdLang(), n.getConceptGroup().getIdgroup(), n.getConceptGroup().getIdtypecode(), null,
                             "domaine", n.getConceptGroup().getIdgroup(), root);
+                    ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
                 } else {
                     dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getConceptGroup().getIdgroup(), n.getConceptGroup().getIdthesaurus(),
                             n.getIdLang(), n.getConceptGroup().getIdgroup(),
                             n.getConceptGroup().getIdtypecode(), null,
                             "domaine", n.getLexicalValue(), root);
+                    ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
                 }
 
                 new DefaultTreeNode("fake", dynamicTreeNode);
@@ -442,7 +451,8 @@ public class NewTreeBean implements Serializable {
             String idConcept = myTreeNode.getIdMot();
             if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso())) {
 
-                myTreeNode.setTypeMot(1);//pour group ?
+                //myTreeNode.setTypeMot(1);//pour group ?
+                myTreeNode.setIsGroup(true);
 
                 liste = groupHelper.getRelationGroupOf(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
 
@@ -466,7 +476,9 @@ public class NewTreeBean implements Serializable {
                     icon = "dossier";
                     if (nodeConceptTree.isIsGroup()) {
                         icon = "domaine";
-
+                    }
+                    else if( nodeConceptTree.isIsSubGroup()){
+                        icon = "subgroup";
                     }
 
                     if (type == 2) { //CrÃ©ation de topConcepts
