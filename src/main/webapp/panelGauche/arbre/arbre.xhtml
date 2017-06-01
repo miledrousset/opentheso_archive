@@ -5,31 +5,59 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
-    
-    <div id="divArbreTheso" > 
-     
-        <h:panelGroup id="panelTree" >
 
-            
+    <div id="divArbreTheso" > 
+
+        <h:panelGroup id="panelTree" >
+     
+     
+     
+
             <h:form id="form">
-                
+
                 <p:tree id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
-                        selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" droppable="true"
-                        
-                       
+                        selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" droppable="true" widgetVar="treeWidgetVar"
                         >
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" />  
                     <p:ajax event="select" 
                             update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                            listener="#{newtreeBean.onNodeSelect}"  />
-            
+                            listener="#{newtreeBean.onNodeSelect}"/>
+
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  
-                        <h:outputText value="#{node}" />  
+                        <h:outputText value="#{node}"  />  
                     </p:treeNode>
-                    <p:treeNode type="subgroup" expandedIcon="ui-icon ui-icon-domaine-open" 
-                                collapsedIcon="ui-icon ui-icon-domaine-close">  
-                        <h:outputText value="#{node}" />  
+                    <p:treeNode type="group" expandedIcon="ui-icon ui-icon-group-open" 
+                                collapsedIcon="ui-icon ui-icon-group-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="subGroup" expandedIcon="ui-icon ui-icon-sub-group-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-group-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="collection" expandedIcon="ui-icon ui-icon-collection-open" 
+                                collapsedIcon="ui-icon ui-icon-collection-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="subCollection" expandedIcon="ui-icon ui-icon-sub-collection-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-collection-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="thème" expandedIcon="ui-icon ui-icon-thème-open" 
+                                collapsedIcon="ui-icon ui-icon-thème-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="subThème" expandedIcon="ui-icon ui-icon-sub-thème-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-thème-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="microTheso" expandedIcon="ui-icon ui-icon-mircoTheso-open" 
+                                collapsedIcon="ui-icon ui-icon-mircoTheso-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                    </p:treeNode>  
+                    <p:treeNode type="subMicroTheso" expandedIcon="ui-icon ui-icon-sub-mircoTheso-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-mircoTheso-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
                     </p:treeNode>  
                     <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-dossier-open" 
                                 collapsedIcon="ui-icon ui-icon-dossier-close">  
@@ -45,12 +73,13 @@
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  
                         <h:outputText value="#{node}"/>  
                     </p:treeNode>
-                    
+
                 </p:tree>
 
             </h:form>      
         </h:panelGroup>
-        
+
 
     </div>
+
 </ui:composition>

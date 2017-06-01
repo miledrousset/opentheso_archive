@@ -30,7 +30,7 @@ import mom.trd.opentheso.skosapi.SKOSXmlDocument;
  * Classe qui permet le chargement et la lecture de fichier RDF
  */
 public class ReadRdf4j {
-    
+
     private static Model model;
     private SKOSXmlDocument sKOSXmlDocument;
 
@@ -45,7 +45,7 @@ public class ReadRdf4j {
      */
     public ReadRdf4j(InputStream is, int type) {
         sKOSXmlDocument = new SKOSXmlDocument();
-        
+
         if (type == 0) {
             laodSkosModel(is);
         } else if (type == 1) {
@@ -53,7 +53,7 @@ public class ReadRdf4j {
         } else {
             laodTurtleModel(is);
         }
-        
+
         readModel();
     }
 
@@ -64,7 +64,7 @@ public class ReadRdf4j {
      * @param is
      */
     private void laodSkosModel(InputStream is) {
-        
+
         model = null;
         try {
             model = Rio.parse(is, "", RDFFormat.RDFXML);
@@ -75,11 +75,11 @@ public class ReadRdf4j {
         } catch (UnsupportedRDFormatException ex) {
             Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
     private void laodJsonLdModel(InputStream is) {
-        
+
         model = null;
         try {
             model = Rio.parse(is, "", RDFFormat.JSONLD);
@@ -90,11 +90,11 @@ public class ReadRdf4j {
         } catch (UnsupportedRDFormatException ex) {
             Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
     private void laodTurtleModel(InputStream is) {
-        
+
         model = null;
         try {
             model = Rio.parse(is, "", RDFFormat.TURTLE);
@@ -105,7 +105,7 @@ public class ReadRdf4j {
         } catch (UnsupportedRDFormatException ex) {
             Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     /**
@@ -124,15 +124,15 @@ public class ReadRdf4j {
      * laodModel() les données sont stoqué dans la variable thesaurus
      */
     private void readModel() {
-        
+
         ReadStruct readStruct = new ReadStruct();
         readStruct.resource = null;
 
         //pour le debug : 
         ArrayList nonReco = new ArrayList();
-        
+
         for (Statement st : model) {
-            
+
             readStruct.value = st.getObject();
             readStruct.property = st.getPredicate();
             if (readStruct.value instanceof Literal) {
@@ -141,31 +141,36 @@ public class ReadRdf4j {
 
             //Concept or ConceptScheme or Collection or ConceptGroup
             if (readStruct.property.getLocalName().equals("type")) {
-                int prop = -1;                
+                int prop = -1;
                 String type = readStruct.value.toString();
                 type = type.toUpperCase();
                 if (type.contains("ConceptScheme".toUpperCase())) {
                     prop = SKOSProperty.ConceptScheme;
-                    sKOSXmlDocument.setTitle(st.getSubject().stringValue());                    
+                    sKOSXmlDocument.setTitle(st.getSubject().stringValue());
                 } else if (type.contains("ConceptGroup".toUpperCase())) {
                     prop = SKOSProperty.ConceptGroup;
+
+                } else if (type.contains("Theme".toUpperCase())) {
+                    prop = SKOSProperty.Theme;
+                } else if (type.contains("MicroThesaurus".toUpperCase())) {
+                    prop = SKOSProperty.MicroThesaurus;
                 } else if (type.contains("Collection".toUpperCase())) {
                     prop = SKOSProperty.Collection;
                 } else if (type.contains("Concept".toUpperCase())) {
                     prop = SKOSProperty.Concept;
                 }
-                
+
                 String uri = st.getSubject().stringValue();
                 readStruct.resource = new SKOSResource(uri, prop);
-                
+
                 if (prop == SKOSProperty.ConceptScheme) {
                     sKOSXmlDocument.setConceptScheme(readStruct.resource);
-                } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection) {
+                } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection|| prop == SKOSProperty.Theme|| prop == SKOSProperty.MicroThesaurus) {
                     sKOSXmlDocument.addGroup(readStruct.resource);
                 } else if (prop == SKOSProperty.Concept) {
                     sKOSXmlDocument.addconcept(readStruct.resource);
                 }
-                
+
             } //Labelling Properties
             else if (readLabellingProperties(readStruct)) {
                 //Dates
@@ -183,17 +188,17 @@ public class ReadRdf4j {
                                                 if (!nonReco.contains(readStruct.property.getLocalName())) {
                                                     System.out.println("non reconue : " + readStruct.property.getLocalName());
                                                     nonReco.add(readStruct.property.getLocalName());
-                                                }                                                
+                                                }
                                             }
-                                        }                                        
-                                    }                                    
-                                }                                
-                            }                            
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            }            
-        }        
+            }
+        }
     }
 
     /**
@@ -204,30 +209,30 @@ public class ReadRdf4j {
      */
     private boolean readDocumentation(ReadStruct readStruct) {
         if (readStruct.property.getLocalName().equals("definition")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.definition);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.definition);
             return false;
         } else if (readStruct.property.getLocalName().equals("scopeNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.scopeNote);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.scopeNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("example")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.example);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.example);
             return false;
         } else if (readStruct.property.getLocalName().equals("historyNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.historyNote);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.historyNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("editorialNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.editorialNote);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.editorialNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("changeNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.changeNote);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.changeNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("note")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.note);            
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.note);
             return false;
         } else {
             return true;
         }
-        
+
     }
 
     /**
@@ -237,45 +242,45 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Relationships true sinon
      */
     private boolean readRelationships(ReadStruct readStruct) {
-        
+
         if (readStruct.property.getLocalName().equals("broader")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broader);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broader);
             return false;
         } else if (readStruct.property.getLocalName().equals("narrower")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrower);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrower);
             return false;
         } else if (readStruct.property.getLocalName().equals("related")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.related);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.related);
             return false;
         } else if (readStruct.property.getLocalName().equals("hasTopConcept")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.hasTopConcept);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.hasTopConcept);
             return false;
         } else if (readStruct.property.getLocalName().equals("inScheme")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.inScheme);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.inScheme);
             return false;
         } else if (readStruct.property.getLocalName().equals("member")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.member);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.member);
             return false;
         } else if (readStruct.property.getLocalName().equals("topConceptOf")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.topConceptOf);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.topConceptOf);
             return false;
         } else if (readStruct.property.getLocalName().equals("microThesaurusOf")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.microThesaurusOf);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.microThesaurusOf);
             return false;
         } else if (readStruct.property.getLocalName().equals("subGroup")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.subGroup);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.subGroup);
             return false;
         } else if (readStruct.property.getLocalName().equals("superGroup")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.superGroup);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.superGroup);
             return false;
         } else if (readStruct.property.getLocalName().equals("hasMainConcept")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.hasMainConcept);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.hasMainConcept);
             return false;
         } else if (readStruct.property.getLocalName().equals("memberOf")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.memberOf);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.memberOf);
             return false;
         } else if (readStruct.property.getLocalName().equals("mainConceptOf")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.mainConceptOf);            
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.mainConceptOf);
             return false;
         } else {
             return true;
@@ -289,7 +294,7 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Labelling true sinon
      */
     private boolean readLabellingProperties(ReadStruct readStruct) {
-        
+
         if (readStruct.property.getLocalName().equals("prefLabel")) {
             readStruct.resource.addLabel(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.prefLabel);
             return false;
@@ -302,7 +307,7 @@ public class ReadRdf4j {
         } else {
             return true;
         }
-        
+
     }
 
     /**
@@ -312,7 +317,7 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Date true sinon
      */
     private boolean readDate(ReadStruct readStruct) {
-        
+
         if (readStruct.property.getLocalName().equals("created")) {
             readStruct.resource.addDate(readStruct.literal.getLabel(), SKOSProperty.created);
             return false;
@@ -324,7 +329,7 @@ public class ReadRdf4j {
             return false;
         } else {
             return true;
-        }        
+        }
     }
 
     /**
@@ -431,5 +436,5 @@ public class ReadRdf4j {
     public SKOSXmlDocument getsKOSXmlDocument() {
         return sKOSXmlDocument;
     }
-    
+
 }

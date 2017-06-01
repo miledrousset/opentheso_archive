@@ -183,18 +183,13 @@ public class ImportRdf4jHelper {
             conn.commit();
             conn.close();
             idGroupDefault = getNewGroupId();
-            
-            
-            for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList() ) {
+
+            for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
                 hasTopConcceptList.add(relation.getTargetUri());
             }
 
-            
-            
-            
-            
             return null;
-                    
+
         } catch (SQLException ex) {
             Logger.getLogger(ImportSkosHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -226,8 +221,25 @@ public class ImportRdf4jHelper {
                 notationValue = notation.getNotation();
             }
 
+            String type;
+            switch (group.getProperty()) {
+                case SKOSProperty.Collection:
+                    type = "C";
+                    break;
+                case SKOSProperty.ConceptGroup:
+                    type = "G";
+                    break;
+                case SKOSProperty.MicroThesaurus:
+                default:
+                    type = "MT";
+                    break;
+                case SKOSProperty.Theme:
+                    type = "T";
+                    break;
+            }
+
             if (notationValue != null) {
-                groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), "MT", notationValue, adressSite, useArk, idUser);
+                groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, adressSite, useArk, idUser);
             }
 
             //sub group
@@ -353,7 +365,7 @@ public class ImportRdf4jHelper {
                     acs.concept.setTopConcept(acs.isTopConcept);
                     acs.concept.setIdGroup(idGroupDefault);
                     acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
-                    
+
                     new GroupHelper().addConceptGroupConcept(ds, idGroupDefault, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
                 } else {
                     for (String idGrp : acs.idGrps) {
@@ -422,7 +434,7 @@ public class ImportRdf4jHelper {
                 acs.hierarchicalRelationships = new ArrayList<>();
                 acs.idGrps = new ArrayList<>();
                 acs.isTopConcept = false;
-                 acs.nodeGps = new NodeGps();
+                acs.nodeGps = new NodeGps();
 
             }
         }
@@ -437,7 +449,7 @@ public class ImportRdf4jHelper {
             if (value != null) {
                 acs.concept.setNotation(value);
             }
-            
+
         }
     }
 
