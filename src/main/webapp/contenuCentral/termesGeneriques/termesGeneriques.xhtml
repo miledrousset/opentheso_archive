@@ -31,10 +31,10 @@
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item0.value != ''}" value="#{item0.value}" escape="false"
                                          actionListener="#{newtreeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
-                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" oncomplete="srollToSelected()"/>
                         <p:commandButton styleClass="termClick" rendered="#{item0.value == ''}" value="#{item0.key}" escape="false"
                                          actionListener="#{newtreeBean.changeTerme(item0.key, selectedTerme.getTypeSup())}" 
-                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />                                                            
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" oncomplete="srollToSelected()"/>                                                            
                     </h:form>
                 </ui:repeat>
             </h:panelGroup>

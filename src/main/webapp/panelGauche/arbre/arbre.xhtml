@@ -21,7 +21,7 @@
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" />  
                     <p:ajax event="select" 
                             update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                            listener="#{newtreeBean.onNodeSelect}" oncomplete="srollToSelected()"  />
+                            listener="#{newtreeBean.onNodeSelect}"/>
 
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close">  
@@ -81,27 +81,5 @@
 
 
     </div>
-    <script type="text/javascript">
-        //<![CDATA[
-        function srollToSelected() {
-            console.log("\n\n DEBUG srollToSelected -----");
-            var treeWidgetVar = PrimeFaces.widgets["treeWidgetVar"];
-            console.log("treeWidgetVar : ",treeWidgetVar);
-            var selectedElement = treeWidgetVar.jq.find('span .ui-state-highlight');
-            if (selectedElement != null && selectedElement != undefined && selectedElement.position() != undefined) {
-                var scrollPanel = document.getElementById("divArbreTheso");
-                var height = treeWidgetVar.jq.parent().height();
-                console.log("selectedElement : ",selectedElement);
-                console.log("scrollPanel : ",scrollPanel);
-                scrollPanel.scrollTop =selectedElement.position().top - height / 2;//test
-                console.log("go to : ", selectedElement.position().top - height / 2);
-                console.log("position top : ",selectedElement.position().top);
-                console.log("scrollPanel.height : ",height);
-                
-            }
-
-        }
-        //]]>
-    </script> 
 
 </ui:composition>
