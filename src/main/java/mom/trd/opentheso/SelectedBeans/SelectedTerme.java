@@ -176,6 +176,7 @@ public class SelectedTerme implements Serializable {
     private boolean arkActive;
     private String serverAdress;
     private boolean z3950_actif;
+    private boolean bdd_active;
 
     NodeGps coordonnees;
 
@@ -219,6 +220,7 @@ public class SelectedTerme implements Serializable {
         serverAdress = bundlePref.getString("cheminSite");
 
         z3950_actif = bundlePref.getString("z3950.actif").equals("true");
+        bdd_active = bundlePref.getString("bdd.active").equals("true");
 
         user.setIdTheso(idTheso);
         identifierType = bundlePref.getString("identifierType");
@@ -370,7 +372,7 @@ public class SelectedTerme implements Serializable {
             if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
                 majNoticeZ3950();
             }
-            if (bundlePref.getString("bdd.active").equalsIgnoreCase("true")) {
+            if (bdd_active) {
                 majNoticeBdd();
             }
 
@@ -436,11 +438,12 @@ public class SelectedTerme implements Serializable {
         ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
         urlNotice = bundlePref.getString("url.bdd");
-        try {
-            urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, bundlePref.getString("url.bdd")));
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       // try {
+            urlNotice = urlNotice.replace("terme", nom);
+          //  urlNotice = URLEncoder.encode(urlNotice);
+       // } catch (UnsupportedEncodingException ex) {
+       //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+       // }
     }
 
     private void majTAsso() {
@@ -3203,6 +3206,16 @@ public class SelectedTerme implements Serializable {
     public void setZ3950_actif(boolean z3950_actif) {
         this.z3950_actif = z3950_actif;
     }
+
+    public boolean isBdd_active() {
+        return bdd_active;
+    }
+
+    public void setBdd_active(boolean bdd_active) {
+        this.bdd_active = bdd_active;
+    }
+    
+    
 
     public String getTotalConceptOfBranch() {
         if (totalConceptOfBranch.isEmpty()) {
