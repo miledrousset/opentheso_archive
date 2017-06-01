@@ -12,6 +12,10 @@ body {
     clear: both;
 }
 
+.groupArbre{
+    font-weight: bold;
+}
+
 input[type="button"], input[type="submit"]{
     cursor: pointer;
     font-family: "Palatino linotype",Times,serif;
@@ -257,6 +261,105 @@ input[type="button"], input[type="submit"]{
     background: url("../images/domaineClose.png") no-repeat !important;
     background: none;
     border-radius: 0px;
+}
+
+.ui-icon-group-close {
+    background: url("../images/groupClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-group-open {
+    background: url("../images/groupOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-group-close {
+    background: url("../images/subGroupClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-group-open {
+    background: url("../images/subGroupOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+
+
+.ui-icon-collection-close {
+    background: url("../images/collectionClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-collection-open {
+    background: url("../images/collectionOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-collection-close {
+    background: url("../images/subCollectionClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-collection-open {
+    background: url("../images/subCollectionOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-thème-close {
+    background: url("../images/thèmeClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-thème-open {
+    background: url("../images/thèmeOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-thème-close {
+    background: url("../images/subThèmeClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-thème-open {
+    background: url("../images/subThèmeOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-mircoTheso-close {
+    background: url("../images/microThesoClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-mircoTheso-open {
+    background: url("../images/microThesoOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-mircoTheso-close {
+    background: url("../images/subMicroThesoClose.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-sub-mircoTheso-open {
+    background: url("../images/subMicroThesoOpen.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    
 }
 
 .ui-icon-dossier-open {
