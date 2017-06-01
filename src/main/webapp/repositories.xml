@@ -17,7 +17,7 @@
 
 
   <Repository repository_dn="FRANTIQ" name="FRANTIQ" type="Z3950" can_multiplex_sessions="no" >
-	  <RepositoryProperty name="ServiceHost" value="193.48.137.34" />
+	  <RepositoryProperty name="ServiceHost" value="pro.frantiq.fr" />
 	  <RepositoryProperty name="ServicePort" value="210" />
 	  <RepositoryProperty name="service_short_name" value="biblios" />
 	  <RepositoryProperty name="default_record_syntax" value="unimarc" />
