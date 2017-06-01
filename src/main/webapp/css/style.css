@@ -314,25 +314,25 @@ input[type="button"], input[type="submit"]{
 }
 
 .ui-icon-thème-close {
-    background: url("../images/thèmeClose.png") no-repeat !important;
+    background: url("../images/themeClose.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
 .ui-icon-thème-open {
-    background: url("../images/thèmeOpen.png") no-repeat !important;
+    background: url("../images/themeOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
 .ui-icon-sub-thème-close {
-    background: url("../images/subThèmeClose.png") no-repeat !important;
+    background: url("../images/subThemeClose.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
 .ui-icon-sub-thème-open {
-    background: url("../images/subThèmeOpen.png") no-repeat !important;
+    background: url("../images/subThemeOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
@@ -356,7 +356,7 @@ input[type="button"], input[type="submit"]{
 }
 
 .ui-icon-sub-mircoTheso-open {
-    background: url("../images/subMicroThesoOpen.png") no-repeat !important;
+    background: url("../images/submicroThesoOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;
     

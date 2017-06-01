@@ -162,6 +162,7 @@ public class NewTreeBean implements Serializable {
         vue.setOnglet(1);
         reInit();
         reExpand();
+        
     }
 
     /**

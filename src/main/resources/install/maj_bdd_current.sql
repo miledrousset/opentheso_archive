@@ -1427,6 +1427,7 @@ $$ LANGUAGE plpgsql;
                     begin
                         drop TABLE concept;
                         ALTER TABLE concepttemp RENAME TO concept;
+                        UPDATE concept_group SET idtypecode = 'MT';
                     end;
 		end if;
 	end;

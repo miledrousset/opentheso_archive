@@ -14,7 +14,7 @@
                                         minQueryLength="2" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
                                         a:placeholder="#{langueBean.getMsg('indexSearch')}" >
 
-                            <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" 
+                            <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" oncomplete="srollToSelected()"  
                                     update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
                                     />
                         </p:autoComplete>
