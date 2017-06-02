@@ -233,6 +233,41 @@ public class GpsHelper {
 
         return coordonnees;
     }
+    
+    /**
+     * fonction qui permet de supprimer les coordonnées GPS d'un Concept
+     * @param ds
+     * @param id_concept
+     * @param id_theso
+     * @return 
+     */
+    public boolean deleteCoordinate(HikariDataSource ds, String id_concept, String id_theso) {
+            Connection conn;
+            Statement stmt;
+            boolean status = false; 
+            try {
+                // Get connection from pool
+                conn = ds.getConnection();
+                try {
+                    stmt = conn.createStatement();
+                    try {
+                        String query = "delete from gps"
+                                + " where id_concept ='" + id_concept + "'"
+                                + " and id_theso = '" + id_theso + "'";
+                        stmt.executeUpdate(query);
+                        status = true;
+                    } finally {
+                        stmt.close();
+                    }
+                } finally {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // Log exception
+                log.error("Error while deleting coordinate GPS of Concept : " + id_concept, sqle);
+            }
+        return status;
+    }
 
     public ArrayList<AlignementSource> getAlignementSource(HikariDataSource ds) {
         ArrayList<AlignementSource> aligSource = null;

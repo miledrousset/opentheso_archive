@@ -130,7 +130,7 @@ public class SelectedTerme implements Serializable {
     private String dateC;
     private String dateM;
     private int type; // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
-    private int tree; // 0 pour treeBean, 2 pour underTree
+    private int tree; // 0 pour newtreeBean, 2 pour underTree
     private String idArk;
     private int contributor;
     private int creator;

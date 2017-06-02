@@ -38,14 +38,14 @@
                 </tr>
                 <tr>
                     <td colspan="1" style="text-align: center;">
-                        <p:commandButton id="cbLoadCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" actionListener="#{treeBean.getConceptForFusion()}" 
+                        <p:commandButton id="cbLoadCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" actionListener="#{newtreeBean.getConceptForFusion()}" 
                                         
                                          oncomplete="PF('conceptFusionValidationDlg').show(); PF('conceptFusionDlg').hide();"
                                          styleClass="styleButton" >
                         </p:commandButton>
                     </td>
                     <td colspan="1" style="text-align: center;">
-                        <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{treeBean.initConceptFusion()}" 
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{newtreeBean.initConceptFusion()}" 
                                          update=":idConceptFusionDlg"
                                          oncomplete="PF('conceptFusionDlg').hide();"  immediate="true"/>
                     </td>                    

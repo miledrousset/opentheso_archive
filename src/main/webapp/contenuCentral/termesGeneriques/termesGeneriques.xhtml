@@ -7,7 +7,7 @@
         
     <div id="divGenerale" >
         <div class="titreGenerique">
-            <h:outputText value="#{langueBean.getMsg('index.BT') }" rendered="#{(treeBean.browserName != 'agent')}"/> 
+            <h:outputText value="#{langueBean.getMsg('index.BT') }" rendered="#{(newtreeBean.browserName != 'agent')}"/> 
             <h:panelGroup id="panFormEditTGen">
                 <div id="imageEdition">
                     <h:form id="formEditTGen" 
@@ -26,7 +26,7 @@
             </h:panelGroup>
         </div>
         <div class="contenuGenerique">
-            <h:panelGroup id="gene" > <!--rendered="{(treeBean.browserName != 'agent')}"> -->
+            <h:panelGroup id="gene" > <!--rendered="{(newtreeBean.browserName != 'agent')}"> -->
                 <ui:repeat value="#{selectedTerme.termeGenerique}" var="item0">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item0.value != ''}" value="#{item0.value}" escape="false"

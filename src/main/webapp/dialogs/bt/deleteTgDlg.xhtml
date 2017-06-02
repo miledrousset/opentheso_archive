@@ -20,7 +20,7 @@
                         <td>
                             <h:form>
                                 <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:idDeleteTgDlg"
-                                                 actionListener="#{treeBean.suppRel(item0.key, 0)}">
+                                                 actionListener="#{newtreeBean.suppRel(item0.key, 0)}">
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>  
 

@@ -40,14 +40,15 @@
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
             <ui:include src="menuAll.xhtml" />
+          
         </div>
 
-        <br/><br/><br/><br/>
+
 
 
         <h:panelGroup rendered="#{selectedCandidat.needchangerpass()}">
             <h:form id="changelePass">
-                <br/><br/><br/><br/>
+                
                 <table width="20%" border="1" align="center">
                     <tr><td><center>
                                 <br/><br/>
@@ -69,13 +70,15 @@
 
         </h:panelGroup>
 
-        <br/><br/><br/>
-        <center>
+       
+        <center >
+              
             <h:form>
                 <a href="index.xhtml" target="_self"><input type="button" name="button" value="Index" styleClass="styleButton"/></a>
             </h:form>
         </center>
         <br/>
+        
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
 
         <ui:insert name="status">

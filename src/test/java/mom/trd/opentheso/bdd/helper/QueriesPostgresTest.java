@@ -20,7 +20,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-//@ManagedBean(name = "treeBean", eager = true)
+//@ManagedBean(name = "newtreeBean", eager = true)
 //@ApplicationScoped
 /**
  *

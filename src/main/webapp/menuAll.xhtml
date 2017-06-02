@@ -32,20 +32,42 @@
     <div>
         <p:messages id="messages" showDetail="true" autoUpdate="true" style="listes"/>
     </div>
-     <p:panel id="panelMenu"  styleClass="panelNoBorder"> 
-    <div style="clear: both;"></div>
- 
+    <p:panel id="panelMenu"  styleClass="panelNoBorder"> 
+        <div style="clear: both;"></div>
+
         <div id="onglets">
-                 
+
             <ul id="listeMenu" style="alignment-adjust: central"> 
                 <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}"/></h:outputLink></li>
                 <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
                 <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
-                
+
                 <li id="itemMenu"><h:outputLink rendered="#{ ((user1.user.name != null) and (user1.haveRights(2)) ) or (user1.haveRights(1))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
                 <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus2)}" value="statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
+             
             </ul>   
+                   
         </div>
-</p:panel>
- 
+
+    </p:panel>
+    
+<!--
+    <p:tabMenu activeIndex="1">
+        <p:menuitem value="Overview" outcome="index.xhtml" icon="ui-icon-star">
+            <f:param name="i" value="0" />
+        </p:menuitem>
+        <p:menuitem value="Demos" outcome="index.xhtml" icon="ui-icon-search">
+            <f:param name="i" value="1" />
+        </p:menuitem>
+        <p:menuitem value="Documentation" outcome="index.xhtml" icon="ui-icon-document">
+            <f:param name="i" value="2" />
+        </p:menuitem>
+        <p:menuitem value="Support" outcome="index.xhtml" icon="ui-icon-wrench">
+            <f:param name="i" value="3" />
+        </p:menuitem>
+        <p:menuitem value="Social" outcome="index.xhtml" icon="ui-icon-person">
+            <f:param name="i" value="4" />
+        </p:menuitem>
+    </p:tabMenu>-->
+
 </ui:composition>

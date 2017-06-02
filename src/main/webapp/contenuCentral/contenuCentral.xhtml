@@ -69,7 +69,7 @@
 
 
                 <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
-                    <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{treeBean.reactivConcept()}"
+                    <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{newtreeBean.reactivConcept()}"
                                      update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                      styleClass="styleButtonValid" >
                     </p:commandButton>

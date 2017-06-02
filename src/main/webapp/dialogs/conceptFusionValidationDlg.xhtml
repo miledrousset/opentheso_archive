@@ -70,13 +70,13 @@
                     <td colspan="1" style="text-align: center;">
                         <h:form>
                             <p:commandButton id="cbCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
-                                              actionListener="#{treeBean.fusionConcept()}"
+                                              actionListener="#{newtreeBean.fusionConcept()}"
                                               update=":idConceptFusionValidationDlg,:accordeonTree,:panContenu," styleClass="styleButton"                                               
                                               oncomplete="PF('conceptFusionValidationDlg').hide();"/>
                         </h:form>
                     </td>
                     <td colspan="1" style="text-align: center;">
-                        <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{treeBean.initConceptFusion()}" 
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{newtreeBean.initConceptFusion()}" 
                                          update=":idConceptFusionDlg"
                                          oncomplete="PF('conceptFusionValidationDlg').hide();"  immediate="true"/>
                     </td>                              

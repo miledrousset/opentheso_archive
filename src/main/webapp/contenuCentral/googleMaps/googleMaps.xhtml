@@ -23,10 +23,23 @@
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonGps" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('gps.nom')}"  actionListener="#{gps.getCoordinatesGps(selectedTerme.idC, selectedTerme.idTheso)}" update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
-                            
+
+                            <p:menuitem value="#{langueBean.getMsg('gps.delete')}"  actionListener="#{gps.deleteCoordinates(selectedTerme.idC, selectedTerme.idTheso)}"
+                                         update=":panContenu" style="font-size: 12px;">
+                                <p:confirm header="Confirmation" message="#{langueBean.getMsg('gps.delete')}" icon="ui-icon-alert" />
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                            </p:menuitem>
+
+
+
+
+
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{gps.setListeAlignementSources1(selectedTerme.idTheso, user1.user.id)}" 
                                         update=":idGpsAutomatiqueEditDlg" oncomplete="PF('gpsAutomatiqueEditDlg').show()" style="font-size: 12px;"/>
-                            
+
                             <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{gps.setListeAlignementSources1(selectedTerme.idTheso,user1.user.id)}" 
                                         action="#{gps.getListChildren(selectedTerme.idTheso, selectedTerme.idC, selectedTerme.idlangue, user1.user.id )}"
                                         update=":idGpsParLotEditDlg" oncomplete="PF('gpsParLotEditDlg').show()" style="font-size: 12px;"/>

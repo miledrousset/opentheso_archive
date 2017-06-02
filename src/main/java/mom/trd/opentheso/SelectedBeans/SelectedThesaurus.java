@@ -110,7 +110,7 @@ public class SelectedThesaurus implements Serializable {
 
 
     // niveaux des classes Beans
-    // theso -> treeBean -> selectedTerme -> user1
+    // theso -> newtreeBean -> selectedTerme -> user1
     //   4   ->    3     ->      2        ->   1
     // ordre d'initialisation des beans
     @ManagedProperty(value = "#{poolConnexion}")

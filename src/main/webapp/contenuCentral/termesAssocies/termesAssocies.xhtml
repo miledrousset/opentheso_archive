@@ -7,7 +7,7 @@
         
     <div id="divGenerale">
         <div class="titreAssocie">
-            <h:outputText value="#{langueBean.getMsg('index.RT')}" rendered="#{(treeBean.browserName != 'agent')}" /> 
+            <h:outputText value="#{langueBean.getMsg('index.RT')}" rendered="#{(newtreeBean.browserName != 'agent')}" /> 
             <div id="imageEdition">
                 <h:form id="formEditTAsso"
                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan'))}">
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="contenuAssocie">
-            <h:panelGroup  id="asso" > <!--rendered="{(treeBean.browserName != 'agent')}"> -->
+            <h:panelGroup  id="asso" > <!--rendered="{(newtreeBean.browserName != 'agent')}"> -->
                 <ui:repeat value="#{selectedTerme.termesAssocies}" var="item2">
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item2.value != ''}" value="#{item2.value}" escape="false"

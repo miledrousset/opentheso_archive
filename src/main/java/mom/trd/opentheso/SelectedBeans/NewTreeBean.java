@@ -5,20 +5,25 @@
  */
 package mom.trd.opentheso.SelectedBeans;
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
+import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.primefaces.event.NodeExpandEvent;
@@ -46,6 +51,9 @@ public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
+    
+    @ManagedProperty(value = "#{conceptbean}")
+    private ConceptBean conceptbean;    
 
     private TreeNode root;
     private TreeNode selectedNode;
@@ -106,7 +114,27 @@ public class NewTreeBean implements Serializable {
         }
         return type;
     }
+    
+    /**
+     * Pour détecter les agents d'indexation 
+     * @return 
+     */
+    public String getBrowserName() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        String userAgent = externalContext.getRequestHeaderMap().get("User-Agent");
 
+        if (userAgent.toLowerCase().contains("slurp")) {
+            return "agent";
+        }
+        if (userAgent.toLowerCase().contains("msnbot")) {
+            return "agent";
+        }
+        if (userAgent.toLowerCase().contains("googlebot")) {
+            return "agent";
+        }
+        return "notagent";
+    }
+    
     public void initTree(String idTheso, String langue) {
 
         //      idThesoSelected = idTheso;
@@ -162,7 +190,7 @@ public class NewTreeBean implements Serializable {
         vue.setOnglet(1);
         reInit();
         reExpand();
-        
+
     }
 
     /**
@@ -523,8 +551,8 @@ public class NewTreeBean implements Serializable {
                         || nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
                     if (nodeConceptTree.isIsGroup()) {
-                        
-                        icon ="domaine";
+
+                        icon = "domaine";
                         //String type = getTypeOfGroup(typeCode);
 
                     } else if (nodeConceptTree.isIsSubGroup()) {
@@ -665,6 +693,283 @@ public class NewTreeBean implements Serializable {
         createValid = true;
     }
 
+
+    /**
+     * ************************** ACTIONS SELECTEDTERME
+     * ***************************
+     */
+    /**
+     * Supprime le groupe sélectionné
+     */
+    public void delGroup() {
+        new GroupHelper().deleteConceptGroup(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId());
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info7")));
+        reInit();
+        initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.reInitTerme();
+    }
+
+    /**
+     * Cette fonction permet de supprimer le ou les orphelins (une branche à
+     * partir du concept orphelin sélectionné
+     *
+     * @return
+     */
+    public boolean delOrphans() {
+        if (!deleteOrphanBranch(connect.getPoolConnexion(),
+                selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return false;
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info8")));
+        conceptbean.setDeleteBranchOrphan(0);
+        reInit();
+        initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.reInitTerme();
+        return true;
+    }
+
+    /**
+     * Fonction recursive qui permet de supprimer une branche d'orphelins un
+     * concept de tête et thesaurus. La suppression est descendante qui ne
+     * supprime pas les autres branches remontantes.
+     *
+     * @param conn
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    private boolean deleteOrphanBranch(HikariDataSource ds, String idConcept, String idTheso, int idUser) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        ArrayList<String> listIdsOfConceptChildren
+                = conceptHelper.getListChildrenOfConcept(ds,
+                        idConcept, idTheso);
+
+        if (!conceptHelper.deleteConceptForced(ds, idConcept, idTheso, idUser)) {
+            return false;
+        }
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            //     if(!conceptHelper.deleteConceptForced(ds, listIdsOfConceptChildren1, idTheso, idUser))
+            //        return false;
+            deleteOrphanBranch(ds, listIdsOfConceptChildren1, idTheso, idUser);
+        }
+        return true;
+    }
+
+    /**
+     * Change le nom du terme courant avec mise à jour dans l'abre
+     */
+    public void editNomT() {
+        if (selectedTerme == null) {
+            return;
+        }
+        if (selectedTerme.getSelectedTermComp() == null) {
+            return;
+        }
+        // si c'est la même valeur, on fait rien
+        String valueEdit = selectedTerme.getSelectedTermComp().getTermLexicalValue().trim();
+        if (selectedTerme.getNom().trim().equals(valueEdit)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
+            selectedTerme.setNomEdit(selectedTerme.getNom());
+            return;
+        }
+
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if ((idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return;
+        }
+
+        selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
+        if (selectedTerme.getNomEdit().trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            selectedTerme.setNomEdit(selectedTerme.getNom());
+        } else {
+            String temp = selectedTerme.getNomEdit();
+            // cas d'un domaine
+            if (selectedTerme.getType() == 1) {
+                if (selectedTerme.getNom() == null || selectedTerme.getNom().equals("")) {
+                    selectedTerme.editTerme(3);
+                } else {
+                    selectedTerme.editTerme(4);
+                }
+            } else {
+                if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
+                    selectedTerme.editTerme(1);
+                } else {
+                    // le terme n'existe pas encore
+                    if (!selectedTerme.editTerme(2)) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                        selectedTerme.setNomEdit(selectedTerme.getNom());
+                        return;
+                    }
+                }
+
+            }
+            if (selectedNode != null) {
+                //((MyTreeNode) selectedNode).setData(temp + " (Id_" + selectedTerme.getIdC() + ")");
+                ((MyTreeNode) selectedNode).setData(temp);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info2")));
+                selectedTerme.setNomEdit(selectedTerme.getNom());
+            }
+        }
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+    }
+
+    /**
+     * Supprime la relation hiÃ©rarchique qui lie le terme courant au terme dont
+     * l'id est passÃ© en paramÃ¨tre puis met l'arbre Ã  jour. Si type vaut 0,
+     * le terme courant est le fils, si type vaut 1, le terme courant est le
+     * pÃ¨re.
+     *
+     * @param id
+     * @param type
+     */
+    public void suppRel(String id, int type) {
+        if (type == 0) {
+            // type 0 = suppression de la relation gÃ©nÃ©rique 
+            if (!selectedTerme.delGene(id)) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                return;
+            }
+
+        } else {
+            // type 1 = suppression de la relation spÃ©cifique
+            if (!selectedTerme.delSpe(id)) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                return;
+            }
+        }
+
+        reInit();
+        reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info3")));
+    }
+
+    public boolean desactivateConcept() {
+        if (!selectedTerme.deprecateConcept()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.error3")));
+            return false;
+        }
+        reInit();
+        reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info4")));
+        vue.setAddTInfo(0);
+        return true;
+
+    }
+
+    public boolean getConceptForFusion() {
+        if (selectedTerme.getSelectedTermComp() == null || !selectedTerme.loadConceptFusion()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error5")));
+            vue.setAddTInfo(0);
+            return false;
+        }
+        vue.setAddTInfo(3);
+        return true;
+    }
+
+    public void initConceptFusion() {
+        selectedTerme.initConceptFusion();
+    }
+
+    /**
+     * Fusionne les concepts avec mise à  jour dans l'abre
+     */
+    public void fusionConcept() {
+        if (selectedTerme.getConceptFusionId().equals(selectedTerme.getIdC())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), langueBean.getMsg("error")));
+            selectedTerme.setConceptFusionId(null);
+            selectedTerme.setConceptFusionAlign(null);
+            selectedTerme.setConceptFusionNodeRT(null);
+        } else {
+            int idUser = selectedTerme.getUser().getUser().getId();
+            for (NodeRT rt : selectedTerme.getConceptFusionNodeRT()) {
+                HierarchicalRelationship hr = new HierarchicalRelationship(rt.getIdConcept(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), "RT");
+                new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
+            }
+            for (NodeAlignment na : selectedTerme.getConceptFusionAlign()) {
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), 
+                        idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(),
+                        selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), 0);
+            }
+            new ConceptHelper().addConceptFusion(connect.getPoolConnexion(), selectedTerme.getConceptFusionId(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info6")));
+            reInit();
+            reExpand();
+
+        }
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        vue.setAddTInfo(0);
+    }
+
+    /*       if (selectedTerme.getChoixdesactive().equals("0")) {
+            if (!selectedTerme.delConcept()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.error3")));
+                return false;
+            }
+            reInit();
+            reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info4")));
+            vue.setAddTInfo(0);
+            return true;
+        } else if (selectedTerme.getChoixdesactive().equals("1")) {
+            if (selectedTerme.getSelectedTermComp() == null || !selectedTerme.loadConceptFusion()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error5")));
+                vue.setAddTInfo(0);
+                return false;
+            }
+            vue.setAddTInfo(3);
+            return true;
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error6")));
+            vue.setAddTInfo(0);
+            return false;
+        }*/
+    public boolean reactivConcept() {
+        if (!selectedTerme.reactivConcept()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.error4")));
+            return false;
+        }
+        reInit();
+        reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info5")));
+        return true;
+    }
+
+    /**
+     * *
+     * Nouvelles fonctions par Miled Rousset
+     */
+    /**
+     * Permet de modifier la valeur de la notation d'un concept
+     */
+    public void editNotation() {
+        if (selectedTerme == null) {
+            return;
+        }
+        if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
+
+            if (!selectedTerme.updateNotation()) {
+                return;
+            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info2")));
+        }
+    }
+
+    /**
+     * Fin des nouvelles fonctions
+     */
     public Connexion getConnect() {
         return connect;
     }
@@ -743,6 +1048,14 @@ public class NewTreeBean implements Serializable {
 
     public void setDefaultLanguage(String defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
+    }
+
+    public ConceptBean getConceptbean() {
+        return conceptbean;
+    }
+
+    public void setConceptbean(ConceptBean conceptbean) {
+        this.conceptbean = conceptbean;
     }
 
 }

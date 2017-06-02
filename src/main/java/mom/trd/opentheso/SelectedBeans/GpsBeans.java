@@ -674,6 +674,11 @@ public class GpsBeans {
         }
     }
 
+    public boolean deleteCoordinates(String idConcept, String idTheso) {
+        GpsHelper gpsHelper = new GpsHelper();
+        return gpsHelper.deleteCoordinate(connect.getPoolConnexion(), idConcept, idTheso);
+    }
+    
     ///////////////GET & SET////////////////////////////
     public MapModel getGeoModel() {
         return geoModel;
