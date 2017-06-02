@@ -374,7 +374,7 @@ public class SelectedThesaurus implements Serializable {
         nodeCG = new NodeGroup();
         ResourceBundle bundlePref = getBundlePref();
         cheminSite = bundlePref.getString("cheminSite");
-        version = bundlePref.getString("version");
+        version = "";
         String useArk = bundlePref.getString("useArk");
         arkActive = useArk.equals("true");
         serverArk = bundlePref.getString("serverArk");

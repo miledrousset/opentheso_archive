@@ -28,7 +28,7 @@
                 <ui:repeat value="#{selectedTerme.langues}" var="item5">
                     <h:form>
                         <p:commandButton styleClass="termClick" value="#{item5.value} (#{item5.key})" 
-                                         actionListener="#{theso.changeTermeTrad(selectedTerme.idC, item5.key, selectedTerme.type)}" 
+                                         actionListener="#{theso.changeTermeTrad(selectedTerme.idC, item5.key, selectedTerme.type)}"  oncomplete="srollToSelected()"
                                          update=":panChoixTheso,:accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     </h:form>
                 </ui:repeat>

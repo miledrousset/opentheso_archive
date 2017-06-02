@@ -177,6 +177,7 @@ public class SelectedTerme implements Serializable {
     private String serverAdress;
     private boolean z3950_actif;
     private boolean bdd_active;
+    private boolean bdd_useId;
 
     NodeGps coordonnees;
 
@@ -221,6 +222,7 @@ public class SelectedTerme implements Serializable {
 
         z3950_actif = bundlePref.getString("z3950.actif").equals("true");
         bdd_active = bundlePref.getString("bdd.active").equals("true");
+        bdd_useId = bundlePref.getString("bdd.useId").equals("true");
 
         user.setIdTheso(idTheso);
         identifierType = bundlePref.getString("identifierType");
@@ -438,8 +440,14 @@ public class SelectedTerme implements Serializable {
         ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
         urlNotice = bundlePref.getString("url.bdd");
-       // try {
+        if(bdd_useId) {
+             urlNotice = urlNotice.replace("terme", idC);
+        }
+        else {
             urlNotice = urlNotice.replace("terme", nom);
+        }
+       // try {
+            
           //  urlNotice = URLEncoder.encode(urlNotice);
        // } catch (UnsupportedEncodingException ex) {
        //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
