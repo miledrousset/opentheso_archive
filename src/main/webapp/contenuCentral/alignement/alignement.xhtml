@@ -4,18 +4,32 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
-        <div id="divGenerale">
+    <div id="divGenerale">
         <div class="titreAlign">
             <h:outputText value="#{langueBean.getMsg('index.align')}" />
             <div id="imageEdition">
                 <h:form id="formEditAlign"  
-                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                        rendered="#{(user1.user.name != null) 
+                                    and (selectedTerme.idC != null)
+                                    and (user1.haveRights(2)) 
+                                    and (user1.isHaveWriteToCurrentThesaurus)
+                                    and (selectedTerme.status != 'hidden') 
+                                    and (selectedTerme.idDomaine != 'Orphan')}">
+
+
                     <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
-                                      update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show()" 
-                                      styleClass="cbEdit" 
-                                      icon="ui-icon-parametre" >
+                                     styleClass="cbEdit" 
+                                     icon="ui-icon-parametre" >
+                  
+                        
+                         <p:menu style="background: #CEF0C4" overlay="true" trigger="buttonParamAlign" my="left top" at="left bottom">
+                             <p:menuitem value="#{langueBean.getMsg('alig.gestion')}" update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show();"  style="font-size: 12px;"/>
+                             <p:menuitem value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('editAlignementSourceEditDlg').show();" action="#{editAlignement.exporterSource()}" update=":panelAlignement"  style="font-size: 12px;"/>
+                        </p:menu>
+                        
+
                     </p:commandButton>
-                                            
+
                     <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                      styleClass="cbEdit" icon="ui-icon-edit" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
@@ -46,7 +60,7 @@
                 </ui:repeat>
             </ui:repeat>
             <br/>
-            
+
         </div>
     </div>
 </ui:composition>
