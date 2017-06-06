@@ -43,7 +43,7 @@
                     <p:selectOneMenu  value="#{editAlignement.idThesoForAssosAlig}"  rendered="#{editAlignement.exporSource}" > 
                         <p:ajax event="change" update=":panelAlignement"
                                 listener="#{editAlignement.selectSourceOfThesoInTable(editAlignement.idThesoForAssosAlig)}" />   
-                        <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue="-1"  />.id
+                        <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue=""  />.id
                         <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" 
                                        />
                     </p:selectOneMenu>
@@ -53,7 +53,7 @@
                     <fieldset>
                         <h:form>
                             <!-- ASSOCIATION ALIGNEMENT--> 
-                            <p:dataTable rendered="#{editAlignement.exporSource and (editAlignement.idThesoForAssosAlig != -1)}"
+                            <p:dataTable rendered="#{editAlignement.exporSource and (editAlignement.idThesoForAssosAlig.length() != 0)}"
                                          var="alig" value="#{editAlignement.listeAlignementSources}" 
                                          rowKey="#{alig.source}" selection="#{editAlignement.alignementSources}"
 
@@ -202,7 +202,7 @@
                 </h:panelGroup>
 
 
-                <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" rendered="#{editAlignement.exporSource and (editAlignement.idThesoForAssosAlig != -1)}"
+                <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" rendered="#{editAlignement.exporSource and ((editAlignement.idThesoForAssosAlig.length() != 0))}"
                                  action="#{editAlignement.exportAlignement(editAlignement.idThesoForAssosAlig)}" 
                                  update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" oncomplete="PF('editAlignementSourceEditDlg').hide()"
                                  />

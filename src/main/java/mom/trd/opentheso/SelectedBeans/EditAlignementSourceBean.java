@@ -66,7 +66,7 @@ public class EditAlignementSourceBean implements Serializable {
     
     @PostConstruct
     public void init() {
-        idThesoForAssosAlig="-1";
+        idThesoForAssosAlig="";
     }
 
     public void setListeAlignementSources(String idTheso) {
@@ -179,7 +179,7 @@ public class EditAlignementSourceBean implements Serializable {
     }
 
     public void exporterSource() {
-        idThesoForAssosAlig="-1";
+        idThesoForAssosAlig="";
         viewAlignement = false;
         editAlignement = false;
         newAlignement = false;
@@ -202,6 +202,8 @@ public class EditAlignementSourceBean implements Serializable {
 
             }
         }
+        
+        idThesoForAssosAlig="";
     }
 
     public void effaceAlignementSource(String idTheso) {
