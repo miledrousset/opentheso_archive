@@ -51,9 +51,9 @@ public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
-    
+
     @ManagedProperty(value = "#{conceptbean}")
-    private ConceptBean conceptbean;    
+    private ConceptBean conceptbean;
 
     private TreeNode root;
     private TreeNode selectedNode;
@@ -114,10 +114,11 @@ public class NewTreeBean implements Serializable {
         }
         return type;
     }
-    
+
     /**
-     * Pour détecter les agents d'indexation 
-     * @return 
+     * Pour détecter les agents d'indexation
+     *
+     * @return
      */
     public String getBrowserName() {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
@@ -134,7 +135,7 @@ public class NewTreeBean implements Serializable {
         }
         return "notagent";
     }
-    
+
     public void initTree(String idTheso, String langue) {
 
         //      idThesoSelected = idTheso;
@@ -147,8 +148,7 @@ public class NewTreeBean implements Serializable {
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
-        
-        
+
         // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
 
@@ -340,7 +340,7 @@ public class NewTreeBean implements Serializable {
     public void onNodeSelect(NodeSelectEvent event) {
 
         //if (((MyTreeNode) event.getTreeNode()).getIdDomaine() != null) {
-            selectedTerme.majTerme((MyTreeNode) selectedNode);
+        selectedTerme.majTerme((MyTreeNode) selectedNode);
         //}
         vue.setOnglet(0);
         selectedTerme.setTree(0);
@@ -358,7 +358,7 @@ public class NewTreeBean implements Serializable {
     }
 
     public void changeTerme(String id, int type) {
-        
+
         selectedNode.setSelected(false);
 
         for (TreeNode node : selectedNodes) {
@@ -539,10 +539,10 @@ public class NewTreeBean implements Serializable {
                 if (listeSubGroup == null) {
                     listeSubGroup = new ArrayList<>();
                 }
-                
+
                 // pour récupérer les concepts mélangés avec les Sous_Groupes
                 listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
-                
+
             } else {
                 listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
             }
@@ -569,11 +569,10 @@ public class NewTreeBean implements Serializable {
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
                     new DefaultTreeNode("fake", treeNode);
                 }
-            }            
-            
+            }
+
             // Ajout dans l'arbre
             for (NodeConceptTree nodeConceptTree : listeConcept) {
-
 
                 if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
                         || nodeConceptTree.isHaveChildren()) {
@@ -611,15 +610,14 @@ public class NewTreeBean implements Serializable {
                             ((MyTreeNode) node).getLangue(), ((MyTreeNode) node).getIdDomaine(),
                             ((MyTreeNode) node).getTypeDomaine(),
                             idTC, icon, value, node);
-                    
-                  /*  if (nodeConceptTree.isIsGroup()) {
+
+                    /*  if (nodeConceptTree.isIsGroup()) {
                         ((MyTreeNode)tn).setIsGroup(true);
                         ((MyTreeNode)tn).setIsSubGroup(false);
                     } else if (nodeConceptTree.isIsSubGroup()) {
                         ((MyTreeNode)tn).setIsGroup(false);
                         ((MyTreeNode)tn).setIsSubGroup(true);
                     }*/
-                    
                     new DefaultTreeNode("fake", treeNode);
 
                     if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdMot())) {
@@ -717,8 +715,8 @@ public class NewTreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
             return;
         }
-        
-        if (!selectedTerme.creerTermeSpe(((MyTreeNode)selectedNode))) {
+
+        if (!selectedTerme.creerTermeSpe(((MyTreeNode) selectedNode))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             return;
         } else {
@@ -729,7 +727,6 @@ public class NewTreeBean implements Serializable {
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
         createValid = true;
     }
-
 
     /**
      * ************************** ACTIONS SELECTEDTERME
@@ -797,7 +794,9 @@ public class NewTreeBean implements Serializable {
     }
 
     /**
-     * Change le nom du terme courant avec mise à jour dans l'abre
+     * Change le nom du terme courant avec mise à jour dans l'arbre Choix du
+     * type de d'objet sélectionné (Group, sousGroup, Concept)
+     *
      */
     public void editNomT() {
         if (selectedTerme == null) {
@@ -816,48 +815,78 @@ public class NewTreeBean implements Serializable {
 
         String idTerm;
         String idConceptLocal;
-        // vérification si le term à ajouter existe déjà 
-        if ((idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
-            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
-            // on vérifie si c'est autorisé de créer une relation ici
-            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+        MyTreeNode myTreeNode = (MyTreeNode) selectedNode;
+
+        // vérification si le Groupe à ajouter existe déjà 
+        if (new GroupHelper().isDomainExist(connect.getPoolConnexion(), valueEdit, myTreeNode.getIdTheso(), myTreeNode.getLangue())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
             return;
         }
 
         selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
+
+        // saisie d'une valeur vide
         if (selectedTerme.getNomEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
-        } else {
-            String temp = selectedTerme.getNomEdit();
-            // cas d'un domaine
-            if (selectedTerme.getType() == 1) {
-                if (selectedTerme.getNom() == null || selectedTerme.getNom().equals("")) {
-                    selectedTerme.editTerme(3);
-                } else {
-                    selectedTerme.editTerme(4);
-                }
-            } else {
-                if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
-                    selectedTerme.editTerme(1);
-                } else {
-                    // le terme n'existe pas encore
-                    if (!selectedTerme.editTerme(2)) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-                        selectedTerme.setNomEdit(selectedTerme.getNom());
-                        return;
-                    }
-                }
+            return;
+        }
+        /// cas d'un Group
+        if (myTreeNode.isIsGroup()) {
+            /*
+                    if (selectedTerme.getNom() == null || selectedTerme.getNom().equals("")) {
+                        selectedTerme.editTerme(3);
+                    } else {
+                        selectedTerme.editTerme(4);
+                    }*/
 
+            if (!selectedTerme.editGroupName(myTreeNode.getIdTheso(),
+                    myTreeNode.getIdMot(), myTreeNode.getLangue(),
+                    valueEdit)) {
+                //erreur à traiter
             }
-            if (selectedNode != null) {
-                //((MyTreeNode) selectedNode).setData(temp + " (Id_" + selectedTerme.getIdC() + ")");
-                ((MyTreeNode) selectedNode).setData(temp);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info2")));
+            myTreeNode.setData(valueEdit);
+            selectedTerme.setNom(valueEdit);
+            selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));
+            return;
+
+        }
+
+        /// cas d'un sousGroup
+        if (((MyTreeNode) selectedNode).isIsSubGroup()) {
+            if (!selectedTerme.editGroupName(myTreeNode.getIdTheso(),
+                    myTreeNode.getIdMot(), myTreeNode.getLangue(),
+                    valueEdit)) {
+                //erreur à traiter
+            }
+            myTreeNode.setData(valueEdit);
+            selectedTerme.setNom(valueEdit);
+            selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));            
+            return;
+        }
+
+        /// cas d'un Concept
+        String temp = selectedTerme.getNomEdit();
+        if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
+            selectedTerme.editTerme(1);
+        } else {
+            // le terme n'existe pas encore
+            if (!selectedTerme.editTerme(2)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 selectedTerme.setNomEdit(selectedTerme.getNom());
+                return;
             }
         }
+
+        if (selectedNode != null) {
+            //((MyTreeNode) selectedNode).setData(temp + " (Id_" + selectedTerme.getIdC() + ")");
+            ((MyTreeNode) selectedNode).setData(temp);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info2")));
+            selectedTerme.setNomEdit(selectedTerme.getNom());
+        }
+
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
     }
 
@@ -936,7 +965,7 @@ public class NewTreeBean implements Serializable {
                 new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
             }
             for (NodeAlignment na : selectedTerme.getConceptFusionAlign()) {
-                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), 
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(),
                         idUser, na.getConcept_target(), na.getThesaurus_target(), na.getUri_target(), na.getAlignement_id_type(),
                         selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), 0);
             }
