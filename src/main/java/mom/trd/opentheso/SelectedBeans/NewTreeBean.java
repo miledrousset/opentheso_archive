@@ -147,6 +147,9 @@ public class NewTreeBean implements Serializable {
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
+        
+        
+        // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
 
             String typeCode = nodegroup.getConceptGroup().getIdtypecode();
@@ -514,7 +517,8 @@ public class NewTreeBean implements Serializable {
 
     private void reExpandChild(ArrayList<String> listeId, TreeNode node, int cpt) {
         if (!node.isExpanded()) {
-            ArrayList<NodeConceptTree> liste;
+            ArrayList<NodeConceptTree> listeConcept;
+            ArrayList<NodeConceptTree> listeSubGroup = new ArrayList<>();
             ConceptHelper conceptHelper = new ConceptHelper();
             GroupHelper groupHelper = new GroupHelper();
             int type = 3;
@@ -527,26 +531,50 @@ public class NewTreeBean implements Serializable {
             String idConcept = myTreeNode.getIdMot();
             if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso())) {
 
-                //myTreeNode.setTypeMot(1);//pour group ?
+                myTreeNode.setTypeMot(1);//pour group ?
                 myTreeNode.setIsGroup(true);
 
-                liste = groupHelper.getRelationGroupOf(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeSubGroup = groupHelper.getRelationGroupOf(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
 
-                if (liste == null) {
-                    liste = new ArrayList<>();
+                if (listeSubGroup == null) {
+                    listeSubGroup = new ArrayList<>();
                 }
-                liste.addAll(conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue()));
-
+                
+                // pour récupérer les concepts mélangés avec les Sous_Groupes
+                listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                
             } else {
-                liste = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
             }
 
-            TreeNode tn = null;
+            TreeNode treeNode = null;
+            String value = "";
+            String idTC = "";
+            String icon;
+            /**
+             * Ajout des Groupes (MT, C, G, T ..)
+             */
+            for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
 
+                value = nodeConceptTreeGroup.getTitle();
+                if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
+                        || nodeConceptTreeGroup.isHaveChildren()) {
+
+                    icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
+
+                    treeNode = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), myTreeNode.getIdTheso(),
+                            myTreeNode.getLangue(), myTreeNode.getIdDomaine(),
+                            myTreeNode.getTypeDomaine(),
+                            idTC, icon, value, myTreeNode);
+                    ((MyTreeNode) treeNode).setIsSubGroup(true);
+                    new DefaultTreeNode("fake", treeNode);
+                }
+            }            
+            
             // Ajout dans l'arbre
-            for (NodeConceptTree nodeConceptTree : liste) {
+            for (NodeConceptTree nodeConceptTree : listeConcept) {
 
-                String value, idTC, icon;
+
                 if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
                         || nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
@@ -579,20 +607,29 @@ public class NewTreeBean implements Serializable {
                             icon = "hidden";
                         }
                     }
-                    tn = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
+                    treeNode = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
                             ((MyTreeNode) node).getLangue(), ((MyTreeNode) node).getIdDomaine(),
                             ((MyTreeNode) node).getTypeDomaine(),
                             idTC, icon, value, node);
-                    new DefaultTreeNode("fake", tn);
+                    
+                  /*  if (nodeConceptTree.isIsGroup()) {
+                        ((MyTreeNode)tn).setIsGroup(true);
+                        ((MyTreeNode)tn).setIsSubGroup(false);
+                    } else if (nodeConceptTree.isIsSubGroup()) {
+                        ((MyTreeNode)tn).setIsGroup(false);
+                        ((MyTreeNode)tn).setIsSubGroup(true);
+                    }*/
+                    
+                    new DefaultTreeNode("fake", treeNode);
 
-                    if (listeId.get(cpt).equals(((MyTreeNode) tn).getIdMot())) {
+                    if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdMot())) {
                         if (cpt + 1 < listeId.size()) {
-                            tn.setSelected(false);
-                            reExpandChild(listeId, tn, cpt + 1);
+                            treeNode.setSelected(false);
+                            reExpandChild(listeId, treeNode, cpt + 1);
                         } else {
-                            tn.setSelected(true);
-                            selectedNode = tn;
-                            selectedNodes.add(tn);
+                            treeNode.setSelected(true);
+                            selectedNode = treeNode;
+                            selectedNodes.add(treeNode);
                         }
                     }
                 } else {
@@ -616,17 +653,17 @@ public class NewTreeBean implements Serializable {
                     if (nodeConceptTree.getStatusConcept().equals("hidden")) {
                         icon = "hidden";
                     }
-                    tn = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
+                    treeNode = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) node).getIdTheso(),
                             ((MyTreeNode) node).getLangue(), ((MyTreeNode) node).getIdDomaine(),
                             ((MyTreeNode) node).getTypeDomaine(),
                             idTC, icon, value, node);
 
-                    if (listeId.get(cpt).equals(((MyTreeNode) tn).getIdMot())) {
-                        tn.setSelected(true);
-                        selectedNode = tn;
-                        selectedNodes.add(tn);
+                    if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdMot())) {
+                        treeNode.setSelected(true);
+                        selectedNode = treeNode;
+                        selectedNodes.add(treeNode);
                     } else {
-                        tn.setSelected(false);
+                        treeNode.setSelected(false);
                     }
 
                 }
@@ -635,7 +672,7 @@ public class NewTreeBean implements Serializable {
             }
             node.setExpanded(true);
         } else {
-            ArrayList<TreeNode> children = (ArrayList<TreeNode>) node.getChildren();
+            List<TreeNode> children = node.getChildren();
             for (TreeNode mtn : children) {
                 if (listeId.get(cpt).equals(((MyTreeNode) mtn).getIdMot())) {
                     if (cpt + 1 < listeId.size()) {
