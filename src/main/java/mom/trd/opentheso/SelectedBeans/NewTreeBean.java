@@ -336,9 +336,9 @@ public class NewTreeBean implements Serializable {
      */
     public void onNodeSelect(NodeSelectEvent event) {
 
-        if (((MyTreeNode) event.getTreeNode()).getIdDomaine() != null) {
+        //if (((MyTreeNode) event.getTreeNode()).getIdDomaine() != null) {
             selectedTerme.majTerme((MyTreeNode) selectedNode);
-        }
+        //}
         vue.setOnglet(0);
         selectedTerme.setTree(0);
 
@@ -355,7 +355,7 @@ public class NewTreeBean implements Serializable {
     }
 
     public void changeTerme(String id, int type) {
-
+        
         selectedNode.setSelected(false);
 
         for (TreeNode node : selectedNodes) {
@@ -680,8 +680,8 @@ public class NewTreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
             return;
         }
-
-        if (!selectedTerme.creerTermeSpe()) {
+        
+        if (!selectedTerme.creerTermeSpe(((MyTreeNode)selectedNode))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             return;
         } else {

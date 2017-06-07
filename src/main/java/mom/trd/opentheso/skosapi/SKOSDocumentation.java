@@ -6,7 +6,7 @@ public class SKOSDocumentation implements SKOSProperty{
 	private int property;
 	
 	public SKOSDocumentation(String text, String lang, int prop) throws Exception{
-		if(30 <=prop && prop <= 35){
+		if(30 <=prop && prop <= 36){
 			this.text = text;
 			this.language = lang;
 			this.property = prop;

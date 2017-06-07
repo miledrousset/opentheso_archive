@@ -135,7 +135,7 @@ public class WriteRdf4j {
             Literal literal = vf.createLiteral(doc.getText(), doc.getLanguage());
             switch (prop) {
                 case SKOSProperty.definition:
-                    builder.add(SKOS.NOTE, literal);
+                    builder.add(SKOS.DEFINITION, literal);
                     break;
                 case SKOSProperty.scopeNote:
                     builder.add(SKOS.SCOPE_NOTE, literal);

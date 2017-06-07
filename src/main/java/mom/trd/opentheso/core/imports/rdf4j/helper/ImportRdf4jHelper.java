@@ -390,9 +390,20 @@ public class ImportRdf4jHelper {
                 } catch (SQLException ex) {
                 }
 
+                // For Concept : customnote ; scopeNote ; historyNote
+                // For Term : definition; editorialNote; historyNote; 
                 for (NodeNote nodeNoteList1 : acs.nodeNotes) {
-                    acs.noteHelper.addConceptNote(ds, acs.concept.getIdConcept(), nodeNoteList1.getLang(),
-                            thesaurus.getId_thesaurus(), nodeNoteList1.getLexicalvalue(), nodeNoteList1.getNotetypecode(), idUser);
+
+                    if (nodeNoteList1.getNotetypecode().equals("customnote") || nodeNoteList1.getNotetypecode().equals("scopeNote") || nodeNoteList1.getNotetypecode().equals("historyNote") || nodeNoteList1.getNotetypecode().equals("note") ) {
+                        acs.noteHelper.addConceptNote(ds, acs.concept.getIdConcept(), nodeNoteList1.getLang(),
+                                thesaurus.getId_thesaurus(), nodeNoteList1.getLexicalvalue(), nodeNoteList1.getNotetypecode(), idUser);
+                    }
+
+                    if (nodeNoteList1.getNotetypecode().equals("definition") || nodeNoteList1.getNotetypecode().equals("editorialNote") ) {
+                        acs.noteHelper.addTermNote(ds, acs.nodeTerm.getIdTerm(), nodeNoteList1.getLang(),
+                                thesaurus.getId_thesaurus(), nodeNoteList1.getLexicalvalue(), nodeNoteList1.getNotetypecode(), idUser);
+                    }
+
                 }
 
                 for (NodeAlignment nodeAlignment : acs.nodeAlignments) {
@@ -409,13 +420,11 @@ public class ImportRdf4jHelper {
                     acs.termHelper.addNonPreferredTerm(ds, acs.term, idUser);
                 }
 
-                if (acs.nodeGps.getLatitude() != 0.0) {
-                    if (acs.nodeGps.getLongitude() != 0.0) {
-                        // insertion des données GPS
-                        acs.gpsHelper.insertCoordonees(ds, acs.concept.getIdConcept(),
-                                thesaurus.getId_thesaurus(),
-                                acs.nodeGps.getLatitude(), acs.nodeGps.getLongitude());
-                    }
+                if (acs.nodeGps.getLatitude() != null && acs.nodeGps.getLongitude() != null) {
+                    // insertion des données GPS
+                    acs.gpsHelper.insertCoordonees(ds, acs.concept.getIdConcept(),
+                            thesaurus.getId_thesaurus(),
+                            acs.nodeGps.getLatitude(), acs.nodeGps.getLongitude());
                 }
 
                 for (String idTopConcept1 : idTopConcept) {
@@ -460,8 +469,8 @@ public class ImportRdf4jHelper {
             acs.nodeGps.setLongitude(Double.parseDouble(gPSCoordinates.getLon()));
 
         } catch (Exception e) {
-            acs.nodeGps.setLatitude(0.0);
-            acs.nodeGps.setLongitude(0.0);
+            acs.nodeGps.setLatitude(null);
+            acs.nodeGps.setLongitude(null);
         }
 
     }

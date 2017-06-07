@@ -149,8 +149,9 @@ public class ExportRdf4jHelper {
                 concept.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.altLabel);
             }
         }
-
-        addNoteGiven(nodeConcept.getNodeNoteConcept(), concept, selectedLanguages);
+        ArrayList<NodeNote> nodeNotes = nodeConcept.getNodeNoteConcept();
+        nodeNotes.addAll(nodeConcept.getNodeNoteTerm());
+        addNoteGiven(nodeNotes, concept, selectedLanguages);
         addGPSGiven(nodeConcept.getNodeGps(), concept);
         addAlignementGiven(nodeConcept.getNodeAlignmentsList(), concept);
         addRelationUriGiven(nodeConcept.getNodeListIdsOfBT(), nodeConcept.getNodeListIdsOfNT(), nodeConcept.getNodeListIdsOfRT(), concept);
@@ -485,7 +486,7 @@ public class ExportRdf4jHelper {
                 continue;
             }
 
-            int prop = -1;
+            int prop;
             switch (note.getNotetypecode()) {
                 case "scopeNote":
                     prop = SKOSProperty.scopeNote;

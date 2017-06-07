@@ -121,7 +121,7 @@ public class SelectedTerme implements Serializable {
     private String notation;
     private String idTheso;
     private String idlangue;
-    private String idDomaine; 
+    private String idDomaine;
     private String typeDomaine; // MT, C, Gr ...
     private String idTopConcept;
     private int nbNotices;
@@ -314,11 +314,11 @@ public class SelectedTerme implements Serializable {
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
         majTAsso();
-        
+
         GroupHelper groupHelper = new GroupHelper();
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
-        
-        if (groupHelper.isIdOfGroup(connect.getPoolConnexion(),idC,idTheso)) {
+
+        if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idC, idTheso)) {
             microTheso = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
 
             NodeGroup ncg = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
@@ -331,12 +331,11 @@ public class SelectedTerme implements Serializable {
                 dateC = dateFormat.format(ncg.getCreated());
                 dateM = dateFormat.format(ncg.getModified());
             }
-            
+
             majGroupTGen();
             majLangueGroup();
             majTSpeGroup();
-            
-          
+            majNotes();
 
         } else {
             Concept concept = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -426,7 +425,7 @@ public class SelectedTerme implements Serializable {
         }
 
     }
-    
+
     public String urlEncodeUtf_8(String value) {
         try {
             return URLEncoder.encode(value, "UTF-8");
@@ -440,18 +439,17 @@ public class SelectedTerme implements Serializable {
         ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
         urlNotice = bundlePref.getString("url.bdd");
-        if(bdd_useId) {
-             urlNotice = urlNotice.replace("terme", idC);
-        }
-        else {
+        if (bdd_useId) {
+            urlNotice = urlNotice.replace("terme", idC);
+        } else {
             urlNotice = urlNotice.replace("terme", nom);
         }
-       // try {
-            
-          //  urlNotice = URLEncoder.encode(urlNotice);
-       // } catch (UnsupportedEncodingException ex) {
-       //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-       // }
+        // try {
+
+        //  urlNotice = URLEncoder.encode(urlNotice);
+        // } catch (UnsupportedEncodingException ex) {
+        //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        // }
     }
 
     private void majTAsso() {
@@ -495,7 +493,7 @@ public class SelectedTerme implements Serializable {
             tempMap1.put(tGroup, value);
             termesSpecifique.addAll(tempMap1.entrySet());
         }*/
-        
+
     }
 
     private void majGroup() {
@@ -659,8 +657,8 @@ public class SelectedTerme implements Serializable {
             termeGenerique.addAll(tempMap2.entrySet());
         }
     }
-    
-     private void majGroupTGen() {
+
+    private void majGroupTGen() {
         termeGenerique = new ArrayList<>();
         // On ajoute le domaine
         ArrayList<String> listIdGroup = new ConceptHelper().getListGroupParentIdOfGroup(connect.getPoolConnexion(), idC, idTheso);
@@ -682,7 +680,6 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    
     public void majSearch() {
         if (nodeSe.isTopConcept()) {
             type = 2;
@@ -761,15 +758,17 @@ public class SelectedTerme implements Serializable {
     /**
      * Crée un nouveau terme spécifique au terme sélectionné
      *
+     * @param selecedTerm
      * @return true or false
      */
-    public boolean creerTermeSpe() {
+    public boolean creerTermeSpe(MyTreeNode selecedTerm) {
         ConceptHelper instance = new ConceptHelper();
         instance.setIdentifierType(identifierType);
-
-        if (type == 1) {
+        // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
+        if (type == 1 ||type == 2) {
+            // ici c'est le cas d'un Group ou Sous Group, on crée un TT Top Terme
             Concept concept = new Concept();
-            concept.setIdGroup(idC);
+            concept.setIdGroup(selecedTerm.getIdMot());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
             concept.setNotation("");
@@ -798,7 +797,7 @@ public class SelectedTerme implements Serializable {
         } else {
 
             Concept concept = new Concept();
-            concept.setIdGroup(idDomaine);
+            concept.setIdGroup(selecedTerm.getIdMot());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
             concept.setNotation("");
@@ -978,7 +977,7 @@ public class SelectedTerme implements Serializable {
 
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-                p.put("RepositoryDataSourceURL", "file:"  + cheminNotice1);
+                p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
                 p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
                 p.put("ConvertorConfigFile", cheminNotice2);
                 Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
@@ -1962,11 +1961,11 @@ public class SelectedTerme implements Serializable {
                         return false;
                     }
                 } else // on coupe la branche de son BT
-                 if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
-                        conn.rollback();
-                        conn.close();
-                        return false;
-                    }
+                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
                 conn.commit();
                 conn.close();
 
@@ -2336,9 +2335,9 @@ public class SelectedTerme implements Serializable {
         for (NodeConceptTree n : racineNode) {
             TreeNode dynamicTreeNode;
             if (n.getTitle().trim().isEmpty()) {
-                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "","", "dossier", n.getIdConcept(), root);
+                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "", "dossier", n.getIdConcept(), root);
             } else {
-                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "","", "", "dossier", n.getTitle(), root);
+                dynamicTreeNode = (TreeNode) new MyTreeNode(1, n.getIdConcept(), idTheso, idlangue, "", "", "", "dossier", n.getTitle(), root);
             }
 
             DefaultTreeNode defaultTreeNode = new DefaultTreeNode("fake", dynamicTreeNode);
@@ -2389,7 +2388,7 @@ public class SelectedTerme implements Serializable {
 
             // Ajout dans l'arbre
             for (NodeConceptTree nct : liste) {
-                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "","", "fichier", nct.getTitle() + "(" + nct.getIdConcept() + ")", event.getTreeNode());
+                new MyTreeNode(3, nct.getIdConcept(), theso, lang, "", "", "", "fichier", nct.getTitle() + "(" + nct.getIdConcept() + ")", event.getTreeNode());
             }
         }
     }
@@ -3222,8 +3221,6 @@ public class SelectedTerme implements Serializable {
     public void setBdd_active(boolean bdd_active) {
         this.bdd_active = bdd_active;
     }
-    
-    
 
     public String getTotalConceptOfBranch() {
         if (totalConceptOfBranch.isEmpty()) {
