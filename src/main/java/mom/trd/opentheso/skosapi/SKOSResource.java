@@ -308,6 +308,8 @@ public class SKOSResource {
      * @param langCode
      * @param langCode2
      * @param idToNameHashMap
+     * @param idToIsTrad
+     * @param resourceChecked
      * @return
      */
     public static Comparator<SKOSResource> sortAlphabeticInLang(boolean isTrad, String langCode, String langCode2, HashMap<String, String> idToNameHashMap, HashMap<String, ArrayList<Integer>> idToIsTrad, ArrayList<String> resourceChecked) {
@@ -361,6 +363,8 @@ public class SKOSResource {
             this.isTrad = isTrad;
             this.resourceChecked = resourceChecked;
             this.idToIsTradDiff = idToIsTradDiff;
+            
+            this.idToNameHashMap.clear();
 
         }
 
@@ -606,6 +610,8 @@ public class SKOSResource {
             this.langCode2 = langCode2;
             this.idToIsTrad = idToIsTrad;
             this.resourceChecked = resourceChecked;
+            
+            this.idToNameHashMap.clear();
         }
 
         @Override

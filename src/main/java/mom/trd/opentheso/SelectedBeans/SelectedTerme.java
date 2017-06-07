@@ -765,7 +765,7 @@ public class SelectedTerme implements Serializable {
         ConceptHelper instance = new ConceptHelper();
         instance.setIdentifierType(identifierType);
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
-        if (type == 1 ||type == 2) {
+        if (selecedTerm.isIsSubGroup() ||selecedTerm.isIsGroup()) {
             // ici c'est le cas d'un Group ou Sous Group, on crée un TT Top Terme
             Concept concept = new Concept();
             concept.setIdGroup(selecedTerm.getIdMot());
@@ -797,7 +797,7 @@ public class SelectedTerme implements Serializable {
         } else {
 
             Concept concept = new Concept();
-            concept.setIdGroup(selecedTerm.getIdMot());
+            concept.setIdGroup(selecedTerm.getIdDomaine());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
             concept.setNotation("");
