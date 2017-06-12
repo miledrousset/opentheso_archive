@@ -1,0 +1,73 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <p:dialog id="idImportBranchDlg"  header="#{langueBean.getMsg('edit.import')}" styleClass="styleText2" widgetVar="importBranchDlg" modal="true" resizable="false"  >
+
+                
+
+
+
+
+            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+
+                <p:messages showDetail="true" autoUpdate="true" />
+                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
+                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                <h:inputText value="#{rdf4jFileBean.formatDate}" />
+                <br/><br/>
+                <p:outputLabel for="idTypeImportSingle" value="#{langueBean.getMsg('export.type')} :" />
+                <p:selectOneMenu id="idTypeImportSingle" value="#{rdf4jFileBean.typeImport}">
+                    <f:selectItem itemLabel="Skos" itemValue="0" />
+                    <f:selectItem itemLabel="Json-ld" itemValue="1" />
+                    <f:selectItem itemLabel="Turtle" itemValue="2" />
+                </p:selectOneMenu>
+                <br/><br/>
+                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
+                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{rdf4jFileBean.chargeFile}" process="@form"
+                              onstart="PrimeFaces.monitorDownload(start_import_branche);PF('pbAjax').start();" 
+                              update="@form" oncomplete="PrimeFaces.monitorDownload(stop_import_branche)" disabled="#{!rdf4jFileBean.uploadEnable}"/>
+                
+                
+                
+                <br/> 
+                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.inserBranch(idUser, idRole,selectedTerme)}" 
+                                 onclick="PrimeFaces.monitorDownload(start_import_branche);PF('pbAjax').start();" 
+                                 oncomplete="PrimeFaces.monitorDownload(stop_import_branche);PF('importBranchDlg').hide();" 
+                                 update=":idImportBranchDlg,:accordeonTree,:panContenu"
+                                 />
+            </h:form>
+
+
+
+            <p:dialog modal="true" widgetVar="importBrancheWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
+                <p:graphicImage id="exportLoadingImage2" value="/images/loading.gif" width="50"/>
+
+                <br />
+                <p:progressBar widgetVar="pbAjax" ajax="true" value="0" labelTemplate="{value}%" styleClass="animated" global="false"/>
+
+
+            </p:dialog>
+
+
+        </p:dialog>
+
+        <script type="text/javascript">
+            function start_import_branche() {
+                PF('importBrancheWait').show();
+            }
+
+            function stop_import_branche() {
+                PF('importBrancheWait').hide();
+
+            }
+        </script> 
+
+
+    </ui:composition>

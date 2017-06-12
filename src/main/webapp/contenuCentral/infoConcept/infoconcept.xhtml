@@ -37,6 +37,11 @@
                             <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
                         </p:submenu>
 
+                        <p:submenu rendered="#{(selectedTerme.type != 1) }"  label="#{langueBean.getMsg('edit.import')}" styleClass="cbSeparateMenu">
+                            <p:menuitem value="#{langueBean.getMsg('concept')}" style="font-size: 12px;" update=":idImportSingleConceptDlg" oncomplete="PF('importSingleConceptDlg').show();"/>
+                            <p:menuitem value="#{langueBean.getMsg('alig.bran')}" style="font-size: 12px;" update=":idImportBranchDlg" oncomplete="PF('importBranchDlg').show();"/>
+                        </p:submenu>
+
                     </p:menu>
                 </h:form>
                 <!--options pour les orphelins -->

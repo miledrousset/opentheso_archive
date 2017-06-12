@@ -44,10 +44,8 @@
             <ui:include src="/dialogs/export/exportDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
-            <ui:include src="/dialogs/import/importSkosDlg.xhtml" />
-            <ui:include src="/dialogs/import/importSkosRdf4jDlg.xhtml" />
-            <ui:include src="/dialogs/import/importJsonLdRdf4jDlg.xhtml" />
-            <ui:include src="/dialogs/import/importTurtleRdf4jDlg.xhtml" />
+            <ui:include src="/dialogs/import/importDlg.xhtml" />
+
             
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -552,23 +550,9 @@
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
 
                             
-                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')}"  update=":idImportSkosDlg" oncomplete="PF('importSkosDlg').show();"
+                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  update=":idImportDlg" oncomplete="PF('importDlg').show();"
                                                     style="font-size: 12px;"/> 
-                            
-                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')} RDF4J"  update=":idImportSkosRdf4jDlg" oncomplete="PF('importSkosRdf4jDlg').show();"
-                                                    style="font-size: 12px;"/> 
-                            
-                            <p:menuitem value="JSON-LD RDF4J"  update=":idImportJsonLdRdf4jDlg" oncomplete="PF('importJsonLdRdf4jDlg').show();"
-                                                    style="font-size: 12px;"/> 
-                            
-                            <p:menuitem value="TURTLE RDF4J"  update=":idImportTurtleRdf4jDlg" oncomplete="PF('importTurtleRdf4jDlg').show();"
-                                                    style="font-size: 12px;"/> 
-                            
-                            
-                            <p:menuitem value="#{langueBean.getMsg('edit.importskos')} new Version" actionListener="#{vue.setAddSkos2(true)}" 
-                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/> 
-                            
-                            
+                                     
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
 
