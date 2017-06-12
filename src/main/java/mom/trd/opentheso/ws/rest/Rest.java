@@ -156,23 +156,7 @@ public class Rest {
         return skos.toString();
     }
 
-    /**
-     * Pour retourner une branche complète d'un domaine (Groupe) en SKOS avec
-     * ses concepts
-     *
-     * @param idGroup
-     * @param idTheso
-     * @return
-     */
-    @Path("/skos/concept/all/idg={idg}&th={th}")
-    @GET
-    @Produces("application/xml;charset=UTF-8")
-    public String getConceptsOfGroup(@PathParam("idg") String idGroup,
-            @PathParam("th") String idTheso) {
-        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
-        ds.close();
-        return skos.toString();
-    }
+
 
     /**
      * Pour retourner un domaine (Groupe) en SKOS
@@ -273,10 +257,59 @@ public class Rest {
     }
 
     
+    /**
+     * Pour retourner une branche complète d'un domaine (Groupe) en SKOS avec
+     * ses concepts
+     *
+     * @param idGroup
+     * @param idTheso
+     * @return
+     */
+    @Path("/skos/concept/all/idg={idg}&th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getConceptsOfGroup(@PathParam("idg") String idGroup,
+            @PathParam("th") String idTheso) {
+        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
+        ds.close();
+        return skos.toString();
+    }    
     
     
+    /**
+     * Pour retourner une branche complète à partir d'un concept en SKOS
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    @Path("/skos/concept/all/idc={idc}&th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getBrancheOfConcepts(@PathParam("idc") String idConcept,
+            @PathParam("th") String idTheso) {
+        StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
+        ds.close();
+        return skos.toString();
+    }       
     
-    
+    /**
+     * Pour retourner une branche complète à partir d'un concept en SKOS
+     * (pour répondre aussi à l'argument "id")
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    @Path("/skos/concept/all/id={id}&th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public String getBrancheOfConcepts2(@PathParam("id") String idConcept,
+            @PathParam("th") String idTheso) {
+        StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
+        ds.close();
+        return skos.toString();
+    }         
     
     
 /////////////////////////////////////////////////////    
@@ -712,6 +745,31 @@ public class Rest {
         StringBuffer skos = exportFromBDD.exportGroup(ds, idThesaurus, idGroup);
         return skos;
     }
+    
+    /**
+     * Fonction qui permet de récupérer une branche complète en partant d'un concept
+     *
+     * @param idGroup
+     * @param idThesaurus
+     * @return skos
+     */
+    private StringBuffer brancheOfConceptsToSkos(String idConcept, String idThesaurus) {
+
+        if (ds == null) {
+            return null;
+        }
+        if (prefs == null) {
+            return null;
+        }
+
+        ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setServerArk(prefs.getProperty("serverArk"));
+        exportFromBDD.setServerAdress(prefs.getProperty("cheminSite"));
+        StringBuffer skos = exportFromBDD.exportBranchOfConcept(ds, idThesaurus, idConcept);
+        return skos;
+    }    
+    
+    
 
     /**
      * Fonction qui permet de récupérer les groupes d'un thésauurs
