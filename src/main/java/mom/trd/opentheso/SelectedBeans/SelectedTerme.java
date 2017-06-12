@@ -1599,6 +1599,30 @@ public class SelectedTerme implements Serializable {
      * *************************************** EDITION
      * ****************************************
      */
+      
+     /** 
+      * Permet de modifier le nom d'un Group ou sousGroup 
+      * 
+     * @param idTheso
+     * @param idGroup
+     * @param idLangue
+     * @param value
+     * @return 
+     * #MR
+     */
+     public boolean editGroupName(String idTheso, String idGroup,
+             String idLangue, String value){
+         
+         GroupHelper groupHelper = new GroupHelper();
+         ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
+         conceptGroupLabel.setIdthesaurus(idTheso);
+         conceptGroupLabel.setIdgroup(idGroup);
+         conceptGroupLabel.setLang(idLangue);
+         conceptGroupLabel.setLexicalvalue(value);
+         return groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId());
+     } 
+    
+    
     /**
      * Modifie le nom du terme selectionné
      *
