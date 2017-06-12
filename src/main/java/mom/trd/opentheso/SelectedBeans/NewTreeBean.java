@@ -393,7 +393,7 @@ public class NewTreeBean implements Serializable {
             //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
         //    selectedNode.setSelected(false);
-        for (TreeNode tn : selectedNodes) {
+         for (TreeNode tn : selectedNodes) {
             tn.setSelected(false);
         }
         selectedNodes = new ArrayList<>();
