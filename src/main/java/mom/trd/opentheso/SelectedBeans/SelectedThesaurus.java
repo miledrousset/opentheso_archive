@@ -108,7 +108,6 @@ public class SelectedThesaurus implements Serializable {
     private boolean internetConection = false;
     //Alignement
 
-
     // niveaux des classes Beans
     // theso -> newtreeBean -> selectedTerme -> user1
     //   4   ->    3     ->      2        ->   1
@@ -116,11 +115,8 @@ public class SelectedThesaurus implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
 
-
-
     @ManagedProperty(value = "#{newtreeBean}")
     private NewTreeBean tree;
-
 
     @ManagedProperty(value = "#{ssTree}")
     private UnderTree uTree;
@@ -139,6 +135,9 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{conceptbean}")
     private ConceptBean conceptbean;
+
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser user;
 
     /**
      * ************************************ INITIALISATION
@@ -291,7 +290,7 @@ public class SelectedThesaurus implements Serializable {
             tree.getSelectedTerme().setIdTheso(idTurl);
             tree.getSelectedTerme().setIdlangue(idLurl);
 
-            MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null,null);
+            MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null, null);
             tree.getSelectedTerme().majTerme(mTN);
             tree.reExpand();
             idCurl = null;
@@ -369,19 +368,9 @@ public class SelectedThesaurus implements Serializable {
      * Constructeur
      */
     public SelectedThesaurus() {
-        thesaurus = new Thesaurus();
-        editTheso = new Thesaurus();
-        nodeCG = new NodeGroup();
-        ResourceBundle bundlePref = getBundlePref();
-        cheminSite = bundlePref.getString("cheminSite");
-        version = "";
-        String useArk = bundlePref.getString("useArk");
-        arkActive = useArk.equals("true");
-        serverArk = bundlePref.getString("serverArk");
-        workLanguage = bundlePref.getString("workLanguage");
-        defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
-        identifierType = bundlePref.getString("identifierType");
 
+        ResourceBundle bundlePref = getBundlePref();
+        defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
         ResourceBundle bundlePrefArk = getBundlePrefArk();
         idNaan = bundlePrefArk.getString("idNaan");
 
@@ -390,6 +379,24 @@ public class SelectedThesaurus implements Serializable {
         idTurl = null;
         idLurl = null;
         arrayTrad = new ArrayList<>();
+
+        thesaurus = new Thesaurus();
+        editTheso = new Thesaurus();
+        nodeCG = new NodeGroup();
+
+        if (user == null || user.getNodePreference() == null) {
+            workLanguage = bundlePref.getString("workLanguage");
+            return;
+        }
+
+        cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
+        version = "";
+        //String useArk = bundlePref.getString("useArk");
+        arkActive = user.getNodePreference().isUseArk();//useArk.equals("true");
+        serverArk = user.getNodePreference().getServeurArk();//bundlePref.getString("serverArk");
+        workLanguage = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
+        Integer temp = user.getNodePreference().getIdentifierType();
+        identifierType = temp.toString();//bundlePref.getString("identifierType");
 
     }
 
@@ -918,7 +925,7 @@ public class SelectedThesaurus implements Serializable {
      */
     public Thesaurus getThisTheso() {
         String idTemp = "", lTemp = "";
-        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+        if (thesaurus == null || thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
             return null;
         }
         if (thesaurus.getLanguage() != null) {
@@ -1053,12 +1060,12 @@ public class SelectedThesaurus implements Serializable {
 
     /**
      * Création d'un domaine avec mise à jour dans l'arbre
+     *
      * @param codeTypeGroup
      * @param titleGroup
-     * @return 
+     * @return
      */
-    
- //   private String typeDom;
+    //   private String typeDom;
     public String addGroup(String codeTypeGroup, String titleGroup) {
 
         String idGroup = null;
@@ -1069,9 +1076,8 @@ public class SelectedThesaurus implements Serializable {
             nodeCG.setLexicalValue(titleGroup);
             nodeCG.setIdLang(thesaurus.getLanguage());
             nodeCG.getConceptGroup().setIdthesaurus(thesaurus.getId_thesaurus());
-            
-            
-        //    boolean haveFather = false;
+
+            //    boolean haveFather = false;
             /*
             if(typeDom == null || typeDom.equals("")){
                  typeDom = getTypeDomainePere();
@@ -1085,20 +1091,20 @@ public class SelectedThesaurus implements Serializable {
                 nodeCG.getConceptGroup().setIdtypecode(codeTypeGroup);
 
             }*/
-            if(codeTypeGroup.isEmpty())
+            if (codeTypeGroup.isEmpty()) {
                 codeTypeGroup = "MT";
+            }
             nodeCG.getConceptGroup().setIdtypecode(codeTypeGroup);
-            
 
             GroupHelper cgh = new GroupHelper();
             int idUser = tree.getSelectedTerme().getUser().getUser().getId();
             idGroup = cgh.addGroup(connect.getPoolConnexion(), nodeCG, cheminSite, arkActive, idUser);
             nodeCG = new NodeGroup();
             vue.setSelectedActionDom(PropertiesNames.noActionDom);
-            
+
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-            
+
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", titleGroup + " " + langueBean.getMsg("theso.info1.2")));
         }
 
@@ -1106,19 +1112,19 @@ public class SelectedThesaurus implements Serializable {
     }
 
     /**
-     * permet d'ajouter un sous groupe avec un type défini,
-     * le groupe père doit exister. Le sous-groupe prend le même type que le père
-     * 
+     * permet d'ajouter un sous groupe avec un type défini, le groupe père doit
+     * exister. Le sous-groupe prend le même type que le père
+     *
      * @param codeTypeGroupFather
-     * @param titleGroupSubGroup 
+     * @param titleGroupSubGroup
      */
     public void addSubGroup(String codeTypeGroupFather, String titleGroupSubGroup) {
-       // typeDom = "";
+        // typeDom = "";
         //si on a bien selectioner un group
         String idGroup = tree.getSelectedTerme().getIdC();
         if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), idGroup, thesaurus.getId_thesaurus())) {
-            String idSubGroup = addGroup(codeTypeGroupFather,titleGroupSubGroup);
-            
+            String idSubGroup = addGroup(codeTypeGroupFather, titleGroupSubGroup);
+
             new GroupHelper().addSubGroup(connect.getPoolConnexion(), idGroup, idSubGroup, thesaurus.getId_thesaurus());
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -1223,7 +1229,7 @@ public class SelectedThesaurus implements Serializable {
         }
 
         // Envoye les domaines (MT)
-        if (thesaurus.getId_thesaurus() != null) {
+        if (thesaurus != null && thesaurus.getId_thesaurus() != null) {
             if (!thesaurus.getId_thesaurus().trim().isEmpty()) {
                 ExportFromBDD exportFromBDD = new ExportFromBDD();
                 exportFromBDD.setServerArk(serverArk);
@@ -1312,7 +1318,6 @@ public class SelectedThesaurus implements Serializable {
     public String getServerArk() {
         return serverArk;
     }
-
 
     public Connexion getConnect() {
         return connect;
@@ -1547,6 +1552,10 @@ public class SelectedThesaurus implements Serializable {
     public ArrayList<Entry<String, String>> getArrayFacette() {
         if (connect.getPoolConnexion() != null) {
 
+            if (thesaurus == null) {
+                return arrayFacette;
+            }
+
             ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             Map<String, String> mapTemp = new HashMap<>();
             for (NodeFacet nf : temp) {
@@ -1669,7 +1678,6 @@ public class SelectedThesaurus implements Serializable {
         this.internetConection = internetConection;
     }
 
-
     public NewTreeBean getTree() {
         return tree;
     }
@@ -1678,5 +1686,76 @@ public class SelectedThesaurus implements Serializable {
         this.tree = tree;
     }
 
-    
+    public String getLangueSource() {
+        return langueSource;
+    }
+
+    public void setLangueSource(String langueSource) {
+        this.langueSource = langueSource;
+    }
+
+    public String getWorkLanguage() {
+        return workLanguage;
+    }
+
+    public void setWorkLanguage(String workLanguage) {
+        this.workLanguage = workLanguage;
+    }
+
+    public String getDefaultThesaurusId() {
+        return defaultThesaurusId;
+    }
+
+    public void setDefaultThesaurusId(String defaultThesaurusId) {
+        this.defaultThesaurusId = defaultThesaurusId;
+    }
+
+    public String getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(String identifierType) {
+        this.identifierType = identifierType;
+    }
+
+    public NodePreference getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(NodePreference nodePreference) {
+        this.nodePreference = nodePreference;
+    }
+
+    public boolean isArkActive() {
+        return arkActive;
+    }
+
+    public void setArkActive(boolean arkActive) {
+        this.arkActive = arkActive;
+    }
+
+    public StreamedContent getFile() {
+        return file;
+    }
+
+    public void setFile(StreamedContent file) {
+        this.file = file;
+    }
+
+    public StreamedContent getFileDownload() {
+        return fileDownload;
+    }
+
+    public void setFileDownload(StreamedContent fileDownload) {
+        this.fileDownload = fileDownload;
+    }
+
+    public CurrentUser getUser() {
+        return user;
+    }
+
+    public void setUser(CurrentUser user) {
+        this.user = user;
+    }
+
 }

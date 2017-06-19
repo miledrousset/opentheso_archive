@@ -59,6 +59,9 @@ public class DownloadBean implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean languageBean;
+    
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser user;
 
     private String serverArk;
     private boolean arkActive;
@@ -96,11 +99,15 @@ public class DownloadBean implements Serializable {
 
     @PostConstruct
     public void initTerme() {
-        ResourceBundle bundlePref = getBundlePref();
-        String temp = bundlePref.getString("useArk");
-        arkActive = temp.equals("true");
-        serverArk = bundlePref.getString("serverArk");
-        serverAdress = bundlePref.getString("cheminSite");
+        if(user == null || user.getNodePreference() == null){
+            return;
+        }
+        
+        //ResourceBundle bundlePref = getBundlePref();
+        //String temp = bundlePref.getString("useArk");
+        arkActive = user.getNodePreference().isUseArk();//temp.equals("true");
+        serverArk = user.getNodePreference().getServeurArk();//bundlePref.getString("serverArk");
+        serverAdress = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
     }
 
     /**
@@ -792,4 +799,45 @@ public class DownloadBean implements Serializable {
     public void setConnect(Connexion connect) {
         this.connect = connect;
     }
+
+    public CurrentUser getUsesr() {
+        return user;
+    }
+
+    public void setUsesr(CurrentUser usesr) {
+        this.user = usesr;
+    }
+
+    public String getServerArk() {
+        return serverArk;
+    }
+
+    public void setServerArk(String serverArk) {
+        this.serverArk = serverArk;
+    }
+
+    public boolean isArkActive() {
+        return arkActive;
+    }
+
+    public void setArkActive(boolean arkActive) {
+        this.arkActive = arkActive;
+    }
+
+    public String getServerAdress() {
+        return serverAdress;
+    }
+
+    public void setServerAdress(String serverAdress) {
+        this.serverAdress = serverAdress;
+    }
+
+    public CurrentUser getUser() {
+        return user;
+    }
+
+    public void setUser(CurrentUser user) {
+        this.user = user;
+    }
+    
 }

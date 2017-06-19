@@ -5,14 +5,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ResourceBundle;
+import javax.faces.bean.ManagedProperty;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import mom.trd.opentheso.SelectedBeans.CurrentUser;
+import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
+import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
+
+
 
 @WebServlet("/pix/*")
 public class ImageServlet extends HttpServlet {
+    
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser usesr;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,7 +42,7 @@ public class ImageServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ImageServlet</title>");            
+            out.println("<title>Servlet ImageServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ImageServlet at " + request.getContextPath() + "</h1>");
@@ -55,9 +65,10 @@ public class ImageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ResourceBundle bundlePref = ResourceBundle.getBundle("preferences");
         String filename = request.getPathInfo().substring(1);
-        File file = new File(bundlePref.getString("pathImage"), filename);
+
+        File file = new File(usesr.getNodePreference().getPathImage(), filename);
+
         response.setHeader("Content-Type", getServletContext().getMimeType(filename));
         response.setHeader("Content-Length", String.valueOf(file.length()));
         response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
@@ -87,5 +98,13 @@ public class ImageServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    public CurrentUser getUsesr() {
+        return usesr;
+    }
+
+    public void setUsesr(CurrentUser usesr) {
+        this.usesr = usesr;
+    }
 
 }
