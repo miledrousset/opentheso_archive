@@ -1059,6 +1059,25 @@ END;
 $$ LANGUAGE plpgsql; 
 
 --
+--Permet d'ajouter les 3 columns boolean dans la table preferences
+--
+CREATE OR REPLACE FUNCTION ajoutercolumn2_preferences() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE COLUMN_NAME = 'identifier_type' AND TABLE_NAME = 'preferences') THEN
+	Execute
+	'
+         Alter TABLE preferences ADD COLUMN gps_id_source Integer  ;
+	 Alter TABLE preferences ADD COLUMN gps_integrertraduction boolean  default true;
+	 Alter TABLE preferences ADD COLUMN gps_reemplacertraduction boolean  default true;
+	 Alter TABLE preferences ADD COLUMN gps_alignementautomatique boolean  default true;
+	 ';
+    END IF;
+END;
+$$ LANGUAGE plpgsql; 
+
+
+--
 --Permet de change l'ancian constraint pour autre nouvelle
 --
 create or replace function changeconstraintalignement() returns void as $$
@@ -1492,6 +1511,7 @@ SELECT create_table_users_historique();
 SELECT add_primary_keyalignement_source();
 SELECT alignement_preferences();
 SELECT gps_preferences();
+
 
 SELECT primary_key_info();
 
