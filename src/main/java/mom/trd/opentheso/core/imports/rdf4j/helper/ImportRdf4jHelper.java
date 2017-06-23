@@ -117,7 +117,7 @@ public class ImportRdf4jHelper {
      *
      * @param selectedTerme
      */
-    public void addSingleConcept(SelectedTerme selectedTerme) {
+    public void addSingleConcept(SelectedTerme selectedTerme) throws SQLException, ParseException {
 
         String idGroup = selectedTerme.getIdDomaine();
         String idConceptPere = selectedTerme.getIdC();
@@ -151,7 +151,7 @@ public class ImportRdf4jHelper {
      *
      * @param selectedTerme
      */
-    public void addBranch(SelectedTerme selectedTerme) {
+    public void addBranch(SelectedTerme selectedTerme) throws ParseException, SQLException {
 
         String idGroup = selectedTerme.getIdDomaine();
         String idConceptPere = selectedTerme.getIdC();
@@ -226,7 +226,7 @@ public class ImportRdf4jHelper {
      *
      * @return
      */
-    public String addThesaurus() {
+    public String addThesaurus() throws SQLException {
         thesaurus = new Thesaurus();
 
         SKOSResource conceptScheme = skosXmlDocument.getConceptScheme();
@@ -247,64 +247,58 @@ public class ImportRdf4jHelper {
 
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         thesaurusHelper.setIdentifierType("2");
-        try {
-            Connection conn = ds.getConnection();
-            conn.setAutoCommit(false);
-            String idTheso;
-            if (thesaurus.getLanguage() == null) {
-                thesaurus.setLanguage(langueSource);
-            }
-            if ((idTheso = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null) {
-                conn.rollback();
-                conn.close();
-                return null;
-            }
-            // Si le Titre du thésaurus n'est pas detecter, on donne un nom par defaut
-            if (skosXmlDocument.getConceptScheme().getLabelsList().isEmpty()) {
-                if (thesaurus.getTitle().isEmpty()) {
-                    thesaurus.setTitle("theso_" + idTheso);
-                    //thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
-                }
-            }
-
-            thesaurus.setId_thesaurus(idTheso);
-            this.idTheso = idTheso;
-            // boucler pour les traductions
-            for (SKOSLabel label : skosXmlDocument.getConceptScheme().getLabelsList()) {
-
-                if (thesaurus.getLanguage() == null) {
-                    String workLanguage = "fr"; //test
-                    thesaurus.setLanguage(workLanguage);
-                }
-                thesaurus.setTitle(label.getLabel());
-                thesaurus.setLanguage(label.getLanguage());
-
-                if (!thesaurusHelper.addThesaurusTraductionRollBack(conn, thesaurus)) {
-                    conn.rollback();
-                    conn.close();
-                    return null;
-                }
-            }
-
-            UserHelper userHelper = new UserHelper();
-            if (!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
-                conn.rollback();
-                conn.close();
-                return null;
-            }
-            conn.commit();
-            conn.close();
-            idGroupDefault = getNewGroupId();
-
-            for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
-                hasTopConcceptList.add(relation.getTargetUri());
-            }
-
-            return null;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ImportSkosHelper.class.getName()).log(Level.SEVERE, null, ex);
+        Connection conn = ds.getConnection();
+        conn.setAutoCommit(false);
+        String idTheso;
+        if (thesaurus.getLanguage() == null) {
+            thesaurus.setLanguage(langueSource);
         }
+        if ((idTheso = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null) {
+            conn.rollback();
+            conn.close();
+            return null;
+        }
+        // Si le Titre du thésaurus n'est pas detecter, on donne un nom par defaut
+        if (skosXmlDocument.getConceptScheme().getLabelsList().isEmpty()) {
+            if (thesaurus.getTitle().isEmpty()) {
+                thesaurus.setTitle("theso_" + idTheso);
+                //thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
+            }
+        }
+
+        thesaurus.setId_thesaurus(idTheso);
+        this.idTheso = idTheso;
+        // boucler pour les traductions
+        for (SKOSLabel label : skosXmlDocument.getConceptScheme().getLabelsList()) {
+
+            if (thesaurus.getLanguage() == null) {
+                String workLanguage = "fr"; //test
+                thesaurus.setLanguage(workLanguage);
+            }
+            thesaurus.setTitle(label.getLabel());
+            thesaurus.setLanguage(label.getLanguage());
+
+            if (!thesaurusHelper.addThesaurusTraductionRollBack(conn, thesaurus)) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+        }
+
+        UserHelper userHelper = new UserHelper();
+        if (!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
+            conn.rollback();
+            conn.close();
+            return null;
+        }
+        conn.commit();
+        conn.close();
+        idGroupDefault = getNewGroupId();
+
+        for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
+            hasTopConcceptList.add(relation.getTargetUri());
+        }
+
         return null;
     }
 
@@ -438,7 +432,7 @@ public class ImportRdf4jHelper {
 
     }
 
-    public void addConcepts(rdf4jFileBean fileBean) {
+    public void addConcepts(rdf4jFileBean fileBean) throws SQLException, ParseException {
 
         AddConceptsStruct acs = new AddConceptsStruct();
         acs.conceptHelper = new ConceptHelper();
@@ -475,10 +469,10 @@ public class ImportRdf4jHelper {
         addLangsToThesaurus(ds, idTheso);
     }
 
-    private void finalizeAddConceptStruct(AddConceptsStruct acs) {
+    private void finalizeAddConceptStruct(AddConceptsStruct acs) throws SQLException {
         acs.termHelper.insertTerm(ds, acs.nodeTerm, idUser);
 
-        try {
+        
             Connection conn = ds.getConnection();
             conn.setAutoCommit(false);
 
@@ -487,8 +481,7 @@ public class ImportRdf4jHelper {
             }
             conn.commit();
             conn.close();
-        } catch (SQLException ex) {
-        }
+        
 
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote;
@@ -546,7 +539,7 @@ public class ImportRdf4jHelper {
         acs.nodeGps = new NodeGps();
     }
 
-    private void initAddConceptsStruct(AddConceptsStruct acs, SKOSResource conceptResource) {
+    private void initAddConceptsStruct(AddConceptsStruct acs, SKOSResource conceptResource) throws ParseException {
         acs.conceptResource = conceptResource;
         acs.concept = new Concept();
         acs.concept.setIdConcept(getIdFromUri(conceptResource.getUri()));
@@ -664,23 +657,19 @@ public class ImportRdf4jHelper {
         }
     }
 
-    private void addDate(AddConceptsStruct acs) {
+    private void addDate(AddConceptsStruct acs) throws ParseException {
 
         //date
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
         for (SKOSDate date : acs.conceptResource.getDateList()) {
             if (date.getProperty() == SKOSProperty.created) {
-                try {
+                
                     acs.concept.setCreated(simpleDateFormat.parse(date.getDate()));
-                } catch (ParseException ex) {
-                    Logger.getLogger(ImportRdf4jHelper.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                
             } else if ((date.getProperty() == SKOSProperty.modified)) {
-                try {
+                
                     acs.concept.setModified(simpleDateFormat.parse(date.getDate()));
-                } catch (ParseException ex) {
-                    Logger.getLogger(ImportRdf4jHelper.class.getName()).log(Level.SEVERE, null, ex);
-                }
+               
             }
         }
 

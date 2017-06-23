@@ -41,6 +41,18 @@ input[type="button"], input[type="submit"]{
     border-color: #A9A691;
 }
 
+.infoAcordionPanel{
+    color: #3333ff !important;
+}
+
+.errorAcordionPanel{
+    color: #ff3333 !important;
+}
+
+.warningAcordionPanel{
+    color: #999900 !important;
+}
+
 .cbSupp {
     background: none !important;
     border: none !important;
@@ -58,7 +70,7 @@ input[type="button"], input[type="submit"]{
 .ui-tree-droppoint{
     height: 0px;
     width: 0px;
-    
+
 }
 
 .ui-icon-ok {
@@ -242,7 +254,7 @@ input[type="button"], input[type="submit"]{
     padding: 2px;
     padding-left: 27px;
     padding-right: 27px;
-    
+
 }
 
 .styleFacetteTerm {
@@ -366,7 +378,7 @@ input[type="button"], input[type="submit"]{
     background: url("../images/submicroThesoOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;
-    
+
 }
 
 .ui-icon-dossier-open {
@@ -449,9 +461,9 @@ input[type="button"], input[type="submit"]{
 .styleTab  {
     height: 400px;
 }
- /*
+/*
 .ui-datatable .ui-datatable-scrollable-body{
-    height: 399px !important;
+   height: 399px !important;
 }*/
 
 .panelNoBorder, .panelNoBorder tr, .panelNoBorder td{
@@ -842,7 +854,7 @@ input[type="button"], input[type="submit"]{
 #droite {
     text-align: left;
     width: 200px;
-    
+
 }
 
 /*Division image (bas droit)*/
@@ -1226,7 +1238,7 @@ input[type="button"], input[type="submit"]{
 
 .ui-tabs .ui-tabs-nav li a {
     font-family: "Palatino linotype",Times,serif !important;
-    
+
 }
 
 #tableTradCdt{
@@ -1472,7 +1484,7 @@ input[type="button"], input[type="submit"]{
     width: 300px; 
     overflow-y: auto;
     margin-top: 10px;
-    
+
 }
 
 .textInfoTitle {
@@ -1568,19 +1580,19 @@ pre {
 
 /* Accordion infos */
 .accordionMenu .ui-menu {
- width:100% !important; 
+    width:100% !important; 
 
 }
 .accordionMenu .ui-accordion-content {
- padding:0 !important;
- overflow:auto !important;
- background: #F0E6CB;
+    padding:0 !important;
+    overflow:auto !important;
+    background: #F0E6CB;
 
 }
 
 .accordionMenu .ui-helper-clearfix:after {
- height:inherit !important;
- 
+    height:inherit !important;
+
 }
 
 #accordeonTree .ui-accordion-content{
@@ -1614,6 +1626,8 @@ pre {
 
 /* style de FieldSet*/
 fieldset {
+    /*padding: 10px;*/
+    margin: 4px;
     background: none;
     font-size: 12px;
     text-shadow: none;
@@ -1625,8 +1639,8 @@ fieldset {
 }
 label
 {
-  margin-bottom:0px;
-  margin-left:16px;
+    margin-bottom:0px;
+    margin-left:16px;
 }
 
 

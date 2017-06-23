@@ -13,11 +13,11 @@
 
             <h:form id="formEditPref">
                 <h:panelGrid columns="1" >
-                <p:scrollPanel style="width:400px;height:700px" mode="native">
+                    <p:scrollPanel style="width:450px;height:700px; border: 0px;" mode="native">
                     
 
-                        <p:fieldset legend="Générale" toggleable="true" collapsed="false">
-                            <h:panelGrid columns="2">
+                        <p:fieldset legend="Générale" toggleable="true" collapsed="false" style="text-align: center; margin-top: 30px;"  >
+                            <h:panelGrid columns="2" style="text-align: left">
 
                                 <h:outputLabel value="chemin site" />
                                 <h:inputText value="#{user1.nodePreference.cheminSite}" />
@@ -54,9 +54,9 @@
                             </h:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="ark" toggleable="true" collapsed="true">
+                        <p:fieldset legend="ark" toggleable="true" collapsed="true" style="text-align: center; margin-top: 30px;">
 
-                            <h:panelGrid columns="2">
+                            <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="use ark :" />
                                 <h:selectOneRadio value="#{user1.nodePreference.useArk}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
@@ -70,9 +70,9 @@
                         </p:fieldset>
 
 
-                        <p:fieldset legend="image" toggleable="true" collapsed="true">
+                        <p:fieldset legend="image" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
 
-                            <h:panelGrid columns="2">
+                            <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="path image" />
                                 <h:inputText value="#{user1.nodePreference.pathImage}" />
 
@@ -82,9 +82,9 @@
                             </h:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="mail" toggleable="true" collapsed="true">
+                        <p:fieldset legend="mail" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
 
-                            <h:panelGrid columns="2">
+                            <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="protocole mail" />
                                 <h:inputText value="#{user1.nodePreference.protcolMail}" />
 
@@ -108,9 +108,9 @@
                             </h:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="BDD" toggleable="true" collapsed="true">
+                        <p:fieldset legend="BDD" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
 
-                            <h:panelGrid columns="2">
+                            <h:panelGrid columns="2" style="text-align: left">
 
                                 <h:outputLabel value="BDD active" />
                                 <h:selectOneRadio value="#{user1.nodePreference.bddActive}">
@@ -128,9 +128,9 @@
                                 <h:inputText value="#{user1.nodePreference.urlBdd}"  />
                             </h:panelGrid>
                         </p:fieldset>
-                        <p:fieldset legend="SIGB" toggleable="true" collapsed="true">
+                        <p:fieldset legend="SIGB" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
 
-                            <h:panelGrid columns="2">
+                            <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="z3950 actif" />
                                 <h:selectOneRadio value="#{user1.nodePreference.z3950acif}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />

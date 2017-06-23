@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
  *
@@ -39,27 +40,27 @@ public class PreferencesHelper {
                         np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
                         np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
                         np.setSourceLang(resultSet.getString("source_lang"));
-                        np.setIdentifierType(resultSet.getInt("identifierType"));
-                        np.setUseArk(resultSet.getBoolean("useArk"));
-                        np.setServeurArk(resultSet.getString("serverArk"));
-                        np.setPathImage(resultSet.getString("pathImage"));
-                        np.setDossierResize(resultSet.getString("dossierResize"));
-                        np.setProtcolMail(resultSet.getString("protocolMail"));
-                        np.setHostMail(resultSet.getString("hostMail"));
-                        np.setPortMail(resultSet.getInt("portMail"));
-                        np.setAuthMail(resultSet.getBoolean("authMail"));
-                        np.setMailForm(resultSet.getString("mailFrom"));
-                        np.setTransportMail(resultSet.getString("transportMail"));
-                        np.setBddActive(resultSet.getBoolean("bddActive"));
-                        np.setBddUseId(resultSet.getBoolean("bddUseId"));
-                        np.setUrlBdd(resultSet.getString("urlBdd"));
+                        np.setIdentifierType(resultSet.getInt("identifier_type"));
+                        np.setUseArk(resultSet.getBoolean("use_ark"));
+                        np.setServeurArk(resultSet.getString("server_ark"));
+                        np.setPathImage(resultSet.getString("path_image"));
+                        np.setDossierResize(resultSet.getString("dossier_resize"));
+                        np.setProtcolMail(resultSet.getString("protocol_mail"));
+                        np.setHostMail(resultSet.getString("host_mail"));
+                        np.setPortMail(resultSet.getInt("port_mail"));
+                        np.setAuthMail(resultSet.getBoolean("auth_mail"));
+                        np.setMailForm(resultSet.getString("mail_from"));
+                        np.setTransportMail(resultSet.getString("transport_mail"));
+                        np.setBddActive(resultSet.getBoolean("bdd_active"));
+                        np.setBddUseId(resultSet.getBoolean("bdd_use_id"));
+                        np.setUrlBdd(resultSet.getString("url_bdd"));
                         np.setZ3950acif(resultSet.getBoolean("z3950actif"));
-                        np.setCollectionAdresse(resultSet.getString("collectionAdresse"));
-                        np.setNoticeUrl(resultSet.getString("noticeUrl"));
-                        np.setUrlEncode(resultSet.getString("urlEncode"));
-                        np.setPathNotice1(resultSet.getString("pathNotice1"));
-                        np.setPathNotice2(resultSet.getString("pathNotice2"));
-                        np.setCheminSite(resultSet.getString("cheminSite"));
+                        np.setCollectionAdresse(resultSet.getString("collection_adresse"));
+                        np.setNoticeUrl(resultSet.getString("notice_url"));
+                        np.setUrlEncode(resultSet.getString("url_encode"));
+                        np.setPathNotice1(resultSet.getString("path_notice1"));
+                        np.setPathNotice2(resultSet.getString("path_notice2"));
+                        np.setCheminSite(resultSet.getString("chemin_site"));
 
                     }
 
@@ -205,6 +206,7 @@ public class PreferencesHelper {
         Connection conn;
         Statement stmt;
         boolean status = false;
+        StringPlus stringPlus = new StringPlus();
 
         try {
             conn = ds.getConnection();
@@ -213,30 +215,30 @@ public class PreferencesHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "update preferences set "
-                            + "source_lang='" + np.getSourceLang() + "'"
+                            + "source_lang='" + stringPlus.convertString(np.getSourceLang()) + "'"
                             + ", nb_alert_cdt='" + np.getNbAlertCdt() + "'"
                             + ", alert_cdt='" + np.isAlertCdt() + "'"
-                            + ", \"identifierType\"='" + np.getIdentifierType() + "'"
-                            + ", \"useArk\"='"+np.isUseArk() + "'"
-                            + ", \"serverArk\"='"+np.getServeurArk() + "'"
-                            + ", \"pathImage\"='"+np.getPathImage() + "'"
-                            + ", \"dossierResize\"='"+np.getDossierResize() + "'"
-                            + ", \"protocolMail\"='"+np.getProtcolMail() + "'"
-                            + ", \"hostMail\"='"+np.getHostMail() + "'"
-                            + ", \"portMail\"='"+np.getPortMail() + "'"
-                            + ", \"authMail\"='"+np.isAuthMail() + "'"
-                            + ", \"mailFrom\"='"+np.getMailForm() + "'"
-                            + ", \"transportMail\"='"+np.getTransportMail() + "'"
-                            + ", \"bddActive\"='"+np.isBddActive() + "'"
-                            + ", \"bddUseId\"='"+np.isBddUseId() + "'"
-                            + ", \"urlBdd\"='"+np.getUrlBdd() + "'"
+                            + ",identifier_type='" + np.getIdentifierType() + "'"
+                            + ", use_ark='"+np.isUseArk() + "'"
+                            + ", server_ark='"+stringPlus.convertString(np.getServeurArk()) + "'"
+                            + ",path_image='"+stringPlus.convertString(np.getPathImage()) + "'"
+                            + ", dossier_resize='"+stringPlus.convertString(np.getDossierResize()) + "'"
+                            + ", protocol_mail='"+stringPlus.convertString(np.getProtcolMail()) + "'"
+                            + ", host_mail='"+stringPlus.convertString(np.getHostMail()) + "'"
+                            + ", port_mail='"+np.getPortMail() + "'"
+                            + ", auth_mail='"+np.isAuthMail() + "'"
+                            + ", mail_from='"+stringPlus.convertString(np.getMailForm()) + "'"
+                            + ", transport_mail='"+stringPlus.convertString(np.getTransportMail()) + "'"
+                            + ", bdd_active='"+np.isBddActive() + "'"
+                            + ", bdd_use_id='"+np.isBddUseId() + "'"
+                            + ", url_bdd='"+stringPlus.convertString(np.getUrlBdd()) + "'"
                             + ", z3950actif='"+np.getZ3950acif() + "'"
-                            + ", \"collectionAdresse\"='"+np.getCollectionAdresse() + "'"
-                            + ", \"noticeUrl\"='"+ np.getNoticeUrl()+ "'"
-                            + ", \"urlEncode\"='"+np.getUrlEncode() + "'"
-                            + ", \"pathNotice1\"='"+np.getPathNotice1() + "'"
-                            + ", \"pathNotice2\"='"+np.getPathNotice2() + "'"
-                            + ", \"cheminSite\"='"+np.getCheminSite()+"'"
+                            + ", collection_adresse='"+stringPlus.convertString(np.getCollectionAdresse()) + "'"
+                            + ", notice_url='"+ stringPlus.convertString(np.getNoticeUrl())+ "'"
+                            + ", url_encode='"+stringPlus.convertString(np.getUrlEncode()) + "'"
+                            + ", path_notice1='"+stringPlus.convertString(np.getPathNotice1()) + "'"
+                            + ", path_notice2='"+stringPlus.convertString(np.getPathNotice2()) + "'"
+                            + ", chemin_site='"+stringPlus.convertString(np.getCheminSite())+"'"
                             + " WHERE"
                             + " id_thesaurus = '" + idThesaurus + "'";
                     stmt.executeUpdate(query);

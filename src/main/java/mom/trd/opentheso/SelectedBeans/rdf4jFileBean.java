@@ -8,11 +8,15 @@ package mom.trd.opentheso.SelectedBeans;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
@@ -48,11 +52,25 @@ public class rdf4jFileBean implements Serializable {
     private boolean BDDinsertEnable = false;
 
     private SKOSXmlDocument sKOSXmlDocument;
+    private String info;
+    private String error;
+    private String warning;
 
     /**
      *
      * @param event
      */
+    public void init() {
+        info = "";
+        error = "";
+        warning = "";
+        uri = "";
+        formatDate = "";
+        total = 0;
+        uploadEnable = true;
+        BDDinsertEnable = false;
+    }
+
     public void chargeSkos(FileUploadEvent event) {
         progress = 0;
 
@@ -61,30 +79,50 @@ public class rdf4jFileBean implements Serializable {
             event.queue();
         } else {
             InputStream is = null;
-
             try {
-                is = event.getFile().getInputstream();
-            } catch (IOException ex) {
-                Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    is = event.getFile().getInputstream();
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                ReadRdf4j readRdf4j = null;
+                try {
+                    readRdf4j = new ReadRdf4j(is, 0, this);
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                progress = 100;
+                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                uri = sKOSXmlDocument.getTitle();
+                uploadEnable = false;
+                BDDinsertEnable = true;
+
+                info = "File correctly loaded";
+
+            } catch (Exception e) {
+            } finally {
+                showError();
             }
-            ReadRdf4j readRdf4j = new ReadRdf4j(is, 0);
-            progress = 100;
-            sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-            total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-            uri = sKOSXmlDocument.getTitle();
-            uploadEnable = false;
-            BDDinsertEnable = true;
 
         }
     }
-    
+
     /**
-     * permet de charger des fichier de type skos, json-ld ou turtle
-     * avec la variable membre typeImport pour choisir le type
-     * 0=skos 1=jsons-ld 2=turtle
-     * @param event 
+     * permet de charger des fichier de type skos, json-ld ou turtle avec la
+     * variable membre typeImport pour choisir le type 0=skos 1=jsons-ld
+     * 2=turtle
+     *
+     * @param event
      */
     public void chargeFile(FileUploadEvent event) {
+        error = "";
+        info = "";
+        warning = "";
         switch (typeImport) {
             case 0:
                 chargeSkos(event);
@@ -97,6 +135,20 @@ public class rdf4jFileBean implements Serializable {
                 break;
 
         }
+
+    }
+
+    private void showError() {
+        if (!info.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", info));
+        }
+        if (!error.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", error));
+        }
+        if (!warning.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning :", warning));
+        }
+
     }
 
     /**
@@ -111,19 +163,34 @@ public class rdf4jFileBean implements Serializable {
             event.queue();
         } else {
             InputStream is = null;
-
             try {
-                is = event.getFile().getInputstream();
-            } catch (IOException ex) {
-                Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    is = event.getFile().getInputstream();
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                ReadRdf4j readRdf4j = null;
+                try {
+                    readRdf4j = new ReadRdf4j(is, 1, this);
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+
+                progress = 100;
+                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                uri = sKOSXmlDocument.getTitle();
+                uploadEnable = false;
+                BDDinsertEnable = true;
+                info = "File correctly loaded";
+            } catch (Exception e) {
+            } finally {
+                showError();
             }
-            ReadRdf4j readRdf4j = new ReadRdf4j(is, 1);
-            progress = 100;
-            sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-            total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-            uri = sKOSXmlDocument.getTitle();
-            uploadEnable = false;
-            BDDinsertEnable = true;
 
         }
     }
@@ -140,19 +207,34 @@ public class rdf4jFileBean implements Serializable {
             event.queue();
         } else {
             InputStream is = null;
-
             try {
-                is = event.getFile().getInputstream();
-            } catch (IOException ex) {
-                Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    is = event.getFile().getInputstream();
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                ReadRdf4j readRdf4j = null;
+                try {
+                    readRdf4j = new ReadRdf4j(is, 2, this);
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                progress = 100;
+                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                uri = sKOSXmlDocument.getTitle();
+                uploadEnable = false;
+                BDDinsertEnable = true;
+
+                info = "File correctly loaded";
+            } catch (Exception e) {
+            } finally {
+                showError();
             }
-            ReadRdf4j readRdf4j = new ReadRdf4j(is, 2);
-            progress = 100;
-            sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-            total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-            uri = sKOSXmlDocument.getTitle();
-            uploadEnable = false;
-            BDDinsertEnable = true;
 
         }
     }
@@ -164,21 +246,48 @@ public class rdf4jFileBean implements Serializable {
      * @param idRole
      */
     public void insertBDD(int idUser, int idRole) {
+        error = "";
+        info = "";
+        warning = "";
 
-        progress = 0;
-        progress_abs = 0;
-        ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-        importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
-        importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
-        importRdf4jHelper.addThesaurus();
-        progress_abs++;
-        progress = progress_abs / total * 100;
-        importRdf4jHelper.addGroups(this);
-        importRdf4jHelper.addConcepts(this);
-        uploadEnable = true;
-        BDDinsertEnable = false;
-        uri = null;
-        total = 0;
+        try {
+            progress = 0;
+            progress_abs = 0;
+            ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            try {
+                importRdf4jHelper.addThesaurus();
+            } catch (SQLException ex) {
+                error = ex.getMessage();
+            } catch (Exception ex) {
+                error = ex.getMessage();
+            }
+            progress_abs++;
+            progress = progress_abs / total * 100;
+            importRdf4jHelper.addGroups(this);
+            try {
+                importRdf4jHelper.addConcepts(this);
+            } catch (SQLException ex) {
+                error = ex.getMessage();
+            } catch (ParseException ex) {
+                error = ex.getMessage();
+            } catch (Exception ex) {
+                error = ex.getMessage();
+            }
+            uploadEnable = true;
+            BDDinsertEnable = false;
+            uri = null;
+            total = 0;
+
+            info = "Thesaurus correctly insert into data base";
+
+        } catch (Exception e) {
+
+        } finally {
+            showError();
+        }
+
     }
 
     /**
@@ -189,21 +298,35 @@ public class rdf4jFileBean implements Serializable {
      * @param selectedTerme
      */
     public void inserSingleConcept(int idUser, int idRole, SelectedTerme selectedTerme) {
-        ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-        importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
-        importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
-        importRdf4jHelper.addSingleConcept(selectedTerme);
-        tree.reInit();
-        tree.reExpand();
-        tree.getSelectedTerme().majTerme((MyTreeNode)tree.getSelectedNode());
-        
-        uploadEnable = true;
-        BDDinsertEnable = false;
-        uri = null;
-        total = 0;
+        try {
+
+        } catch (Exception e) {
+            ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            try {
+                importRdf4jHelper.addSingleConcept(selectedTerme);
+            } catch (SQLException ex) {
+                error = ex.getMessage();
+            } catch (ParseException ex) {
+                error = ex.getMessage();
+            } catch (Exception ex) {
+                error = ex.getMessage();
+            }
+            tree.reInit();
+            tree.reExpand();
+            tree.getSelectedTerme().majTerme((MyTreeNode) tree.getSelectedNode());
+
+            uploadEnable = true;
+            BDDinsertEnable = false;
+            uri = null;
+            total = 0;
+        } finally {
+            showError();
+        }
 
     }
-    
+
     /**
      * ajoute une branche a la base de données
      *
@@ -212,22 +335,35 @@ public class rdf4jFileBean implements Serializable {
      * @param selectedTerme
      */
     public void inserBranch(int idUser, int idRole, SelectedTerme selectedTerme) {
-        ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-        importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
-        importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
-        importRdf4jHelper.addBranch(selectedTerme);
-        tree.reInit();
-        tree.reExpand();
-        tree.getSelectedTerme().majTerme((MyTreeNode)tree.getSelectedNode());
-        
-        uploadEnable = true;
-        BDDinsertEnable = false;
-        uri = null;
-        total = 0;
+
+        try {
+            ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            try {
+                importRdf4jHelper.addBranch(selectedTerme);
+            } catch (ParseException ex) {
+                error = ex.getMessage();
+            } catch (SQLException ex) {
+                error = ex.getMessage();
+            } catch (Exception ex) {
+                error = ex.getMessage();
+            }
+            tree.reInit();
+            tree.reExpand();
+            tree.getSelectedTerme().majTerme((MyTreeNode) tree.getSelectedNode());
+
+            uploadEnable = true;
+            BDDinsertEnable = false;
+            uri = null;
+            total = 0;
+
+        } catch (Exception e) {
+        } finally {
+            showError();
+        }
 
     }
-    
-    
 
     public String getFormatDate() {
         return formatDate;
@@ -323,6 +459,34 @@ public class rdf4jFileBean implements Serializable {
 
     public void setTypeImport(int typeImport) {
         this.typeImport = typeImport;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getWarning() {
+        return warning;
+    }
+
+    public void setWarning(String warning) {
+        this.warning = warning;
+    }
+
+    public boolean warningIsEmpty() {
+        return warning == null || warning.isEmpty();
     }
 
 }

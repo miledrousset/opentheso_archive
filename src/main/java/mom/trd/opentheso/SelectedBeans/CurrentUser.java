@@ -105,14 +105,15 @@ public class CurrentUser implements Serializable {
                 preferencesHelper.initPreferences(connect.getPoolConnexion(),
                         idThesaurus, workLanguage, alertNbCdtEdit, alertCdtEdit);
                 nodePreference = preferencesHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
+                
             } else {
                 langSourceEdit = nodePreference.getSourceLang();
                 alertNbCdtEdit = nodePreference.getNbAlertCdt();
                 alertCdtEdit = nodePreference.isAlertCdt();
-                idTheso = idThesaurus;
                 selectedThesaurus = new ArrayList<>();
                 selectedThesaurus.add(idTheso);
             }
+            idTheso = idThesaurus;
             versionOfOpentheso = new BaseDeDoneesHelper().getVersionOfOpentheso(connect.getPoolConnexion());
             return nodePreference;
         }

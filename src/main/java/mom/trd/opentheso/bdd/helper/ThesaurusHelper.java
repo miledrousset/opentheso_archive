@@ -1136,6 +1136,7 @@ public class ThesaurusHelper {
                             + "delete from thesaurus_alignement_source where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_group_concept where idthesaurus = '" + idThesaurus + "';"
                             + "delete from relation_group where id_thesaurus = '" + idThesaurus + "';"
+                            + "delete from preferences where id_thesaurus = '" + idThesaurus + "';"
                             
                             ;
 

@@ -367,6 +367,7 @@ public class SelectedThesaurus implements Serializable {
     /**
      * Constructeur
      */
+    
     public SelectedThesaurus() {
 
         ResourceBundle bundlePref = getBundlePref();
@@ -389,6 +390,11 @@ public class SelectedThesaurus implements Serializable {
             return;
         }
 
+        majPref();
+
+    }
+
+    private void majPref() {
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
         version = "";
         //String useArk = bundlePref.getString("useArk");
@@ -397,7 +403,6 @@ public class SelectedThesaurus implements Serializable {
         workLanguage = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
         Integer temp = user.getNodePreference().getIdentifierType();
         identifierType = temp.toString();//bundlePref.getString("identifierType");
-
     }
 
     @PostConstruct
@@ -416,10 +421,7 @@ public class SelectedThesaurus implements Serializable {
         StartDefaultThesauriTree();
     }
 
-    /**
-     * ************************************ EDITION THESO BDD
-     * *************************************
-     */
+    /* ******************** EDITION THESO BDD * ******************** */
     /**
      * Cette fonction permet de nettoyer et réorganiser le thésaurus
      *
@@ -789,6 +791,7 @@ public class SelectedThesaurus implements Serializable {
         } else {
             thesaurus.setLanguage("");
         }
+        
         uTree.reInit();
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -798,6 +801,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
         vue.setCreat(false);
+        majPref();
     }
 
     /**

@@ -215,6 +215,17 @@ public class SelectedTerme implements Serializable {
             return;
         }
         
+        majPref();
+
+        user.setIdTheso(idTheso);
+        Integer temp = user.getNodePreference().getIdentifierType();
+        identifierType = temp.toString();//bundlePref.getString("identifierType");
+        totalConceptOfBranch = "";
+        totalNoticesOfBranch = "";
+
+    }
+
+    private void majPref() {
         nodeSe = new NodeSearch();
         images = new ArrayList<>();
         //ResourceBundle bundlePref = getBundlePref();
@@ -229,13 +240,6 @@ public class SelectedTerme implements Serializable {
         z3950_actif = user.getNodePreference().getZ3950acif();//bundlePref.getString("z3950.actif").equals("true");
         bdd_active = user.getNodePreference().isBddActive();//bundlePref.getString("bdd.active").equals("true");
         bdd_useId = user.getNodePreference().isBddUseId();//bundlePref.getString("bdd.useId").equals("true");
-
-        user.setIdTheso(idTheso);
-        Integer temp = user.getNodePreference().getIdentifierType();
-        identifierType = temp.toString();//bundlePref.getString("identifierType");
-        totalConceptOfBranch = "";
-        totalNoticesOfBranch = "";
-
     }
 
     /**
@@ -307,6 +311,7 @@ public class SelectedTerme implements Serializable {
         // contrôler si la connexion est toujour valide 
         // connect.
         reInitTerme();
+        majPref();
 
         idC = sN.getIdMot();
         idTheso = sN.getIdTheso();
@@ -445,7 +450,7 @@ public class SelectedTerme implements Serializable {
     private void majNoticeBdd() {
         //ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
-        urlNotice = user.getNodePreference().getNoticeUrl();
+        urlNotice = user.getNodePreference().getUrlBdd();
         if (bdd_useId) {
             urlNotice = urlNotice.replace("terme", idC);
         } else {
