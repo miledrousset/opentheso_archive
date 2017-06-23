@@ -314,7 +314,7 @@ BEGIN
 		id_theso character varying,
 		latitude float,
 		longitude float,
-		CONSTRAINT gps_pkey PRIMARY KEY (id_concept)
+		CONSTRAINT gps_pkey PRIMARY KEY (id_concept, id_theso)
 		);'
 	;
 
@@ -1434,6 +1434,21 @@ $$ LANGUAGE plpgsql;
 	$$language plpgsql;
 
 
+--
+-- fonction pour mettre à jour la table GPS (ajouter la contrainte de clé unique si elle n'est pas juste)
+-- #MR
+--
+create or replace function update_table_gps() returns void as $$
+begin 
+    if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'gps') then
+        begin
+            ALTER TABLE gps DROP CONSTRAINT gps_pkey;
+            ALTER TABLE ONLY gps
+                ADD CONSTRAINT gps_pkey PRIMARY KEY (id_concept, id_theso);
+        end;
+    end if;
+end;
+$$language plpgsql;
 
 
 
@@ -1450,6 +1465,7 @@ SELECT majnote();
 SELECT create_table_info();
 SELECT info_donnes();
 SELECT table_gps();
+SELECT update_table_gps();
 SELECT ajouter_column_concept();
 SELECT ajouter_sequence('alignement_source__id_seq');
 SELECT ajouter_sequence('concept_group_historique__id_seq');
@@ -1617,6 +1633,7 @@ $BODY$
 SELECT delete_fonction ('create_table_info','');
 SELECT delete_fonction ('majnote', '');
 SELECT delete_fonction ('table_gps','');
+SELECT delete_fonction ('update_table_gps','');
 SELECT delete_fonction ('info_donnes','');
 SELECT delete_fonction ('ajouter_column_concept','');
 SELECT delete_fonction ('updateColumn_alignement_source','');
