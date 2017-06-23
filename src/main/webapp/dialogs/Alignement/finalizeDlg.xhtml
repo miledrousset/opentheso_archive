@@ -1,0 +1,19 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idFinalizeDlg"  header="#{langueBean.getMsg('alig.fin')}" widgetVar="finalizeDlg" modal="true" resizable="false" >
+        
+            
+        
+        <p:commandButton value="save workFlow"  action="#{alignementparlot.enregister_Des_Progres(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" update=":panContenu" />
+          <br/>
+          <br/>
+          <p:commandButton value="initialiser" action="#{alignementparlot.initAlign(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" />
+        
+    </p:dialog>
+</ui:composition>

@@ -5,6 +5,28 @@ public class NodePreference {
     private String sourceLang;
     private int nbAlertCdt;
     private boolean alertCdt;
+    private int identifierType;
+    
+    private boolean useArk;
+    private String serveurArk;
+    private String pathImage;
+    private String dossierResize;
+    private String protcolMail;
+    private String hostMail;
+    private int portMail;
+    private boolean authMail;
+    private String mailFrom;
+    private String transportMail;
+    private boolean bddActive;
+    private boolean bddUseId;
+    private String urlBdd;
+    private boolean z3950actif;
+    private String collectionAdresse;
+    private String noticeUrl;
+    private String urlEncode;
+    private String pathNotice1;
+    private String pathNotice2;
+    private String cheminSite;
 
     public String getSourceLang() {
         return sourceLang;
@@ -29,5 +51,190 @@ public class NodePreference {
     public void setAlertCdt(boolean alertCdt) {
         this.alertCdt = alertCdt;
     }
+
+    public int getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(int identifierType) {
+        this.identifierType = identifierType;
+    }
+
+    public boolean isUseArk() {
+        return useArk;
+    }
+
+    public void setUseArk(boolean useArk) {
+        this.useArk = useArk;
+    }
+
+    public String getServeurArk() {
+        return serveurArk;
+    }
+
+    public void setServeurArk(String serveurArk) {
+        this.serveurArk = serveurArk;
+    }
+
+    public String getPathImage() {
+        return pathImage;
+    }
+
+    public void setPathImage(String pathImage) {
+        this.pathImage = pathImage;
+    }
+
+    public String getDossierResize() {
+        return dossierResize;
+    }
+
+    public void setDossierResize(String dossierResize) {
+        this.dossierResize = dossierResize;
+    }
+
+    public String getProtcolMail() {
+        return protcolMail;
+    }
+
+    public void setProtcolMail(String protcolMail) {
+        this.protcolMail = protcolMail;
+    }
+
+    public String getHostMail() {
+        return hostMail;
+    }
+
+    public void setHostMail(String hostMail) {
+        this.hostMail = hostMail;
+    }
+
+    public int getPortMail() {
+        return portMail;
+    }
+
+    public void setPortMail(int portMail) {
+        this.portMail = portMail;
+    }
+
+    public boolean isAuthMail() {
+        return authMail;
+    }
+
+    public void setAuthMail(boolean authMail) {
+        this.authMail = authMail;
+    }
+
+    public String getTransportMail() {
+        return transportMail;
+    }
+
+    public void setTransportMail(String transportMail) {
+        this.transportMail = transportMail;
+    }
+
+    public boolean isBddActive() {
+        return bddActive;
+    }
+
+    public void setBddActive(boolean bddActive) {
+        this.bddActive = bddActive;
+    }
+
+    public boolean isBddUseId() {
+        return bddUseId;
+    }
+
+    public void setBddUseId(boolean bddUseId) {
+        this.bddUseId = bddUseId;
+    }
+
+    public String getUrlBdd() {
+        return urlBdd;
+    }
+
+    public void setUrlBdd(String urlBdd) {
+        this.urlBdd = urlBdd;
+    }
+
+    public boolean getZ3950acif() {
+        return z3950actif;
+    }
+
+    public void setZ3950acif(boolean z3950acif) {
+        this.z3950actif = z3950acif;
+    }
+
+    public String getCollectionAdresse() {
+        return collectionAdresse;
+    }
+
+    public void setCollectionAdresse(String collectionAdresse) {
+        this.collectionAdresse = collectionAdresse;
+    }
+
+    public String getNoticeUrl() {
+        return noticeUrl;
+    }
+
+    public void setNoticeUrl(String noticeUrl) {
+        this.noticeUrl = noticeUrl;
+    }
+
+    public String getUrlEncode() {
+        return urlEncode;
+    }
+
+    public void setUrlEncode(String urlEncode) {
+        this.urlEncode = urlEncode;
+    }
+
+    public String getPathNotice1() {
+        return pathNotice1;
+    }
+
+    public void setPathNotice1(String pathNotice1) {
+        this.pathNotice1 = pathNotice1;
+    }
+
+    public String getPathNotice2() {
+        return pathNotice2;
+    }
+
+    public void setPathNotice2(String pathNotice2) {
+        this.pathNotice2 = pathNotice2;
+    }
+
+    public String getMailForm() {
+        return mailFrom;
+    }
+
+    public void setMailForm(String mailForm) {
+        this.mailFrom = mailForm;
+    }
+
+    public String getMailFrom() {
+        return mailFrom;
+    }
+
+    public void setMailFrom(String mailFrom) {
+        this.mailFrom = mailFrom;
+    }
+
+    public boolean isZ3950actif() {
+        return z3950actif;
+    }
+
+    public void setZ3950actif(boolean z3950actif) {
+        this.z3950actif = z3950actif;
+    }
+
+    public String getCheminSite() {
+        return cheminSite;
+    }
+
+    public void setCheminSite(String cheminSite) {
+        this.cheminSite = cheminSite;
+    }
+    
 
 }

@@ -1150,6 +1150,46 @@ public class AlignmentHelper {
         return true;
     }
 
+    /**
+     * reinitialize le workFlow
+     *
+     * @param ds
+     * @param id_theso
+     * @param id_user
+     * @param id_concept_depart
+     */
+    public void init_preferences(HikariDataSource ds, String id_theso, int id_user, String id_concept_depart) {
+        Statement stmt;
+        Connection conn;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    stmt = conn.createStatement();
+                    String query = "DELETE FROM alignement_preferences WHERE "
+                            + "id_thesaurus = '" + id_theso + "'"
+                            + " AND "
+                            + "id_user = '" + id_user + "'"
+                            + " AND "
+                            + "id_concept_depart = '" + id_concept_depart + "'";
+
+                    stmt.execute(query);
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while get alignement's preferences", sqle);
+        }
+
+    }
+
     private boolean existPreferences(HikariDataSource ds, String id_theso, int id_user, String id_concept_depart, int id_alignement_source) {
         Statement stmt;
         Connection conn;

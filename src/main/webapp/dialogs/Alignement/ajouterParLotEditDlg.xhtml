@@ -29,22 +29,17 @@
                     <br/>
                     <hr/>
                     <br/>
-                    <center>
-                        <p:selectOneRadio id="city" value="#{alignementparlot.optionOfAlignement}"  layout="grid" columns="1">
+                    <p:selectOneRadio  value="#{alignementparlot.optionOfAlignement}"  layout="grid" columns="1" style="text-align: left;">
                             <f:selectItems value="#{alignementparlot.options.entrySet()}" var="c" itemLabel="#{c.value}" itemValue="#{c.key}" />
-
-                        </p:selectOneRadio>
-                    </center>
+                    </p:selectOneRadio>
                 </p:layoutUnit>
                 <p:layoutUnit position="center" resizable="false" size="200" minSize="250" maxSize="200">
                     <h:outputText value="#{langueBean.getMsg('file.info1.2')}:" /><br/>
                     <hr/>
                     <br/>
-                    <center>
                         <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
                             <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
                         </p:selectOneRadio>
-                    </center>
                 </p:layoutUnit>
             </p:layout> 
             <br/>

@@ -202,6 +202,8 @@ public class SelectedTerme implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    
 
     /**
      * *************************************** INITIALISATION
@@ -209,26 +211,35 @@ public class SelectedTerme implements Serializable {
      */
     @PostConstruct
     public void initTerme() {
-        nodeSe = new NodeSearch();
-        images = new ArrayList<>();
-        ResourceBundle bundlePref = getBundlePref();
-        cheminNotice1 = bundlePref.getString("pathNotice1");
-        cheminNotice2 = bundlePref.getString("pathNotice2");
-
-        arkActive = bundlePref.getString("useArk").equals("true");
-
-        root = (TreeNode) new DefaultTreeNode("Root", null);
-        serverAdress = bundlePref.getString("cheminSite");
-
-        z3950_actif = bundlePref.getString("z3950.actif").equals("true");
-        bdd_active = bundlePref.getString("bdd.active").equals("true");
-        bdd_useId = bundlePref.getString("bdd.useId").equals("true");
+        if(user == null ||user.getNodePreference() == null){
+            return;
+        }
+        
+        majPref();
 
         user.setIdTheso(idTheso);
-        identifierType = bundlePref.getString("identifierType");
+        Integer temp = user.getNodePreference().getIdentifierType();
+        identifierType = temp.toString();//bundlePref.getString("identifierType");
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
 
+    }
+
+    private void majPref() {
+        nodeSe = new NodeSearch();
+        images = new ArrayList<>();
+        //ResourceBundle bundlePref = getBundlePref();
+        cheminNotice1 = user.getNodePreference().getPathNotice1();//bundlePref.getString("pathNotice1");
+        cheminNotice2 = user.getNodePreference().getPathNotice2();//bundlePref.getString("pathNotice2");
+
+        arkActive = user.getNodePreference().isUseArk();//bundlePref.getString("useArk").equals("true");
+
+        root = (TreeNode) new DefaultTreeNode("Root", null);
+        serverAdress = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
+
+        z3950_actif = user.getNodePreference().getZ3950acif();//bundlePref.getString("z3950.actif").equals("true");
+        bdd_active = user.getNodePreference().isBddActive();//bundlePref.getString("bdd.active").equals("true");
+        bdd_useId = user.getNodePreference().isBddUseId();//bundlePref.getString("bdd.useId").equals("true");
     }
 
     /**
@@ -300,6 +311,7 @@ public class SelectedTerme implements Serializable {
         // contrôler si la connexion est toujour valide 
         // connect.
         reInitTerme();
+        majPref();
 
         idC = sN.getIdMot();
         idTheso = sN.getIdTheso();
@@ -369,8 +381,8 @@ public class SelectedTerme implements Serializable {
             updateGps();
             majTSpeConcept();
             align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
-            ResourceBundle bundlePref = getBundlePref();
-            if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
+            //ResourceBundle bundlePref = getBundlePref();
+            if (user.getNodePreference().isZ3950actif()) {
                 majNoticeZ3950();
             }
             if (bdd_active) {
@@ -385,8 +397,8 @@ public class SelectedTerme implements Serializable {
     }
 
     private void majNoticeZ3950() {
-        ResourceBundle bundlePref = getBundlePref();
-        if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
+        //ResourceBundle bundlePref = getBundlePref();
+        if (user.getNodePreference().isZ3950actif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
             p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
@@ -397,7 +409,7 @@ public class SelectedTerme implements Serializable {
             try {
                 IRQuery e = new IRQuery();
                 //   e.collections = new Vector<String>();
-                e.collections.add(bundlePref.getString("collection.adresse"));
+                e.collections.add(user.getNodePreference().getCollectionAdresse());
                 e.hints.put("default_element_set_name", "f");
                 e.hints.put("small_set_setname", "f");
                 e.hints.put("record_syntax", "unimarc");
@@ -415,10 +427,10 @@ public class SelectedTerme implements Serializable {
             } catch (TimeoutExceededException | SearchException srch_e) {
                 srch_e.printStackTrace();
             }
-            urlNotice = bundlePref.getString("notice.url");
+            urlNotice = user.getNodePreference().getNoticeUrl();
             try {
                 //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
-                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, bundlePref.getString("url.encode")));
+                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -436,9 +448,9 @@ public class SelectedTerme implements Serializable {
     }
 
     private void majNoticeBdd() {
-        ResourceBundle bundlePref = getBundlePref();
+        //ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
-        urlNotice = bundlePref.getString("url.bdd");
+        urlNotice = user.getNodePreference().getUrlBdd();
         if (bdd_useId) {
             urlNotice = urlNotice.replace("terme", idC);
         } else {
@@ -967,7 +979,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public String getNbNoticesOfBranch() {
-        ResourceBundle bundlePref = getBundlePref();
+        //ResourceBundle bundlePref = getBundlePref();
         int total = 0;
         if (totalNoticesOfBranch.isEmpty()) {
             if (z3950_actif) {
@@ -985,7 +997,7 @@ public class SelectedTerme implements Serializable {
                 try {
                     IRQuery e = new IRQuery();
                     //   e.collections = new Vector<String>();
-                    e.collections.add(bundlePref.getString("collection.adresse"));
+                    e.collections.add(user.getNodePreference().getCollectionAdresse());
                     e.hints.put("default_element_set_name", "f");
                     e.hints.put("small_set_setname", "f");
                     e.hints.put("record_syntax", "unimarc");
@@ -2487,9 +2499,9 @@ public class SelectedTerme implements Serializable {
      * @param idTe
      */
     private int getNotice(String idTe) {
-        ResourceBundle bundlePref = getBundlePref();
+        //ResourceBundle bundlePref = getBundlePref();
         int nbNoticesT = 0;
-        if (bundlePref.getString("z3950.actif").equalsIgnoreCase("true")) {
+        if (user.getNodePreference().getZ3950acif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
             p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
@@ -2500,7 +2512,7 @@ public class SelectedTerme implements Serializable {
             try {
                 IRQuery e = new IRQuery();
                 //   e.collections = new Vector<String>();
-                e.collections.add(bundlePref.getString("collection.adresse"));
+                e.collections.add(user.getNodePreference().getCollectionAdresse());
                 e.hints.put("default_element_set_name", "f");
                 e.hints.put("small_set_setname", "f");
                 e.hints.put("record_syntax", "unimarc");

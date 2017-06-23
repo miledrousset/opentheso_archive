@@ -8,8 +8,7 @@ package mom.trd.opentheso.core.imports.rdf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import org.eclipse.rdf4j.model.IRI;
@@ -18,9 +17,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.Rio;
-import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 
 /**
@@ -42,19 +39,25 @@ public class ReadRdf4j {
      *
      * @param is
      * @param type 0 pour skos 1 pour jsonld 2 pour turtle
+     * @param warning
+     * @throws java.io.IOException
      */
-    public ReadRdf4j(InputStream is, int type) {
+    public ReadRdf4j(InputStream is, int type, rdf4jFileBean fileBean) throws IOException {
         sKOSXmlDocument = new SKOSXmlDocument();
 
-        if (type == 0) {
-            laodSkosModel(is);
-        } else if (type == 1) {
-            laodJsonLdModel(is);
-        } else {
-            laodTurtleModel(is);
+        switch (type) {
+            case 0:
+                laodSkosModel(is);
+                break;
+            case 1:
+                laodJsonLdModel(is);
+                break;
+            default:
+                laodTurtleModel(is);
+                break;
         }
 
-        readModel();
+        readModel(fileBean);
     }
 
     /**
@@ -63,48 +66,24 @@ public class ReadRdf4j {
      *
      * @param is
      */
-    private void laodSkosModel(InputStream is) {
+    private void laodSkosModel(InputStream is) throws IOException {
 
         model = null;
-        try {
-            model = Rio.parse(is, "", RDFFormat.RDFXML);
-        } catch (IOException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RDFParseException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedRDFormatException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        model = Rio.parse(is, "", RDFFormat.RDFXML);
 
     }
 
-    private void laodJsonLdModel(InputStream is) {
+    private void laodJsonLdModel(InputStream is) throws IOException {
 
         model = null;
-        try {
-            model = Rio.parse(is, "", RDFFormat.JSONLD);
-        } catch (IOException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RDFParseException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedRDFormatException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        model = Rio.parse(is, "", RDFFormat.JSONLD);
 
     }
 
-    private void laodTurtleModel(InputStream is) {
+    private void laodTurtleModel(InputStream is) throws IOException {
 
         model = null;
-        try {
-            model = Rio.parse(is, "", RDFFormat.TURTLE);
-        } catch (IOException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RDFParseException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedRDFormatException ex) {
-            Logger.getLogger(ReadRdf4j.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        model = Rio.parse(is, "", RDFFormat.TURTLE);
 
     }
 
@@ -123,13 +102,13 @@ public class ReadRdf4j {
      * Permet de lire un fichier RDF précédament charger avec la fonction
      * laodModel() les données sont stoqué dans la variable thesaurus
      */
-    private void readModel() {
+    private void readModel(rdf4jFileBean fileBean) {
 
         ReadStruct readStruct = new ReadStruct();
         readStruct.resource = null;
 
         //pour le debug : 
-        ArrayList nonReco = new ArrayList();
+        ArrayList<String> nonReco = new ArrayList();
 
         for (Statement st : model) {
 
@@ -165,7 +144,7 @@ public class ReadRdf4j {
 
                 if (prop == SKOSProperty.ConceptScheme) {
                     sKOSXmlDocument.setConceptScheme(readStruct.resource);
-                } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection|| prop == SKOSProperty.Theme|| prop == SKOSProperty.MicroThesaurus) {
+                } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection || prop == SKOSProperty.Theme || prop == SKOSProperty.MicroThesaurus) {
                     sKOSXmlDocument.addGroup(readStruct.resource);
                 } else if (prop == SKOSProperty.Concept) {
                     sKOSXmlDocument.addconcept(readStruct.resource);
@@ -184,9 +163,9 @@ public class ReadRdf4j {
                                     if (readNotation(readStruct)) {
                                         if (readIdentifier(readStruct)) {
                                             if (readMatch(readStruct)) {
-                                                //test debug
+                                                //debug
                                                 if (!nonReco.contains(readStruct.property.getLocalName())) {
-                                                    System.out.println("non reconue : " + readStruct.property.getLocalName());
+                                                    //System.out.println("non reconue : " + readStruct.property.getLocalName());
                                                     nonReco.add(readStruct.property.getLocalName());
                                                 }
                                             }
@@ -198,6 +177,14 @@ public class ReadRdf4j {
                     }
                 }
             }
+        }
+
+        if (!nonReco.isEmpty()) {
+            String balises = "";
+            for (String b : nonReco) {
+                balises += "    " + b + "\n";
+            }
+            fileBean.setWarning("Not readed RDF tag\n" + balises);
         }
     }
 

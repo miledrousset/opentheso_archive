@@ -82,6 +82,9 @@ public class FileBean implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser user;
 
     /**
      * Récupération des préférences
@@ -96,10 +99,14 @@ public class FileBean implements Serializable {
 
     @PostConstruct
     public void initFileBean() {
-        ResourceBundle bundlePref = getBundlePref();
-        pathImage = bundlePref.getString("pathImage");
-        langueSource = bundlePref.getString("workLanguage");
-        dossierResize = bundlePref.getString("dossierResize");
+        ///ResourceBundle bundlePref = getBundlePref();
+        if(user == null || user.getNodePreference() == null){
+            return;
+        }
+        
+        pathImage = user.getNodePreference().getPathImage();//bundlePref.getString("pathImage");
+        langueSource = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
+        dossierResize =user.getNodePreference().getDossierResize(); //bundlePref.getString("dossierResize");
 
     }
 
@@ -205,17 +212,15 @@ public class FileBean implements Serializable {
             event.queue();
         } else {
             UploadedFile file = event.getFile();
-            if (formatDate == null || formatDate.equals("")) {
+            if (formatDate == null || formatDate.equals("") || user == null || user.getNodePreference() == null  ) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
             } else {
                 try {
                     boolean useArk = false;
-                    ResourceBundle bundlePref = getBundlePref();
-                    if (bundlePref.getString("useArk").equalsIgnoreCase("true")) {
-                        useArk = true;
-                    }
+                    useArk = user.getNodePreference().isUseArk();
+                    
 
-                    String adressSite = bundlePref.getString("cheminSite");
+                    String adressSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
                     int idUser = selectedTerme.getUser().getUser().getId();
                     new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser, langueSource);
                 } catch (IOException ex) {
@@ -235,7 +240,7 @@ public class FileBean implements Serializable {
      *
      * @param event
      */
-    public void readSkos2(FileUploadEvent event) {
+    /*public void readSkos2(FileUploadEvent event) {
         importSkosHelper = null;
         if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
             event.setPhaseId(PhaseId.INVOKE_APPLICATION);
@@ -281,7 +286,7 @@ public class FileBean implements Serializable {
 
             }
         }
-    } 
+    } */
     
     /**
      * Cette fonction permet de charger le thésaurus dans la BDD
@@ -343,84 +348,84 @@ public class FileBean implements Serializable {
      *
      * @param event
      */
-    public void chargeSkos2(FileUploadEvent event) {
-        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
-            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
-            event.queue();
-        } else {
-            UploadedFile file = event.getFile();
-
-            if (formatDate == null || formatDate.equals("")) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
-            } else {
-                try {
-                    boolean useArk = false;
-                    ResourceBundle bundlePref = getBundlePref();
-                    if (bundlePref.getString("useArk").equalsIgnoreCase("true")) {
-                        useArk = true;
-                    }
-
-                    String adressSite = bundlePref.getString("cheminSite");
-                    int idUser = selectedTerme.getUser().getUser().getId();
-                    
-                    // lecture du fichier SKOS
-                    ImportSkosHelper importSkosHelper1 = new ImportSkosHelper();
-                    importSkosHelper1.setInfos(connect.getPoolConnexion(), 
-                            formatDate, useArk, adressSite, idUser, langueSource);
-                    if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
-                        FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
-                        return;
-                    }
-                    else {
-                        FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));            
-                    }
-                    
-                    // chargement dans la base de données 
-                    
-                    //chargement du nom du thesaurus 
-                    if(!importSkosHelper1.addThesaurus()){
-                        FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
-                        
-                        if(!importSkosHelper1.addDefaultThesaurus()){
-                            FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
-                        }
-                        // echec de l'ajout du nom de thésaurus
-                    }
-                    
-                    // ajout des groups ou domaine
-                   /* if(!importSkosHelper.addGroups()){
-                        // echec de l'ajout des groups ou domaines
-                    }*/
-                    
-                    // chargement des concepts
-                    if(!importSkosHelper1.addConcepts()){
-                        FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
-                        
-                        // echec de l'ajout des concepts 
-                    }
-                    FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));
-                    
-                    vue.setAddSkos2(false);
-                    
-                }
-//                catch (IOException ex) {
-//                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+//    public void chargeSkos2(FileUploadEvent event) {
+//        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+//            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+//            event.queue();
+//        } else {
+//            UploadedFile file = event.getFile();
+//
+//            if (formatDate == null || formatDate.equals("")) {
+//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
+//            } else {
+//                try {
+//                    boolean useArk = false;
+//                    ResourceBundle bundlePref = getBundlePref();
+//                    if (bundlePref.getString("useArk").equalsIgnoreCase("true")) {
+//                        useArk = true;
+//                    }
+//
+//                    String adressSite = bundlePref.getString("cheminSite");
+//                    int idUser = selectedTerme.getUser().getUser().getId();
+//                    
+//                    // lecture du fichier SKOS
+//                    ImportSkosHelper importSkosHelper1 = new ImportSkosHelper();
+//                    importSkosHelper1.setInfos(connect.getPoolConnexion(), 
+//                            formatDate, useArk, adressSite, idUser, langueSource);
+//                    if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
+//                        FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
+//                        return;
+//                    }
+//                    else {
+//                        FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));            
+//                    }
+//                    
+//                    // chargement dans la base de données 
+//                    
+//                    //chargement du nom du thesaurus 
+//                    if(!importSkosHelper1.addThesaurus()){
+//                        FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucune information sur le thésaurus et ses domaines, un thésaurus par defaut sera créer.. "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
+//                        
+//                        if(!importSkosHelper1.addDefaultThesaurus()){
+//                            FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper1.getMessage()));
+//                        }
+//                        // echec de l'ajout du nom de thésaurus
+//                    }
+//                    
+//                    // ajout des groups ou domaine
+//                   /* if(!importSkosHelper.addGroups()){
+//                        // echec de l'ajout des groups ou domaines
+//                    }*/
+//                    
+//                    // chargement des concepts
+//                    if(!importSkosHelper1.addConcepts()){
+//                        FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aucun Concept n'a été détecté dans le fichier ... "/*langueBean.getMsg("info")*/ + " :", importSkosHelper1.getMessage())); 
+//                        
+//                        // echec de l'ajout des concepts 
+//                    }
+//                    FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", importSkosHelper1.getMessage()));
+//                    
+//                    vue.setAddSkos2(false);
+//                    
 //                }
-                catch (IOException | OWLOntologyCreationException | SKOSCreationException ex) {
-                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
-                    FacesContext.getCurrentInstance().addMessage(null, 
-                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.getMessage()));
-                }
-
-            }
-        }
-    }
+////                catch (IOException ex) {
+////                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+////                }
+//                catch (IOException | OWLOntologyCreationException | SKOSCreationException ex) {
+//                    Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+//                    FacesContext.getCurrentInstance().addMessage(null, 
+//                                new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.getMessage()));
+//                }
+//
+//            }
+//        }
+//    }
     
     
     /**
@@ -685,5 +690,37 @@ public class FileBean implements Serializable {
     public void setIdTheso(String idTheso) {
         this.idTheso = idTheso;
     }    
+
+    public String getLangueSource() {
+        return langueSource;
+    }
+
+    public void setLangueSource(String langueSource) {
+        this.langueSource = langueSource;
+    }
+
+    public boolean isCreateNewId() {
+        return createNewId;
+    }
+
+    public void setCreateNewId(boolean createNewId) {
+        this.createNewId = createNewId;
+    }
+
+    public CurrentUser getUsesr() {
+        return user;
+    }
+
+    public void setUsesr(CurrentUser usesr) {
+        this.user = usesr;
+    }
+
+    public CurrentUser getUser() {
+        return user;
+    }
+
+    public void setUser(CurrentUser user) {
+        this.user = user;
+    }
 
 }

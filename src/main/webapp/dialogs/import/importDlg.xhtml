@@ -17,7 +17,6 @@
 
             <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
 
-                <p:messages showDetail="true" autoUpdate="true" />
                 <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
                 <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
                 <h:inputText value="#{rdf4jFileBean.formatDate}" />
@@ -36,28 +35,49 @@
 
 
 
-            <br/>             
-            <h:outputText value="uri : #{rdf4jFileBean.uri}" />
-            <br/> 
-            <h:outputText value="#{langueBean.getMsg('import.total')} : #{rdf4jFileBean.total}" />
-            <br/> 
+                <br/>             
+                <h:outputText value="uri : #{rdf4jFileBean.uri}" />
+                <br/> 
+                <h:outputText value="#{langueBean.getMsg('import.total')} : #{rdf4jFileBean.total}" />
+                <br/> 
 
 
-            <br/> 
-            <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.insertBDD(user1.user.id, user1.user.idRole)}" 
-                             onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
-                             oncomplete="PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
-                             update=":idImportDlg,:panSkos,:tableTheso"
-                             />
-
-            <p:dialog modal="true" widgetVar="importWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
-                <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
-
-                <br />
-                <p:progressBar widgetVar="pbAjax" ajax="true" value="#{rdf4jFileBean.progress}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+                <br/> 
+                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.insertBDD(user1.user.id, user1.user.idRole)}" 
+                                 onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
+                                 oncomplete="PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
+                                 update=":idImportDlg,:panSkos,:tableTheso"
+                                 />
 
 
-            </p:dialog>
+                <br/>
+                <br/>
+                <p:accordionPanel activeIndex="-1">
+                    <p:tab title="Info" titleStyleClass="infoAcordionPanel" >
+                        <p:scrollPanel mode="native" style="width:400px;height:200px">
+                            <pre><h:outputText value="#{rdf4jFileBean.info}" styleClass="infoAcordionPanel" /></pre>
+                            <hr/>
+                            <pre><h:outputText rendered="#{!rdf4jFileBean.warningIsEmpty()}" value="Warning : #{rdf4jFileBean.warning}" styleClass="warningAcordionPanel" /></pre>
+                        </p:scrollPanel>
+                    </p:tab>
+                    <p:tab title="Error" titleStyleClass="errorAcordionPanel">
+                        <p:scrollPanel mode="native" style="width:400px;height:200px">
+                            <pre><h:outputText value="#{rdf4jFileBean.error}" styleClass="errorAcordionPanel" /></pre>
+                        </p:scrollPanel>
+                    </p:tab>
+
+                </p:accordionPanel> 
+
+                <p:dialog modal="true" widgetVar="importWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
+                    <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
+
+                    <br />
+                    <p:progressBar widgetVar="pbAjax" ajax="true" value="#{rdf4jFileBean.progress}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+
+
+                </p:dialog>
+
+
             </h:form>
 
 

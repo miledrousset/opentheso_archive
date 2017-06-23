@@ -7,7 +7,7 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
 
-    <p:dialog id="idGpsParLot_suiteDlg"  header="#{langueBean.getMsg('index.alignBtn1')}" widgetVar="gpsParLot_suiteDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsParLot_suiteDlg"  header="#{langueBean.getMsg('index.alignBtn1')} ( #{gps.position +1}  / #{gps.listOfChildrenInConcept.size()} )" widgetVar="gpsParLot_suiteDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique -->
         <h:form rendered="#{!gps.fin}">
             <p:layout style="min-width:800px;min-height:400px; max-width:800px; max-height:400px" >
@@ -17,7 +17,7 @@
                         <tr>
                             <h:panelGrid columns="2" style="margin-bottom:10px">
                                 <p:outputLabel for="RadioGps" />
-                                <p:selectOneRadio id="RadioGps" value="#{gps.codeid}"  layout="grid" columns="1">
+                                <p:selectOneRadio id="RadioGps" value="#{gps.codeid}"  layout="grid" columns="1" style="text-align: left;">
                                     <f:selectItems value="#{gps.listAlignValues}" var="c" itemLabel="#{c.name}, #{c.toponymName}, #{c.countryName}" itemValue="#{c.idUrl}" />
                                 </p:selectOneRadio>
                             </h:panelGrid>
@@ -40,16 +40,23 @@
                         <f:selectItems value="#{selectedTerme.allALignType}" var="tt" itemLabel="#{tt.value}" itemValue="#{tt.key}" />
                     </h:selectOneMenu><br/><br/>
 
-                    <p:commandButton id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" actionListener="#{gps.reinitTotal()}"
-                                     action="#{gps.enregister_Des_Progres(user1.user.id)}"
-                                     update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg.hide()';"  />
+                    
+                     <p:commandButton id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" actionListener="#{gps.reinitTotal()}"
+                                    styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg').hide();PF('finalizeGPSDlg').show();"  />
 
-                    <p:commandButton rendered="#{!gps.fin}" id="ajouterAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
+                    <p:commandButton rendered="#{!gps.fin}" id="ajouterAllAlignAuto" title="#{langueBean.getMsg('conf.btnValid')}"  icon="ui-icon-valider"
                                      action="#{gps.doForLot(user1.user.id)}"
                                      update="idGpsParLot_suiteDlg" 
                                      oncomplete="PF('gpsParLot_suiteDlg').show();" styleClass="styleButton" />
-
-                    <p:commandButton rendered="#{!gps.last}" id="proxAllAlignAuto" value="#{langueBean.getMsg('alig.sui')}"  
+                    
+                    <br/>
+                    <br/>
+                    
+                    <p:commandButton disabled="#{!(gps.position > 0)}" id="proxAllAlignAuto2" value="&lt;&lt;"  
+                                     actionListener="#{gps.prevPosition()}"
+                                     update="idGpsParLot_suiteDlg" oncomplete="PF('gpsParLot_suiteDlg').show();"
+                                     styleClass="styleButton"  />
+                    <p:commandButton disabled="#{gps.position gt (gps.listOfChildrenInConcept.size() -2)}" id="proxAllAlignAuto" value=">>"  
                                      actionListener="#{gps.nextPosition()}"
                                      update="idGpsParLot_suiteDlg" oncomplete="PF('gpsParLot_suiteDlg').show();"
                                      styleClass="styleButton"  />

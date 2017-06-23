@@ -488,6 +488,55 @@ public class GpsBeans {
 
     }
 
+    public void prevPosition() {
+
+        if (position <= 0) {
+            return;
+        }
+        
+        erreur = "";
+        GpsHelper gpsHelper = new GpsHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        if (optionAllBranch == optionOfAlignement || optionOfAlignement == optionWorkFlow) {
+            position--;
+            id_concept = listOfChildrenInConcept.get(position);
+            comprobationFin();
+            if (fin) {
+                return;
+            }
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        }
+        if (optionNonAligned == optionOfAlignement) {
+            position--;
+            id_concept = listOfChildrenInConcept.get(position);
+            comprobationFin();
+            while (gpsHelper.isHaveCoordinate(connect.getPoolConnexion(),
+                    id_concept, id_theso)) {
+                position++;
+                id_concept = listOfChildrenInConcept.get(position);
+
+                comprobationFin();
+            }
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        }
+        try {
+            creerAlignAutoParLot(id_concept, id_theso, nomduterm, id_langue);
+
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(GpsBeans.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+        } catch (SAXException ex) {
+            Logger.getLogger(GpsBeans.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        listConceptTrates.remove(id_concept);
+
+    }
+
     /**
      * Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog
      */
@@ -629,14 +678,19 @@ public class GpsBeans {
     public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         if (optionWorkFlow == optionOfAlignement) {
-            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,
-                    id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,id_concept_depart, listConceptTrates, alignementPreferences.getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));
             }
         }
         return true;
+    }
+    
+    public void initAlign(int id_user) {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        alignmentHelper.init_preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart);
+
     }
 
     public void onRowSelect(SelectEvent event) {
@@ -678,7 +732,7 @@ public class GpsBeans {
         GpsHelper gpsHelper = new GpsHelper();
         return gpsHelper.deleteCoordinate(connect.getPoolConnexion(), idConcept, idTheso);
     }
-    
+
     ///////////////GET & SET////////////////////////////
     public MapModel getGeoModel() {
         return geoModel;
@@ -1037,6 +1091,30 @@ public class GpsBeans {
 
     public void setAlignement_source(AlignementSource alignement_source) {
         this.alignement_source = alignement_source;
+    }
+
+    public GpsPreferences getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(GpsPreferences nodePreference) {
+        this.nodePreference = nodePreference;
+    }
+
+    public ArrayList<String> getListConceptTrates() {
+        return listConceptTrates;
+    }
+
+    public void setListConceptTrates(ArrayList<String> listConceptTrates) {
+        this.listConceptTrates = listConceptTrates;
+    }
+
+    public NodeAlignment getNodeAli() {
+        return nodeAli;
+    }
+
+    public void setNodeAli(NodeAlignment nodeAli) {
+        this.nodeAli = nodeAli;
     }
 
 }

@@ -1,0 +1,165 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idPrefDlg"  header="#{langueBean.getMsg('conf.field3')}" widgetVar="prefDlg" modal="true" resizable="false" >
+
+        <h:panelGroup rendered="#{user1.haveRights(2)}" >
+
+
+
+            <h:form id="formEditPref">
+                <h:panelGrid columns="1" >
+                    <p:scrollPanel style="width:450px;height:700px; border: 0px;" mode="native">
+                    
+
+                        <p:fieldset legend="Générale" toggleable="true" collapsed="false" style="text-align: center; margin-top: 30px;"  >
+                            <h:panelGrid columns="2" style="text-align: left">
+
+                                <h:outputLabel value="chemin site" />
+                                <h:inputText value="#{user1.nodePreference.cheminSite}" />
+
+                                <h:outputLabel for="prefLangueSource"  value="#{langueBean.getMsg('conf.langSource')} :" /> 
+                                <h:selectOneMenu id="prefLangueSource" value="#{user1.langSourceEdit}" style="width: 100px;">
+                                    <f:selectItem itemValue="fr" itemLabel="Français" />
+                                    <f:selectItem itemValue="en" itemLabel="Anglais" />
+                                    <f:selectItem itemValue="de" itemLabel="Allemand" />
+                                    <f:selectItem itemValue="es" itemLabel="Espagnole" />
+                                    <f:selectItem itemValue="it" itemLabel="Italien" />
+                                </h:selectOneMenu>
+
+                                <h:outputLabel  value="#{langueBean.getMsg('conf.nbCdt')}" />
+                                <h:selectOneMenu value="#{user1.alertNbCdtEdit}" style="width: 60px;">
+                                    <f:selectItem itemValue="5" itemLabel="5" />
+                                    <f:selectItem itemValue="10" itemLabel="10" />
+                                    <f:selectItem itemValue="15" itemLabel="15" />
+                                    <f:selectItem itemValue="20" itemLabel="20" />
+                                </h:selectOneMenu>
+
+                                <h:outputLabel for="prefAlert" value="#{langueBean.getMsg('conf.alertCdt')}" /> 
+                                <h:selectOneRadio id="prefAlert" value="#{user1.alertCdtEdit}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+
+                                <h:outputLabel value="identifier type : " />
+                                <h:selectOneMenu value="#{user1.nodePreference.identifierType}" >
+                                    <f:selectItem itemValue="1" itemLabel="alphanumérique" />
+                                    <f:selectItem itemValue="2" itemLabel="numérique" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="ark" toggleable="true" collapsed="true" style="text-align: center; margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="use ark :" />
+                                <h:selectOneRadio value="#{user1.nodePreference.useArk}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+                                <h:outputLabel value="serveur ark" />
+                                <h:inputText value="#{user1.nodePreference.serveurArk}" />
+
+                            </h:panelGrid>
+                        </p:fieldset>
+
+
+                        <p:fieldset legend="image" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="path image" />
+                                <h:inputText value="#{user1.nodePreference.pathImage}" />
+
+                                <h:outputLabel value="dosier resize" />
+                                <h:inputText value="#{user1.nodePreference.dossierResize}" />
+
+                            </h:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="mail" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="protocole mail" />
+                                <h:inputText value="#{user1.nodePreference.protcolMail}" />
+
+                                <h:outputLabel value="host mail"/>
+                                <h:inputText value="#{user1.nodePreference.hostMail}"  />
+
+                                <h:outputLabel value="port mail"/>
+                                <h:inputText value="#{user1.nodePreference.portMail}"  />
+
+                                <h:outputLabel value="authMail" /> 
+                                <h:selectOneRadio value="#{user1.nodePreference.authMail}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+                                <h:outputLabel value="mail form"/> 
+                                <h:inputText value="#{user1.nodePreference.mailForm}"  />
+
+                                <h:outputLabel value="transport mail"/>
+                                <h:inputText value="#{user1.nodePreference.transportMail}"  />
+                            </h:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="BDD" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+
+                                <h:outputLabel value="BDD active" />
+                                <h:selectOneRadio value="#{user1.nodePreference.bddActive}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+                                <h:outputLabel value="BDD use id" />
+                                <h:selectOneRadio value="#{user1.nodePreference.bddUseId}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>    
+
+                                <h:outputLabel value="url bdd"/>
+                                <h:inputText value="#{user1.nodePreference.urlBdd}"  />
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <p:fieldset legend="SIGB" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="z3950 actif" />
+                                <h:selectOneRadio value="#{user1.nodePreference.z3950acif}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+                                <h:outputLabel value="collection addresse"/>
+                                <h:inputText value="#{user1.nodePreference.collectionAdresse}"  />
+
+                                <h:outputLabel value="notice url"/>
+                                <h:inputText value="#{user1.nodePreference.noticeUrl}"  />
+
+                                <h:outputLabel value="url encode"/>
+                                <h:inputText value="#{user1.nodePreference.urlEncode}"  />
+
+                                <h:outputLabel value="path notice 1"/>
+                                <h:inputText value="#{user1.nodePreference.pathNotice1}"  />
+
+                                <h:outputLabel value="path notice 2"/>
+                                <h:inputText value="#{user1.nodePreference.pathNotice2}"  />
+                            </h:panelGrid>
+                        </p:fieldset>
+                </p:scrollPanel>
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}"  styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
+                </h:panelGrid>
+            </h:form> 
+
+        </h:panelGroup>
+
+    </p:dialog>
+
+</ui:composition>

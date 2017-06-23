@@ -1,0 +1,21 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idFinalizeGPSDlg"  header="#{langueBean.getMsg('alig.fin')}" widgetVar="finalizeGPSDlg" modal="true" resizable="false" >
+        
+            
+        
+        <p:commandButton value="save workFlow"  action="#{gps.enregister_Des_Progres(user1.user.id)}" oncomplete="PF('finalizeGPSDlg').hide();" update=":panContenu" />
+          <br/>
+          <br/>
+          <p:commandButton value="initialiser" action="#{gps.initAlign(user1.user.id)}" oncomplete="PF('finalizeGPSDlg').hide();" />
+        
+    </p:dialog>
+    
+</ui:composition>
+    

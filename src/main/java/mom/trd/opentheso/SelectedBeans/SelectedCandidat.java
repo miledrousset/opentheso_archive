@@ -34,6 +34,7 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
+import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
@@ -74,8 +75,6 @@ public class SelectedCandidat implements Serializable {
 
     private String statusCandidat;
 
-
-    
     private ArrayList<String> nomsProp;
 
     // Variables resourcesBundle
@@ -95,15 +94,23 @@ public class SelectedCandidat implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
 
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser user;
+
     /**
      * ************************** INITIALISATION ****************************
      */
     public SelectedCandidat() {
-        ResourceBundle bundlePref = getBundlePref();
-        String temp = bundlePref.getString("useArk");
-        arkActive = temp.equals("true");
-        serverAdress = bundlePref.getString("cheminSite");
-        identifierType = bundlePref.getString("identifierType");
+
+        if (user == null || user.getNodePreference() == null) {
+            return;
+        }
+        //ResourceBundle bundlePref = getBundlePref();
+        //bundlePref.getString("useArk");
+        arkActive = user.getNodePreference().isUseArk();
+        serverAdress = user.getNodePreference().getCheminSite(); //bundlePref.getString("cheminSite");
+        Integer temp = user.getNodePreference().getIdentifierType();
+        identifierType = temp.toString(); //bundlePref.getString("identifierType");
     }
 
     /**
@@ -171,13 +178,9 @@ public class SelectedCandidat implements Serializable {
         }
     }
 
-    
     /**
-     *   $$$$$$$$$
-     *      fonction à revoir, trop de connection, à optimiser
-     *   $$$$$$$$$
-     */   
-
+     * $$$$$$$$$ fonction à revoir, trop de connection, à optimiser $$$$$$$$$
+     */
     /**
      * Récupération des informations d'un candidat lors de sa sélection dans la
      * table des candidats
@@ -186,7 +189,7 @@ public class SelectedCandidat implements Serializable {
      * @param langue
      */
     public void maj(String theso, String langue) {
-       // if(theso == null) return;
+        // if(theso == null) return;
         idTheso = theso;
         langueTheso = langue;
         infoCdt.setNodesUser(new CandidateHelper().getListUsersOfCandidat(connect.getPoolConnexion(), selected.getIdConcept(), theso));
@@ -197,9 +200,9 @@ public class SelectedCandidat implements Serializable {
         }
         if (selected.getIdConcept() != null && !selected.getIdConcept().equals("")) {
             NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(), selected.getIdConcept(), theso, infoCdt.getNodesUser().get(0).getId());
-            if(np == null) { // erreur
+            if (np == null) { // erreur
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
-                return;                
+                return;
             }
             note = np.getNote();
             niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langue) + " (" + np.getIdConceptParent() + ")";
@@ -224,7 +227,7 @@ public class SelectedCandidat implements Serializable {
      *
      * @param theso
      * @param langue
-     * @return 
+     * @return
      */
     public boolean newCandidat(String theso, String langue) {
         if (selectedNvx != null) {
@@ -241,18 +244,18 @@ public class SelectedCandidat implements Serializable {
         try {
             conn = connect.getPoolConnexion().getConnection();
             String id_candidat = new CandidateHelper().addCandidat_rollBack(conn, valueEdit, langue, theso, theUser.getUser().getId(), noteEdit, niveauEdit, domaineEdit);
-            if( id_candidat == null) {
+            if (id_candidat == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
                 conn.rollback();
                 conn.close();
-                return false;           
+                return false;
             }
             conn.commit();
             conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
-            return false;   
+            return false;
         }
         selectedNvx = new NodeAutoCompletion();
         noteEdit = "";
@@ -307,7 +310,7 @@ public class SelectedCandidat implements Serializable {
             selected.setNbProp(selected.getNbProp() + 1);
 
             // envoie d'email d'alerte !!
-            int minAlert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(),idTheso).getNbAlertCdt();
+            int minAlert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).getNbAlertCdt();
             if (selected.getNbProp() >= minAlert) {
                 ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
                 for (String mail : lesMails) {
@@ -335,24 +338,26 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertNb(String candidat, String dest, int minAlert) {
         try {
-            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
+            boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                ResourceBundle bundlePref = getBundlePref();
+                //ResourceBundle bundlePref = getBundlePref();
 
                 java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-                props.setProperty("mail.smtp.port", bundlePref.getString("portMail"));
-                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
+                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
+                Integer temp = user.getNodePreference().getPortMail();
+                props.setProperty("mail.smtp.port", temp.toString());
+                Boolean temp2 = user.getNodePreference().isAuthMail();;
+                props.setProperty("mail.smtp.auth", temp2.toString());
                 Session session = Session.getInstance(props);
 
                 Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
                 msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
                 msg.setSubject("Proposition de candidat");
                 msg.setText("Le candidat " + candidat + " a été proposé au moins " + minAlert + " fois.");
 
-                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
@@ -375,24 +380,26 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertValid(String candidat, String dest) {
         try {
-            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
+            boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                ResourceBundle bundlePref = getBundlePref();
+                //ResourceBundle bundlePref = getBundlePref();
 
                 java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
-                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
+                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
+                Integer temp = user.getNodePreference().getPortMail();
+                props.setProperty("mail.smtp.port", temp.toString());
+                Boolean temp2 = user.getNodePreference().isAuthMail();;
+                props.setProperty("mail.smtp.auth", temp2.toString());
                 Session session = Session.getInstance(props);
 
                 Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
                 msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
                 msg.setSubject("Gestion de candidats");
                 msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
 
-                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
@@ -415,24 +422,26 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean envoyerMailAlertRefut(String candidat, String dest) {
         try {
-            boolean alert = new UserHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
+            boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                ResourceBundle bundlePref = getBundlePref();
+                //ResourceBundle bundlePref = getBundlePref();
 
                 java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
-                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
+                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
+                Integer temp = user.getNodePreference().getPortMail();
+                props.setProperty("mail.smtp.port", temp.toString());
+                Boolean temp2 = user.getNodePreference().isAuthMail();;
+                props.setProperty("mail.smtp.auth", temp2.toString());
                 Session session = Session.getInstance(props);
 
                 Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
                 msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
                 msg.setSubject("Gestion de candidats");
                 msg.setText("Le candidat " + candidat + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".");
 
-                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
@@ -446,7 +455,7 @@ public class SelectedCandidat implements Serializable {
     }
 
     public boolean newTradCdt(String idT, String langue) {
-        if(!new CandidateHelper().addTermCandidatTraduction(connect.getPoolConnexion(), selected.getIdConcept(), valueEdit, langueEdit.trim(), idT, theUser.getUser().getId())) {
+        if (!new CandidateHelper().addTermCandidatTraduction(connect.getPoolConnexion(), selected.getIdConcept(), valueEdit, langueEdit.trim(), idT, theUser.getUser().getId())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
             return false;
         }
@@ -510,8 +519,8 @@ public class SelectedCandidat implements Serializable {
         selected.setEtat("v");
 
         // envoie d'email d'alerte !!
-        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(),idTheso);
-        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(),idTheso);
+        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
+        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(), idTheso);
         for (String contrib : contribs) {
             if (!lesMails.contains(contrib)) {
                 lesMails.add(contrib);
@@ -673,14 +682,15 @@ public class SelectedCandidat implements Serializable {
         domaineEdit = np.getIdGroup();
         vue.setEditPropCandidat(true);
     }
-    
+
     public boolean setStatusToInsert() {
         CandidateHelper candidateHelper = new CandidateHelper();
-        if(candidateHelper.setStatusCandidatToInserted(connect.getPoolConnexion(), selected.getIdConcept(),
-                idTheso, theUser.getUser().getId()))
-           return true;
-        else 
+        if (candidateHelper.setStatusCandidatToInserted(connect.getPoolConnexion(), selected.getIdConcept(),
+                idTheso, theUser.getUser().getId())) {
+            return true;
+        } else {
             return false;
+        }
     }
 
     /**
@@ -714,43 +724,41 @@ public class SelectedCandidat implements Serializable {
         noteEdit = "";
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info8")));
     }
-    public boolean needchangerpass() throws SQLException
-    {
+
+    public boolean needchangerpass() throws SQLException {
         UserHelper user = new UserHelper();
-        if(user.isneededpass(connect.getPoolConnexion(),theUser.getUser().getId()))
-        {
+        if (user.isneededpass(connect.getPoolConnexion(), theUser.getUser().getId())) {
             return true;
         }
         return false;
     }
+
     /**
      * Applelation de la funtion avec les parametres pour changer le mot de
-     * pass.
-     * on fait le comprobation pour voir si tout c'est bon
-     * @return 
-     * @throws SQLException 
+     * pass. on fait le comprobation pour voir si tout c'est bon
+     *
+     * @return
+     * @throws SQLException
      */
-    public String fchangepass() throws SQLException{
-        boolean sort=false;
+    public String fchangepass() throws SQLException {
+        boolean sort = false;
         ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
         CurrentUser user = new CurrentUser();
-        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass))
-        {
-            sort=true;
+        if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass)) {
+            sort = true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
         }
-        if(newPass == null || newPass.trim().equals("") || confirmPass == null || confirmPass.trim().equals("") ) {
-            sort=true;
+        if (newPass == null || newPass.trim().equals("") || confirmPass == null || confirmPass.trim().equals("")) {
+            sort = true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
-        }
-        else if(!sort){ 
-            if(forgetPassword.faireChangePass(connect.getPoolConnexion(),newPass,confirmPass, theUser.getUser().getId()))
-            {
+        } else if (!sort) {
+            if (forgetPassword.faireChangePass(connect.getPoolConnexion(), newPass, confirmPass, theUser.getUser().getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
                 return "index.xhtml?faces-redirect=true";
 
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             }
-            else FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
         }
         return "";// nouvelle pass web pour changer le motpasstemp
     }
@@ -772,7 +780,6 @@ public class SelectedCandidat implements Serializable {
         }
         return false;
     }
-
 
     /**
      * ************************** GETTERS SETTERS ****************************
@@ -964,7 +971,7 @@ public class SelectedCandidat implements Serializable {
     public void setModifiedProposition(Date modifiedProposition) {
         this.modifiedProposition = modifiedProposition;
     }
-    
+
     public String getStatusCandidat() {
         return statusCandidat;
     }
@@ -976,7 +983,8 @@ public class SelectedCandidat implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-     public String getNewPass() {
+
+    public String getNewPass() {
         return newPass;
     }
 
@@ -999,22 +1007,51 @@ public class SelectedCandidat implements Serializable {
     public void setAncianPass(String ancianPass) {
         this.ancianPass = ancianPass;
     }
-    
-    
 
     public boolean setStatusCandidat(String idCandidat) {
         CandidateHelper candidateHelper = new CandidateHelper();
-        if(!candidateHelper.setStatusCandidatToInserted(
+        if (!candidateHelper.setStatusCandidatToInserted(
                 connect.getPoolConnexion(),
                 idCandidat,
                 idTheso,
-                theUser.getUser().getId()))
-                return false;
-        else
-            
+                theUser.getUser().getId())) {
+            return false;
+        } else {
             selected.setEtat("i");
+        }
         return true;
     }
-    
+
+    public boolean isArkActive() {
+        return arkActive;
+    }
+
+    public void setArkActive(boolean arkActive) {
+        this.arkActive = arkActive;
+    }
+
+    public String getServerAdress() {
+        return serverAdress;
+    }
+
+    public void setServerAdress(String serverAdress) {
+        this.serverAdress = serverAdress;
+    }
+
+    public String getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(String identifierType) {
+        this.identifierType = identifierType;
+    }
+
+    public CurrentUser getUser() {
+        return user;
+    }
+
+    public void setUser(CurrentUser user) {
+        this.user = user;
+    }
 
 }

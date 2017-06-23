@@ -550,7 +550,7 @@
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
 
                             
-                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  update=":idImportDlg" oncomplete="PF('importDlg').show();"
+                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  update=":idImportDlg" oncomplete="PF('importDlg').show();" action="#{rdf4jFileBean.init()}"
                                                     style="font-size: 12px;"/> 
                                      
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 

@@ -34,6 +34,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import mom.trd.opentheso.SelectedBeans.CurrentUser;
 
 /**
  *
@@ -46,10 +47,13 @@ public class ForgetPasswordHelper {
     private String passsansmd5;
     private String newpass;
     private String confirmpass;
-    
+
     private String emailTitle;
-    private String emailMessage; 
+    private String emailMessage;
     private String pseudoMessage;
+
+    @ManagedProperty(value = "#{user1}")
+    private CurrentUser user;
 
     /**
      * s'appeléer depuis donwloadBean ou on pass le nom et le mail del usuaire
@@ -57,7 +61,7 @@ public class ForgetPasswordHelper {
      *
      * @param ds
      * @param mail
-     * @return 
+     * @return
      * @throws javax.mail.MessagingException
      */
     public boolean forgotPass(HikariDataSource ds, String mail) throws MessagingException {
@@ -65,7 +69,9 @@ public class ForgetPasswordHelper {
         String nouvelleSansMD5;
         email = mail;//change a l'heure de partir ca vien de donwloadBean
         String pseudo;
-        if (email == null) return false;
+        if (email == null) {
+            return false;
+        }
         UserHelper userHelper = new UserHelper();
         if (userHelper.isUserMailExist(ds, mail)) {
             ToolsHelper toolsHelper = new ToolsHelper();
@@ -76,10 +82,10 @@ public class ForgetPasswordHelper {
             envoiEmail(email, nouvelleSansMD5, pseudo);
             insertNP(ds, nouvellePass);
             return true;
-        } 
+        }
         return false;
     }
-    
+
     /**
      * Injection a la BDD de le pass en motpasstemp del usuaire que la demandé
      *
@@ -119,24 +125,24 @@ public class ForgetPasswordHelper {
         Statement stmt, stmt1;
         boolean ok = false;
         //if (cestlememmepass(ds, ancien)) {
-            //ancien = MD5Password.getEncodedPassword(ancien);//transform le pass en format encrypt pour la BDD
+        //ancien = MD5Password.getEncodedPassword(ancien);//transform le pass en format encrypt pour la BDD
+        try {
+            Connection conn = ds.getConnection();
+            stmt = stmt1 = conn.createStatement();
             try {
-                Connection conn = ds.getConnection();
-                stmt = stmt1 = conn.createStatement();
-                try {
-                    //System.out.println(Pass);
-                    String queryAjouPass = "update users set password ='" + passwordencoding
-                            + "',passtomodify = false where id_user ='" + id + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
-                    stmt.executeUpdate(queryAjouPass);
-                    ok = true;
-                } finally {
-                    stmt.close();
-                    stmt1.close();
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+                //System.out.println(Pass);
+                String queryAjouPass = "update users set password ='" + passwordencoding
+                        + "',passtomodify = false where id_user ='" + id + "'";//on mettre a jour le nouvelle pass dans le memme colon que le motpasstemp
+                stmt.executeUpdate(queryAjouPass);
+                ok = true;
+            } finally {
+                stmt.close();
+                stmt1.close();
+                conn.close();
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //}
         return ok;
     }
@@ -154,30 +160,31 @@ public class ForgetPasswordHelper {
     /**
      * Envoi une email a "nonUsu" a la direcction "email" pour l'indiquer son
      * nouvelle "pass"
+     *
      * @param email
      * @param pass
      * @throws MessagingException
      */
     private void envoiEmail(String email, String pass, String pseudo) throws MessagingException {
 
-        ResourceBundle bundlePref = getBundlePref();
-
+        //ResourceBundle bundlePref = getBundlePref();
         java.util.Properties props = new java.util.Properties();
-        props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-        props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-        props.setProperty("mail.smtp.port", bundlePref.getString("portMail"));
-        props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+        props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
+        props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
+        Integer temp = user.getNodePreference().getPortMail();
+        props.setProperty("mail.smtp.port", temp.toString());
+        Boolean temp2 = user.getNodePreference().isAuthMail();
+        props.setProperty("mail.smtp.auth",temp2.toString());
         Session session = Session.getInstance(props);
 
         Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+        msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         msg.setSubject(emailTitle); /// mot.titlePass
-        
-        msg.setText(emailMessage + pass +"\n" + pseudoMessage + pseudo); 
 
-        
-        SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+        msg.setText(emailMessage + pass + "\n" + pseudoMessage + pseudo);
+
+        SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
         transport.connect();
         transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
         transport.close();
@@ -188,7 +195,6 @@ public class ForgetPasswordHelper {
      *
      * @return
      */
-
     public String getNewpass() {
         return newpass;
     }

@@ -31,11 +31,10 @@ import mom.trd.opentheso.core.alignment.AlignementPreferences;
 
 public class AlignementParLotBean {
 
-    private static  int optionAllBranch = 0;
-    private static  int optionNonAligned = 1;
-    private static  int optionWorkFlow = 2;    
-    
-    
+    private static int optionAllBranch = 0;
+    private static int optionNonAligned = 1;
+    private static int optionWorkFlow = 2;
+
     private AlignementPreferences alignementPreferences;
     private ArrayList<String> listOfChildrenInConcept;
     private ArrayList<String> listConceptTrates = new ArrayList<>();
@@ -50,6 +49,8 @@ public class AlignementParLotBean {
     private boolean last = false;
     private boolean addDefinition = false;
 
+    private boolean uriManuel = false;
+
     private String uriSelection = null;
     private String nomduterm;
     private String id_concept;
@@ -63,9 +64,8 @@ public class AlignementParLotBean {
     /////////////Preferences*//////////////
     private int optionOfAlignement = -1;
     private ArrayList<Integer> option;
-    private ArrayList<String> optionValue;    
-    private Map<Integer,String> options;
-    
+    private ArrayList<String> optionValue;
+    private Map<Integer, String> options;
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
@@ -98,7 +98,7 @@ public class AlignementParLotBean {
     }
 
     private void initOption() {
-    
+
         options = new LinkedHashMap<>();
         options.put(optionAllBranch, langueBean.getMsg("alig.TTB"));
         options.put(optionNonAligned, langueBean.getMsg("alig.nonA"));
@@ -130,7 +130,9 @@ public class AlignementParLotBean {
             while (alignmentHelper.isAlignedWithThisSource(connect.getPoolConnexion(),
                     id_concept, id_theso, selectedTerme.alignementSource.getId())) {//alignement_id_type)) {
                 position++;
-                if(fin) return;
+                if (fin) {
+                    return;
+                }
                 if (position < listOfChildrenInConcept.size()) {
                     id_concept = listOfChildrenInConcept.get(position);
                 }
@@ -157,6 +159,56 @@ public class AlignementParLotBean {
     }
 
     /**
+     * Cette fonction permet de passer au concept précédant
+     */
+    public void prevPosition() {
+        if (position <= 0) {
+            return;
+        }
+        erreur = "";
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+       
+
+        if (optionNonAligned == optionOfAlignement) {
+            position--;
+            if (position >= 0) {
+                id_concept = listOfChildrenInConcept.get(position);
+            }
+            checkEndConcepts();
+            while (alignmentHelper.isAlignedWithThisSource(connect.getPoolConnexion(),
+                    id_concept, id_theso, selectedTerme.alignementSource.getId())) {//alignement_id_type)) {
+                position--;
+                if (first) {
+                    return;
+                }
+                if (position >= 0) {
+                    id_concept = listOfChildrenInConcept.get(position);
+                }
+                checkEndConcepts();
+            }
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        }
+        if ((optionAllBranch == optionOfAlignement) || (optionWorkFlow == optionOfAlignement)) {
+            position--;
+            checkEndConcepts();
+            if (position >= 0) {
+                id_concept = listOfChildrenInConcept.get(position);
+            } else {
+                return;
+            }
+            nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
+                    selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+
+        }
+        selectedTerme.creerAlignAuto(id_concept, nomduterm);
+        
+         listConceptTrates.remove(id_concept);
+
+    }
+
+    /**
      * Permet de savoir si c'est le fin de l'Arraylist et sortir du dialog
      */
     private void checkEndConcepts() {
@@ -169,7 +221,7 @@ public class AlignementParLotBean {
         }
         if (position > listOfChildrenInConcept.size()) {
             fin = true;
-        }        
+        }
 
     }
 
@@ -196,47 +248,45 @@ public class AlignementParLotBean {
     public void addAlignement() {
         erreur = "";
         TermHelper termHelper = new TermHelper();
-            if (uriSelection.isEmpty() && uri_manual.isEmpty()) {
-                erreur = "no selected alignment";
-                message = "";
+        if ((uriSelection == null || uriSelection.isEmpty()) && uri_manual.isEmpty()) {
+            erreur = "no selected alignment";
+            message = "";
+        } else {
+            if (uri_manual != null && !uri_manual.trim().isEmpty()) {
+                nodeAli = new NodeAlignment();
+                nodeAli.setAlignement_id_type(alignement_id_type);
+                nodeAli.setUri_target(uri_manual);
+                nodeAli.setInternal_id_concept(id_concept);
+                nodeAli.setThesaurus_target(selectedTerme.alignementSource.getSource());
+                nodeAli.setConcept_target(nomduterm);
+                id_term = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), id_concept, id_theso);
+                selectedTerme.ajouterAlignAutoByLot(nodeAli, addDefinition, id_term);
+                message += selectedTerme.getMessageAlig();
+                addDefinition = false;
+                nodeAli = null;
+                message += "<br>Concept aligné ...";
+                uriSelection = null;
+                uri_manual = null;
+                nextPosition();
             } else {
-                if(!uri_manual.trim().isEmpty())
-                {
-                    nodeAli = new NodeAlignment();
-                    nodeAli.setAlignement_id_type(alignement_id_type);
-                    nodeAli.setUri_target(uri_manual);
-                    nodeAli.setInternal_id_concept(id_concept);
-                    nodeAli.setThesaurus_target(selectedTerme.alignementSource.getSource());
-                    nodeAli.setConcept_target(nomduterm);
-                    id_term = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), id_concept, id_theso);
-                    selectedTerme.ajouterAlignAutoByLot(nodeAli, addDefinition, id_term);
-                    message += selectedTerme.getMessageAlig();
-                    addDefinition = false;
-                    nodeAli = null;
-                    message += "<br>Concept aligné ...";
-                    uriSelection = null;
-                    uri_manual = null;
-                    nextPosition();
-                }else
-                {
-                    for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
-                        if (nodeAlignment.getUri_target().equals(uriSelection)) {
-                            message = "";
-                            nodeAli = nodeAlignment;
-                            nodeAli.setAlignement_id_type(alignement_id_type);
-                            // message = "l'alignement va se faire <br>";
-                            id_term = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), id_concept, id_theso);
-                            selectedTerme.ajouterAlignAutoByLot(nodeAli, addDefinition, id_term);
-                            message += selectedTerme.getMessageAlig();
-                            addDefinition = false;
-                            nodeAli = null;
-                            message += "<br>Concept aligné ...";
-                            uriSelection = null;
-                            nextPosition();
-                        }
+                for (NodeAlignment nodeAlignment : selectedTerme.getListAlignValues()) {
+                    if (nodeAlignment.getUri_target().equals(uriSelection)) {
+                        message = "";
+                        nodeAli = nodeAlignment;
+                        nodeAli.setAlignement_id_type(alignement_id_type);
+                        // message = "l'alignement va se faire <br>";
+                        id_term = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), id_concept, id_theso);
+                        selectedTerme.ajouterAlignAutoByLot(nodeAli, addDefinition, id_term);
+                        message += selectedTerme.getMessageAlig();
+                        addDefinition = false;
+                        nodeAli = null;
+                        message += "<br>Concept aligné ...";
+                        uriSelection = null;
+                        nextPosition();
                     }
                 }
-        } 
+            }
+        }
     }
 
     /**
@@ -250,18 +300,18 @@ public class AlignementParLotBean {
         if (!"".equals(selectedTerme.selectedAlignement)) {
             getPreferenceAlignement(id_theso, id_user);
             if (optionOfAlignement != -1) {
-                if (optionNonAligned==optionOfAlignement) {//reprise de non alignes
+                if (optionNonAligned == optionOfAlignement) {//reprise de non alignes
                     isNonAligne(id_Concept, id_theso, id_user);
                 }
-                if (optionAllBranch == optionOfAlignement ) {//Mise a jour = true
+                if (optionAllBranch == optionOfAlignement) {//Mise a jour = true
                     ismiseAJour();
                 }
                 if (optionWorkFlow == optionOfAlignement) {//reprise de la suite
-                    if(alignementPreferences.getId_concept_tratees() == null)
-                    {
+                    if (alignementPreferences.getId_concept_tratees() == null) {
                         ismiseAJour();
-                    }else
+                    } else {
                         isSuite();
+                    }
                 }
             } else {
                 erreur += "Veuillez choissir une option";
@@ -346,7 +396,6 @@ public class AlignementParLotBean {
                 connect.getPoolConnexion(), idTheso, id_user, id_concept_depart, selectedTerme.alignementSource.getId());
     }
 
-
     /**
      * permet d'ecrire dans la bdd les concept que sont déjà tratées
      *
@@ -356,14 +405,19 @@ public class AlignementParLotBean {
     public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         if (optionWorkFlow == optionOfAlignement) {
-            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user, 
-                    id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));
             }
         }
         return true;
+    }
+
+    public void initAlign(int id_user) {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        alignmentHelper.init_preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart);
+
     }
 
     ///////////////GET & SET////////////////
@@ -559,5 +613,60 @@ public class AlignementParLotBean {
         this.uri_manual = uri_manual;
     }
 
+    public static int getOptionAllBranch() {
+        return optionAllBranch;
+    }
+
+    public static void setOptionAllBranch(int optionAllBranch) {
+        AlignementParLotBean.optionAllBranch = optionAllBranch;
+    }
+
+    public static int getOptionNonAligned() {
+        return optionNonAligned;
+    }
+
+    public static void setOptionNonAligned(int optionNonAligned) {
+        AlignementParLotBean.optionNonAligned = optionNonAligned;
+    }
+
+    public static int getOptionWorkFlow() {
+        return optionWorkFlow;
+    }
+
+    public static void setOptionWorkFlow(int optionWorkFlow) {
+        AlignementParLotBean.optionWorkFlow = optionWorkFlow;
+    }
+
+    public AlignementPreferences getAlignementPreferences() {
+        return alignementPreferences;
+    }
+
+    public void setAlignementPreferences(AlignementPreferences alignementPreferences) {
+        this.alignementPreferences = alignementPreferences;
+    }
+
+    public boolean isUriManuel() {
+        return uriManuel;
+    }
+
+    public void setUriManuel(boolean uriManuel) {
+        this.uriManuel = uriManuel;
+    }
+
+    public String getId_theso() {
+        return id_theso;
+    }
+
+    public void setId_theso(String id_theso) {
+        this.id_theso = id_theso;
+    }
+
+    public String getId_concept_depart() {
+        return id_concept_depart;
+    }
+
+    public void setId_concept_depart(String id_concept_depart) {
+        this.id_concept_depart = id_concept_depart;
+    }
 
 }
