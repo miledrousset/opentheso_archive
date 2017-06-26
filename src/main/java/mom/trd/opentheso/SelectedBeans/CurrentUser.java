@@ -694,5 +694,7 @@ public class CurrentUser implements Serializable {
     public void setAuthorizedTheso(List<String> authorizedTheso) {
         this.authorizedTheso = authorizedTheso;
     }
+
+
     
 }

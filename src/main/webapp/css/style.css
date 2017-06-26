@@ -1015,8 +1015,8 @@ input[type="button"], input[type="submit"]{
 }
 .fieldReorga {
     float: right; 
-    /*width: 190px; 
-    height: 150px; */
+    width: 300px !important; 
+    height: 200px !important; 
     text-align: center;
     border-radius: 5px;
 }

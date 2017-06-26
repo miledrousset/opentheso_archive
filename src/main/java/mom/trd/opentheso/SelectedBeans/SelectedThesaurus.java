@@ -143,6 +143,9 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{user1}")
     private CurrentUser user;
+    
+    @ManagedProperty(value = "#{selectedTerme}")
+    private SelectedTerme selectedTerme;
 
     /**
      * ************************************ INITIALISATION
@@ -1010,6 +1013,9 @@ public class SelectedThesaurus implements Serializable {
         }
         vue.setCreat(false);
         majPref();
+        if(selectedTerme != null){
+            selectedTerme.initTerme();
+        }
     }
 
     /**
@@ -1968,6 +1974,22 @@ public class SelectedThesaurus implements Serializable {
 
     public void setUser(CurrentUser user) {
         this.user = user;
+    }
+
+    public SelectedTerme getSelectedTerme() {
+        return selectedTerme;
+    }
+
+    public void setSelectedTerme(SelectedTerme selectedTerme) {
+        this.selectedTerme = selectedTerme;
+    }
+
+    public static SecureRandom getRnd() {
+        return rnd;
+    }
+
+    public static void setRnd(SecureRandom rnd) {
+        SelectedThesaurus.rnd = rnd;
     }
 
 }
