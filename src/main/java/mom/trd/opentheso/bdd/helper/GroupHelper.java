@@ -1542,6 +1542,39 @@ public class GroupHelper {
         return tabIdConceptGroup;
     }
 
+    public ArrayList<String> getListIdOfGroup(Connection conn,
+            String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList tabIdConceptGroup = null;
+
+        try {
+            // Get connection from pool
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    tabIdConceptGroup = new ArrayList();
+                    while (resultSet.next()) {
+                        tabIdConceptGroup.add(resultSet.getString("idgroup"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Id or Groups of thesaurus : " + idThesaurus, sqle);
+        }
+        return tabIdConceptGroup;
+    }
+
     public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
             String idThesaurus) {
 
@@ -1942,8 +1975,7 @@ public class GroupHelper {
     /**
      * Cette fonction permet de savoir si un group ou sous_group a des
      * sous_group ou non suivant l'id du Group ou sous_group et l'id du
-     * thésaurus
-     * #MR.
+     * thésaurus #MR.
      *
      * @param ds
      * @param idThesaurus
@@ -1988,6 +2020,155 @@ public class GroupHelper {
             log.error("Error while testing if haveSubGroup of Group : " + idGroup, sqle);
         }
         return subGroup;
+    }
+
+    /**
+     * Change l'id d'un group dans la table concept_group
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroup(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE concept_group"
+                    + " SET idgroup = '" + newIdGroup + "'"
+                    + " WHERE idgroup = '" + idGroup + "'"
+                    + " AND idthesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+
+    /**
+     * Change l'id d'un group dans la table concept_group_concept
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroupConcept(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE concept_group_concept"
+                    + " SET idgroup = '" + newIdGroup + "'"
+                    + " WHERE idgroup = '" + idGroup + "'"
+                    + " AND idthesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+
+    /**
+     * Change l'id d'un group dans la table concept_group_historique
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroupHisto(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE concept_group_historique"
+                    + " SET idgroup = '" + newIdGroup + "'"
+                    + " WHERE idgroup = '" + idGroup + "'"
+                    + " AND idthesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+
+    /**
+     * Change l'id d'un group dans la table concept_group_label
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroupLabel(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE concept_group_label"
+                    + " SET idgroup = '" + newIdGroup + "'"
+                    + " WHERE idgroup = '" + idGroup + "'"
+                    + " AND idthesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+
+    /**
+     * Change l'id d'un group dans la table concept_group_label_historique
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroupLabelHisto(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE concept_group_label_historique"
+                    + " SET idgroup = '" + newIdGroup + "'"
+                    + " WHERE idgroup = '" + idGroup + "'"
+                    + " AND idthesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+
+    /**
+     * Change l'id d'un group dans la table relation_group
+     *
+     * @param conn
+     * @param idTheso
+     * @param idGroup
+     * @param newIdGroup
+     * @throws java.sql.SQLException
+     */
+    public void setIdGroupRelation(Connection conn, String idTheso, String idGroup, String newIdGroup) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE relation_group"
+                    + " SET id_group1 = '" + newIdGroup + "'"
+                    + " WHERE id_group1 = '" + idGroup + "'"
+                    + " AND id_thesaurus = '" + idTheso + "'";
+            query += ";";
+            query += "UPDATE relation_group"
+                    + " SET id_group2 = '" + newIdGroup + "'"
+                    + " WHERE id_group2 = '" + idGroup + "'"
+                    + " AND id_thesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
     }
 
 }

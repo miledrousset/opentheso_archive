@@ -1139,6 +1139,52 @@ public class NoteHelper {
         }
         return nodeNotes;
     }
+    
+     /**
+     * Change l'id d'un concept dans la table note
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @param newIdConcept
+     * @throws SQLException
+     */
+    public void setIdConceptNote(Connection conn, String idTheso, String idConcept, String newIdConcept) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE note"
+                    + " SET id_concept = '" + newIdConcept + "'"
+                    + " WHERE id_concept = '" + idConcept + "'"
+                    + " AND id_thesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+        } finally {
+            stmt.close();
+        }
+    }
+    
+    /**
+     * Change l'id d'un concept dans la table note_historique
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @param newIdConcept
+     * @throws SQLException
+     */
+    public void setIdConceptNoteHisto(Connection conn, String idTheso, String idConcept, String newIdConcept) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE note_historique"
+                    + " SET id_concept = '" + newIdConcept + "'"
+                    + " WHERE id_concept = '" + idConcept + "'"
+                    + " AND id_thesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+        } finally {
+            stmt.close();
+        }
+    }
 
 }
 

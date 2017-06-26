@@ -17,6 +17,11 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}"  styleClass="styleButton" />
+                    <br/>
+                    <hr/>
+                    <p:commandButton value="Regénérer de nouveaux indentifiants" actionListener="#{theso.regenAllId(theso.thesaurus.id_thesaurus)}"  styleClass="styleButton" />
+                    
+                    
                 </h:form> 
             </fieldset>
         </h:panelGroup>
