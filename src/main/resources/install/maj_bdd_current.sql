@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.3.0
--- date : 01/06/2017
+-- date : 26/06/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1046,35 +1046,42 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION ajoutercolumn_preferences() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'gps_integrertraduction' AND TABLE_NAME = 'preferences') THEN
-	Execute
-	'
-         Alter TABLE preferences ADD COLUMN gps_id_source Integer  ;
-	 Alter TABLE preferences ADD COLUMN gps_integrertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_reemplacertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_alignementautomatique boolean  default true;
-	 ';
+     WHERE COLUMN_NAME = 'identifier_type' AND TABLE_NAME = 'preferences') THEN
+        begin
+            DROP TABLE preferences;
+            CREATE TABLE preferences
+            (
+              id_pref integer NOT NULL DEFAULT nextval('pref__id_seq'::regclass),
+              id_thesaurus character varying NOT NULL,
+              source_lang character varying(2) DEFAULT 'fr'::character varying,
+              nb_alert_cdt integer DEFAULT 10,
+              alert_cdt boolean DEFAULT false,
+              identifier_type integer DEFAULT 2,
+              use_ark boolean DEFAULT false,
+              server_ark character varying DEFAULT 'http://ark.mondomaine.fr/ark:/'::character varying,
+              path_image character varying DEFAULT '/var/www/images/'::character varying,
+              dossier_resize character varying DEFAULT 'resize'::character varying,
+              bdd_active boolean DEFAULT false,
+              bdd_use_id boolean DEFAULT false,
+              url_bdd character varying DEFAULT 'http://www.mondomaine.fr/fr/recherche?search=terme'::character varying,
+              z3950actif boolean DEFAULT false,
+              collection_adresse character varying DEFAULT 'KOHA/biblios'::character varying,
+              notice_url character varying DEFAULT 'http://catalogue.mondomaine.fr/cgi-bin/koha/opac-search.pl?type=opac&op=do_search&q=an=terme'::character varying,
+              url_encode character varying(10) DEFAULT 'UTF-8'::character varying,
+              path_notice1 character varying DEFAULT '/var/www/notices/repositories.xml'::character varying,
+              path_notice2 character varying DEFAULT '/var/www/notices/SchemaMappings.xml'::character varying,
+              chemin_site character varying DEFAULT 'http://mondomaine.fr/'::character varying,
+              CONSTRAINT preferences_pkey PRIMARY KEY (id_pref),
+              CONSTRAINT preferences_id_thesaurus_key UNIQUE (id_thesaurus)
+            )
+            WITH (
+              OIDS=FALSE
+            );                                                       
+        end;
     END IF;
 END;
 $$ LANGUAGE plpgsql; 
 
---
---Permet d'ajouter les 3 columns boolean dans la table preferences
---
-CREATE OR REPLACE FUNCTION ajoutercolumn2_preferences() RETURNS VOID AS $$
-BEGIN
-    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'identifier_type' AND TABLE_NAME = 'preferences') THEN
-	Execute
-	'
-         Alter TABLE preferences ADD COLUMN gps_id_source Integer  ;
-	 Alter TABLE preferences ADD COLUMN gps_integrertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_reemplacertraduction boolean  default true;
-	 Alter TABLE preferences ADD COLUMN gps_alignementautomatique boolean  default true;
-	 ';
-    END IF;
-END;
-$$ LANGUAGE plpgsql; 
 
 
 --

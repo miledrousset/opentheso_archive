@@ -451,6 +451,7 @@ public class CurrentUser implements Serializable {
         nodePreference.setAlertCdt(alertCdtEdit);
         nodePreference.setSourceLang(langSourceEdit);
         nodePreference.setNbAlertCdt(roleEdit);
+        nodePreference.setNbAlertCdt(alertNbCdtEdit);
         
         if (!new PreferencesHelper().updateAllPreferenceUser(connect.getPoolConnexion(), nodePreference, idTheso)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));

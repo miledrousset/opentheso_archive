@@ -389,6 +389,10 @@ public class ImportRdf4jHelper {
                 adressSite,
                 useArk,
                 idUser);
+        
+        // Création du domaine par défaut 
+
+        
         // ajouter les traductions des Groupes
         /*ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
         conceptGroupLabel.setIdgroup(idGroupDefault);

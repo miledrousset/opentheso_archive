@@ -82,31 +82,6 @@
                             </h:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="mail" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
-
-                            <h:panelGrid columns="2" style="text-align: left">
-                                <h:outputLabel value="protocole mail" />
-                                <h:inputText value="#{user1.nodePreference.protcolMail}" />
-
-                                <h:outputLabel value="host mail"/>
-                                <h:inputText value="#{user1.nodePreference.hostMail}"  />
-
-                                <h:outputLabel value="port mail"/>
-                                <h:inputText value="#{user1.nodePreference.portMail}"  />
-
-                                <h:outputLabel value="authMail" /> 
-                                <h:selectOneRadio value="#{user1.nodePreference.authMail}">
-                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
-                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
-                                </h:selectOneRadio>
-
-                                <h:outputLabel value="mail form"/> 
-                                <h:inputText value="#{user1.nodePreference.mailForm}"  />
-
-                                <h:outputLabel value="transport mail"/>
-                                <h:inputText value="#{user1.nodePreference.transportMail}"  />
-                            </h:panelGrid>
-                        </p:fieldset>
 
                         <p:fieldset legend="BDD" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
 

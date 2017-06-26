@@ -45,12 +45,14 @@ public class PreferencesHelper {
                         np.setServeurArk(resultSet.getString("server_ark"));
                         np.setPathImage(resultSet.getString("path_image"));
                         np.setDossierResize(resultSet.getString("dossier_resize"));
+                        /*
                         np.setProtcolMail(resultSet.getString("protocol_mail"));
                         np.setHostMail(resultSet.getString("host_mail"));
                         np.setPortMail(resultSet.getInt("port_mail"));
                         np.setAuthMail(resultSet.getBoolean("auth_mail"));
                         np.setMailForm(resultSet.getString("mail_from"));
                         np.setTransportMail(resultSet.getString("transport_mail"));
+                        */
                         np.setBddActive(resultSet.getBoolean("bdd_active"));
                         np.setBddUseId(resultSet.getBoolean("bdd_use_id"));
                         np.setUrlBdd(resultSet.getString("url_bdd"));
@@ -223,12 +225,13 @@ public class PreferencesHelper {
                             + ", server_ark='"+stringPlus.convertString(np.getServeurArk()) + "'"
                             + ",path_image='"+stringPlus.convertString(np.getPathImage()) + "'"
                             + ", dossier_resize='"+stringPlus.convertString(np.getDossierResize()) + "'"
-                            + ", protocol_mail='"+stringPlus.convertString(np.getProtcolMail()) + "'"
+                        /*    + ", protocol_mail='"+stringPlus.convertString(np.getProtcolMail()) + "'"
                             + ", host_mail='"+stringPlus.convertString(np.getHostMail()) + "'"
                             + ", port_mail='"+np.getPortMail() + "'"
                             + ", auth_mail='"+np.isAuthMail() + "'"
                             + ", mail_from='"+stringPlus.convertString(np.getMailForm()) + "'"
                             + ", transport_mail='"+stringPlus.convertString(np.getTransportMail()) + "'"
+                            */
                             + ", bdd_active='"+np.isBddActive() + "'"
                             + ", bdd_use_id='"+np.isBddUseId() + "'"
                             + ", url_bdd='"+stringPlus.convertString(np.getUrlBdd()) + "'"

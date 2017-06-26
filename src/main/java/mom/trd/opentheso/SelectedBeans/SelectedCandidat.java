@@ -340,14 +340,34 @@ public class SelectedCandidat implements Serializable {
         try {
             boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                //ResourceBundle bundlePref = getBundlePref();
+                ResourceBundle bundlePref = getBundlePref();
+                java.util.Properties props = new java.util.Properties();
+                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
+                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
+                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
+                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                Session session = Session.getInstance(props);
 
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+                msg.setSubject("Gestion de candidats");
+                msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
+
+                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                transport.connect();
+                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
+                transport.close();
+              
+            /*    
+                // version avec les infos dans la BDD
+                
                 java.util.Properties props = new java.util.Properties();
                 props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
                 props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
                 Integer temp = user.getNodePreference().getPortMail();
                 props.setProperty("mail.smtp.port", temp.toString());
-                Boolean temp2 = user.getNodePreference().isAuthMail();;
+                Boolean temp2 = user.getNodePreference().isAuthMail();
                 props.setProperty("mail.smtp.auth", temp2.toString());
                 Session session = Session.getInstance(props);
 
@@ -361,6 +381,7 @@ public class SelectedCandidat implements Serializable {
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
+                */
             }
         } catch (NoSuchProviderException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
@@ -382,8 +403,28 @@ public class SelectedCandidat implements Serializable {
         try {
             boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                //ResourceBundle bundlePref = getBundlePref();
+                ResourceBundle bundlePref = getBundlePref();
 
+                java.util.Properties props = new java.util.Properties();
+                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
+                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
+                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
+                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                Session session = Session.getInstance(props);
+
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+                msg.setSubject("Gestion de candidats");
+                msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
+
+                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                transport.connect();
+                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
+                transport.close();
+                
+                /*
+                // version avec appel à la BDD
                 java.util.Properties props = new java.util.Properties();
                 props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
                 props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
@@ -403,6 +444,7 @@ public class SelectedCandidat implements Serializable {
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
+                */
             }
         } catch (NoSuchProviderException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
@@ -424,8 +466,28 @@ public class SelectedCandidat implements Serializable {
         try {
             boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
-                //ResourceBundle bundlePref = getBundlePref();
 
+                ResourceBundle bundlePref = getBundlePref();
+
+                java.util.Properties props = new java.util.Properties();
+                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
+                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
+                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
+                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+                Session session = Session.getInstance(props);
+
+                Message msg = new MimeMessage(session);
+                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+                msg.setSubject("Gestion de candidats");
+                msg.setText("Le candidat " + candidat + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".");
+
+                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+                transport.connect();
+                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
+                transport.close();
+                
+                /*
                 java.util.Properties props = new java.util.Properties();
                 props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
                 props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
@@ -445,6 +507,7 @@ public class SelectedCandidat implements Serializable {
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
+                */
             }
         } catch (NoSuchProviderException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);

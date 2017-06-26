@@ -11,12 +11,16 @@ public class NodePreference {
     private String serveurArk;
     private String pathImage;
     private String dossierResize;
-    private String protcolMail;
+    
+    
+/*    private String protcolMail;
     private String hostMail;
     private int portMail;
     private boolean authMail;
     private String mailFrom;
     private String transportMail;
+*/    
+    
     private boolean bddActive;
     private boolean bddUseId;
     private String urlBdd;
@@ -92,46 +96,6 @@ public class NodePreference {
         this.dossierResize = dossierResize;
     }
 
-    public String getProtcolMail() {
-        return protcolMail;
-    }
-
-    public void setProtcolMail(String protcolMail) {
-        this.protcolMail = protcolMail;
-    }
-
-    public String getHostMail() {
-        return hostMail;
-    }
-
-    public void setHostMail(String hostMail) {
-        this.hostMail = hostMail;
-    }
-
-    public int getPortMail() {
-        return portMail;
-    }
-
-    public void setPortMail(int portMail) {
-        this.portMail = portMail;
-    }
-
-    public boolean isAuthMail() {
-        return authMail;
-    }
-
-    public void setAuthMail(boolean authMail) {
-        this.authMail = authMail;
-    }
-
-    public String getTransportMail() {
-        return transportMail;
-    }
-
-    public void setTransportMail(String transportMail) {
-        this.transportMail = transportMail;
-    }
-
     public boolean isBddActive() {
         return bddActive;
     }
@@ -202,22 +166,6 @@ public class NodePreference {
 
     public void setPathNotice2(String pathNotice2) {
         this.pathNotice2 = pathNotice2;
-    }
-
-    public String getMailForm() {
-        return mailFrom;
-    }
-
-    public void setMailForm(String mailForm) {
-        this.mailFrom = mailForm;
-    }
-
-    public String getMailFrom() {
-        return mailFrom;
-    }
-
-    public void setMailFrom(String mailFrom) {
-        this.mailFrom = mailFrom;
     }
 
     public boolean isZ3950actif() {

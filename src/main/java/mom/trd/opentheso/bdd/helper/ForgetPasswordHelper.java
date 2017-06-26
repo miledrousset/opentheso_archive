@@ -166,8 +166,29 @@ public class ForgetPasswordHelper {
      * @throws MessagingException
      */
     private void envoiEmail(String email, String pass, String pseudo) throws MessagingException {
+        ResourceBundle bundlePref = getBundlePref();
 
-        //ResourceBundle bundlePref = getBundlePref();
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
+        props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
+        props.setProperty("mail.smtp.port", bundlePref.getString("portMail"));
+        props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
+        Session session = Session.getInstance(props);
+
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+        msg.setSubject(emailTitle); /// mot.titlePass
+        
+        msg.setText(emailMessage + pass +"\n" + pseudoMessage + pseudo); 
+
+        
+        SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
+        transport.connect();
+        transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
+        transport.close();
+        
+        /*
         java.util.Properties props = new java.util.Properties();
         props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
         props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
@@ -188,6 +209,7 @@ public class ForgetPasswordHelper {
         transport.connect();
         transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
         transport.close();
+        */
     }
 
     /**

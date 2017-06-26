@@ -84,7 +84,7 @@ public class SelectedThesaurus implements Serializable {
     private String workLanguage; // la langue de travail pour démarrer (info du fichier de configuration
     private String cheminSite;
     private String defaultThesaurusId;
-    private String identifierType;
+    private String identifierType = "2";
 
     private String idNaan;
 
