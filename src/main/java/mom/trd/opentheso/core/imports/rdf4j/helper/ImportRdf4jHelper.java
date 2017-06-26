@@ -343,10 +343,7 @@ public class ImportRdf4jHelper {
                     type = "T";
                     break;
             }
-
-            if (notationValue != null) {
-                groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, adressSite, useArk, idUser);
-            }
+            groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, adressSite, useArk, idUser);
 
             //sub group
             String idSubGroup = null;

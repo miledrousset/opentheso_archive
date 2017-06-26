@@ -1347,6 +1347,34 @@ public class AlignmentHelper {
         }
         return trates;
     }
+    
+    
+    /**
+     * Change l'id d'un concept dans la table alignement
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @param newIdConcept
+     * @throws java.sql.SQLException
+     */
+    public void setIdConceptAlignement(Connection conn, String idTheso, String idConcept, String newIdConcept) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE alignement"
+                    + " SET internal_id_concept = '" + newIdConcept + "'"
+                    + " WHERE internal_id_concept = '" + idConcept + "'"
+                    + " AND internal_id_thesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+
+        } finally {
+            stmt.close();
+        }
+    }
+    
+    
+    
 
     public String getMessage() {
         return message;

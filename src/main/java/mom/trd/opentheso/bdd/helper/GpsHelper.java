@@ -511,4 +511,27 @@ public class GpsHelper {
         }
         return gpsPreferences;
     }
+    
+    /**
+     * Change l'id d'un concept dans la table concept_orphan
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @param newIdConcept
+     * @throws SQLException
+     */
+    public void setIdConceptGPS(Connection conn, String idTheso, String idConcept, String newIdConcept) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE gps"
+                    + " SET id_concept = '" + newIdConcept + "'"
+                    + " WHERE id_concept = '" + idConcept + "'"
+                    + " AND id_theso = '" + idTheso + "'";
+            stmt.execute(query);
+        } finally {
+            stmt.close();
+        }
+    }
 }

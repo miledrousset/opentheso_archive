@@ -166,4 +166,27 @@ public class ImagesHelper {
         return status;
     }   
     
+    /**
+     * Change l'id d'un concept dans la table images
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @param newIdConcept
+     * @throws SQLException
+     */
+    public void setIdConceptImage(Connection conn, String idTheso, String idConcept, String newIdConcept) throws SQLException {
+        Statement stmt;
+        stmt = conn.createStatement();
+        try {
+            String query = "UPDATE images"
+                    + " SET id_concept = '" + newIdConcept + "'"
+                    + " WHERE id_concept = '" + idConcept + "'"
+                    + " AND id_thesaurus = '" + idTheso + "'";
+            stmt.execute(query);
+        } finally {
+            stmt.close();
+        }
+    }
+    
 }

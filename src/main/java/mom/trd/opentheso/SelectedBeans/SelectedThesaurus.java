@@ -2,6 +2,7 @@ package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
 import java.io.Serializable;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,12 +24,16 @@ import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
+import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.FacetHelper;
+import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.ImagesHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
+import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
@@ -367,7 +372,6 @@ public class SelectedThesaurus implements Serializable {
     /**
      * Constructeur
      */
-    
     public SelectedThesaurus() {
 
         ResourceBundle bundlePref = getBundlePref();
@@ -453,6 +457,210 @@ public class SelectedThesaurus implements Serializable {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+
+    private final int LENGHT_ID_ALPHANUMERIQUE = 10;
+
+    /**
+     * Cette fonction remplace tout les id des groupes et concepts du théso Roll
+     * back en cas d'erreur
+     *
+     * @param idTheso
+     */
+    public void regenAllId(String idTheso) {
+        Connection conn = null;
+        try {
+            conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+        } catch (SQLException ex) {
+            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (conn == null) {
+            return;
+        }
+        try {
+            ArrayList<String> idGroup = null;
+
+            //group
+            try {
+                idGroup = regenIdGroup(conn, idTheso);
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
+                throw new Exception("Error while regen id group ");
+            }
+
+            //concept
+            try {
+                regenIdConcept(conn, idTheso, idGroup);
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
+                throw new Exception("Error while regen id concept ");
+            }
+
+            conn.commit();
+            maj();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+
+        } catch (SQLException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
+        } catch (Exception ex) {
+
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+            }
+        }
+
+    }
+
+    /**
+     * Cette fonction remplace tout les id des groupes du théso
+     *
+     * @param conn
+     * @param idTheso
+     * @return la liste des nouveaux id group
+     */
+    private ArrayList<String> regenIdGroup(Connection conn, String idTheso) throws Exception {
+
+        /*récup les concepts*/
+        GroupHelper groupHelper = new GroupHelper();
+        ArrayList<String> idgroup = groupHelper.getListIdOfGroup(conn, idTheso);
+        if (idgroup == null || idgroup.isEmpty()) {
+            throw new Exception("No group in this thesaurus");
+        }
+
+        /*génération des nouveaux id*/
+        ArrayList<String> newIdGroup = createNewId(idgroup, idgroup.size());
+
+        /*maj des tables*/
+        for (int i = 0; i < idgroup.size(); i++) {
+            String id = idgroup.get(i);
+            String newId = newIdGroup.get(i);
+            //table concept_group
+            groupHelper.setIdGroup(conn, idTheso, id, newId);
+            //table concept_group_concept
+            groupHelper.setIdGroupConcept(conn, idTheso, id, newId);
+            //table concept_group_historique
+            groupHelper.setIdGroupHisto(conn, idTheso, id, newId);
+            //table concept_group_label
+            groupHelper.setIdGroupLabel(conn, idTheso, id, newId);
+            //table concept_group_label_historique
+            groupHelper.setIdGroupLabelHisto(conn, idTheso, id, newId);
+            //table relation_group
+            groupHelper.setIdGroupRelation(conn, idTheso, id, newId);
+
+        }
+
+        return newIdGroup;
+    }
+
+    /**
+     * Cette fonction remplace tout les id des concepts du théso
+     */
+    private void regenIdConcept(Connection conn, String idTheso, ArrayList<String> idGroup) throws Exception {
+
+        /*récup les concepts*/
+        ConceptHelper conceptHelper = new ConceptHelper();
+        ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(conn, idTheso);
+        if (idConcepts == null || idConcepts.isEmpty()) {
+            throw new Exception("No concept in this thesaurus");
+        }
+
+        /*génération des nouveaux id*/
+        ArrayList<String> reservedId = idConcepts;
+        reservedId.addAll(idGroup);
+        ArrayList<String> newIdConcepts = createNewId(reservedId, idConcepts.size());
+
+        /*maj des tables*/
+        NoteHelper noteHelper = new NoteHelper();
+        GpsHelper gpsHelper = new GpsHelper();
+        ImagesHelper imagesHelper = new ImagesHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        for (int i = 0; i < idConcepts.size(); i++) {
+            String id = idConcepts.get(i);
+            String newId = newIdConcepts.get(i);
+            //table concept
+            conceptHelper.setIdConcept(conn, idTheso, id, newId);
+            //table concept_group_concept
+            conceptHelper.setIdConceptGroupConcept(conn, idTheso, id, newId);
+            //table concept_historique
+            conceptHelper.setIdConceptHistorique(conn, idTheso, id, newId);
+            //table concept_orphan
+            conceptHelper.setIdConceptOrphan(conn, idTheso, id, newId);
+            //table gps 
+            gpsHelper.setIdConceptGPS(conn, idTheso, id, newId);
+            //table hierarchical_relationship
+            conceptHelper.setIdConceptHieraRelation(conn, idTheso, id, newId);
+            //table hierarchical_relationship_historique
+            conceptHelper.setIdConceptHieraRelationHisto(conn, idTheso, id, newId);
+            //table note
+            noteHelper.setIdConceptNote(conn, idTheso, id, newId);
+            //table note_historique
+            noteHelper.setIdConceptNoteHisto(conn, idTheso, id, newId);
+            //table images 
+            imagesHelper.setIdConceptImage(conn, idTheso, id, newId);
+            //table concept_fusion
+            conceptHelper.setIdConceptFusion(conn, idTheso, id, newId);
+            //table preferred_term 
+            conceptHelper.setIdConceptPreferedTerm(conn, idTheso, id, newId);
+            //table alignement
+            alignmentHelper.setIdConceptAlignement(conn, idTheso, id, newId);
+        }
+
+    }
+
+    private static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static SecureRandom rnd = new SecureRandom();
+
+    private String randomString(int len) {
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(AB.charAt(rnd.nextInt(AB.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
+     *
+     * Génere de nouveaux identifiant unique
+     */
+    private ArrayList<String> createNewId(ArrayList<String> idList, int nbOfId) {
+
+        ArrayList<String> newIdConcepts = new ArrayList<>();
+        if (user != null
+                && user.getNodePreference() != null
+                && user.getNodePreference().getIdentifierType() == 2) { // numérique
+            int offset = 0;
+            for (int i = 0; i < nbOfId; i++) {
+                boolean idNotFinded = true;
+                while (idNotFinded) {
+                    int number = i + offset;
+                    String newId = "" + number;
+                    if (!idList.contains(newId)) {
+                        newIdConcepts.add(newId);
+                        idNotFinded = false;
+                    } else {
+                        offset++;
+                    }
+                }
+            }
+        } else { // alpha-numérique
+            for (int i = 0; i < nbOfId; i++) {
+                String newId;
+                boolean idNotFinded = true;
+                while (idNotFinded) {
+                    newId = randomString(LENGHT_ID_ALPHANUMERIQUE);
+                    if (!newIdConcepts.contains(newId) && !idList.contains(newId)) {
+                        newIdConcepts.add(newId);
+                        idNotFinded = false;
+                    }
+                }
+            }
+        }
+        return newIdConcepts;
     }
 
     /**
@@ -791,7 +999,7 @@ public class SelectedThesaurus implements Serializable {
         } else {
             thesaurus.setLanguage("");
         }
-        
+
         uTree.reInit();
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
