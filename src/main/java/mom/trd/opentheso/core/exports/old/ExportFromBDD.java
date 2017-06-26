@@ -487,6 +487,30 @@ public class ExportFromBDD {
         return writeFileSKOS.getSkosBuff();
     }
     
+    /**
+     * Fonction permet d'exporter une branche complète d'un thésaurus
+     * en partant de n'importe quel identifiant ARK 
+     * @param ds
+     * @param idThesaurus 
+     * @param idArk 
+     * @return  
+     */
+/*    public StringBuffer exportBranchOfConceptArk(HikariDataSource ds, String idThesaurus, String idArk) {
+        
+        WriteFileSKOS writeFileSKOS = new WriteFileSKOS();
+        
+        // inititialisation des URI
+        writeFileSKOS.setServerArk(serverArk);
+        writeFileSKOS.setServerAdress(serverAdress);
+        
+        writeFileSKOS.writeHeader();
+        NodeUri nodeUri = new NodeUri();
+        nodeUri.setIdConcept(idArk);
+        exportAllConcepts(ds, nodeUri.getIdConcept(), idThesaurus, writeFileSKOS);
+        writeFileSKOS.endSkos(); 
+        return writeFileSKOS.getSkosBuff();
+    }    
+  */  
     
     public void exportAllConcepts(HikariDataSource ds,
             String idConcept, String idThesaurus,
@@ -530,6 +554,59 @@ public class ExportFromBDD {
             }
         }
     }
+    
+   
+    /**
+     * focntion récursive pour récupérer la branche des 
+     * @param ds
+     * @param idArk
+     * @param idThesaurus
+     * @param writeFileSKOS 
+     */
+/*    private void exportAllConceptsArk(HikariDataSource ds,
+            String idArk, String idThesaurus,
+            WriteFileSKOS writeFileSKOS) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        
+        ArrayList <String> listIdsOfConceptChildren = conceptHelper.getListChildrenOfConcept(ds, idConcept, idThesaurus);
+        
+        NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
+      
+        /// attention il y a un problème ici, il faut vérifier pourquoi nous avons un Concept Null
+        
+       
+        
+        
+        if(nodeConcept.getConcept() == null) {
+            int k = 0;
+            return;
+        }
+        
+        
+        
+        
+        
+        writeFileSKOS.writeDescriptor(nodeConcept, null);
+
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
+            if(nodeConcept != null) {
+                writeFileSKOS.writeDescriptor(nodeConcept, null);
+                if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+
+                        exportAllConcepts(ds,
+                                nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                                idThesaurus, writeFileSKOS);
+
+                    }
+                }
+            }
+        }
+    }    */
+    
+    
     
     public void exportAllConceptsAdvanced(HikariDataSource ds,
             String idConcept, String idThesaurus,

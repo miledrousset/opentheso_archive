@@ -309,7 +309,25 @@ public class Rest {
         StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
         ds.close();
         return skos.toString();
-    }         
+    }
+
+    /**
+     * Permet de renvoyer la branche complète en SKOS en partant d'un identifiant ARK
+     * @param naan
+     * @param ark
+     * @return
+     */
+    @Path("/skos/all/ark:/{naan}/{ark}")
+    @GET
+
+    @Produces("application/xml;charset=UTF-8")
+    public String getBranchOfConceptSkosArk(@PathParam("naan") String naan,
+            @PathParam("ark") String ark) {
+        StringBuffer skos = conceptToSkos(naan + "/" + ark);
+
+        ds.close();
+        return skos.toString();
+    }    
     
     
 /////////////////////////////////////////////////////    
