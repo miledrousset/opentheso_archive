@@ -19,6 +19,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
@@ -275,6 +276,9 @@ public class rdf4jFileBean implements Serializable {
             } catch (Exception ex) {
                 error = ex.getMessage();
             }
+            
+            //new UserHelper().addRole(connect.getPoolConnexion().getConnection(), idUser,idRole, ImportRdf4jHelper.getIdFromUri(uri) , "");
+            
             uploadEnable = true;
             BDDinsertEnable = false;
             uri = null;

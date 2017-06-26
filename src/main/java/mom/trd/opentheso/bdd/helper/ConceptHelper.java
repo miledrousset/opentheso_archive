@@ -1251,7 +1251,7 @@ public class ConceptHelper {
                 stmt = conn.createStatement();
                 String query;
                 try {
-                    if (identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
+                    if (identifierType == null || identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
                         ToolsHelper toolsHelper = new ToolsHelper();
                         idConcept = toolsHelper.getNewId(10);
                         while (isIdExiste(conn, idConcept, concept.getIdThesaurus())) {

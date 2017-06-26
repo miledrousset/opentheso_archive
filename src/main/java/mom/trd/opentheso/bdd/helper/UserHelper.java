@@ -659,6 +659,8 @@ public class UserHelper {
         return idThesausus;
 
     }
+    
+    
 
     /**
      * cette fonction permet de retourner la liste des utlisateurs par thésaurus
