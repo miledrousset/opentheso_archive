@@ -74,15 +74,16 @@
                     </a>
 
                 </h:panelGroup>
+                <h:outputText id="idC" value="id : "/>
+                <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
+                
                 <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
                 <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
+                
                 <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
 
                     <p:tab title="..."    titleStyleClass="titleAccordion">
-                        <h:panelGroup rendered="#{(user1.user.name != null)}" >
-                            <h:outputText id="idC" value="id : "/>
-                            <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
-                        </h:panelGroup>  
+ 
 
                         <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
                         <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
