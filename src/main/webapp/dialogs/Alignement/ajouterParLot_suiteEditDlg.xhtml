@@ -73,8 +73,14 @@
                     </h:selectOneMenu><br/><br/>
                     <hr/><br/>
 
-                    <p:commandButton id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" 
+                    <p:commandButton rendered="#{Alignementparlot.optionWorkFlow == alignementparlot.optionOfAlignement}" id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" 
                                       styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg').hide();PF('finalizeDlg').show();"  />
+                    <p:commandButton rendered="#{Alignementparlot.optionWorkFlow != alignementparlot.optionOfAlignement}" update=":panContenu" id="finAllAlignAuto2" value="#{langueBean.getMsg('alig.fin')}" 
+                                      styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg').hide();"/>
+                    
+                    
+                    
+                    
                     &#160;
                     <p:commandButton rendered="#{!alignementparlot.fin}" id="ajouterAllAlignAuto" title="#{langueBean.getMsg('conf.btnValid')}"  icon="ui-icon-valider"
                                      action="#{alignementparlot.addAlignement()}"
@@ -103,7 +109,6 @@
         <h:form rendered="#{alignementparlot.fin}">
             <br/><br/>
             <p:commandButton id="finAllAlignAutoFin" value="fini" actionListener="#{alignementparlot.reinitTotal()}"
-                             action="#{alignementparlot.enregister_Des_Progres(user1.user.id)}"
                              update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg.hide()';"  />
             <br/><br/>
             <h:outputText value="#{gps.erreur}" style="color: red" />

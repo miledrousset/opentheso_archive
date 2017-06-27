@@ -8,6 +8,7 @@ package mom.trd.opentheso.core.exports.pdf;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
@@ -311,6 +312,11 @@ public class WritePdf {
      * ecri les information du ConceptSheme dans le PDF
      */
     private void writeConceptSheme() {
+
+        PdfPTable table = new PdfPTable(2);
+        PdfPCell cell1 = new PdfPCell();
+        PdfPCell cell2 = new PdfPCell();
+
         try {
 
             SKOSResource thesaurus = xmlDocument.getConceptScheme();
@@ -319,25 +325,32 @@ public class WritePdf {
                 if (label.getLanguage().equals(codeLang)) {
                     String labelValue = label.getLabel();
                     if (label.getProperty() == SKOSProperty.prefLabel) {
-                        document.add(new Paragraph(labelValue, titleFont));
+                        cell1.addElement(new Paragraph(labelValue + " (" + codeLang + ")", titleFont));
+
                     }
                 }
 
             }
+            cell1.setBorderWidth(Rectangle.NO_BORDER);
+            table.addCell(cell1);
 
             if (!codeLang2.equals("")) {
                 for (SKOSLabel label : thesaurus.getLabelsList()) {
                     if (label.getLanguage().equals(codeLang2)) {
                         String labelValue = label.getLabel();
                         if (label.getProperty() == SKOSProperty.prefLabel) {
-                            document.add(new Paragraph(labelValue, titleFont));
+                            cell2.addElement(new Paragraph(labelValue + " (" + codeLang2 + ")", titleFont));
+
                         }
                     }
 
                 }
-
             }
+            cell2.setBorder(Rectangle.NO_BORDER);
+            table.addCell(cell2);
+
             document.add(new Paragraph(thesaurus.getUri(), subTitleFont));
+            document.add(table);
             document.add(new Paragraph(" "));
             document.add(new Paragraph(" "));
 

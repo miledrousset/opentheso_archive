@@ -11,9 +11,9 @@
             
         
         <p:commandButton value="save workFlow"  action="#{alignementparlot.enregister_Des_Progres(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" update=":panContenu" />
-          <br/>
-          <br/>
-          <p:commandButton value="initialiser" action="#{alignementparlot.initAlign(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" />
+        <br/>
+        <br/>
+        <p:commandButton value="initialiser" action="#{alignementparlot.initAlign(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" />
         
     </p:dialog>
 </ui:composition>
