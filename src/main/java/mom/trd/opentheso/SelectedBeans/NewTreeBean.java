@@ -393,7 +393,7 @@ public class NewTreeBean implements Serializable {
             //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
         //    selectedNode.setSelected(false);
-         for (TreeNode tn : selectedNodes) {
+        for (TreeNode tn : selectedNodes) {
             tn.setSelected(false);
         }
         selectedNodes = new ArrayList<>();
@@ -568,6 +568,17 @@ public class NewTreeBean implements Serializable {
                             idTC, icon, value, myTreeNode);
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
                     new DefaultTreeNode("fake", treeNode);
+                    if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdMot())) {
+                        if (cpt + 1 < listeId.size()) {
+                            treeNode.setSelected(false);
+                            reExpandChild(listeId, treeNode, cpt + 1);
+                        } else {
+                            treeNode.setSelected(true);
+                            selectedNode = treeNode;
+                            selectedNodes.add(treeNode);
+                        }
+                    }
+
                 }
             }
 
@@ -863,7 +874,7 @@ public class NewTreeBean implements Serializable {
             myTreeNode.setData(valueEdit);
             selectedTerme.setNom(valueEdit);
             selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));            
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));
             return;
         }
 

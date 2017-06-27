@@ -143,7 +143,7 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{user1}")
     private CurrentUser user;
-    
+
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
 
@@ -988,6 +988,7 @@ public class SelectedThesaurus implements Serializable {
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void maj() {
+        
         tree.getSelectedTerme().reInitTerme();
         tree.reInit();
         tree.initTree(null, null);
@@ -1013,15 +1014,17 @@ public class SelectedThesaurus implements Serializable {
         }
         vue.setCreat(false);
         majPref();
-        if(selectedTerme != null){
+        if (selectedTerme != null) {
             selectedTerme.initTerme();
         }
+        tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
     }
 
     /**
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void StartDefaultThesauriTree() {
+        tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
         if (connect.getPoolConnexion() == null) {
             System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données 2!!!!!!! ");
             return;

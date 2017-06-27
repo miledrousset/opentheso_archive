@@ -168,7 +168,6 @@ public class AlignementParLotBean {
         erreur = "";
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
-       
 
         if (optionNonAligned == optionOfAlignement) {
             position--;
@@ -203,8 +202,8 @@ public class AlignementParLotBean {
 
         }
         selectedTerme.creerAlignAuto(id_concept, nomduterm);
-        
-         listConceptTrates.remove(id_concept);
+
+        listConceptTrates.remove(id_concept);
 
     }
 
@@ -405,7 +404,7 @@ public class AlignementParLotBean {
     public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         if (optionWorkFlow == optionOfAlignement) {
-            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart, listConceptTrates, selectedTerme.alignementSource.getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));

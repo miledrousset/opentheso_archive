@@ -97,6 +97,8 @@ public class CurrentUser implements Serializable {
      * @return
      */
     public NodePreference getThesaurusPreferences(String idThesaurus, String workLanguage) {
+        
+        authorizedTheso = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
         PreferencesHelper preferencesHelper = new PreferencesHelper();
         if (connect.getPoolConnexion() != null) {
             nodePreference = preferencesHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
