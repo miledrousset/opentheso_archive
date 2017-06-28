@@ -427,16 +427,27 @@ public class ExportRdf4jHelper {
         RelationsHelper helper = new RelationsHelper();
         ArrayList<String[]> btList = helper.getListIdAndRoleOfBT(ds, id, idTheso);
         ArrayList<String[]> ntList = helper.getListIdAndRoleOfNT(ds, id, idTheso);
-        ArrayList<String> rtList = helper.getListIdsOfRT(ds, id, idTheso);
+        ArrayList<String[]> rtList = helper.getListIdAndRoleOfRT(ds, id, idTheso);
 
         addRelationGiven2(btList, ntList, rtList, resource);
 
     }
 
-    private void addRelationGiven2(ArrayList<String[]> btList, ArrayList<String[]> ntList, ArrayList<String> rtList, SKOSResource resource) {
-        for (String rt : rtList) {
+    private void addRelationGiven2(ArrayList<String[]> btList, ArrayList<String[]> ntList, ArrayList<String[]> rtList, SKOSResource resource) {
+        for (String rt[] : rtList) {
+            int prop;
 
-            resource.addRelation(getUriFromId(rt), SKOSProperty.related);
+            switch (rt[1]) {
+                case "RHP":
+                    prop = SKOSProperty.relatedHasPart;
+                    break;
+                case "RPO":
+                    prop = SKOSProperty.relatedPartOf;
+                    break;
+                default:
+                    prop = SKOSProperty.related;
+            }
+            resource.addRelation(getUriFromId(rt[0]), prop);
         }
 
         for (String bt[] : btList) {
@@ -480,9 +491,21 @@ public class ExportRdf4jHelper {
         }
     }
 
-    private void addRelationGiven(ArrayList<NodeHieraRelation> btList, ArrayList<NodeHieraRelation> ntList, ArrayList<NodeUri> rtList, SKOSResource resource) {
-        for (NodeUri rt : rtList) {
-            resource.addRelation(getUriFromId(rt.getIdConcept()), SKOSProperty.related);
+    private void addRelationGiven(ArrayList<NodeHieraRelation> btList, ArrayList<NodeHieraRelation> ntList, ArrayList<NodeHieraRelation> rtList, SKOSResource resource) {
+        for (NodeHieraRelation rt : rtList) {
+            int prop;
+
+            switch (rt.getRole()) {
+                case "RHP":
+                    prop = SKOSProperty.relatedHasPart;
+                    break;
+                case "RPO":
+                    prop = SKOSProperty.relatedPartOf;
+                    break;
+                default:
+                    prop = SKOSProperty.related;
+            }
+            resource.addRelation(getUriFromId(rt.getUri().getIdConcept()), prop);
         }
         for (NodeHieraRelation nt : ntList) {
             int prop;

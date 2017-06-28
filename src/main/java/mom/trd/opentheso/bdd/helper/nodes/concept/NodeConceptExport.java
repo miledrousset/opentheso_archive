@@ -24,7 +24,7 @@ public class NodeConceptExport {
     private ArrayList <NodeHieraRelation> nodeListOfNT;
 
     //RT related term
-    private ArrayList <NodeUri> nodeListIdsOfRT;
+    private ArrayList <NodeHieraRelation> nodeListIdsOfRT;
 
     //EM ou USE synonymes ou employé pour
     private ArrayList<NodeEM> nodeEM;
@@ -57,11 +57,11 @@ public class NodeConceptExport {
     }
 
 
-    public ArrayList<NodeUri> getNodeListIdsOfRT() {
+    public ArrayList<NodeHieraRelation> getNodeListIdsOfRT() {
         return nodeListIdsOfRT;
     }
 
-    public void setNodeListIdsOfRT(ArrayList<NodeUri> nodeListIdsOfRT) {
+    public void setNodeListIdsOfRT(ArrayList<NodeHieraRelation> nodeListIdsOfRT) {
         this.nodeListIdsOfRT = nodeListIdsOfRT;
     }
 

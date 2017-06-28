@@ -257,6 +257,12 @@ public class ReadRdf4j {
         } else if (readStruct.property.getLocalName().equals("related")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.related);
             return false;
+        } else if (readStruct.property.getLocalName().equals("relatedHasPart")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.relatedHasPart);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("relatedPartOf")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.relatedPartOf);
+            return false;
         } else if (readStruct.property.getLocalName().equals("hasTopConcept")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.hasTopConcept);
             return false;

@@ -3406,8 +3406,8 @@ public class ConceptHelper {
         nodeConceptExport.setNodeListOfNT(nodeListIdsOfNT_Ark);
 
         //récupération des termes associés
-        ArrayList<NodeUri> nodeListIdsOfRT_Ark = getListIdArkOfConcept2(ds,
-                relationsHelper.getListOfRT(ds, idConcept, idThesaurus),
+        ArrayList<NodeHieraRelation> nodeListIdsOfRT_Ark = getListIdArkOfConcept(ds,
+                relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                 idThesaurus);
         nodeConceptExport.setNodeListIdsOfRT(nodeListIdsOfRT_Ark);
 
@@ -3616,8 +3616,8 @@ public class ConceptHelper {
             nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeUri> nodeListIdOfRT_Ark = getListIdArkOfConcept2(ds,
-                    relationsHelper.getListOfRT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                     idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 
@@ -3695,8 +3695,8 @@ public class ConceptHelper {
             nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeUri> nodeListIdOfRT_Ark = getListIdArkOfConcept2(ds,
-                    relationsHelper.getListOfRT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                     idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 

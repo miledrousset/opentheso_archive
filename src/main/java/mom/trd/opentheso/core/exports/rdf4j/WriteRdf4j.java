@@ -58,7 +58,6 @@ public class WriteRdf4j {
         builder.setNamespace("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
         builder.setNamespace("iso-thes", "http://purl.org/iso25964/skos-thes#");
 
-
     }
 
     private void writeModel() {
@@ -302,6 +301,12 @@ public class WriteRdf4j {
                     break;
                 case SKOSProperty.related:
                     builder.add(SKOS.RELATED, uri);
+                    break;
+                case SKOSProperty.relatedHasPart:
+                    builder.add("skos:relatedHasPart", uri);
+                    break;
+                case SKOSProperty.relatedPartOf:
+                    builder.add("skos:relatedPartOf", uri);
                     break;
                 case SKOSProperty.hasTopConcept:
                     builder.add(SKOS.HAS_TOP_CONCEPT, uri);

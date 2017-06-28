@@ -468,9 +468,9 @@ public class SelectedTerme implements Serializable {
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeRT nrt : tempRT) {
             if (nrt.getStatus().equals("hidden")) {
-                tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + "</del>");
+                tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + " (" + nrt.getRole() + ")" + "</del>");
             } else {
-                tempMap.put(nrt.getIdConcept(), nrt.getTitle());
+                tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
             }
         }
         termesAssocies.addAll(tempMap.entrySet());
@@ -949,7 +949,23 @@ public class SelectedTerme implements Serializable {
         termesAssocies = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeRT nrt : tempRT) {
-            tempMap.put(nrt.getIdConcept(), nrt.getTitle());
+            tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
+        }
+        termesAssocies.addAll(tempMap.entrySet());
+        vue.setAddTAsso(0);
+    }
+    public void creerTermeAsso(String idC2,String role) {
+        HierarchicalRelationship hr = new HierarchicalRelationship();
+        hr.setIdConcept1(idC);
+        hr.setIdConcept2(idC2);
+        hr.setIdThesaurus(idTheso);
+        hr.setRole(role);
+        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getId());
+        ArrayList<NodeRT> tempRT = new RelationsHelper().getListRT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        termesAssocies = new ArrayList<>();
+        HashMap<String, String> tempMap = new HashMap<>();
+        for (NodeRT nrt : tempRT) {
+            tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
         }
         termesAssocies.addAll(tempMap.entrySet());
         vue.setAddTAsso(0);

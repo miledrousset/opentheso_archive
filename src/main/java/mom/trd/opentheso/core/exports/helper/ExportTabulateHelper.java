@@ -265,11 +265,11 @@ public class ExportTabulateHelper {
             
             // related
             first = true;
-            for (NodeUri nodeUri : nodeConceptExport.getNodeListIdsOfRT()) {
+            for (NodeHieraRelation nodeUri : nodeConceptExport.getNodeListIdsOfRT()) {
                 if(!first) {
                     tabulateBuff.append("##");
                 }
-                tabulateBuff.append(nodeUri.getIdConcept());
+                tabulateBuff.append(nodeUri.getUri().getIdConcept());
                 first = false;
             }            
             tabulateBuff.append(";");

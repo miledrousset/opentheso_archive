@@ -28,6 +28,8 @@ import org.primefaces.event.SelectEvent;
 public class AutoCompletBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    String RTtag;
 
     private NodeAutoCompletion selectedAtt;
     private String idOld;
@@ -172,6 +174,24 @@ public class AutoCompletBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
             } else {
                 terme.creerTermeAsso(selectedAtt.getIdConcept());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", laValeur.getLexical_value() + " " + langueBean.getMsg("autoComp.info1")));
+            }
+            selectedAtt = new NodeAutoCompletion();
+            
+        }
+    }
+    /**
+     * Ajoute un terme associé special
+     */
+    public void newSpecialTAsso() {
+        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
+        } else {
+            Term laValeur = terme.getTerme(selectedAtt.getIdConcept());
+            if (laValeur == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
+            } else {
+                terme.creerTermeAsso(selectedAtt.getIdConcept(),RTtag);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", laValeur.getLexical_value() + " " + langueBean.getMsg("autoComp.info1")));
             }
             selectedAtt = new NodeAutoCompletion();
@@ -937,6 +957,14 @@ public class AutoCompletBean implements Serializable {
 
     public void setTheso(SelectedThesaurus theso) {
         this.theso = theso;
+    }
+
+    public String getRTtag() {
+        return RTtag;
+    }
+
+    public void setRTtag(String RTtag) {
+        this.RTtag = RTtag;
     }
 
 }

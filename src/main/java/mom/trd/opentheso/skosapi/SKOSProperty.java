@@ -27,6 +27,10 @@ public interface SKOSProperty {
     public static final int narrowerGeneric=16;
     public static final int narrowerInstantive=17;
     public static final int narrowerPartitive=18;
+    public static final int relatedHasPart=19;
+    public static final int relatedPartOf=-1;
+    
+    
 
     //Symbolic Labelling
     public static final int prefSymbol = 20;

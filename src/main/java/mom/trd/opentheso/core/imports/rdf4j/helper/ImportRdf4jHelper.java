@@ -12,8 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import mom.trd.opentheso.SelectedBeans.SelectedTerme;
 import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -37,7 +35,6 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
-import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSCreator;
@@ -700,6 +697,13 @@ public class ImportRdf4jHelper {
                 case SKOSProperty.related:
                     role = "RT";
                     break;
+                case SKOSProperty.relatedHasPart:
+                    role = "RHP";
+                    break;
+                case SKOSProperty.relatedPartOf:
+                    role = "RPO";
+                    break;
+
                 default:
                     role = "";
 
@@ -773,6 +777,12 @@ public class ImportRdf4jHelper {
                     break;
                 case SKOSProperty.related:
                     role = "RT";
+                    break;
+                case SKOSProperty.relatedHasPart:
+                    role = "RHP";
+                    break;
+                case SKOSProperty.relatedPartOf:
+                    role = "RPO";
                     break;
                 default:
                     role = "";

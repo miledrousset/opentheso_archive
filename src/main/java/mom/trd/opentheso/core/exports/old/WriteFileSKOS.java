@@ -292,7 +292,7 @@ public class WriteFileSKOS {
         for (int i = 0; i < nodeConceptExport.getNodeListIdsOfRT().size(); i++) {
             //    concept.addRelation(URI + "/concept#" + nodeConceptExport.getNodeListIdsOfRT().get(i), SKOSProperty.related);
             concept.addRelation(
-                    getRelationUri(nodeConceptExport.getNodeListIdsOfRT().get(i),
+                    getRelationUri(nodeConceptExport.getNodeListIdsOfRT().get(i).getUri(),
                             nodeConceptExport.getConcept().getIdThesaurus()),
                     SKOSProperty.related);
         }
