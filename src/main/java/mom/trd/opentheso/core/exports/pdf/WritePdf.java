@@ -8,7 +8,6 @@ package mom.trd.opentheso.core.exports.pdf;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
@@ -198,8 +197,11 @@ public class WritePdf {
             }
 
             if (isAtRoot) {
-
-                paragraphs.add(new Paragraph(idToNameHashMap.get(conceptID) + " (" + conceptID + ")", termFont));
+                String name = idToNameHashMap.get(conceptID);
+                if (name == null) {
+                    name = "";
+                }
+                paragraphs.add(new Paragraph(name + " (" + conceptID + ")", termFont));
                 String indentation = "";
                 writeHieraTermInfo(conceptID, indentation, paragraphs, idToDoc);
                 writeHieraTermRecursif(conceptID, indentation, paragraphs, idToDoc);
@@ -228,8 +230,11 @@ public class WritePdf {
         }
 
         for (String idFils : childList) {
-
-            paragraphs.add(new Paragraph(indentation + idToNameHashMap.get(idFils) + " (" + idFils + ")", textFont));
+            String name = idToNameHashMap.get(idFils);
+            if (name == null) {
+                name = "";
+            }
+            paragraphs.add(new Paragraph(indentation + name + " (" + idFils + ")", textFont));
             writeHieraTermInfo(idFils, indentation, paragraphs, idToDoc);
             writeHieraTermRecursif(idFils, indentation, paragraphs, idToDoc);
 
@@ -439,6 +444,31 @@ public class WritePdf {
                 case SKOSProperty.related:
                     codeRelation = "RT";
                     break;
+                case SKOSProperty.relatedHasPart:
+                    codeRelation = "RHP";
+                    break;
+                case SKOSProperty.relatedPartOf:
+                    codeRelation = "RPO";
+                    break;
+                case SKOSProperty.narrowerGeneric:
+                    codeRelation = "NTG";
+                    break;
+                case SKOSProperty.narrowerInstantive:
+                    codeRelation = "NTI";
+                    break;
+                case SKOSProperty.narrowerPartitive:
+                    codeRelation = "NTP";
+                    break;
+                case SKOSProperty.broaderGeneric:
+                    codeRelation = "BTG";
+                    break;
+                case SKOSProperty.broaderInstantive:
+                    codeRelation = "BTI";
+                    break;
+                case SKOSProperty.broaderPartitive:
+                    codeRelation = "BTP";
+                    break;
+
                 default:
                     continue;
 

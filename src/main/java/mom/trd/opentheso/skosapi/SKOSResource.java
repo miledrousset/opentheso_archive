@@ -548,7 +548,10 @@ public class SKOSResource {
         private void writeIdToChild(SKOSResource resource) {
             for (SKOSRelation relation : resource.getRelationsList()) {
                 String key;
-                if (relation.getProperty() == SKOSProperty.narrower) {
+                if (relation.getProperty() == SKOSProperty.narrower 
+                        || relation.getProperty() == SKOSProperty.narrowerGeneric
+                        || relation.getProperty() == SKOSProperty.narrowerInstantive
+                        || relation.getProperty() == SKOSProperty.narrowerPartitive) {
                     key = getIdFromUri(resource.getUri());
                     ArrayList<String> child = idToChildId.get(key);
                     if (child == null) {

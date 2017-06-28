@@ -16,6 +16,7 @@ public class NodeBT implements Comparable {
     private String title;
     private String idConcept;
     private String status;
+    private String role;
 
     public NodeBT() {
     }
@@ -59,6 +60,14 @@ public class NodeBT implements Comparable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 }

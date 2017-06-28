@@ -68,6 +68,8 @@ public class NewTreeBean implements Serializable {
 
     private boolean createValid = false;
 
+    private String NTtag;
+
     /**
      *
      * @param idTheso
@@ -739,6 +741,58 @@ public class NewTreeBean implements Serializable {
         createValid = true;
     }
 
+    public void newSpecialTSpe() {
+        createValid = false;
+        selectedTerme.setValueEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
+        if (selectedTerme.getValueEdit().trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }
+
+        String valueEdit = selectedTerme.getValueEdit().trim();
+
+        // vérification si c'est le même nom, on fait rien
+        if (valueEdit.equalsIgnoreCase(selectedTerme.getNom())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
+            return;
+        }
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if ((idTerm = selectedTerme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = selectedTerme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            selectedTerme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return;
+        }
+
+        String BTtag = null;
+
+        switch (NTtag) {
+            case "NTG":
+                BTtag = "BTG";
+                break;
+            case "NTP":
+                BTtag = "BTP";
+                break;
+            case "NTI":
+                BTtag = "BTI";
+                break;
+        }
+
+        if (!selectedTerme.creerSpecialTermeSpe(((MyTreeNode) selectedNode), BTtag, NTtag)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        } else {
+            reInit();
+            reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
+        }
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }
+
     /**
      * ************************** ACTIONS SELECTEDTERME
      * ***************************
@@ -1133,6 +1187,14 @@ public class NewTreeBean implements Serializable {
 
     public void setConceptbean(ConceptBean conceptbean) {
         this.conceptbean = conceptbean;
+    }
+
+    public String getNTtag() {
+        return NTtag;
+    }
+
+    public void setNTtag(String NTtag) {
+        this.NTtag = NTtag;
     }
 
 }

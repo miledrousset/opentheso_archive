@@ -15,6 +15,7 @@ import java.text.Normalizer;
 public class NodeNT implements Comparable {
     private String title;
     private String idConcept;
+    private String role;
     private String status;
     private String dateCreated;
     private String dateModified;
@@ -77,6 +78,14 @@ public class NodeNT implements Comparable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
     
     

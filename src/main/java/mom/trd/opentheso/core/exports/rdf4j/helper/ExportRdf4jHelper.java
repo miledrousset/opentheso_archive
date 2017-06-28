@@ -21,6 +21,7 @@ import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
@@ -56,7 +57,7 @@ public class ExportRdf4jHelper {
     private ArrayList<String> rootGroupList;
     private HashMap<String, String> superGroupHashMap;
 
-    ArrayList<NodeUri> nodeTTs =  new ArrayList<>();
+    ArrayList<NodeUri> nodeTTs = new ArrayList<>();
 
     public ExportRdf4jHelper() {
         skosXmlDocument = new SKOSXmlDocument();
@@ -100,7 +101,7 @@ public class ExportRdf4jHelper {
             //writeConceptInfo(conceptHelper, concept, idThesaurus, idOfConceptChildren, downloadBean, selectedLanguages);
 
             //if (conceptHelper.haveChildren(ds, idThesaurus, idOfConceptChildren)) {
-                addFilsConcpetRecursif(idThesaurus, idOfConceptChildren, concept, downloadBean, selectedLanguages);
+            addFilsConcpetRecursif(idThesaurus, idOfConceptChildren, concept, downloadBean, selectedLanguages);
             //}
         }
 
@@ -154,7 +155,7 @@ public class ExportRdf4jHelper {
         addNoteGiven(nodeNotes, concept, selectedLanguages);
         addGPSGiven(nodeConcept.getNodeGps(), concept);
         addAlignementGiven(nodeConcept.getNodeAlignmentsList(), concept);
-        addRelationUriGiven(nodeConcept.getNodeListIdsOfBT(), nodeConcept.getNodeListIdsOfNT(), nodeConcept.getNodeListIdsOfRT(), concept);
+        addRelationGiven(nodeConcept.getNodeListOfBT(), nodeConcept.getNodeListOfNT(), nodeConcept.getNodeListIdsOfRT(), concept);
 
         String notation = nodeConcept.getConcept().getNotation();
         String created = nodeConcept.getConcept().getCreated().toString();
@@ -239,9 +240,8 @@ public class ExportRdf4jHelper {
             group = new SKOSResource();
 
             //writeGroupInfo(groupHelper, group, idThesaurus, idOfGroupChildren, selectedLanguages);
-
             //if (!groupHelper.getListGroupChildIdOfGroup(ds, idOfGroupChildren, idThesaurus).isEmpty()) {
-                addFilsGroupRcursif(idThesaurus, idOfGroupChildren, group, selectedLanguages);
+            addFilsGroupRcursif(idThesaurus, idOfGroupChildren, group, selectedLanguages);
             //}
         }
 
@@ -291,7 +291,6 @@ public class ExportRdf4jHelper {
         ArrayList<String> childURI = new GroupHelper().getListGroupChildIdOfGroup(ds, idOfGroupChildren, idThesaurus);
         ArrayList<NodeConceptTree> nodeConceptTrees = new ConceptHelper().getListTopConcepts(ds, idOfGroupChildren, idThesaurus, "fr");
 
-        
         for (NodeConceptTree node : nodeConceptTrees) {
             String id = node.getIdConcept();
             group.addRelation(getUriFromId(id), SKOSProperty.member);
@@ -426,35 +425,122 @@ public class ExportRdf4jHelper {
     private void addRelation(String id, SKOSResource resource) {
 
         RelationsHelper helper = new RelationsHelper();
-        ArrayList<String> btList = helper.getListIdOfBT(ds, id, idTheso);
-        ArrayList<String> ntList = helper.getListIdsOfNT(ds, id, idTheso);
-        ArrayList<String> rtList = helper.getListIdsOfRT(ds, id, idTheso);
+        ArrayList<String[]> btList = helper.getListIdAndRoleOfBT(ds, id, idTheso);
+        ArrayList<String[]> ntList = helper.getListIdAndRoleOfNT(ds, id, idTheso);
+        ArrayList<String[]> rtList = helper.getListIdAndRoleOfRT(ds, id, idTheso);
 
-        addRelationGiven(btList, ntList, rtList, resource);
+        addRelationGiven2(btList, ntList, rtList, resource);
 
     }
 
-    private void addRelationGiven(ArrayList<String> btList, ArrayList<String> ntList, ArrayList<String> rtList, SKOSResource resource) {
-        for (String rt : rtList) {
-            resource.addRelation(getUriFromId(rt), SKOSProperty.related);
+    private void addRelationGiven2(ArrayList<String[]> btList, ArrayList<String[]> ntList, ArrayList<String[]> rtList, SKOSResource resource) {
+        for (String rt[] : rtList) {
+            int prop;
+
+            switch (rt[1]) {
+                case "RHP":
+                    prop = SKOSProperty.relatedHasPart;
+                    break;
+                case "RPO":
+                    prop = SKOSProperty.relatedPartOf;
+                    break;
+                default:
+                    prop = SKOSProperty.related;
+            }
+            resource.addRelation(getUriFromId(rt[0]), prop);
         }
-        for (String nt : ntList) {
-            resource.addRelation(getUriFromId(nt), SKOSProperty.narrower);
+
+        for (String bt[] : btList) {
+
+            int prop;
+
+            switch (bt[1]) {
+                case "BTG":
+                    prop = SKOSProperty.broaderGeneric;
+                    break;
+                case "BTP":
+                    prop = SKOSProperty.broaderPartitive;
+                    break;
+                case "BTI":
+                    prop = SKOSProperty.broaderInstantive;
+                    break;
+                default:
+                    prop = SKOSProperty.broader;
+            }
+            resource.addRelation(getUriFromId(bt[0]), prop);
         }
-        for (String bt : btList) {
-            resource.addRelation(getUriFromId(bt), SKOSProperty.broader);
+
+        for (String nt[] : ntList) {
+
+            int prop;
+
+            switch (nt[1]) {
+                case "NTG":
+                    prop = SKOSProperty.narrowerGeneric;
+                    break;
+                case "NTP":
+                    prop = SKOSProperty.narrowerPartitive;
+                    break;
+                case "NTI":
+                    prop = SKOSProperty.narrowerInstantive;
+                    break;
+                default:
+                    prop = SKOSProperty.narrower;
+            }
+            resource.addRelation(getUriFromId(nt[0]), prop);
         }
     }
 
-    private void addRelationUriGiven(ArrayList<NodeUri> btList, ArrayList<NodeUri> ntList, ArrayList<NodeUri> rtList, SKOSResource resource) {
-        for (NodeUri rt : rtList) {
-            resource.addRelation(getUriFromId(rt.getIdConcept()), SKOSProperty.related);
+    private void addRelationGiven(ArrayList<NodeHieraRelation> btList, ArrayList<NodeHieraRelation> ntList, ArrayList<NodeHieraRelation> rtList, SKOSResource resource) {
+        for (NodeHieraRelation rt : rtList) {
+            int prop;
+
+            switch (rt.getRole()) {
+                case "RHP":
+                    prop = SKOSProperty.relatedHasPart;
+                    break;
+                case "RPO":
+                    prop = SKOSProperty.relatedPartOf;
+                    break;
+                default:
+                    prop = SKOSProperty.related;
+            }
+            resource.addRelation(getUriFromId(rt.getUri().getIdConcept()), prop);
         }
-        for (NodeUri nt : ntList) {
-            resource.addRelation(getUriFromId(nt.getIdConcept()), SKOSProperty.narrower);
+        for (NodeHieraRelation nt : ntList) {
+            int prop;
+            switch (nt.getRole()) {
+                case "NTG":
+                    prop = SKOSProperty.narrowerGeneric;
+                    break;
+                case "NTP":
+                    prop = SKOSProperty.narrowerPartitive;
+                    break;
+                case "NTI":
+                    prop = SKOSProperty.narrowerInstantive;
+                    break;
+                default:
+                    prop = SKOSProperty.narrower;
+            }
+            resource.addRelation(getUriFromId(nt.getUri().getIdConcept()), prop);
         }
-        for (NodeUri bt : btList) {
-            resource.addRelation(getUriFromId(bt.getIdConcept()), SKOSProperty.broader);
+        for (NodeHieraRelation bt : btList) {
+
+            int prop;
+            switch (bt.getRole()) {
+                case "BTG":
+                    prop = SKOSProperty.broaderGeneric;
+                    break;
+                case "BTP":
+                    prop = SKOSProperty.broaderPartitive;
+                    break;
+                case "BTI":
+                    prop = SKOSProperty.broaderInstantive;
+                    break;
+                default:
+                    prop = SKOSProperty.broader;
+            }
+            resource.addRelation(getUriFromId(bt.getUri().getIdConcept()), prop);
         }
     }
 

@@ -23,6 +23,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.helper.nodes.NodeTT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
@@ -432,6 +433,120 @@ public class ConceptHelper {
             hierarchicalRelationship.setIdConcept2(idParent);
             hierarchicalRelationship.setIdThesaurus(concept.getIdThesaurus());
             hierarchicalRelationship.setRole("BT");
+
+            if (!addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+
+            // cette fonction permet de remplir la table Permutée
+            termHelper.splitConceptForPermute(ds, idConcept,
+                    getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus()),
+                    term.getId_thesaurus(),
+                    term.getLang(),
+                    term.getLexical_value());
+
+            // Si on arrive ici, c'est que tout va bien 
+            // alors c'est le moment de récupérer le code ARK
+            if (isArkActive) {
+                NodeMetaData nodeMetaData = new NodeMetaData();
+                nodeMetaData.setCreator(term.getSource());
+                nodeMetaData.setTitle(term.getLexical_value());
+                nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+
+                if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
+                        urlSite, nodeMetaData, idUser)) {
+                    conn.rollback();
+                    conn.close();
+                    return null;
+                }
+            }
+
+            conn.commit();
+            conn.close();
+            return idConcept;
+
+        } catch (SQLException ex) {
+            try {
+                Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex1) {
+            }
+        }
+        return null;
+    }
+    
+     /**
+     * Cette fonction permet d'ajouter un Concept et de choisir le type de relation  complet à la base avec le
+     * libellé et les relations Si l'opération échoue, elle envoi un NULL et ne
+     * modifie pas la base de données
+     *
+     * @param ds
+     * @param idParent
+     * @param concept
+     * @param term
+     * @param urlSite
+     * @param isArkActive
+     * @param idUser
+     * @return null si le term existe ou si erreur, sinon le numero de Concept
+     */
+    public String addConceptSpecial(HikariDataSource ds,
+            String idParent,
+            Concept concept, Term term,String BTname,String NTname,
+            String urlSite, boolean isArkActive, int idUser) {
+
+        Connection conn = null;
+        try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            TermHelper termHelper = new TermHelper();
+            // controle si le term existe avant de rajouter un concept
+            /*if (termHelper.isTermExist(ds, term.getLexical_value(),
+             term.getId_thesaurus(), term.getLang())) {
+             conn.close();
+             return null;
+             }*/
+            concept.setTopConcept(false);
+
+            String idConcept = addConceptInTable(conn, concept, idUser);
+            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
+            if (idConcept == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+
+            String idTerm = termHelper.addTerm(conn, term, idConcept, idUser);
+            if (idTerm == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+            term.setId_term(idTerm);
+
+            /**
+             * ajouter le lien hiérarchique
+             */
+            HierarchicalRelationship hierarchicalRelationship = new HierarchicalRelationship();
+            hierarchicalRelationship.setIdConcept1(idParent);
+            hierarchicalRelationship.setIdConcept2(idConcept);
+            hierarchicalRelationship.setIdThesaurus(concept.getIdThesaurus());
+            hierarchicalRelationship.setRole(NTname);
+
+            if (!addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+
+            hierarchicalRelationship.setIdConcept1(idConcept);
+            hierarchicalRelationship.setIdConcept2(idParent);
+            hierarchicalRelationship.setIdThesaurus(concept.getIdThesaurus());
+            hierarchicalRelationship.setRole(BTname);
 
             if (!addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
                 conn.rollback();
@@ -930,7 +1045,7 @@ public class ConceptHelper {
                     String query = "select id_concept2 from hierarchical_relationship"
                             + " where id_thesaurus ='" + idTheso
                             + "' and id_concept1 ='" + idConcept
-                            + "' and role ='NT'";
+                            + "' and role LIKE 'NT%'";
                     resulset = stmt.executeQuery(query);
                     while (resulset.next()) {
                         conceptabush.add(resulset.getString(1));
@@ -2296,11 +2411,11 @@ public class ConceptHelper {
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, false);
             nodeConceptExports.add(nodeConcept);
-            if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
-                for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+            if (!nodeConcept.getNodeListOfNT().isEmpty()) {
+                for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
 
                     exportAllConcepts(ds,
-                            nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                            nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
                             idThesaurus, nodeConceptExports);
                 }
             }
@@ -2795,9 +2910,9 @@ public class ConceptHelper {
             String idGroup, String idThesaurus) {
 
         ArrayList<String> listIdTopConcept = getListIdsOfTopConcepts(ds, idGroup, idThesaurus);
-        ArrayList<NodeUri> listIdTopConcept_Ark = getListIdArkOfConcept(ds, listIdTopConcept, idThesaurus);
+        ArrayList<NodeUri> listTopConcept_Ark = getListIdArkOfConcept2(ds, listIdTopConcept, idThesaurus);
 
-        return listIdTopConcept_Ark;
+        return listTopConcept_Ark;
     }
 
     /**
@@ -3135,7 +3250,7 @@ public class ConceptHelper {
                     String query = "select id_concept2 from hierarchical_relationship"
                             + " where id_thesaurus = '" + idThesaurus + "'"
                             + " and id_concept1 = '" + idConcept + "'"
-                            + " and role = '" + "NT" + "'";
+                            + " and role LIKE 'NT%'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
@@ -3178,11 +3293,11 @@ public class ConceptHelper {
                             + " alignement.internal_id_concept = hierarchical_relationship.id_concept2 AND"
                             + " alignement.internal_id_thesaurus = hierarchical_relationship.id_thesaurus AND"
                             + " alignement.id_alignement_source = " + id_alignement_source + " AND "
-                            + " hierarchical_relationship.role = 'NT'"
+                            + " hierarchical_relationship.role LIKE 'NT%'"
                             + " AND hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'"
                             + " and hierarchical_relationship.id_concept1 = '" + idConcept + "')"
                             + " and id_thesaurus = '" + idThesaurus + "'"
-                            + " and role ='NT'"
+                            + " and role LIKE 'NT%'"
                             + " and id_concept1= '" + idConcept + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -3292,7 +3407,7 @@ public class ConceptHelper {
                     String query = "select id_concept2 from hierarchical_relationship"
                             + " where id_thesaurus = '" + idThesaurus + "'"
                             + " and id_concept1 = '" + idConcept + "'"
-                            + " and role = '" + "NT" + "'";
+                            + " and role LIKE 'NT%'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
@@ -3382,10 +3497,10 @@ public class ConceptHelper {
         // récupération des BT
         RelationsHelper relationsHelper = new RelationsHelper();
 
-        ArrayList<NodeUri> nodeListIdOfBT_Ark = getListIdArkOfConcept(ds,
-                relationsHelper.getListIdBT(ds, idConcept, idThesaurus),
+        ArrayList<NodeHieraRelation> nodeListOfBT_Ark = getListIdArkOfConcept(ds,
+                relationsHelper.getListBT(ds, idConcept, idThesaurus),
                 idThesaurus);
-        nodeConceptExport.setNodeListIdsOfBT(nodeListIdOfBT_Ark);
+        nodeConceptExport.setNodeListOfBT(nodeListOfBT_Ark);
 
         //récupération du Concept
         Concept concept = getThisConcept(ds, idConcept, idThesaurus);
@@ -3404,14 +3519,14 @@ public class ConceptHelper {
         nodeConceptExport.setNodeAlignmentsList(nodeAlignmentList);
 
         //récupération des termes spécifiques
-        ArrayList<NodeUri> nodeListIdsOfNT_Ark = getListIdArkOfConcept(ds,
-                relationsHelper.getListIdsOfNT(ds, idConcept, idThesaurus),
+        ArrayList<NodeHieraRelation> nodeListIdsOfNT_Ark = getListIdArkOfConcept(ds,
+                relationsHelper.getListOfNT(ds, idConcept, idThesaurus),
                 idThesaurus);
-        nodeConceptExport.setNodeListIdsOfNT(nodeListIdsOfNT_Ark);
+        nodeConceptExport.setNodeListOfNT(nodeListIdsOfNT_Ark);
 
         //récupération des termes associés
-        ArrayList<NodeUri> nodeListIdsOfRT_Ark = getListIdArkOfConcept(ds,
-                relationsHelper.getListIdsOfRT(ds, idConcept, idThesaurus),
+        ArrayList<NodeHieraRelation> nodeListIdsOfRT_Ark = getListIdArkOfConcept(ds,
+                relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                 idThesaurus);
         nodeConceptExport.setNodeListIdsOfRT(nodeListIdsOfRT_Ark);
 
@@ -3494,7 +3609,38 @@ public class ConceptHelper {
      * @param idThesaurus
      * @return ArrayList<NodeUri>
      */
-    private ArrayList<NodeUri> getListIdArkOfConcept(
+    private ArrayList<NodeHieraRelation> getListIdArkOfConcept(
+            HikariDataSource ds,
+            ArrayList<String[]> nodeListIdOfConcept,
+            String idThesaurus) {
+
+        ArrayList<NodeHieraRelation> nodeListIdOfConcept_idArk = new ArrayList<>();
+
+        String idArk;
+        for (String nodeListIdOfConcept1[] : nodeListIdOfConcept) {
+            idArk = getIdArkOfConcept(ds, nodeListIdOfConcept1[0], idThesaurus);
+            NodeHieraRelation node = new NodeHieraRelation();
+            if (idArk == null || idArk.trim().isEmpty()) {
+                node.getUri().setIdArk("");
+            } else {
+                node.getUri().setIdArk(idArk);
+            }
+            node.getUri().setIdConcept(nodeListIdOfConcept1[0]);
+            node.setRole(nodeListIdOfConcept1[1]);
+            nodeListIdOfConcept_idArk.add(node);
+        }
+        return nodeListIdOfConcept_idArk;
+    }
+    
+    /**
+     * Cette fonction permet de récupérer les Id Ark d'une liste d'Identifiants
+     * de Concepts et les rajouter dans le tableau de NodeUri
+     *
+     * @param nodeListIdOfConcept
+     * @param idThesaurus
+     * @return ArrayList<NodeUri>
+     */
+    private ArrayList<NodeUri> getListIdArkOfConcept2(
             HikariDataSource ds,
             ArrayList<String> nodeListIdOfConcept,
             String idThesaurus) {
@@ -3504,14 +3650,14 @@ public class ConceptHelper {
         String idArk;
         for (String nodeListIdOfConcept1 : nodeListIdOfConcept) {
             idArk = getIdArkOfConcept(ds, nodeListIdOfConcept1, idThesaurus);
-            NodeUri nodeUri = new NodeUri();
+            NodeUri node = new NodeUri();
             if (idArk == null || idArk.trim().isEmpty()) {
-                nodeUri.setIdArk("");
+                node.setIdArk("");
             } else {
-                nodeUri.setIdArk(idArk);
+                node.setIdArk(idArk);
             }
-            nodeUri.setIdConcept(nodeListIdOfConcept1);
-            nodeListIdOfConcept_idArk.add(nodeUri);
+            node.setIdConcept(nodeListIdOfConcept1);
+            nodeListIdOfConcept_idArk.add(node);
         }
         return nodeListIdOfConcept_idArk;
     }
@@ -3577,20 +3723,20 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
 
             // récupération des BT
-            ArrayList<NodeUri> nodeListIdOfBT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdBT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListBT(ds, idConcept, idThesaurus),
                     idThesaurus);
-            nce.setNodeListIdsOfBT(nodeListIdOfBT_Ark);
+            nce.setNodeListOfBT(nodeListIdOfBT_Ark);
 
             //récupération des termes spécifiques
-            ArrayList<NodeUri> nodeListIdOfNT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdsOfNT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListOfNT(ds, idConcept, idThesaurus),
                     idThesaurus);
-            nce.setNodeListIdsOfNT(nodeListIdOfNT_Ark);
+            nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeUri> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdsOfRT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                     idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 
@@ -3656,20 +3802,20 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
 
             // récupération des BT
-            ArrayList<NodeUri> nodeListIdOfBT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdBT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListBT(ds, idConcept, idThesaurus),
                     idThesaurus);
-            nce.setNodeListIdsOfBT(nodeListIdOfBT_Ark);
+            nce.setNodeListOfBT(nodeListIdOfBT_Ark);
 
             //récupération des termes spécifiques
-            ArrayList<NodeUri> nodeListIdOfNT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdsOfNT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListOfNT(ds, idConcept, idThesaurus),
                     idThesaurus);
-            nce.setNodeListIdsOfNT(nodeListIdOfNT_Ark);
+            nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeUri> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
-                    relationsHelper.getListIdsOfRT(ds, idConcept, idThesaurus),
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = getListIdArkOfConcept(ds,
+                    relationsHelper.getListIdAndRoleOfRT(ds, idConcept, idThesaurus),
                     idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 
@@ -3825,7 +3971,7 @@ public class ConceptHelper {
                     String query = "select count(*)  from hierarchical_relationship"
                             + " where id_thesaurus='" + idThesaurus + "'"
                             + " and id_concept1='" + idConcept + "'"
-                            + " and role='NT'";
+                            + " and role LIKE 'NT%'";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -4169,7 +4315,7 @@ public class ConceptHelper {
                     String query = "SELECT id_concept2 FROM hierarchical_relationship"
                             + " WHERE id_thesaurus='" + id_theso + "'"
                             + " AND id_concept1='" + id_concept + "'"
-                            + " AND role ='BT'";
+                            + " AND role LIKE 'BT%'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {

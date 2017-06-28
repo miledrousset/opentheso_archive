@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
+import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -242,33 +243,33 @@ public class ExportTabulateHelper {
             
             // broader
             first = true;
-            for (NodeUri nodeUri : nodeConceptExport.getNodeListIdsOfBT()) {
+            for (NodeHieraRelation node : nodeConceptExport.getNodeListOfBT()) {
                 if(!first) {
                     tabulateBuff.append("##");
                 }
-                tabulateBuff.append(nodeUri.getIdConcept());
+                tabulateBuff.append(node.getUri().getIdConcept());
                 first = false;
             }
             tabulateBuff.append(";");
             
             // narrower
             first = true;
-            for (NodeUri nodeUri : nodeConceptExport.getNodeListIdsOfNT()) {
+            for (NodeHieraRelation node : nodeConceptExport.getNodeListOfNT()) {
                 if(!first) {
                     tabulateBuff.append("##");
                 }
-                tabulateBuff.append(nodeUri.getIdConcept());
+                tabulateBuff.append(node.getUri().getIdConcept());
                 first = false;
             }            
             tabulateBuff.append(";");
             
             // related
             first = true;
-            for (NodeUri nodeUri : nodeConceptExport.getNodeListIdsOfRT()) {
+            for (NodeHieraRelation nodeUri : nodeConceptExport.getNodeListIdsOfRT()) {
                 if(!first) {
                     tabulateBuff.append("##");
                 }
-                tabulateBuff.append(nodeUri.getIdConcept());
+                tabulateBuff.append(nodeUri.getUri().getIdConcept());
                 first = false;
             }            
             tabulateBuff.append(";");

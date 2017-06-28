@@ -215,8 +215,8 @@ public class WriteFileSKOS_Frantiq {
                     SKOSProperty.inScheme);*/
         }
 
-        for (int i = 0; i < nodeConceptExport.getNodeListIdsOfBT().size(); i++) {
-            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListIdsOfBT().get(i).getIdConcept(), SKOSProperty.broader);
+        for (int i = 0; i < nodeConceptExport.getNodeListOfBT().size(); i++) {
+            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListOfBT().get(i).getUri().getIdConcept(), SKOSProperty.broader);
         /*    concept.addRelation(
                     getRelationUri(nodeConceptExport.getNodeListIdsOfBT().get(i),
                             nodeConceptExport.getConcept().getIdThesaurus()),
@@ -224,8 +224,8 @@ public class WriteFileSKOS_Frantiq {
             */
         }
 
-        for (int i = 0; i < nodeConceptExport.getNodeListIdsOfNT().size(); i++) {
-            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListIdsOfNT().get(i).getIdConcept(), SKOSProperty.narrower);
+        for (int i = 0; i < nodeConceptExport.getNodeListOfNT().size(); i++) {
+            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListOfNT().get(i).getUri().getIdConcept(), SKOSProperty.narrower);
         /*    concept.addRelation(
                     getRelationUri(nodeConceptExport.getNodeListIdsOfNT().get(i),
                             nodeConceptExport.getConcept().getIdThesaurus()),
@@ -234,7 +234,7 @@ public class WriteFileSKOS_Frantiq {
         }
 
         for (int i = 0; i < nodeConceptExport.getNodeListIdsOfRT().size(); i++) {
-            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListIdsOfRT().get(i).getIdConcept(), SKOSProperty.related);
+            concept.addRelation(URI + "concept#" + nodeConceptExport.getNodeListIdsOfRT().get(i).getUri().getIdConcept(), SKOSProperty.related);
         /*    concept.addRelation(
                     getRelationUri(nodeConceptExport.getNodeListIdsOfRT().get(i),
                             nodeConceptExport.getConcept().getIdThesaurus()),

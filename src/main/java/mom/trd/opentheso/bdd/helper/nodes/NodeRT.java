@@ -14,6 +14,7 @@ public class NodeRT {
     private String title;
     private String idConcept;
     private String status;
+    private String role;
     
 
     public NodeRT() {
@@ -41,6 +42,14 @@ public class NodeRT {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
 

@@ -1,0 +1,46 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!-- Gestion de la note -->
+    <p:dialog id="idTermeAssocieSpecialEditDlg"  header="#{langueBean.getMsg('index.RT')} special" widgetVar="termeAssocieSpecialEditDlg" modal="true" resizable="false">
+        <fieldset>
+            <h:form>
+                <p:messages showDetail="true" autoUpdate="true" /><br/>
+                <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
+                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
+                                itemLabel="#{t3.termLexicalValue}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
+                    <f:facet name="itemtip">
+                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+                            <f:facet name="header" rendered="#{(t3.url) != null}">
+                                <h:outputText value="ID : " />
+                                <h:outputText value="#{t3.idConcept}" />
+                            </f:facet>
+
+                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                            <h:outputText value="#{t3.groupLexicalValue}" />
+
+                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                            <h:outputText value="#{t3.definition}" />
+
+                            
+                        </h:panelGrid>
+                    </f:facet>
+                </p:autoComplete>
+                <h:panelGrid columns="2" cellpadding="5" width="200" >
+                 <h:outputText value="Type : " />
+                <p:selectOneMenu  value="#{autoComp.RTtag}" >
+                                <f:selectItem itemLabel="has part (RHP)" itemValue="RHP" />
+                                <f:selectItem itemLabel="is part of (RPO)" itemValue="RPO" />
+                </p:selectOneMenu>
+                </h:panelGrid>
+                <br/><br/>
+                <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newSpecialTAsso()}" 
+                                 update=":panContenu" styleClass="styleButton" oncomplete="PF('termeAssocieSpecialEditDlg').hide();"/> 
+            </h:form>
+        </fieldset>
+    </p:dialog>
+</ui:composition>

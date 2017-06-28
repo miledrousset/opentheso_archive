@@ -202,8 +202,6 @@ public class SelectedTerme implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    
-    
 
     /**
      * *************************************** INITIALISATION
@@ -211,10 +209,10 @@ public class SelectedTerme implements Serializable {
      */
     @PostConstruct
     public void initTerme() {
-        if(user == null ||user.getNodePreference() == null){
+        if (user == null || user.getNodePreference() == null) {
             return;
         }
-        
+
         majPref();
 
         user.setIdTheso(idTheso);
@@ -470,9 +468,9 @@ public class SelectedTerme implements Serializable {
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeRT nrt : tempRT) {
             if (nrt.getStatus().equals("hidden")) {
-                tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + "</del>");
+                tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + " (" + nrt.getRole() + ")" + "</del>");
             } else {
-                tempMap.put(nrt.getIdConcept(), nrt.getTitle());
+                tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
             }
         }
         termesAssocies.addAll(tempMap.entrySet());
@@ -623,12 +621,16 @@ public class SelectedTerme implements Serializable {
     private void majTSpeConcept() {
         termesSpecifique = new ArrayList<>();
         ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        writeTermesSpecifique(tempNT);
+    }
+
+    private void writeTermesSpecifique(ArrayList<NodeNT> tempNT) {
         for (NodeNT nnt : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             if (nnt.getStatus().equals("hidden")) {
-                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + "</del>");
+                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + " (" +nnt.getRole() +")" + "</del>");
             } else {
-                tempMap1.put(nnt.getIdConcept(), nnt.getTitle());
+                tempMap1.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
             }
             termesSpecifique.addAll(tempMap1.entrySet());
         }
@@ -637,15 +639,7 @@ public class SelectedTerme implements Serializable {
     public void majTSpeConceptOrder() {
         termesSpecifique = new ArrayList<>();
         ArrayList<NodeNT> tempNT = new RelationsHelper().getListNTOrderByDate(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        for (NodeNT nnt : tempNT) {
-            HashMap<String, String> tempMap1 = new HashMap<>();
-            if (nnt.getStatus().equals("hidden")) {
-                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + "</del>");
-            } else {
-                tempMap1.put(nnt.getIdConcept(), nnt.getTitle());
-            }
-            termesSpecifique.addAll(tempMap1.entrySet());
-        }
+        writeTermesSpecifique(tempNT);
     }
 
     private void majTGen() {
@@ -662,9 +656,9 @@ public class SelectedTerme implements Serializable {
         for (NodeBT nbt : tempBT) {
             HashMap<String, String> tempMap2 = new HashMap<>();
             if (nbt.getStatus().equals("hidden")) {
-                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + "</del>");
+                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() +")" + "</del>");
             } else {
-                tempMap2.put(nbt.getIdConcept(), nbt.getTitle());
+                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() +")");
             }
             termeGenerique.addAll(tempMap2.entrySet());
         }
@@ -684,9 +678,9 @@ public class SelectedTerme implements Serializable {
         for (NodeBT nbt : tempBT) {
             HashMap<String, String> tempMap2 = new HashMap<>();
             if (nbt.getStatus().equals("hidden")) {
-                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + "</del>");
+                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() +")" + "</del>");
             } else {
-                tempMap2.put(nbt.getIdConcept(), nbt.getTitle());
+                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() +")");
             }
             termeGenerique.addAll(tempMap2.entrySet());
         }
@@ -777,7 +771,7 @@ public class SelectedTerme implements Serializable {
         ConceptHelper instance = new ConceptHelper();
         instance.setIdentifierType(identifierType);
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
-        if (selecedTerm.isIsSubGroup() ||selecedTerm.isIsGroup()) {
+        if (selecedTerm.isIsSubGroup() || selecedTerm.isIsGroup()) {
             // ici c'est le cas d'un Group ou Sous Group, on crée un TT Top Terme
             Concept concept = new Concept();
             concept.setIdGroup(selecedTerm.getIdMot());
@@ -802,7 +796,7 @@ public class SelectedTerme implements Serializable {
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
             for (NodeConceptTree nct : tempNT) {
-                tempMap.put(nct.getIdConcept(), nct.getTitle());
+                tempMap.put(nct.getIdConcept(), nct.getTitle()  );
             }
             termesSpecifique.addAll(tempMap.entrySet());
 
@@ -833,10 +827,54 @@ public class SelectedTerme implements Serializable {
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
             for (NodeNT nnt : tempNT) {
-                tempMap.put(nnt.getIdConcept(), nnt.getTitle());
+                tempMap.put(nnt.getIdConcept(), nnt.getTitle()  + " (" +nnt.getRole() +")");
             }
             termesSpecifique.addAll(tempMap.entrySet());
         }
+        vue.setAddTSpe(false);
+        valueEdit = "";
+        return true;
+    }
+
+    /**
+     * relation special type NTG NTP NTI ...
+     *
+     * @param selecedTerm
+     * @return
+     */
+    public boolean creerSpecialTermeSpe(MyTreeNode selecedTerm,String BTname, String NTname) {
+        ConceptHelper instance = new ConceptHelper();
+        instance.setIdentifierType(identifierType);
+
+        Concept concept = new Concept();
+        concept.setIdGroup(selecedTerm.getIdDomaine());
+        concept.setIdThesaurus(idTheso);
+        concept.setStatus("D");
+        concept.setNotation("");
+
+        Term terme = new Term();
+        terme.setId_thesaurus(idTheso);
+        terme.setLang(idlangue);
+        terme.setLexical_value(valueEdit);
+        terme.setSource("");
+        terme.setStatus("");
+
+        //String idTC = idTopConcept;
+        String idP = idC;
+             
+        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme,BTname,NTname, serverAdress, arkActive, user.getUser().getId()) == null) {
+            return false;
+        }
+        instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
+        concept.getUserName();
+        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        termesSpecifique = new ArrayList<>();
+        HashMap<String, String> tempMap = new HashMap<>();
+        for (NodeNT nnt : tempNT) {
+            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
+        }
+        termesSpecifique.addAll(tempMap.entrySet());
+
         vue.setAddTSpe(false);
         valueEdit = "";
         return true;
@@ -911,7 +949,23 @@ public class SelectedTerme implements Serializable {
         termesAssocies = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeRT nrt : tempRT) {
-            tempMap.put(nrt.getIdConcept(), nrt.getTitle());
+            tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
+        }
+        termesAssocies.addAll(tempMap.entrySet());
+        vue.setAddTAsso(0);
+    }
+    public void creerTermeAsso(String idC2,String role) {
+        HierarchicalRelationship hr = new HierarchicalRelationship();
+        hr.setIdConcept1(idC);
+        hr.setIdConcept2(idC2);
+        hr.setIdThesaurus(idTheso);
+        hr.setRole(role);
+        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getId());
+        ArrayList<NodeRT> tempRT = new RelationsHelper().getListRT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        termesAssocies = new ArrayList<>();
+        HashMap<String, String> tempMap = new HashMap<>();
+        for (NodeRT nrt : tempRT) {
+            tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
         }
         termesAssocies.addAll(tempMap.entrySet());
         vue.setAddTAsso(0);
@@ -1313,7 +1367,7 @@ public class SelectedTerme implements Serializable {
         termesSpecifique = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeNT nnt : tempNT) {
-            tempMap.put(nnt.getIdConcept(), nnt.getTitle());
+            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
         }
         termesSpecifique.addAll(tempMap.entrySet());
         vue.setAddTSpe(false);
@@ -1611,30 +1665,27 @@ public class SelectedTerme implements Serializable {
      * *************************************** EDITION
      * ****************************************
      */
-      
-     /** 
-      * Permet de modifier le nom d'un Group ou sousGroup 
-      * 
+    /**
+     * Permet de modifier le nom d'un Group ou sousGroup
+     *
      * @param idTheso
      * @param idGroup
      * @param idLangue
      * @param value
-     * @return 
-     * #MR
+     * @return #MR
      */
-     public boolean editGroupName(String idTheso, String idGroup,
-             String idLangue, String value){
-         
-         GroupHelper groupHelper = new GroupHelper();
-         ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
-         conceptGroupLabel.setIdthesaurus(idTheso);
-         conceptGroupLabel.setIdgroup(idGroup);
-         conceptGroupLabel.setLang(idLangue);
-         conceptGroupLabel.setLexicalvalue(value);
-         return groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId());
-     } 
-    
-    
+    public boolean editGroupName(String idTheso, String idGroup,
+            String idLangue, String value) {
+
+        GroupHelper groupHelper = new GroupHelper();
+        ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
+        conceptGroupLabel.setIdthesaurus(idTheso);
+        conceptGroupLabel.setIdgroup(idGroup);
+        conceptGroupLabel.setLang(idLangue);
+        conceptGroupLabel.setLexicalvalue(value);
+        return groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId());
+    }
+
     /**
      * Modifie le nom du terme selectionné
      *
@@ -2188,7 +2239,7 @@ public class SelectedTerme implements Serializable {
                 termesSpecifique = new ArrayList<>();
                 HashMap<String, String> tempMap3 = new HashMap<>();
                 for (NodeNT nnt : tempNT) {
-                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle());
+                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
                 }
                 termesSpecifique.addAll(tempMap3.entrySet());
             } catch (SQLException ex) {
