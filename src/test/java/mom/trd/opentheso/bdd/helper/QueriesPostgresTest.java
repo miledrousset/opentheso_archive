@@ -73,7 +73,7 @@ public class QueriesPostgresTest {
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "pactols");
+        config.addDataSourceProperty("databaseName", "4.2.2");
 
         config.addDataSourceProperty("serverName", "localhost");
         //config.addDataSourceProperty("serverName", "opentheso.mom.fr");
@@ -1148,7 +1148,7 @@ public class QueriesPostgresTest {
 
     public void testOpenThesoServices() {
 
-        HikariDataSource conn = openConnexionPool();
+ //       HikariDataSource conn = openConnexionPool();
         
  /*       try {
             ConceptHelper conceptHelper = new ConceptHelper();
@@ -1213,27 +1213,39 @@ public class QueriesPostgresTest {
 
     public void testDeleteThesaurus() {
         
-       HikariDataSource conn = openConnexionPool();
+   /*    HikariDataSource conn = openConnexionPool();
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         thesaurusHelper.deleteThesaurus(conn, "null");
 
         
-        conn.close();
+        conn.close();*/
     }    
     
     @org.junit.Test
 
     public void testGetVersion() {
-        System.out.println(getClass().getPackage().getImplementationVersion());
-        System.out.println(QueriesPostgresTest.class.getPackage().getImplementationVersion());
+//        System.out.println(getClass().getPackage().getImplementationVersion());
+//        System.out.println(QueriesPostgresTest.class.getPackage().getImplementationVersion());
     /*    HikariDataSource conn = openConnexionPool();
         ToolsHelper toolsHelper = new ToolsHelper();
         boolean test = toolsHelper.orphanDetect(conn, "TH_1");
         System.out.println
         
         conn.close();*/
-        System.out.println("");
+  //      System.out.println("");
     }
     
+    
+    @org.junit.Test
+    public void modifyIdToNumeric() {
+
+        HikariDataSource conn = openConnexionPool();
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        boolean status =  conceptHelper.setIdConceptToNumeric(conn, "1", "Tz6caNb7Jg");
+
+        conn.close();
+        System.out.println("");
+    }    
 
 }

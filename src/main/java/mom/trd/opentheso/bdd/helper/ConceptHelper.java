@@ -86,6 +86,122 @@ public class ConceptHelper {
         return lisIds;
     }
 
+    /**
+     * permet de modifier l'identifiant du concept en numérique, la fonction
+     * modifie toutes les tables dépendantes et les relations
+     *
+     * @param ds
+     * @param idTheso
+     * @param id
+     * @return
+     */
+    public boolean setIdConceptToNumeric(HikariDataSource ds, String idTheso, String id) {
+
+        if (id == null) {
+            return false;
+        }
+        if (idTheso == null) {
+            return false;
+        }
+
+        // on récupère un nouvel identifiant numérique
+        String newId = getNumericConceptId(ds, idTheso);
+        if (newId == null) {
+            return false;
+        }
+        GpsHelper gpsHelper = new GpsHelper();
+        NoteHelper noteHelper = new NoteHelper();
+        ImagesHelper imagesHelper = new ImagesHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            try {
+                //table concept
+                setIdConcept(conn, idTheso, id, newId);
+                //table concept_group_concept
+                setIdConceptGroupConcept(conn, idTheso, id, newId);
+                //table concept_historique
+                setIdConceptHistorique(conn, idTheso, id, newId);
+                //table concept_orphan
+                setIdConceptOrphan(conn, idTheso, id, newId);
+                //table gps 
+                gpsHelper.setIdConceptGPS(conn, idTheso, id, newId);
+                //table hierarchical_relationship
+                setIdConceptHieraRelation(conn, idTheso, id, newId);
+                //table hierarchical_relationship_historique
+                setIdConceptHieraRelationHisto(conn, idTheso, id, newId);
+                //table note
+                noteHelper.setIdConceptNote(conn, idTheso, id, newId);
+                //table note_historique
+                noteHelper.setIdConceptNoteHisto(conn, idTheso, id, newId);
+                //table images 
+                imagesHelper.setIdConceptImage(conn, idTheso, id, newId);
+                //table concept_fusion
+                setIdConceptFusion(conn, idTheso, id, newId);
+                //table preferred_term 
+                setIdConceptPreferedTerm(conn, idTheso, id, newId);
+                //table alignement
+                alignmentHelper.setIdConceptAlignement(conn, idTheso, id, newId);
+                conn.commit();
+                conn.close();
+                return true;
+                
+            } catch (SQLException e) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+
+        } catch (SQLException sqle) {
+            
+        }
+        return false;
+    }
+
+    /**
+     * Permet de retourner un Id numérique et unique pour le Concept
+     *
+     * @param ds
+     * @param idTheso
+     * @return
+     */
+    private String getNumericConceptId(HikariDataSource ds, String idTheso) {
+        Connection conn;
+        String idConcept = null;
+        String query;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                query = "select max(id) from concept";
+                stmt.executeQuery(query);
+                resultSet = stmt.getResultSet();
+                if (resultSet.next()) {
+                    int idNumerique = resultSet.getInt(1);
+                    idNumerique++;
+                    idConcept = "" + (idNumerique);
+                    // si le nouveau Id existe, on l'incrémente
+                    while (isIdExiste(conn, idConcept, idTheso)) {
+                        idConcept = "" + (++idNumerique);
+                    }
+                }
+
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return idConcept;
+    }
+
     /*
         public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
             String idConceptDeTete,
@@ -1888,6 +2004,9 @@ public class ConceptHelper {
         }
         if (concept.getModified() == null) {
             concept.setModified(new java.util.Date());
+        }
+        if (concept.getStatus() == null) {
+            concept.setStatus("D");
         }
         try {
             // Get connection from pool
@@ -4163,7 +4282,7 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
+
     /**
      * Change l'id d'un concept dans la table hierarchical_relationship
      *
@@ -4191,9 +4310,10 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
+
     /**
-     * Change l'id d'un concept dans la table hierarchical_relationship_historique
+     * Change l'id d'un concept dans la table
+     * hierarchical_relationship_historique
      *
      * @param conn
      * @param idTheso
@@ -4219,7 +4339,7 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
+
     /**
      * Change l'id d'un concept dans la table concept_fusion
      *
@@ -4248,7 +4368,7 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
+
     /**
      * Change l'id d'un concept dans la table preferred_term
      *
@@ -4272,5 +4392,5 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
+
 }

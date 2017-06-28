@@ -165,7 +165,7 @@ public class SelectedTerme implements Serializable {
     private NodeSearch nodeSe;
     private NodePermute nodePe;
 
-    private String identifierType;
+    private String identifierType = "2";
     public String icon = "+";
 
     public String messageAlig = "";

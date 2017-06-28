@@ -402,6 +402,8 @@ public class SelectedThesaurus implements Serializable {
     }
 
     private void majPref() {
+        if(user.getNodePreference() == null) return;
+        
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
         version = "";
         //String useArk = bundlePref.getString("useArk");
@@ -1034,6 +1036,11 @@ public class SelectedThesaurus implements Serializable {
         tree.initTree(null, null);
         statBean.reInit();
         uTree.reInit();
+
+        if (selectedTerme != null) {
+            selectedTerme.initTerme();
+        }
+        majPref();
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         if (thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
             thesaurus = thesaurusHelper.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, workLanguage);

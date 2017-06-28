@@ -1,0 +1,56 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptFusionDlg" header="#{langueBean.getMsg('index.fusion')}" widgetVar="conceptFusionDlg" modal="true" resizable="false" >
+        
+        <!-- Cas de la désactivation du concept Deprecated -->
+        <h:form>
+            <p:messages showDetail="true" autoUpdate="true" />
+
+            <h:outputText escape="false" value="#{langueBean.getMsg('popup.indic')}" /><br/><br/>
+
+            <table>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('popup.delCptReor')}" /> : </td>
+                    <td>
+                        <p:autoComplete id="fusionConcept" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="tFusion"
+                                        itemLabel="#{tFusion.termLexicalValue}" itemValue="#{tFusion}" converter="termConverter" forceSelection="true">
+                            <f:facet name="itemtip">
+                                <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                    <f:facet name="header" rendered="#{(tFusion.url) != null}">
+                                        <h:outputText value="ID : " />
+                                        <h:outputText value="#{tFusion.idConcept}" />
+                                    </f:facet>
+
+                                    <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                    <h:outputText value="#{tFusion.groupLexicalValue}" />
+
+                                    <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                    <h:outputText value="#{tFusion.definition}" />
+                                </h:panelGrid>
+                            </f:facet>
+                        </p:autoComplete>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="1" style="text-align: center;">
+                        <p:commandButton id="cbLoadCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" actionListener="#{newtreeBean.getConceptForFusion()}" 
+                                        
+                                         oncomplete="PF('conceptFusionValidationDlg').show(); PF('conceptFusionDlg').hide();"
+                                         styleClass="styleButton" >
+                        </p:commandButton>
+                    </td>
+                    <td colspan="1" style="text-align: center;">
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{newtreeBean.initConceptFusion()}" 
+                                         update=":idConceptFusionDlg"
+                                         oncomplete="PF('conceptFusionDlg').hide();"  immediate="true"/>
+                    </td>                    
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>
