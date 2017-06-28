@@ -542,11 +542,11 @@ public class ExportFromBDD {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
             if(nodeConcept != null) {
                 writeFileSKOS.writeDescriptor(nodeConcept, null);
-                if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
-                    for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+                if (!nodeConcept.getNodeListOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
 
                         exportAllConcepts(ds,
-                                nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                                nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
                                 idThesaurus, writeFileSKOS);
 
                     }
@@ -638,11 +638,11 @@ public class ExportFromBDD {
             if(nodeConcept != null) {
                 writeFileSKOS.writeDescriptor(nodeConcept, selectedLanguages);
                 incrementProgressBar();
-                if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
-                    for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+                if (!nodeConcept.getNodeListOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
 
                         exportAllConceptsAdvanced(ds,
-                                nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                                nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
                                 idThesaurus, writeFileSKOS, selectedLanguages);
 
                     }

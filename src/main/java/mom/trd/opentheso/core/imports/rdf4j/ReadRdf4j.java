@@ -233,8 +233,26 @@ public class ReadRdf4j {
         if (readStruct.property.getLocalName().equals("broader")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broader);
             return false;
+        } else if (readStruct.property.getLocalName().equals("broaderGeneric")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderGeneric);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("broaderInstantive")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderInstantive);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("broaderPartitive")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderPartitive);
+            return false;
         } else if (readStruct.property.getLocalName().equals("narrower")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrower);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("narrowerGeneric")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerGeneric);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("narrowerInstantive")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerInstantive);
+            return false;
+        } else if (readStruct.property.getLocalName().equals("narrowerPartitive")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerPartitive);
             return false;
         } else if (readStruct.property.getLocalName().equals("related")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.related);

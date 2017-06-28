@@ -311,11 +311,11 @@ public class ExportFromBDD_Frantiq {
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, isArkActive);
             writeFileSKOS.writeDescriptor(nodeConcept);
-            if (!nodeConcept.getNodeListIdsOfNT().isEmpty()) {
-                for (int j = 0; j < nodeConcept.getNodeListIdsOfNT().size(); j++) {
+            if (!nodeConcept.getNodeListOfNT().isEmpty()) {
+                for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
 
                     exportAllConcepts(ds,
-                            nodeConcept.getNodeListIdsOfNT().get(j).getIdConcept(),
+                            nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
                             idThesaurus, writeFileSKOS);
 
                 }

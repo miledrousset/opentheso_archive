@@ -5,20 +5,23 @@ import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 
 public class NodeConceptExport {
 
-    //BT termes génériques
-    private ArrayList <NodeUri> nodeListIdsOfBT;
+    
 
     //pour gérer le concept
     private Concept concept;
+    
+    //BT termes génériques
+    private ArrayList <NodeHieraRelation> nodeListOfBT;
 
     //NT pour les termes spécifiques
-    private ArrayList <NodeUri> nodeListIdsOfNT;
+    private ArrayList <NodeHieraRelation> nodeListOfNT;
 
     //RT related term
     private ArrayList <NodeUri> nodeListIdsOfRT;
@@ -43,13 +46,7 @@ public class NodeConceptExport {
     public NodeConceptExport() {
     }
 
-    public ArrayList<NodeUri> getNodeListIdsOfBT() {
-        return nodeListIdsOfBT;
-    }
 
-    public void setNodeListIdsOfBT(ArrayList<NodeUri> nodeListIdsOfBT) {
-        this.nodeListIdsOfBT = nodeListIdsOfBT;
-    }
 
     public Concept getConcept() {
         return concept;
@@ -59,13 +56,6 @@ public class NodeConceptExport {
         this.concept = concept;
     }
 
-    public ArrayList<NodeUri> getNodeListIdsOfNT() {
-        return nodeListIdsOfNT;
-    }
-
-    public void setNodeListIdsOfNT(ArrayList<NodeUri> nodeListIdsOfNT) {
-        this.nodeListIdsOfNT = nodeListIdsOfNT;
-    }
 
     public ArrayList<NodeUri> getNodeListIdsOfRT() {
         return nodeListIdsOfRT;
@@ -131,7 +121,28 @@ public class NodeConceptExport {
         this.nodeGps = nodeGps;
     }
 
+    public ArrayList<NodeHieraRelation> getNodeListOfBT() {
+        return nodeListOfBT;
+    }
+
+    public void setNodeListOfBT(ArrayList<NodeHieraRelation> nodeListOfBT) {
+        this.nodeListOfBT = nodeListOfBT;
+    }
+
+    public ArrayList<NodeHieraRelation> getNodeListOfNT() {
+        return nodeListOfNT;
+    }
+
+    public void setNodeListOfNT(ArrayList<NodeHieraRelation> nodeListOfNT) {
+        this.nodeListOfNT = nodeListOfNT;
+    }
+
+    
+    
+    
 
    
+
+    
     
 }

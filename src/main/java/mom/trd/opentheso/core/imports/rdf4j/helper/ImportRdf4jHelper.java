@@ -205,7 +205,11 @@ public class ImportRdf4jHelper {
             String uri = resource.getUri();
             uriList.add(uri);
             for (SKOSRelation relation : resource.getRelationsList()) {
-                if (relation.getProperty() == SKOSProperty.broader) {
+                int relationProp = relation.getProperty();
+                if (relationProp == SKOSProperty.broader
+                        || relationProp == SKOSProperty.broaderGeneric
+                        || relationProp == SKOSProperty.broaderInstantive
+                        || relationProp == SKOSProperty.broaderPartitive) {
                     uriRessourcePere.put(uri, relation.getTargetUri());
                 }
             }
@@ -386,10 +390,8 @@ public class ImportRdf4jHelper {
                 adressSite,
                 useArk,
                 idUser);
-        
-        // Création du domaine par défaut 
 
-        
+        // Création du domaine par défaut 
         // ajouter les traductions des Groupes
         /*ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
         conceptGroupLabel.setIdgroup(idGroupDefault);
@@ -473,16 +475,14 @@ public class ImportRdf4jHelper {
     private void finalizeAddConceptStruct(AddConceptsStruct acs) throws SQLException {
         acs.termHelper.insertTerm(ds, acs.nodeTerm, idUser);
 
-        
-            Connection conn = ds.getConnection();
-            conn.setAutoCommit(false);
+        Connection conn = ds.getConnection();
+        conn.setAutoCommit(false);
 
-            for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
-                acs.conceptHelper.addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser);
-            }
-            conn.commit();
-            conn.close();
-        
+        for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
+            acs.conceptHelper.addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser);
+        }
+        conn.commit();
+        conn.close();
 
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote;
@@ -664,13 +664,13 @@ public class ImportRdf4jHelper {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
         for (SKOSDate date : acs.conceptResource.getDateList()) {
             if (date.getProperty() == SKOSProperty.created) {
-                
-                    acs.concept.setCreated(simpleDateFormat.parse(date.getDate()));
-                
+
+                acs.concept.setCreated(simpleDateFormat.parse(date.getDate()));
+
             } else if ((date.getProperty() == SKOSProperty.modified)) {
-                
-                    acs.concept.setModified(simpleDateFormat.parse(date.getDate()));
-               
+
+                acs.concept.setModified(simpleDateFormat.parse(date.getDate()));
+
             }
         }
 
@@ -681,20 +681,30 @@ public class ImportRdf4jHelper {
         int prop;
         for (SKOSRelation relation : acs.conceptResource.getRelationsList()) {
             prop = relation.getProperty();
-            if (prop == SKOSProperty.narrower || prop == SKOSProperty.related) {
-                hierarchicalRelationship = new HierarchicalRelationship();
-                String role = "";
+            hierarchicalRelationship = new HierarchicalRelationship();
+            String role;
 
-                switch (prop) {
-                    case SKOSProperty.narrower:
-                        role = "NT";
-                        break;
+            switch (prop) {
+                case SKOSProperty.narrower:
+                    role = "NT";
+                    break;
+                case SKOSProperty.narrowerGeneric:
+                    role = "NTG";
+                    break;
+                case SKOSProperty.narrowerPartitive:
+                    role = "NTP";
+                    break;
+                case SKOSProperty.narrowerInstantive:
+                    role = "NTI";
+                    break;
+                case SKOSProperty.related:
+                    role = "RT";
+                    break;
+                default:
+                    role = "";
 
-                    case SKOSProperty.related:
-                        role = "RT";
-                        break;
-                }
-
+            }
+            if (!role.equals("")) {
                 hierarchicalRelationship.setIdConcept1(acs.concept.getIdConcept());
                 hierarchicalRelationship.setIdConcept2(getIdFromUri(relation.getTargetUri()));
                 hierarchicalRelationship.setIdThesaurus(idTheso);
@@ -732,24 +742,43 @@ public class ImportRdf4jHelper {
         int prop;
         for (SKOSRelation relation : acs.conceptResource.getRelationsList()) {
             prop = relation.getProperty();
-            if (prop == SKOSProperty.narrower
-                    || prop == SKOSProperty.broader
-                    || prop == SKOSProperty.related) {
-                hierarchicalRelationship = new HierarchicalRelationship();
-                String role = "";
 
-                switch (prop) {
-                    case SKOSProperty.narrower:
-                        role = "NT";
-                        break;
-                    case SKOSProperty.broader:
-                        role = "BT";
-                        break;
-                    case SKOSProperty.related:
-                        role = "RT";
-                        break;
-                }
+            hierarchicalRelationship = new HierarchicalRelationship();
+            String role;
 
+            switch (prop) {
+                case SKOSProperty.narrower:
+                    role = "NT";
+                    break;
+                case SKOSProperty.narrowerGeneric:
+                    role = "NTG";
+                    break;
+                case SKOSProperty.narrowerPartitive:
+                    role = "NTP";
+                    break;
+                case SKOSProperty.narrowerInstantive:
+                    role = "NTI";
+                    break;
+                case SKOSProperty.broader:
+                    role = "BT";
+                    break;
+                case SKOSProperty.broaderGeneric:
+                    role = "BTG";
+                    break;
+                case SKOSProperty.broaderInstantive:
+                    role = "BTI";
+                    break;
+                case SKOSProperty.broaderPartitive:
+                    role = "BTP";
+                    break;
+                case SKOSProperty.related:
+                    role = "RT";
+                    break;
+                default:
+                    role = "";
+            }
+
+            if (!role.equals("")) {
                 hierarchicalRelationship.setIdConcept1(acs.concept.getIdConcept());
                 hierarchicalRelationship.setIdConcept2(getIdFromUri(relation.getTargetUri()));
                 hierarchicalRelationship.setIdThesaurus(idTheso);

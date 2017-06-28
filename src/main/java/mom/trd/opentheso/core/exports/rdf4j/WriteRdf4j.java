@@ -58,6 +58,7 @@ public class WriteRdf4j {
         builder.setNamespace("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
         builder.setNamespace("iso-thes", "http://purl.org/iso25964/skos-thes#");
 
+
     }
 
     private void writeModel() {
@@ -79,6 +80,7 @@ public class WriteRdf4j {
             writeDocumentation(concept);
             writeGPS(concept);
         }
+
     }
 
     private void writeGroup() {
@@ -93,6 +95,7 @@ public class WriteRdf4j {
             writeCreator(group);
             writeDocumentation(group);
             writeGPS(group);
+
         }
     }
 
@@ -117,13 +120,13 @@ public class WriteRdf4j {
         String lat = gps.getLat();
         String lon = gps.getLon();
         Literal literal;
-        
+
         if (lat != null && lon != null) {
             literal = vf.createLiteral(lat, XMLSchema.DOUBLE);
-            builder.add("geo:lat" ,literal);
-            
+            builder.add("geo:lat", literal);
+
             literal = vf.createLiteral(lon, XMLSchema.DOUBLE);
-            builder.add("geo:long",literal);
+            builder.add("geo:long", literal);
         }
 
     }
@@ -164,10 +167,16 @@ public class WriteRdf4j {
     private void writeCreator(SKOSResource resource) {
         int prop;
         for (SKOSCreator creator : resource.getCreatorList()) {
-            if(creator == null) return;
-            if(creator.getCreator() == null) return;
-            if(creator.getCreator().isEmpty()) return;
-            
+            if (creator == null) {
+                return;
+            }
+            if (creator.getCreator() == null) {
+                return;
+            }
+            if (creator.getCreator().isEmpty()) {
+                return;
+            }
+
             prop = creator.getProperty();
             if (prop == SKOSProperty.creator) {
                 builder.add(DCTERMS.CREATOR, creator.getCreator());
@@ -180,7 +189,7 @@ public class WriteRdf4j {
     private void writeDate(SKOSResource resource) {
         int prop;
         Literal literal;
-        
+
         for (SKOSDate date : resource.getDateList()) {
             literal = vf.createLiteral(date.getDate(), XMLSchema.DATE);
             prop = date.getProperty();
@@ -203,10 +212,16 @@ public class WriteRdf4j {
 
     private void writeNotation(SKOSResource resource) {
         for (SKOSNotation notation : resource.getNotationList()) {
-            if(notation == null) return;
-            if(notation.getNotation() == null) return;
-            if(notation.getNotation().isEmpty()) return;
-            
+            if (notation == null) {
+                return;
+            }
+            if (notation.getNotation() == null) {
+                return;
+            }
+            if (notation.getNotation().isEmpty()) {
+                return;
+            }
+
             builder.add(SKOS.NOTATION, notation.getNotation());
         }
     }
@@ -264,8 +279,26 @@ public class WriteRdf4j {
                 case SKOSProperty.broader:
                     builder.add(SKOS.BROADER, uri);
                     break;
+                case SKOSProperty.broaderGeneric:
+                    builder.add("skos:broaderGeneric", uri);
+                    break;
+                case SKOSProperty.broaderInstantive:
+                    builder.add("skos:broaderInstantive", uri);
+                    break;
+                case SKOSProperty.broaderPartitive:
+                    builder.add("skos:broaderPartitive", uri);
+                    break;
                 case SKOSProperty.narrower:
                     builder.add(SKOS.NARROWER, uri);
+                    break;
+                case SKOSProperty.narrowerGeneric:
+                    builder.add("skos:narrowerGeneric", uri);
+                    break;
+                case SKOSProperty.narrowerInstantive:
+                    builder.add("skos:narrowerInstantive", uri);
+                    break;
+                case SKOSProperty.narrowerPartitive:
+                    builder.add("skos:narrowerPartitive", uri);
                     break;
                 case SKOSProperty.related:
                     builder.add(SKOS.RELATED, uri);
@@ -288,8 +321,7 @@ public class WriteRdf4j {
                 case SKOSProperty.superGroup:
                     builder.add("iso-thes:superGroup", uri);
                     break;
-                default:
-                    break;
+
             }
 
         }

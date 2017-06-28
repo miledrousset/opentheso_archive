@@ -10,7 +10,7 @@ public class SKOSRelation implements SKOSProperty{
 	private int property;
 	
 	public SKOSRelation(String uri, int prop) throws Exception{
-		if(0 <=prop && prop <= 12){
+		if(0 <=prop && prop <= 18){
 			this.targetUri = uri;
 			this.property = prop;
 		}

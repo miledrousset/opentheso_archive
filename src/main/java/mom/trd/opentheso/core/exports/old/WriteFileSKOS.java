@@ -273,18 +273,18 @@ public class WriteFileSKOS {
                     SKOSProperty.inScheme);
         }
 
-        for (int i = 0; i < nodeConceptExport.getNodeListIdsOfBT().size(); i++) {
+        for (int i = 0; i < nodeConceptExport.getNodeListOfBT().size(); i++) {
             //    concept.addRelation(URI + "/concept#" + nodeConceptExport.getNodeListIdsOfBT().get(i), SKOSProperty.broader);
             concept.addRelation(
-                    getRelationUri(nodeConceptExport.getNodeListIdsOfBT().get(i),
+                    getRelationUri(nodeConceptExport.getNodeListOfBT().get(i).getUri(),
                             nodeConceptExport.getConcept().getIdThesaurus()),
                     SKOSProperty.broader);
         }
 
-        for (int i = 0; i < nodeConceptExport.getNodeListIdsOfNT().size(); i++) {
+        for (int i = 0; i < nodeConceptExport.getNodeListOfNT().size(); i++) {
             //    concept.addRelation(URI + "/concept#" + nodeConceptExport.getNodeListIdsOfNT().get(i), SKOSProperty.narrower);
             concept.addRelation(
-                    getRelationUri(nodeConceptExport.getNodeListIdsOfNT().get(i),
+                    getRelationUri(nodeConceptExport.getNodeListOfNT().get(i).getUri(),
                             nodeConceptExport.getConcept().getIdThesaurus()),
                     SKOSProperty.narrower);
         }
