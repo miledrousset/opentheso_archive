@@ -521,6 +521,16 @@ public class SelectedThesaurus implements Serializable {
 
     }
 
+    public void reGenerateConceptId(String idConcept) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        if(conceptHelper.setIdConceptToNumeric(connect.getPoolConnexion()
+                ,thesaurus.getId_thesaurus(), idConcept)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate id finished"));
+        } else 
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ","while regenerate id for concept"));
+    }
+    
     /**
      * Cette fonction remplace tout les id des groupes du théso
      *

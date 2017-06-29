@@ -1,0 +1,31 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idReGenerateConceptIdDlg" header="#{langueBean.getMsg('concept.setId')}" widgetVar="reGenerateConceptIdDlg" modal="true" resizable="false" >
+        
+        <!-- Cas de la désactivation du concept Deprecated -->
+        <h:form>
+
+            <h:outputText escape="false" value="#{langueBean.getMsg('concept.setId')}" /><br/><br/>
+
+                    <h:outputText value="#{langueBean.getMsg('concept.setId')}" /> : 
+                    <h:outputText value="!!!!! Attention !!!!!" /> <br/> 
+                   <h:outputText value="l'identifiant du concept sera remplacé par un nouveau"/><br/> 
+                    <h:outputText value="il sera généré automatiquement" /> <br/> 
+                   <h:outputText value="il faut recharger le thésaurus après cette opétation" /> 
+                    
+<br/><br/>
+                        <p:commandButton id="cbRegenerateConceptID" styleClass="cbSupp" icon="ui-icon-valider" 
+                                         actionListener="#{theso.reGenerateConceptId(selectedTerme.idC)}"  
+                                         oncomplete="PF('reGenerateConceptIdDlg').hide()"
+                                         update=":contenuDroite1, :idDeleteImageDlg" >
+                        </p:commandButton>
+
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idReGenerateConceptIdDlg" oncomplete="PF('reGenerateConceptIdDlg').hide();"  immediate="true"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
