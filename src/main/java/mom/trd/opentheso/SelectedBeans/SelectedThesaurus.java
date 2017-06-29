@@ -1062,7 +1062,7 @@ public class SelectedThesaurus implements Serializable {
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             vue.setCreat(false);
-            tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+            nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }

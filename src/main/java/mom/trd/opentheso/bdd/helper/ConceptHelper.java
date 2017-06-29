@@ -1490,6 +1490,7 @@ public class ConceptHelper {
                         }
                         concept.setIdConcept(idConcept);
                     } else {
+               //         getNumericConceptId(conn, concept.getIdThesaurus());
                         query = "select max(id) from concept";
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();

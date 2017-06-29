@@ -238,6 +238,7 @@ public class SelectedTerme implements Serializable {
         z3950_actif = user.getNodePreference().getZ3950acif();//bundlePref.getString("z3950.actif").equals("true");
         bdd_active = user.getNodePreference().isBddActive();//bundlePref.getString("bdd.active").equals("true");
         bdd_useId = user.getNodePreference().isBddUseId();//bundlePref.getString("bdd.useId").equals("true");
+        identifierType = "" + user.getNodePreference().getIdentifierType();
     }
 
     /**
