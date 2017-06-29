@@ -75,6 +75,8 @@ public class ImportRdf4jHelper {
     ArrayList<String> hasTopConcceptList = new ArrayList<>();
 
     private SKOSXmlDocument skosXmlDocument;
+    
+    private HashMap<String,String>codeRelationReciproque;
 
     public ImportRdf4jHelper() {
         idTopConcept = new ArrayList<>();
@@ -740,7 +742,8 @@ public class ImportRdf4jHelper {
         }
 
     }
-
+    
+    
     private void addRelation(AddConceptsStruct acs) {
         HierarchicalRelationship hierarchicalRelationship;
         int prop;
