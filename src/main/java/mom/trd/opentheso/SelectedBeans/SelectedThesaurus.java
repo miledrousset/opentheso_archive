@@ -402,7 +402,7 @@ public class SelectedThesaurus implements Serializable {
     }
 
     private void majPref() {
-        if(user.getNodePreference() == null) return;
+        if(user == null || user.getNodePreference() == null) return;
         
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
         version = "";
@@ -1050,7 +1050,7 @@ public class SelectedThesaurus implements Serializable {
         if (selectedTerme != null) {
             selectedTerme.initTerme();
         }
-        majPref();
+        
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         if (thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
             thesaurus = thesaurusHelper.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, workLanguage);
@@ -1066,6 +1066,9 @@ public class SelectedThesaurus implements Serializable {
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }
+        
+        user.initUserNodePref(thesaurus.getId_thesaurus());
+        majPref();
     }
 
     /**
