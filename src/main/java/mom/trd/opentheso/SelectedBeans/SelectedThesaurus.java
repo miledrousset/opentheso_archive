@@ -521,6 +521,16 @@ public class SelectedThesaurus implements Serializable {
 
     }
 
+    public void reGenerateConceptId(String idConcept) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        if(conceptHelper.setIdConceptToNumeric(connect.getPoolConnexion()
+                ,thesaurus.getId_thesaurus(), idConcept)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate id finished"));
+        } else 
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ","while regenerate id for concept"));
+    }
+    
     /**
      * Cette fonction remplace tout les id des groupes du théso
      *
@@ -1052,7 +1062,7 @@ public class SelectedThesaurus implements Serializable {
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             vue.setCreat(false);
-            tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+            nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }

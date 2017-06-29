@@ -497,6 +497,8 @@ public class FileBean implements Serializable {
 
     public void chargeImage(FileUploadEvent event) {
         int idUser = selectedTerme.getUser().getUser().getId();
+        if(selectedTerme.getUser().nodePreference == null) return;
+        
         if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
             event.setPhaseId(PhaseId.INVOKE_APPLICATION);
             event.queue();
@@ -509,7 +511,7 @@ public class FileBean implements Serializable {
                     // Traitement
                     String suffix = FilenameUtils.getExtension(file.getFileName());
                     InputStream input = file.getInputstream();
-                    String path = pathImage;
+                    String path = selectedTerme.getUser().nodePreference.getPathImage();//pathImage; 
 
                     SimpleDateFormat dateFormatDirectory = new SimpleDateFormat(" dd-MM-yyyy HH-mm-ss");
                     String dateDirectory = dateFormatDirectory.format(new Date());
@@ -533,7 +535,9 @@ public class FileBean implements Serializable {
 
                     resizeImage(image.getName());
                     addFiligrane(image.getName(), source, suffix);
-                    addFiligrane(dossierResize + "/" + image.getName(), source, suffix);
+                    addFiligrane(selectedTerme.getUser().nodePreference.getDossierResize()
+                            /*dossierResize*/ 
+                            + "/" + image.getName(), source, suffix);
 
                     new ImagesHelper().addImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), image.getName(), source, idUser);
 

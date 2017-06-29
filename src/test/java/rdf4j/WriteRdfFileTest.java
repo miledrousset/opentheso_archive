@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.datatype.XMLGregorianCalendar;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
-import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import org.eclipse.rdf4j.model.BNode;
 import org.eclipse.rdf4j.model.Graph;
 import org.eclipse.rdf4j.model.IRI;
