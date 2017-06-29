@@ -16,11 +16,15 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
+import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.OrphanHelper;
+import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
@@ -60,6 +64,7 @@ public class NewTreeBean implements Serializable {
     private ArrayList<TreeNode> selectedNodes;
     private String idThesoSelected;
     private String defaultLanguage;
+    private ArrayList<String> orphans;
 
     public NewTreeBean() {
         root = (TreeNode) new DefaultTreeNode("Root", null);
@@ -179,7 +184,39 @@ public class NewTreeBean implements Serializable {
 
         }
         if (idTheso != null) {
-            //loadOrphan(idTheso, langue);
+            loadOrphan(idTheso, langue);
+        }
+
+    }
+    public void loadOrphan(String idTheso, String langue) {
+        String typeNode, value = "";
+        /*
+        this.typeMot = type;
+      this.idMot = id;
+      this.idTheso = idT;
+      this.langue = l;
+      this.idDomaine = idD;
+      this.typeDomaine = typeDomaine; 
+      this.idTopConcept = idTC;
+        */
+        TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, null, idTheso, langue, null, null,null, "orphan", langueBean.getMsg("index.orphans"), root);
+        orphans = new OrphanHelper().getListOrphanId(connect.getPoolConnexion(), idTheso);
+        for (String idC : orphans) {
+            if (new ConceptHelper().haveChildren(connect.getPoolConnexion(), idTheso, idC)) {
+                typeNode = "dossier";
+            } else {
+                typeNode = "fichier";
+            }
+            Term term = new TermHelper().getThisTerm(connect.getPoolConnexion(), idC, idTheso, langue);
+            if (term != null) {
+                value = term.getLexical_value() + " (id_" + idC + ")";
+                Concept temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
+                MyTreeNode mtn = new MyTreeNode(3, idC, idTheso,langue, "Orphan", null,null, typeNode, value, dynamicTreeNode);
+                if (typeNode.equals("dossier")) {
+                    new DefaultTreeNode("fake", mtn);
+                }
+            }
+
         }
 
     }
@@ -260,7 +297,7 @@ public class NewTreeBean implements Serializable {
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
 
                     treeNode = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
-                            ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdDomaine(),
+                            ((MyTreeNode) event.getTreeNode()).getLangue(), nodeConceptTreeGroup.getIdConcept(),
                             ((MyTreeNode) event.getTreeNode()).getTypeDomaine(),
                             idTC, icon, value, event.getTreeNode());
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
@@ -404,6 +441,8 @@ public class NewTreeBean implements Serializable {
         ArrayList<ArrayList<String>> paths = new ArrayList<>();
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
         reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        
+     
     }
 
     /**
@@ -457,6 +496,7 @@ public class NewTreeBean implements Serializable {
                     }
                 }
             }
+            loadOrphan(idTheso, langue);
             //loadOrphan(idTheso, langue);
             for (TreeNode tn : root.getChildren()) {
                 if (tn.getType().equals("orphan")) {

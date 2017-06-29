@@ -49,6 +49,8 @@ public class WriteRdf4j {
         writeModel();
         model = builder.build();
     }
+    
+    
 
     private void loadModel() {
         builder = new ModelBuilder();
@@ -99,6 +101,9 @@ public class WriteRdf4j {
     }
 
     private void writeConceptScheme() {
+        if(xmlDocument.getConceptScheme() == null){
+            return;
+        }
         SKOSResource conceptScheme = xmlDocument.getConceptScheme();
         builder.subject(vf.createIRI(conceptScheme.getUri()));//createURI(conceptScheme.getUri()));
 

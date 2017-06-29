@@ -59,7 +59,7 @@ public class DownloadBean implements Serializable {
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean languageBean;
-    
+
     @ManagedProperty(value = "#{user1}")
     private CurrentUser user;
 
@@ -99,10 +99,10 @@ public class DownloadBean implements Serializable {
 
     @PostConstruct
     public void initTerme() {
-        if(user == null || user.getNodePreference() == null){
+        if (user == null || user.getNodePreference() == null) {
             return;
         }
-        
+
         //ResourceBundle bundlePref = getBundlePref();
         //String temp = bundlePref.getString("useArk");
         arkActive = user.getNodePreference().isUseArk();//temp.equals("true");
@@ -255,16 +255,17 @@ public class DownloadBean implements Serializable {
             vue.setThesoToSkosCsvFile(true);
         }*/
     }
-    private WriteRdf4j loadExportHelper(String idTheso,List<NodeLang> selectedLanguages,List<NodeGroup> selectedGroups) {
+
+    private WriteRdf4j loadExportHelper(String idTheso, List<NodeLang> selectedLanguages, List<NodeGroup> selectedGroups) {
         progress_per_100 = 0;
         progress_abs = 0;
         ConceptHelper conceptHelper = new ConceptHelper();
         sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
-        exportRdf4jHelper.addThesaurus(idTheso,selectedLanguages);
-        exportRdf4jHelper.addGroup(idTheso,selectedLanguages,selectedGroups);
-        exportRdf4jHelper.addConcept(idTheso, this,selectedLanguages );
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
+        exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
+        exportRdf4jHelper.addConcept(idTheso, this, selectedLanguages);
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
         return writeRdf4j;
     }
@@ -291,7 +292,7 @@ public class DownloadBean implements Serializable {
                 break;
         }
 
-        WriteRdf4j writeRdf4j = loadExportHelper(idTheso,selectedLanguages, selectedGroups);
+        WriteRdf4j writeRdf4j = loadExportHelper(idTheso, selectedLanguages, selectedGroups);
         ByteArrayOutputStream out;
         out = new ByteArrayOutputStream();
         Rio.write(writeRdf4j.getModel(), out, format);
@@ -344,8 +345,7 @@ public class DownloadBean implements Serializable {
         return file;
     }
 
-    
-/*
+    /*
     public StreamedContent thesoToSkosRdf4j(String idTheso,
             List<NodeLang> selectedLanguages,
             List<NodeGroup> selectedGroups) {
@@ -387,7 +387,7 @@ public class DownloadBean implements Serializable {
         progress_abs = 0;
         return file;
     }
-*/
+     */
     /**
      * Cette fonction permet d'exporter un concept en SKOS en temps réel dans la
      * page principale
@@ -412,6 +412,49 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return file;
+
+        //   new ExportFromBDD().exportConcept(connect.getPoolConnexion(), idTheso, idC).toString();
+    }
+
+    /**
+     * Cette fonction permet d'exporter un concept en SKOS en temps réel dans la
+     * page principale
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    public StreamedContent conceptToFile(String idConcept, String idTheso, int type) {
+
+        RDFFormat format = null;
+        String extention = "";
+
+        switch (type) {
+            case 0:
+                format = RDFFormat.RDFXML;
+                extention = "_skos.xml";
+                break;
+            case 1:
+                format = RDFFormat.JSONLD;
+                extention = "_json-ld.json";
+                break;
+            case 2:
+                format = RDFFormat.TURTLE;
+                extention = "_turtle.ttl";
+                break;
+        }
+        
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
+        WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+
+        ByteArrayOutputStream out;
+        out = new ByteArrayOutputStream();
+        Rio.write(writeRdf4j.getModel(), out, format);
+        file = new ByteArrayContent(out.toByteArray(), "application/xml", idTheso + " " + extention);
+
         return file;
 
         //   new ExportFromBDD().exportConcept(connect.getPoolConnexion(), idTheso, idC).toString();
@@ -477,6 +520,47 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return file;
+    }
+    
+    /**
+     * Cette fonction permet de retourner une branche en SKOS
+     *
+     * @param idConcept
+     * @param idTheso
+     * @return
+     */
+    public StreamedContent brancheToFile(String idConcept, String idTheso,int type) {
+        
+        
+        RDFFormat format = null;
+        String extention = "";
+
+        switch (type) {
+            case 0:
+                format = RDFFormat.RDFXML;
+                extention = "_skos.xml";
+                break;
+            case 1:
+                format = RDFFormat.JSONLD;
+                extention = "_json-ld.json";
+                break;
+            case 2:
+                format = RDFFormat.TURTLE;
+                extention = "_turtle.ttl";
+                break;
+        }
+
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.addBranch(idTheso, idConcept);
+        WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+
+        ByteArrayOutputStream out;
+        out = new ByteArrayOutputStream();
+        Rio.write(writeRdf4j.getModel(), out, format);
+        file = new ByteArrayContent(out.toByteArray(), "application/xml", idTheso + " " + extention);
+      
         return file;
     }
 
@@ -717,27 +801,21 @@ public class DownloadBean implements Serializable {
         }
         return file;
     }
-    
-    
-    public StreamedContent thesoPDF(String idTheso,List<NodeLang> selectedLanguages,
-            List<NodeGroup> selectedGroups,String codeLang,String codeLang2,int type) {
+
+    public StreamedContent thesoPDF(String idTheso, List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups, String codeLang, String codeLang2, int type) {
 
         progress_per_100 = 0;
         progress_abs = 0;
-        
 
-        
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso);
-        exportRdf4jHelper.addThesaurus(idTheso,selectedLanguages);
-        exportRdf4jHelper.addGroup(idTheso,selectedLanguages,selectedGroups);
-        exportRdf4jHelper.addConcept(idTheso, this,selectedLanguages );
-        
-    
-     
-        
-        WritePdf writePdf = new WritePdf(exportRdf4jHelper.getSkosXmlDocument(),codeLang,codeLang2,type);
-        
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
+        exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
+        exportRdf4jHelper.addConcept(idTheso, this, selectedLanguages);
+
+        WritePdf writePdf = new WritePdf(exportRdf4jHelper.getSkosXmlDocument(), codeLang, codeLang2, type);
+
         InputStream stream;
         stream = new ByteArrayInputStream(writePdf.getOutput().toByteArray());
         file = new DefaultStreamedContent(stream, "application/pdf", "test.pdf");
@@ -745,7 +823,7 @@ public class DownloadBean implements Serializable {
         return file;
     }
 
-        /**
+    /**
      * Applelation de la funtion pour realiser l'injection a la BDD; on puex
      * choisir le fichier dans une fenetre que se ouvre;
      */
@@ -839,5 +917,5 @@ public class DownloadBean implements Serializable {
     public void setUser(CurrentUser user) {
         this.user = user;
     }
-    
+
 }

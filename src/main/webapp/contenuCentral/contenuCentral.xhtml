@@ -30,24 +30,24 @@
                 <h:form  rendered="#{(selectedTerme.idC != null) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
                     <!-- exporter le concept en SKOS -->
                     <p:commandButton value="Skos" ajax="false" styleClass="link">
-                        <p:fileDownload  value="#{downloadBean.conceptToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
+                        <p:fileDownload  value="#{downloadBean.conceptToFile(selectedTerme.idC, selectedTerme.idTheso,0)}" />
                     </p:commandButton>
 
                     <!-- exporter le concept en JsonLd -->
                     <p:commandButton value="JsonLd" ajax="false" styleClass="link">
-                        <p:fileDownload  value="#{downloadBean.conceptToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
+                        <p:fileDownload  value="#{downloadBean.conceptToFile(selectedTerme.idC, selectedTerme.idTheso,1)}" />
                     </p:commandButton>
                 </h:form>                 
 
                 <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
                     <!-- exporter la branche en SKOS mode connecté -->
                     <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
-                        <p:fileDownload  value="#{downloadBean.brancheToSkos(selectedTerme.idC, selectedTerme.idTheso)}" />
+                        <p:fileDownload  value="#{downloadBean.brancheToFile(selectedTerme.idC, selectedTerme.idTheso,0)}" />
                     </p:commandButton>
 
                     <!-- exporter la branche en JsonLd -->
                     <p:commandButton value="JsonLd_Branch" ajax="false" styleClass="link">
-                        <p:fileDownload  value="#{downloadBean.brancheToJsonLd(selectedTerme.idC, selectedTerme.idTheso)}" />
+                        <p:fileDownload  value="#{downloadBean.brancheToFile(selectedTerme.idC, selectedTerme.idTheso,1)}" />
                     </p:commandButton>
                 </h:form>  
 
