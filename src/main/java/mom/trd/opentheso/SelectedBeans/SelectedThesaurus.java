@@ -23,6 +23,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
+import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
@@ -1799,9 +1800,14 @@ public class SelectedThesaurus implements Serializable {
 
             ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             Map<String, String> mapTemp = new HashMap<>();
+            Term value;
             for (NodeFacet nf : temp) {
-                String value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), thesaurus.getId_thesaurus(), thesaurus.getLanguage()).getLexical_value();
-                mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value + ")");
+                value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+                if(value == null) {
+                    mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + nf.getIdConceptParent() + ")");
+                } else {
+                    mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value.getLexical_value() + ")");
+                }
             }
             arrayFacette = new ArrayList<>(mapTemp.entrySet());
         }
