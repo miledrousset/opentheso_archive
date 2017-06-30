@@ -1,0 +1,35 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idOtherThesoChoseTerm"  header="Autre theso" widgetVar="otherThesoChoseTerm" modal="true" resizable="false" >
+
+        <form>
+            <p:scrollPanel mode="native"  style="width: 800px; height: 500px;" >
+                <p:dataTable id="idOtherThesoChoseTermDataTable" var="termOfOtherTheso" 
+                             value="#{editAlignement.listTerm}" 
+                             selection="#{editAlignement.selectedAlignement}" 
+                             rowKey="#{termOfOtherTheso.idConcept}"> 
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <p:column headerText="id">
+                        <h:outputText value="#{termOfOtherTheso.idConcept}" />
+                    </p:column>
+                    <p:column headerText="Nom">
+                        <h:outputText value="#{termOfOtherTheso.termLexicalValue}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:scrollPanel>
+
+        <br/><br/>
+
+        <p:commandButton value="ok" styleClass="styleButton"  oncomplete="PF('otherThesoChoseTerm').hide();" update=":panContenu" 
+                         actionListener="#{selectedTerme.addOtherThesoAlign(editAlignement.selectedAlignement,editAlignement.idOtherTheso,1)}"/>
+                </form>
+
+    </p:dialog>
+</ui:composition>
+

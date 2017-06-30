@@ -1630,7 +1630,18 @@ public class SelectedThesaurus implements Serializable {
         }
         return arrayTheso;
     }
+    
+    private ArrayList<Entry<String, String>> allTheso;
 
+    public ArrayList<Entry<String, String>> getAllTheso() {
+        allTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfAllTheso(connect.getPoolConnexion(), workLanguage).entrySet());
+        return allTheso;  
+    }
+
+    public void setAllTheso(ArrayList<Entry<String, String>> allTheso) {
+        this.allTheso = allTheso;
+    }
+    
     public void setArrayTheso(ArrayList<Entry<String, String>> arrayTheso) {
         this.arrayTheso = arrayTheso;
     }

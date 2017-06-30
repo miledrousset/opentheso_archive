@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public class ThesaurusHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
-    
+
     private String identifierType = "1";
 
     public String getIdentifierType() {
@@ -44,8 +44,6 @@ public class ThesaurusHelper {
     public void setIdentifierType(String identifierType) {
         this.identifierType = identifierType;
     }
-
-
 
     /**
      * Permet de créer un nouveau Thésaurus. Retourne l'identifiant du thésaurus
@@ -103,7 +101,7 @@ public class ThesaurusHelper {
 
                     stmt.executeUpdate(query);
                     thesaurus.setId_thesaurus(idThesaurus);
-                 /*   if(thesaurus.getTitle().isEmpty()){
+                    /*   if(thesaurus.getTitle().isEmpty()){
                         thesaurus.setTitle("Theso_" + idThesaurus);
                     }
                     addThesaurusTraduction(ds, thesaurus);*/
@@ -121,7 +119,7 @@ public class ThesaurusHelper {
         }
         return idThesaurus;
     }
-    
+
     /**
      * Permet de créer un nouveau Thésaurus. Retourne l'identifiant du thésaurus
      * ou null
@@ -145,14 +143,13 @@ public class ThesaurusHelper {
                 stmt = conn.createStatement();
                 try {
                     String query;
-                    if(identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
+                    if (identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
                         ToolsHelper toolsHelper = new ToolsHelper();
                         idThesaurus = toolsHelper.getNewId(10);
                         while (isThesaurusExiste(conn, idThesaurus)) {
                             idThesaurus = toolsHelper.getNewId(10);
                         }
-                    }
-                    else {
+                    } else {
                         query = "select max(id) from thesaurus";
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
@@ -185,15 +182,14 @@ public class ThesaurusHelper {
                             + "current_date)";
 
                     stmt.executeUpdate(query);
-                 //   thesaurus.setId_thesaurus(idThesaurus);
-                   /* if(thesaurus.getTitle().isEmpty()) {
+                    //   thesaurus.setId_thesaurus(idThesaurus);
+                    /* if(thesaurus.getTitle().isEmpty()) {
                         thesaurus.setTitle("theso_" + idThesaurus);
                     }
                     if(!addThesaurusTraductionRollBack(conn, thesaurus)) {
                         stmt.close();
                         return null;
                     }*/
-                       
 
                 } finally {
                     stmt.close();
@@ -207,7 +203,7 @@ public class ThesaurusHelper {
         }
         return idThesaurus;
     }
-    
+
     /**
      * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
      * du thésaurus et la langue retourne yes or No si l'opération a réussie ou
@@ -266,13 +262,14 @@ public class ThesaurusHelper {
             log.error("Error while adding Traduction Thesaurus : " + thesaurus.getTitle(), sqle);
         }
         return status;
-    }    
+    }
 
     /**
-     * Cette focntion permet de nettoyer un thésaurus 
+     * Cette focntion permet de nettoyer un thésaurus
+     *
      * @param conn
      * @param idTheso
-     * @return 
+     * @return
      */
     public boolean reorganizingTheso(Connection conn, String idTheso) {
         Statement stmt;
@@ -289,16 +286,16 @@ public class ThesaurusHelper {
                     query = "delete from concept_group_label where idgroup = ''"
                             + " and idthesaurus = '" + idTheso + "'";
                     stmt.executeUpdate(query);
-                    
+
                     query = "UPDATE concept_group SET notation = '' WHERE notation ilike 'null'";
                     stmt.executeUpdate(query);
-                    
+
                     query = "UPDATE concept_group SET idtypecode = 'MT' WHERE idtypecode ilike 'null'";
                     stmt.executeUpdate(query);
-                    
+
                     query = "UPDATE concept SET notation = '' WHERE notation ilike 'null'";
                     stmt.executeUpdate(query);
-                    
+
                     status = true;
 
                 } finally {
@@ -310,9 +307,9 @@ public class ThesaurusHelper {
             // Log exception
             log.error("Error while reorganizing theso : " + idTheso, sqle);
         }
-        return status;        
+        return status;
     }
-    
+
     /**
      * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
      * du thésaurus et la langue retourne yes or No si l'opération a réussie ou
@@ -530,7 +527,7 @@ public class ThesaurusHelper {
     }
 
     /**
-     * Retourne la liste des Ids des thésaurus existants 
+     * Retourne la liste des Ids des thésaurus existants
      *
      * @param ds
      * @return
@@ -566,14 +563,15 @@ public class ThesaurusHelper {
             log.error("Error while getting All ids of thesaurus : ", sqle);
         }
         return tabIdThesaurus;
-    }    
-    
+    }
+
     /**
-     * retourne la liste des thésaurus  d'un utilisateur
+     * retourne la liste des thésaurus d'un utilisateur
+     *
      * @param ds
      * @param idUser
      * @param idLang
-     * @return 
+     * @return
      */
     public Map getListThesaurusOfUser(HikariDataSource ds, int idUser, String idLang) {
 
@@ -597,8 +595,9 @@ public class ThesaurusHelper {
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         while (resultSet.next()) {
-                            if(!resultSet.getString("id_thesaurus").isEmpty())
+                            if (!resultSet.getString("id_thesaurus").isEmpty()) {
                                 tabIdThesaurus.add(resultSet.getString("id_thesaurus"));
+                            }
                         }
                         for (Object tabIdThesauru : tabIdThesaurus) {
                             query = "select title from thesaurus_label where"
@@ -630,8 +629,54 @@ public class ThesaurusHelper {
             log.error("Error while getting Map of thesaurus : " + map.toString(), sqle);
         }
         return map;
-    }    
-    
+    }
+
+    public Map getListThesaurusOfAllTheso(HikariDataSource ds, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        Map map = new HashMap();
+        List tabIdThesaurus = getAllIdOfThesaurus(ds);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query;
+
+                    for (Object tabIdThesauru : tabIdThesaurus) {
+                        query = "select title from thesaurus_label where"
+                                + " id_thesaurus = '" + tabIdThesauru + "'" + " and lang = '" + idLang + "'";
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        if (resultSet != null) {
+                            resultSet.next();
+                            if (resultSet.getRow() == 0) {
+                                map.put("(" + tabIdThesauru + ")", tabIdThesauru);
+                            } else {
+                                map.put(resultSet.getString("title") + "(" + tabIdThesauru + ")", tabIdThesauru);
+                            }
+
+                        } else {
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Map of thesaurus : " + map.toString(), sqle);
+        }
+        return map;
+    }
+
     /**
      * Retourne la liste des traductions d'un thesaurus sous forme de MAP (lang
      * + title)
@@ -677,10 +722,10 @@ public class ThesaurusHelper {
         }
         return map;
     }
-    
+
     /**
-     * Cette fonction permet de récupérer l'identifiant Ark
-     * sinon renvoie un une chaine vide
+     * Cette fonction permet de récupérer l'identifiant Ark sinon renvoie un une
+     * chaine vide
      *
      * @param ds
      * @param idThesaurus
@@ -701,7 +746,7 @@ public class ThesaurusHelper {
                             + " id_thesaurus = '" + idThesaurus + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                        
+
                     if (resultSet.next()) {
                         ark = resultSet.getString("id_ark");
                     }
@@ -717,7 +762,7 @@ public class ThesaurusHelper {
             log.error("Error while getting idArk of Thesaurus : " + idThesaurus, sqle);
         }
         return ark;
-    }        
+    }
 
     /**
      * Retourne la liste des traductions d'un thesaurus sous forme de ArrayList
@@ -809,7 +854,7 @@ public class ThesaurusHelper {
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    int i=0;
+                    int i = 0;
                     while (resultSet.next()) {
                         NodeLang nodeLang = new NodeLang();
                         nodeLang.setId("" + i);
@@ -829,12 +874,11 @@ public class ThesaurusHelper {
             log.error("Error while getting All Used languages of Concepts of thesaurus  : " + idThesaurus, sqle);
         }
         return nodeLangs;
-    }    
-    
-    
+    }
+
     /**
      * Cette fonction permet de retourner toutes les langues utilisées par les
-     * Concepts d'un thésaurus  !!! seulement les code iso des langues 
+     * Concepts d'un thésaurus !!! seulement les code iso des langues
      *
      * @param ds
      * @param idThesaurus
@@ -921,7 +965,7 @@ public class ThesaurusHelper {
         }
         return existe;
     }
-    
+
     /**
      * Cette fonction permet de savoir si le thesaurus existe ou non
      *
@@ -962,7 +1006,7 @@ public class ThesaurusHelper {
         }
         return existe;
     }
-    
+
     /**
      * Cette fonction permet de savoir si le thesaurus existe ou non
      *
@@ -998,8 +1042,7 @@ public class ThesaurusHelper {
             log.error("Error while asking if thesaurus exist : " + idThesaurus, sqle);
         }
         return existe;
-    }    
-    
+    }
 
     /**
      * Cette fonction permet d'ajouter des cotes pour passer des données en JDBC
@@ -1136,9 +1179,7 @@ public class ThesaurusHelper {
                             + "delete from thesaurus_alignement_source where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_group_concept where idthesaurus = '" + idThesaurus + "';"
                             + "delete from relation_group where id_thesaurus = '" + idThesaurus + "';"
-                            + "delete from preferences where id_thesaurus = '" + idThesaurus + "';"
-                            
-                            ;
+                            + "delete from preferences where id_thesaurus = '" + idThesaurus + "';";
 
                     stmt.executeUpdate(query);
                     state = true;

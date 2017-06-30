@@ -55,6 +55,7 @@ import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
+import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
@@ -1628,6 +1629,24 @@ public class SelectedTerme implements Serializable {
                         na.getUri_target(), na.getAlignement_id_type(), idC, idTheso, alignementSource.getId());
             }
         }
+        align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
+        vue.setAddAlign(0);
+    }
+    
+    public void addOtherThesoAlign(NodeAutoCompletion term,String idOtherTheso,int alignType){
+          
+        if(term == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :","No term selected"));
+            return;
+        }
+        
+        String termUri = "test/" + term.getIdConcept();
+        
+        
+        new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), term.getIdConcept(), idOtherTheso,
+                        termUri, alignType, idC, idTheso,-1);
+       
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
         vue.setAddAlign(0);
