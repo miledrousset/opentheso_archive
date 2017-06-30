@@ -1,0 +1,28 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idOtherTheso"  header="Autre theso" widgetVar="otherTheso" modal="true" resizable="false" >
+
+        <h:form> 
+            <p:selectOneMenu id="car"  value="#{editAlignement.idOtherTheso}" > 
+                <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue=""  />
+                <f:selectItems value="#{theso.allTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}"/>
+                <p:ajax event="change" update="@this" />
+            </p:selectOneMenu>
+            
+        
+
+        <br/>    
+        <p:commandButton value="ok" styleClass="styleButton" actionListener="#{editAlignement.loadAlignementTheso(theso.workLanguage,selectedTerme)}" 
+                         oncomplete="PF('otherThesoChoseTerm').show();PF('otherTheso').hide();" update=":idOtherThesoChoseTerm"
+                         />
+        </h:form> 
+
+    </p:dialog>
+</ui:composition>
+
