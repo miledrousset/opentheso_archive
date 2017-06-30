@@ -401,7 +401,7 @@ public class SelectedThesaurus implements Serializable {
 
     }
 
-    private void majPref() {
+    public void majPref() {
         if(user == null || user.getNodePreference() == null) return;
         
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");

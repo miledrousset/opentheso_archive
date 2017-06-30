@@ -210,6 +210,7 @@ public class PreferencesHelper {
         boolean status = false;
         StringPlus stringPlus = new StringPlus();
 
+        np = normalizeDatas(np);
         try {
             conn = ds.getConnection();
 
@@ -259,6 +260,32 @@ public class PreferencesHelper {
 
         return status;
     }
+    
+    /**
+     * permet de nettoyer les "/" et préparer les paramètres correctement 
+     * @param nodePreference
+     * @return 
+     */
+    private NodePreference normalizeDatas(NodePreference nodePreference) {
+
+        // vérification des "/" à la fin 
+        if(!nodePreference.getCheminSite().isEmpty()) {
+            if(!nodePreference.getCheminSite().substring(nodePreference.getCheminSite().length() - 1, nodePreference.getCheminSite().length()).equalsIgnoreCase("/")) {
+                nodePreference.setCheminSite(nodePreference.getCheminSite() + "/");
+            }
+        }
+        if(!nodePreference.getServeurArk().isEmpty()) {
+            if(!nodePreference.getServeurArk().substring(nodePreference.getServeurArk().length() - 1, nodePreference.getServeurArk().length()).equalsIgnoreCase("/")) {
+                nodePreference.setServeurArk(nodePreference.getServeurArk() + "/");
+            }
+        }
+        if(!nodePreference.getPathImage().isEmpty()) {
+            if(!nodePreference.getPathImage().substring(nodePreference.getPathImage().length() - 1, nodePreference.getPathImage().length()).equalsIgnoreCase("/")) {
+                nodePreference.setPathImage(nodePreference.getPathImage() + "/");
+            }
+        }         
+        return nodePreference;
+    } 
     
     
 
