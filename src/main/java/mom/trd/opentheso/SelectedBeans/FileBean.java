@@ -512,6 +512,8 @@ public class FileBean implements Serializable {
                     String suffix = FilenameUtils.getExtension(file.getFileName());
                     InputStream input = file.getInputstream();
                     String path = selectedTerme.getUser().nodePreference.getPathImage();//pathImage; 
+                    
+
 
                     SimpleDateFormat dateFormatDirectory = new SimpleDateFormat(" dd-MM-yyyy HH-mm-ss");
                     String dateDirectory = dateFormatDirectory.format(new Date());
@@ -535,6 +537,7 @@ public class FileBean implements Serializable {
 
                     resizeImage(image.getName());
                     addFiligrane(image.getName(), source, suffix);
+                    
                     addFiligrane(selectedTerme.getUser().nodePreference.getDossierResize()
                             /*dossierResize*/ 
                             + "/" + image.getName(), source, suffix);

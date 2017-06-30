@@ -31,7 +31,7 @@
                     <ui:repeat value="#{selectedTerme.images}" var="image" id="manuelSwitcherImages">
                         <h:form>
                             <img itemprop="image">
-                                <p:graphicImage title="#{image.imageName}" value="/pix/#{theso.nodePreference.pathImage}/#{theso.nodePreference.dossierResize}/#{image.imageName}" onclick="PF('dlgPix').show()" 
+                                <p:graphicImage title="#{image.imageName}" value="/pix/#{theso.nodePreference.pathImage}#{theso.nodePreference.dossierResize}/#{image.imageName}" onclick="PF('dlgPix').show()" 
                                                 style="cursor: pointer;"  />
                             </img>
                         </h:form>
@@ -49,7 +49,7 @@
                 <div id="clean" />
                 <p:imageSwitch effect="fade" widgetVar="fullSwitcher" slideshowAuto="false">
                     <ui:repeat value="#{selectedTerme.images}" var="imageFull">
-                        <p:graphicImage value="/pix/#{theso.nodePreference.pathImage}/#{imageFull.imageName}" />
+                        <p:graphicImage value="/pix/#{theso.nodePreference.pathImage}#{imageFull.imageName}" />
                     </ui:repeat>
                 </p:imageSwitch>
             </p:dialog>

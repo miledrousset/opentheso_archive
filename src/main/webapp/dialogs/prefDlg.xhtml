@@ -129,7 +129,7 @@
                             </h:panelGrid>
                         </p:fieldset>
                 </p:scrollPanel>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}"  styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}" action="#{theso.majPref()}" styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
                 </h:panelGrid>
             </h:form> 
 
