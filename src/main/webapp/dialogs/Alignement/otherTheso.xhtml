@@ -14,15 +14,10 @@
                 <f:selectItems value="#{theso.allTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}"/>
                 <p:ajax event="change" update="@this" />
             </p:selectOneMenu>
-            
-        
-
         <br/>    
         <p:commandButton value="ok" styleClass="styleButton" actionListener="#{editAlignement.loadAlignementTheso(theso.workLanguage,selectedTerme)}" 
-                         oncomplete="PF('otherThesoChoseTerm').show();PF('otherTheso').hide();" update=":idOtherThesoChoseTerm"
-                         />
+                         oncomplete="PF('otherThesoChoseTerm').show();PF('otherTheso').hide();" update=":idOtherThesoChoseTerm"/>
         </h:form> 
-
     </p:dialog>
 </ui:composition>
 

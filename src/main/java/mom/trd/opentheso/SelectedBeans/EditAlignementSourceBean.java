@@ -39,7 +39,7 @@ public class EditAlignementSourceBean implements Serializable {
     private String description;
     private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
-    private NodeAutoCompletion selectedAlignement;
+    private NodeAutoCompletion selectedAlignement = new NodeAutoCompletion();
 
     private List<AlignementSource> alignementSources = new ArrayList<>();
 
@@ -466,6 +466,9 @@ public class EditAlignementSourceBean implements Serializable {
     public void setSelectedAlignement(NodeAutoCompletion selectedAlignement) {
         this.selectedAlignement = selectedAlignement;
     }
+
+
+
     
 
 }
