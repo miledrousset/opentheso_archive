@@ -39,7 +39,7 @@ public class EditAlignementSourceBean implements Serializable {
     private String description;
     private int id = 0;
     private ArrayList<AlignementSource> listeAlignementSources;
-    private NodeAutoCompletion selectedAlignement;
+    private List<NodeAutoCompletion> selectedAlignement;
 
     private List<AlignementSource> alignementSources = new ArrayList<>();
 
@@ -115,8 +115,9 @@ public class EditAlignementSourceBean implements Serializable {
     
     
 
-    public void loadAlignementTheso(String langue,SelectedTerme selectedTerm) {
-        listTerm = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), idOtherTheso,langue, selectedTerm.getNom());
+    public void loadAlignementTheso(String langue, String value){//SelectedTerme selectedTerm) {
+        listTerm = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), idOtherTheso,langue, value);//selectedTerm.getNom());
+        selectedAlignement = listTerm;
     }
 
     /**
@@ -459,13 +460,23 @@ public class EditAlignementSourceBean implements Serializable {
         this.idOtherTheso = idOtherTheso;
     }
 
-    public NodeAutoCompletion getSelectedAlignement() {
+ /*   public NodeAutoCompletion getSelectedAlignement() {
         return selectedAlignement;
     }
 
     public void setSelectedAlignement(NodeAutoCompletion selectedAlignement) {
         this.selectedAlignement = selectedAlignement;
     }
+   */
+
+    public List<NodeAutoCompletion> getSelectedAlignement() {
+        return selectedAlignement;
+    }
+
+    public void setSelectedAlignement(List<NodeAutoCompletion> selectedAlignement) {
+        this.selectedAlignement = selectedAlignement;
+    }
+    
     
 
 }

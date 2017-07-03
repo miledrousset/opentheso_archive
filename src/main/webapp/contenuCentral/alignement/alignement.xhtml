@@ -36,7 +36,7 @@
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn1')}" update=":idAjouterManuelEditDlg" oncomplete="PF('ajouterManuelEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{selectedTerme.setAlignementSources()}" update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('ajouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn3')}" update=":idSuprimerEditDlg" oncomplete="PF('suprimerEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="Avec un autre thésaurus" oncomplete="PF('otherTheso').show()"  style="font-size: 12px;"/>
+                            <p:menuitem value="Avec un autre thésaurus" actionListener="#{editAlignement.loadAlignementTheso(theso.workLanguage,selectedTerme.nom)}" oncomplete="PF('idOtherTheso').show()"  style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{selectedTerme.setAlignementSources()}" 
                                         action="#{alignementparlot.getListChildren(selectedTerme.idTheso, selectedTerme.idC)}"
                                         update=":idAjouterParLotEditDlg" oncomplete="PF('ajouterParLotEditDlg').show();" style="font-size: 12px;"/>
