@@ -21,6 +21,7 @@ import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
+import mom.trd.opentheso.bdd.helper.nodes.NodeConceptArkId;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
@@ -201,6 +202,51 @@ public class ConceptHelper {
         }
 
         return idConcept;
+    }
+    
+    /**
+     * focntion qui permet de récupérer le Delta des Id concepts créés ou modifiéés 
+     * le format de la date est (yyyy-MM-dd)
+     * @param ds
+     * @param idTheso
+     * @param date
+     * @return 
+     */
+    public ArrayList<String> getConceptsDelta(HikariDataSource ds,
+            String idTheso, String date) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        ArrayList<String> ids = new ArrayList<>();
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where " +
+                        " id_thesaurus = '" + idTheso + "'" +
+                        " and (created > '" + date + "'" +
+                        " or modified > '" + date + "')";
+
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        ids.add(resultSet.getString("id_concept"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting delta of Concept  : " + idTheso, sqle);
+        }
+        return ids;
+  
     }
 
     /*
@@ -2347,6 +2393,53 @@ public class ConceptHelper {
         }
         return tabIdConcept;
     }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
+     * (cette fonction sert pour la génération de la table Permuté
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<NodeConceptArkId> getAllConceptArkIdOfThesaurus(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeConceptArkId> nodeConceptArkIds = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept, id_ark from concept where id_thesaurus = '"
+                            + idThesaurus + "' order by id_concept ASC";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        NodeConceptArkId nodeConceptArkId = new NodeConceptArkId();
+                        nodeConceptArkId.setIdConcept(resultSet.getString("id_concept"));
+                        nodeConceptArkId.setIdArk(resultSet.getString("id_ark"));
+                        nodeConceptArkIds.add(nodeConceptArkId);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All Id of Concept _ Ark of Thesaurus : " + idThesaurus, sqle);
+        }
+        return nodeConceptArkIds;
+    }    
 
     public ArrayList<String> getAllIdConceptOfThesaurus(Connection conn,
             String idThesaurus) {
@@ -3997,7 +4090,7 @@ public class ConceptHelper {
 
     /**
      * Focntion récursive pour trouver le chemin complet d'un concept en partant
-     * du Concept lui même pour arriver à la tête on peut rencontrer plusieurs
+     * du Concept lui même pour arriver à la tête en incluant les Groupes on peut rencontrer plusieurs
      * têtes en remontant, alors on construit à chaque fois un chemin complet.
      *
      * @param ds
@@ -4011,7 +4104,7 @@ public class ConceptHelper {
      * il faut trouver le path qui correspond au microthesaurus en cours pour
      * l'afficher en premier
      */
-    public ArrayList<ArrayList<String>> getInvertPathOfConcept(HikariDataSource ds,
+    private ArrayList<ArrayList<String>> getInvertPathOfConcept(HikariDataSource ds,
             String idConcept, String idThesaurus,
             ArrayList<String> firstPath,
             ArrayList<String> path,
@@ -4064,10 +4157,10 @@ public class ConceptHelper {
     public ArrayList<ArrayList<String>> getPathOfConcept(HikariDataSource ds,
             String idConcept, String idThesaurus, ArrayList<String> path, ArrayList<ArrayList<String>> tabId) {
 
-        ArrayList<String> fistPath = new ArrayList<>();
+        ArrayList<String> firstPath = new ArrayList<>();
         ArrayList<ArrayList<String>> tabIdInvert = getInvertPathOfConcept(ds, idConcept,
                 idThesaurus,
-                fistPath,
+                firstPath,
                 path, tabId);
 
         for (int i = 0; i < tabIdInvert.size(); i++) {
@@ -4080,6 +4173,92 @@ public class ConceptHelper {
         }
         return tabIdInvert;
     }
+    
+    /**
+     * Focntion récursive pour trouver le chemin complet d'un concept en partant
+     * du Concept lui même pour arriver à la tête TT on peut rencontrer plusieurs
+     * têtes en remontant, alors on construit à chaque fois un chemin complet.
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @param firstPath
+     * @param path
+     * @param tabId
+     * @return Vector Ce vecteur contient tous les Path des BT d'un id_terme
+     * exemple (327,368,100,#,2251,5555,54544,8789,#) ici deux path disponible
+     * il faut trouver le path qui correspond au microthesaurus en cours pour
+     * l'afficher en premier
+     */
+    private ArrayList<ArrayList<String>> getInvertPathOfConceptWithoutGroup(HikariDataSource ds,
+            String idConcept, String idThesaurus,
+            ArrayList<String> firstPath,
+            ArrayList<String> path,
+            ArrayList<ArrayList<String>> tabId) {
+
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        ArrayList<String> resultat = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
+        if (resultat.size() > 1) {
+            for (String path1 : path) {
+                firstPath.add(path1);
+            }
+        }
+        if (resultat.isEmpty()) {
+
+     /*       String group;
+
+            do {
+                group = getGroupIdOfConcept(ds, idConcept, idThesaurus);
+                if (group == null) {
+                    group = new GroupHelper().getIdFather(ds, idConcept, idThesaurus);
+                }
+
+                path.add(group);
+                idConcept = group;
+            } while (new GroupHelper().getIdFather(ds, group, idThesaurus) != null);
+            */
+            ArrayList<String> pathTemp = new ArrayList<>();
+            for (String path2 : firstPath) {
+                pathTemp.add(path2);
+            }
+            for (String path1 : path) {
+                if (pathTemp.indexOf(path1) == -1) {
+                    pathTemp.add(path1);
+                }
+            }
+            tabId.add(pathTemp);
+            path.clear();
+        }
+
+        for (String resultat1 : resultat) {
+            path.add(resultat1);
+            getInvertPathOfConceptWithoutGroup(ds, resultat1, idThesaurus, firstPath, path, tabId);
+        }
+
+        return tabId;
+
+    }    
+    
+    public ArrayList<ArrayList<String>> getPathOfConceptWithoutGroup(HikariDataSource ds,
+            String idConcept, String idThesaurus, ArrayList<String> path, ArrayList<ArrayList<String>> tabId) {
+
+        ArrayList<String> firstPath = new ArrayList<>();
+        ArrayList<ArrayList<String>> tabIdInvert = getInvertPathOfConceptWithoutGroup(ds, idConcept,
+                idThesaurus,
+                firstPath,
+                path, tabId);
+
+        for (int i = 0; i < tabIdInvert.size(); i++) {
+            ArrayList<String> pathTemp = new ArrayList<>();
+            for (int j = tabIdInvert.get(i).size(); j > 0; j--) {
+                pathTemp.add(tabIdInvert.get(i).get(j - 1));
+            }
+            tabIdInvert.remove(i);
+            tabIdInvert.add(i, pathTemp);
+        }
+        return tabIdInvert;
+    }    
 
     public void updateGroupOfConcept(HikariDataSource ds, String idConcept, String idNewDomaine, String idOldDomaine, String idTheso) {
         Connection conn;

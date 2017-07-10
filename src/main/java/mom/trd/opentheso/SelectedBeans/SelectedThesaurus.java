@@ -221,6 +221,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+            user.initUserNodePref(idTurl);
 
             // Initialisation du terme séléctionné et de l'arbre
             int type;
@@ -284,7 +285,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-
+            user.initUserNodePref(idTurl);
             // Initialisation du terme séléctionné et de l'arbre
             int type = 1;
 
@@ -350,7 +351,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-
+            user.initUserNodePref(idTurl);
             // Initialisation du terme séléctionné et de l'arbre
             //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
             /*
@@ -404,7 +405,7 @@ public class SelectedThesaurus implements Serializable {
 
     public void majPref() {
         if(user == null || user.getNodePreference() == null) return;
-        
+        user.initUserNodePref(thesaurus.getId_thesaurus());
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
         version = "";
         //String useArk = bundlePref.getString("useArk");

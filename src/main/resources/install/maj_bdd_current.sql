@@ -1,14 +1,14 @@
 
 --  !!!!!!! Attention !!!!!!!!!
 --
--- pour le passage des anciennes versions vers la 4.3.0
+-- pour le passage des anciennes versions vers la 4.3.1
 -- il faut appliquer ce script à votre BDD actuelle,
 -- il faut faire une sauvegarde avant toute opération
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.3.0
--- date : 30/06/2017
+-- version=4.3.1
+-- date : 04/07/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1041,12 +1041,12 @@ END;
 $$ LANGUAGE plpgsql; 
 
 --
---Permet d'ajouter les 3 columns boolean dans la table preferences
+--Permet de mettre à jour la table preferences
 --
 CREATE OR REPLACE FUNCTION ajoutercolumn_preferences() RETURNS VOID AS $$
 BEGIN
     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE COLUMN_NAME = 'identifier_type' AND TABLE_NAME = 'preferences') THEN
+     WHERE COLUMN_NAME = 'url_counter_bdd' AND TABLE_NAME = 'preferences') THEN
         begin
             DROP TABLE preferences;
             CREATE TABLE preferences
@@ -1063,7 +1063,8 @@ BEGIN
               dossier_resize character varying DEFAULT 'resize'::character varying,
               bdd_active boolean DEFAULT false,
               bdd_use_id boolean DEFAULT false,
-              url_bdd character varying DEFAULT 'http://www.mondomaine.fr/fr/recherche?search=terme'::character varying,
+              url_bdd character varying DEFAULT 'http://www.mondomaine.fr/concept/##value##'::character varying,
+              url_counter_bdd character varying DEFAULT 'http://mondomaine.fr/concept/##conceptId##/total'::character varying,
               z3950actif boolean DEFAULT false,
               collection_adresse character varying DEFAULT 'KOHA/biblios'::character varying,
               notice_url character varying DEFAULT 'http://catalogue.mondomaine.fr/cgi-bin/koha/opac-search.pl?type=opac&op=do_search&q=an=terme'::character varying,
@@ -1071,6 +1072,7 @@ BEGIN
               path_notice1 character varying DEFAULT '/var/www/notices/repositories.xml'::character varying,
               path_notice2 character varying DEFAULT '/var/www/notices/SchemaMappings.xml'::character varying,
               chemin_site character varying DEFAULT 'http://mondomaine.fr/'::character varying,
+              webservices boolean DEFAULT true,
               CONSTRAINT preferences_pkey PRIMARY KEY (id_pref),
               CONSTRAINT preferences_id_thesaurus_key UNIQUE (id_thesaurus)
             )

@@ -51,14 +51,14 @@ public class ArkeoJUnitTest {
      */
     @org.junit.Test
     public void testGetInfosArk() {
-        Ark_Client ark_Client = new Ark_Client();
+   /*     Ark_Client ark_Client = new Ark_Client();
         String idArk = ark_Client.getInfosArkId("66666/pcrt2mwfPgYzYg");
-        System.out.println(idArk);
+        System.out.println(idArk);*/
     }
 
     
     /**
-     * Test of Facet methods.
+     * Test 
      */
     @org.junit.Test
     public void testGetCodeArk() {
@@ -193,7 +193,7 @@ public class ArkeoJUnitTest {
     /*    HikariDataSource conn = openConnexionPool();
 */
 
-        Ark_Client ark_Client = new Ark_Client();
+/*        Ark_Client ark_Client = new Ark_Client();
         ArrayList<DcElement> dcElementsList = new ArrayList<>();
 
 
@@ -230,7 +230,7 @@ public class ArkeoJUnitTest {
 
 //        conn.close();*/    
         
-        System.out.println("ark.result=" +idArk);
+       // System.out.println("ark.result=" +idArk);
     }
     
 }

@@ -70,8 +70,8 @@
                     <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
-                        <h:outputText rendered="#{(selectedTerme.nbNotices == 0)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
-                        <h:outputText rendered="#{(selectedTerme.nbNotices != 0)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(!selectedTerme.bdd_useId)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(selectedTerme.bdd_useId)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
                     </a>
 
                 </h:panelGroup>
@@ -149,6 +149,7 @@
                                           value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall">
                                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
                                               value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
+                                <h:graphicImage value = "#{theso.getServerArk()}#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
                             </h:outputLink>
                         </span>
 

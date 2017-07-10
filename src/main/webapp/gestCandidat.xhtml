@@ -13,7 +13,7 @@
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
     </h:head>
     <h:body>
-        <p:growl showDetail="true" sticky="true" autoUpdate="true" /> 
+
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Gestionnaire de candidats</h1>
             Le gestionnaire de candidat permet de proposer des termes pour qu'ils puissent un jour intégrer le thésaurus. Une première version avait été faite en 2013
@@ -381,7 +381,7 @@
                 </div>
 
                 <h:form>
-                 <p:growl id="msg" />
+            
                     <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                         <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}" />
                         <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >

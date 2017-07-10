@@ -24,6 +24,8 @@ public class NodePreference {
     private boolean bddActive;
     private boolean bddUseId;
     private String urlBdd;
+    private String urlCounterBdd;    
+    
     private boolean z3950actif;
     private String collectionAdresse;
     private String noticeUrl;
@@ -31,6 +33,7 @@ public class NodePreference {
     private String pathNotice1;
     private String pathNotice2;
     private String cheminSite;
+    private boolean webservices;
 
     public String getSourceLang() {
         return sourceLang;
@@ -182,6 +185,22 @@ public class NodePreference {
 
     public void setCheminSite(String cheminSite) {
         this.cheminSite = cheminSite;
+    }
+
+    public String getUrlCounterBdd() {
+        return urlCounterBdd;
+    }
+
+    public void setUrlCounterBdd(String urlCounterBdd) {
+        this.urlCounterBdd = urlCounterBdd;
+    }
+
+    public boolean isWebservices() {
+        return webservices;
+    }
+
+    public void setWebservices(boolean webservices) {
+        this.webservices = webservices;
     }
     
 

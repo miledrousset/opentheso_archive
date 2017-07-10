@@ -101,6 +101,8 @@
 
                                 <h:outputLabel value="url bdd"/>
                                 <h:inputText value="#{user1.nodePreference.urlBdd}"  />
+                                <h:outputLabel value="url counter bdd"/>
+                                <h:inputText value="#{user1.nodePreference.urlCounterBdd}"  />                                
                             </h:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="SIGB" toggleable="true" collapsed="true" style="text-align: center;margin-top: 30px;">
@@ -128,6 +130,16 @@
                                 <h:inputText value="#{user1.nodePreference.pathNotice2}"  />
                             </h:panelGrid>
                         </p:fieldset>
+                        <p:fieldset legend="Webservices" toggleable="true" collapsed="true" style="text-align: center; margin-top: 30px;">
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="Webservices :" />
+                                <h:selectOneRadio value="#{user1.nodePreference.webservices}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+                            </h:panelGrid>
+                        </p:fieldset>                        
                 </p:scrollPanel>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}" action="#{theso.majPref()}" styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
                 </h:panelGrid>

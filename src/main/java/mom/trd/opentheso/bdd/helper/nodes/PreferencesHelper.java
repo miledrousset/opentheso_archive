@@ -56,6 +56,7 @@ public class PreferencesHelper {
                         np.setBddActive(resultSet.getBoolean("bdd_active"));
                         np.setBddUseId(resultSet.getBoolean("bdd_use_id"));
                         np.setUrlBdd(resultSet.getString("url_bdd"));
+                        np.setUrlCounterBdd(resultSet.getString("url_counter_bdd"));
                         np.setZ3950acif(resultSet.getBoolean("z3950actif"));
                         np.setCollectionAdresse(resultSet.getString("collection_adresse"));
                         np.setNoticeUrl(resultSet.getString("notice_url"));
@@ -63,6 +64,7 @@ public class PreferencesHelper {
                         np.setPathNotice1(resultSet.getString("path_notice1"));
                         np.setPathNotice2(resultSet.getString("path_notice2"));
                         np.setCheminSite(resultSet.getString("chemin_site"));
+                        np.setWebservices(resultSet.getBoolean("webservices"));
 
                     }
 
@@ -78,6 +80,38 @@ public class PreferencesHelper {
         }
         return np;
     }
+    
+    public boolean isWebservicesOn(HikariDataSource ds, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        
+        boolean status = false;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT webservices FROM preferences where id_thesaurus = '" + idThesaurus + "'";
+                    resultSet = stmt.executeQuery(query);
+
+                    if (resultSet.next()) {
+                        status = resultSet.getBoolean("webservices");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }    
     
     
 
@@ -236,6 +270,7 @@ public class PreferencesHelper {
                             + ", bdd_active='"+np.isBddActive() + "'"
                             + ", bdd_use_id='"+np.isBddUseId() + "'"
                             + ", url_bdd='"+stringPlus.convertString(np.getUrlBdd()) + "'"
+                            + ", url_counter_bdd='"+stringPlus.convertString(np.getUrlCounterBdd()) + "'"
                             + ", z3950actif='"+np.getZ3950acif() + "'"
                             + ", collection_adresse='"+stringPlus.convertString(np.getCollectionAdresse()) + "'"
                             + ", notice_url='"+ stringPlus.convertString(np.getNoticeUrl())+ "'"
@@ -243,6 +278,7 @@ public class PreferencesHelper {
                             + ", path_notice1='"+stringPlus.convertString(np.getPathNotice1()) + "'"
                             + ", path_notice2='"+stringPlus.convertString(np.getPathNotice2()) + "'"
                             + ", chemin_site='"+stringPlus.convertString(np.getCheminSite())+"'"
+                            + ", webservices='" + np.isWebservices()+"'"
                             + " WHERE"
                             + " id_thesaurus = '" + idThesaurus + "'";
                     stmt.executeUpdate(query);

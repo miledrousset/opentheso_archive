@@ -365,6 +365,41 @@ public class ExportFromBDD {
      }
     
     /**
+     * Fonction permettant d'exporter un lot de concepts d'un tableau
+     * ceci permet de construire un export ascendant 
+     *
+     * @param ds
+     * @param idThesaurus 
+     * @param idConcepts 
+     * @return  Le Skos en String
+     */
+    public StringBuffer exportConceptByLot(HikariDataSource ds, String idThesaurus,
+            ArrayList<ArrayList<String>> idConcepts) {
+        if(idConcepts == null) return null;
+        if(idConcepts.isEmpty()) return null;
+        
+        WriteFileSKOS writeFileSKOS = new WriteFileSKOS();
+        
+        // inititialisation des URI
+        writeFileSKOS.setServerArk(serverArk);
+        writeFileSKOS.setServerAdress(serverAdress);
+        
+        writeFileSKOS.writeHeader();
+        ConceptHelper conceptHelper = new ConceptHelper();
+            for (ArrayList<String> tabIdConcept : idConcepts) {
+                for (String idConcept : tabIdConcept) {
+                NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
+                if(nodeConcept == null) return null;
+                writeFileSKOS.writeDescriptor(nodeConcept, null);
+            }        
+        }
+        writeFileSKOS.endSkos(); 
+//        System.out.println(writeFileSKOS.getSkosBuff().toString());
+        
+        return writeFileSKOS.getSkosBuff();
+     }    
+    
+    /**
      * Fonction permettant d'exporter Un concept
      *
      * @param ds

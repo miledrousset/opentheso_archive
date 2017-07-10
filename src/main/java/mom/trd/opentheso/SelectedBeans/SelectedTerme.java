@@ -7,6 +7,10 @@ import com.k_int.IR.SearchTask;
 import com.k_int.IR.Searchable;
 import com.k_int.IR.TimeoutExceededException;
 import com.k_int.hss.HeterogeneousSetOfSearchable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import mom.trd.opentheso.bdd.tools.AsciiUtils;
 //import com.k_int.IR.IRQuery;
 //import com.k_int.IR.QueryModels.PrefixString;
@@ -16,7 +20,11 @@ import mom.trd.opentheso.bdd.tools.AsciiUtils;
 //import com.k_int.IR.TimeoutExceededException;
 //import com.k_int.hss.HeterogeneousSetOfSearchable;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -37,6 +45,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
+
 import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -55,7 +70,6 @@ import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
-import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
@@ -451,13 +465,59 @@ public class SelectedTerme implements Serializable {
         //ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
         urlNotice = user.getNodePreference().getUrlBdd();
+        bdd_useId = user.getNodePreference().isBddUseId();
         if (bdd_useId) {
-            urlNotice = urlNotice.replace("terme", idC);
+            urlNotice = urlNotice.replace("##value##", idC);
         } else {
-            urlNotice = urlNotice.replace("terme", nom);
+            urlNotice = urlNotice.replace("##value##", nom);
         }
-        // try {
 
+        // récupération du total des notices 
+        String urlCounterBdd = user.getNodePreference().getUrlCounterBdd();
+        urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
+  
+        //urlCounterBdd = "http://healthandco.test.o2sources.com/concept/40/total";
+        // exemple des données récupérées 
+        // "{\"content\":[{\"nb_notices\":\"s7\"}],\"debug\":\"\",\"error\":0}\" ";   
+        //{"content":[{"nb_notices":"7"}],"debug":"","error":0}
+        
+        URL url;
+        try {
+            url = new URL(urlCounterBdd);
+            InputStream is = url.openStream();
+            JsonReader reader = Json.createReader(is);
+            JsonObject totalNotices = reader.readObject();
+            reader.close();
+
+            JsonArray values = totalNotices.getJsonArray("content");
+            String name;
+            for (int i = 0; i < values.size(); i++) {
+                
+                    JsonObject item = values.getJsonObject(i);
+                    try {
+                        name = item.getString("nb_notices");
+                        if(name != null) {
+                            if(!name.isEmpty())
+                                nbNotices = Integer.parseInt(name);
+                        }
+                    }
+                    catch (JsonException e) {
+                        System.out.println(e.toString());
+                    }
+                    catch (Exception ex) {
+                        System.out.println(ex.toString());
+                    }
+
+
+            }
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // try {
         //  urlNotice = URLEncoder.encode(urlNotice);
         // } catch (UnsupportedEncodingException ex) {
         //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
@@ -630,9 +690,9 @@ public class SelectedTerme implements Serializable {
         for (NodeNT nnt : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             if (nnt.getStatus().equals("hidden")) {
-                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + " (" +nnt.getRole() +")" + "</del>");
+                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + " (" + nnt.getRole() + ")" + "</del>");
             } else {
-                tempMap1.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
+                tempMap1.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
             }
             termesSpecifique.addAll(tempMap1.entrySet());
         }
@@ -658,9 +718,9 @@ public class SelectedTerme implements Serializable {
         for (NodeBT nbt : tempBT) {
             HashMap<String, String> tempMap2 = new HashMap<>();
             if (nbt.getStatus().equals("hidden")) {
-                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() +")" + "</del>");
+                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() + ")" + "</del>");
             } else {
-                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() +")");
+                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() + ")");
             }
             termeGenerique.addAll(tempMap2.entrySet());
         }
@@ -680,9 +740,9 @@ public class SelectedTerme implements Serializable {
         for (NodeBT nbt : tempBT) {
             HashMap<String, String> tempMap2 = new HashMap<>();
             if (nbt.getStatus().equals("hidden")) {
-                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() +")" + "</del>");
+                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() + ")" + "</del>");
             } else {
-                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() +")");
+                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() + ")");
             }
             termeGenerique.addAll(tempMap2.entrySet());
         }
@@ -798,7 +858,7 @@ public class SelectedTerme implements Serializable {
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
             for (NodeConceptTree nct : tempNT) {
-                tempMap.put(nct.getIdConcept(), nct.getTitle()  );
+                tempMap.put(nct.getIdConcept(), nct.getTitle());
             }
             termesSpecifique.addAll(tempMap.entrySet());
 
@@ -829,7 +889,7 @@ public class SelectedTerme implements Serializable {
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
             for (NodeNT nnt : tempNT) {
-                tempMap.put(nnt.getIdConcept(), nnt.getTitle()  + " (" +nnt.getRole() +")");
+                tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
             }
             termesSpecifique.addAll(tempMap.entrySet());
         }
@@ -844,7 +904,7 @@ public class SelectedTerme implements Serializable {
      * @param selecedTerm
      * @return
      */
-    public boolean creerSpecialTermeSpe(MyTreeNode selecedTerm,String BTname, String NTname) {
+    public boolean creerSpecialTermeSpe(MyTreeNode selecedTerm, String BTname, String NTname) {
         ConceptHelper instance = new ConceptHelper();
         instance.setIdentifierType(identifierType);
 
@@ -863,8 +923,8 @@ public class SelectedTerme implements Serializable {
 
         //String idTC = idTopConcept;
         String idP = idC;
-             
-        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme,BTname,NTname, serverAdress, arkActive, user.getUser().getId()) == null) {
+
+        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme, BTname, NTname, serverAdress, arkActive, user.getUser().getId()) == null) {
             return false;
         }
         instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
@@ -873,7 +933,7 @@ public class SelectedTerme implements Serializable {
         termesSpecifique = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeNT nnt : tempNT) {
-            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
+            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
         }
         termesSpecifique.addAll(tempMap.entrySet());
 
@@ -956,7 +1016,8 @@ public class SelectedTerme implements Serializable {
         termesAssocies.addAll(tempMap.entrySet());
         vue.setAddTAsso(0);
     }
-    public void creerTermeAsso(String idC2,String role) {
+
+    public void creerTermeAsso(String idC2, String role) {
         HierarchicalRelationship hr = new HierarchicalRelationship();
         hr.setIdConcept1(idC);
         hr.setIdConcept2(idC2);
@@ -1369,7 +1430,7 @@ public class SelectedTerme implements Serializable {
         termesSpecifique = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeNT nnt : tempNT) {
-            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
+            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
         }
         termesSpecifique.addAll(tempMap.entrySet());
         vue.setAddTSpe(false);
@@ -1633,20 +1694,19 @@ public class SelectedTerme implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
         vue.setAddAlign(0);
     }
-    
-    public void addOtherThesoAlign(NodeAutoCompletion term,String idOtherTheso,int alignType){
-          
-        if(term == null){
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :","No term selected"));
+
+    public void addOtherThesoAlign(NodeAutoCompletion term, String idOtherTheso, int alignType) {
+
+        if (term == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", "No term selected"));
             return;
         }
-        
+
         String termUri = "test/" + term.getIdConcept();
-        
-        
+
         new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), term.getIdConcept(), idOtherTheso,
-                        termUri, alignType, idC, idTheso,-1);
-       
+                termUri, alignType, idC, idTheso, -1);
+
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
         vue.setAddAlign(0);
@@ -2259,7 +2319,7 @@ public class SelectedTerme implements Serializable {
                 termesSpecifique = new ArrayList<>();
                 HashMap<String, String> tempMap3 = new HashMap<>();
                 for (NodeNT nnt : tempNT) {
-                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle() + " (" +nnt.getRole() +")");
+                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
                 }
                 termesSpecifique.addAll(tempMap3.entrySet());
             } catch (SQLException ex) {
@@ -3328,6 +3388,16 @@ public class SelectedTerme implements Serializable {
     public void setBdd_active(boolean bdd_active) {
         this.bdd_active = bdd_active;
     }
+
+    public boolean isBdd_useId() {
+        return bdd_useId;
+    }
+
+    public void setBdd_useId(boolean bdd_useId) {
+        this.bdd_useId = bdd_useId;
+    }
+    
+    
 
     public String getTotalConceptOfBranch() {
         if (totalConceptOfBranch.isEmpty()) {
