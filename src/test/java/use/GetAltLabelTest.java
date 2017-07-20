@@ -3,34 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ark;
+package use;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
-import mom.trd.opentheso.bdd.helper.nodes.NodeConceptArkId;
+import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
+import mom.trd.opentheso.bdd.helper.nodes.NodeTab2Levels;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
-import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author miled.rousset
  */
-public class GetAllArkTest {
+public class GetAltLabelTest {
     
-    public GetAllArkTest() {
+    public GetAltLabelTest() {
     }
     
     @BeforeClass
@@ -58,59 +53,66 @@ public class GetAllArkTest {
         HikariDataSource conn = openConnexionPool();
         
         String idTheso = "TH_1";
-        ConceptHelper conceptHelper = new ConceptHelper();
-        ArrayList<NodeConceptArkId> allIds = conceptHelper.getAllConceptArkIdOfThesaurus(conn, idTheso);
-        StringBuilder file = new StringBuilder();
+        String idLang = "fr";
+        String idGroup = "6";
+        
+        boolean passed = false;
+        
+        
+       // ConceptHelper conceptHelper = new ConceptHelper();
         TermHelper termHelper = new TermHelper();
         NoteHelper noteHelper = new NoteHelper();
         
-        ArrayList<NodeTermTraduction> nodeTermTraductions;
-        String idTerme;
-        ArrayList<NodeNote> nodeNote;
-        boolean passed = false;
         
-        for (NodeConceptArkId ids : allIds) {
-            file.append(ids.getIdConcept());
-            file.append("\t");
+        //ArrayList<NodeConceptArkId> allIds = conceptHelper.getAllConceptArkIdOfThesaurus(conn, idTheso);
+        StringBuilder file = new StringBuilder();
 
-            if(ids.getIdArk() == null || ids.getIdArk().isEmpty()) {
-                file.append("");
-            } else {
-                file.append(ids.getIdArk().substring(ids.getIdArk().indexOf("/") + 1));
-            }
-            nodeTermTraductions = termHelper.getAllTraductionsOfConcept(conn, ids.getIdConcept(), idTheso);
-            if(!nodeTermTraductions.isEmpty()) {
-                for (NodeTermTraduction nodeTermTraduction : nodeTermTraductions) {
-                    if(nodeTermTraduction.getLang().equalsIgnoreCase("fr")) {
-                        file.append("\t");
-                        file.append(nodeTermTraduction.getLexicalValue());
-                    //    file.append("(");
-                    //    file.append(nodeTermTraduction.getLang());
-                    //    file.append(")");
-                    }
-                }
-            }
-            idTerme = termHelper.getIdTermOfConcept(conn, ids.getIdConcept(), idTheso);
-            nodeNote = noteHelper.getListNotesTerm(conn, idTerme, idTheso, "fr");
+        ArrayList<NodeEM> nodeEMs;
+        ArrayList<NodeTab2Levels> nodeConceptTermId = termHelper.getAllIdOfNonPreferredTermsByGroup(conn, idTheso, idGroup);
+        
+        Term term;
+        ArrayList<NodeNote> nodeNotes;
+       
+        file.append("Id_concept");
+        file.append("\t");
+        file.append("prefLabel");
+        file.append("\t");
+        file.append("altLabel");
+        file.append("\t");
+        file.append("définition");
+        file.append("\n");
+        
+        for (NodeTab2Levels nodeTab2Levels : nodeConceptTermId) {
+            nodeEMs = termHelper.getNonPreferredTerms(conn, nodeTab2Levels.getIdTerm(), idTheso, idLang);
             
-
-            
-            for (NodeNote nodeNote1 : nodeNote) {
-                if(nodeNote1.getLang().equalsIgnoreCase("fr")) {
-                    if(nodeNote1.getNotetypecode().equalsIgnoreCase("definition")){
-                        file.append("\t");
-                        file.append(nodeNote1.getLexicalvalue());
-                        passed = true;
-                    }
-                }
-            }
-            if(!passed) {
+            if(!nodeEMs.isEmpty()) {
+                
+                term = termHelper.getThisTerm(conn, nodeTab2Levels.getIdConcept(), idTheso, idLang);
+                nodeNotes = noteHelper.getListNotesTerm(conn, nodeTab2Levels.getIdTerm(), idTheso, idLang);
+                
+                // écriture dans le fichier
+                file.append(nodeTab2Levels.getIdConcept());
                 file.append("\t");
-                file.append(" ");
+                file.append(term.getLexical_value());
+                file.append("\t");
+                
+                for (NodeEM nodeEM : nodeEMs) {
+                    if(passed) {
+                        file.append("##");
+                    }
+                    file.append(nodeEM.getLexical_value());
+                    passed = true;
+
+                }
+                file.append("\t");
+                for (NodeNote nodeNote : nodeNotes) {
+                    if(nodeNote.getNotetypecode().equalsIgnoreCase("definition")) {
+                        file.append(nodeNote.getLexicalvalue());
+                    }
+                }
+                file.append("\n");
             }
             passed = false;
-                
-            file.append("\n");
         }
         
         System.out.println(file.toString());

@@ -1752,7 +1752,8 @@ public class SelectedTerme implements Serializable {
      * @param idGroup
      * @param idLangue
      * @param value
-     * @return #MR
+     * @return 
+     * #MR
      */
     public boolean editGroupName(String idTheso, String idGroup,
             String idLangue, String value) {
@@ -1763,7 +1764,19 @@ public class SelectedTerme implements Serializable {
         conceptGroupLabel.setIdgroup(idGroup);
         conceptGroupLabel.setLang(idLangue);
         conceptGroupLabel.setLexicalvalue(value);
-        return groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId());
+        
+        // vérification si le Groupe est traduit déjà, on fait un update 
+        if(groupHelper.isHaveTraduction(connect.getPoolConnexion(),
+                idGroup, idTheso, idLangue)) {
+            if(!groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId())) {
+                return false;
+            }
+        } else {
+            if(!groupHelper.addGroupTraduction(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1794,21 +1807,7 @@ public class SelectedTerme implements Serializable {
             termTemp.setLexical_value(nomEdit);
             termTemp.setSource(String.valueOf(user.getUser().getId()));
             new TermHelper().addTraduction(connect.getPoolConnexion(), termTemp, user.getUser().getId());
-        } else if (cas == 3) {
-            ConceptGroupLabel cgl = new ConceptGroupLabel();
-            cgl.setLexicalvalue(nomEdit);
-            cgl.setIdgroup(idDomaine);
-            cgl.setIdthesaurus(idTheso);
-            cgl.setLang(idlangue);
-            new GroupHelper().addGroupTraduction(connect.getPoolConnexion(), cgl, user.getUser().getId());
-        } else if (cas == 4) {
-            ConceptGroupLabel cgl = new ConceptGroupLabel();
-            cgl.setLexicalvalue(nomEdit);
-            cgl.setIdgroup(idDomaine);
-            cgl.setIdthesaurus(idTheso);
-            cgl.setLang(idlangue);
-            new GroupHelper().updateConceptGroupLabel(connect.getPoolConnexion(), cgl, user.getUser().getId());
-        }
+        } 
         vue.setAddTInfo(0);
         nom = nomEdit;
         nomEdit = "";

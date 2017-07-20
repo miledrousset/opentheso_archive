@@ -522,6 +522,97 @@ public class SelectedThesaurus implements Serializable {
         }
 
     }
+    
+    /**
+     * Permet de vérifier si les Identifiants Ark sont valides 
+     * s'ils n'existent pas, on les ajoutes
+     * s'ils exient, on ne fait rien.
+     * 
+     * @param idTheso 
+     * #MR
+     */
+   public void regenerateAllArkId(String idTheso) {
+        try {
+            ArrayList<String> idGroup = null;
+
+            //group
+          /*  try {
+                if(!regenArkIdGroup(conn, idTheso)) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
+                throw new Exception("Error while regen id group ");
+            }*/
+
+            //concept
+            try {
+                regenArkIdConcept(idTheso);
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
+                throw new Exception("Error while regen id concept ");
+            }
+            maj();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+
+        } catch (SQLException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
+        } catch (Exception ex) {
+        }  
+   }
+    
+    /**
+     * Cette fonction remplace tout les id des groupes du théso
+     *
+     * @param conn
+     * @param idTheso
+     * @return la liste des nouveaux id group
+     * #MR
+     */
+    private boolean regenArkIdGroup(Connection conn, String idTheso) throws Exception {
+
+        //récup les concepts
+        GroupHelper groupHelper = new GroupHelper();
+        ArrayList<String> idGroups = groupHelper.getListIdOfGroup(conn, idTheso);
+        if (idGroups == null || idGroups.isEmpty()) {
+            throw new Exception("No group in this thesaurus");
+        }
+
+        
+        //vérification et génération des nouveaux id Ark
+        for (String idGroup : idGroups) {
+           // if(!) return false;
+        }
+        return true;
+    }  
+
+
+    /**
+     * Cette fonction remplace tous les id des concepts du théso
+     */
+    private boolean regenArkIdConcept(String idTheso) throws Exception {
+        //récup les concepts
+        ConceptHelper conceptHelper = new ConceptHelper();
+        ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
+        if (idConcepts == null || idConcepts.isEmpty()) {
+            throw new Exception("No concept in this thesaurus");
+        }
+
+        /*Vérification et génération des nouveaux id Ark*/
+        for (String idConcept : idConcepts) {
+            if(!conceptHelper.regenerateArkId(connect.getPoolConnexion(),
+                    nodePreference.getCheminSite(), idConcept,
+                    thesaurus.getLanguage(),thesaurus.getId_thesaurus())) {
+                
+                throw new Exception("BDD error");
+            }
+        }
+        return true;
+    }   
+    
+    
+    
 
     public void reGenerateConceptId(String idConcept) {
         ConceptHelper conceptHelper = new ConceptHelper();

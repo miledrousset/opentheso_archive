@@ -41,6 +41,13 @@ input[type="button"], input[type="submit"]{
     border-color: #A9A691;
 }
 
+.styleButton2 {
+    cursor: pointer !important;
+    font-family: "Palatino linotype",Times,serif !important;
+    font-size: 12px !important;
+    color: black !important;
+}
+
 .infoAcordionPanel{
     color: #3333ff !important;
 }
@@ -1016,10 +1023,11 @@ input[type="button"], input[type="submit"]{
 .fieldReorga {
     float: right; 
     width: 300px !important; 
-    height: 200px !important; 
+    height: 100px !important; 
     text-align: center;
     border-radius: 5px;
 }
+
 
 
 
@@ -1655,3 +1663,8 @@ label
     text-align: left; 
 }
 */
+.fieldAdmin {
+    float: left; 
+    width: 150px;
+    border-radius: 5px;
+}

@@ -394,7 +394,7 @@ public class TermHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding Term : " + idTerm, sqle);
+            log.error("Error while deleting traduction of Term : " + idTerm, sqle);
         }
         return status;
     }
@@ -705,16 +705,22 @@ public class TermHelper {
             Term term, int idUser) {
 
         Connection conn;
+        boolean status = false;
         try {
             conn = ds.getConnection();
-            if (addTermTraduction(conn, term, idUser)) {
-                return true;
+            try {
+                if (addTermTraduction(conn, term, idUser)) {
+                    status = true;
+                }
             }
-
-        } catch (SQLException ex) {
+            finally {
+                conn.close();
+            }
+        }
+        catch (SQLException ex) {
             Logger.getLogger(TermHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return false;
+        return status;
     }
 
     /**
@@ -993,40 +999,6 @@ public class TermHelper {
         }
     }
 
-    public boolean isExitsTraduction(HikariDataSource ds, Term term) {
-        Connection conn;
-        Statement stmt;
-        ResultSet rs;
-        boolean status = false;
-        term.setLexical_value(new StringPlus().convertString(term.getLexical_value()));
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "SELECT id_term from term "
-                            + " where id_term ='" + term.getId_term()
-                            + "' and lang ='" + term.getLang() + "'"
-                            + " and id_thesaurus = '" + term.getId_thesaurus() + "'";
-
-                    rs = stmt.executeQuery(query);
-                    if (rs.next()) {
-                        status = true;
-                    }
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while updating Term Traduction : " + term.getId_term(), sqle);
-        }
-        return status;
-    }
-
     /**
      * Cette fonction permet de mettre à jour un Terme à la table Term, en
      * paramètre un objet Classe Term
@@ -1038,19 +1010,24 @@ public class TermHelper {
      */
     public boolean updateTermTraduction(HikariDataSource ds,
             Term term, int idUser) {
-        if (isExitsTraduction(ds, term)) {
-            if (!updateTermTraduction2(ds, term, idUser)) {
-                return false;
-            }
-        } else {
-            if (!addTraduction(ds, term, idUser)) {
-                return false;
-            }
+        if (isTermExist(ds, term.getLexical_value(), term.getId_thesaurus(), term.getLang())){//isExitsTraduction(ds, term)) {
+            // terme existe, il faut créer une relation
+            return false;
+        }
+        if (!updateTermIntoTable(ds, term, idUser)) {
+            return false;
         }
         return true;
     }
 
-    public boolean updateTermTraduction2(HikariDataSource ds,
+    /**
+     * fonction qui permet de mettre à jour une traduction 
+     * @param ds
+     * @param term
+     * @param idUser
+     * @return 
+     */
+    private boolean updateTermIntoTable(HikariDataSource ds,
             Term term, int idUser) {
         Connection conn;
         Statement stmt;
@@ -1725,6 +1702,65 @@ public class TermHelper {
         return tabIdNonPreferredTerm;
     }
 
+    /**
+     * Cette fonction permet de récupérer la liste de idTermes des
+     * NonPreferredTerm (synonymes) pour un Thésaurus en filtrant par Group
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param idGroup
+     * @return ArrayList (idConcept, idTerm)
+     */
+    public ArrayList<NodeTab2Levels> getAllIdOfNonPreferredTermsByGroup(HikariDataSource ds,
+            String idThesaurus, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        ArrayList<NodeTab2Levels> tabIdNonPreferredTerm = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT DISTINCT preferred_term.id_concept,"
+                            + " preferred_term.id_term FROM"
+                            + " non_preferred_term, preferred_term, concept_group_concept WHERE"
+                            
+                            + " preferred_term.id_term = non_preferred_term.id_term AND"
+                            + " concept_group_concept.idconcept = preferred_term.id_concept AND"
+                            + " concept_group_concept.idthesaurus = preferred_term.id_thesaurus AND"
+                            + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus"
+                            
+                            + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "' AND"
+                            + " concept_group_concept.idgroup = '" + idGroup + "' order by id_concept ASC";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeTab2Levels nodeTab2Levels = new NodeTab2Levels();
+                        nodeTab2Levels.setIdConcept(resultSet.getString("id_concept"));
+                        nodeTab2Levels.setIdTerm(resultSet.getString("id_term"));
+                        tabIdNonPreferredTerm.add(nodeTab2Levels);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All Id of NonPreferedTerm of Thesaurus : " + idThesaurus, sqle);
+        }
+
+        return tabIdNonPreferredTerm;
+    }    
+    
     /**
      * Cette fonction permet de récupérer une liste de termes pour
      * l'autocomplétion avec les synonymes

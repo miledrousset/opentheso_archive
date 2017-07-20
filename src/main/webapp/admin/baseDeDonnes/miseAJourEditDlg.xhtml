@@ -6,7 +6,27 @@
     xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="idMiseAJourEditDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="miseAJourEditDlg" modal="true" resizable="false" >
-        <!-- POPUP ADD USER DEBUT -->
+
+            <h:panelGroup rendered="#{user1.haveRights(1)}">
+                <fieldset class="fieldPref">
+                    <legend><h:outputText value="#{langueBean.getMsg('bdd.act')}"/></legend><br/>
+
+                    <h:form>
+                        <p:commandButton id="chercheMaJ" value="Vérifier la mise à jour"  update=":idMiseAJourEditDlg" 
+                                         actionListener="#{baseDeDonnes.loadinfoDB()}" oncomplete="PF('miseAJourEditDlg').show()" 
+                                         styleClass="styleButton"/>
+
+                        <br/>
+                        <br/>
+
+                        <p:commandButton id="passForgeted" value="#{langueBean.getMsg('bdd.act')}" 
+                                         actionListener="#{baseDeDonnes.maJBdd}" styleClass="styleButton"/>       
+                    </h:form>
+
+                </fieldset>
+            </h:panelGroup>        
+        
+        
         <h:form>
             <p:messages showDetail="true" autoUpdate="true" />
 

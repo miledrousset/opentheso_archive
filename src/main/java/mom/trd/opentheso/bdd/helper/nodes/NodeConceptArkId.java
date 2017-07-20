@@ -13,6 +13,7 @@ public class NodeConceptArkId {
     
     private String idConcept;
     private String idArk;
+
     
     public NodeConceptArkId() {
         

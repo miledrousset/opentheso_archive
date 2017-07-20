@@ -454,7 +454,7 @@ public class Rest {
 
     /**
      * Pour retourner une branche complète à partir d'un concept en SKOS mais en
-     * remontant la branche
+     * remontant la branche par les BT
      *
      * @param idConcept
      * @param idTheso

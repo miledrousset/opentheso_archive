@@ -79,20 +79,22 @@ public class TestRestService {
     @org.junit.Test
     public void testGetInvertPathConcept() {
         
-/*        ArrayList<String> path = new ArrayList<>();
+        ArrayList<String> path = new ArrayList<>();
         ArrayList<ArrayList<String>> tabId = new ArrayList<>();
+        String idTheso = "TH_1";
+        String idConcept = "150082";
         
         HikariDataSource conn = openConnexionPool();
         
         ConceptHelper conceptHelper = new ConceptHelper();
-        path.add("5");
-        tabId = conceptHelper.getPathOfConceptWithoutGroup(conn, "5", "1", path, tabId);
+        path.add(idConcept);
+        tabId = conceptHelper.getPathOfConceptWithoutGroup(conn, idConcept, idTheso, path, tabId);
         
         
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk("http://ark.frantiq.fr/ark:/");
         exportFromBDD.setServerAdress("http://pactols.frantiq.fr/");
-        StringBuffer skos = exportFromBDD.exportConceptByLot(conn,"1", tabId);
+        StringBuffer skos = exportFromBDD.exportConceptByLot(conn,idTheso, tabId);
         
         if(skos == null)
             System.out.println("");
@@ -100,7 +102,7 @@ public class TestRestService {
             System.err.println(skos.toString());
 
         conn.close();
-        */
+        
     }
     
     
@@ -110,7 +112,7 @@ public class TestRestService {
     @org.junit.Test
     public void testDeltaOfConcept() {
         
-        Date actuelle = new Date();
+/*        Date actuelle = new Date();
 	
 //	* Definition du format utilise pour les dates
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -147,7 +149,7 @@ public class TestRestService {
         else 
             System.err.println(skos.toString());
 
-        conn.close();
+        conn.close();*/
     }    
     
     
@@ -163,7 +165,7 @@ public class TestRestService {
         // Zoomathia
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "4.2.2");        
+        config.addDataSourceProperty("databaseName", "pactols");        
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");        
         

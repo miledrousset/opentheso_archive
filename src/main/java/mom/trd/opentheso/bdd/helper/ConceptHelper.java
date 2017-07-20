@@ -246,9 +246,95 @@ public class ConceptHelper {
             log.error("Error while getting delta of Concept  : " + idTheso, sqle);
         }
         return ids;
-  
     }
 
+    /**
+     * permet de vérifier si l'id ark existe; 
+     * si oui, on ne fait rien, 
+     * s'il n'existe pas, on l'ajoute.
+     * @param ds
+     * @param url
+     * @param idConcept
+     * @param idLang
+     * @param idTheso
+     * @param idUser
+     * @return
+     * #MR
+     */
+    public boolean regenerateArkId(HikariDataSource ds,
+            String url, 
+            String idConcept, String idLang, String idTheso) {
+        String idArk;
+
+        Ark_Client ark_Client = new Ark_Client();
+
+        Concept concept = getThisConcept(ds, idConcept, idTheso);
+        
+        if(concept.getIdArk() == null) {
+            // création d'un identifiant Ark
+            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+        }
+
+        if(concept.getIdArk().isEmpty()) {
+            // création d'un identifiant Ark
+            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+        }
+        
+        // ici, nous abvons un  IdArk, on vérifie s'il est encore valide ?
+        idArk = ark_Client.getInfosArkId(concept.getIdArk());
+        // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
+        if (idArk == null) {
+            // l'idArk n'est plus valide, il faut le créer 
+            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+        }
+        // ici l'idArk est valide, on ne fait rien.
+        return true;
+    }    
+
+    /**
+     * Pour préparer les données pour la création d'un idArk 
+     * 
+     * @param ds
+     * @param url
+     * @param idConcept
+     * @param idLang
+     * @param idTheso
+     * @param idUser
+     * @return 
+     */
+    private boolean prepareToAddArkId (HikariDataSource ds,
+            String url, 
+            String idConcept, String idLang, String idTheso) {
+        
+        ArrayList<DcElement> dc = new ArrayList<>();
+        NodeConcept nodeConcept;
+        nodeConcept = getConcept(ds, idConcept, idTheso, idLang);
+        NodeMetaData nodeMetaData = new NodeMetaData();
+        nodeMetaData.setCreator(nodeConcept.getTerm().getSource());
+        nodeMetaData.setTitle(nodeConcept.getTerm().getLexical_value());
+        nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+        Connection conn;
+        try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            if (!addIdArk(conn, idConcept, idTheso,
+                    url,
+                    nodeMetaData,
+                    nodeConcept.getTerm().getCreator())) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;    
+    }
+    
+    
     /*
         public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
             String idConceptDeTete,
@@ -2396,7 +2482,7 @@ public class ConceptHelper {
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
-     * (cette fonction sert pour la génération de la table Permuté
+     * (cette fonction sert pour la génération des identifiants pour Wikidata)
      *
      * @param ds
      * @param idThesaurus

@@ -14,7 +14,10 @@
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
 
-                        <p:menuitem rendered="#{selectedTerme.status != 'hidden'}"  value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"  value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                        
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
+                        
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
 

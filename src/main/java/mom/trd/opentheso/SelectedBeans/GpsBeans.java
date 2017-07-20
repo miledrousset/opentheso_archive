@@ -189,6 +189,10 @@ public class GpsBeans {
                 }
             }
             if (found) {
+                if (alignment_choisi == null) {
+                    return false;
+                }
+
                 latitud = alignment_choisi.getLat();
                 longitud = alignment_choisi.getLng();
                 addCoordinates(idC, id_Theso);
@@ -269,7 +273,7 @@ public class GpsBeans {
         if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
             return false;
         } else if (!new TermHelper()
-                .isExitsTraduction(connect.getPoolConnexion(), term)) {
+                .isTermExist(connect.getPoolConnexion(), term.getLexical_value(), term.getId_thesaurus(), term.getLang())) { //ExitsTraduction(connect.getPoolConnexion(), term)) {
             if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
                 return false;
             }
@@ -493,7 +497,7 @@ public class GpsBeans {
         if (position <= 0) {
             return;
         }
-        
+
         erreur = "";
         GpsHelper gpsHelper = new GpsHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -532,7 +536,7 @@ public class GpsBeans {
             Logger.getLogger(GpsBeans.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         listConceptTrates.remove(id_concept);
 
     }
@@ -678,7 +682,7 @@ public class GpsBeans {
     public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         if (optionWorkFlow == optionOfAlignement) {
-            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user,id_concept_depart, listConceptTrates, alignementPreferences.getId())) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart, listConceptTrates, alignementPreferences.getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));
@@ -686,7 +690,7 @@ public class GpsBeans {
         }
         return true;
     }
-    
+
     public void initAlign(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         alignmentHelper.init_preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart);

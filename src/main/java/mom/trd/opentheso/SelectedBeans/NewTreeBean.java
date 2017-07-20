@@ -867,6 +867,41 @@ public class NewTreeBean implements Serializable {
         selectedTerme.reInitTerme();
         return true;
     }
+    
+    public boolean renameGroup() {
+        MyTreeNode myTreeNode = (MyTreeNode) selectedNode;
+       
+        String valueEdit = selectedTerme.getNomEdit().trim();
+        if(valueEdit.isEmpty()) return false;
+        
+        // si c'est la même valeur, on fait rien
+        if (selectedTerme.getNom().trim().equals(valueEdit)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
+        //    selectedTerme.setNomEdit(selectedTerme.getNom());
+            return false;
+        }
+
+        // vérification si le Groupe à ajouter existe déjà 
+        if (new GroupHelper().isDomainExist(connect.getPoolConnexion(), valueEdit, myTreeNode.getIdTheso(), myTreeNode.getLangue())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return false;
+        }      
+        
+        if (myTreeNode.isIsGroup()) {
+            if (!selectedTerme.editGroupName(myTreeNode.getIdTheso(),
+                    myTreeNode.getIdMot(), myTreeNode.getLangue(),
+                    valueEdit)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "erreur BDD"));
+            //    selectedTerme.setNomEdit(selectedTerme.getNom());
+                return false;
+            }
+            myTreeNode.setData(valueEdit);
+            selectedTerme.setNom(valueEdit);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Fonction recursive qui permet de supprimer une branche d'orphelins un
@@ -918,57 +953,12 @@ public class NewTreeBean implements Serializable {
             return;
         }
 
-        String idTerm;
-        String idConceptLocal;
-        MyTreeNode myTreeNode = (MyTreeNode) selectedNode;
-
-        // vérification si le Groupe à ajouter existe déjà 
-        if (new GroupHelper().isDomainExist(connect.getPoolConnexion(), valueEdit, myTreeNode.getIdTheso(), myTreeNode.getLangue())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
-            return;
-        }
-
         selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
 
         // saisie d'une valeur vide
         if (selectedTerme.getNomEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
-            return;
-        }
-        /// cas d'un Group
-        if (myTreeNode.isIsGroup()) {
-            /*
-                    if (selectedTerme.getNom() == null || selectedTerme.getNom().equals("")) {
-                        selectedTerme.editTerme(3);
-                    } else {
-                        selectedTerme.editTerme(4);
-                    }*/
-
-            if (!selectedTerme.editGroupName(myTreeNode.getIdTheso(),
-                    myTreeNode.getIdMot(), myTreeNode.getLangue(),
-                    valueEdit)) {
-                //erreur à traiter
-            }
-            myTreeNode.setData(valueEdit);
-            selectedTerme.setNom(valueEdit);
-            selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));
-            return;
-
-        }
-
-        /// cas d'un sousGroup
-        if (((MyTreeNode) selectedNode).isIsSubGroup()) {
-            if (!selectedTerme.editGroupName(myTreeNode.getIdTheso(),
-                    myTreeNode.getIdMot(), myTreeNode.getLangue(),
-                    valueEdit)) {
-                //erreur à traiter
-            }
-            myTreeNode.setData(valueEdit);
-            selectedTerme.setNom(valueEdit);
-            selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info2")));
             return;
         }
 
@@ -993,6 +983,22 @@ public class NewTreeBean implements Serializable {
         }
 
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+    }
+    
+    /**
+     * permet de savoir si le neoud sélectionné est un Group
+     * @return 
+     */
+    public boolean isGroup(){
+         return ((MyTreeNode) selectedNode).isIsGroup();
+    }    
+    
+    /**
+     * permet de savoir si le noeud sélectionné est un sousGroupe
+     * @return 
+     */
+    public boolean isSubGroup(){
+         return ((MyTreeNode) selectedNode).isIsSubGroup();
     }
 
     /**

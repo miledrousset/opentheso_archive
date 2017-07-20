@@ -4,11 +4,12 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
-    <div id="reorganizing">
-        
+   
+    <p:dialog id="idReorganizing"  header="#{langueBean.getMsg('admin.regenerateArk')}" widgetVar="reorganizing" modal="true" resizable="false" >
+
         <h:panelGroup rendered="#{user1.haveRights(2)}">
             <fieldset class="fieldReorga">
-                
+
                 <legend><h:outputText value="#{langueBean.getMsg('conf.reorganizing')}" /></legend><br/>
                 <h:form id="formReorganizing">
                     <table>
@@ -17,18 +18,8 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}"  styleClass="styleButton" />
-                    <br/>
-                    <hr/>
-                    <table>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newIdExplication')}" />  </td>
-                        </tr>
-                    </table>
-                    <p:commandButton value="#{langueBean.getMsg('conf.newId')}" actionListener="#{theso.regenAllId(theso.thesaurus.id_thesaurus)}"  styleClass="styleButton" />
-                    
-                    
                 </h:form> 
             </fieldset>
         </h:panelGroup>
-    </div>
+    </p:dialog>
 </ui:composition>

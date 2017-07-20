@@ -15,6 +15,10 @@
         <ui:include src="dialogs/user/addUserDlg.xhtml" />
         <ui:include src="dialogs/user/editUserDlg.xhtml" />
         <ui:include src="dialogs/prefDlg.xhtml" />
+        <ui:include src ="/admin/reorganizing.xhtml" />
+        <ui:include src="admin/regenerateAllConceptId.xhtml" />
+        <ui:include src="admin/regenerateArkId.xhtml" />
+        <ui:include src="/admin/baseDeDonnes/miseAJourEditDlg.xhtml"/>
 
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
@@ -132,37 +136,27 @@
                     </table>
                 </h:form>
             </fieldset>
-            
-            
-            <fieldset class="fieldPref">
-                    <legend><h:outputText value="#{langueBean.getMsg('conf.field3')}" /></legend><br/>
-            <p:commandButton value="#{langueBean.getMsg('conf.modifPref')}" update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton" />
+
+
+            <fieldset class="fieldAdmin">
+                <legend><h:outputText value="#{langueBean.getMsg('menu.div1')}" /></legend>
+                <h:form>
+                    <p:menuButton  value="Admin" style="font-family:'Palatino linotype',Times,serif; font-size: 11px;" >
+                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
+                        <p:separator />
+                        <p:separator />
+                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
+                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
+                        <p:separator />
+                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
+                        <p:menuitem style="background: #CEF0C4" value="regerenrate Ark_ids"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
+                    </p:menuButton>
+                </h:form>
             </fieldset>
-            
-           
-            
-            
-            <ui:include src ="/admin/reorganizing.xhtml" /><br/><br/><br/>
-            <ui:include src="dialogs/Alignement/editAlignementSourceEditDlg.xhtml"/>
-            <ui:include src="/dialogs/baseDeDonnes/miseAJourEditDlg.xhtml"/>
-            <h:panelGroup rendered="#{user1.haveRights(1)}">
-                <fieldset class="fieldPref">
-                    <legend><h:outputText value="#{langueBean.getMsg('bdd.act')}"/></legend><br/>
 
-                    <h:form>
-                        <p:commandButton id="chercheMaJ" value="Vérifier la mise à jour"  update=":idMiseAJourEditDlg" 
-                                         actionListener="#{baseDeDonnes.loadinfoDB()}" oncomplete="PF('miseAJourEditDlg').show()" 
-                                         styleClass="styleButton"/>
 
-                        <br/>
-                        <br/>
 
-                        <p:commandButton id="passForgeted" value="#{langueBean.getMsg('bdd.act')}" 
-                                         actionListener="#{baseDeDonnes.maJBdd}" styleClass="styleButton"/>       
-                    </h:form>
 
-                </fieldset>
-            </h:panelGroup>
         </div>
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">

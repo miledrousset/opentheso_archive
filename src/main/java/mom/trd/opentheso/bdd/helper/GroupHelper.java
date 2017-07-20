@@ -1821,9 +1821,9 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT id_concept FROM concept"
-                            + " WHERE id_thesaurus='" + idThesaurus + "'"
-                            + " AND id_group='" + idGroup + "'";
+                    String query = "SELECT idgroup FROM concept_group_concept"
+                            + " WHERE idthesaurus='" + idThesaurus + "'"
+                            + " AND idgroup='" + idGroup + "'";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -1890,6 +1890,52 @@ public class GroupHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le Domaine existe dans cette langue
+     *
+     * @param ds
+     * @param idGroup
+     * @param idThesaurus
+     * @param idLang
+     * @return boolean
+     */
+    public boolean isHaveTraduction(HikariDataSource ds,
+            String idGroup, String idThesaurus, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select idgroup from concept_group_label where "
+                            + " idgroup ='" + idGroup + "'"
+                            + " and lang = '" + idLang + "'"
+                            + " and idthesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if traduction exist of Group : " + idGroup, sqle);
+        }
+        return existe;
+    }    
 
     /**
      * Fonction qui permet de retourner la liste des Type de Groupe
