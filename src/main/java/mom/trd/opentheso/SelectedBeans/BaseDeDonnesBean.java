@@ -166,22 +166,27 @@ public class BaseDeDonnesBean implements Serializable {
 
     /**
      * Permet de recuperer le mot de pass pour faire le login dans Opentheso
-     * @throws MessagingException 
      */
-    public void oublieMonPass() throws MessagingException {
-        ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
-        
-        forgetPassword.setEmailTitle(langueBean.getMsg("mot.titlePass"));
-        forgetPassword.setEmailMessage(langueBean.getMsg("mot.textPass"));
-        forgetPassword.setPseudoMessage(langueBean.getMsg("mot.textPseudo"));
-        
-        if(forgetPassword.forgotPass(connect.getPoolConnexion(), email))
-        {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("mot.envoy")+ email)); 
-        }
-        else
-        {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.info8")));
+    public void oublieMonPass() {
+        try {
+            ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
+            
+            forgetPassword.setEmailTitle(langueBean.getMsg("mot.titlePass"));
+            forgetPassword.setEmailMessage(langueBean.getMsg("mot.textPass"));
+            forgetPassword.setPseudoMessage(langueBean.getMsg("mot.textPseudo"));
+            
+            if(forgetPassword.forgotPass(connect.getPoolConnexion(), email))
+            { 
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("mot.envoy")+ email));
+            }
+            else
+            {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.info8")));
+            }
+            
+        } catch (MessagingException ex) {
+            Logger.getLogger(BaseDeDonnesBean.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.toString()));
         }
         email = null;
     }

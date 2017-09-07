@@ -690,7 +690,8 @@ public class RelationsHelper {
                     String query = "delete from hierarchical_relationship"
                             + " where id_concept1 ='" + idConcept1 + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
-                            + " and role LIKE 'BT%'"
+                            + " and (role = 'RT'"
+                            + " or role = 'RHP' or role = 'RPO')"
                             + " and id_concept2 = '" + idConcept2 + "'";
 
                     stmt.executeUpdate(query);

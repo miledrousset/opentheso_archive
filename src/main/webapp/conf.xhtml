@@ -138,22 +138,23 @@
             </fieldset>
 
 
-            <fieldset class="fieldAdmin">
-                <legend><h:outputText value="#{langueBean.getMsg('menu.div1')}" /></legend>
-                <h:form>
-                    <p:menuButton  value="Admin" style="font-family:'Palatino linotype',Times,serif; font-size: 11px;" >
-                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
-                        <p:separator />
-                        <p:separator />
-                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
-                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
-                        <p:separator />
-                        <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
-                        <p:menuitem style="background: #CEF0C4" value="regerenrate Ark_ids"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
-                    </p:menuButton>
-                </h:form>
-            </fieldset>
-
+            <h:panelGroup rendered="#{user1.haveRights(2)}">
+                <fieldset class="fieldAdmin">
+                    <legend><h:outputText value="#{langueBean.getMsg('menu.div1')}" /></legend>
+                    <h:form>
+                        <p:menuButton  value="Admin" style="font-family:'Palatino linotype',Times,serif; font-size: 11px;" >
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
+                            <p:separator />
+                            <p:separator />
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
+                            <p:separator />
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
+                        </p:menuButton>
+                    </h:form>
+                </fieldset>
+            </h:panelGroup>
 
 
 

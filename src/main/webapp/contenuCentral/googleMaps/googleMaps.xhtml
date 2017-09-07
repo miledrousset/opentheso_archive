@@ -17,10 +17,10 @@
                     <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
                                      update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show()" 
                                      styleClass="cbEdit" 
-                                     icon="ui-icon-parametre" >
+                                     icon="ui-icon-settings-16" >
                     </p:commandButton>
                     <p:commandButton id="dynaButtonGps" rendered="#{selectedTerme.type != 1}" 
-                                     styleClass="cbEdit" icon="ui-icon-edit" >
+                                     styleClass="cbEdit" icon="ui-icon-edit-16" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonGps" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('gps.nom')}"  actionListener="#{gps.getCoordinatesGps(selectedTerme.idC, selectedTerme.idTheso)}" update=":idGpsEditDlg" oncomplete="PF('gpsEditDlg').show();" style="font-size: 12px;"/>
 

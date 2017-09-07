@@ -48,6 +48,8 @@ input[type="button"], input[type="submit"]{
     color: black !important;
 }
 
+
+
 .infoAcordionPanel{
     color: #3333ff !important;
 }
@@ -70,6 +72,12 @@ input[type="button"], input[type="submit"]{
 
 .ui-icon-supp {
     background: url("../images/iconeSupprimer.gif") no-repeat top left !important;
+    height: 25px;
+    width: 25px;
+}
+
+.ui-icon-add {
+    background: url("../images/add.png") no-repeat top left !important;
     height: 25px;
     width: 25px;
 }
@@ -136,7 +144,18 @@ input[type="button"], input[type="submit"]{
 }
 
 .ui-icon-plus {
-    background: url("../images/plus.gif") no-repeat top left !important;
+    background: url("../images/plus.png") no-repeat top left !important;
+    height: 25px;
+    width: 25px;
+    border-radius: 0px;
+}
+
+
+
+
+
+.ui-icon-addfile {
+    background: url("../images/add-file.png") no-repeat top left !important;
     height: 25px;
     width: 25px;
     border-radius: 0px;
@@ -416,6 +435,109 @@ input[type="button"], input[type="submit"]{
     background: url("../images/facette.png") no-repeat !important;
     background: none;
     border-radius: 0px;
+}
+
+
+/***********************************Nouvelles icones / iconsDB***********************************/
+/* custom color #69B019   #284309 */
+.ui-icon-ok-16 {
+    background: url("../images/ok-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+
+}
+
+.ui-icon-plus-16 {
+    background: url("../images/plus-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+  
+}
+.ui-icon-trash-16 {
+    background: url("../images/trash-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+  
+}
+.ui-icon-edit-16 {
+    background: url("../images/edit-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-icon-settings-16 {
+    background: url("../images/settings-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-icon-search-16.png {
+    background: url("../images/search-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+
+.ui-icon-login-20 {
+    background: url("../images/login-20.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 20px;
+    width: 20px;    
+  
+}
+.ui-icon-logout-20 {
+    background: url("../images/logout-20.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 20px;
+    width: 20px;
+}
+
+.ui-icon-folder-open-14 {
+    background: url("../images/folder-open-14.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+.ui-icon-folder-closed-14 {
+    background: url("../images/folder-closed-14.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+.ui-icon-file-12 {
+    background: url("../images/file-12.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+.ui-icon-help-20 {
+    background: url("../images/help-20.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 20px;
+    width: 20px;
+}
+.styleButton_db {
+    cursor: pointer !important;
+    font-family: "Palatino linotype",Times,serif !important;
+    font-size: 12px !important;
+    color: black !important;
+    background: transparent !important;
+    
+
+    border: none;
+    box-shadow: none;
 }
 
 

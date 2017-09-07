@@ -950,6 +950,10 @@ public class SelectedTerme implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
                 return;
             }
+            if (new TermHelper().isAltLabelExist(connect.getPoolConnexion(), valueEdit, idTheso, idlangue)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error7")));
+                return;
+            }            
             String leNom = valueEdit;
             Term temp = new Term();
             temp.setId_term(idT);

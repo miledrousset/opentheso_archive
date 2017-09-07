@@ -18,10 +18,14 @@
                             <td><h:outputText value="#{langueBean.getMsg('admin.regenerateArk.help')}" />  </td>
                         </tr>
                     </table>
-                    <p:commandButton value="#{langueBean.getMsg('conf.newId')}" actionListener="#{theso.regenerateAllArkId(theso.thesaurus.id_thesaurus)}"   
+                    <p:commandButton value="#{langueBean.getMsg('admin.regenerateArk')}" actionListener="#{theso.regenerateAllArkId(theso.thesaurus.id_thesaurus)}"   
                                      update=":idRegenerateAllConceptId, idRegenerateArkId" styleClass="styleButton">
                         <p:confirm header="Confirmation" message="!!! Attention !!!! cette opération peut prendre beaucoup de temps !" icon="ui-icon-alert"/>
                     </p:commandButton>
+                    <p:commandButton value="#{langueBean.getMsg('admin.regenerateArkInexistant')}" actionListener="#{theso.generateAllInexistantArkId(theso.thesaurus.id_thesaurus)}"   
+                                     update=":idRegenerateAllConceptId, idRegenerateArkId" styleClass="styleButton">
+                        <p:confirm header="Confirmation" message="!!! Attention !!!! cette opération peut prendre beaucoup de temps !" icon="ui-icon-alert"/>
+                    </p:commandButton>                    
                     <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
                         <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />

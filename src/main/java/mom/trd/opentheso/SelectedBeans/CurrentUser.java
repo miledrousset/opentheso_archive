@@ -125,6 +125,7 @@ public class CurrentUser implements Serializable {
         }
         return null;
     }
+ 
 
     /**
      * Connect l'utilisateur si le compte existe

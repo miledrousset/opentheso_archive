@@ -11,7 +11,7 @@
             <div id="imageEdition">
                 <h:form id="formEditTAsso"
                         rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan'))}">
-                    <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit"/>
+                    <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
                          <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" update=":idTermeAssocieEditDlg" oncomplete="PF('termeAssocieEditDlg').show();" style="font-size: 12px;"/>
                          <p:menuitem value="terme special" update=":idTermeAssocieSpecialEditDlg" oncomplete="PF('termeAssocieSpecialEditDlg').show();" style="font-size: 12px;"/>

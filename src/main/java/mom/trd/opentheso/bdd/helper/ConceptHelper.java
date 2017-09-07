@@ -2482,6 +2482,50 @@ public class ConceptHelper {
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
+     * (cette fonction sert pour la génération de la table Permuté
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<String> getAllIdConceptOfThesaurusWithoutArk(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where id_thesaurus = '"
+                            + idThesaurus + "' and id_ark = ''";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdConcept of Thesaurus : " + idThesaurus, sqle);
+        }
+        return tabIdConcept;
+    }    
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * (cette fonction sert pour la génération des identifiants pour Wikidata)
      *
      * @param ds

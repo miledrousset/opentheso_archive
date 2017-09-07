@@ -7,7 +7,6 @@ package mom.trd.opentheso.core.exports.tabulate;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
-import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
@@ -48,11 +47,9 @@ public class ThesaurusDatas {
      * @param idThesaurus
      * @return 
      */
-    DownloadBean downloadBean;
     
     public boolean exportAllDatas(HikariDataSource ds, String idThesaurus) {
         
-        this.downloadBean =downloadBean;
         // récupération du thésaurus 
         this.nodeThesaurus = new ThesaurusHelper().getNodeThesaurus(ds, idThesaurus);
         

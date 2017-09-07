@@ -1,0 +1,93 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <p:dialog id="idExportAltLabel"  header="#{langueBean.getMsg('edit.exportAltlabel')}" styleClass="styleText2" widgetVar="exportAltLabel" modal="true" resizable="false"  >
+            <h:form >
+                <h:panelGroup>
+                    <h:outputText value="#{langueBean.getMsg('edit.exportAltlabel')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
+
+
+
+                    <div style="align-content: center">
+
+
+                        <h:panelGroup  id="panelExportAltLabel" rendered="#{user1.haveRights(2)}">
+                        <p:outputLabel value="type : CSV" />  
+
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                <p:outputLabel for="idLangExport" value="#{langueBean.getMsg('export.langOfTheso')} :" />    
+                                <p:selectOneMenu id="idLangExport" value="#{skosExportBean.singleLanguageCodeSelected}">
+                                    <f:selectItems value="#{skosExportBean.getCodesLanguagesOfTheso()}"/>
+                                </p:selectOneMenu>
+
+                            </h:panelGrid>
+                            
+
+
+                        </h:panelGroup>
+
+                        <br/>
+
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Altlabel, stop_export_Altlabel);PF('pbAjaxAltLabel').start();" > 
+
+                            <p:fileDownload value="#{downloadBean.getAllAltLabels(skosExportBean.idTheso, 
+                                                     skosExportBean.singleLanguageCodeSelected)}" />  
+                        </p:commandButton>
+
+                        <p:dialog modal="true" widgetVar="exportWaitAltLabel" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
+                            <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
+
+
+
+                            <br />
+                            <p:progressBar widgetVar="pbAjaxAltLabel" ajax="true" value="#{downloadBean.progress_per_100}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+
+
+
+
+
+
+                        </p:dialog>
+
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <p:commandButton id="cbAjAlignAuto2" title="#{langueBean.getMsg('btnBack')}" 
+                                         update="idExportAltLabel"
+                                         action="PF('exportAltLabel').hide();"
+                                         icon="ui-icon-retour"
+                                         styleClass="styleButton"  style="align-content: flex-end"/>
+                    </div>
+                    <br/>
+
+
+                </h:panelGroup>
+
+
+            </h:form> 
+        </p:dialog>
+        <script type="text/javascript">
+            function start_export_Altlabel() {
+                PF('exportWaitAltLabel').show();
+            }
+
+            function stop_export_Altlabel() {
+                PF('exportWaitAltLabel').hide();
+                PF('exportAltLabel').hide();
+
+            }
+        </script> 
+
+    </ui:composition>
+
+
+
+
+
+
+

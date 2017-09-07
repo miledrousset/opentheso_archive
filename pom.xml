@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.3.1</version>
+    <version>4.3.2</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -23,7 +23,7 @@
             <version>2.2</version>
         </dependency>
 
-        
+
         
         
     <!-- https://mvnrepository.com/artifact/org.dspace/handle 
@@ -238,14 +238,14 @@
         <dependency>  
             <groupId>org.primefaces</groupId>  
             <artifactId>primefaces</artifactId>  
-            <version>5.3</version>  
+            <version>6.1</version>  
         </dependency>
         
        <!-- Attention, il faut aussi tester la version 2.5.1 qui ne passe pas sur le serveur Debian avec java 1.7.0_85 -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.4.3</version>
+            <version>2.6.3</version>
             <type>jar</type>
         </dependency>   
 
@@ -262,6 +262,9 @@
             <artifactId>jaxrs-ri</artifactId>
             <version>2.24.1</version>
         </dependency>
+        
+        
+        <!-- Pour l'envoie de Mail> 
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -271,9 +274,17 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>smtp</artifactId>
             <version>1.5.2</version>
+        </dependency> -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.0</version>
         </dependency>
-        
-
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>smtp</artifactId>
+            <version>1.6.0</version>
+        </dependency>
         
 
         <dependency>

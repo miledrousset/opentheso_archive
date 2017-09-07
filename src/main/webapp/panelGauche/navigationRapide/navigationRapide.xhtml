@@ -22,7 +22,7 @@
                 <!-- gestion des domaines ou groupes --> 
                 <td>
                     <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
-                        <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit" title="Tools"/>
+                        <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="Tools"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
 
                             <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>

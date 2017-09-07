@@ -17,7 +17,7 @@
                     <td><h:outputText value="#{itemTrad.value} (#{itemTrad.key})" /></td>
                     <td>
                         <h:form>
-                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-edit" 
+                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-edit-16" 
                                              actionListener="#{selectedTerme.traductionEnCours(itemTrad.value, itemTrad.key)}" update=":contenuDroite3,:idModifierTraductionEditDlg,:idEditTraductionDlg" 
                                              oncomplete="PF('editTraductionDlg').show(); PF('modifierTraductionEditDlg').hide();">
                                 

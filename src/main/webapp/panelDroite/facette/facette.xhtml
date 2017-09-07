@@ -11,7 +11,7 @@
                     <div id="imageEdition">
                         <h:form id="formEditFacette" target="_blanc"
                                 rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
-                            <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit" 
+                            <p:commandButton id="cbEditThesoFacette" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit-16" 
                                               update=":idAddToFacetteDlg" oncomplete="PF('addToFacetteDlg').show()" />
                         </h:form>
                     </div>

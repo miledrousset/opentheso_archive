@@ -11,7 +11,7 @@
         <div class="contenuTerme">
             <div id="imageEdition">
                 <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
-                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" update=":idGpsEditDlg"/>
+                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
 
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"  value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
@@ -50,7 +50,7 @@
                 </h:form>
                 <!--options pour les orphelins -->
                 <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine == 'Orphan')}">
-                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit" />
+                    <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>

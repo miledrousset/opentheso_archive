@@ -404,7 +404,9 @@ public class SelectedThesaurus implements Serializable {
     }
 
     public void majPref() {
-        if(user == null || user.getNodePreference() == null) return;
+        if (user == null || user.getNodePreference() == null) {
+            return;
+        }
         user.initUserNodePref(thesaurus.getId_thesaurus());
         cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
         version = "";
@@ -522,21 +524,20 @@ public class SelectedThesaurus implements Serializable {
         }
 
     }
-    
+
     /**
-     * Permet de vérifier si les Identifiants Ark sont valides 
-     * s'ils n'existent pas, on les ajoutes
-     * s'ils exient, on ne fait rien.
-     * 
-     * @param idTheso 
-     * #MR
+     * Permet de vérifier si les Identifiants Ark sont valides s'ils n'existent
+     * pas, on les ajoutes s'ils exient, on ne fait rien.
+     *
+     * @param idTheso #MR
      */
-   public void regenerateAllArkId(String idTheso) {
+    public void regenerateAllArkId(String idTheso) {
+        ConceptHelper conceptHelper = new ConceptHelper();
         try {
             ArrayList<String> idGroup = null;
 
             //group
-          /*  try {
+            /*  try {
                 if(!regenArkIdGroup(conn, idTheso)) {
                     conn.rollback();
                 }
@@ -545,10 +546,13 @@ public class SelectedThesaurus implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
                 throw new Exception("Error while regen id group ");
             }*/
-
             //concept
             try {
-                regenArkIdConcept(idTheso);
+                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
+                if (idConcepts == null || idConcepts.isEmpty()) {
+                    throw new Exception("No concept in this thesaurus");
+                }
+                regenArkIdConcept(idTheso, idConcepts);
             } catch (Exception ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
                 throw new Exception("Error while regen id concept ");
@@ -559,16 +563,56 @@ public class SelectedThesaurus implements Serializable {
         } catch (SQLException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
         } catch (Exception ex) {
-        }  
-   }
-    
+        }
+    }
+
+    /**
+     * Permet de générere les identifiants Ark manquants
+     *
+     * @param idTheso #MR
+     */
+    public void generateAllInexistantArkId(String idTheso) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        try {
+            ArrayList<String> idGroup = null;
+
+            //group
+            /*  try {
+                if(!regenArkIdGroup(conn, idTheso)) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
+                throw new Exception("Error while regen id group ");
+            }*/
+            //concept
+            try {
+                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
+                if (idConcepts == null || idConcepts.isEmpty()) {
+                    throw new Exception("No concept in this thesaurus");
+                }
+
+                regenArkIdConcept(idTheso, idConcepts);
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
+                throw new Exception("Error while regen id concept ");
+            }
+            maj();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+
+        } catch (SQLException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
+        } catch (Exception ex) {
+        }
+    }
+
     /**
      * Cette fonction remplace tout les id des groupes du théso
      *
      * @param conn
      * @param idTheso
-     * @return la liste des nouveaux id group
-     * #MR
+     * @return la liste des nouveaux id group #MR
      */
     private boolean regenArkIdGroup(Connection conn, String idTheso) throws Exception {
 
@@ -579,51 +623,43 @@ public class SelectedThesaurus implements Serializable {
             throw new Exception("No group in this thesaurus");
         }
 
-        
         //vérification et génération des nouveaux id Ark
         for (String idGroup : idGroups) {
-           // if(!) return false;
+            // if(!) return false;
         }
         return true;
-    }  
-
+    }
 
     /**
      * Cette fonction remplace tous les id des concepts du théso
      */
-    private boolean regenArkIdConcept(String idTheso) throws Exception {
+    private boolean regenArkIdConcept(String idTheso, ArrayList<String> idConcepts) throws Exception {
         //récup les concepts
         ConceptHelper conceptHelper = new ConceptHelper();
-        ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
-        if (idConcepts == null || idConcepts.isEmpty()) {
-            throw new Exception("No concept in this thesaurus");
-        }
 
         /*Vérification et génération des nouveaux id Ark*/
         for (String idConcept : idConcepts) {
-            if(!conceptHelper.regenerateArkId(connect.getPoolConnexion(),
+            if (!conceptHelper.regenerateArkId(connect.getPoolConnexion(),
                     nodePreference.getCheminSite(), idConcept,
-                    thesaurus.getLanguage(),thesaurus.getId_thesaurus())) {
-                
+                    thesaurus.getLanguage(), idTheso)) {
+
                 throw new Exception("BDD error");
             }
         }
         return true;
-    }   
-    
-    
-    
+    }
 
     public void reGenerateConceptId(String idConcept) {
         ConceptHelper conceptHelper = new ConceptHelper();
 
-        if(conceptHelper.setIdConceptToNumeric(connect.getPoolConnexion()
-                ,thesaurus.getId_thesaurus(), idConcept)) {
+        if (conceptHelper.setIdConceptToNumeric(connect.getPoolConnexion(),
+                 thesaurus.getId_thesaurus(), idConcept)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate id finished"));
-        } else 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ","while regenerate id for concept"));
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate id for concept"));
+        }
     }
-    
+
     /**
      * Cette fonction remplace tout les id des groupes du théso
      *
@@ -1093,7 +1129,7 @@ public class SelectedThesaurus implements Serializable {
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void maj() {
-        
+
         tree.getSelectedTerme().reInitTerme();
         tree.reInit();
         tree.initTree(null, null);
@@ -1143,7 +1179,7 @@ public class SelectedThesaurus implements Serializable {
         if (selectedTerme != null) {
             selectedTerme.initTerme();
         }
-        
+
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         if (thesaurusHelper.isThesaurusExiste(connect.getPoolConnexion(), defaultThesaurusId)) {
             thesaurus = thesaurusHelper.getThisThesaurus(connect.getPoolConnexion(), defaultThesaurusId, workLanguage);
@@ -1159,7 +1195,7 @@ public class SelectedThesaurus implements Serializable {
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }
-        
+
         user.initUserNodePref(thesaurus.getId_thesaurus());
         majPref();
     }
@@ -1723,18 +1759,18 @@ public class SelectedThesaurus implements Serializable {
         }
         return arrayTheso;
     }
-    
+
     private ArrayList<Entry<String, String>> allTheso;
 
     public ArrayList<Entry<String, String>> getAllTheso() {
         allTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurusOfAllTheso(connect.getPoolConnexion(), workLanguage).entrySet());
-        return allTheso;  
+        return allTheso;
     }
 
     public void setAllTheso(ArrayList<Entry<String, String>> allTheso) {
         this.allTheso = allTheso;
     }
-    
+
     public void setArrayTheso(ArrayList<Entry<String, String>> arrayTheso) {
         this.arrayTheso = arrayTheso;
     }
@@ -1906,7 +1942,7 @@ public class SelectedThesaurus implements Serializable {
             Term value;
             for (NodeFacet nf : temp) {
                 value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-                if(value == null) {
+                if (value == null) {
                     mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + nf.getIdConceptParent() + ")");
                 } else {
                     mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value.getLexical_value() + ")");

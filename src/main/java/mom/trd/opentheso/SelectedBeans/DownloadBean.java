@@ -24,8 +24,11 @@ import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
+import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
+import mom.trd.opentheso.core.exports.helper.ExportThesaurus;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.exports.pdf.WritePdf;
@@ -260,9 +263,13 @@ public class DownloadBean implements Serializable {
         progress_per_100 = 0;
         progress_abs = 0;
         ConceptHelper conceptHelper = new ConceptHelper();
+
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
         sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
         exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
         exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
         exportRdf4jHelper.addConcept(idTheso, this, selectedLanguages);
@@ -444,9 +451,11 @@ public class DownloadBean implements Serializable {
                 extention = "_turtle.ttl";
                 break;
         }
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
         
+        if(nodePreference == null) return null;
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,nodePreference.getCheminSite());
         exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
 
@@ -550,9 +559,11 @@ public class DownloadBean implements Serializable {
                 extention = "_turtle.ttl";
                 break;
         }
-
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
         exportRdf4jHelper.addBranch(idTheso, idConcept);
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
 
@@ -778,6 +789,7 @@ public class DownloadBean implements Serializable {
      * second cas l'utilisateur télécharge de fichier.
      *
      * @param idTheso
+     * @return 
      */
     public StreamedContent thesoCsv(String idTheso) {
 
@@ -808,8 +820,13 @@ public class DownloadBean implements Serializable {
         progress_per_100 = 0;
         progress_abs = 0;
 
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
+        sizeOfTheso = new ConceptHelper().getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
+        
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
-        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,user.getNodePreference().getCheminSite());
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
         exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
         exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
         exportRdf4jHelper.addConcept(idTheso, this, selectedLanguages);
@@ -821,6 +838,27 @@ public class DownloadBean implements Serializable {
         file = new DefaultStreamedContent(stream, "application/pdf", "test.pdf");
 
         return file;
+    }
+    
+    public StreamedContent getAllAltLabels(String idTheso,
+            String codeLang) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        ExportThesaurus exportThesaurus = new ExportThesaurus();
+        StringBuilder stringBuilder = exportThesaurus.exportAltLabel(connect.getPoolConnexion(),
+                idTheso, codeLang);
+        if(stringBuilder == null) return null;
+
+        InputStream stream;
+        try {
+            stream = new ByteArrayInputStream(stringBuilder.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "AltLabels_" + idTheso +".csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;        
     }
 
     /**

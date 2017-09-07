@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,14 +62,14 @@ public class GpsBeans {
     private String codeid;
 
     private boolean integrerTraduction = true;
-    private boolean reemplacerTraduction = true;
+    private boolean remplacerTraduction = true;
     private boolean alignementAutomatique = true;
 
     // variables pour le lot
     private AlignementSource alignement_source = new AlignementSource();
 
     private AlignementPreferences alignementPreferencesAlignement;
-    private ArrayList<String> listConceptTrates = new ArrayList<>();
+    private ArrayList<String> listConceptTraites = new ArrayList<>();
     private ArrayList<String> listOfChildrenInConcept;
     private Map<Integer, String> options;
     private NodeAlignment nodeAli;
@@ -199,6 +200,9 @@ public class GpsBeans {
                 if (alignementAutomatique) {
                     status = alignementautomatique(idTerm);
                 }
+                if (integrerTraduction) {
+                    status = integreTraduction(idTerm, langEnCour);
+                }
                 if (listOfChildrenInConcept != null) {
                     nextPosition();
                 }
@@ -222,63 +226,67 @@ public class GpsBeans {
         if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), theUser.getUser().getId(),
                 alignment_choisi.getName(), alignementPreferences.getSource(),
                 alignment_choisi.getIdUrl(), 1, id_concept, id_theso, alignementPreferences.getId())) {
-            if (integrerTraduction) {
-                status = integreTraduction(idTerm);
-            }
+
         }
         return status;
     }
 
     /**
-     * Fait l'intregration du traduction du term
+     * Permet d'intégrer les traductions à un Concept venant de l'alignement
+     * source On intègre que les traductions disponible pour le thésaurus en
+     * cours
      *
      * @param idTerm
      * @return
      */
-    private boolean integreTraduction(String idTerm) {
+    private boolean integreTraduction(String idTerm, String langEnCour) {
         boolean status = false;
         LanguageHelper languageHelper = new LanguageHelper();
-        listLanguesInTheso = new ArrayList<>();
+        TermHelper termHelper = new TermHelper();
+
+        // la liste des langues du thésaurus 
         listLanguesInTheso = languageHelper.getLanguagesOfThesaurus(connect.getPoolConnexion(), id_theso);
+
         if (alignment_choisi.getAlltraductions() != null) {
             if (!alignment_choisi.getAlltraductions().isEmpty()) {
-                for (NodeLang languesOfGps : alignment_choisi.getAlltraductions()) {
-                    for (Languages_iso639 langueTheso : listLanguesInTheso) {
-                        if (langueTheso.getId_iso639_1().equals(languesOfGps.getCode())) {
-                            term = new Term();
-                            term.setLexical_value(languesOfGps.getValue());
-                            term.setId_term(idTerm);
-                            term.setId_thesaurus(id_theso);
-                            term.setLang(languesOfGps.getCode());
-                            term.setSource("");
-                            term.setStatus("");
-                            if (reemplacerTraduction) {
-                                status = reemplacerTraduction(term);
-                            }
+
+                ArrayList<String> langsOfTheso = new ArrayList<>();
+                ArrayList<NodeLang> ourLangs = new ArrayList<>();
+
+                // classer les langues dasn une liste 
+                for (Languages_iso639 languages_iso639 : listLanguesInTheso) {
+                    if (!langEnCour.equalsIgnoreCase(languages_iso639.getId_iso639_1())) // on ignore la langue en cours 
+                    {
+                        langsOfTheso.add(languages_iso639.getId_iso639_1());
+                    }
+                }
+
+                // filtrer les langues récupérées de l'alignement et qui sont dans notre thésaurus 
+                for (NodeLang traduction : alignment_choisi.getAlltraductions()) {
+                    if (langsOfTheso.contains(traduction.getCode())) {
+                        ourLangs.add(traduction);
+                    }
+                }
+                Term termTemp = new Term();
+                for (NodeLang ourLang : ourLangs) {
+                    termTemp.setLexical_value(ourLang.getValue());
+                    termTemp.setId_term(idTerm);
+                    termTemp.setId_thesaurus(id_theso);
+                    termTemp.setLang(ourLang.getCode());
+                    termTemp.setSource("");
+                    termTemp.setStatus("");
+                    if (termHelper.isTermExist(connect.getPoolConnexion(),
+                            termTemp.getLexical_value(), termTemp.getId_thesaurus(), termTemp.getLang())) {
+                        if (remplacerTraduction) { // si le terme existe et on a autorisé le remplacement, on remplace la traduction
+                            termHelper.updateTermTraduction(connect.getPoolConnexion(), termTemp, theUser.getUser().getId());
                         }
+                    } else { // on ajoute simplement la traduction
+                        termHelper.addTraduction(connect.getPoolConnexion(), termTemp, theUser.getUser().getId());
                     }
                 }
             }
         }
         return status;
-    }
-
-    /**
-     * Reemplace les traductions de la BDD pour les nouvelles
-     *
-     * @param term
-     * @return
-     */
-    private boolean reemplacerTraduction(Term term) {
-        if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
-            return false;
-        } else if (!new TermHelper()
-                .isTermExist(connect.getPoolConnexion(), term.getLexical_value(), term.getId_thesaurus(), term.getLang())) { //ExitsTraduction(connect.getPoolConnexion(), term)) {
-            if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, theUser.getUser().getId())) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private void initcoordonees() {
@@ -288,7 +296,7 @@ public class GpsBeans {
 
     public void reinitBoolean() {
         integrerTraduction = true;
-        reemplacerTraduction = true;
+        remplacerTraduction = true;
         alignementAutomatique = true;
     }
 
@@ -308,7 +316,7 @@ public class GpsBeans {
             }
             GpsHelper gpsHelper = new GpsHelper();
             if (!gpsHelper.garderPreferences(connect.getPoolConnexion(), id_Theso,
-                    integrerTraduction, reemplacerTraduction, alignementAutomatique, alignementPreferences.getId(), id_user)) {
+                    integrerTraduction, remplacerTraduction, alignementAutomatique, alignementPreferences.getId(), id_user)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
                 //message error
                 status = false;
@@ -445,7 +453,7 @@ public class GpsBeans {
         if (fin) {
             return;
         }
-        listConceptTrates.add(id_concept);
+        listConceptTraites.add(id_concept);
         erreur = "";
         GpsHelper gpsHelper = new GpsHelper();
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -468,12 +476,13 @@ public class GpsBeans {
             }
             comprobationFin();
             while (gpsHelper.isHaveCoordinate(connect.getPoolConnexion(),
-                    id_concept, id_theso)) {
+                    id_concept, id_theso) ) {
                 position++;
                 if (position < listOfChildrenInConcept.size()) {
                     id_concept = listOfChildrenInConcept.get(position);
                 }
                 comprobationFin();
+                if(fin) return;
             }
             nomduterm = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id_concept,
                     selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
@@ -537,7 +546,7 @@ public class GpsBeans {
                     .getName()).log(Level.SEVERE, null, ex);
         }
 
-        listConceptTrates.remove(id_concept);
+        listConceptTraites.remove(id_concept);
 
     }
 
@@ -594,7 +603,7 @@ public class GpsBeans {
         dejaTratees = (alignementPreferencesAlignement.getId_concept_tratees()).split("#");
         ArrayList<String> conceptFait = new ArrayList<>();
         conceptFait.addAll(Arrays.asList(dejaTratees));
-        listConceptTrates = conceptFait;
+        listConceptTraites = conceptFait;
 
         if (!conceptFait.isEmpty()) {
             for (String traite : conceptFait) {
@@ -606,7 +615,7 @@ public class GpsBeans {
         if (listOfChildrenInConcept.isEmpty()) {
             last = true;
             fin = true;
-            message = "tout la branche traités";
+            message = "toute la branche est traitée";
             return;
         }
         comprobationFin();
@@ -662,8 +671,10 @@ public class GpsBeans {
 
     public void doForLot(int id_user) {
         ConceptHelper conceptHelper = new ConceptHelper();
-        String id_term = conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(),
-                id_concept, id_theso, id_langue);
+        TermHelper termHelper = new TermHelper();
+        
+        String id_term = termHelper.getIdTermOfConcept(connect.getPoolConnexion(),
+                id_concept, id_theso);
         try {
             doAll(id_concept, id_theso, id_user, id_langue, id_term);
 
@@ -682,7 +693,7 @@ public class GpsBeans {
     public boolean enregister_Des_Progres(int id_user) {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         if (optionWorkFlow == optionOfAlignement) {
-            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart, listConceptTrates, alignementPreferences.getId())) {
+            if (!alignmentHelper.validate_Preferences(connect.getPoolConnexion(), id_theso, id_user, id_concept_depart, listConceptTraites, alignementPreferences.getId())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ne peux pas faire uptdate de preferences"));
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("alig.ok") + " :", ""));
@@ -705,7 +716,7 @@ public class GpsBeans {
         gpsPreferences = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, ((AlignementSource) event.getObject()).getId());
         integrerTraduction = gpsPreferences.isGps_integrertraduction();
         alignementAutomatique = gpsPreferences.isGps_alignementautomatique();
-        reemplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
+        remplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
         //   alignement_source = "" + gpsPreferences.getId_alignement_source();
         for (AlignementSource alignementSource : alignementSources) {
             if (((AlignementSource) event.getObject()).getId() == alignementSource.getId()) {
@@ -728,7 +739,7 @@ public class GpsBeans {
             gpsPreferences = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, alignement_source.getId());
             integrerTraduction = gpsPreferences.isGps_integrertraduction();
             alignementAutomatique = gpsPreferences.isGps_alignementautomatique();
-            reemplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
+            remplacerTraduction = gpsPreferences.isGps_reemplacertraduction();
         }
     }
 
@@ -857,12 +868,12 @@ public class GpsBeans {
         this.integrerTraduction = integrerTraduction;
     }
 
-    public boolean isReemplacerTraduction() {
-        return reemplacerTraduction;
+    public boolean isRemplacerTraduction() {
+        return remplacerTraduction;
     }
 
-    public void setReemplacerTraduction(boolean reemplacerTraduction) {
-        this.reemplacerTraduction = reemplacerTraduction;
+    public void setRemplacerTraduction(boolean remplacerTraduction) {
+        this.remplacerTraduction = remplacerTraduction;
     }
 
     public boolean isAlignementAutomatique() {
@@ -1105,12 +1116,12 @@ public class GpsBeans {
         this.nodePreference = nodePreference;
     }
 
-    public ArrayList<String> getListConceptTrates() {
-        return listConceptTrates;
+    public ArrayList<String> getListConceptTraites() {
+        return listConceptTraites;
     }
 
-    public void setListConceptTrates(ArrayList<String> listConceptTrates) {
-        this.listConceptTrates = listConceptTrates;
+    public void setListConceptTraites(ArrayList<String> listConceptTraites) {
+        this.listConceptTraites = listConceptTraites;
     }
 
     public NodeAlignment getNodeAli() {

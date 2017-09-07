@@ -13,7 +13,7 @@
                     <h:form id="formEditTGen" 
                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)}">
 
-                        <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit"/>
+                        <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
                             <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgDlg" oncomplete="PF('addTgDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" update=":idDeleteTgDlg" oncomplete="PF('deleteTgDlg').show();" style="font-size: 12px;"/>
