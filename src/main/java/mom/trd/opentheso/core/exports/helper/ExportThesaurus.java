@@ -7,7 +7,10 @@ package mom.trd.opentheso.core.exports.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
+import java.util.List;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.altlabel.WriteAltLabel;
 import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
 
@@ -56,5 +59,27 @@ public class ExportThesaurus {
         return writeAltLabel.getAllAltLabels();
     }
     
+    /**
+     * Permet d'exporter tout le thésaurus en filtrant par langue et Groupe
+     * @param ds
+     * @param idThesaurus
+     * @param selectedLanguages
+     * @param selectedGroups
+     * @return 
+     */
+    public boolean exportAllDatas(HikariDataSource ds,
+            String idThesaurus, 
+             List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups){
+        this.thesaurusDatas = new ThesaurusDatas();
+        if(!thesaurusDatas.exportAllDatas(ds,
+                idThesaurus, 
+                selectedLanguages, 
+                selectedGroups)){
+            return false;
+        }
+        return true;
+    }    
+   
     
 }

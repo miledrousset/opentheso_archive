@@ -22,10 +22,11 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.from')}" /> : </td>
                             <td>
                                 <p:selectOneMenu value="#{autoComp.idOld}">
-                                    <f:selectItems value="#{selectedTerme.termeGenerique}" var="tg" itemValue="#{tg.key}"  itemLabel="#{tg.value}" />
+                                    <f:selectItems value="#{selectedTerme.nodeGroupIdLabel}" var="group" itemValue="#{group.idGroup}"  itemLabel="#{group.label}" />
                                 </p:selectOneMenu>
                             </td>
                         </tr>
+                        <h:outputText value="#{selectedTerme.nodeGroupIdLabel}" />
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
                             <td>

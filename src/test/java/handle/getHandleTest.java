@@ -68,8 +68,8 @@ public class getHandleTest {
         String xmlRecord = "";
         try {
          //   String query = "20.500.11942/TEST";
-            String requete = "http://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/TEST";
-            
+         //   String requete = "http://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/TEST";
+            String requete = "http://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/opentheso3_1";   
             URL myURL = new URL(requete);// + URLEncoder.encode(query, "utf8"));
             HttpURLConnection myURLConnection = (HttpURLConnection)myURL.openConnection();
             myURLConnection.setRequestMethod("GET");

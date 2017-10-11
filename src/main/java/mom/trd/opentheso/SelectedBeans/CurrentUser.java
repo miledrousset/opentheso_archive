@@ -20,7 +20,7 @@ import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
-import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.tools.MD5Password;
 
 @ManagedBean(name = "user1", eager = true)

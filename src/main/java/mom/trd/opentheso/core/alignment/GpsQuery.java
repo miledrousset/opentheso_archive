@@ -139,6 +139,18 @@ public class GpsQuery {
                             nodeAlignment.setToponymName(nodeList.item(j).getTextContent());
                         }
                     }
+                    nodeList = element.getElementsByTagName("adminName1");
+                    if (nodeList != null && nodeList.getLength() > 0) {
+                        for (int j = 0; j < nodeList.getLength(); j++) {
+                            nodeAlignment.setAdminName1(nodeList.item(j).getTextContent());
+                        }
+                    }
+                    nodeList = element.getElementsByTagName("adminName2");
+                    if (nodeList != null && nodeList.getLength() > 0) {
+                        for (int j = 0; j < nodeList.getLength(); j++) {
+                            nodeAlignment.setAdminName2(nodeList.item(j).getTextContent());
+                        }
+                    }                    
                     nodeList = element.getElementsByTagName("alternateName");
                     if (nodeList != null && nodeList.getLength() > 0) {
                         for (int j = 0; j < nodeList.getLength(); j++) {

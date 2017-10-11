@@ -458,8 +458,11 @@ public class ImportRdf4jHelper {
                     for (String idGrp : acs.idGrps) {
                         acs.concept.setTopConcept(acs.isTopConcept);
                         acs.concept.setIdGroup(idGrp);
-                        acs.conceptHelper.insertConceptInTable(ds, acs.concept,
-                                adressSite, useArk, idUser);
+                        
+                        if(!acs.conceptHelper.insertConceptInTable(ds, acs.concept,
+                                adressSite, useArk, idUser)){
+                            System.out.println("Erreur sur le Concept = " + acs.concept.getIdConcept());
+                        }
                     }
                 }
 
@@ -477,8 +480,17 @@ public class ImportRdf4jHelper {
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
 
+        if(acs.concept.getIdConcept().equalsIgnoreCase("gentilhomme_ordinaire_de_la_maison_du_roi")) {
+            int k = 0;
+        }
+        
         for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
-            acs.conceptHelper.addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser);
+            if(!acs.conceptHelper.addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
+              /*  conn.commit();
+                conn.close();
+                conn = ds.getConnection();*/
+                System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+            } 
         }
         conn.commit();
         conn.close();

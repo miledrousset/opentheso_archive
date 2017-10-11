@@ -7,17 +7,11 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
-import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
-import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
-import mom.trd.opentheso.core.imports.tabulate.ReadFileTabule;
+import mom.trd.opentheso.bdd.helper.nodes.NodeConceptArkId;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,7 +49,8 @@ public class TestGetSiteMap {
         HikariDataSource conn = openConnexionPool();
         
         ConceptHelper conceptHelper = new ConceptHelper();
-        ArrayList<String> allIds = conceptHelper.getAllIdConceptOfThesaurus(conn, "TH_1");
+        ArrayList<NodeConceptArkId> nodeConceptArkIds = conceptHelper.getAllConceptArkIdOfThesaurus(conn, "TH_1");
+    //    ArrayList<String> allIds = conceptHelper.getAllIdConceptOfThesaurus(conn, "TH_1");
         
         String url;
 	Date actuelle = new Date();
@@ -76,8 +71,41 @@ public class TestGetSiteMap {
    //     System.out.println( formater.format( date ) ); 
 
         
-        for (String allId : allIds) {
+
+        for (NodeConceptArkId nodeConceptArkId : nodeConceptArkIds) {
+            // http://ark.frantiq.fr/ark:/26678/pcrtoBSSWiOt51
+            // c'est l'URL qu'il faut composer.
+
+            siteMap.append("  <url>\n");
+            siteMap.append("    <loc>");
+
+        //    siteMap.append("http://pactols.frantiq.fr/opentheso/?idc=");
             
+        //    if(nodeConceptArkId.getIdArk() == null || nodeConceptArkId.getIdArk().isEmpty()){
+                siteMap.append("http://pactols.frantiq.fr/opentheso/?idc=");
+                siteMap.append(nodeConceptArkId.getIdConcept());
+                siteMap.append("&amp;idt=TH_1");
+         /*   } else {
+                siteMap.append("http://ark.frantiq.fr/ark:/");
+                siteMap.append(nodeConceptArkId.getIdArk());
+            }*/
+            //siteMap.append(url);
+            siteMap.append("</loc>\n");
+            
+            if(dat != null) {
+                siteMap.append("    <lastmod>");
+                siteMap.append(dat);
+                siteMap.append("</lastmod>\n");
+                
+                siteMap.append("    <changefreq>");
+                siteMap.append("monthly");
+                siteMap.append("</changefreq>\n");
+                
+                siteMap.append("    <priority>0.9</priority>\n");
+            }
+            siteMap.append("  </url>\n");            
+        }
+        /*    for (String allId : allIds) { 
             // http://pactols.frantiq.fr/opentheso/?idc=13412&idt=TH_1
             // c'est l'URL qu'il faut composer.
             
@@ -86,8 +114,10 @@ public class TestGetSiteMap {
 
             siteMap.append("  <url>\n");
             siteMap.append("    <loc>");
-        //    siteMap.append("http://ark.frantiq.fr/ark:/");
-            siteMap.append("http://pactols.frantiq.fr/opentheso/?idc=");
+            siteMap.append("http://ark.frantiq.fr/ark:/");
+        //    siteMap.append("http://pactols.frantiq.fr/opentheso/?idc=");
+            
+            
             siteMap.append(allId);
             siteMap.append("&amp;idt=TH_1");
          //   siteMap.append(url);
@@ -100,6 +130,9 @@ public class TestGetSiteMap {
             }
             siteMap.append("  </url>\n");
         }
+        */
+        
+        
         siteMap.append("</urlset>");
         
         System.out.println(siteMap.toString());
@@ -139,12 +172,12 @@ public class TestGetSiteMap {
          config.addDataSourceProperty("databaseName", "OTW");
          */
         config.addDataSourceProperty("user", "pactols");
-        config.addDataSourceProperty("password", "frantiq2014");
+        config.addDataSourceProperty("password", "pactols");
         config.addDataSourceProperty("databaseName", "pactols");
 
       //  config.addDataSourceProperty("serverName", "localhost");
-        config.addDataSourceProperty("portNumber", "5432");
-        config.addDataSourceProperty("serverName", "opentheso.mom.fr");
+        config.addDataSourceProperty("portNumber", "5433");
+        config.addDataSourceProperty("serverName", "localhost");
         //    config.addDataSourceProperty("serverName", "193.48.137.88");
         HikariDataSource poolConnexion1 = new HikariDataSource(config);
         return poolConnexion1;

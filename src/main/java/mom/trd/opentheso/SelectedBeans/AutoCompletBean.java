@@ -268,8 +268,8 @@ public class AutoCompletBean implements Serializable {
         // terme.getIdC() est le terme séléctionné dans l'arbre
         // terme.getIdTheso() est l'id du thésaurus
         
-        ConceptHelper conceptHelper = new ConceptHelper();
-        GroupHelper groupHelper = new GroupHelper();
+
+
         if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
             return false;

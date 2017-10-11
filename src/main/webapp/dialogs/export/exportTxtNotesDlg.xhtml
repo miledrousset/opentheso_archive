@@ -8,41 +8,35 @@
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:p="http://primefaces.org/ui">
 
-        <p:dialog id="idExportcsvDlg"  header="#{langueBean.getMsg('edit.exportcsv')}" styleClass="styleText2" widgetVar="exportcsvDlg" modal="true" resizable="false"  >
+        <p:dialog id="idExportTxtNotesDlg"  header="#{langueBean.getMsg('edit.export')} _txt_csv" styleClass="styleText2" widgetVar="exportTxtNotesDlg" modal="true" resizable="false"  >
             <h:form >
                 <h:panelGroup>
                     <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
 
+
+
+                    <!-- Ajouter alignement automatique 
+                    Cette function appelarais a  AjouterAutomatique2EditDlg -->
+
                     <div>
                         <h:panelGroup  id="panelExport" rendered="#{user1.haveRights(2)}">
 
-                            <fieldset class="fieldLang"  >
-                                <legend><h:outputText value="#{langueBean.getMsg('export.langOfTheso')}" styleClass="textInfoSmall" /></legend>
 
-                                <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
-                                    <p:tab title="..."    titleStyleClass="titleAccordion">
-
-                                        <p:dataTable id="checkboxLang" var="langOfTheso" value="#{skosExportBean.languagesOfTheso}" selection="#{skosExportBean.selectedLanguages}" rowKey="#{langOfTheso.code}" style="width:300px;margin-bottom:0">
-                                            <f:facet name="header" >
-                                            </f:facet>
-                                            <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
-                                            <p:column headerText="Id" width="30" styleClass="styleText2" >
-                                                <h:outputText value="#{langOfTheso.code}" styleClass="styleText2"/>
-                                            </p:column>
-                                            <p:column headerText="Langue" styleClass="styleText2">
-                                                <h:outputText value="#{langOfTheso.value}" styleClass="styleText2"/>
-                                            </p:column>
-                                            <f:facet name="footer">
-
-                                            </f:facet>
-
-                                        </p:dataTable>
-                                    </p:tab>
-                                </p:accordionPanel>
-
-                            </fieldset>
+                        </h:panelGroup>
+                    </div>
+                    <div style="align-content: center">
 
 
+                        <h:panelGroup  id="panelExportPDF" rendered="#{user1.haveRights(2)}">
+
+
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                <p:outputLabel for="idLangExport" value="#{langueBean.getMsg('export.langOfTheso')} :" />    
+                                <p:selectOneMenu id="idLangExport" value="#{skosExportBean.singleLanguageCodeSelected}">
+                                    <f:selectItems value="#{skosExportBean.getCodesLanguagesOfTheso()}"/>
+                                </p:selectOneMenu>
+
+                            </h:panelGrid>
 
                             <fieldset class="fieldDomain" >
                                 <legend><h:outputText value="#{langueBean.getMsg('stat.statTheso1')}" styleClass="textInfoSmall" /></legend>
@@ -70,16 +64,13 @@
 
                             </fieldset>
                         </h:panelGroup>
-                    </div>
-
-
-                    <div style="align-content: center">
 
                         <br/>
 
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_csv, stop_export_csv);PF('pbAjax').start();" > 
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Txt, stop_export_Txt);PF('pbAjax').start();" > 
 
-                            <p:fileDownload value="#{downloadBean.thesoCsv2(skosExportBean.idTheso,skosExportBean.selectedLanguages, skosExportBean.selectedGroups)}" />  
+                            <p:fileDownload value="#{downloadBean.thesoTxtNotes(skosExportBean.idTheso,
+                                                     skosExportBean.selectedGroups,skosExportBean.singleLanguageCodeSelected)}" />  
                         </p:commandButton>
 
                         <p:dialog modal="true" widgetVar="exportWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
@@ -99,8 +90,8 @@
 
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <p:commandButton id="cbAjAlignAuto2" title="#{langueBean.getMsg('btnBack')}" 
-                                         update="idExportcsvDlg"
-                                         action="PF('exportcsvDlg').hide();"
+                                         update="idExportTxtNotesDlg"
+                                         action="PF('exportTxtNotesDlg').hide();"
                                          icon="ui-icon-retour"
                                          styleClass="styleButton"  style="align-content: flex-end"/>
                     </div>
@@ -113,13 +104,13 @@
             </h:form> 
         </p:dialog>
         <script type="text/javascript">
-            function start_export_csv() {
+            function start_export_Txt() {
                 PF('exportWait').show();
             }
 
-            function stop_export_csv() {
+            function stop_export_Txt() {
                 PF('exportWait').hide();
-                PF('exportcsvDlg').hide();
+                PF('exportTxtNotesDlg').hide();
 
             }
         </script> 

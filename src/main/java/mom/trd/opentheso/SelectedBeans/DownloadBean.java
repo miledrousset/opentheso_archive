@@ -1,18 +1,12 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -25,22 +19,19 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
-import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.helper.ExportThesaurus;
+import mom.trd.opentheso.core.exports.helper.ExportTxtHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.exports.pdf.WritePdf;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.output.WriterOutputStream;
-import org.apache.jena.atlas.io.OutStreamUTF8;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
-import org.primefaces.context.RequestContext;
 import org.primefaces.model.ByteArrayContent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -813,6 +804,46 @@ public class DownloadBean implements Serializable {
         }
         return file;
     }
+    
+    /**
+     * Cette fonction permet d'exporter un thésaurus au format CSV à partir de
+     * son identifiant. 
+     * Il est filtré par Langue et par Groupe
+     * Le résultat est enregistré dans la variable 'skos' du
+     * downloadBean si la taille est petite, ou dans la variable 'file' du
+     * downloadBean sinon. Dans le premier cas on affiche la variable, dans le
+     * second cas l'utilisateur télécharge de fichier.
+     *
+     * @param idTheso
+     * @param selectedLanguages
+     * @param selectedGroups
+     * @return 
+     */
+    public StreamedContent thesoCsv2(String idTheso,
+            List<NodeLang> selectedLanguages,
+            List<NodeGroup> selectedGroups) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
+
+        ExportTabulateHelper exportTabulateHelper = new ExportTabulateHelper();
+
+        exportTabulateHelper.setThesaurusDatas(connect.getPoolConnexion(),
+                idTheso, selectedLanguages, selectedGroups);
+        exportTabulateHelper.exportToTabulate();
+        StringBuffer temp = exportTabulateHelper.getTabulateBuff();
+        InputStream stream;
+        try {
+            stream = new ByteArrayInputStream(temp.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "downloadedCsv.csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;
+    }    
 
     public StreamedContent thesoPDF(String idTheso, List<NodeLang> selectedLanguages,
             List<NodeGroup> selectedGroups, String codeLang, String codeLang2, int type) {
@@ -839,6 +870,75 @@ public class DownloadBean implements Serializable {
 
         return file;
     }
+    
+    /**
+     * Permet d'exporter le thésauurus au format txt (tabulé et hiérarchisé)
+     * @param idTheso
+     * @param selectedGroups
+     * @param codeLang
+     * @return 
+     * MR
+     */
+    public StreamedContent thesoTxt(String idTheso,
+            List<NodeGroup> selectedGroups, String codeLang) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
+
+        ExportTxtHelper exportTxtHelper = new ExportTxtHelper();
+        exportTxtHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso, codeLang, selectedGroups,
+                nodePreference);
+        exportTxtHelper.exportToTxt();
+
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(exportTxtHelper.getTxtBuff().toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "Txt_" + idTheso + ".csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+        return file;
+    } 
+    
+    /**
+     * Permet d'exporter le thésauurus au format txt (tabulé et hiérarchisé)
+     * @param idTheso
+     * @param selectedGroups
+     * @param codeLang
+     * @return 
+     * MR
+     */
+    public StreamedContent thesoTxtNotes(String idTheso,
+            List<NodeGroup> selectedGroups, String codeLang) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
+
+        ExportTxtHelper exportTxtHelper = new ExportTxtHelper();
+        exportTxtHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso, codeLang, selectedGroups,
+                nodePreference);
+        exportTxtHelper.exportNotes();
+
+        InputStream stream;
+
+        try {
+            stream = new ByteArrayInputStream(exportTxtHelper.getTxtBuff().toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "Txt_" + idTheso + ".csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+        return file;
+    }    
+    
     
     public StreamedContent getAllAltLabels(String idTheso,
             String codeLang) {

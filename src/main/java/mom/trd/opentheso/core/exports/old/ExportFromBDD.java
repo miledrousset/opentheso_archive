@@ -117,6 +117,7 @@ public class ExportFromBDD {
      * @param idThesaurus 
      * @param selectedLanguages 
      * @param selectedGroups 
+     * @param downloadBean 
      * @return  
      */
     public StringBuffer exportThesaurusAdvanced(HikariDataSource ds, String idThesaurus,
@@ -526,7 +527,9 @@ public class ExportFromBDD {
      * Fonction permet d'exporter une branche complète d'un thésaurus
      * en partant de n'importe quel identifiant ARK 
      * @param ds
+     * @param idConcept
      * @param idThesaurus 
+     * @param writeFileSKOS 
      * @param idArk 
      * @return  
      */
@@ -547,7 +550,14 @@ public class ExportFromBDD {
     }    
   */  
     
-    public void exportAllConcepts(HikariDataSource ds,
+    /**
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @param writeFileSKOS 
+     */
+    private void exportAllConcepts(HikariDataSource ds,
             String idConcept, String idThesaurus,
             WriteFileSKOS writeFileSKOS) {
 

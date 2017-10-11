@@ -34,7 +34,7 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
-import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
@@ -109,8 +109,7 @@ public class SelectedCandidat implements Serializable {
         //bundlePref.getString("useArk");
         arkActive = user.getNodePreference().isUseArk();
         serverAdress = user.getNodePreference().getCheminSite(); //bundlePref.getString("cheminSite");
-        Integer temp = user.getNodePreference().getIdentifierType();
-        identifierType = temp.toString(); //bundlePref.getString("identifierType");
+        identifierType = "" + user.getNodePreference().getIdentifierType(); //bundlePref.getString("identifierType");
     }
 
     /**
@@ -136,6 +135,7 @@ public class SelectedCandidat implements Serializable {
         infoCdt.setNodeTraductions(new ArrayList<NodeTraductionCandidat>());
         selectedNvx = new NodeAutoCompletion();
         tradInsert = new ArrayList<>();
+        setPreferences();
     }
 
     /**
@@ -153,6 +153,17 @@ public class SelectedCandidat implements Serializable {
         note = "";
         niveau = "";
         domaine = "";
+    }
+    
+    private void setPreferences(){
+        if (user == null || user.getNodePreference() == null) {
+            return;
+        }
+        //ResourceBundle bundlePref = getBundlePref();
+        //bundlePref.getString("useArk");
+        arkActive = user.getNodePreference().isUseArk();
+        serverAdress = user.getNodePreference().getCheminSite(); //bundlePref.getString("cheminSite");
+        identifierType = "" + user.getNodePreference().getIdentifierType(); //bundlePref.getString("identifierType");        
     }
 
     /**
@@ -639,6 +650,7 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean toInsert() {
 
+        setPreferences();
         if (selectedNvx != null) {
             niveauEdit = selectedNvx.getIdConcept();
         } else {

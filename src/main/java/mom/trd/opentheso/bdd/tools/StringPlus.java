@@ -154,5 +154,17 @@ public class StringPlus {
         }
         return aux;
     }
+    
+    /**
+     * permet de supprimer le retour à la ligne dans les commentaires, les notes ...
+     * @param text
+     * @return 
+     */
+    public String clearNewLine(String text) {
+        text = text.replace('\r', ' ');
+        text = text.replace('\n', ' ');
+        text = text.replace('\t', ' ');
+        return text;
+    }
 
 }

@@ -363,7 +363,7 @@
 
             <div id="principaleCandidat">
 
-                <div id="titreCandidat2"><h2><h:outputText value="#{langueBean.getMsg('cdt.editCdt')}" /></h2></div>
+                <div id="titreCandidat2"><h3><h:outputText value="#{langueBean.getMsg('cdt.editCdt')}" style="color: green" /></h3></div>
 
                 <div style=" float: left; padding: 5px; height: 25px; margin-top: 5px; margin-bottom: 0px; margin-left: 20px;">
                     <h:panelGroup id="liste2">
@@ -373,8 +373,8 @@
                                 <f:selectItems value="#{theso.getThisTrad()}" var="tl" itemLabel="#{tl.french_name}" 
                                                itemValue="#{tl.id_iso639_1}" />
                             </h:selectOneMenu>
-                            <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.update()}" 
-                                             update=":tableCdt,:gestionCandidat" styleClass="styleButton"/><br/>
+                            <p:commandButton id="cbSelectTheso" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-ok-16" actionListener="#{theso.update()}" 
+                                             update=":tableCdt,:gestionCandidat" styleClass="styleButton_db"/><br/>
 
                         </h:form>
                     </h:panelGroup>
@@ -475,14 +475,14 @@
                         </h:form>
                     </div>
 
-                    <div style="float: left; margin-left: 45px;">
+                    <div style="float: right; margin-right: 30px;">
                         <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'a') and (user1.haveRights(2))}">
                             <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-ok-16" title="#{langueBean.getMsg('cdt.btnValid')}"
                                              actionListener="#{vue.setAddValidCdt(true)}" update=":panValidCdt" /><br/>
                         </h:form>
                     </div>
 
-                    <div style="float: right; margin-right: 30px;">
+                    <div style="float: right; margin-right: 20px;">
                         <h:form  rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.userHaveProp() != true) and (selectedCandidat.selected.etat == 'a')}">
                             <p:commandButton id="cbAjPropCandidat" styleClass="styleButton_db" icon="ui-icon-addfile" title="#{langueBean.getMsg('cdt.btnAddProp')}"
                                              actionListener="#{vue.setAddPropCandidat(true)}" update=":panAjProp,:gestionCandidat,:tableCdt" />
@@ -501,7 +501,7 @@
                         </h:form>
 
                         <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'v') and (user1.haveRights(2))}">
-                            <p:commandButton id="cbInsertCdt" value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton_db" 
+                            <p:commandButton id="cbInsertCdt" title="#{langueBean.getMsg('cdt.btnInsert')}"  icon="ui-icon-add" styleClass="styleButton_db" 
                                              actionListener="#{vue.setAddInsertCdt(true)}" update=":panInsertCdt" />
                         </h:form>
                     </div>

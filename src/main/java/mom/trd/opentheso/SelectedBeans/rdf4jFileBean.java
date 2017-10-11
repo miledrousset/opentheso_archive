@@ -5,6 +5,7 @@
  */
 package mom.trd.opentheso.SelectedBeans;
 
+import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;

@@ -117,7 +117,7 @@ public class putHandleTest {
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
         try {
-            URL url = new URL("https://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/opentheso3_1");
+            URL url = new URL("https://cchum-isi-handle01.in2p3.fr:8001/api/handles/20.500.11942/opentheso4.3.2");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             // -X PUT
@@ -141,7 +141,7 @@ public class putHandleTest {
             // -d '{"index":1,"type":"URL",
             // "data":{"format":"string","value":"http://www.huma-num.fr"},"ttl":86400,"permissions":"1110"}'
             String data = "{\"index\":1,\"type\":\"URL\","
-                    + "\"data\":{\"format\":\"string\",\"value\":\"http://www.opentheso3.mom.fr\"},\"ttl\":86400,\"permissions\":\"1110\"}";
+                    + "\"data\":{\"format\":\"string\",\"value\":\"http://opentheso.mom.fr\"},\"ttl\":86400,\"permissions\":\"1110\"}";
 
             OutputStream os = conn.getOutputStream();
             

@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,7 @@ public class UnderTree implements Serializable {
         String lang = ((MyTreeNode)event.getTreeNode()).getLangue();
         
         // Récupération des facettes
-        ArrayList<Integer> listIdFacet = new FacetHelper().getIdFacetUnderConcept(connect.getPoolConnexion(), ((MyTreeNode)event.getTreeNode()).getIdMot(), theso);
+        ArrayList<Integer> listIdFacet = new FacetHelper().getIdFacetUnderConcept(connect.getPoolConnexion(), ((MyTreeNode)event.getTreeNode()).getIdConcept(), theso);
         ArrayList<NodeFacet> listFacet = new ArrayList<>();
         for(Integer id : listIdFacet) {
             NodeFacet nf = new FacetHelper().getThisFacet(connect.getPoolConnexion(), id, theso, lang);
@@ -118,7 +119,7 @@ public class UnderTree implements Serializable {
     public void onNodeSelect(NodeSelectEvent event) {
         if(!event.getTreeNode().getType().equals("facette")) {
             MyTreeNode temp = (MyTreeNode)selectedNode;
-            temp.setTypeMot(3);
+            temp.setTypeConcept(3);
             selectedTerme.majTerme(temp);
             selectedTerme.setTree(3);
         } else {

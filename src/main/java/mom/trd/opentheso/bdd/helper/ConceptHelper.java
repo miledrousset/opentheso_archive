@@ -257,7 +257,6 @@ public class ConceptHelper {
      * @param idConcept
      * @param idLang
      * @param idTheso
-     * @param idUser
      * @return
      * #MR
      */
@@ -280,7 +279,7 @@ public class ConceptHelper {
             return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
         }
         
-        // ici, nous abvons un  IdArk, on vérifie s'il est encore valide ?
+        // ici, nous avons un  IdArk, on vérifie s'il est encore valide ?
         idArk = ark_Client.getInfosArkId(concept.getIdArk());
         // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
         if (idArk == null) {
@@ -1477,7 +1476,6 @@ public class ConceptHelper {
 
         //     Connection conn;
         Statement stmt;
-
         try {
             //conn.setAutoCommit(false);
             // Get connection from pool
@@ -1487,9 +1485,9 @@ public class ConceptHelper {
                 try {
 
                     if (!new RelationsHelper().addRelationHistorique(conn, hierarchicalRelationship.getIdConcept1(), hierarchicalRelationship.getIdThesaurus(), hierarchicalRelationship.getIdConcept2(), hierarchicalRelationship.getRole(), idUser, "ADD")) {
-                        conn.rollback();
+                      /*  conn.rollback();
                         conn.close();
-                        return false;
+                        return false;*/
                     }
 
                     String query = "Insert into hierarchical_relationship"
@@ -1511,6 +1509,7 @@ public class ConceptHelper {
             // To avoid dupplicate Key
             //   System.out.println(sqle.toString());
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                System.out.println(sqle.toString());
                 return false;
             }
         }
@@ -2156,6 +2155,10 @@ public class ConceptHelper {
         if (concept.getModified() == null) {
             concept.setModified(new java.util.Date());
         }
+        if (concept.getStatus() == null) {
+            concept.setStatus("D");
+        }    
+        
         try {
             // Get connection from pool
             String query;
@@ -2188,18 +2191,17 @@ public class ConceptHelper {
                     if (concept.getCreated() == null || concept.getModified() == null) {
 
                         query = "Insert into concept "
-                                + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept, id_group)"
+                                + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept)"
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
                                 + ",'" + idArk + "'"
                                 + ",'" + concept.getStatus() + "'"
                                 + ",'" + concept.getNotation() + "'"
-                                + "," + concept.isTopConcept()
-                                + ",'" + concept.getIdGroup() + "')";
+                                + "," + concept.isTopConcept() +")";
                     } else {
                         query = "Insert into concept "
-                                + "(id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept, id_group)"
+                                + "(id_concept, id_thesaurus, id_ark, created, modified, status, notation, top_concept)"
                                 + " values ("
                                 + "'" + concept.getIdConcept() + "'"
                                 + ",'" + concept.getIdThesaurus() + "'"
@@ -2208,8 +2210,7 @@ public class ConceptHelper {
                                 + ",'" + concept.getModified() + "'"
                                 + ",'" + concept.getStatus() + "'"
                                 + ",'" + concept.getNotation() + "'"
-                                + "," + concept.isTopConcept()
-                                + ",'" + concept.getIdGroup() + "')";
+                                + "," + concept.isTopConcept() +")";
                     }
 
                     stmt.executeUpdate(query);
@@ -2242,6 +2243,43 @@ public class ConceptHelper {
      * @return
      */
     public boolean insertConceptInTable(HikariDataSource ds,
+        Concept concept, String urlSite, boolean isArkActive, int idUser) {
+        
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            if (!insertConceptInTableRollBack(
+                    conn,
+                    concept, urlSite, isArkActive, idUser)) {
+                conn.rollback();
+                conn.close();
+                return false;    
+            } else {
+                conn.setAutoCommit(true);
+                conn.close();
+                return true;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    
+    /**
+     * deprecated by Miled
+     * Cette fonction permet d'insérrer un Concept dans la table Concept avec un
+     * idConcept existant (Import)
+     *
+     * @param ds
+     * @param concept
+     * @param urlSite
+     * @param isArkActive
+     * @param idUser
+     * @return
+     */
+ /*   public boolean insertConceptInTable(HikariDataSource ds,
             Concept concept, String urlSite, boolean isArkActive, int idUser) {
 
         Connection conn;
@@ -2263,13 +2301,13 @@ public class ConceptHelper {
             try {
                 conn.setAutoCommit(false);
                 stmt = conn.createStatement();
-                try {
+                try {*/
 
                     /**
                      * récupération du code Ark via WebServices
                      *
                      */
-                    String idArk = "";
+       /*             String idArk = "";
                     if (isArkActive) {
                         ArrayList<DcElement> dcElementsList = new ArrayList<>();
                         Ark_Client ark_Client = new Ark_Client();
@@ -2280,12 +2318,12 @@ public class ConceptHelper {
                         concept.setIdArk(idArk);
                     } else {
                         concept.setIdArk("");
-                    }
+                    }*/
 
                     /**
                      * Ajout des informations dans la table Concept
                      */
-                    if (!addConceptHistorique(conn, concept, idUser)) {
+ /*                   if (!addConceptHistorique(conn, concept, idUser)) {
                         conn.rollback();
                         conn.close();
                         return false;
@@ -2334,7 +2372,7 @@ public class ConceptHelper {
             }
         }
         return status;
-    }
+    }*/
 
     /**
      * Cette fonction permet de récupérer un Concept par son id et son thésaurus
@@ -2626,7 +2664,6 @@ public class ConceptHelper {
         /// attention il y a un problème ici, il faut vérifier pourquoi nous avons un Concept Null
         if (nodeConcept == null || nodeConcept.getConcept() == null) {
             System.err.println("Attention Null proche de = : " + idConcept);
-            int k = 0;
             return null;
         }
 
@@ -3768,6 +3805,10 @@ public class ConceptHelper {
                 idThesaurus);
         nodeConceptExport.setNodeListIdsOfConceptGroup(nodeListIdsOfConceptGroup_Ark);
 
+        if(idConcept.equalsIgnoreCase("14717")) {
+            int p = 0;
+        }
+        
         //récupération des notes du Terme
         String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
         nodeConceptExport.setNodeNoteTerm(new NoteHelper().getListNotesTermAllLang(ds, idTerm, idThesaurus));

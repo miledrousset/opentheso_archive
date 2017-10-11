@@ -1,6 +1,6 @@
 -- * Author:  miled.rousset
 -- * Created: 15 avr. 2016
--- * Modified : 04 juillet 2017
+-- * Modified : 04 octobre 2017
 -- */
 
 
@@ -43,6 +43,8 @@ delete from user_role;
 delete from users;
 delete from thesaurus_array_concept;
 delete from relation_group;
+delete from alignement_preferences;
+delete from gps_preferences;
 
 
 

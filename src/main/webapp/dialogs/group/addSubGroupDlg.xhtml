@@ -6,8 +6,12 @@
     xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="idSubGroupAddDlg"  header="#{langueBean.getMsg('add.subGroup')}" widgetVar="subGroupAddDlg" modal="true" resizable="false" >
+        
+        <h:outputText rendered="#{(!newtreeBean.group) and (!newtreeBean.subGroup)}" value="#{langueBean.getMsg('add.subGroupValidation')}" /> 
+        
         <!-- Ajout d'un domaine/ group -->
         <h:form >
+            <h:panelGroup id="addSubGroupValidation" rendered="#{(newtreeBean.group) or (newtreeBean.subGroup)}">
             <p:messages showDetail="true" autoUpdate="true" />
             <table>
                 <tr>
@@ -37,6 +41,7 @@
                     </td>
                 </tr>
             </table>
+            </h:panelGroup>
         </h:form>
     </p:dialog>
 </ui:composition>

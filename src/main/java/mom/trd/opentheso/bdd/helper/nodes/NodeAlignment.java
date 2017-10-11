@@ -37,6 +37,9 @@ public class NodeAlignment {
     private Double lat;
     private Double lng;
     private String toponymName;
+    private String adminName1;
+    private String adminName2;
+    
     private ArrayList<String> traduction;
     private ArrayList<NodeLang> alltraductions;
     
@@ -202,6 +205,23 @@ public class NodeAlignment {
     public void setLng(Double lng) {
         this.lng = lng;
     }
+
+    public String getAdminName1() {
+        return adminName1;
+    }
+
+    public void setAdminName1(String adminName1) {
+        this.adminName1 = adminName1;
+    }
+
+    public String getAdminName2() {
+        return adminName2;
+    }
+
+    public void setAdminName2(String adminName2) {
+        this.adminName2 = adminName2;
+    }
+    
     public ArrayList<String> getTraduction() {
         return traduction;
     }

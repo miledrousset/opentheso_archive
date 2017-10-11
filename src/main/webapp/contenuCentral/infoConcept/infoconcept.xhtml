@@ -25,22 +25,31 @@
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 }" value="#{langueBean.getMsg('concept.setId')}" onclick="PF('reGenerateConceptIdDlg').show();" style="font-size: 12px;"/>
+                        
+                        <p:menuitem rendered="#{selectedTerme.type != 1 }" value="#{langueBean.getMsg('concept.setIdArk')}" onclick="PF('reGenerateConceptArkIdDlg').show();" style="font-size: 12px;"/>
 
+                        <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
+                        <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
 
-                        <p:menuitem rendered="#{selectedTerme.type == 1 and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-
-
+                        
+                        
+                        
                         <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
                             <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.type != 2) and (selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheToGroup')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.selectedNode.isTopConcept)}" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(!selectedTerme.selectedNode.isTopConcept) and (!selectedTerme.selectedNode.isGroup)and (!selectedTerme.selectedNode.isSubGroup)}" value="#{langueBean.getMsg('panel.moveBrancheToGroup')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
                         </p:submenu>
+                        
+                        
+                        
                         <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
                             <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroup')}" update=":idMoveBranchToConceptOtherGroupDlg" oncomplete="PF('moveBranchToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.type == 2) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem rendered="#{(selectedTerme.selectedNode.isTopConcept) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
                         </p:submenu>
 
+                        
+                        
                         <p:submenu rendered="#{(selectedTerme.type != 1) }"  label="#{langueBean.getMsg('edit.import')}" styleClass="cbSeparateMenu">
                             <p:menuitem value="#{langueBean.getMsg('concept')}" style="font-size: 12px;" update=":idImportSingleConceptDlg" oncomplete="PF('importSingleConceptDlg').show();"/>
                             <p:menuitem value="#{langueBean.getMsg('alig.bran')}" style="font-size: 12px;" update=":idImportBranchDlg" oncomplete="PF('importBranchDlg').show();"/>

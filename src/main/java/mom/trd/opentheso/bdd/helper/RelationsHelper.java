@@ -66,14 +66,12 @@ public class RelationsHelper {
                     /*  if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "MT", idUser, "ADD")) {
                         return false;
                     }*/
-                    query = "Insert into concept"
-                            + "(id_concept, id_thesaurus, id_ark, top_concept, id_group)"
+                    query = "Insert into concept_group_concept"
+                            + "(idgroup, idthesaurus, idconcept)"
                             + " values ("
-                            + "'" + idConcept + "'"
+                            + "'" + idGroup + "'"
                             + ",'" + idThesaurus + "'"
-                            + ",'',"
-                            + "false"
-                            + ",'" + idGroup + "')";
+                            + ",'" + idConcept + "')";
 
                     stmt.executeUpdate(query);
                     status = true;
@@ -95,7 +93,7 @@ public class RelationsHelper {
                     Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+                log.error("Error while adding relation Group of Concept : " + idConcept, sqle);
             }
         }
         return status;
@@ -750,8 +748,7 @@ public class RelationsHelper {
                             + " top_concept = false,"
                             + " modified = current_date"
                             + " WHERE id_concept ='" + idConcept + "'"
-                            + " AND id_thesaurus = '" + idThesaurus + "'"
-                            + " AND id_group = '" + idGroup + "'";
+                            + " AND id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);
                     status = true;

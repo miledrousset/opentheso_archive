@@ -29,9 +29,6 @@ public class ApplicationConfig extends Application {
  If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(mom.trd.opentheso.ws.rest.NewRestJson.class);
-        resources.add(mom.trd.opentheso.ws.rest.NewRestSkos.class);
-        resources.add(mom.trd.opentheso.ws.rest.Rest.class);
         resources.add(org.glassfish.jersey.server.wadl.internal.WadlResource.class);
     }
     

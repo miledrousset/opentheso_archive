@@ -1,6 +1,7 @@
 package mom.trd.opentheso.SelectedBeans;
 
 //import com.hp.hpl.jena.util.OneToManyMap;
+import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -659,6 +660,27 @@ public class SelectedThesaurus implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate id for concept"));
         }
     }
+    
+    /**
+     * fonction qui permet de regénéerer l'identifiant ARK d'un Concept 
+     * Ajout si n'exite pas
+     * Mis à jour s'il n'est plus valide
+     * 
+     * @param idConcept 
+     */
+    public void reGenerateConceptArkId(String idConcept) {
+        try {
+            ArrayList<String> idConcepts = new ArrayList<>();
+            idConcepts.add(idConcept);
+            if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
+            } else
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
+        } catch (Exception ex) {
+            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }    
 
     /**
      * Cette fonction remplace tout les id des groupes du théso

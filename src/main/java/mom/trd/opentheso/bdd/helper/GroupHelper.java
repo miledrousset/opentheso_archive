@@ -19,6 +19,7 @@ import mom.trd.opentheso.bdd.datas.ConceptGroup;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGroupType;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGroupSousGroup;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -1148,6 +1149,7 @@ public class GroupHelper {
 
         return nodeGroupLabel;
     }
+    
 
     /**
      * Permet de retourner le lexical Value of Group
@@ -1611,6 +1613,31 @@ public class GroupHelper {
         return tabIdConceptGroup;
     }
 
+    /**
+     * Permet de retourner l'hiérarchie complète d'un groupe 
+     * en partant du groupe ou sous-groupe pour arriver à la racine.
+     * exp pour le sous_groupe (environnement) : Education -> Education science -> environnement 
+     * 
+     * @param ds
+     * @param idThesaurus
+     * @param idGroup
+     * @return 
+     * #MR
+     */
+    public NodeGroup getGroupHierarchy (HikariDataSource ds, 
+            String idThesaurus, String idGroup) {
+        NodeGroup nodeGroup = new NodeGroup();
+        
+     //   nodeGroup. 
+      //  getSubGroup()
+      return nodeGroup;
+    }
+    
+    public String getSubGroup(HikariDataSource ds, 
+            String idThesaurus, String idGroup) {
+        return "";
+    }
+    
     /**
      * Permet de retourner la liste des Groupes pour un Concept et un thésaurus
      * donné

@@ -628,7 +628,7 @@ public class AlignementParLotBean {
         AlignementParLotBean.optionNonAligned = optionNonAligned;
     }
 
-    public static int getOptionWorkFlow() {
+    public int getOptionWorkFlow() {
         return optionWorkFlow;
     }
 

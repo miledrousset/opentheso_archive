@@ -48,6 +48,8 @@ public class skosExportBean {
     private List<NodeGroup> selectedGroups;    
     
     
+    // options pour l'export CSV
+    private String[] selectedOptions;
     
     
     /**
@@ -176,6 +178,14 @@ public class skosExportBean {
 
     public void setSingleLanguageCodeSelected2(String singleLanguageCodeSelected2) {
         this.singleLanguageCodeSelected2 = singleLanguageCodeSelected2;
+    }
+
+    public String[] getSelectedOptions() {
+        return selectedOptions;
+    }
+
+    public void setSelectedOptions(String[] selectedOptions) {
+        this.selectedOptions = selectedOptions;
     }
 
 

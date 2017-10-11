@@ -1635,7 +1635,7 @@ public class CandidateHelper {
 
     /**
      * Permet de retourner une ArrayList de NodeConceptCandidat par thésaurus,
-     * c'est la liste des candidats archivés tous les status sauf a (a=attente,
+     * c'est la liste des candidats archivés tous les status sauf a et v (a=attente, v=validé)
      * v=validé,i=insérré,r=refusé) Si le Candidat n'est pas traduit dans la
      * langue en cours, on récupère l'identifiant pour l'afficher à la place
      *
@@ -1661,7 +1661,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept, status from concept_candidat where id_thesaurus = '" + idThesaurus + "' and status != 'a' "
+                    String query = "select id_concept, status from concept_candidat where id_thesaurus = '" + idThesaurus + "' and status != 'a' and status != 'v'"
                             + " order by modified DESC";
 
                     stmt.executeQuery(query);

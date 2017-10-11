@@ -1,5 +1,6 @@
 package mom.trd.opentheso.SelectedBeans;
 
+import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.k_int.IR.IRQuery;
 import com.k_int.IR.QueryModels.PrefixString;
 import com.k_int.IR.SearchException;
@@ -7,22 +8,11 @@ import com.k_int.IR.SearchTask;
 import com.k_int.IR.Searchable;
 import com.k_int.IR.TimeoutExceededException;
 import com.k_int.hss.HeterogeneousSetOfSearchable;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import mom.trd.opentheso.bdd.tools.AsciiUtils;
-//import com.k_int.IR.IRQuery;
-//import com.k_int.IR.QueryModels.PrefixString;
-//import com.k_int.IR.SearchException;
-//import com.k_int.IR.SearchTask;
-//import com.k_int.IR.Searchable;
-//import com.k_int.IR.TimeoutExceededException;
-//import com.k_int.hss.HeterogeneousSetOfSearchable;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -50,7 +40,6 @@ import javax.json.JsonArray;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.json.JsonValue;
 
 import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.bdd.helper.Connexion;
@@ -77,6 +66,8 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGroupIdLabel;
+import mom.trd.opentheso.bdd.helper.nodes.NodeGroupSousGroup;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.NodePermute;
@@ -94,7 +85,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
-import org.primefaces.model.map.MapModel;
 
 @ManagedBean(name = "selectedTerme", eager = true)
 @SessionScoped
@@ -114,7 +104,7 @@ public class SelectedTerme implements Serializable {
     private ArrayList<NodeNote> listnotes = new ArrayList<>();
 
     private TreeNode root;
-    private TreeNode selectedNode;
+    private MyTreeNode selectedNode;
     private NodeAutoCompletion selectedTermComp;
     private boolean allLangue = false;
 
@@ -201,7 +191,8 @@ public class SelectedTerme implements Serializable {
 
     //maps
     private String latitudLongitud = null;
-    private MapModel simpleModel = null;
+    
+    private ArrayList<NodeGroupIdLabel> nodeGroupIdLabel;
 
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
@@ -308,6 +299,7 @@ public class SelectedTerme implements Serializable {
         statutEdit = "";
 
         nodeSe = new NodeSearch();
+        nodeGroupIdLabel = new ArrayList<>();
     }
 
     /**
@@ -324,19 +316,19 @@ public class SelectedTerme implements Serializable {
 
         // contrôler si la connexion est toujour valide 
         // connect.
+        selectedNode = sN;
         reInitTerme();
         majPref();
 
-        idC = sN.getIdMot();
+        idC = sN.getIdConcept();
         idTheso = sN.getIdTheso();
         idlangue = sN.getLangue();
-        idDomaine = sN.getIdDomaine();
+        idDomaine = sN.getIdCurrentGroup();
         idTopConcept = sN.getIdTopConcept();
-        type = sN.getTypeMot();
+        type = sN.getTypeConcept();
         status = "";
         notation = "";
         latitudLongitud = null;
-        simpleModel = null;
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
         majTAsso();
@@ -431,6 +423,8 @@ public class SelectedTerme implements Serializable {
                 SearchTask st = federated_search_proxy.createTask(e, null);
                 st.evaluate(5000);
                 nbNotices = st.getTaskResultSet().getFragmentCount();
+                st.destroyTask();
+                federated_search_proxy.destroy();
                 for (NodeFusion nf : getFusions()) {
                     if (nf.getIdConcept1().equals(idC)) {
                         String idTe = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), nf.getIdConcept2(), idTheso);
@@ -568,13 +562,29 @@ public class SelectedTerme implements Serializable {
 
     }
 
+    /**
+     * chargement des groupes d'un concept
+     * #MR
+     */
     private void majGroup() {
+        GroupHelper groupHelper = new GroupHelper();
+        String labelGroup;
+        boolean first = true;
+        
         ArrayList<String> idGroup = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
-        microTheso = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idGroup.get(0), idTheso, idlangue);
-        if (idGroup.size() > 1) {
-            for (int i = 1; i < idGroup.size(); i++) {
-                microTheso += ", " + new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idGroup.get(i), idTheso, idlangue);
-            }
+        
+        for (String id : idGroup) {
+            labelGroup = groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), id, idTheso, idlangue);
+            if(first) {
+                microTheso = labelGroup;
+                first = false;
+            } else
+                microTheso += ", " + labelGroup;
+            
+            NodeGroupIdLabel nodeGroupIdLabeltmp = new NodeGroupIdLabel();
+            nodeGroupIdLabeltmp.setIdGroup(id);
+            nodeGroupIdLabeltmp.setLabel(labelGroup);
+            nodeGroupIdLabel.add(nodeGroupIdLabeltmp);            
         }
     }
 
@@ -836,7 +846,7 @@ public class SelectedTerme implements Serializable {
         if (selecedTerm.isIsSubGroup() || selecedTerm.isIsGroup()) {
             // ici c'est le cas d'un Group ou Sous Group, on crée un TT Top Terme
             Concept concept = new Concept();
-            concept.setIdGroup(selecedTerm.getIdMot());
+            concept.setIdGroup(selecedTerm.getIdConcept());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
             concept.setNotation("");
@@ -865,7 +875,7 @@ public class SelectedTerme implements Serializable {
         } else {
 
             Concept concept = new Concept();
-            concept.setIdGroup(selecedTerm.getIdDomaine());
+            concept.setIdGroup(selecedTerm.getIdCurrentGroup());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
             concept.setNotation("");
@@ -909,7 +919,7 @@ public class SelectedTerme implements Serializable {
         instance.setIdentifierType(identifierType);
 
         Concept concept = new Concept();
-        concept.setIdGroup(selecedTerm.getIdDomaine());
+        concept.setIdGroup(selecedTerm.getIdCurrentGroup());
         concept.setIdThesaurus(idTheso);
         concept.setStatus("D");
         concept.setNotation("");
@@ -1127,7 +1137,9 @@ public class SelectedTerme implements Serializable {
                         SearchTask st = federated_search_proxy.createTask(e, null);
                         st.evaluate(5000);
                         total = total + st.getTaskResultSet().getFragmentCount();
+                        st.destroyTask();
                     }
+                    federated_search_proxy.destroy();
 
                 } catch (TimeoutExceededException | SearchException srch_e) {
                     srch_e.printStackTrace();
@@ -2525,7 +2537,7 @@ public class SelectedTerme implements Serializable {
         String lang = ((MyTreeNode) event.getTreeNode()).getLangue();
 
         // Récupération des facettes
-        ArrayList<Integer> listIdFacet = new FacetHelper().getIdFacetUnderConcept(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdMot(), theso);
+        ArrayList<Integer> listIdFacet = new FacetHelper().getIdFacetUnderConcept(connect.getPoolConnexion(), ((MyTreeNode) event.getTreeNode()).getIdConcept(), theso);
         ArrayList<NodeFacet> listFacet = new ArrayList<>();
         for (Integer id : listIdFacet) {
             NodeFacet nf = new FacetHelper().getThisFacet(connect.getPoolConnexion(), id, theso, lang);
@@ -2572,7 +2584,7 @@ public class SelectedTerme implements Serializable {
     public void onNodeSelect(NodeSelectEvent event) {
         if (!event.getTreeNode().getType().equals("facette")) {
             MyTreeNode temp = (MyTreeNode) selectedNode;
-            temp.setTypeMot(3);
+            temp.setTypeConcept(3);
             majTerme(temp);
             setTree(2);
         } else {
@@ -2654,6 +2666,8 @@ public class SelectedTerme implements Serializable {
                 SearchTask st = federated_search_proxy.createTask(e, null);
                 st.evaluate(5000);
                 nbNoticesT = st.getTaskResultSet().getFragmentCount();
+                st.destroyTask();
+                federated_search_proxy.destroy();           
             } catch (TimeoutExceededException | SearchException srch_e) {
                 srch_e.printStackTrace();
             }
@@ -3028,13 +3042,14 @@ public class SelectedTerme implements Serializable {
         this.root = root;
     }
 
-    public TreeNode getSelectedNode() {
+    public MyTreeNode getSelectedNode() {
         return selectedNode;
     }
 
-    public void setSelectedNode(TreeNode selectedNode) {
+    public void setSelectedNode(MyTreeNode selectedNode) {
         this.selectedNode = selectedNode;
     }
+
 
     public ArrayList<NodeAlignment> getAlign() {
         return align;
@@ -3432,6 +3447,14 @@ public class SelectedTerme implements Serializable {
 
     public void setTypeDomaine(String typeDomaine) {
         this.typeDomaine = typeDomaine;
+    }
+
+    public ArrayList<NodeGroupIdLabel> getNodeGroupIdLabel() {
+        return nodeGroupIdLabel;
+    }
+
+    public void setNodeGroupIdLabel(ArrayList<NodeGroupIdLabel> nodeGroupIdLabel) {
+        this.nodeGroupIdLabel = nodeGroupIdLabel;
     }
 
 }

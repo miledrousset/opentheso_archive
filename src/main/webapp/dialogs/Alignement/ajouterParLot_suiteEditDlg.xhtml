@@ -73,9 +73,9 @@
                     </h:selectOneMenu><br/><br/>
                     <hr/><br/>
 
-                    <p:commandButton rendered="#{Alignementparlot.optionWorkFlow == alignementparlot.optionOfAlignement}" id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" 
+                    <p:commandButton rendered="#{alignementparlot.optionWorkFlow == alignementparlot.optionOfAlignement}" id="finAllAlignAuto" value="#{langueBean.getMsg('alig.fin')}" 
                                       styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg').hide();PF('finalizeDlg').show();"  />
-                    <p:commandButton rendered="#{Alignementparlot.optionWorkFlow != alignementparlot.optionOfAlignement}" update=":panContenu" id="finAllAlignAuto2" value="#{langueBean.getMsg('alig.fin')}" 
+                    <p:commandButton rendered="#{alignementparlot.optionWorkFlow != alignementparlot.optionOfAlignement}" update=":panContenu" id="finAllAlignAuto2" value="#{langueBean.getMsg('alig.fin')}" 
                                       styleClass="styleButton" oncomplete="PF('ajouterParLot_suiteEditDlg').hide();"/>
                     
                     

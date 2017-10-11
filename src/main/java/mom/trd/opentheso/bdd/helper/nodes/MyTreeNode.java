@@ -1,49 +1,64 @@
-package mom.trd.opentheso.SelectedBeans;
+package mom.trd.opentheso.bdd.helper.nodes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 public class MyTreeNode extends DefaultTreeNode implements Serializable {
     
     private static final long serialVersionUID = 1L;
-    private int typeMot;
-    private String idMot;
+    private int typeConcept;
+    private String idConcept;
     private String idTheso;
     private String langue;
-    private String idDomaine;
+    private String idCurrentGroup;
     private String typeDomaine;
     private String idTopConcept;
     private boolean isGroup =false;
     private boolean isSubGroup = false;
+    private boolean isTopConcept = false;
+    
+    private ArrayList<String> otherGroup;
+
     
     public MyTreeNode(int type, String id, String idT, String l, String idD, String typeDomaine, 
             String idTC, String icone, Object value, TreeNode parent)
    {
       super(icone, value, parent);
-      this.typeMot = type;
-      this.idMot = id;
+      this.typeConcept = type;
+      this.idConcept = id;
       this.idTheso = idT;
       this.langue = l;
-      this.idDomaine = idD;
+      this.idCurrentGroup = idD;
       this.typeDomaine = typeDomaine; 
       this.idTopConcept = idTC;
+      
    }
 
-    public int getTypeMot() {
-        return typeMot;
+    public ArrayList<String> getOtherGroup() {
+        return otherGroup;
     }
 
-    public void setTypeMot(int typeMot) {
-        this.typeMot = typeMot;
+    public void setOtherGroup(ArrayList<String> otherGroup) {
+        this.otherGroup = otherGroup;
+    }
+    
+
+    public int getTypeConcept() {
+        return typeConcept;
     }
 
-    public String getIdMot() {
-        return idMot;
+    public void setTypeConcept(int typeConcept) {
+        this.typeConcept = typeConcept;
     }
 
-    public void setIdMot(String idMot) {
-        this.idMot = idMot;
+    public String getIdConcept() {
+        return idConcept;
+    }
+
+    public void setIdConcept(String idConcept) {
+        this.idConcept = idConcept;
     }
 
     public String getIdTheso() {
@@ -62,12 +77,12 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
         this.langue = langue;
     }
 
-    public String getIdDomaine() {
-        return idDomaine;
+    public String getIdCurrentGroup() {
+        return idCurrentGroup;
     }
 
-    public void setIdDomaine(String idDomaine) {
-        this.idDomaine = idDomaine;
+    public void setIdCurrentGroup(String idCurrentGroup) {
+        this.idCurrentGroup = idCurrentGroup;
     }
 
     public String getIdTopConcept() {
@@ -101,6 +116,13 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     public void setIsSubGroup(boolean isSubGroup) {
         this.isSubGroup = isSubGroup;
     }
-    
-    
+
+    public boolean isIsTopConcept() {
+        return isTopConcept;
+    }
+
+    public void setIsTopConcept(boolean isTopConcept) {
+        this.isTopConcept = isTopConcept;
+    }
+
 }

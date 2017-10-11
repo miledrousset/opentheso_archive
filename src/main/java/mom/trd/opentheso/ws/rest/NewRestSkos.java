@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response.Status;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 
-import mom.trd.opentheso.bdd.helper.nodes.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 
 /**
  * REST Web Service

@@ -15,7 +15,7 @@
                         <h:panelGrid rendered="#{gps.listAlignValues.size() != 0}" columns="2" style="margin-bottom:10px">
                             <p:outputLabel for="RadioGps" />
                             <p:selectOneRadio id="RadioGps" value="#{gps.codeid}"  layout="grid" columns="1">
-                                <f:selectItems value="#{gps.listAlignValues}" var="c" itemLabel="#{c.name}, #{c.toponymName}, #{c.countryName}" itemValue="#{c.idUrl}" />
+                                <f:selectItems value="#{gps.listAlignValues}" var="c" itemLabel="#{c.name}, #{c.countryName}, #{c.adminName1}, #{c.adminName2}" itemValue="#{c.idUrl}"  />
                             </p:selectOneRadio>
                         </h:panelGrid>
                     </tr>
