@@ -209,23 +209,23 @@ public class SearchHelper {
                      * recherche aussi dans les notes 
                      */
                     if(withNote) {
-                        query = "SELECT concept.id_concept, concept.id_thesaurus," +
-                                " concept.top_concept, idgroup," +
+                        query = "SELECT " +
+                                " concept.id_concept, concept.id_thesaurus," +
+                                " concept.top_concept, concept_group_concept.idgroup," +
                                 " note.lang, note.lexicalvalue," +
                                 " note.id_term " +
-                                " FROM preferred_term, note, concept,concept_group_concept" +
+                                " FROM term, preferred_term, note, concept,concept_group_concept" +
                                 " WHERE" +
-                                " preferred_term.id_term = note.id_term AND "
-                                + "concept_group_concept.idconcept = concept.id_concept AND "
-                                + "concept.id_thesaurus = concept_group_concept.idthesaurus"
-                                + "" +
-                                " AND" +
-                                " preferred_term.id_thesaurus = note.id_thesaurus" +
-                                " AND" +
-                                " concept.id_concept = preferred_term.id_concept" +
-                                " AND" +
-                                " concept.id_thesaurus = preferred_term.id_thesaurus" +
-                                " AND" +
+                                "  term.id_thesaurus = note.id_thesaurus AND" +
+                                "  term.lang = note.lang AND" +
+                                "  (term.id_term = note.id_term OR preferred_term.id_concept = note.id_concept) AND" +
+                                "  preferred_term.id_term = term.id_term AND" +
+                                "  preferred_term.id_thesaurus = term.id_thesaurus AND" +
+                                "  concept_group_concept.idthesaurus = concept.id_thesaurus AND" +
+                                "  concept_group_concept.idconcept = concept.id_concept AND" +
+                                "  concept.id_concept = preferred_term.id_concept AND" +
+                                "  concept.id_thesaurus = preferred_term.id_thesaurus AND" +
+
                                 " note.id_thesaurus = '" + idThesaurus + "'" +
                                 multivaluesNote +
                                 langNote +
@@ -640,7 +640,6 @@ public class SearchHelper {
                             + " preferred_term.id_thesaurus = term.id_thesaurus"
                             + " and concept.id_concept = '" + id + "'"
                             + " and term.id_thesaurus = '" + idThesaurus + "'"
-                            + " and term.lang = '" + idLang + "'"
                             + " order by lexical_value ASC LIMIT 100";
 
                     resultSet = stmt.executeQuery(query);

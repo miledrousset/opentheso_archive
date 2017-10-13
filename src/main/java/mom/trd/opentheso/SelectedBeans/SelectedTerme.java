@@ -524,9 +524,15 @@ public class SelectedTerme implements Serializable {
         HashMap<String, String> tempMap = new HashMap<>();
         for (NodeRT nrt : tempRT) {
             if (nrt.getStatus().equals("hidden")) {
-                tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + " (" + nrt.getRole() + ")" + "</del>");
+                if(nrt.getTitle().isEmpty())
+                    tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getIdConcept() + " (" + nrt.getRole() + ")" + "</del>");
+                else
+                    tempMap.put(nrt.getIdConcept(), "<del>" + nrt.getTitle() + " (" + nrt.getRole() + ")" + "</del>");
             } else {
-                tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
+                if(nrt.getTitle().isEmpty())
+                    tempMap.put(nrt.getIdConcept(), nrt.getIdConcept() + " (" + nrt.getRole() + ")");
+                else
+                    tempMap.put(nrt.getIdConcept(), nrt.getTitle() + " (" + nrt.getRole() + ")");
             }
         }
         termesAssocies.addAll(tempMap.entrySet());
@@ -700,9 +706,15 @@ public class SelectedTerme implements Serializable {
         for (NodeNT nnt : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             if (nnt.getStatus().equals("hidden")) {
-                tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + " (" + nnt.getRole() + ")" + "</del>");
+                if(nnt.getTitle().isEmpty())
+                    tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getIdConcept() + " (" + nnt.getRole() + ")" + "</del>");
+                else
+                    tempMap1.put(nnt.getIdConcept(), "<del>" + nnt.getTitle() + " (" + nnt.getRole() + ")" + "</del>");
             } else {
-                tempMap1.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
+                if(nnt.getTitle().isEmpty())
+                    tempMap1.put(nnt.getIdConcept(), nnt.getIdConcept() + " (" + nnt.getRole() + ")");
+                else
+                    tempMap1.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
             }
             termesSpecifique.addAll(tempMap1.entrySet());
         }
@@ -728,9 +740,15 @@ public class SelectedTerme implements Serializable {
         for (NodeBT nbt : tempBT) {
             HashMap<String, String> tempMap2 = new HashMap<>();
             if (nbt.getStatus().equals("hidden")) {
-                tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() + ")" + "</del>");
+                if(nbt.getTitle().isEmpty())
+                    tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getIdConcept() + " (" + nbt.getRole() + ")" + "</del>");
+                else    
+                    tempMap2.put(nbt.getIdConcept(), "<del>" + nbt.getTitle() + " (" + nbt.getRole() + ")" + "</del>");
             } else {
-                tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() + ")");
+                if(nbt.getTitle().isEmpty())
+                    tempMap2.put(nbt.getIdConcept(), nbt.getIdConcept() + " (" + nbt.getRole() + ")");
+                else
+                    tempMap2.put(nbt.getIdConcept(), nbt.getTitle() + " (" + nbt.getRole() + ")");
             }
             termeGenerique.addAll(tempMap2.entrySet());
         }

@@ -61,7 +61,7 @@ public class SearchBean implements Serializable {
                 }
                
             } else if(typeValueSearch == 1) { // idC
-                result1 = new SearchHelper().searchIdConcept(connect.getPoolConnexion(), entry, theso.getThesaurus().getId_thesaurus(), langue.trim());
+                result1 = new SearchHelper().searchIdConcept(connect.getPoolConnexion(), entry, theso.getThesaurus().getId_thesaurus(), theso.getWorkLanguage());
             }
             nbRes = result1.size();
         } else if (typeSearch == 2) { // PERMUTEE
@@ -88,7 +88,11 @@ public class SearchBean implements Serializable {
             }
         }
         for(NodeSearch ns : result1) {
-            String temp = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), ns.getIdGroup(), theso.getThesaurus().getId_thesaurus(), theso.getThesaurus().getLanguage());
+            String temp;
+            if(typeValueSearch == 1) {
+                temp = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), ns.getIdGroup(), theso.getThesaurus().getId_thesaurus(), theso.getWorkLanguage());  
+            } else
+                temp = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), ns.getIdGroup(), theso.getThesaurus().getId_thesaurus(), theso.getThesaurus().getLanguage());
             ns.setGroupLabel(temp);
         }
         theso.getVue().setOnglet(1);

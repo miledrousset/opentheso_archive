@@ -873,14 +873,18 @@ public class DownloadBean implements Serializable {
     
     /**
      * Permet d'exporter le thésauurus au format txt (tabulé et hiérarchisé)
+     * avec des options de colonnes supplémentaires NT, BT, RT, Notes, traductions 
+     * ceci figure dans le tableau (String[] selectedOptions)
      * @param idTheso
      * @param selectedGroups
      * @param codeLang
+     * @param selectedOptions
      * @return 
      * MR
      */
-    public StreamedContent thesoTxt(String idTheso,
-            List<NodeGroup> selectedGroups, String codeLang) {
+    public StreamedContent thesoTxtCsv(String idTheso,
+            List<NodeGroup> selectedGroups, String codeLang,
+            String[] selectedOptions) {
 
         progress_per_100 = 0;
         progress_abs = 0;
@@ -891,8 +895,8 @@ public class DownloadBean implements Serializable {
 
         ExportTxtHelper exportTxtHelper = new ExportTxtHelper();
         exportTxtHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso, codeLang, selectedGroups,
-                nodePreference);
-        exportTxtHelper.exportToTxt();
+                nodePreference, selectedOptions);
+        exportTxtHelper.exportToTxtCsv();
 
         InputStream stream;
 
@@ -925,7 +929,7 @@ public class DownloadBean implements Serializable {
 
         ExportTxtHelper exportTxtHelper = new ExportTxtHelper();
         exportTxtHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso, codeLang, selectedGroups,
-                nodePreference);
+                nodePreference, null);
         exportTxtHelper.exportNotes();
 
         InputStream stream;

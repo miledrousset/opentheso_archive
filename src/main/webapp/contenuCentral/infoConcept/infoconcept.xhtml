@@ -89,6 +89,8 @@
                 </h:panelGroup>
                 <h:outputText id="idC" value="id : "/>
                 <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
+                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="idArk : "/>
+                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" value ="#{selectedTerme.idArk}&lt;br/&gt;" escape="false" styleClass="textInfo"/>
                 
                 <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
                 <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>

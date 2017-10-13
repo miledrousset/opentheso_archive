@@ -78,8 +78,10 @@
 
                         <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Txt, stop_export_Txt);PF('pbAjax').start();" > 
 
-                            <p:fileDownload value="#{downloadBean.thesoTxt(skosExportBean.idTheso,
-                                                     skosExportBean.selectedGroups,skosExportBean.singleLanguageCodeSelected)}" />  
+                            <p:fileDownload value="#{downloadBean.thesoTxtCsv(skosExportBean.idTheso,
+                                                     skosExportBean.selectedGroups,
+                                                     skosExportBean.singleLanguageCodeSelected,
+                                                     skosExportBean.selectedOptions)}" />  
                         </p:commandButton>
 
                         <p:dialog modal="true" widgetVar="exportWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">

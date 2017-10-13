@@ -1240,6 +1240,179 @@ public class RelationsHelper {
         Collections.sort(nodeListNT);
         return nodeListNT;
     }
+    
+    /**
+     * permet de retourner le nombre de NT pour un concept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public int getCountOfNT(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(id_concept2) from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role LIKE 'NT%'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of NT of Concept : " + idConcept, sqle);
+        }
+        return count;
+    }
+    
+    /**
+     * permet de retourner le nombre de BT pour un concept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public int getCountOfBT(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(id_concept2) from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role LIKE 'BT%'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of BT of Concept : " + idConcept, sqle);
+        }
+        return count;
+    }
+    
+    /**
+     * permet de retourner le nombre de RT pour un concept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public int getCountOfRT(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(id_concept2) from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role LIKE 'R%'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of RT of Concept : " + idConcept, sqle);
+        }
+        return count;
+    }
+
+    /**
+     * permet de retourner le nombre de UF pour un concept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public int getCountOfUF(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(non_preferred_term.id_term) "
+                            + " from non_preferred_term, preferred_term "
+                            + " where"
+                            + " non_preferred_term.id_term = preferred_term.id_term"
+                            + " AND"
+                            + " non_preferred_term.id_thesaurus = preferred_term.id_thesaurus"
+                            + " AND"
+                            + " preferred_term.id_concept = '" + idConcept + "'"
+                            + " and preferred_term.id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of UF of Concept : " + idConcept, sqle);
+        }
+        return count;
+    }    
 
     /**
      * cette fonction est pour trier les concept NT par date chronologique

@@ -1140,6 +1140,55 @@ public class NoteHelper {
         return nodeNotes;
     }
     
+    /**
+     * Cette fonction permet de retourner le nombre de notes pour un concept
+     * (toutes les notes (type terme et type concept)
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return
+     */
+    public int getCountOfNotes(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT term.id_term, term.lexical_value, term.lang FROM"
+                            + " term, preferred_term WHERE"
+                            + " term.id_term = preferred_term.id_term"
+                            + " and term.id_thesaurus = preferred_term.id_thesaurus"
+                            + " and preferred_term.id_concept = '" + idConcept + "'"
+                            + " and term.id_thesaurus = '" + idThesaurus + "'"
+                            + " order by term.lexical_value";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                   if(resultSet.next()) {
+                       count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Count of Traductions of Concept  : " + idConcept, sqle);
+        }
+        return count;
+    }    
+    
      /**
      * Change l'id d'un concept dans la table note
      *

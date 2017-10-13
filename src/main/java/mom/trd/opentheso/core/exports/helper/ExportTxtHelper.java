@@ -50,8 +50,16 @@ public class ExportTxtHelper {
     private String selectedLang;
     private String idTheso;
     private HikariDataSource ds;
-    private int count = 0;
+    private int indentationConcept = 0;
+    private int indentationNT = 0;
+    private int indentationBT = 0;
+    private int indentationRT = 0;
+    private int indentationUF = 0;    
+    private int indentationTraductions = 0; 
+    private int indentationNotes = 0; 
+    
     private NodePreference nodePreference;
+    private String[] selectedOptions;
     
     public ExportTxtHelper() {
     }
@@ -66,27 +74,32 @@ public class ExportTxtHelper {
      * @param selectedLang
      * @param selectedGroups
      * @param nodePreference
+     * @param selectedOptions
      */
     public void setThesaurusDatas(HikariDataSource ds,
             String idThesaurus,
             String selectedLang,
             List<NodeGroup> selectedGroups,
-            NodePreference nodePreference) {
+            NodePreference nodePreference,
+            String[] selectedOptions) {
 
         this.idTheso = idThesaurus;
         this.selectedLang = selectedLang;
         this.selectedGroups = selectedGroups;
         this.ds = ds;
         this.nodePreference = nodePreference;
+        this.selectedOptions = selectedOptions;
     }
 
     /**
-     * permet de préparer le thésaurus au format tabulé les données sont écrites
-     * dans une variable type StringBuffer
+     * permet de préparer le thésaurus au format tabulé. Les données sont écrites
+     * dans des variables type StringBuffer suivant les options sélectionnées 
+     * dans le tableau String[] selectedOptions
      *
+     * @param selectedOptions
      * @return
      */
-    public boolean exportToTxt() {
+    public boolean exportToTxtCsv() {
         txtBuff = new StringBuffer();
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         
@@ -159,26 +172,69 @@ public class ExportTxtHelper {
         if(nodeUris == null) return;
         
         // pour compter le décalage (indentations)
-        for (NodeUri nodeUri : nodeUris) {
+        nodeUris.forEach((nodeUri) -> {
             String indentation = "";
             countIndentation(nodeUri.getIdConcept(), indentation);
-        }
+        });
         
         // on écrit les concepts et le décalage par tabulation
-        for (NodeUri nodeUri : nodeUris) {
+        nodeUris.forEach((nodeUri) -> {
             String indentation = "";
             writeConceptsInfo(nodeUri.getIdConcept(), indentation);
             writeConceptRecursive(nodeUri.getIdConcept(), indentation);
-        }
+        });
     }
 
+    /**
+     * permet de compter le nombre de décalalge pour chaque type de données 
+     * concept : pour l'hiérarchie
+     * NT : pour le nombre maxi de NT existant dans le thésaurus ou le domaine choisi
+     * RT ...
+     * UF ....
+     * 
+     * @param idConcept
+     * @param indentation 
+     */
     private void countIndentation(String idConcept, String indentation) {
         ArrayList<NodeNT> childList = new RelationsHelper().getListNT(ds, idConcept, idTheso, selectedLang);
         if (childList == null) return;
+        // indentation des concepts par hiérarchie
         indentation += "\t";
         int tot = StringUtils.countMatches(indentation, "\t");
-        if(tot > count) 
-            count = tot;        
+        if(tot > indentationConcept) 
+            indentationConcept = tot;
+        
+        // indentation des NT nombre maxi
+        int totNT = new RelationsHelper().getCountOfNT(ds, idConcept, idTheso);
+        if(totNT > indentationNT) 
+            indentationNT = totNT;
+
+        // indentation des BT nombre maxi
+        int totBT = new RelationsHelper().getCountOfBT(ds, idConcept, idTheso);
+        if(totBT > indentationBT) 
+            indentationBT = totBT;
+        
+        // indentation des RT nombre maxi
+        int totRT = new RelationsHelper().getCountOfRT(ds, idConcept, idTheso);
+        if(totRT > indentationRT) 
+            indentationRT = totRT;    
+        
+        // indentation des UF nombre maxi
+        int totUF = new RelationsHelper().getCountOfUF(ds, idConcept, idTheso);
+        if(totUF > indentationUF) 
+            indentationUF = totUF;
+        
+        // indentation traductions
+        int totTraductions = new TermHelper().getCountOfTraductions(ds, idConcept, idTheso);
+        if(totTraductions > indentationTraductions) 
+            indentationTraductions = totTraductions;
+        
+        // indentation notes
+        int totNotes = new NoteHelper().getCountOfNotes(ds, idConcept, idTheso);
+        if(totNotes > indentationNotes) 
+            indentationNotes = totNotes;        
+        
+        
         for (NodeNT nodeNT : childList) {
             countIndentation(nodeNT.getIdConcept(), indentation);
         }
@@ -231,8 +287,8 @@ public class ExportTxtHelper {
             txtBuff.append(nodeConcept.getTerm().getLexical_value());
         }
         int tot = StringUtils.countMatches(indentation, "\t");
-        if(tot < count) {
-            addTabulate (count - tot);
+        if(tot < indentationConcept) {
+            addTabulate (indentationConcept - tot);
         }
         
         //on écrit les occurences 
@@ -240,8 +296,6 @@ public class ExportTxtHelper {
         txtBuff.append("Nb:");
         txtBuff.append(totalOfNotices(idConcept));
         
-        
-        first = true;
         // on écrit la relation TG
         txtBuff.append("\t");        
         if(!nodeConcept.getNodeBT().isEmpty()) {
