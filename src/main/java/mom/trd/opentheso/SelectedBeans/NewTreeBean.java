@@ -66,6 +66,10 @@ public class NewTreeBean implements Serializable {
     private String idThesoSelected;
     private String defaultLanguage;
     private ArrayList<String> orphans;
+    
+    private boolean duplicate = false;
+    private boolean forced = false;
+    private boolean editPassed = false;
 
     public NewTreeBean() {
         root = (TreeNode) new DefaultTreeNode("Root", null);
@@ -123,6 +127,13 @@ public class NewTreeBean implements Serializable {
         return type;
     }
 
+    public void init() {
+        duplicate = false;
+        forced = false;
+        editPassed = false;
+    }    
+    
+    
     /**
      * Pour détecter les agents d'indexation
      *
@@ -980,21 +991,21 @@ public class NewTreeBean implements Serializable {
      *
      */
     public void editNomT() {
+        duplicate = false;
         if (selectedTerme == null) {
             return;
         }
-        if (selectedTerme.getSelectedTermComp() == null) {
+/*        if (selectedTerme.getSelectedTermComp() == null) {
             return;
         }
+        selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());        
+  */      
         // si c'est la même valeur, on fait rien
-        String valueEdit = selectedTerme.getSelectedTermComp().getTermLexicalValue().trim();
-        if (selectedTerme.getNom().trim().equals(valueEdit)) {
+        if (selectedTerme.getNom().trim().equals(selectedTerme.getNomEdit())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
             return;
         }
-
-        selectedTerme.setNomEdit(selectedTerme.getSelectedTermComp().getTermLexicalValue());
 
         // saisie d'une valeur vide
         if (selectedTerme.getNomEdit().trim().equals("")) {
@@ -1002,9 +1013,19 @@ public class NewTreeBean implements Serializable {
             selectedTerme.setNomEdit(selectedTerme.getNom());
             return;
         }
-
-        /// cas d'un Concept
-        String temp = selectedTerme.getNomEdit();
+        
+        // si le terme existe, il faut proposer le choix de valider ou non !!
+        if(!forced) { // ici l'utilisateur a accepté de valider un doublon, donc on ne controle plus le terme 
+            if(new TermHelper().isTermExistForEdit(connect.getPoolConnexion(),
+                    selectedTerme.getNomEdit().trim(),
+                    idThesoSelected, selectedTerme.getIdT(), selectedTerme.getIdlangue())) {
+                // traitement des doublons
+                duplicate = true;
+                editPassed = true;
+                return;
+            }
+        }
+        
         if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
             selectedTerme.editTerme(1);
         } else {
@@ -1018,13 +1039,42 @@ public class NewTreeBean implements Serializable {
 
         if (selectedNode != null) {
             //((MyTreeNode) selectedNode).setData(temp + " (Id_" + selectedTerme.getIdC() + ")");
-            ((MyTreeNode) selectedNode).setData(temp);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("tree.info2")));
+            ((MyTreeNode) selectedNode).setData(selectedTerme.getNom());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedTerme.getNom() + " " + langueBean.getMsg("tree.info2")));
+            selectedTerme.setNomEdit(selectedTerme.getNom());
+        }
+
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        forced = false;
+        duplicate = false;
+        editPassed = true;
+    }
+    
+    /**
+     * Fonction qui permet de modifier le nom d'un concept avec un autre en doublon (action autorisée après validation de l'utilisateur)
+     */
+    public void renameWithoutControl(){
+        if (selectedTerme.getIdT() != null && !selectedTerme.getIdT().equals("")) {
+            selectedTerme.editTerme(1);
+        } else {
+            // le terme n'existe pas encore
+            if (!selectedTerme.editTerme(2)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                selectedTerme.setNomEdit(selectedTerme.getNom());
+                return;
+            }
+        }
+
+        if (selectedNode != null) {
+            //((MyTreeNode) selectedNode).setData(temp + " (Id_" + selectedTerme.getIdC() + ")");
+            ((MyTreeNode) selectedNode).setData(selectedTerme.getNom());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedTerme.getNom() + " " + langueBean.getMsg("tree.info2")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
         }
 
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
     }
+    
     
     /**
      * permet de savoir si le neoud sélectionné est un Group
@@ -1285,6 +1335,31 @@ public class NewTreeBean implements Serializable {
 
     public void setNTtag(String NTtag) {
         this.NTtag = NTtag;
+    }
+
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
+    }
+
+    public boolean isForced() {
+        return forced;
+    }
+
+    public void setForced(boolean forced) {
+        this.forced = forced;
+        this.duplicate = forced;
+    }
+
+    public boolean isEditPassed() {
+        return editPassed;
+    }
+
+    public void setEditPassed(boolean editPassed) {
+        this.editPassed = editPassed;
     }
 
 }

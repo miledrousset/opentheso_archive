@@ -40,6 +40,7 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.primefaces.event.TabChangeEvent;
 
 @ManagedBean(name = "selectedCandidat", eager = true)
@@ -131,8 +132,8 @@ public class SelectedCandidat implements Serializable {
         selected.setValue("");
         selected.setNbProp(0);
         infoCdt = new NodeCandidat();
-        infoCdt.setNodesUser(new ArrayList<NodeUser>());
-        infoCdt.setNodeTraductions(new ArrayList<NodeTraductionCandidat>());
+        infoCdt.setNodesUser(new ArrayList<>());
+        infoCdt.setNodeTraductions(new ArrayList<>());
         selectedNvx = new NodeAutoCompletion();
         tradInsert = new ArrayList<>();
         setPreferences();
@@ -148,8 +149,9 @@ public class SelectedCandidat implements Serializable {
         selected.setValue("");
         selected.setNbProp(0);
         infoCdt = new NodeCandidat();
-        infoCdt.setNodesUser(new ArrayList<NodeUser>());
-        infoCdt.setNodeTraductions(new ArrayList<NodeTraductionCandidat>());
+        infoCdt.setNodesUser(new ArrayList<>());
+        infoCdt.setNodeTraductions(new ArrayList<>());
+        selectedNvx = new NodeAutoCompletion();
         note = "";
         niveau = "";
         domaine = "";
@@ -177,16 +179,37 @@ public class SelectedCandidat implements Serializable {
      */
     public void onChange(TabChangeEvent event) {
         String nom = (String) event.getData();
+
         for (NodeUser nu : infoCdt.getNodesUser()) {
             if (nom.equals(nu.getName())) {
                 NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, nu.getId());
                 note = np.getNote();
                 modifiedProposition = np.getModified();
-                niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langueTheso) + " (" + np.getIdConceptParent() + ")";
-                domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langueTheso) + " (" + np.getIdGroup() + ")";
+                if(!np.getIdConceptParent().isEmpty()) {
+                    niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langueTheso) + " (" + np.getIdConceptParent() + ")";
+                    showGroup(np);
+           //         domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langueTheso) + " (" + np.getIdGroup() + ")";
+                }
                 break;
             }
         }
+    }
+    
+    /**
+     * permet de récupérer les Groups du concept sur lequel il faut accrocher le candidat
+     * @param np 
+     */
+    private void showGroup(NodeProposition np) {
+        boolean first = true;        
+        ArrayList<NodeGroup> nodeGroups = new GroupHelper().getListGroupOfConcept(connect.getPoolConnexion(), idTheso, np.getIdConceptParent(), langueTheso);
+        for (NodeGroup nodeGroup : nodeGroups) {
+            if(first) {
+                domaine = nodeGroup.getLexicalValue();
+                first = false;
+            } else {
+                domaine = domaine + "; " + nodeGroup.getLexicalValue();
+            }
+        }         
     }
 
     /**
@@ -203,6 +226,7 @@ public class SelectedCandidat implements Serializable {
         // if(theso == null) return;
         idTheso = theso;
         langueTheso = langue;
+
         infoCdt.setNodesUser(new CandidateHelper().getListUsersOfCandidat(connect.getPoolConnexion(), selected.getIdConcept(), theso));
         infoCdt.setNodeTraductions(new CandidateHelper().getNodeTraductionCandidat(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, langue));
         nomsProp = new ArrayList<>();
@@ -217,7 +241,8 @@ public class SelectedCandidat implements Serializable {
             }
             note = np.getNote();
             niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langue) + " (" + np.getIdConceptParent() + ")";
-            domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langue) + " (" + np.getIdGroup() + ")";
+            showGroup(np);
+           // domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langue) + " (" + np.getIdGroup() + ")";
 
             modifiedProposition = np.getModified();
             createdProposition = np.getCreated();
@@ -268,12 +293,16 @@ public class SelectedCandidat implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
             return false;
         }
+        initNewProposal();
+        return true;
+    }
+    
+    private void initNewProposal() {
         selectedNvx = new NodeAutoCompletion();
         noteEdit = "";
         domaineEdit = "";
         niveauEdit = "";
         valueEdit = "";
-        return true;
     }
 
     /**
@@ -284,6 +313,9 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean newPropCandidat(String langue) {
         try {
+            if(!selectedNvx.getIdConcept().isEmpty())
+                if(!setLevelInfos(selectedNvx.getIdConcept(), langue)) return false;
+            
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
             if (selectedNvx != null) {
@@ -330,12 +362,35 @@ public class SelectedCandidat implements Serializable {
                     }
                 }
             }
+            initNewProposal();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-
+    }
+    
+    /**
+     * permet d'initialiser les Groupes pour le niveau de concept sélectionné dans le thésauurus 
+     * @param idConcept
+     * @param idLang
+     * @return 
+     */
+    private boolean setLevelInfos(String idConcept, String idLang){
+        GroupHelper groupHelper = new GroupHelper();
+        ArrayList<NodeGroup> nodeGroups = groupHelper.getListGroupOfConcept(connect.getPoolConnexion(),
+                idTheso, idConcept, idLang);
+        if(nodeGroups == null) return false;
+        String tmp = "";
+        boolean first = true;
+        for (NodeGroup nodeGroup : nodeGroups) {
+            if(!first)
+                tmp = tmp + "; ";
+            tmp = tmp + nodeGroup.getLexicalValue();
+            first = false;
+        }
+        selectedNvx.setGroupLexicalValue(tmp);
+        return true;
     }
 
     /**
@@ -651,16 +706,25 @@ public class SelectedCandidat implements Serializable {
     public boolean toInsert() {
 
         setPreferences();
-        if (selectedNvx != null) {
-            niveauEdit = selectedNvx.getIdConcept();
-        } else {
-            niveauEdit = null;
-        }
-        if (domaineEdit == null || domaineEdit.trim().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sCdt.error1")));
+        if (selectedNvx == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sCdt.error4")));
             return false;
         }
+        niveauEdit = selectedNvx.getIdConcept();
+        /*else {
+            niveauEdit = null;
+        }*/
+        
+        
+        
+     /*   if (domaineEdit == null || domaineEdit.trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sCdt.error1")));
+            return false;
+        }*/
 
+        GroupHelper groupHelper = new GroupHelper();
+        ArrayList<String> idGroups = groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(), idTheso, niveauEdit);
+     
         if (tradInsert.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sCdt.error2")));
             return false;
@@ -670,6 +734,12 @@ public class SelectedCandidat implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
             return false;
         }
+        
+        if (idGroups.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "No Group Error !!"));
+            return false;
+        }        
+        
 
         HashMap<String, String> trad = new HashMap<>();
         if (tradInsert.contains(langueTheso)) {
@@ -689,7 +759,7 @@ public class SelectedCandidat implements Serializable {
 
         instance.setIdentifierType(identifierType);
         Concept concept = new Concept();
-        concept.setIdGroup(domaineEdit);
+        concept.setIdGroup(idGroups.get(0));
         concept.setIdThesaurus(idTheso);
         concept.setStatus("D");
         concept.setNotation("");
@@ -704,11 +774,16 @@ public class SelectedCandidat implements Serializable {
 
         String idc;
 
-        if (niveauEdit == null || niveauEdit.trim().equals("")) { // Top concept
-            idc = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
-        } else { // concept
+    //    if (niveauEdit == null || niveauEdit.trim().equals("")) { // Top concept
+     //       idc = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
+      //  } else { // concept
             idc = instance.addConcept(connect.getPoolConnexion(), niveauEdit, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
+       // }
+        // permet d'ajouter les domaines au nouveau concept
+        for (String idGroup : idGroups) {
+            groupHelper.addConceptGroupConcept(connect.getPoolConnexion(), idGroup, niveauEdit, idTheso);
         }
+        
 
         if (!temp.isEmpty()) {
             String idt = new TermHelper().getThisTerm(connect.getPoolConnexion(), idc, idTheso, langueTemp).getId_term();

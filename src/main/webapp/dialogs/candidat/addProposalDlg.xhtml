@@ -1,0 +1,62 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <p:dialog id="idAddProposalDlg"  header="#{langueBean.getMsg('cdt.btnAddProp')}" styleClass="styleText2" widgetVar="addProposalDlg" modal="true" resizable="false"  >
+            <h:panelGroup id="panAjProp" style="background: transparent; box-shadow: none;">
+                <h:form>
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
+                            <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
+                            <td>
+                                <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
+                                                itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
+                                    <f:facet name="itemtip">
+                                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                            <f:facet name="header" rendered="#{(t.url) != null}">
+                                                <h:outputText value="ID : " />
+                                                <h:outputText value="#{t.idConcept}" />
+                                            </f:facet>
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                            <h:outputText value="#{t.groupLexicalValue}" />
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                            <h:outputText value="#{t.definition}" />
+                                        </h:panelGrid>
+                                    </f:facet>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.MT')}" /> : </td>
+                            <td>
+                                <h:selectOneMenu value="#{selectedCandidat.domaineEdit}" styleClass="listes" style="width: 200px;">
+                                    <f:selectItems value="#{theso.listeDomaine()}"/>
+                                </h:selectOneMenu>                                
+                            </td>
+                        </tr>
+                    </table><br/>
+                    <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
+                                     update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView, :idAddProposalDlg" oncomplete="PF('addTgDlg').hide();"/>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+    </ui:composition>
+
+
+
+
+
+
+

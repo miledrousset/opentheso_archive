@@ -1096,7 +1096,8 @@ public class SelectedTerme implements Serializable {
                     c.setIdThesaurus(idTheso);
                     c.setTopConcept(false);
                     c.setStatus("D");
-                    if (!new ConceptHelper().addNewGroupOfConcept(conn, c, user.getUser().getId())) {
+                    if (!new GroupHelper().addConceptGroupConcept(conn, s, idConcept, idTheso)) {
+                      //      !new ConceptHelper().addNewGroupOfConcept(conn, c, user.getUser().getId())) {
                         conn.rollback();
                         conn.close();
                         return false;

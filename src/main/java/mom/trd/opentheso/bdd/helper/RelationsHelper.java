@@ -1372,10 +1372,11 @@ public class RelationsHelper {
      * @param ds
      * @param idConcept
      * @param idThesaurus
+     * @param idLang
      * @return 
      */
     public int getCountOfUF(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
@@ -1395,7 +1396,8 @@ public class RelationsHelper {
                             + " non_preferred_term.id_thesaurus = preferred_term.id_thesaurus"
                             + " AND"
                             + " preferred_term.id_concept = '" + idConcept + "'"
-                            + " and preferred_term.id_thesaurus = '" + idThesaurus + "'";
+                            + " and preferred_term.id_thesaurus = '" + idThesaurus + "'"
+                            + " and non_preferred_term.lang = '" + idLang + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {

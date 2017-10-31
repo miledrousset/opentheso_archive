@@ -1147,10 +1147,11 @@ public class NoteHelper {
      * @param ds
      * @param idConcept
      * @param idThesaurus
+     * @param idLang
      * @return
      */
     public int getCountOfNotes(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
@@ -1163,14 +1164,16 @@ public class NoteHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT term.id_term, term.lexical_value, term.lang FROM"
-                            + " term, preferred_term WHERE"
-                            + " term.id_term = preferred_term.id_term"
-                            + " and term.id_thesaurus = preferred_term.id_thesaurus"
-                            + " and preferred_term.id_concept = '" + idConcept + "'"
-                            + " and term.id_thesaurus = '" + idThesaurus + "'"
-                            + " order by term.lexical_value";
-
+                    String query = "SELECT count(preferred_term.id_concept) FROM " +
+                        "  preferred_term, note" +
+                        " WHERE " +
+                        "  preferred_term.id_thesaurus = note.id_thesaurus AND" +
+                        "  (preferred_term.id_term = note.id_term or" +
+                        "  preferred_term.id_concept = note.id_concept)" +
+                        "  AND" +
+                        "  preferred_term.id_thesaurus = '" + idThesaurus + "'" +
+                        " AND preferred_term.id_concept='" + idConcept + "'" +
+                        " AND note.lang = '" + idLang + "'";    
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                    if(resultSet.next()) {
