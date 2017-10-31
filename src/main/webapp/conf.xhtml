@@ -19,6 +19,7 @@
         <ui:include src="admin/regenerateAllConceptId.xhtml" />
         <ui:include src="admin/regenerateArkId.xhtml" />
         <ui:include src="/admin/baseDeDonnes/miseAJourEditDlg.xhtml"/>
+        <ui:include src="/admin/copyrightEditDlg.xhtml" />
 
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
@@ -151,6 +152,8 @@
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
+                            <p:separator/>
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('copyright.addCopyrightTo')}" action="#{copyrightBean.setDisplayBrutText(false)}" oncomplete="PF('copyrightEditDlg').show()"  styleClass="styleButton"/>
                         </p:menuButton>
                     </h:form>
                 </fieldset>
