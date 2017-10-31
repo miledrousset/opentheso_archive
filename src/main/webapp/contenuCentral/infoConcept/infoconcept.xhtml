@@ -90,6 +90,8 @@
                 <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="idArk : "/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" value ="#{selectedTerme.idArk}&lt;br/&gt;" escape="false" styleClass="textInfo"/>
+                <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
+                <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />                
                 
                 <h:outputText value="#{langueBean.getMsg('index.MT')}" />  : 
                 <h:outputText id="mTheso" value="#{selectedTerme.microTheso}" styleClass="textInfo"/><br/>
@@ -97,18 +99,7 @@
                 <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
 
                     <p:tab title="..."    titleStyleClass="titleAccordion">
- 
-
-                        <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
-                        <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />
-
-
-
-
-
-
-
-                        <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
+                         <h:outputText value="#{langueBean.getMsg('index.dateC')}" />  : 
                         <h:outputText id="dateC" value="#{selectedTerme.dateC}" styleClass="textInfo"/><br/>
                         <span>
                             <h:outputText value="#{langueBean.getMsg('index.dateE')}" />  : 

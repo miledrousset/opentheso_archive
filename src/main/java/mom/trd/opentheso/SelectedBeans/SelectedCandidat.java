@@ -1,6 +1,7 @@
 package mom.trd.opentheso.SelectedBeans;
 
 import com.sun.mail.smtp.SMTPTransport;
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -241,9 +242,11 @@ public class SelectedCandidat implements Serializable {
             }
             note = np.getNote();
             niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langue) + " (" + np.getIdConceptParent() + ")";
-            showGroup(np);
-           // domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langue) + " (" + np.getIdGroup() + ")";
-
+            if(!np.getIdConceptParent().isEmpty()) {
+                niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langueTheso) + " (" + np.getIdConceptParent() + ")";
+                showGroup(np);
+       //         domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langueTheso) + " (" + np.getIdGroup() + ")";
+            }
             modifiedProposition = np.getModified();
             createdProposition = np.getCreated();
             if (selected.getEtat().equals("r") || selected.getEtat().equals("v") || selected.getEtat().equals("i")) {
@@ -313,8 +316,12 @@ public class SelectedCandidat implements Serializable {
      */
     public boolean newPropCandidat(String langue) {
         try {
-            if(!selectedNvx.getIdConcept().isEmpty())
-                if(!setLevelInfos(selectedNvx.getIdConcept(), langue)) return false;
+            if(selectedNvx != null) {
+                if(!selectedNvx.getIdConcept().isEmpty())
+                    if(!setLevelInfos(selectedNvx.getIdConcept(), langue)) return false;
+            } else {
+                niveauEdit = "";
+            }  
             
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
@@ -348,8 +355,11 @@ public class SelectedCandidat implements Serializable {
             }
             note = np.getNote();
             niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langue) + " (" + np.getIdConceptParent() + ")";
-            domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langue) + " (" + np.getIdGroup() + ")";
-
+            if(!np.getIdConceptParent().isEmpty()) {
+                niveau = new ConceptHelper().getLexicalValueOfConcept(connect.getPoolConnexion(), np.getIdConceptParent(), idTheso, langueTheso) + " (" + np.getIdConceptParent() + ")";
+                showGroup(np);
+       //         domaine = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), np.getIdGroup(), idTheso, langueTheso) + " (" + np.getIdGroup() + ")";
+            }
             selected.setNbProp(selected.getNbProp() + 1);
 
             // envoie d'email d'alerte !!
@@ -358,7 +368,8 @@ public class SelectedCandidat implements Serializable {
                 ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
                 for (String mail : lesMails) {
                     if (mail != null && !mail.trim().equals("")) {
-                        envoyerMailAlertNb(selected.getValue(), mail, minAlert);
+                        String message =  "Le candidat " + selected.getValue() + " a atteint le seuil d'alerte de " + minAlert + " fois.";
+                        envoyerMailAlert(mail, message);
                     }
                 }
             }
@@ -393,16 +404,20 @@ public class SelectedCandidat implements Serializable {
         return true;
     }
 
+    //////////////////////////////////////////////////////////////////
+    ///// regroupement des alertes mails sur une seule fonction //////
+    //////////////////////////////////////////////////////////////////
+    //#MR
     /**
      * Un mail est envoyé à l'adresse mail passée en paramètre pour signaler
-     * qu'un candidat a atteint le seuil de propositions activant l'alerte
+     * un évènmenet en paramètre
      *
-     * @param candidat
      * @param dest
-     * @param minAlert
+     * @param message
      * @return
      */
-    public boolean envoyerMailAlertNb(String candidat, String dest, int minAlert) {
+    public boolean envoyerMailAlert(String dest, String message) {
+        boolean status = false;
         try {
             boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
             if (alert) {
@@ -418,170 +433,22 @@ public class SelectedCandidat implements Serializable {
                 msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
                 msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
                 msg.setSubject("Gestion de candidats");
-                msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
+                msg.setText(message);
 
                 SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
                 transport.connect();
                 transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
                 transport.close();
-              
-            /*    
-                // version avec les infos dans la BDD
-                
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
-                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
-                Integer temp = user.getNodePreference().getPortMail();
-                props.setProperty("mail.smtp.port", temp.toString());
-                Boolean temp2 = user.getNodePreference().isAuthMail();
-                props.setProperty("mail.smtp.auth", temp2.toString());
-                Session session = Session.getInstance(props);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
-                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-                msg.setSubject("Proposition de candidat");
-                msg.setText("Le candidat " + candidat + " a été proposé au moins " + minAlert + " fois.");
-
-                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
-                transport.connect();
-                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
-                transport.close();
-                */
+                status = true;
             }
         } catch (NoSuchProviderException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MessagingException ex) {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return true;
-    }
+        return status;
+    }    
 
-    /**
-     * Un mail est envoyé à l'adresse mail passée en paramètre pour signaler
-     * qu'un candidat a été validé
-     *
-     * @param candidat
-     * @param dest
-     * @return
-     */
-    public boolean envoyerMailAlertValid(String candidat, String dest) {
-        try {
-            boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
-            if (alert) {
-                ResourceBundle bundlePref = getBundlePref();
-
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
-                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
-                Session session = Session.getInstance(props);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
-                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-                msg.setSubject("Gestion de candidats");
-                msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
-
-                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
-                transport.connect();
-                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
-                transport.close();
-                
-                /*
-                // version avec appel à la BDD
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
-                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
-                Integer temp = user.getNodePreference().getPortMail();
-                props.setProperty("mail.smtp.port", temp.toString());
-                Boolean temp2 = user.getNodePreference().isAuthMail();;
-                props.setProperty("mail.smtp.auth", temp2.toString());
-                Session session = Session.getInstance(props);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
-                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-                msg.setSubject("Gestion de candidats");
-                msg.setText("Le candidat " + candidat + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".");
-
-                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
-                transport.connect();
-                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
-                transport.close();
-                */
-            }
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-            Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return true;
-    }
-
-    /**
-     * Un mail est envoyé à l'adresse mail passée en paramètre pour signaler
-     * qu'un candidat a été refusé
-     *
-     * @param candidat
-     * @param dest
-     * @return
-     */
-    public boolean envoyerMailAlertRefut(String candidat, String dest) {
-        try {
-            boolean alert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).isAlertCdt();
-            if (alert) {
-
-                ResourceBundle bundlePref = getBundlePref();
-
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", bundlePref.getString("protocolMail"));
-                props.setProperty("mail.smtp.host", bundlePref.getString("hostMail"));
-                props.setProperty("SMTP_PORT_PROPERTY", bundlePref.getString("portMail"));
-                props.setProperty("mail.smtp.auth", bundlePref.getString("authMail"));
-                Session session = Session.getInstance(props);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(bundlePref.getString("mailFrom")));
-                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-                msg.setSubject("Gestion de candidats");
-                msg.setText("Le candidat " + candidat + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".");
-
-                SMTPTransport transport = (SMTPTransport) session.getTransport(bundlePref.getString("transportMail"));
-                transport.connect();
-                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
-                transport.close();
-                
-                /*
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("mail.transport.protocol", user.getNodePreference().getProtcolMail());
-                props.setProperty("mail.smtp.host", user.getNodePreference().getHostMail());
-                Integer temp = user.getNodePreference().getPortMail();
-                props.setProperty("mail.smtp.port", temp.toString());
-                Boolean temp2 = user.getNodePreference().isAuthMail();;
-                props.setProperty("mail.smtp.auth", temp2.toString());
-                Session session = Session.getInstance(props);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(user.getNodePreference().getMailFrom()));
-                msg.setRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-                msg.setSubject("Gestion de candidats");
-                msg.setText("Le candidat " + candidat + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".");
-
-                SMTPTransport transport = (SMTPTransport) session.getTransport(user.getNodePreference().getTransportMail());
-                transport.connect();
-                transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
-                transport.close();
-                */
-            }
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-            Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return true;
-    }
 
     public boolean newTradCdt(String idT, String langue) {
         if (!new CandidateHelper().addTermCandidatTraduction(connect.getPoolConnexion(), selected.getIdConcept(), valueEdit, langueEdit.trim(), idT, theUser.getUser().getId())) {
@@ -638,61 +505,65 @@ public class SelectedCandidat implements Serializable {
      */
     /**
      * Passe un candidat de son état courant à l'état validé. Un mail est envoyé
-     * aux admin et au contributor si l'option d'envois de mail est activée
+     * aux contributeurs si l'option d'envoi de mail est activée
      */
     public void toValid() {
         CandidateHelper ch = new CandidateHelper();
         ch.updateCandidatStatus(connect.getPoolConnexion(), "v", idTheso, selected.getIdConcept());
         ch.addAdminMessage(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, theUser.getUser().getId(), msgValid);
-        msgValid = "";
+    //    msgValid = "";
         selected.setEtat("v");
 
-        // envoie d'email d'alerte !!
-        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
-        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(), idTheso);
-        for (String contrib : contribs) {
+        
+    //    ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
+//        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(), idTheso);
+
+        // récupération des contributeurs du candidat
+        ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
+            selected.getIdConcept(), idTheso);
+        
+    /*    for (NodeUser nodeUser : contribs) {
             if (!lesMails.contains(contrib)) {
                 lesMails.add(contrib);
             }
-        }
-        for (String mail : lesMails) {
-            if (mail != null && !mail.trim().equals("")) {
-                envoyerMailAlertValid(selected.getValue(), mail);
+        }*/
+        for (NodeUser nodeUser : contribs) {
+            if (nodeUser.getMail() != null &&  !nodeUser.getMail().trim().equals("")) {
+                String message =  "Votre candidat " + selected.getValue() + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".";
+                message = message + "\n avec le message suivant : " + msgValid + ".";
+                envoyerMailAlert(nodeUser.getMail(), message);
             }
-
         }
-
+        msgValid = "";
         vue.setAddValidCdt(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info4")));
     }
 
     /**
      * Passe un candidat de son état courant à l'état refusé. Un mail est envoyé
-     * aux admin et au contributor si l'option d'envois de mail est activée
+     * aux contributeurs si l'option d'envoi de mail est activée
      */
     public void toRefus() {
         CandidateHelper ch = new CandidateHelper();
         ch.updateCandidatStatus(connect.getPoolConnexion(), "r", idTheso, selected.getIdConcept());
         ch.addAdminMessage(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, theUser.getUser().getId(), msgValid);
         // gestion message
-        msgValid = "";
+
         selected.setEtat("r");
 
         // envoie d'email d'alerte !!
-        ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
-        ArrayList<String> contribs = new UserHelper().getMailContributor(connect.getPoolConnexion(), selected.getIdConcept(), idTheso);
-        for (String contrib : contribs) {
-            if (!lesMails.contains(contrib)) {
-                lesMails.add(contrib);
-            }
-        }
-        for (String mail : lesMails) {
-            if (mail != null && !mail.trim().equals("")) {
-                envoyerMailAlertRefut(selected.getValue(), mail);
+        ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
+            selected.getIdConcept(), idTheso);
+        
+        for (NodeUser nodeUser : contribs) {
+            if (nodeUser.getMail() != null && !nodeUser.getMail().trim().equals("")) {
+                String message = "Le candidat " + selected.getValue() + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".";
+                message = message + "\n avec le message suivant : " + msgValid + ".";
+                envoyerMailAlert(nodeUser.getMail(), message);
             }
 
         }
-
+        msgValid = "";
         vue.setAddValidCdt(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info5")));
     }
@@ -801,6 +672,26 @@ public class SelectedCandidat implements Serializable {
         CandidateHelper ch = new CandidateHelper();
         ch.updateCandidatStatus(connect.getPoolConnexion(), "i", idTheso, selected.getIdConcept());
         ch.addAdminMessage(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, theUser.getUser().getId(), msgValid);
+        
+        
+        // message d'alerte 
+        ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
+            selected.getIdConcept(), idTheso);
+        
+    /*    for (NodeUser nodeUser : contribs) {
+            if (!lesMails.contains(contrib)) {
+                lesMails.add(contrib);
+            }
+        }*/
+        for (NodeUser nodeUser : contribs) {
+            if (nodeUser.getMail() != null &&  !nodeUser.getMail().trim().equals("")) {
+                String message =  "Votre candidat " + selected.getValue() + " a été intégré au thésaurus par le(a) terminologue : " + theUser.getUser().getName() + ".";
+                envoyerMailAlert(nodeUser.getMail(), message);
+            }
+        }        
+        
+        
+        
         msgValid = "";
         selected.setEtat("i");
         vue.setAddInsertCdt(false);

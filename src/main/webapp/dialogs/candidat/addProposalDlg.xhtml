@@ -9,7 +9,7 @@
         xmlns:p="http://primefaces.org/ui">
 
         <p:dialog id="idAddProposalDlg"  header="#{langueBean.getMsg('cdt.btnAddProp')}" styleClass="styleText2" widgetVar="addProposalDlg" modal="true" resizable="false"  >
-            <h:panelGroup id="panAjProp" style="background: transparent; box-shadow: none;">
+            <h:panelGroup id="panAjProp7" style="background: transparent; box-shadow: none;">
                 <h:form>
                     <table>
                         <tr>
@@ -38,17 +38,10 @@
                                 </p:autoComplete>
                             </td>
                         </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('cdt.MT')}" /> : </td>
-                            <td>
-                                <h:selectOneMenu value="#{selectedCandidat.domaineEdit}" styleClass="listes" style="width: 200px;">
-                                    <f:selectItems value="#{theso.listeDomaine()}"/>
-                                </h:selectOneMenu>                                
-                            </td>
-                        </tr>
+
                     </table><br/>
                     <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                     update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView, :idAddProposalDlg" oncomplete="PF('addTgDlg').hide();"/>
+                                     update=":idAddProposalDlg, :gestionCandidat, :tableCdt" oncomplete="PF('addTgDlg').hide();"/>
                 </h:form>
             </h:panelGroup>
         </p:dialog>

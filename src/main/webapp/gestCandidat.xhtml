@@ -98,7 +98,53 @@
             <!-- POP UP AJOUT CANDIDAT FIN -->
 
             <!-- POP UP AJOUT PROPOSITION DEBUT -->
+            <h:panelGroup id="panAjProp" style="background: transparent; box-shadow: none;">
+                <h:panelGroup rendered="#{vue.addPropCandidat == true}" styleClass="overlay" />
+                <h:panelGroup rendered="#{vue.addPropCandidat == true}" styleClass="popUp" style="width: 300px;">
+                    <div id="titreAllEdit">
+                        <h:outputText value="#{langueBean.getMsg('cdt.btnAddProp')}" />
+                        <div id="divClose">
+                            <h:form>
+                                <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddPropCandidat(false)}" 
+                                                 update=":panAjProp" />
+                            </h:form>
+                        </div>
+                    </div>
+                    <br/>
+                    <h:form>
+                        <table>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
+                                <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
+                                <td>
+                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
+                                                    itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
+                                        <f:facet name="itemtip">
+                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                                <f:facet name="header" rendered="#{(t.url) != null}">
+                                                    <h:outputText value="ID : " />
+                                                    <h:outputText value="#{t.idConcept}" />
+                                                </f:facet>
 
+                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                                <h:outputText value="#{t.groupLexicalValue}" />
+
+                                                <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                                <h:outputText value="#{t.definition}" />
+                                            </h:panelGrid>
+                                        </f:facet>
+                                    </p:autoComplete>
+                                </td>
+                            </tr>
+                        </table><br/>
+                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
+                                         update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView"/>
+                    </h:form>
+                </h:panelGroup>
+            </h:panelGroup>
             <!-- POP UP AJOUT PROPOSITION FIN -->
 
             <!-- POP UP EDIT PROPOSITION DEBUT -->
@@ -413,10 +459,11 @@
                         </h:form>
                     </div>
 
-                    <div style="float: right;">
+                    <div style="float: right; margin-right: 30px;">
+                        
                         <h:form  rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.userHaveProp() != true) and (selectedCandidat.selected.etat == 'a')}">
-                            <p:commandButton id="cbAjPropCandidat" styleClass="styleButton_db" icon="ui-icon-addfile-16" title="#{langueBean.getMsg('cdt.btnAddProp')}"
-                                              update=":idAddProposalDlg" oncomplete="PF('addProposalDlg').show();"  />
+                            <p:commandButton id="cbAjPropCandidat" styleClass="styleButton_db" icon="ui-icon-addfile-16"  title="#{langueBean.getMsg('cdt.btnAddProp')}"
+                                             actionListener="#{vue.setAddPropCandidat(true)}" update=":panAjProp,:gestionCandidat,:tableCdt" />
                         </h:form>
                         
                         <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">

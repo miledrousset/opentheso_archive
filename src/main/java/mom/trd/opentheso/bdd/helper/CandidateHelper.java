@@ -1415,7 +1415,7 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT users.username, users.id_user,"
+                    String query = "SELECT users.username, users.id_user, users.mail,"
                             + " proposition.modified"
                             + " FROM proposition, users WHERE"
                             + " proposition.id_user = users.id_user"
@@ -1431,6 +1431,7 @@ public class CandidateHelper {
                             NodeUser nodeUser = new NodeUser();
                             nodeUser.setId(resultSet.getInt("id_user"));
                             nodeUser.setName(resultSet.getString("username"));
+                            nodeUser.setMail(resultSet.getString("mail"));
                             nodeUserList.add(nodeUser);
                         }
                     }
