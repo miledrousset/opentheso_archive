@@ -22,6 +22,7 @@ public class Thesaurus {
     private String subject = "";
     private String title = "";
     private String type = "";
+    private boolean visibility;
  
     private ArrayList <DcElement> dcElement;
 
@@ -61,6 +62,7 @@ public class Thesaurus {
         this.subject = subject;
         this.title = title;
         this.type = type;
+        
     }
 
     public String getId_thesaurus() {
@@ -210,6 +212,21 @@ public class Thesaurus {
     public void addDcElement(DcElement dcElement) {
         this.dcElement.add(dcElement);
     }
+    /**
+     * #JM
+     * @return 
+     */
+    public boolean isVisibility() {
+        return visibility;
+    }
+    /**
+     * #JM
+     * @param visibility 
+     */
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+    }
+    
 
 
 }

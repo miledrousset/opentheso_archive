@@ -9,9 +9,9 @@
     <h:panelGroup rendered="#{user1.user.name != null}">
         <div id="disconnect">
             <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
-            <h:outputLink value="deco.xhtml">
-                <h:outputText value="#{langueBean.getMsg('menu.account2')}" />
-            </h:outputLink>
+            <h:form>
+                <p:commandButton title="#{langueBean.getMsg('menu.account2')}" actionListener="#{accessThesaurusBean.cleanSession()}" update=":panChoixTheso" />
+            </h:form>
         </div>
     </h:panelGroup>
 
@@ -28,7 +28,7 @@
                         </td>
                         <td>
                             <p:commandButton id="cbCo" icon="ui-icon-login-20" styleClass="styleButton_db"
-                                             title="#{langueBean.getMsg('co.title')}" action="#{user1.connect()}"/>
+                                             title="#{langueBean.getMsg('co.title')}" action="#{user1.connect()}" oncomplete="#{accessThesaurusBean.accessList()}" update=":panChoixTheso"/>
                            
                         </td>
  

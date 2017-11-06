@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.3.4
--- date : 03/01/2017
+-- date : 03/10/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -1498,6 +1498,17 @@ begin
     END IF;
 end;
 $$language plpgsql;
+
+--fonction pour insérer une valeur booleénne public dans la table thesaurus
+--
+--
+create or replace function alter_table_thesaurus_private() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='thesaurus' AND column_name='private' ) THEN
+        execute 'ALTER TABLE thesaurus ADD COLUMN private boolean DEFAULT false;';
+    END IF;
+end;
+$$language plpgsql;
 -- mises à jour 
 --
 --
@@ -1506,7 +1517,8 @@ $$language plpgsql;
 
 
 
--- création ou mise à jour des séquences 
+-- création ou mise à jour des séquences
+SELECT alter_table_thesaurus_private();
 SELECT create_table_copyright();
 SELECT majnote();
 SELECT create_table_info();
@@ -1677,6 +1689,7 @@ $BODY$
 --
 --Delete toutes les function
 --
+SELECT delete_fonction ('alter_table_thesaurus_private','');
 SELECT delete_fonction ('create_table_copyright','');
 SELECT delete_fonction ('create_table_info','');
 SELECT delete_fonction ('majnote', '');

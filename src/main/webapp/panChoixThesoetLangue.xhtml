@@ -17,7 +17,7 @@
                             <td style="padding-right: 5px;">
                                 <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
                                 <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                    <f:selectItems value="#{theso.arrayTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
+                                    <f:selectItems value="#{accessThesaurusBean.listAccess}" var="th" itemLabel="#{listAccess.key}" itemValue="#{listAccess.value}" />
                                 </h:selectOneMenu>
                             </td>
                             <td>
@@ -46,8 +46,8 @@
                                     <h:form rendered="#{(user1.user.name != null)}" >
                                         <td>
                                             <h:outputText value="#{langueBean.getMsg('theso.my')}" /><br/>
-                                            <p:selectBooleanCheckbox value="#{theso.tousThesos}" >
-                                                <p:ajax listener="#{theso.getArrayTheso()}" update=":liste1"  />
+                                            <p:selectBooleanCheckbox value="#{accessThesaurusBean.onlyOwned}" >
+                                                <p:ajax listener="#{accessThesaurusBean.accessOwnerThesaurus()}" update=":liste1"  />
                                             </p:selectBooleanCheckbox>
                                         </td>
                                     </h:form>

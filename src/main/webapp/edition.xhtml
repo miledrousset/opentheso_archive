@@ -155,7 +155,7 @@
                                 </f:facet>
                                 <h:form>
                                     <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{theso.afficheEditTheso(1,entry.key,'',entry.value)}" 
-                                                     update=":panSkos,:panCsv,:panCreer,:panTrad,:panAjTrad,:panModif" />
+                                                     action="#{accessThesaurusBean.accessAThesaurus(entry.value)}" update=":panSkos,:panCsv,:panCreer,:panTrad,:panAjTrad,:panModif" />
                                 </h:form>
 
                             </h:column>
@@ -169,7 +169,7 @@
                                     </p:commandButton>  
 
                                     <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                        <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                        <p:commandButton value="#{langueBean.getMsg('yes')}" actionListener="#{accessThesaurusBean.supprVisibility(entry.value)}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
                                         <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
                                     </p:confirmDialog> 
                                 </h:form>
@@ -329,6 +329,16 @@
                                             </h:selectOneMenu>
                                         </td>
                                     </tr>
+                                    <!-- ajout d'un select visibilité-->
+                                    <tr>
+                                        <td><p:outputLabel for="visible" value="#{langueBean.getMsg('visibility.visible')} :" /></td>
+                                        <td><p:selectOneRadio id="visible" value="#{accessThesaurusBean.accessThesaurus.visibility}">
+                                                <f:selectItem itemLabel="#{langueBean.getMsg('visibility.public')}" itemValue="#{false}" />
+                                                <f:selectItem itemLabel="#{langueBean.getMsg('visibility.private')}" itemValue="#{true}" />
+                                            </p:selectOneRadio>
+                                        </td>
+                                    </tr>
+                                    <!-- fin de l'ajout -->
                                     <tr>
                                         <td><h:outputText value="#{langueBean.getMsg('edit.attTheso3')}" /> : </td>
                                         <td><h:inputText id="contribTheso" value="#{theso.editTheso.contributor}"/></td>
@@ -367,7 +377,9 @@
                                     </tr>
                                 </table><br/>
                                 <div style="float: left; margin-left: 50px;">
-                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" actionListener="#{theso.ajouterTheso(user1.user.id, user1.user.idRole)}" 
+                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" 
+                                                     action="#{accessThesaurusBean.addVisibility()}"
+                                                     actionListener="#{theso.ajouterTheso(user1.user.id, user1.user.idRole)}" 
                                                      styleClass="styleButton" update=":panCreer,:tableTheso"/>
                                 </div>
                             </h:form>
@@ -433,9 +445,12 @@
                                         <td><h:outputText value="#{langueBean.getMsg('edit.attTheso11')}" /> : </td>
                                         <td><h:inputText id="typeTheso" value="#{theso.editTheso.type}"/></td>
                                     </tr>
+                                    
                                 </table><br/>
                                 <div style="float: left; margin-left: 50px;">
-                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" action="#{theso.editerTheso}" 
+                                    <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" 
+                                                     action="#{theso.editerTheso}" 
+                                                     
                                                      styleClass="styleButton" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad"/>&nbsp;
                                 </div>
                             </h:form>
@@ -489,8 +504,33 @@
                                     </h:form>
                                 </div>
                             </div>
-                            <br/>
-                            <h:outputLabel value="#{theso.editTheso.title}"/><br/><br/>
+                          
+                            <h:outputLabel value="#{theso.editTheso.title}"/><br/>
+                            <h:form id="visibleTrad" style="margin-top:2px;margin-bottom:2px" >
+                               
+                                <p:commandButton rendered="#{accessThesaurusBean.accessThesaurus.visibility}" title="#{langueBean.getMsg('visibility.toPublic')}" 
+                                                             value="#{langueBean.getMsg('visibility.private')}"
+                                                             action="#{accessThesaurusBean.changeVisibility()}"
+                                                             style="color:red;border-color:#2F556A;font-size:11px"
+                                                             update="visibleTrad">
+                                            <p:confirm header="Confirmation" message="êtes vous sûr ? " icon="ui-icon-alert" />
+                                        </p:commandButton>
+                                <p:commandButton rendered="#{!(accessThesaurusBean.accessThesaurus.visibility)}" title="#{langueBean.getMsg('visibility.toPrivate')}" 
+                                                             value="#{langueBean.getMsg('visibility.public')}"
+                                                             action="#{accessThesaurusBean.changeVisibility()}"
+                                                             style="color:green;border-color:#2F556A;font-size:11px"
+                                                             update="visibleTrad"
+                                                             >
+                                            <p:confirm header="Confirmation" message="êtes vous sûr de vouloir changer la visibilité du thesaurus ? " icon="ui-icon-alert" />
+                                        </p:commandButton>
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                            <p:commandButton value="#{langueBean.getMsg('yes')}"   type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />  
+                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" /> 
+                                                
+                                        </p:confirmDialog>
+                                        
+                                
+                            </h:form>
                             <div id="divTableTrad">
                                 <h:dataTable id="tableTrad" value="#{theso.arrayTrad}" var="entry" styleClass="styleTableTrad">
                                     <h:column id="columnTrad1">
@@ -510,8 +550,9 @@
                                             <h:outputText value="" />
                                         </f:facet>                                        
                                         <h:form>
-                                            <p:commandButton id="cbAjTradTheso" styleClass="cbSupp" icon="ui-icon-edi" 
-                                                             actionListener="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad" />
+                                            <p:commandButton id="cbAjTradTheso" styleClass="cbSupp" icon="ui-icon-edi" action="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}"
+                                                             actionListener="#{accessThesaurusBean.accessAThesaurus(theso.editTheso.id_thesaurus)}" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad" />
+                                           
                                         </h:form>
                                     </h:column>
                                     <h:column id="columnTrad4">
@@ -531,16 +572,17 @@
                                         </h:form>
                                     </h:column>
                                 </h:dataTable>
+                                
                             </div><br/>
                             <div style="float: left; margin-left: 20px;">
                                 <h:form>
-                                    <p:commandButton id="cbAjTradTheso" value="#{langueBean.getMsg('edit.addTrad')}" actionListener="#{vue.setTrad(true)}" 
+                                    <p:commandButton id="cbAjTradTheso" value="#{langueBean.getMsg('edit.addTrad')}" actionListener="#{vue.setTrad(true)}"
                                                      update=":panSkos,:panCsv,:panAjTrad,:panModif" styleClass="styleButton"/>
                                 </h:form>
                             </div>
                             <h:form>
-                                <p:commandButton id="cbAnnulTradTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setLanguage(false)}" 
-                                                 update=":panSkos,:panCsv,:panTrad,:panAjTrad,:panModif" styleClass="styleButton"/>
+                                <p:commandButton id="cbAnnulTradTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setLanguage(false)}"
+                                               update=":panSkos,:panCsv,:panTrad,:panAjTrad,:panModif" styleClass="styleButton"/>
                             </h:form>
                         </div>
                     </h:panelGroup>
@@ -549,6 +591,7 @@
                 <div style="float: left;">
                     <h:form>
                         <p:commandButton id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{theso.setVueCreat(true)}" 
+                                         action="#{accessThesaurusBean.setAccessThesaurus(null)}" 
                                          update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
                     </h:form>
                 </div>

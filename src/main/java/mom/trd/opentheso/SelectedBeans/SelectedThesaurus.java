@@ -113,8 +113,7 @@ public class SelectedThesaurus implements Serializable {
     private boolean tousThesos = false;
 
     private boolean internetConection = false;
-    //Alignement
-
+    
     // niveaux des classes Beans
     // theso -> newtreeBean -> selectedTerme -> user1
     //   4   ->    3     ->      2        ->   1
@@ -2181,5 +2180,7 @@ public class SelectedThesaurus implements Serializable {
     public static void setRnd(SecureRandom rnd) {
         SelectedThesaurus.rnd = rnd;
     }
+    
 
+    
 }
