@@ -111,6 +111,47 @@ public class GroupHelper {
 
     }
 
+    /**
+     * Ajout d'un groupe à un concept avec Rollback
+     * @param conn
+     * @param groupID
+     * @param conceptID
+     * @param idThesaurus 
+     * @return  
+     */
+    public boolean addConceptGroupConcept(Connection conn,
+            String groupID, String conceptID, String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into concept_group_concept "
+                            + "(idgroup, idthesaurus, idconcept)"
+                            + "values ("
+                            + "'" + groupID + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'" + conceptID + "'"
+                            + ")";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+           //     conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while addConceptGroupConcept : " + sqle);
+        }
+        return status;
+    }    
+    
     public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
             String idGRoup, String idThesaurus) {
 
@@ -622,6 +663,50 @@ public class GroupHelper {
         return nodeGroupTraductionsList;
     }
 
+    /**
+     * permet de retourner le nombre de Groups pour un concept
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return 
+     */
+    public int getCountOfGroups(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        int count = 0;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT count(concept_group_concept.idgroup)" +
+                        " FROM concept_group_concept" +
+                        " WHERE" +
+                        " concept_group_concept.idconcept = '" + idConcept +"'" +
+                        " AND" +
+                        " concept_group_concept.idthesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        count = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of Groups of Concept : " + idConcept, sqle);
+        }
+        return count;
+    }    
+    
     /**
      * Cette fonction permet de retourner les traductions d'un domaine
      *
@@ -1639,7 +1724,7 @@ public class GroupHelper {
     }
     
     /**
-     * Permet de retourner la liste des Groupes pour un Concept et un thésaurus
+     * Permet de retourner la liste Id des Groupes pour un Concept et un thésaurus
      * donné
      *
      * @param ds le pool de connexion
@@ -1688,6 +1773,59 @@ public class GroupHelper {
         }
         return tabIdConceptGroup;
     }
+    
+    /**
+     * Permet de retourner la liste des Groupes pour un Concept et un thésaurus
+     * donné
+     *
+     * @param ds le pool de connexion
+     * @param idThesaurus
+     * @param idConcept
+     * @param idLang
+     * @return Objet Class ArrayList NodeGroup
+     */
+    public ArrayList<NodeGroup> getListGroupOfConcept(HikariDataSource ds,
+            String idThesaurus, String idConcept, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList <NodeGroup> nodeGroups = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    /*String query = "select id_group from concept where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept = '" + idConcept + "'";*/
+
+                    String query = "select idgroup from concept_group_concept where idthesaurus = '" + idThesaurus + "'"
+                            + " and idconcept = '" + idConcept + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeGroup nodeGroup = getThisConceptGroup(ds, 
+                                resultSet.getString("idgroup"),
+                                idThesaurus, idLang);
+                        if(nodeGroup != null) 
+                            nodeGroups.add(nodeGroup);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Id or Groups of Concept : " + idConcept, sqle);
+        }
+        return nodeGroups;
+    }    
 
     /**
      * Cette fonction permet de récupérer l'identifiant Ark sinon renvoie un une

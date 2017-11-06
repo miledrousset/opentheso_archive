@@ -14,7 +14,7 @@
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
 
-                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"  value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" action="#{newtreeBean.init()}" value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                         
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
                         
@@ -31,7 +31,6 @@
                         <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
 
-                        
                         
                         
                         <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">

@@ -49,7 +49,7 @@ public class skosExportBean {
     
     
     // options pour l'export CSV
-    private String[] selectedOptions;
+    private ArrayList<String> selectedOptions;
     
     
     /**
@@ -180,14 +180,22 @@ public class skosExportBean {
         this.singleLanguageCodeSelected2 = singleLanguageCodeSelected2;
     }
 
-    public String[] getSelectedOptions() {
+//    public String[] getSelectedOptions() {
+//        return selectedOptions;
+//    }
+//
+//    public void setSelectedOptions(String[] selectedOptions) {
+//        this.selectedOptions = selectedOptions;
+//    }
+//
+
+    public ArrayList<String> getSelectedOptions() {
         return selectedOptions;
     }
 
-    public void setSelectedOptions(String[] selectedOptions) {
+    public void setSelectedOptions(ArrayList<String> selectedOptions) {
         this.selectedOptions = selectedOptions;
     }
-
 
 
    

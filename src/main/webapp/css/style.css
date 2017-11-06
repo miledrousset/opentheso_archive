@@ -161,6 +161,11 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
 }
 
+.ui-icon-addfile-16 {
+    background: url("../images/add-file-16.png") no-repeat top left !important;
+    border-radius: 0px;
+}
+
 .ui-icon-branch {
     background: url("../images/domaineOpen.png") no-repeat top left !important;
     height: 25px;
@@ -461,6 +466,14 @@ input[type="button"], input[type="submit"]{
 }
 .ui-icon-edit-16 {
     background: url("../images/edit-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-icon-edit-16-2 {
+    background: url("../images/edit-16-2.png") no-repeat !important;
     background: none ;
     border-radius: 0px;
     height: 16px;

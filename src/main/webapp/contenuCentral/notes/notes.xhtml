@@ -53,11 +53,13 @@
                 <div id="clean" />
                 <h:panelGroup id="note"  >
                     <ui:repeat value="#{selectedTerme.nodeNoteTermList}" var="nodeNoteTermListVar">
-                        <h:outputText value="#{nodeNoteTermListVar.notetypecode} : #{nodeNoteTermListVar.lexicalvalue} (#{nodeNoteTermListVar.lang}) " />
+                        <h:outputText value="#{nodeNoteTermListVar.notetypecode}:" />
+                        <h:outputText value = " #{nodeNoteTermListVar.lexicalvalue} (#{nodeNoteTermListVar.lang}) " style="color: olivedrab"/>
                             <br/>
                     </ui:repeat>
                     <ui:repeat value="#{selectedTerme.nodeNoteConceptList}" var="nodeNoteConceptListVar">
-                        <h:outputText value="#{nodeNoteConceptListVar.notetypecode} : #{nodeNoteConceptListVar.lexicalvalue} (#{nodeNoteConceptListVar.lang}) " />
+                        <h:outputText value="#{nodeNoteConceptListVar.notetypecode}:"/>
+                        <h:outputText value =" #{nodeNoteConceptListVar.lexicalvalue} (#{nodeNoteConceptListVar.lang}) " style="color: olivedrab"/>
                         <br/>
                     </ui:repeat>    
                </h:panelGroup>

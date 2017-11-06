@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -884,7 +885,7 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent thesoTxtCsv(String idTheso,
             List<NodeGroup> selectedGroups, String codeLang,
-            String[] selectedOptions) {
+            ArrayList<String> selectedOptions) {
 
         progress_per_100 = 0;
         progress_abs = 0;
@@ -908,42 +909,7 @@ public class DownloadBean implements Serializable {
         }        
         return file;
     } 
-    
-    /**
-     * Permet d'exporter le thésauurus au format txt (tabulé et hiérarchisé)
-     * @param idTheso
-     * @param selectedGroups
-     * @param codeLang
-     * @return 
-     * MR
-     */
-    public StreamedContent thesoTxtNotes(String idTheso,
-            List<NodeGroup> selectedGroups, String codeLang) {
 
-        progress_per_100 = 0;
-        progress_abs = 0;
-
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
-        if(nodePreference == null) return null;
-        
-
-        ExportTxtHelper exportTxtHelper = new ExportTxtHelper();
-        exportTxtHelper.setThesaurusDatas(connect.getPoolConnexion(), idTheso, codeLang, selectedGroups,
-                nodePreference, null);
-        exportTxtHelper.exportNotes();
-
-        InputStream stream;
-
-        try {
-            stream = new ByteArrayInputStream(exportTxtHelper.getTxtBuff().toString().getBytes("UTF-8"));
-            file = new DefaultStreamedContent(stream, "text/csv", "Txt_" + idTheso + ".csv");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
-        }        
-        return file;
-    }    
-    
-    
     public StreamedContent getAllAltLabels(String idTheso,
             String codeLang) {
 

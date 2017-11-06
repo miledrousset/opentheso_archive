@@ -1007,8 +1007,9 @@ public class TermHelper {
      * @param term
      * @param idUser
      * @return
-     */
-    public boolean updateTermTraduction(HikariDataSource ds,
+     */ 
+    // Deprecated by Miled
+  /*  public boolean updateTermTraduction(HikariDataSource ds,
             Term term, int idUser) {
         if (isTermExist(ds, term.getLexical_value(), term.getId_thesaurus(), term.getLang())){//isExitsTraduction(ds, term)) {
             // terme existe, il faut créer une relation
@@ -1018,7 +1019,7 @@ public class TermHelper {
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * fonction qui permet de mettre à jour une traduction 
@@ -1027,7 +1028,7 @@ public class TermHelper {
      * @param idUser
      * @return 
      */
-    private boolean updateTermIntoTable(HikariDataSource ds,
+    public boolean updateTermTraduction(HikariDataSource ds,
             Term term, int idUser) {
         Connection conn;
         Statement stmt;
@@ -2322,10 +2323,12 @@ public class TermHelper {
      * @param ds
      * @param idConcept
      * @param idThesaurus
+     * @param idLang
+     * @return 
      * @returne
      */
     public int getCountOfTraductions(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
+            String idConcept, String idThesaurus, String idLang) {
 
         Connection conn;
         Statement stmt;
@@ -2338,13 +2341,13 @@ public class TermHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT term.id_term, term.lexical_value, term.lang FROM"
+                    String query = "SELECT count(term.id_term) FROM"
                             + " term, preferred_term WHERE"
                             + " term.id_term = preferred_term.id_term"
                             + " and term.id_thesaurus = preferred_term.id_thesaurus"
                             + " and preferred_term.id_concept = '" + idConcept + "'"
                             + " and term.id_thesaurus = '" + idThesaurus + "'"
-                            + " order by term.lexical_value";
+                            + " and term.lang != '" + idLang + "'";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();

@@ -1,4 +1,4 @@
-id;idArk;type;prefLabel;altLabel;inScheme;broader;narrower;related;alignment;definition;scopeNote;historyNote;editorialNote;createdDate;modifiedDate
+id;idArk;type;prefLabel;altLabel;group;broader;narrower;related;alignment;definition;scopeNote;historyNote;editorialNote;createdDate;modifiedDate
 1;;MT;france::fr##french::en;;;;;;;;;;;2016-12-012016-12-01;2016-12-012016-12-01
 MT_18;;MT;Industries::fr;;;;;;;;;;;2016-12-01;2016-12-01
 2;;TT;ile de france::fr;;1;;;;;;;;;2014-03-27;2014-03-27
@@ -9,7 +9,7 @@ MT_18;;MT;Industries::fr;;;;;;;;;;;2016-12-01;2016-12-01
 4;;DE;rhone::fr;;1;3;13##5;;;;;;;2014-03-27;2014-03-27
 13;;DE;salaise::fr;sys::fr;1;4;14;12;;;;;;2014-03-27;2014-03-27
 14;;DE;spec::fr;;1;13;;;;;;;;2014-03-27;2014-03-27
-5;;DE;Lyon::fr##Lyon_eng::en##Lyon_xx::xx;lugdunum::fr##lugdunum_eng::en;1;4;6##7;9;;;;;;2014-03-27;2014-03-27
+5;;DE;Lyon::fr##Lyon_eng::en;lugdunum::fr##lugdunum_eng::en;1;4;6##7;9;;;;;;2014-03-27;2014-03-27
 6;;DE;1er arrondissement::fr;69001::fr;1;5;;;;;;;;2014-03-27;2014-03-27
 7;;DE;2eme arrondissement::fr;69002::fr;1;5;;;;;;;;2014-03-27;2014-03-27
 8;;DE;Ain::fr##Ain_eng::en##Ain_esp::es;;1;3;9;;;;;;;2014-03-27;2014-03-27
