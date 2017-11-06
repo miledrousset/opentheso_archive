@@ -7,7 +7,7 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.3.3
+-- version=4.3.4
 -- date : 03/10/2017
 --
 -- n'oubliez pas de définir le role suivant votre installation 
@@ -1479,7 +1479,36 @@ end;
 $$language plpgsql;
 
 
+--fonction pour créer une table copyright pour gérer les copyrights
+--
+--
 
+create or replace function create_table_copyright() returns void as $$
+begin
+     IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'copyright') THEN
+
+        execute 
+		'CREATE TABLE copyright
+                ( id_thesaurus character varying NOT NULL,
+                  copyright character varying,
+                  CONSTRAINT copyright_pkey PRIMARY KEY (id_thesaurus)
+                )';
+        
+
+    END IF;
+end;
+$$language plpgsql;
+
+--fonction pour insérer une valeur booleénne public dans la table thesaurus
+--
+--
+create or replace function alter_table_thesaurus_private() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='thesaurus' AND column_name='private' ) THEN
+        execute 'ALTER TABLE thesaurus ADD COLUMN private boolean DEFAULT false;';
+    END IF;
+end;
+$$language plpgsql;
 -- mises à jour 
 --
 --
@@ -1488,7 +1517,9 @@ $$language plpgsql;
 
 
 
--- création ou mise à jour des séquences 
+-- création ou mise à jour des séquences
+SELECT alter_table_thesaurus_private();
+SELECT create_table_copyright();
 SELECT majnote();
 SELECT create_table_info();
 SELECT info_donnes();
@@ -1658,7 +1689,8 @@ $BODY$
 --
 --Delete toutes les function
 --
-
+SELECT delete_fonction ('alter_table_thesaurus_private','');
+SELECT delete_fonction ('create_table_copyright','');
 SELECT delete_fonction ('create_table_info','');
 SELECT delete_fonction ('majnote', '');
 SELECT delete_fonction ('table_gps','');

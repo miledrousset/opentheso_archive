@@ -127,6 +127,7 @@ public class ThesaurusHelper {
      * @param conn
      * @param urlSite
      * @param isArkActive
+     * @param visible
      * @return String Id du thésaurus rajouté
      */
     public String addThesaurusRollBack(Connection conn,
@@ -419,6 +420,7 @@ public class ThesaurusHelper {
                             thesaurus.setSubject(resultSet.getString("subject"));
                             thesaurus.setTitle(resultSet.getString("title"));
                             thesaurus.setType(resultSet.getString("type"));
+                           
                         }
                     }
                     resultSet.close();
@@ -587,9 +589,10 @@ public class ThesaurusHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT DISTINCT user_role.id_thesaurus FROM"
-                            + " user_role WHERE"
-                            + " id_user = " + idUser;
+                    String query = "SELECT DISTINCT user_role.id_thesaurus FROM user_role, thesaurus WHERE " +
+                                    "thesaurus.id_thesaurus = user_role.id_thesaurus " +
+                                    "and " +
+                                    " id_user = "+idUser;
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -631,7 +634,7 @@ public class ThesaurusHelper {
         return map;
     }
 
-    public Map getListThesaurusOfAllTheso(HikariDataSource ds, String idLang) {
+     public Map getListThesaurusOfAllTheso(HikariDataSource ds, String idLang) {
 
         Connection conn;
         Statement stmt;
