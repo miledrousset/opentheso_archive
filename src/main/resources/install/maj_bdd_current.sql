@@ -1499,7 +1499,7 @@ begin
 end;
 $$language plpgsql;
 
---fonction pour insérer une valeur booleénne public dans la table thesaurus
+--fonction pour insérer une valeur booleénne  dans la table thesaurus
 --
 --
 create or replace function alter_table_thesaurus_private() returns void as $$
@@ -1508,6 +1508,37 @@ begin
         execute 'ALTER TABLE thesaurus ADD COLUMN private boolean DEFAULT false;';
     END IF;
 end;
+$$language plpgsql;
+
+
+
+
+--fonction pour créer une table routine_mail pour l'utilisation 
+-- des routines d'envoi de mail
+--
+create or replace function create_table_routine_mail() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='routine_mail') THEN
+        execute 'CREATE TABLE routine_mail 
+                    ( id_thesaurus character varying PRIMARY KEY,
+                      alert_cdt boolean DEFAULT true,
+                      debut_env_cdt_propos DATE NOT NULL,
+                      debut_env_cdt_valid DATE NOT NULL,
+                      period_env_cdt_propos integer NOT NULL,
+                      period_env_cdt_valid integer NOT NULL
+                        )';
+    END IF;
+end
+$$language plpgsql;
+
+--mise à jour de la table préférence
+--
+create or replace function update_table_preferences_alert() returns void as $$
+begin
+    IF EXISTS(SELECT *  FROM information_schema.columns where table_name='preferences' AND column_name='alert_cdt') THEN
+        execute'ALTER TABLE preferences DROP COLUMN "alert_cdt"';
+    END IF;
+end
 $$language plpgsql;
 -- mises à jour 
 --
@@ -1518,6 +1549,7 @@ $$language plpgsql;
 
 
 -- création ou mise à jour des séquences
+SELECT create_table_routine_mail();
 SELECT alter_table_thesaurus_private();
 SELECT create_table_copyright();
 SELECT majnote();
@@ -1689,6 +1721,7 @@ $BODY$
 --
 --Delete toutes les function
 --
+SELECT delete_fonction ('create_table_routine_mail','');
 SELECT delete_fonction ('alter_table_thesaurus_private','');
 SELECT delete_fonction ('create_table_copyright','');
 SELECT delete_fonction ('create_table_info','');

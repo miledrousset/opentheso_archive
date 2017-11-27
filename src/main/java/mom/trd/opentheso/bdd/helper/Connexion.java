@@ -17,8 +17,6 @@ import javax.faces.context.FacesContext;
 
 @ManagedBean (name = "poolConnexion", eager = true)
 @ApplicationScoped
-
-
 public class Connexion implements Serializable {
     
     private static final long serialVersionUID = 1L;

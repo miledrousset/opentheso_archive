@@ -7,10 +7,12 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
@@ -19,6 +21,7 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.tools.StringPlus;
+import mom.trd.opentheso.timeJob.LineCdt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -2231,5 +2234,157 @@ public class CandidateHelper {
         }
         return existe;
     }
+    /**
+     * getInsertedValidedRefusedCdtDuingPeriod
+     * #JM
+     * Méthode qui fait une requête sur la BDD, pour récupérer des candidats
+     * insérés validés ou refusés entre deux dates, pour un thésaurus donné
+     * 
+     * retourne une arrayList String, dont les lignes sont les valeurs des
+     * candidats sous forme de tableau html
+     * @param ds
+     * @param debut
+     * @param fin
+     * @param idThesaurus
+     * 
+     * @return 
+     */
+    public ArrayList<String> getInsertedValidedRefusedCdtDuringPeriod(HikariDataSource ds,Date debut,Date fin, String idThesaurus){
+        ArrayList<String> cdtList=new ArrayList<>();
+        Connection conn;
+        PreparedStatement stmt;
+        ResultSet rs;
+        try{
+            conn=ds.getConnection();
+            try{
+                String sql="SELECT DISTINCT concept_candidat.id_concept,concept_candidat.id_thesaurus,"
+                        + "concept_candidat.created,concept_candidat.modified,concept_candidat.status,concept_candidat.admin_message" +
+                        " concept_term_candidat.id_term,term_candidat.lexical_value," +
+                        " proposition.id_user, thesaurus_label.title" +
+                        " FROM concept_candidat "+
+                        " INNER JOIN concept_term_candidat ON concept_candidat.id_concept=concept_term_candidat.id_concept " +
+                        " INNER JOIN term_candidat ON concept_term_candidat.id_term=term_candidat.id_term" +
+                        " INNER JOIN proposition ON concept_candidat.id_concept=proposition.id_concept" +
+                        " INNER JOIN thesaurus_label ON concept_term_candidat.id_thesaurus=thesaurus_label.id_thesaurus "+
+                        " WHERE concept_candidat.id_thesaurus=?" +
+                        " AND (concept_candidat.status='i' OR concept_candidat.status='v' OR concept_candidat.status='r')" +
+                        " AND( ( concept_candidat.created BETWEEN  ? AND  ? )" +
+                        " OR ( concept_candidat.modified BETWEEN  ? AND  ? ) )";
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1,idThesaurus);
+                java.sql.Date d1=new java.sql.Date(debut.getTime());
+                java.sql.Date d2=new java.sql.Date(fin.getTime()+(1000*60*60*24));
+                stmt.setDate(2,d1);
+                stmt.setDate(3,d2);
+                stmt.setDate(4,d1);
+                stmt.setDate(5,d2);
+                try{
+                    rs=stmt.executeQuery();
+                    while(rs.next()){
+                          LineCdt lCdt=new LineCdt();
+                          lCdt.setId_thesaurus(rs.getString("id_thesaurus"));
+                          lCdt.setTitle_thesaurus(rs.getString("title"));
+                          lCdt.setId_concept(rs.getString("id_concept"));
+                          lCdt.setValeur_lexical(rs.getString("lexical_value"));
+                          lCdt.setCreated(rs.getDate("created"));
+                          lCdt.setModified(rs.getDate("modified"));
+                          lCdt.setAdmin_message(rs.getString("admin_message"));
+                          lCdt.setStatus(rs.getString("status"));
+                          lCdt.setNote(rs.getString("note"));
+                        cdtList.add(lCdt.getMessage());
+                        
+                    }
+                }
+                finally{
+                    stmt.close();
+                }
+            }finally{
+                conn.close();
+            }
+        }catch(SQLException e){
+            log.error("error while getting database query on Valided and Inserted candidat",e);
+        }
+    return cdtList;
+    }
+    /**
+     * getListOfCdtDuringPeriod
+     * 
+     * Permet de récupérer la liste des candidats entre deux dates
+     * 
+     * retourne une arrayList String ou chaque ligne donne les valeurs associés
+     * à un candidat dans un tableau html
+     * #JM
+     * @param idTheso
+     * @param d1
+     * @param d2
+     * @param poolConnexion
+     * @return 
+     */
+    public ArrayList<String> getListOfCdtDuringPeriod(String idTheso, Date d1,Date d2,HikariDataSource poolConnexion){
+        ArrayList<String> listCdt=new ArrayList<>();
+        try{
+            Connection conn=poolConnexion.getConnection();
+            try{
+                String sql="SELECT DISTINCT concept_term_candidat.id_thesaurus,concept_term_candidat.id_concept,"
+                        + "concept_term_candidat.id_term,proposition.id_user,proposition.created," +
+                        "  proposition.modified,proposition.note,concept_candidat.status,concept_candidat.admin_message,"
+                        + "term_candidat.lexical_value,thesaurus_label.title " +
+                        "  FROM concept_term_candidat "+
+                        "  INNER JOIN proposition ON concept_term_candidat.id_concept=proposition.id_concept " +
+                        "  INNER JOIN concept_candidat ON proposition.id_concept=concept_candidat.id_concept " +
+                        "  INNER JOIN term_candidat ON concept_term_candidat.id_term=term_candidat.id_term " +
+                        "  INNER JOIN thesaurus_label ON concept_term_candidat.id_thesaurus=thesaurus_label.id_thesaurus "+
+                        "  WHERE concept_term_candidat.id_thesaurus=? " +
+                        "  AND concept_candidat.status='a' "+
+                        "  AND ( ( proposition.created between  ? AND   ? ) OR ( proposition.modified between  ? AND  ? ) )";
+                ResultSet rs;
+                PreparedStatement stmt =conn.prepareStatement(sql);
+                stmt.setString(1,idTheso);
+                java.sql.Date d11=new java.sql.Date(d1.getTime());
+                java.sql.Date d21=new java.sql.Date(d2.getTime()+(1000*60*60*24)); 
+                stmt.setDate(2,d11);
+                stmt.setDate(3,d21);
+                stmt.setDate(4,d11);
+                stmt.setDate(5,d21);
+                try{
+                    rs=stmt.executeQuery();
 
+                        while(rs.next()){
+                         
+                            LineCdt lCdt=new LineCdt();
+                            lCdt.setId_thesaurus(rs.getString("id_thesaurus"));
+                            lCdt.setTitle_thesaurus(rs.getString("title"));
+                            lCdt.setId_concept(rs.getString("id_concept"));
+                            lCdt.setValeur_lexical(rs.getString("lexical_value"));
+                            lCdt.setCreated(rs.getDate("created"));
+                            lCdt.setModified(rs.getDate("modified"));
+                            lCdt.setAdmin_message(rs.getString("admin_message"));
+                            lCdt.setStatus(rs.getString("status"));
+                            lCdt.setNote(rs.getString("note"));
+                            
+                            listCdt.add(lCdt.getMessage());
+
+
+
+                        }
+                    
+                }
+                finally{
+                   
+                    stmt.close();
+                }
+            }
+            finally{
+                
+              conn.close();
+           
+ 
+            }
+        }catch(SQLException e){
+             
+            log.error("error while getting concept term candidat from id thesaurus "+idTheso, e);
+                
+        }
+       return listCdt;
+    }
 }

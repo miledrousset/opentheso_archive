@@ -1,0 +1,191 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 21 nov. 2017, 09:27:27
+    Author     : jm.prudham
+*/
+
+/**panneau gauche**/
+form#tableCdt div ul.ui-tabs-nav  {
+    background-color:white;
+    line-height:10px;
+}
+
+form#tableCdt div ul.ui-tabs-nav li.ui-state-default{
+    background-color:#FEF8ED;
+    
+}
+form#tableCdt div ul.ui-tabs-nav li.ui-state-active{
+    background-color:#fcc971;
+}
+
+
+form#tableCdt div div.ui-tabs-panels div fieldset div.ui-fieldset-content div.ui-datatable{
+    border:none;
+}
+form#tableCdt div div.ui-tabs-panels div  div.ui-datatable div.ui-datatable-scrollable-header div.ui-datatable-scrollable-header-box table thead{
+     line-height:10px !important;
+}
+form#tableCdt div div.ui-tabs-panels div  div.ui-datatable div.ui-datatable-scrollable-header div.ui-datatable-scrollable-header-box table thead tr th {
+    /*background: #fef8ed; /* Old browsers */
+    /*background: -moz-linear-gradient(top, #fef8ed 0%, #fce9c9 33%, #fcdeab 66%, #fcc971 100%);*/ /* FF3.6-15 */
+   /* background: -webkit-linear-gradient(top, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* Chrome10-25,Safari5.1-6 */
+   /* background: linear-gradient(to bottom, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+   /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fef8ed', endColorstr='#fcc971',GradientType=0 ); /* IE6-9 */ 
+   
+   /*box-shadow:0px 0px 5px  #fef8ed;*/
+   background-color:#FEF8ED;
+    
+   
+    
+}
+form#tableCdt div div.ui-tabs-panels div.ui-tabs-panel span div.listeCandidat div.ui-datatable-scrollable-body table tbody tr.ui-state-highlight,
+form#tableCdt div div.ui-tabs-panels div.ui-tabs-panel  div.ui-datatable div.ui-datatable-scrollable-body table tbody tr.ui-state-highlight{
+    background: #fcc971 ;
+    color:black;
+    text-shadow:0 1px 0 rgba(255,255,255,0.8);
+    
+}
+form#tableCdt div div.ui-tabs-panels div.ui-tabs-panel span div.listeCandidat div.ui-datatable-scrollable-body table tbody tr:hover,
+form#tableCdt div div.ui-tabs-panels div.ui-tabs-panel  div.ui-datatable div.ui-datatable-scrollable-body table tbody tr:hover{
+     background-color:#FEF8ED;
+}
+form#tableCdt div div.ui-tabs-panels div.ui-tabs-panel  div.ui-outputpanel input{
+    
+    width:249px !important;
+    position:relative;
+    left:-81px;
+    
+}
+form#tableCdt div div.ui-tabs-panels div fieldset legend{
+    font-weight:normal;
+}
+form#tableCdt div div.ui-tabs-panels div fieldset legend:active{
+    box-shadow:0px 0px 5px #fcc971
+    
+}
+
+/*panneau droit*/
+#proposition {
+    margin-bottom: 5px;
+
+   
+}
+
+
+#proposition #formTabView div div.ui-tabs-panels{
+
+  /*  background: #fef8ed; /* Old browsers */
+   /* background: -moz-linear-gradient(left, #fef8ed 0%, #fce9c9 33%, #fcdeab 66%, #fcc971 100%); /* FF3.6-15 */
+   /* background: -webkit-linear-gradient(left, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* Chrome10-25,Safari5.1-6 */
+   /* background: linear-gradient(to right, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+   /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fef8ed', endColorstr='#fcc971',GradientType=1 ); /* IE6-9 */
+    
+   border:1px solid black;
+    border-radius: 2px;
+    padding-bottom:2px;
+    z-index:2;
+    line-height:11px;
+}
+
+#proposition #formTabView div div.ui-helper-hidden{
+    display:none;
+   
+}
+#proposition #formTabView div{
+    height:230px;
+    display:flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+#proposition #formTabView div .ui-tabs-nav{
+    height:230px;
+    width:150px;
+    background-color:#FEF8ED;
+    
+}
+#proposition #formTabView div .ui-tabs-nav li{
+    width:150px;
+    left:5px;
+    top:-1px;
+    left:-0.5px;
+    line-height:11px;
+    
+   
+    
+}
+#proposition #formTabView div .ui-tabs-nav li.ui-state-default{
+    background-color:#FEF8ED;
+    border:1px solid black;
+    padding-right:10px;
+    z-index:1;
+}
+#proposition #formTabView div .ui-tabs-nav li.ui-tabs-selected{
+    background-color:#fcc971;
+  /* border-right:3px solid transparent;*/
+    z-index:3;
+}
+#proposition #formTabView div div.ui-tabs-panels div.ui-widget-content table tr:nth-child(odd){
+    font-weight:bolder;
+    font-size:13px;
+    
+   
+    
+}
+#proposition #formTabView div div.ui-tabs-panels div.ui-widget-content table tr:nth-child(even){
+    background:#f2f5f9; 
+    border:1px solid black;
+    font-size:14px;
+ 
+   
+}
+#proposition #formTabView div div.ui-tabs-panels div.ui-widget-content table tr {
+    line-height:15px;
+}
+
+#traduction{
+    z-index:5;
+    margin-top:10px;
+    width:100%;
+    padding-bottom:10px;
+}
+
+#traduction form#ajoutTrad{
+    flex-direction: row;
+    margin-bottom:10px;
+    
+    
+}
+
+#traduction form#ajoutTrad fieldset legend:active{
+    box-shadow:0px 0px 5px #fcc971
+    
+}
+#traduction form#ajoutTrad button{
+    width:50px;
+    line-height:10px !important;
+
+}
+#traduction form#ajoutTrad button,#traduction form#tableTradCdt div div table thead tr th{
+    background: #fef8ed; /* Old browsers */
+    /*background: -moz-linear-gradient(top, #fef8ed 0%, #fce9c9 33%, #fcdeab 66%, #fcc971 100%); /* FF3.6-15 */
+    /*background: -webkit-linear-gradient(top, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* Chrome10-25,Safari5.1-6 */
+   /* background: linear-gradient(to bottom, #fef8ed 0%,#fce9c9 33%,#fcdeab 66%,#fcc971 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fef8ed', endColorstr='#fcc971',GradientType=0 ); /* IE6-9 */ 
+   /* box-shadow:0px 0px 5px  #fef8ed;*/
+   
+}
+#traduction form#tableTradCdt div{
+    overflow:hidden;
+}
+
+/**css pour boîtes de dilaogues (nouvelle contribution , nouveau candidat insérer candidat **/
+span#panEditProp >*,span#panAjCdt >*,span#panInsertCdt >*, span#panValidCdt >*,span#panEditCdt >*, span#panAjProp >*{
+    
+    z-index:6;
+}

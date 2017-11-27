@@ -45,7 +45,7 @@
 
             <ul id="listeMenu" style="alignment-adjust: central"> 
                 <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}"/></h:outputLink></li>
-                <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
+                <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" onclick="#{gestCandidat.init()}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
                 <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
 
                 <li id="itemMenu"><h:outputLink rendered="#{ ((user1.user.name != null) and (user1.haveRights(2)) ) or (user1.haveRights(1))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>

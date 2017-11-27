@@ -33,6 +33,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -1241,6 +1242,19 @@ public class NewTreeBean implements Serializable {
     /**
      * Fin des nouvelles fonctions
      */
+    /**fonction drag drop par #JM*/
+    /**
+     * 
+     * @param event 
+     */
+    /*public void onDragDrop(TreeDragDropEvent event){
+        MyTreeNode dragNode=(MyTreeNode)event.getDragNode();
+        MyTreeNode dropNode=(MyTreeNode)event.getDropNode();
+        int dropIndex=event.getDropIndex();
+       FacesMessage message=new FacesMessage(FacesMessage.SEVERITY_INFO,"dragged my treeNode "+dragNode.toString()," Dropped on id current group "+dropNode.toString());
+       FacesContext.getCurrentInstance().addMessage(null, message);
+        
+    }*/
     public Connexion getConnect() {
         return connect;
     }
