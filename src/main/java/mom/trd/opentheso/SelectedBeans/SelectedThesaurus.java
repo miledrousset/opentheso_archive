@@ -867,6 +867,7 @@ public class SelectedThesaurus implements Serializable {
                     return;
                 }
 
+                
                 // ajout de role pour le thésaurus à l'utilisateur en cours
                 UserHelper userHelper = new UserHelper();
                 if (!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
@@ -886,7 +887,8 @@ public class SelectedThesaurus implements Serializable {
             tree.getSelectedTerme().getUser().updateAuthorizedTheso();
             vue.setCreat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
-            editTheso = new Thesaurus();
+            
+       //     editTheso = new Thesaurus();
         }
         // tree.getSelectedTerme().getUser().getUser().getId();
     }

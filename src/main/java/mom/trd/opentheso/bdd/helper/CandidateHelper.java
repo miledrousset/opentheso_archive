@@ -2157,6 +2157,8 @@ public class CandidateHelper {
         Statement stmt;
         ResultSet resultSet;
         boolean existe = false;
+        StringPlus stringPlus = new StringPlus();
+        title = stringPlus.addQuotes(title);
 
         try {
             // Get connection from pool

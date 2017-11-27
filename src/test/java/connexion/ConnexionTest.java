@@ -27,8 +27,8 @@ public class ConnexionTest {
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
         // Zoomathia
-        config.addDataSourceProperty("user", "opentheso");
-        config.addDataSourceProperty("password", "opentheso");
+        config.addDataSourceProperty("user", "pactols");
+        config.addDataSourceProperty("password", "pactols");
         config.addDataSourceProperty("databaseName", "pactols");
         config.addDataSourceProperty("portNumber", "5433");
         config.addDataSourceProperty("serverName", "localhost");

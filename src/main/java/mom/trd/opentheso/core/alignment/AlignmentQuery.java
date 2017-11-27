@@ -60,11 +60,12 @@ public class AlignmentQuery {
      * @param lexicalValue
      * @param lang
      * @param requete
+     * @param source
      * @return
      */
     public ArrayList<NodeAlignment> queryWikipedia(String idC, String idTheso,
             String lexicalValue, String lang,
-            String requete) {
+            String requete, String source) {
         listeAlign = new ArrayList<>();
         
         lexicalValue = lexicalValue.replaceAll(" ", "%20");
@@ -125,7 +126,7 @@ public class AlignmentQuery {
                                 na.setDef_target(snippet);
                                 na.setInternal_id_concept(idC);
                                 na.setInternal_id_thesaurus(idTheso);
-                                na.setThesaurus_target("Wikipedia");
+                                na.setThesaurus_target(source);
                                 na.setUri_target("https://" + lang + ".wikipedia.org/wiki/" + title.replaceAll(" ", "_"));
                                 listeAlign.add(0, na);
                             }
@@ -134,7 +135,7 @@ public class AlignmentQuery {
                                 na.setDef_target(snippet);
                                 na.setInternal_id_concept(idC);
                                 na.setInternal_id_thesaurus(idTheso);
-                                na.setThesaurus_target("Wikipedia");
+                                na.setThesaurus_target(source);
                                 na.setUri_target("https://" + lang + ".wikipedia.org/wiki/" + title.replaceAll(" ", "_"));
                                 listeAlign.add(na);
                             }
@@ -160,12 +161,14 @@ public class AlignmentQuery {
      * @param lexicalValue
      * @param lang
      * @param requete
+     * @param source
      * @return
      */
     public ArrayList<NodeAlignment> queryOpentheso(
             String idC, 
             String idTheso, String lexicalValue,
-            String lang, String requete) {
+            String lang, String requete, 
+            String source) {
         
         if (requete.trim().equals("") ) {
             return null;
@@ -208,7 +211,7 @@ public class AlignmentQuery {
                     NodeAlignment na = new NodeAlignment();
                     na.setInternal_id_concept(idC);
                     na.setInternal_id_thesaurus(idTheso);
-                    na.setThesaurus_target("Pactols");
+                    na.setThesaurus_target(source);//"Pactols");
                     na.setUri_target(resource.getUri());
                     for(SKOSLabel label : resource.getLabelsList()) {
                         switch (label.getProperty()) {
@@ -272,11 +275,12 @@ public class AlignmentQuery {
      * @param lexicalValue
      * @param lang
      * @param requete
+     * @param source
      * @return
      */
     public ArrayList<NodeAlignment> queryBNF(String idC,
             String idTheso, String lexicalValue,
-            String lang, String requete) {
+            String lang, String requete, String source) {
         
         listeAlign = new ArrayList<>();
         
@@ -323,7 +327,7 @@ public class AlignmentQuery {
             na.setInternal_id_thesaurus(idTheso);
             na.setConcept_target(qs.get("value").toString());
             na.setDef_target("");//qs.get("comment").toString());
-            na.setThesaurus_target("BNF");
+            na.setThesaurus_target(source);
             na.setUri_target(qs.get("instrument").toString());
             listeAlign.add(na);
         }
@@ -342,9 +346,11 @@ public class AlignmentQuery {
      * @param idTheso
      * @param lexicalValue
      * @param lang
+     * @param source
      * @return
      */
-    public ArrayList<NodeAlignment> queryDBPedia(String idC, String idTheso, String lexicalValue, String lang) {
+    public ArrayList<NodeAlignment> queryDBPedia(String idC, String idTheso,
+            String lexicalValue, String lang, String source ) {
         listeAlign = new ArrayList<>();
         if (lexicalValue.contains(" ")) {
             lexicalValue = lexicalValue.substring(0, lexicalValue.indexOf(" "));
@@ -378,7 +384,7 @@ public class AlignmentQuery {
             na.setInternal_id_thesaurus(idTheso);
             na.setConcept_target(qs.get("label").toString());
             na.setDef_target(qs.get("comment").toString());
-            na.setThesaurus_target("DBPedia");
+            na.setThesaurus_target(source);
             na.setUri_target(qs.get("primaryTopicOf").toString());
             listeAlign.add(na);
         }
@@ -400,7 +406,8 @@ public class AlignmentQuery {
      * @param lang
      * @return
      */
-    private ArrayList<NodeAlignment> queryAgrovoc(String idC, String idTheso, String lexicalValue, String lang) {
+    private ArrayList<NodeAlignment> queryAgrovoc(String idC, String idTheso,
+            String lexicalValue, String lang, String source) {
         listeAlign = new ArrayList<>();
         lexicalValue = String.valueOf(lexicalValue.charAt(0)).toUpperCase() + lexicalValue.substring(1);
         String sparqlQueryString1 = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
@@ -425,7 +432,7 @@ public class AlignmentQuery {
             na.setInternal_id_thesaurus(idTheso);
             na.setConcept_target(qs.get("pl").toString());
             na.setDef_target(qs.get("def").toString());
-            na.setThesaurus_target("Agrovoc");
+            na.setThesaurus_target(source);
             na.setUri_target(qs.get("uri").toString());
             listeAlign.add(na);
         }

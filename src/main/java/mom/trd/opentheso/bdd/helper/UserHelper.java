@@ -614,6 +614,8 @@ public class UserHelper {
         return listUser;
     }
 
+    
+    
     /**
      * Permet de retourner la liste des thésaurus autorisées pour un utilisateur
      *

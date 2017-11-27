@@ -2183,11 +2183,11 @@ public class ConceptHelper {
                     /**
                      * Ajout des informations dans la table Concept
                      */
-                    if (!addConceptHistorique(conn, concept, idUser)) {
+                 /*   if (!addConceptHistorique(conn, concept, idUser)) {
                         conn.rollback();
                         conn.close();
                         return false;
-                    }
+                    }*/
                     if (concept.getCreated() == null || concept.getModified() == null) {
 
                         query = "Insert into concept "
@@ -2477,7 +2477,6 @@ public class ConceptHelper {
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * (cette fonction sert pour la génération de la table Permuté
-     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2517,6 +2516,56 @@ public class ConceptHelper {
         }
         return tabIdConcept;
     }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
+     * en filtrant par Domaine/Group
+     * @param ds
+     * @param idThesaurus
+     * @param idGroup
+     * @return ArrayList
+     * #MR
+     */
+    public ArrayList<String> getAllIdConceptOfThesaurusByGroup(HikariDataSource ds,
+            String idThesaurus, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT concept.id_concept" +
+                        " FROM concept, concept_group_concept" +
+                        " WHERE" +
+                        " concept.id_concept = concept_group_concept.idconcept AND" +
+                        " concept.id_thesaurus = concept_group_concept.idthesaurus AND" +
+                        " concept.id_thesaurus = '" + idThesaurus + "' AND " +
+                        " concept_group_concept.idgroup = '" + idGroup + "';";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdConcept of Thesaurus by Group : " + idThesaurus, sqle);
+        }
+        return tabIdConcept;
+    }    
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus

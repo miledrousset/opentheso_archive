@@ -32,10 +32,10 @@ import javax.servlet.ServletContext;
  */
 
 
-@ManagedBean(name = "poolConnexionInstall", eager = true)
+@ManagedBean(name = "autoInstall", eager = true)
 @SessionScoped
 
-public class ConnectInstall implements Serializable {
+public class AutoInstall implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,6 +66,11 @@ public class ConnectInstall implements Serializable {
     private Map<String, String> conf;
     private ArrayList<String> ord = new ArrayList<>();
 
+    public AutoInstall() {
+        int i=0;
+    }
+
+    
     public boolean createPropertiesFile() {
         int i = 0;
         ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
@@ -187,7 +192,7 @@ public class ConnectInstall implements Serializable {
         try {
             poolConnexion1.getConnection();
         } catch (SQLException ex) {
-            Logger.getLogger(ConnectInstall.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AutoInstall.class.getName()).log(Level.SEVERE, null, ex);
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_FATAL, ex.getClass().getName(), ex.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, message);
             poolConnexion1.close();
@@ -198,8 +203,7 @@ public class ConnectInstall implements Serializable {
     }
 
     /**
-     * Gross function que permet de créer une BDD à partir du fichier current;
-     * tout c'est automatique
+     * Permet de créer la BDD à partir du fichier opentheso_current.sql;
      * @return
      */
     public boolean createBdd() {
@@ -212,7 +216,6 @@ public class ConnectInstall implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("inst.Err1")));
             messages = langueBean.getMsg("inst.Err1");
             return false;
-
         }
         BaseDeDoneesHelper baseDeDoneesHelper = new BaseDeDoneesHelper();
 

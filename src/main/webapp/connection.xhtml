@@ -8,9 +8,10 @@
 
     <h:panelGroup rendered="#{user1.user.name != null}">
         <div id="disconnect">
-            <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
+            
             <h:form>
-                <p:commandButton title="#{langueBean.getMsg('menu.account2')}" actionListener="#{accessThesaurusBean.cleanSession()}" update=":panChoixTheso" />
+                <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
+                <p:commandButton id="logout" icon="ui-icon-logout-20" styleClass="styleButton_db" title="#{langueBean.getMsg('menu.account2')}" actionListener="#{accessThesaurusBean.cleanSession()}" update=":panChoixTheso" />
             </h:form>
         </div>
     </h:panelGroup>

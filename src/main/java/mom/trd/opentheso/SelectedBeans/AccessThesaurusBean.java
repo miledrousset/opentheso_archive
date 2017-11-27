@@ -126,10 +126,11 @@ public class AccessThesaurusBean {
      */
     public void addVisibility(){
         boolean visible=this.accessThesaurus.isVisibility();
-        String id=this.accessThesaurus.getId_thesaurus();
+        String id=theso.getEditTheso().getId_thesaurus();
         AccessThesaurusHelper ath=new AccessThesaurusHelper();
         int ret=ath.insertVisibility(this.connect.getPoolConnexion(),visible,id);
         System.out.println("valeur retour insertVibility ="+ret);
+        theso.setEditTheso(new Thesaurus());
     }
     
     public void supprVisibility(String id){

@@ -49,7 +49,7 @@
                         <table>
                             <tr>
                                 <td>
-                                    <h:outputText value="Intégrer Traduction"/>
+                                    <h:outputText value="Intégrer les traductions"/>
                                 </td>
                                 <td>
                                     <p:selectBooleanCheckbox value="#{gps.integrerTraduction}" /><br/>
@@ -57,7 +57,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <h:outputText value="Remplacer Traduction"/>
+                                    <h:outputText value="Remplacer les traductions"/>
                                 </td>
                                 <td>
                                     <p:selectBooleanCheckbox value="#{gps.remplacerTraduction}" /><br/>
@@ -65,7 +65,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <h:outputText value="Alignement Automatique"/>
+                                    <h:outputText value="Ajouter l'alignement"/>
                                 </td>
                                 <td>
                                     <p:selectBooleanCheckbox value="#{gps.alignementAutomatique}" /><br/>
@@ -75,6 +75,7 @@
                         <Br/>
                     </p:layoutUnit>
                 </p:layout>
+                <br/>
                 <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
                                  actionListener="#{gps.validateParamretagesGps(selectedTerme.idTheso, selectedTerme.idlangue, user1.user.id)}"
                                  action="#{gps.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.idlangue, user1.user.id)}"

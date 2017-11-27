@@ -45,6 +45,7 @@ public class AccessThesaurusHelper {
         Connection conn;
         PreparedStatement stmt;
         HashMap listTheoUser=new HashMap();
+        if(ds == null) return listTheoUser;
         ResultSet rs;
         try{
             conn=ds.getConnection();
@@ -95,6 +96,7 @@ public class AccessThesaurusHelper {
         Connection conn;
         PreparedStatement stmt;
         HashMap listOfPrivate=new HashMap();
+        if(ds == null) return listOfPrivate;
         ResultSet rs;
         
         try{

@@ -41,10 +41,14 @@ delete from thesaurus_array;
 delete from thesaurus_label;
 delete from user_role;
 delete from users;
+delete from users_historique;
 delete from thesaurus_array_concept;
 delete from relation_group;
 delete from alignement_preferences;
 delete from gps_preferences;
+delete from copyright;
+delete from info;
+delete from thesaurus_alignement_source;
 
 
 

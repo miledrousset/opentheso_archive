@@ -1651,19 +1651,22 @@ public class SelectedTerme implements Serializable {
                     // si type opentheso / skos
                     // action skos
                     if ("skos".equals(alignementSource1.getAlignement_format())) {
-                        listAlignValues = alignmentQuery.queryOpentheso(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
+                        listAlignValues = alignmentQuery.queryOpentheso(idConcept, idTheso, lexicalValue.trim(),
+                                idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
                     }
                     // action xml (wikipédia)
                     if ("xml".equals(alignementSource1.getAlignement_format())) {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryWikipedia(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
+                        listAlignValues = alignmentQuery.queryWikipedia(idConcept, idTheso, lexicalValue.trim(),
+                                idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
                     }
                 }
                 if ("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete())) {
                     // action SKOS (BNF)
                     if ("skos".equals(alignementSource1.getAlignement_format())) {
                         //ici il faut appeler le filtre de Wikipédia 
-                        listAlignValues = alignmentQuery.queryBNF(idConcept, idTheso, lexicalValue.trim(), idlangue, alignementSource1.getRequete());
+                        listAlignValues = alignmentQuery.queryBNF(idConcept, idTheso, lexicalValue.trim(),
+                                idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
                     }
                     // action SKOS (BNF)
                     if ("skos".equals(alignementSource1.getAlignement_format())) {

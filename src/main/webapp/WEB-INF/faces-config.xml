@@ -30,6 +30,15 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/admin/install.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>install</from-outcome>
+            <to-view-id>/admin/install.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>    
+    
 
     <application>
        <resource-bundle>
