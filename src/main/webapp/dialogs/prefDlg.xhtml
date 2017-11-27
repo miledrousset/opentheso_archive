@@ -31,19 +31,7 @@
                                     <f:selectItem itemValue="it" itemLabel="Italien" />
                                 </h:selectOneMenu>
 
-                                <h:outputLabel  value="#{langueBean.getMsg('conf.nbCdt')}" />
-                                <h:selectOneMenu value="#{user1.alertNbCdtEdit}" style="width: 60px;">
-                                    <f:selectItem itemValue="5" itemLabel="5" />
-                                    <f:selectItem itemValue="10" itemLabel="10" />
-                                    <f:selectItem itemValue="15" itemLabel="15" />
-                                    <f:selectItem itemValue="20" itemLabel="20" />
-                                </h:selectOneMenu>
-
-                                <h:outputLabel for="prefAlert" value="#{langueBean.getMsg('conf.alertCdt')}" /> 
-                                <h:selectOneRadio id="prefAlert" value="#{user1.alertCdtEdit}">
-                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
-                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
-                                </h:selectOneRadio>
+                                
 
 
                                 <h:outputLabel value="identifier type : " />
@@ -51,6 +39,29 @@
                                     <f:selectItem itemValue="1" itemLabel="alphanumérique" />
                                     <f:selectItem itemValue="2" itemLabel="numérique" />
                                 </h:selectOneMenu>
+                            </h:panelGrid>
+                        </p:fieldset>
+                        
+                        <p:fieldset legend="alert" toggleable="true" collapsed="true" styleClass="styleButton2">
+                            <h:panelGrid columns="1">
+                            <h:outputLabel for="prefAlert" value="#{langueBean.getMsg('conf.alertCdt')}" /> 
+                            <h:selectOneRadio id="prefAlert" value="#{preferencesAlertBean.alert}" >
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}"  />
+                            </h:selectOneRadio>
+                            
+                            <h:outputLabel for="date_debut_proposition" value="récaputulatif des propositions depuis" />
+                            <p:calendar id="date_debut_proposition" value="#{preferencesAlertBean.date_debut_envoi_cdt_propos}" showOn="button" />
+                            
+                            <h:outputLabel for="period_proposition" value="nombre de jour avant le prochain envoi" />
+                            <p:inputNumber id="period_proposition" value="#{preferencesAlertBean.period_envoi_cdt_propos}" decimalPlaces="0" />
+                            
+                            <h:outputLabel for="date_debut_valid" value="récapitulatif des validation insertion refus depuis " />
+                            <p:calendar id="date_debut_valid" value="#{preferencesAlertBean.date_debut_envoi_cdt_valid}" showOn="button" />
+                                               
+                            <h:outputLabel for="period_validation" value="nombre de jour avant le prochain envoi" />
+                            <p:inputNumber id="period_validation" value="#{preferencesAlertBean.period_envoi_cdt_valid}" decimalPlaces="0"/>
+                                          
                             </h:panelGrid>
                         </p:fieldset>
 
@@ -141,7 +152,7 @@
                             </h:panelGrid>
                         </p:fieldset>                        
                 </p:scrollPanel>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}" action="#{theso.majPref()}" styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}" action="#{preferencesAlertBean.multipleBeanAction()}" styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
                 </h:panelGrid>
             </h:form> 
 

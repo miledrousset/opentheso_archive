@@ -38,7 +38,7 @@ public class PreferencesHelper {
 
                     if (resultSet.next()) {
                         np = new NodePreference();
-                        np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
+ //                       np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
                         np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
                         np.setSourceLang(resultSet.getString("source_lang"));
                         np.setIdentifierType(resultSet.getInt("identifier_type"));

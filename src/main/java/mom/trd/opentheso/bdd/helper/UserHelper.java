@@ -2,10 +2,12 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -487,7 +489,7 @@ public class UserHelper {
                     String query = "SELECT mail FROM users, user_role"
                             + " WHERE"
                             + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = 2 AND"
+                            + " user_role.id_role = 2 OR user_role.id_role=1 AND"
                             + " users.active = true AND"
                             + " user_role.id_thesaurus = '" + idThesaurus + "'";
                     resultSet = stmt.executeQuery(query);
@@ -1532,4 +1534,59 @@ public class UserHelper {
         }
         return update;
     }
+    /**
+     * getMailUserForCandidat
+     * #JM
+     * méthode pour récupérer une arrayList de Mail des utilisateurs qui ont proposé
+     * un candidat et qui a été inséré validé ou refusé, entre deux dates debut et fin
+     * @param ds
+     * @param id_thesaurus
+     * @param debut
+     * @param fin
+     * @return 
+     */
+    public ArrayList<String> getMailUserForCandidat(HikariDataSource ds,String id_thesaurus,Date debut,Date fin){
+       Connection conn;
+       PreparedStatement stmt;
+       ArrayList<String> mail=new ArrayList<>();
+       ResultSet rs;
+       try{
+           conn=ds.getConnection();
+           try{
+               String sql="SELECT mail FROM users INNER JOIN proposition ON proposition.id_user=users.id_user" +
+                            " INNER JOIN  concept_candidat ON proposition.id_concept=concept_candidat.id_concept" +
+                            " INNER JOIN concept_term_candidat ON concept_candidat.id_concept=concept_term_candidat.id_concept" +
+                            " INNER JOIN term_candidat ON concept_term_candidat.id_term=term_candidat.id_term" +
+                            " WHERE concept_candidat.id_thesaurus=?" +
+                            " AND ( concept_candidat.status='i' OR concept_candidat.status='v' OR concept_candidat.status='r')" +
+                            " AND ((concept_candidat.created BETWEEN ? AND ?)" +
+                            " OR (concept_candidat.modified BETWEEN ? AND ?))";
+               stmt=conn.prepareStatement(sql);
+               stmt.setString(1,id_thesaurus);
+                java.sql.Date d=new java.sql.Date(debut.getTime());
+               java.sql.Date f=new java.sql.Date(fin.getTime());
+               stmt.setDate(2,d);
+               stmt.setDate(3,f);
+               stmt.setDate(4,d);
+               stmt.setDate(5,f);
+               try{
+                   rs=stmt.executeQuery();
+                   while(rs.next()){
+                       mail.add(rs.getString("mail"));
+                   }
+               }
+               finally{
+                   stmt.close();
+               }
+           }finally{
+               conn.close();
+               
+           }
+       }
+       catch(SQLException e){
+           Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE,"error while selecting mail from users in getMailUserForCandidat id thesaurus ="+id_thesaurus,e);
+       }
+        return mail;
+    }
+    
 }

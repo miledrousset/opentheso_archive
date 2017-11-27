@@ -54,7 +54,9 @@ public class ConceptHelper {
     public void setIdentifierType(String identifierType) {
         this.identifierType = identifierType;
     }
-
+    public void test(){
+        System.out.println("dans le concept helper ");
+    }
     /**
      * ************************************************************
      * /**************************************************************
