@@ -1247,14 +1247,14 @@ public class NewTreeBean implements Serializable {
      * 
      * @param event 
      */
-    /*public void onDragDrop(TreeDragDropEvent event){
+    public void onDragDrop(TreeDragDropEvent event){
         MyTreeNode dragNode=(MyTreeNode)event.getDragNode();
         MyTreeNode dropNode=(MyTreeNode)event.getDropNode();
         int dropIndex=event.getDropIndex();
        FacesMessage message=new FacesMessage(FacesMessage.SEVERITY_INFO,"dragged my treeNode "+dragNode.toString()," Dropped on id current group "+dropNode.toString());
        FacesContext.getCurrentInstance().addMessage(null, message);
         
-    }*/
+    }
     public Connexion getConnect() {
         return connect;
     }
