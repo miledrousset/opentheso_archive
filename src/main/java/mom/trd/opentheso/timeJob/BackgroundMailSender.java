@@ -123,7 +123,7 @@ public class BackgroundMailSender  {
              job[i]=this.sendPropos(i);
          
         }
-        sjPropos=new ScheduleJob(count, initialD, period, TimeUnit.MINUTES,job);
+        sjPropos=new ScheduleJob(count, initialD, period, TimeUnit.DAYS,job);
         sjPropos.sendPeriodicMultipleJob();
         
     }
@@ -147,7 +147,7 @@ public class BackgroundMailSender  {
              job[i]=this.sendValid(i);
            
         }
-        sjValid=new ScheduleJob(count, initialD, period, TimeUnit.MINUTES,job);
+        sjValid=new ScheduleJob(count, initialD, period, TimeUnit.DAYS,job);
         sjValid.sendPeriodicMultipleJob();
         
     }
