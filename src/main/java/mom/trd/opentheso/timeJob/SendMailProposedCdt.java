@@ -27,7 +27,7 @@ public class SendMailProposedCdt extends SendMail implements Runnable {
       MessageCdt mess=this.getValue(idTheso,date);
       int ret=this.updateDateRoutine(idTheso,new Date());
       id_theso.replace(idTheso,new Date());
-      System.out.println("retour de la fonction updateDateRoutine dans SendMailProposedCdt :"+ret+" id thesaurus"+super.getTheso() );
+     
       this.send(mess);
       
     }
@@ -71,7 +71,7 @@ public class SendMailProposedCdt extends SendMail implements Runnable {
      * @param mess 
      */
     public void send(MessageCdt mess){
-        System.out.println("send in SendMAilProposedCdt ");
+       
         super.send(mess,"rapport d\'activité des candidats proposés");
     }
     

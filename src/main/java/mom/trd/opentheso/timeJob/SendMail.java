@@ -74,7 +74,7 @@ public class  SendMail implements Runnable {
         catch(InterruptedException e){
             
         }
-        System.out.println("message :"+pm.getMsg().toString());
+    
         return;
     }
     

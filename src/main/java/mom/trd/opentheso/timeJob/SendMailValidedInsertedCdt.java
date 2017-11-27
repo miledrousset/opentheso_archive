@@ -22,10 +22,10 @@ public class SendMailValidedInsertedCdt extends SendMail implements Runnable {
     public void run() {
         String idTheso=getTheso();
         Date d=id_theso.get(idTheso);
-        System.out.println("valided inserted cdt date in methode get "+d.toString());
+        
         MessageCdt mess=getValue(idTheso,d);
        int ret=updateDateRoutine(idTheso,new Date());
-       System.out.println("retour de la fonction updateDateRoutine dans SendMailValidedInsertedCdt : "+ret+" id thesaurus "+super.getTheso() );
+      
        id_theso.replace(idTheso,new Date());
        this.send(mess);
     }
@@ -60,7 +60,7 @@ public class SendMailValidedInsertedCdt extends SendMail implements Runnable {
      * @param mess 
      */
       void send(MessageCdt mess){
-        System.out.println("send in SendMAilValidedInserted ");
+       
         super.send(mess,"rapport d\'activité des candidats insérés validés ou refusés");
     }
     
