@@ -10,6 +10,7 @@
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
         <ui:include src="dialogs/user/addUserDlg.xhtml" />
@@ -31,11 +32,17 @@
             Le choix de la langue de travail préférée de l'utilisateur (pour avoir automatiquement le thésaurus dans cette langue) et la possibilité de modifier le nombre de 
             propositions nécessaires à un candidat pour l'envois automatique d'un e-mail (qui préviendra les administrateurs que ce candidat est fortement demandé) sont à venir.
         </p:dialog>  
+       
         <div id="menuHead">
+            <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
-
-            <ui:include src="menuAll.xhtml" />
+            <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+           
+            </div>
+           
+               
         </div>
         <center>
 

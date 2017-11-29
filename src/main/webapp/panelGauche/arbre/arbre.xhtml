@@ -13,12 +13,11 @@
             <h:form id="form">
 
                 <p:tree id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
-                        selectionMode="multiple"  selection="#{newtreeBean.selectedNodes}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
+                        selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
                         >
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" />
                     <p:ajax event="dragdrop" listener="#{newtreeBean.onDragDrop}"  /> 
-                    <p:ajax event="select" 
-                            update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                             listener="#{newtreeBean.onNodeSelect}"/>
 
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 

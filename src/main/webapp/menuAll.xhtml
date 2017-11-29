@@ -4,7 +4,18 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
-    <div style="float: right;">
+    
+    <div>
+       
+
+        <p:growl life="5000"  id="messages" showDetail="true" autoUpdate="true" />
+
+
+        
+    </div>
+
+    
+    <div id="langueEtHelp" >
         <div id="help">
             <h:form>
                 <p:commandButton icon="ui-icon-help-20" title="#{langueBean.getMsg('menu.help')}"  onclick="PF('dlgHelp').show();" styleClass="styleButton_db"/>
@@ -29,32 +40,6 @@
             </h:form>
         </div>
     </div>
-    <div>
-       
-
-        <p:growl life="5000"  id="messages" showDetail="true" autoUpdate="true" />
-
-
-        
-    </div>
-
-    <p:panel id="panelMenu"  styleClass="panelNoBorder"> 
-        <div style="clear: both;"></div>
-
-        <div id="onglets">
-
-            <ul id="listeMenu" style="alignment-adjust: central"> 
-                <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}"/></h:outputLink></li>
-                <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" onclick="#{gestCandidat.init()}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
-                <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
-
-                <li id="itemMenu"><h:outputLink rendered="#{ ((user1.user.name != null) and (user1.haveRights(2)) ) or (user1.haveRights(1))}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
-                <li id="itemMenu"><h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus2)}" value="statistic.xhtml"><h:outputText value="Statistiques" /></h:outputLink></li>
-             
-            </ul>   
-                   
-        </div>
-
-    </p:panel>
+ 
 
 </ui:composition>

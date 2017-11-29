@@ -12,6 +12,7 @@
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
         <link rel="stylesheet" type="text/css" href="css/gestCandidat.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
 
@@ -34,13 +35,15 @@
             de les modifier mais il est possible de connaitre la raison du refus d'un candidat.<br/><br/>
         </p:dialog>  
         <div id="menuHead">
+            <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
-
-            <ui:include src="menuAll.xhtml" />
-            <ui:include src="dialogs/candidat/addProposalDlg.xhtml" />            
-            
-            
+            <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+           
+            </div>
+           
+              <ui:include src="dialogs/candidat/addProposalDlg.xhtml" />        
         </div>
         <center>
 

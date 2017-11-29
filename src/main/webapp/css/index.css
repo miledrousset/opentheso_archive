@@ -1,0 +1,59 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29 nov. 2017, 09:58:57
+    Author     : jm.prudham
+*/
+div#center{
+    position:relative;
+    top:20px;
+}
+div#center div#SplitterVertical1,div#center div#SplitterVertical1 div#SplitterVertical2{
+    
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+
+}
+
+div#recherche{
+    
+    max-width:300px;
+}
+div#menuHead{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-content: center;
+  
+}
+div#menuHead div#menuHeadTop{
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-content: center;
+    
+}
+div#menuHead div#langueEtHelp{ 
+    
+    flex-direction:row;
+    justify-content:flex-start;
+    
+    
+}
+div#menuHead div#langueEtHelp div#help {
+    width:28.8px;
+    
+}
+
+div#menuHead div#panelMenu {
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+     align-content: flex-start;
+    height:55px;
+    
+}
