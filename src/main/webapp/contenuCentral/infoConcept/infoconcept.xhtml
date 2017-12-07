@@ -77,12 +77,12 @@
                 <span style="font-size: 17px; font-weight: bold;">
                     <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                 </span>
-                <h:panelGroup rendered= "#{(selectedTerme.z3950_actif) or (selectedTerme.bdd_active)}">
+                <h:panelGroup rendered= "#{(user.getNodePreference().z3950_actif) or (user.getNodePreference().bdd_active)}">
                     <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
 
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
-                        <h:outputText rendered="#{(!selectedTerme.bdd_useId)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
-                        <h:outputText rendered="#{(selectedTerme.bdd_useId)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(!user.getNodePreference().bdd_useId)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(user.getNodePreference().bdd_useId)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
                     </a>
 
                 </h:panelGroup>
@@ -130,7 +130,7 @@
 
 
                 <!-- affichage du nombre total des notices de la branche -->
-                <h:panelGroup id="totalNoticesG" rendered="#{selectedTerme.z3950_actif}">
+                <h:panelGroup id="totalNoticesG" rendered="#{user.getNodePreference().z3950_actif}">
                     <h:form>
                         <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
                                           id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />

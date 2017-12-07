@@ -200,26 +200,6 @@ public class AutoCompletBean implements Serializable {
     }
 
     /**
-     * Ajoute un terme générique
-     */
-    public void newTGene() {
-        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
-        } else {
-            Term laValeur = terme.getTerme(selectedAtt.getIdConcept());
-            if (laValeur == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
-            } else {
-                terme.creerTermeGene(selectedAtt.getIdConcept());
-                tree.reInit();
-                tree.reExpand();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", laValeur.getLexical_value() + " " + langueBean.getMsg("autoComp.info1")));
-            }
-            selectedAtt = new NodeAutoCompletion();
-        }
-    }
-
-    /**
      * Cette fonction permet d'ajouter une relation TG à un concept Le TG existe
      * déjà dans le thésaurus, donc c'est une relation à créer
      *

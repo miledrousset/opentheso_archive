@@ -20,9 +20,9 @@ import org.primefaces.context.PrimeFacesContext;
  *
  * @author jm.prudham
  */
-@ManagedBean(name = "gestCandidat", eager = true)
+@ManagedBean(name = "searchCandidat", eager = true)
 @SessionScoped
-public class GestCandidatBean {
+public class SearchCandidatBean {
     @ManagedProperty(value="#{theso}")
     SelectedThesaurus st;
     private String textSearch1="";
@@ -36,9 +36,9 @@ public class GestCandidatBean {
     private List<NodeCandidatValue> filteredCandidatsA;
 
     /**
-     * Creates a new instance of GestCandidatBean
+     * Creates a new instance of SearchCandidatBean
      */
-    public GestCandidatBean() {
+    public SearchCandidatBean() {
               
     }
     

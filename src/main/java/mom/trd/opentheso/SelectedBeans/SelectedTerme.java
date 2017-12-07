@@ -170,19 +170,11 @@ public class SelectedTerme implements Serializable {
     private NodeSearch nodeSe;
     private NodePermute nodePe;
 
-    private String identifierType = "2";
     public String icon = "+";
 
     public String messageAlig = "";
 
     // Variables resourcesBundle
-    String cheminNotice1;
-    String cheminNotice2;
-    private boolean arkActive;
-    private String serverAdress;
-    private boolean z3950_actif;
-    private boolean bdd_active;
-    private boolean bdd_useId;
 
     NodeGps coordonnees;
 
@@ -222,8 +214,6 @@ public class SelectedTerme implements Serializable {
         majPref();
 
         user.setIdTheso(idTheso);
-        Integer temp = user.getNodePreference().getIdentifierType();
-        identifierType = temp.toString();//bundlePref.getString("identifierType");
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
 
@@ -232,19 +222,7 @@ public class SelectedTerme implements Serializable {
     private void majPref() {
         nodeSe = new NodeSearch();
         images = new ArrayList<>();
-        //ResourceBundle bundlePref = getBundlePref();
-        cheminNotice1 = user.getNodePreference().getPathNotice1();//bundlePref.getString("pathNotice1");
-        cheminNotice2 = user.getNodePreference().getPathNotice2();//bundlePref.getString("pathNotice2");
-
-        arkActive = user.getNodePreference().isUseArk();//bundlePref.getString("useArk").equals("true");
-
         root = (TreeNode) new DefaultTreeNode("Root", null);
-        serverAdress = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
-
-        z3950_actif = user.getNodePreference().getZ3950acif();//bundlePref.getString("z3950.actif").equals("true");
-        bdd_active = user.getNodePreference().isBddActive();//bundlePref.getString("bdd.active").equals("true");
-        bdd_useId = user.getNodePreference().isBddUseId();//bundlePref.getString("bdd.useId").equals("true");
-        identifierType = "" + user.getNodePreference().getIdentifierType();
     }
 
     /**
@@ -391,7 +369,7 @@ public class SelectedTerme implements Serializable {
             if (user.getNodePreference().isZ3950actif()) {
                 majNoticeZ3950();
             }
-            if (bdd_active) {
+            if (user.getNodePreference().isBddActive()) {
                 majNoticeBdd();
             }
 
@@ -407,9 +385,9 @@ public class SelectedTerme implements Serializable {
         if (user.getNodePreference().isZ3950actif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-            p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
+            p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
             p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-            p.put("ConvertorConfigFile", cheminNotice2);
+            p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
             Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
             federated_search_proxy.init(p);
             try {
@@ -459,8 +437,7 @@ public class SelectedTerme implements Serializable {
         //ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
         urlNotice = user.getNodePreference().getUrlBdd();
-        bdd_useId = user.getNodePreference().isBddUseId();
-        if (bdd_useId) {
+        if (user.getNodePreference().isBddUseId()) {
             urlNotice = urlNotice.replace("##value##", idC);
         } else {
             urlNotice = urlNotice.replace("##value##", nom);
@@ -859,7 +836,10 @@ public class SelectedTerme implements Serializable {
      */
     public boolean creerTermeSpe(MyTreeNode selecedTerm) {
         ConceptHelper instance = new ConceptHelper();
-        instance.setIdentifierType(identifierType);
+        if(user.nodePreference == null) return false;
+        instance.setNodePreference(user.getNodePreference());
+        
+        
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
         if (selecedTerm.isIsSubGroup() || selecedTerm.isIsGroup()) {
             // ici c'est le cas d'un Group ou Sous Group, on crée un TT Top Terme
@@ -876,10 +856,11 @@ public class SelectedTerme implements Serializable {
             terme.setSource("");
             terme.setStatus("");
 
-            if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, user.getUser().getId()) == null) {
+            if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getId()) == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
-            instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
+          //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
             ConceptHelper ch = new ConceptHelper();
 
             ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue);
@@ -908,10 +889,11 @@ public class SelectedTerme implements Serializable {
             //String idTC = idTopConcept;
             String idP = idC;
 
-            if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, serverAdress, arkActive, user.getUser().getId()) == null) {
+            if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, user.getUser().getId()) == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
-            instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
+          //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
             concept.getUserName();
             ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
             termesSpecifique = new ArrayList<>();
@@ -930,11 +912,14 @@ public class SelectedTerme implements Serializable {
      * relation special type NTG NTP NTI ...
      *
      * @param selecedTerm
+     * @param BTname
+     * @param NTname
      * @return
      */
     public boolean creerSpecialTermeSpe(MyTreeNode selecedTerm, String BTname, String NTname) {
         ConceptHelper instance = new ConceptHelper();
-        instance.setIdentifierType(identifierType);
+        if(user.nodePreference == null) return false;
+        instance.setNodePreference(user.getNodePreference());        
 
         Concept concept = new Concept();
         concept.setIdGroup(selecedTerm.getIdCurrentGroup());
@@ -952,7 +937,8 @@ public class SelectedTerme implements Serializable {
         //String idTC = idTopConcept;
         String idP = idC;
 
-        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme, BTname, NTname, serverAdress, arkActive, user.getUser().getId()) == null) {
+        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme, BTname, NTname, user.getUser().getId()) == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
             return false;
         }
         instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
@@ -1132,16 +1118,16 @@ public class SelectedTerme implements Serializable {
         //ResourceBundle bundlePref = getBundlePref();
         int total = 0;
         if (totalNoticesOfBranch.isEmpty()) {
-            if (z3950_actif) {
+            if (user.getNodePreference().isZ3950actif()) {
                 ConceptHelper conceptHelper = new ConceptHelper();
                 ArrayList<String> lisIds = new ArrayList();
                 lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso, lisIds);
 
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-                p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
+                p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
                 p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-                p.put("ConvertorConfigFile", cheminNotice2);
+                p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
                 Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
                 federated_search_proxy.init(p);
                 try {
@@ -1167,83 +1153,6 @@ public class SelectedTerme implements Serializable {
             }
         }
         return totalNoticesOfBranch;
-    }
-
-    /**
-     * $$$$$ deprecated $$$$$$ Ajoute une relation terme générique au concept
-     * courant
-     *
-     * @param idCBT
-     * @return true or false
-     */
-    public boolean creerTermeGene(String idCBT) {
-        if (termeGenerique.isEmpty()) {
-            try {
-                // Le concept était orphelin
-                Connection conn = connect.getPoolConnexion().getConnection();
-                conn.setAutoCommit(false);
-
-                ArrayList<String> newGroup = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idCBT, idTheso);
-                for (String s : newGroup) {
-                    Concept c = new Concept();
-                    c.setIdConcept(idC);
-                    c.setIdGroup(s);
-                    c.setIdThesaurus(idTheso);
-                    c.setStatus("D");
-                    if (!new ConceptHelper().insertConceptInTableRollBack(
-                            conn, c, urlNotice, arkActive, user.getUser().getId())) {
-                        conn.rollback();
-                        conn.close();
-                        return false;
-                    };
-                }
-                if (!new OrphanHelper().deleteOrphan(conn, idC, idTheso)) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
-                }
-                conn.commit();
-                conn.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            }
-
-        } else {
-            // On ajoute les nouveaux domaines s'il y en a
-            ArrayList<String> groupBT = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idCBT, idTheso);
-            ArrayList<String> groupCurrent = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
-            ArrayList<String> newGroup = new ArrayList<>();
-            for (String s : groupBT) {
-                if (!groupCurrent.contains(s)) {
-                    newGroup.add(s);
-                }
-            }
-            if (!addBranchGroup(newGroup, idC)) {
-                return false;
-            }
-        }
-
-        try {
-            Connection conn = connect.getPoolConnexion().getConnection();
-            conn.setAutoCommit(false);
-            //On crée les relations
-            if (!new RelationsHelper().addRelationBT(conn, idC, idTheso, idCBT, user.getUser().getId())) {
-                conn.rollback();
-                conn.close();
-                return false;
-            }
-            conn.commit();
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        termeGenerique = new ArrayList<>();
-        majTGen();
-        vue.setAddTGen(0);
-        return true;
     }
 
     /**
@@ -1355,7 +1264,6 @@ public class SelectedTerme implements Serializable {
      */
     public boolean creerTermeSpe(String idCNT) {
         ConceptHelper conceptHelper = new ConceptHelper();
-        conceptHelper.setIdentifierType(identifierType);
 
         if (new OrphanHelper().isOrphan(connect.getPoolConnexion(), idCNT, idTheso)) {
             try {
@@ -2672,9 +2580,9 @@ public class SelectedTerme implements Serializable {
         if (user.getNodePreference().getZ3950acif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-            p.put("RepositoryDataSourceURL", "file:" + cheminNotice1);
+            p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
             p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-            p.put("ConvertorConfigFile", cheminNotice2);
+            p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
             Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
             federated_search_proxy.init(p);
             try {
@@ -3412,32 +3320,6 @@ public class SelectedTerme implements Serializable {
     public void setMessageAlig(String messageAlig) {
         this.messageAlig = messageAlig;
     }
-
-    public boolean isZ3950_actif() {
-        return z3950_actif;
-    }
-
-    public void setZ3950_actif(boolean z3950_actif) {
-        this.z3950_actif = z3950_actif;
-    }
-
-    public boolean isBdd_active() {
-        return bdd_active;
-    }
-
-    public void setBdd_active(boolean bdd_active) {
-        this.bdd_active = bdd_active;
-    }
-
-    public boolean isBdd_useId() {
-        return bdd_useId;
-    }
-
-    public void setBdd_useId(boolean bdd_useId) {
-        this.bdd_useId = bdd_useId;
-    }
-    
-    
 
     public String getTotalConceptOfBranch() {
         if (totalConceptOfBranch.isEmpty()) {

@@ -39,7 +39,7 @@ public class ReadRdf4j {
      *
      * @param is
      * @param type 0 pour skos 1 pour jsonld 2 pour turtle
-     * @param warning
+     * @param fileBean
      * @throws java.io.IOException
      */
     public ReadRdf4j(InputStream is, int type, rdf4jFileBean fileBean) throws IOException {
@@ -52,9 +52,12 @@ public class ReadRdf4j {
             case 1:
                 laodJsonLdModel(is);
                 break;
-            default:
+            case 2:
                 laodTurtleModel(is);
                 break;
+            case 3:
+                laodJsonModel(is);
+                break;                
         }
 
         readModel(fileBean);
@@ -67,25 +70,27 @@ public class ReadRdf4j {
      * @param is
      */
     private void laodSkosModel(InputStream is) throws IOException {
-
         model = null;
         model = Rio.parse(is, "", RDFFormat.RDFXML);
 
     }
 
     private void laodJsonLdModel(InputStream is) throws IOException {
-
         model = null;
         model = Rio.parse(is, "", RDFFormat.JSONLD);
 
     }
 
     private void laodTurtleModel(InputStream is) throws IOException {
-
         model = null;
         model = Rio.parse(is, "", RDFFormat.TURTLE);
 
     }
+    
+    private void laodJsonModel(InputStream is) throws IOException {
+        model = null;
+        model = Rio.parse(is, "", RDFFormat.RDFJSON);
+   }    
 
     /**
      * structure qui contiens des informations pour la lecture de fichier RDF
@@ -448,4 +453,5 @@ public class ReadRdf4j {
         return sKOSXmlDocument;
     }
 
+    
 }

@@ -20,7 +20,7 @@ public class MD5Password {
         } catch (NoSuchAlgorithmException e) {
             throw new Error("no MD5 support in this VM : " + e.toString());
         }
-        StringBuffer hashString = new StringBuffer();
+        StringBuilder hashString = new StringBuilder();
         for (int i = 0; i < hash.length; ++i) {
             String hex = Integer.toHexString(hash[i]);
             if (hex.length() == 1) {

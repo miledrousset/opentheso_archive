@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -26,6 +27,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeTT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
@@ -45,18 +47,14 @@ public class ConceptHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
-    // 1=numericId ; 2=alphaNumericId
-    private String identifierType = "1";
+    
+    //identifierType  1=numericId ; 2=alphaNumericId
+    private NodePreference nodePreference;
+    private String message = "";
 
     public ConceptHelper() {
     }
 
-    public void setIdentifierType(String identifierType) {
-        this.identifierType = identifierType;
-    }
-    public void test(){
-        System.out.println("dans le concept helper ");
-    }
     /**
      * ************************************************************
      * /**************************************************************
@@ -263,7 +261,6 @@ public class ConceptHelper {
      * #MR
      */
     public boolean regenerateArkId(HikariDataSource ds,
-            String url, 
             String idConcept, String idLang, String idTheso) {
         String idArk;
 
@@ -273,12 +270,12 @@ public class ConceptHelper {
         
         if(concept.getIdArk() == null) {
             // création d'un identifiant Ark
-            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+            return prepareToAddArkId(ds, idConcept, idLang, idTheso);
         }
 
         if(concept.getIdArk().isEmpty()) {
             // création d'un identifiant Ark
-            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+            return prepareToAddArkId(ds, idConcept, idLang, idTheso);
         }
         
         // ici, nous avons un  IdArk, on vérifie s'il est encore valide ?
@@ -286,7 +283,7 @@ public class ConceptHelper {
         // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
         if (idArk == null) {
             // l'idArk n'est plus valide, il faut le créer 
-            return prepareToAddArkId(ds, url, idConcept, idLang, idTheso);
+            return prepareToAddArkId(ds, idConcept, idLang, idTheso);
         }
         // ici l'idArk est valide, on ne fait rien.
         return true;
@@ -304,7 +301,6 @@ public class ConceptHelper {
      * @return 
      */
     private boolean prepareToAddArkId (HikariDataSource ds,
-            String url, 
             String idConcept, String idLang, String idTheso) {
         
         ArrayList<DcElement> dc = new ArrayList<>();
@@ -313,15 +309,13 @@ public class ConceptHelper {
         NodeMetaData nodeMetaData = new NodeMetaData();
         nodeMetaData.setCreator(nodeConcept.getTerm().getSource());
         nodeMetaData.setTitle(nodeConcept.getTerm().getLexical_value());
-        nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+        nodeMetaData.setDcElementsList(new ArrayList<>());
         Connection conn;
         try {
             conn = ds.getConnection();
             conn.setAutoCommit(false);
             if (!addIdArk(conn, idConcept, idTheso,
-                    url,
-                    nodeMetaData,
-                    nodeConcept.getTerm().getCreator())) {
+                    nodeMetaData)) {
                 conn.rollback();
                 conn.close();
                 return false;
@@ -367,15 +361,13 @@ public class ConceptHelper {
      * @param idParent
      * @param concept
      * @param term
-     * @param urlSite
-     * @param isArkActive
      * @param idUser
      * @return null si le term existe ou si erreur, sinon le numero de Concept
      */
     public String addTopConcept(HikariDataSource ds,
             String idParent,
             Concept concept, Term term,
-            String urlSite, boolean isArkActive, int idUser) {
+            int idUser) {
 
         Connection conn = null;
 
@@ -409,23 +401,16 @@ public class ConceptHelper {
             }
             term.setId_term(idTerm);
 
-            // cette fonction permet de remplir la table Permutée
-            termHelper.splitConceptForPermute(ds, idConcept,
-                    getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus()),
-                    term.getId_thesaurus(),
-                    term.getLang(),
-                    term.getLexical_value());
-
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if (isArkActive) {
+            if (nodePreference.isUseArk()) {
                 NodeMetaData nodeMetaData = new NodeMetaData();
                 nodeMetaData.setCreator(term.getSource());
                 nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+                nodeMetaData.setDcElementsList(new ArrayList<>());
 
                 if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                        urlSite, nodeMetaData, idUser)) {
+                       nodeMetaData)) {
                     conn.rollback();
                     conn.close();
                     return null;
@@ -507,15 +492,12 @@ public class ConceptHelper {
      * @param idParent
      * @param concept
      * @param term
-     * @param urlSite
-     * @param isArkActive
      * @param idUser
      * @return null si le term existe ou si erreur, sinon le numero de Concept
      */
     public String addConcept(HikariDataSource ds,
             String idParent,
-            Concept concept, Term term,
-            String urlSite, boolean isArkActive, int idUser) {
+            Concept concept, Term term, int idUser) {
 
         Connection conn = null;
         try {
@@ -582,16 +564,17 @@ public class ConceptHelper {
 
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if (isArkActive) {
+            if (nodePreference.isUseArk()) {
                 NodeMetaData nodeMetaData = new NodeMetaData();
                 nodeMetaData.setCreator(term.getSource());
                 nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+                nodeMetaData.setDcElementsList(new ArrayList<>());
 
                 if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                        urlSite, nodeMetaData, idUser)) {
+                        nodeMetaData)) {
                     conn.rollback();
                     conn.close();
+                    Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La connexion Ark a échouée");
                     return null;
                 }
             }
@@ -621,15 +604,15 @@ public class ConceptHelper {
      * @param idParent
      * @param concept
      * @param term
-     * @param urlSite
-     * @param isArkActive
+     * @param BTname
+     * @param NTname
      * @param idUser
      * @return null si le term existe ou si erreur, sinon le numero de Concept
      */
     public String addConceptSpecial(HikariDataSource ds,
             String idParent,
             Concept concept, Term term,String BTname,String NTname,
-            String urlSite, boolean isArkActive, int idUser) {
+            int idUser) {
 
         Connection conn = null;
         try {
@@ -687,23 +670,16 @@ public class ConceptHelper {
                 return null;
             }
 
-            // cette fonction permet de remplir la table Permutée
-            termHelper.splitConceptForPermute(ds, idConcept,
-                    getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus()),
-                    term.getId_thesaurus(),
-                    term.getLang(),
-                    term.getLexical_value());
-
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if (isArkActive) {
+            if (nodePreference.isUseArk()) {
                 NodeMetaData nodeMetaData = new NodeMetaData();
                 nodeMetaData.setCreator(term.getSource());
                 nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<DcElement>());
+                nodeMetaData.setDcElementsList(new ArrayList<>());
 
                 if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                        urlSite, nodeMetaData, idUser)) {
+                        nodeMetaData)) {
                     conn.rollback();
                     conn.close();
                     return null;
@@ -1615,7 +1591,7 @@ public class ConceptHelper {
                 stmt = conn.createStatement();
                 String query;
                 try {
-                    if (identifierType == null || identifierType.equalsIgnoreCase("1")) { // identifiants types alphanumérique
+                    if (nodePreference.getIdentifierType() == 1) { // identifiants types alphanumérique
                         ToolsHelper toolsHelper = new ToolsHelper();
                         idConcept = toolsHelper.getNewId(10);
                         while (isIdExiste(conn, idConcept, concept.getIdThesaurus())) {
@@ -2056,23 +2032,31 @@ public class ConceptHelper {
     private boolean addIdArk(Connection conn,
             String idConcept,
             String idThesaurus,
-            String urlSite,
-            NodeMetaData nodeMetaData,
-            int idUser) {
+            NodeMetaData nodeMetaData) {
         /**
          * récupération du code Ark via WebServices
          *
          */
+        if(!nodePreference.isUseArk()) return false;
+        
         Ark_Client ark_Client = new Ark_Client();
+
+        Properties propertiesArk = new Properties();
+        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
+        propertiesArk.setProperty("user", nodePreference.getUserArk());
+        propertiesArk.setProperty("password", nodePreference.getPassArk());
+        ark_Client.setPropertiesArk(propertiesArk);
+        
         String idArk = ark_Client.getArkId(
                 new FileUtilities().getDate(),
-                urlSite + "?idc=" + idConcept + "&idt=" + idThesaurus,
+                nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus,
                 nodeMetaData.getTitle(), // title
                 nodeMetaData.getCreator(), // creator
                 nodeMetaData.getDcElementsList(),
                 "pcrt" // pcrt : p= pactols, crt=code DCMI pour collection
         ); // description
         if (idArk == null) {
+            message = "La connexion Ark a échouée";
             return false;
         }
 
@@ -4942,6 +4926,22 @@ public class ConceptHelper {
         } finally {
             stmt.close();
         }
+    }
+
+    public NodePreference getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(NodePreference nodePreference) {
+        this.nodePreference = nodePreference;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

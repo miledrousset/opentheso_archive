@@ -7,8 +7,6 @@ import fr.mom.arkeo.soap.ArkManagerService;
 import fr.mom.arkeo.soap.DcElement;
 import fr.mom.arkeo.soap.Login;
 import fr.mom.arkeo.soap.LoginService;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -21,19 +19,13 @@ public final class Ark_Client {
 
     private Properties propertiesArk;  
     
+    
     public Ark_Client() {
-        propertiesArk = new Properties();
-        try {
-            InputStream inputStream = Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("ark.properties");
-            if(inputStream != null) {
-                propertiesArk.load(inputStream);
-            }
-        } catch (IOException ex) {
-            System.err.println(ex.toString());
-        }
     }
 
+    public void setPropertiesArk(Properties propertiesArk) {
+        this.propertiesArk = propertiesArk;
+    }
 
     private static Account login(String baseId, String user, String password) {
 
@@ -68,37 +60,44 @@ public final class Ark_Client {
     
     public String getArkId(String date, String url, String title, 
             String creator, ArrayList<DcElement> dcElementsList, String type) {
-
-     // compte de Frantiq
-        Account account = login(
+        Account account;
+        try {
+            account = login(
                 propertiesArk.getProperty("idNaan"),
                 propertiesArk.getProperty("user"),
                 propertiesArk.getProperty("password"));
-        
-        
-    //    System.out.println("authentification.result=" + account.getUser().getFirstname() + " " + account.getUser().getLastname());
-        Ark inputArk = new Ark();
-        inputArk.setDate(date);
-        inputArk.setUrlTarget(url);
-        inputArk.setTitle(title);
-        //prefixes à définir type DCMI
-        inputArk.setType(type);//"pcrt");
-        
-        inputArk.setCreator(creator);
-      
-        for (DcElement dcElementsList1 : dcElementsList) {
-            inputArk.getDcElements().add(dcElementsList1);
+                if(account == null) return null;
+            //    System.out.println("authentification.result=" + account.getUser().getFirstname() + " " + account.getUser().getLastname());
+                Ark inputArk = new Ark();
+                inputArk.setDate(date);
+                inputArk.setUrlTarget(url);
+                inputArk.setTitle(title);
+                //prefixes à définir type DCMI
+                inputArk.setType(type);//"pcrt");
+
+                inputArk.setCreator(creator);
+
+                for (DcElement dcElementsList1 : dcElementsList) {
+                    inputArk.getDcElements().add(dcElementsList1);
+                }
+                Ark returnedArk = createArk(account, inputArk);    
+                if(returnedArk != null)
+                    return returnedArk.getArk();
+                return null;
+        } catch (Exception e) {
+            System.out.println(e.toString());
         }
-        Ark returnedArk = createArk(account, inputArk);
+
+        return null;
+        
+
         
         /*
         for(DcElement dcElement : returnedArk.getDcElements()){
         	System.out.println(dcElement.getName()+" = " +dcElement.getValue());
         }
         */
-        if(returnedArk != null)
-            return returnedArk.getArk();
-        return null;
+
         
         // Liste des DcElements
     /*     

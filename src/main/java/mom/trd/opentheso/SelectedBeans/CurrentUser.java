@@ -45,8 +45,7 @@ public class CurrentUser implements Serializable {
 
     //pref
     private String langSourceEdit;
-    private int alertNbCdtEdit = 10;
-    private boolean alertCdtEdit = false;
+
     NodePreference nodePreference;
 
     private String idTheso;
@@ -113,13 +112,13 @@ public class CurrentUser implements Serializable {
 
             if (nodePreference == null) { // cas où il n'y a pas de préférence pour ce thésaurus, il faut les créer 
                 preferencesHelper.initPreferences(connect.getPoolConnexion(),
-                        idThesaurus, workLanguage, alertNbCdtEdit, alertCdtEdit);
+                        idThesaurus, workLanguage);
                 nodePreference = preferencesHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
 
             } else {
                 langSourceEdit = nodePreference.getSourceLang();
-                alertNbCdtEdit = nodePreference.getNbAlertCdt();
-                alertCdtEdit = nodePreference.isAlertCdt();
+            //    alertNbCdtEdit = nodePreference.getNbAlertCdt();
+            //    alertCdtEdit = nodePreference.isAlertCdt();
                 selectedThesaurus = new ArrayList<>();
                 selectedThesaurus.add(idTheso);
             }
@@ -446,23 +445,11 @@ public class CurrentUser implements Serializable {
         vue.setAddUser(false);
     }
 
-    public void editPrefUser() {
-        NodePreference np = new NodePreference();
-        np.setAlertCdt(alertCdtEdit);
-        np.setSourceLang(langSourceEdit);
-        np.setNbAlertCdt(alertNbCdtEdit);
-        if (!new PreferencesHelper().updatePreferenceUser(connect.getPoolConnexion(), np, idTheso)) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-            return;
-        }
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info6")));
-    }
-
     public void editAllPref() {
-        nodePreference.setAlertCdt(alertCdtEdit);
+    //    nodePreference.setAlertCdt(alertCdtEdit);
         nodePreference.setSourceLang(langSourceEdit);
-        nodePreference.setNbAlertCdt(roleEdit);
-        nodePreference.setNbAlertCdt(alertNbCdtEdit);
+     //   nodePreference.setNbAlertCdt(roleEdit);
+    //    nodePreference.setNbAlertCdt(alertNbCdtEdit);
 
         if (!new PreferencesHelper().updateAllPreferenceUser(connect.getPoolConnexion(), nodePreference, idTheso)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
@@ -621,22 +608,6 @@ public class CurrentUser implements Serializable {
 
     public void setLangSourceEdit(String langSourceEdit) {
         this.langSourceEdit = langSourceEdit;
-    }
-
-    public int getAlertNbCdtEdit() {
-        return alertNbCdtEdit;
-    }
-
-    public void setAlertNbCdtEdit(int alertNbCdtEdit) {
-        this.alertNbCdtEdit = alertNbCdtEdit;
-    }
-
-    public boolean isAlertCdtEdit() {
-        return alertCdtEdit;
-    }
-
-    public void setAlertCdtEdit(boolean alertCdtEdit) {
-        this.alertCdtEdit = alertCdtEdit;
     }
 
     public String getIdTheso() {

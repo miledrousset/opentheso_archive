@@ -640,7 +640,7 @@ public class SelectedThesaurus implements Serializable {
         /*Vérification et génération des nouveaux id Ark*/
         for (String idConcept : idConcepts) {
             if (!conceptHelper.regenerateArkId(connect.getPoolConnexion(),
-                    nodePreference.getCheminSite(), idConcept,
+                    idConcept,
                     thesaurus.getLanguage(), idTheso)) {
 
                 throw new Exception("BDD error");
@@ -1011,6 +1011,7 @@ public class SelectedThesaurus implements Serializable {
                 candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             }
         }
+        filteredCandidats = candidats;
         return candidats;
     }
 

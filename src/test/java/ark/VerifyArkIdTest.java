@@ -7,17 +7,11 @@ package ark;
 
 import com.zaxxer.hikari.HikariDataSource;
 import connexion.ConnexionTest;
-import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.Ark_Client;
 import org.junit.After;
@@ -25,7 +19,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -234,7 +227,7 @@ public class VerifyArkIdTest {
         }
         ConceptHelper conceptHelper = new ConceptHelper();
         
-        conceptHelper.regenerateArkId(ds, urlSite, idConcept, idLang, idTheso);
+        conceptHelper.regenerateArkId(ds, idConcept, idLang, idTheso);
         ds.close();
     }
     
