@@ -5314,8 +5314,6 @@ public class ConceptHelper {
             stmt.close();
         }
     }
-    
-}   
 
     public NodePreference getNodePreference() {
         return nodePreference;
