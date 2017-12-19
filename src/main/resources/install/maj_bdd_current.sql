@@ -32,26 +32,58 @@ SET ROLE = opentheso;
 
 
 
-Il faut ajouter les modifs suivantes :
-table   Concept :  id_ark character varying DEFAULT ''::character varying,
-        id_handle character varying DEFAULT ''::character varying,
+        Il faut ajouter les modifs suivantes :
+        table   Concept :  id_ark character varying DEFAULT ''::character varying,
+                id_handle character varying DEFAULT ''::character varying,
 
 
-table preferences
-        use_ark boolean DEFAULT false,
-        server_ark character varying DEFAULT 'http://ark.mondomaine.fr/ark:/'::character varying,
-        id_naan character varying NOT NULL DEFAULT '66666'::character varying,
-        prefix_ark character varying NOT NULL DEFAULT 'crt'::character varying,
-        user_ark character varying,
-        pass_ark character varying,
-        use_handle boolean DEFAULT false,
-        user_handle character varying,
-        pass_handle character varying,
-        path_key_handle character varying,
-        path_cert_handle character varying,
-        url_api_handle character varying NOT NULL DEFAULT 'https://handle-server.mondomaine.fr:8001/api/handles/'::character varying,
-        id_handle character varying NOT NULL DEFAULT '66.666.66666'::character varying,
-        prefix_handle character varying NOT NULL DEFAULT 'crt'::character varying,
+        -- Table: preferences
+
+        -- DROP TABLE preferences;
+
+        CREATE TABLE preferences
+        (
+          id_pref integer NOT NULL DEFAULT nextval('pref__id_seq'::regclass),
+          id_thesaurus character varying NOT NULL,
+          source_lang character varying(2) DEFAULT 'fr'::character varying,
+          identifier_type integer DEFAULT 2,
+          path_image character varying DEFAULT '/var/www/images/'::character varying,
+          dossier_resize character varying DEFAULT 'resize'::character varying,
+          bdd_active boolean DEFAULT false,
+          bdd_use_id boolean DEFAULT false,
+          url_bdd character varying DEFAULT 'http://www.mondomaine.fr/concept/##value##'::character varying,
+          url_counter_bdd character varying DEFAULT 'http://mondomaine.fr/concept/##conceptId##/total'::character varying,
+          z3950actif boolean DEFAULT false,
+          collection_adresse character varying DEFAULT 'KOHA/biblios'::character varying,
+          notice_url character varying DEFAULT 'http://catalogue.mondomaine.fr/cgi-bin/koha/opac-search.pl?type=opac&op=do_search&q=an=terme'::character varying,
+          url_encode character varying(10) DEFAULT 'UTF-8'::character varying,
+          path_notice1 character varying DEFAULT '/var/www/notices/repositories.xml'::character varying,
+          path_notice2 character varying DEFAULT '/var/www/notices/SchemaMappings.xml'::character varying,
+          chemin_site character varying DEFAULT 'http://mondomaine.fr/'::character varying,
+          webservices boolean DEFAULT true,
+          use_ark boolean DEFAULT false,
+          server_ark character varying DEFAULT 'http://ark.mondomaine.fr/ark:/'::character varying,
+          id_naan character varying NOT NULL DEFAULT '66666'::character varying,
+          prefix_ark character varying NOT NULL DEFAULT 'crt'::character varying,
+          user_ark character varying,
+          pass_ark character varying,
+          use_handle boolean DEFAULT false,
+          user_handle character varying,
+          pass_handle character varying,
+          path_key_handle character varying DEFAULT '/certificat/key.p12'::character varying,
+          path_cert_handle character varying DEFAULT '/certificat/cacerts2'::character varying,
+          url_api_handle character varying NOT NULL DEFAULT 'https://handle-server.mondomaine.fr:8001/api/handles/'::character varying,
+          prefix_handle character varying NOT NULL DEFAULT '66.666.66666'::character varying,
+          private_prefix_handle character varying NOT NULL DEFAULT 'crt'::character varying,
+          CONSTRAINT preferences_pkey PRIMARY KEY (id_pref),
+          CONSTRAINT preferences_id_thesaurus_key UNIQUE (id_thesaurus)
+        )
+        WITH (
+          OIDS=FALSE
+        );
+        ALTER TABLE preferences
+          OWNER TO opentheso;
+
 
 
 
