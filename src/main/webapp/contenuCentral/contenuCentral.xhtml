@@ -13,7 +13,35 @@
     
     <div id="contenuPrincipale">
         <h:panelGroup id="panContenu">
-            <div style="text-align: center">
+           
+
+            <div id="alignGauche">
+                <!--TERMES GENERIQUES DEBUT -->
+                <ui:include src="termesGeneriques/termesGeneriques.xhtml"/>
+                <!--INFO TERMES DEBUT -->
+                <ui:include src="infoConcept/infoconcept.xhtml" />
+                <!--TERMES SPECIFIQUES DEBUT -->
+                <ui:include src="termesSpecifiques/termesSpecifiques.xhtml"/>
+
+            </div>
+            <div id="alignDroite">
+                <!--TERMES ASSOCIES DEBUT -->
+                <ui:include src="termesAssocies/termesAssocies.xhtml"/>
+                <!--TERMES SYNONYMES DEBUT -->
+                <ui:include src="synonymes/synonymes.xhtml"/>
+                <!--NOTES -->
+                <ui:include src="notes/notes.xhtml" />
+                <!--ALIGNEMENT DEBUT -->
+                <ui:include src="alignement/alignement.xhtml"/>
+                <!--GOOGLE MAPS -->
+                <ui:include  src="googleMaps/googleMaps.xhtml"/>
+            </div>
+           
+        </h:panelGroup>
+        
+    </div>
+     <div id="clean" />
+             <div id="exportPanel" style="text-align: center;position:relative;top:-3px;">
 
                 <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
                     <!-- exporter le Group en SKOS -->
@@ -67,7 +95,7 @@
 
 
 
-
+                
                 <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
                     <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{newtreeBean.reactivConcept()}"
                                      update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
@@ -76,32 +104,8 @@
                     <br/><br/>
                 </h:form>
 
-                <div id="clean" />
+               
             </div>
-
-            <div id="alignGauche">
-                <!--TERMES GENERIQUES DEBUT -->
-                <ui:include src="termesGeneriques/termesGeneriques.xhtml"/>
-                <!--INFO TERMES DEBUT -->
-                <ui:include src="infoConcept/infoconcept.xhtml" />
-                <!--TERMES SPECIFIQUES DEBUT -->
-                <ui:include src="termesSpecifiques/termesSpecifiques.xhtml"/>
-
-            </div>
-            <div id="alignDroite">
-                <!--TERMES ASSOCIES DEBUT -->
-                <ui:include src="termesAssocies/termesAssocies.xhtml"/>
-                <!--TERMES SYNONYMES DEBUT -->
-                <ui:include src="synonymes/synonymes.xhtml"/>
-                <!--NOTES -->
-                <ui:include src="notes/notes.xhtml" />
-                <!--ALIGNEMENT DEBUT -->
-                <ui:include src="alignement/alignement.xhtml"/>
-                <!--GOOGLE MAPS -->
-                <ui:include  src="googleMaps/googleMaps.xhtml"/>
-            </div>
-        </h:panelGroup>
-    </div>
             
             
 </ui:composition>

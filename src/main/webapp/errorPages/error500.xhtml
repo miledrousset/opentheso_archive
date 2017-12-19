@@ -1,11 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>OpenTheso - Erreur 500</title>
         <link rel="stylesheet" type="text/css" href="../css/style.css"/>
         <link rel="stylesheet" type="text/css" href="../css/menu.css"/>
+        <link rel="stylesheet" type="text/css" href="../css/index.css" media="screen" />
     </h:head>
     <h:body>
         <h:panelGroup rendered="#{poolConnexion.poolConnexion != null}">
@@ -17,14 +19,21 @@
                     </div>
                 </a>
                 <div style="clear: both;"></div>
-                <div id="onglets">
-                    <ul id="listeMenu"> 
-                        <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
-                        <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
-                        <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
-                        <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
-                    </ul>
-                </div><br/>
+         
+          
+               <div id="menuHeadTop"> 
+                   <p:panel id="panelMenu"   styleClass="panelNoBorder"> 
+                       <div id="onglets">
+
+                        <div id="listeMenu" >
+                        <h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink>
+                       <h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink>
+                        <h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink>
+                        <h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink>
+                        </div>
+                       </div>
+                   </p:panel>
+                </div>
             </div>
             <div style="margin: auto; width: 1000px; margin-top: 100px;">
                 <h1>Une erreur est survenue : Error500</h1>
@@ -33,7 +42,7 @@
                 Cette erreur peut être due à une mise à jour du serveur, essayez de nouveau l'opération plus tard.
             </div>
         </h:panelGroup>
-        <h:panelGroup  >
+        <h:panelGroup  rendered="#{poolConnexion.poolConnexion == null}">
             <div style="margin: auto; width: 1000px; margin-top: 100px;">
                 <h1>#{langueBean.getMsg('installTitle')} </h1>
                 #{langueBean.getMsg('installTitle2')}<br/><br/>

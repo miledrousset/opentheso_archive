@@ -6,8 +6,9 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
     <div id="gauche">
-        <p:tabView id="accordeonTree" dynamic="true" cache="true" activeIndex="#{vue.onglet}" > <!--rendered="{(newtreeBean.browserName != 'agent') }"> -->
-            <p:tab titletip="#{langueBean.getMsg('theso')}" >
+        <p:tabView id="accordeonTree" dynamic="true" cache="false" activeIndex="#{vue.onglet}"   > <!--rendered="{(newtreeBean.browserName != 'agent') }"> -->
+          <p:ajax event="tabChange" listener="#{vue.onTabChange}" />  
+            <p:tab id="tab0" titletip="#{langueBean.getMsg('theso')}" >
                 <f:facet name="title" >
                     <p:graphicImage value="images/iconeTree2.png" style="width:15px;height: auto;"/>
                 </f:facet>
@@ -18,7 +19,7 @@
                 <!-- ARBRE DEBUT -->  
                 <ui:include src="arbre/arbre.xhtml"/>  
             </p:tab>
-            <p:tab titletip="#{langueBean.getMsg('index.search')}">
+            <p:tab id="tab1" titletip="#{langueBean.getMsg('index.search')}">
                 
                 <f:facet name="title">
                     <p:graphicImage value="images/search-16.png" style="width:15px;height: auto;" />
@@ -31,7 +32,7 @@
             </p:tab>
 
 
-            <p:tab titletip="facette">
+            <p:tab id="tab2" titletip="facette">
 
                 <f:facet name="title">
                     <p:graphicImage value="images/facette.png" style="width:15px;height: 15px;" />

@@ -8,9 +8,13 @@ package mom.trd.opentheso.SelectedBeans;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -25,12 +29,17 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
+import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
+import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
+import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
+import mom.trd.opentheso.dragdrop.TreeChange;
+import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
@@ -51,7 +60,7 @@ public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
-
+   
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
 
@@ -80,7 +89,14 @@ public class NewTreeBean implements Serializable {
     private boolean createValid = false;
 
     private String NTtag;
-
+    
+    /*** attributs pour le drag and drop****************/
+    private MyTreeNode draggedNode;
+    private MyTreeNode droppedNode;
+    private String parentId;
+    ArrayList<StructIdBroaderTerm> idsBT;
+    ArrayList<String> idsBTRemoveNode;
+   /***************************************************/
     /**
      *
      * @param idTheso
@@ -201,8 +217,8 @@ public class NewTreeBean implements Serializable {
         }
 
     }
-    public void loadOrphan(String idTheso, String langue) {
-        String typeNode, value = "";
+    public void loadOrphan(String idTheso, String langue){
+         String typeNode, value = "";
         /*
         this.typeMot = type;
       this.idMot = id;
@@ -232,7 +248,7 @@ public class NewTreeBean implements Serializable {
 
         }
 
-    }
+    } 
 
     public void majSearchPermute() {
         selectedTerme.majSearchPermute();
@@ -256,7 +272,13 @@ public class NewTreeBean implements Serializable {
      */
     public void onNodeExpand(NodeExpandEvent event) {
 
-        if (!event.getTreeNode().getType().equals("orphan")) {
+       onNodeExpand(event.getTreeNode());
+
+    }
+    
+    public void onNodeExpand(TreeNode treeNode) {
+
+        if (!treeNode.getType().equals("orphan")) {
             ArrayList<NodeConceptTree> listeSubGroup = new ArrayList<>();
             ArrayList<NodeConceptTree> listeConcept;
             ArrayList<String> idGroupList;
@@ -267,11 +289,11 @@ public class NewTreeBean implements Serializable {
             boolean isTopTerm;
 
             //<Retirer noeuds fictifs>
-            if (event.getTreeNode().getChildCount() == 1) {
-                event.getTreeNode().getChildren().remove(0);
+            if (treeNode.getChildCount() == 1) {
+                treeNode.getChildren().remove(0);
             }
 
-            MyTreeNode myTreeNode = (MyTreeNode) event.getTreeNode();
+            MyTreeNode myTreeNode = (MyTreeNode) treeNode;
 
             // id du concept ou group sélectionné qu'il faut déployer
             String idSelectedNode = myTreeNode.getIdConcept();
@@ -295,7 +317,7 @@ public class NewTreeBean implements Serializable {
             //    myTreeNode.setIsTopConcept(true);
             }
 
-            TreeNode treeNode;
+            MyTreeNode treeNode2=null;
             // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
             // myTreeNode.isIsGroup() myTreeNode.isIsSubGroup()
             // 
@@ -306,25 +328,28 @@ public class NewTreeBean implements Serializable {
              * Ajout des sous_Groupes (MT, C, G, T ..)
              */
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
-
+                treeNode2=null;
                 value = nodeConceptTreeGroup.getTitle();
                 if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
 
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
 
-                    treeNode = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
-                            ((MyTreeNode) event.getTreeNode()).getLangue(),  nodeConceptTreeGroup.getIdConcept(),
-                            ((MyTreeNode) event.getTreeNode()).getTypeDomaine(),
-                            idTC, icon, value, event.getTreeNode());
-                    ((MyTreeNode) treeNode).setIsSubGroup(true);
-                    new DefaultTreeNode("fake", treeNode);
+                    treeNode2 = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) treeNode).getIdTheso(),
+                            ((MyTreeNode) treeNode).getLangue(),  nodeConceptTreeGroup.getIdConcept(),
+                            ((MyTreeNode) treeNode).getTypeDomaine(),
+                            idTC, icon, value, treeNode);
+                    ((MyTreeNode) treeNode2).setIsSubGroup(true);
+                    ((MyTreeNode)treeNode2).setIdParent(myTreeNode.getIdConcept());
+                    new DefaultTreeNode(null, treeNode2);
                 }
+              
             }
 
             // Ajout dans l'arbre des concepts
             for (NodeConceptTree nodeConceptTree : listeConcept) {
                 isTopTerm = false;
+                treeNode2=null;
                 if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
                         || nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
@@ -338,7 +363,7 @@ public class NewTreeBean implements Serializable {
                         idTC = value;
                         isTopTerm = true;
                     } else { //Création de concepts
-                        idTC = ((MyTreeNode) event.getTreeNode()).getIdTopConcept();
+                        idTC = ((MyTreeNode) treeNode).getIdTopConcept();
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
@@ -350,17 +375,18 @@ public class NewTreeBean implements Serializable {
                             icon = "hidden";
                         }
                     }
-                    treeNode = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
-                            ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdCurrentGroup(),
-                            ((MyTreeNode) event.getTreeNode()).getTypeDomaine(),
-                            idTC, icon, value, event.getTreeNode());
+                    treeNode2 = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) treeNode).getIdTheso(),
+                            ((MyTreeNode) treeNode).getLangue(), ((MyTreeNode) treeNode).getIdCurrentGroup(),
+                            ((MyTreeNode) treeNode).getTypeDomaine(),
+                            idTC, icon, value, treeNode);
                     if(isTopTerm)
-                        ((MyTreeNode) treeNode).setIsTopConcept(true);
+                        ((MyTreeNode) treeNode2).setIsTopConcept(true);
                     idGroupList = groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(),
                             nodeConceptTree.getIdThesaurus(),
                             nodeConceptTree.getIdConcept());
-                    ((MyTreeNode) treeNode).setOtherGroup(idGroupList);
-                    new DefaultTreeNode("fake", treeNode);
+                    ((MyTreeNode) treeNode2).setOtherGroup(idGroupList);
+                   ((MyTreeNode)treeNode2).setIdParent(myTreeNode.getIdConcept());
+                   new DefaultTreeNode(null, treeNode2);
                 } else {
                     icon = "fichier";
                     // if (type == 2) { //Création des topConcepts
@@ -376,7 +402,7 @@ public class NewTreeBean implements Serializable {
 
                     } else { //Création de concepts
                         //type=3;
-                        idTC = ((MyTreeNode) event.getTreeNode()).getIdTopConcept();
+                        idTC = ((MyTreeNode) treeNode).getIdTopConcept();
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
@@ -386,23 +412,22 @@ public class NewTreeBean implements Serializable {
                     if (nodeConceptTree.getStatusConcept().equals("hidden")) {
                         icon = "hidden";
                     }
-                    treeNode = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) event.getTreeNode()).getIdTheso(),
-                            ((MyTreeNode) event.getTreeNode()).getLangue(), ((MyTreeNode) event.getTreeNode()).getIdCurrentGroup(),
-                            ((MyTreeNode) event.getTreeNode()).getTypeDomaine(),
-                            idTC, icon, value, event.getTreeNode());
+                    treeNode2 = new MyTreeNode(type, nodeConceptTree.getIdConcept(), ((MyTreeNode) treeNode).getIdTheso(),
+                            ((MyTreeNode) treeNode).getLangue(), ((MyTreeNode) treeNode).getIdCurrentGroup(),
+                            ((MyTreeNode) treeNode).getTypeDomaine(),
+                            idTC, icon, value, treeNode);
                     if(isTopTerm)
-                        ((MyTreeNode) treeNode).setIsTopConcept(true);
+                        ((MyTreeNode) treeNode2).setIsTopConcept(true);
                     idGroupList = groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(),
                             nodeConceptTree.getIdThesaurus(),
                             nodeConceptTree.getIdConcept());
-                    ((MyTreeNode) treeNode).setOtherGroup(idGroupList);                    
+                    ((MyTreeNode) treeNode2).setOtherGroup(idGroupList);                    
                 }
-//*/
+                ((MyTreeNode)treeNode2).setIdParent(myTreeNode.getIdConcept());
             }
         }
 
     }
-
     /**
      *
      * @param event
@@ -414,6 +439,7 @@ public class NewTreeBean implements Serializable {
         //}
         vue.setOnglet(0);
         selectedTerme.setTree(0);
+       // this.parentOrigine=(MyTreeNode)selectedNode.getParent();
 
     }
 
@@ -436,7 +462,9 @@ public class NewTreeBean implements Serializable {
         selectedTerme.majIndexRapidSearch(idThesoSelected, defaultLanguage);
         reInit();
         reExpand();
+        vue.setOnglet(0);
     }
+ 
 
     public void changeTerme(String id, int type) {
 
@@ -1238,23 +1266,461 @@ public class NewTreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info2")));
         }
     }
-
+/*************************fin des nouvelles fonctions**************************/
     /**
-     * Fin des nouvelles fonctions
-     */
-    /**fonction drag drop par #JM*/
-    /**
+     * onCollapse #JM
      * 
+     * @param event
+     */
+    public void onNodeCollapse(NodeCollapseEvent event){
+        ((MyTreeNode)event.getTreeNode()).setExpanded(false);
+        
+    }
+    /*********************fonctions drag drop #JM******************************/
+    /**************************************************************************/
+    /**
+     * Fonction pour récupérer l'éveneme drag drop de l'arbre
      * @param event 
      */
     public void onDragDrop(TreeDragDropEvent event){
         MyTreeNode dragNode=(MyTreeNode)event.getDragNode();
         MyTreeNode dropNode=(MyTreeNode)event.getDropNode();
+        idsBT=new ArrayList<>();
+        idsBTRemoveNode=new ArrayList<>();
+        TreeChange treeChange=new TreeChange();
         int dropIndex=event.getDropIndex();
-       FacesMessage message=new FacesMessage(FacesMessage.SEVERITY_INFO,"dragged my treeNode "+dragNode.toString()," Dropped on id current group "+dropNode.toString());
-       FacesContext.getCurrentInstance().addMessage(null, message);
+        this.draggedNode=dragNode;
+        this.parentId=dragNode.getIdParent();
+        this.droppedNode=dropNode;
+       
+        ArrayList<String> idsbt=null;
+        RelationsHelper relationsHelper = new RelationsHelper();
+        ConceptHelper conceptHelper =new ConceptHelper();
+        GroupHelper groupHelper=new GroupHelper();
+        if(dragNode.isIsTopConcept() ){
+           idsbt=dragNode.getOtherGroup();
+        }
+        else{
+           idsbt=relationsHelper.getListIdOfBT(connect.getPoolConnexion(), dragNode.getIdConcept(), idThesoSelected);
+        }
+        ArrayList<StructIdBroaderTerm> sibt=new ArrayList<>();
+       for(String id :idsbt){
+           StructIdBroaderTerm elem=new StructIdBroaderTerm();
+           
+                      
+           String idLang=(selectedTerme.getIdlangue().isEmpty())? defaultLanguage : selectedTerme.getIdlangue();
+           String idGroup=conceptHelper.getGroupIdOfConcept(connect.getPoolConnexion(),id, idThesoSelected);
+           String lexicalValue=conceptHelper.getLexicalValueOfConcept(connect.getPoolConnexion(), id, idThesoSelected, idLang);
+           String lexicalValueGroup=groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), idGroup, idThesoSelected, idLang);
+           
+           
+           elem.setIdBroaderTerm(id);
+           elem.setIdGroupBroaderTerm(idGroup);
+           elem.setLexicalValueTerm(lexicalValue);
+           elem.setLexicalValueGroup(lexicalValueGroup);
+
+           sibt.add(elem);
+       }
+        idsBT.addAll(sibt);
+        
+        if("fichier".equals(event.getDropNode().getType()))
+             treeChange.changeLeafToDirectory(event.getDragNode(),event.getDropNode());   
+        
+        if(!"fichier".equals(event.getDropNode().getType()) && !"dossier".equals(event.getDropNode().getType()) )
+                 treeChange.changeToGroupChild(event.getDragNode(),event.getDropNode());
+        
+  
+       
+        treeChange.saveExpandedNodes(root);
         
     }
+    
+   
+    
+    /**
+     * confrimDrop
+     * Fonction qui est appelée depuis le dialogue de confirmation du drag drop
+     * de la page JSF , permet de préparer le traitement des paramètres
+     * et appelle ensuite la fonction qui correspond à l'évenement produit dans
+     * le tree
+     */
+    public void confirmDrop(){
+       
+       this.idsBTRemoveNode.add(parentId);
+       if((droppedNode.isIsSubGroup()||droppedNode.isIsGroup())&&(!draggedNode.isIsSubGroup())){
+          for(StructIdBroaderTerm elem:this.idsBT){
+           this.idsBTRemoveNode.add(elem.getIdBroaderTerm());
+          }
+       }
+       callTreeHandle();
+       callreExpande();
+       idsBT=new ArrayList<>();
+       idsBTRemoveNode=new ArrayList<>();
+    }
+    /**
+     * callTreeHandle
+     * méthode pour appeler la bonne méthode suivant les noeuds parents et 
+     * enfants
+     */
+    public void callTreeHandle(){
+         if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               draggedNode.isIsTopConcept() && !droppedNode.isIsGroup() && !droppedNode.isIsSubGroup()  && !droppedNode.isIsTopConcept()){
+           fromTTToConceptDomain();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               draggedNode.isIsTopConcept() && !droppedNode.isIsGroup() && !droppedNode.isIsSubGroup() && !droppedNode.isIsTopConcept()){
+           fromTTToConceptOtherDomain();
+       }
+    
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               draggedNode.isIsTopConcept() && droppedNode.isIsSubGroup() ){
+           fromTTToSubGroupOtherDomain();
+       }
+      
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               draggedNode.isIsTopConcept() && droppedNode.isIsGroup() ){
+           fromTTToGroupOtherDomain();
+       }
+       
+       
+       if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsTopConcept() && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup() && !draggedNode.isIsTopConcept()){
+           fromConceptToTTDomain();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsTopConcept() && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup()&& !draggedNode.isIsTopConcept()){
+           fromConceptToTTOtherDomain();
+       }
+        if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsSubGroup()  && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup() && !draggedNode.isIsTopConcept()){
+           fromConceptToSubGroupDomain();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsSubGroup() && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup()&& !draggedNode.isIsTopConcept()){
+           fromConceptToSubGroupOtherDomain();
+       }
+        if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsGroup() && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup() && !draggedNode.isIsTopConcept() ){
+           fromConceptToGroupDomain();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsGroup() && !draggedNode.isIsGroup() && !draggedNode.isIsSubGroup()&& !draggedNode.isIsTopConcept()){
+           fromConceptToGroupOtherDomain();
+       }
+       
+       
+       
+    
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               draggedNode.isIsSubGroup()&& droppedNode.isIsGroup() ){
+           fromSubGroupToGroupOtherDomain();
+       }
+     
+       
+       
+      
+   
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsSubGroup() && draggedNode.isIsSubGroup()){
+           fromSubGoupToSubGroupOtherDomain();
+       }
+    
+       if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsTopConcept()&& draggedNode.isIsTopConcept()){
+           fromTTToTT();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+               droppedNode.isIsTopConcept()&& draggedNode.isIsTopConcept()){
+           fromTTToTTOtherDomain();
+       }
+       if(droppedNode.getIdCurrentGroup()==draggedNode.getIdCurrentGroup() && 
+               !droppedNode.isIsTopConcept() && !droppedNode.isIsSubGroup() && !droppedNode.isIsGroup()
+               && !draggedNode.isIsTopConcept()&& !draggedNode.isIsSubGroup() && !droppedNode.isIsGroup()){
+           fromConceptToConcept();
+       }
+       if(droppedNode.getIdCurrentGroup()!=draggedNode.getIdCurrentGroup() && 
+              !droppedNode.isIsTopConcept() && !droppedNode.isIsSubGroup() && !droppedNode.isIsGroup()
+               && !draggedNode.isIsTopConcept()&& !draggedNode.isIsSubGroup() && !droppedNode.isIsGroup()){
+           fromConceptToConceptOtherDomain();
+       }
+    }
+    /*Fonction qui doivent gérer les déplacement des noeuds vis à vis de la bdd**/
+    
+    /**déplacement d'un groupe ce déplacement n'est pas prévu pour le moment **/
+   
+   /******************déplacement d'un sous groupe*********************/
+ 
+    /**
+     * fromSubGroupToGroupOtherDomain
+     * déplace un sous groupe vers un groupe d'un autre domaine
+     */
+    public void fromSubGroupToGroupOtherDomain(){
+            for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),draggedNode.getType(),droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId());
+        }
+        
+        System.out.println("from subgroup to group other domain");
+    }
+  
+    /**
+     * fromSubGroupToSubGroupOtherDomain()
+     * déplace un sous groupe vers un autre sous groupe d'un autre domaine
+     */
+    public void fromSubGoupToSubGroupOtherDomain(){
+            for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),draggedNode.getType(),droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        System.out.println("from sub grou to subgroup other domain");
+    }
+  
+    /* public void fromSubGroupToConceptOtherDomain(){
+        System.out.println(" from sub group to  concept other  domain"); 
+    }
+    public void fromSubGroupToConceptDomain(){
+         System.out.println(" from sub group to  concept   domain");
+    }*/
+    
+    /********************déplacement d'un top term************************* ***/
+    
+    public void fromTTToGroupOtherDomain(){
+            for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        System.out.println("from top term to group other domain");
+    }
+    
+  
+    
+    /**
+     * fromTTToSubGroupOtherDomain
+     * déplace un top terme vers un sous groupe d'un autre domaine
+     */
+    public void fromTTToSubGroupOtherDomain(){
+          for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        System.out.println("from top term to sub group other domain");
+    }
+    
+ 
+    
+    /**
+     * fromTTTOTTTOtherDomain
+     * déplace un top terme vers un top terme d'un autre domaine
+     */
+    public void fromTTToTTOtherDomain(){
+         for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptTermToConceptTermOtherDomain( connect, draggedNode.getIdConcept(), idBT,droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+       
+        System.out.println("from to top term to top term other domain");
+    }
+    
+    /**
+     * fromTTToTT()
+     * déplace un top terme dans un autre top terme
+     * 
+     */
+    public void fromTTToTT(){
+         for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+      
+        System.out.println("from top term to top term domain");
+    }
+    
+    /**
+     * fromTTToConceptDomain
+     * déplace un top terme vers un concept du même domaine
+     */
+    public void fromTTToConceptDomain(){
+         for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        System.out.println(" from top term to concept  domain");
+    }
+   /**
+    * fromTTToConceptOtherDomain
+    * déplace un top terme vers une branche dans un autre domaine
+    */ 
+    public void fromTTToConceptOtherDomain(){
+           for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        System.out.println(" from top term to concept  other domain");
+    }
+   
+    /*******************déplacement d'un concept************************** ***/
+    /**
+     *formConceptToGroupOtherDomain
+     * 
+     * déplacement d'un concept vers un goupe d'un autre domaine
+     * 
+     */
+     public void fromConceptToGroupOtherDomain(){
+            for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        
+       
+        System.out.println(" from concept to group other domain");
+    }
+    public void fromConceptToGroupDomain(){
+        
+        System.out.println(" from concept to group  domain");
+    }
+    /**
+     * fromConceptToSubGroupOtherDomain
+     * déplacement d'un concept vers un sous groupe d'un autre domaine
+     */
+    public void fromConceptToSubGroupOtherDomain(){
+        for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT,draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+            System.out.println(" from concept  to  sub group other domain   domain");
+    }
+    
+    /**
+     * fromConceptToSubGroupDomain
+     * 
+     * déplace un concept dnas un sous groupe
+     */
+    public void fromConceptToSubGroupDomain(){
+        for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+         tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(),droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            }
+            
+        System.out.println(" from   concept to sub group domain");
+    }
+   
+    /**
+     * fromConceptToTTOtherDomain
+     * déplace un concept vers un top terme d'un autre domaine
+     */
+    public void fromConceptToTTOtherDomain(){
+         for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        System.out.println(" from concept m to top term other  domain");
+    }
+    /**
+     * fromConceptToTTDomain
+     * déplace un concept vers un toipo terme du même domaine
+     */
+    public void fromConceptToTTDomain(){
+         for(String idBT :idsBTRemoveNode){
+         TreeChange tc=new TreeChange();
+         tc.moveConceptTermToConceptTermSameDomain(connect,
+                draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId());
+          
+        }
+             System.out.println(" from concept m to top term  domain");
+    }
+   
+    /**
+     * fromConceptToConcept
+     * déplace un concept vers un autre concept dans le même domaine
+     */
+    public void fromConceptToConcept(){
+  
+        for(String idBT :idsBTRemoveNode){
+         TreeChange tc=new TreeChange();
+         tc.moveConceptTermToConceptTermSameDomain(connect,
+                draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId());
+          
+        }
+        System.out.println("from concept to concept domain");
+    }
+    /**
+     * fromConceptToConceptOtherDomain
+     * déplacement d'un concept vers un concept d'un autre domaine
+     */
+    public void fromConceptToConceptOtherDomain(){
+    
+        for(String idBT :idsBTRemoveNode){
+          TreeChange tc=new TreeChange();
+          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+        }
+        
+        System.out.println("from concept to concept other domain");
+    }
+    
+    /**fin des fonctions qui doivent gérer le déplacement d'un noeuds vis à vis 
+     * de la bdd
+     */
+    
+    /**
+     * infirmDrop
+     * Méthode qui est appelée depuis la boîte de confirmation du drag and drop
+     * en cas d'annulation des modifications
+     */
+    public void infirmDrop(){
+       
+      
+       callreExpande();
+    }
+    private void callreExpande(){
+         
+        TreeChange tc=new TreeChange();
+        tc.saveExpandedNodes(root);
+        if(selectedTerme.getIdlangue().isEmpty())
+            initTree(idThesoSelected, defaultLanguage);
+        else
+            initTree(idThesoSelected, selectedTerme.getIdlangue());
+        this.reExpandNodes(root,tc);
+        idsBT=new ArrayList<>();
+    }
+    private void reExpandNodes(TreeNode root,TreeChange tc){
+        for (TreeNode tn:root.getChildren()){
+            if(tc.getExpandedNodes().contains(tn)){
+                tn.setExpanded(true);
+                this.onNodeExpand(tn);
+                reExpandNodes(tn,tc);
+            }
+        }
+    }
+    
+    public boolean renderValid(){
+        if(draggedNode!=null && droppedNode!=null)
+        return draggedNode.isIsGroup()==false && ((draggedNode.isIsSubGroup() && droppedNode.isIsGroup()) || (draggedNode.isIsSubGroup() && droppedNode.isIsSubGroup()) || draggedNode.isIsSubGroup()==false);
+        else           
+        return false;
+
+        
+        
+    }
+
+   
+    public String getParentId() {
+        return parentId;
+    }
+
+    
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    /***********************************fin des fonctions drag drop ******************************************
+     * ******************************************************************************************************/
+  
     public Connexion getConnect() {
         return connect;
     }
@@ -1376,4 +1842,42 @@ public class NewTreeBean implements Serializable {
         this.editPassed = editPassed;
     }
 
+ 
+
+    public ArrayList<StructIdBroaderTerm> getIdsBT() {
+        return idsBT;
+    }
+
+    public void setIdsBT(ArrayList<StructIdBroaderTerm> idsBT) {
+        this.idsBT = idsBT;
+    }
+
+
+    
+    
+    public MyTreeNode getDraggedNode() {
+        if(draggedNode==null){
+            //pour éviter un null pointer dans le xhtml :§
+            return new MyTreeNode(0,"00","00","En","00","00", "00","","",null);
+        }
+        return draggedNode;
+    }
+
+    public void setDraggedNode(MyTreeNode draggedNode) {
+        this.draggedNode = draggedNode;
+    }
+
+    public MyTreeNode getDroppedNode() {
+        if(droppedNode==null){
+            return new MyTreeNode(0,"00","00","En","00","00", "00","","",null);
+        }
+        return droppedNode;
+    }
+
+    public void setDroppedNode(MyTreeNode droppedNode) {
+        this.droppedNode = droppedNode;
+    }
+
+ 
+   
 }

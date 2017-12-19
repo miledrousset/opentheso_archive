@@ -26,7 +26,13 @@
         </script>
     </h:head>
     <h:body>
-        
+        <style >
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a.edit{
+               border: 3px  solid #956620;
+               box-shadow:0px 0px 5px #BD6060;
+            }
+        </style>
+       
         <ui:include src="conceptPopUp.xhtml" />
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Edition de thésaurus</h1>

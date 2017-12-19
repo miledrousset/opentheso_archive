@@ -18,7 +18,7 @@
                 </div>
                 <h:form>
                     <p:tree  id="facetteTree" value="#{selectedTerme.root}" var="nodeFT" dynamic="true" cache="true" animate="true"   
-                            selectionMode="single"   selection="#{selectedTerme.selectedNode}" styleClass="styleFacetteTerm" >
+                            selectionMode="single"   selection="#{selectedTerme.selectedNode}" styleClass="styleFacetteTerm" style="width:200px;" >
                         <p:ajax event="expand"  listener="#{selectedTerme.onNodeExpand}" />  
                         <p:ajax event="select" 
                                 update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 

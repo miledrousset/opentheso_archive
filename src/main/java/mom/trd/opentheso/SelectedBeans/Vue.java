@@ -9,6 +9,11 @@ package mom.trd.opentheso.SelectedBeans;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.FacesComponent;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import org.primefaces.component.tabview.TabView;
+import org.primefaces.event.TabChangeEvent;
 
 @ManagedBean(name = "vue", eager = true)
 @SessionScoped
@@ -86,7 +91,7 @@ public class Vue implements Serializable {
     private boolean statPermuted =false;
     private boolean DBinfoBD = true;
     
-    
+
     public Vue() {
     }
 
@@ -503,7 +508,20 @@ public class Vue implements Serializable {
         this.DBinfoBD = DBinfoBD;
     }
 
- 
+    public void onTabChange(TabChangeEvent event){
+  
+       
+        switch(event.getTab().getId()){
+            case("tab0"):this.setOnglet(0);
+            break;
+            case("tab1"):this.setOnglet(1);
+            break;
+            case("tab2"):this.setOnglet(2);
+            break;
+        }
     
+    }
+
+   
     
 }

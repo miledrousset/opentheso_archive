@@ -15,6 +15,7 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     private String idCurrentGroup;
     private String typeDomaine;
     private String idTopConcept;
+    private String idParent;//#jm
     private boolean isGroup =false;
     private boolean isSubGroup = false;
     private boolean isTopConcept = false;
@@ -125,4 +126,13 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
         this.isTopConcept = isTopConcept;
     }
 
+    public String getIdParent() {
+        return idParent;
+    }
+
+    public void setIdParent(String idParent) {
+        this.idParent = idParent;
+    }
+    
+    
 }

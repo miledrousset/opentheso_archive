@@ -9,6 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -4943,5 +4944,7 @@ public class ConceptHelper {
             stmt.close();
         }
     }
+    
+}   
 
-}
+   

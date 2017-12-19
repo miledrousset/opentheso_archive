@@ -140,43 +140,61 @@
 /******************************************************** Boutons menu ********************************************/
 
 #onglets{
-    height:75px;
+    height:20px;
     margin-top:0px;
 }
 
 #listeMenu{ 
     display:flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: flex-start;
+    height:20px;
  /*   width: 600px;
     margin: 100px auto;*/
     padding: 0;
+    margin:0;
+    position:relative;
+    left:10px;
   /*  background: linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -webkit-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -moz-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -ms-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -o-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);*/
     border-radius: 3px; 
+    
   
 }
 
 #itemMenu{ 
-    list-style-type: none;
+
 }
 
-#itemMenu a{ 
+div#onglets div#listeMenu a{ 
    /* display: block;*/
     text-align: center;
-    background:rgba(10,150,20,1);
-    color: #FFF;
+     color: #FFF;
     text-decoration: none;
-    padding: 8px 8px 17px 8px;
-    border:1px solid black;
-    border-radius: 10px;
-    transition:padding .3s, background .3s;
-    position: relative;
+      list-style-type: none;
+    background:rgba(87,147,35,1);
+    display: block;
+      border:1px solid black;
+      transition:padding .3s, background .3s;
+      border-radius: 5px;
+       margin-top:2px;
+    margin-bottom:2px;
+    width:100px;
+   
+   
+    
+    
+    
+   
 }
 
+div#onglets div#listeMenu a:hover{
+  box-shadow:0px 0px 8px #cb794d ;  
+}
 /*#itemMenu:first-child a{
     border-radius: 3px 0 0 3px;
 }
@@ -184,14 +202,14 @@
 #itemMenu:last-child a{
     border-radius: 0 3px 3px 0;
 }*/
-
-#itemMenu a:hover, #itemMenu a:focus{
+/*
+#itemMenu li:hover, #itemMenu li:focus{
     background: rgba(10,200,20,0.6); 
     padding: 10px 12px 19px 12px;
  
    
 }
-
+*/
 #itemMenu a:active{ 
     background: linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.1)); 
     box-shadow: 0 0 2px rgba(0,0,0,.3) inset;

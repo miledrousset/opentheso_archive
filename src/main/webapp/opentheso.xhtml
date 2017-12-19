@@ -1,28 +1,21 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Opentheso - Copyright</title>
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
         <div id="menuHead">
-            <a href="index.xhtml">
-                <div id="titre">
-                    <img src="images/opentheso.png" style="width: 100px; margin-top: -10px; margin-right: -20px; margin-bottom: -25px;"/><br/>
-                </div>
-            </a>
-            <div style="clear: both;"></div>
-            <div id="onglets">
-                <ul id="listeMenu"> 
-                    <li id="itemMenu"><h:outputLink value="index.xhtml"><h:outputText value="#{langueBean.getMsg('theso')}" /></h:outputLink></li>
-                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="gestCandidat.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink></li>
-                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="conf.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink></li>
-                    <li id="itemMenu"><h:outputLink rendered="#{user1.user.name != null}" value="edition.xhtml"><h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink></li>
-                </ul>
-            </div><br/>
+            <div id="menuHeadTop">
+               <ui:include src="logo.xhtml" />
+               <ui:include src="menuThesaurus.xhtml" />
+               <ui:include src="menuAll.xhtml" />
+            </div>
         </div>
         <div style="margin: auto; width: 1000px; margin-top: 10px;">
             <h1>Opentheso</h1>
@@ -42,7 +35,7 @@
             <br/>
             Développement : <b>Miled Rousset</b>
             <br/>
-            Contributeurs : <b>Quincy Mbape Eyoke, Antonio Perez, Carole Bonfré</b>
+            Contributeurs : <b>Prudham Jean-Marc, Quincy Mbape Eyoke, Antonio Perez, Carole Bonfré</b>
 
             <br/>
             Partenariat, test et expertise : <b>Les équipes du réseau <A HREF="http://www.frantiq.fr" target="_blank">Frantiq</A></b>
