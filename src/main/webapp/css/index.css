@@ -1,0 +1,179 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29 nov. 2017, 09:58:57
+    Author     : jm.prudham
+*/
+div#center{
+    position:relative;
+    top:20px;
+}
+div#center div#SplitterVertical1,div#center div#SplitterVertical1 div#SplitterVertical2{
+    
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+
+}
+
+div#recherche{
+    
+    max-width:300px;
+}
+div#menuHead{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-content: stretch;
+    height:80px;
+  
+}
+div#menuHead div#menuHeadTop{
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-content: center;
+    height:55px;
+    
+}
+div#menuHead div#langueEtHelp{ 
+    
+    flex-direction:row;
+    justify-content:flex-start;
+    
+    
+}
+div#menuHead div#langueEtHelp div#help {
+    width:28.8px;
+    
+}
+
+div#menuHead div#panelMenu {
+   
+    box-shadow:none;
+    border:none;
+    
+}
+div#menuHead div#panelMenu  div.ui-overlaypanel-content{
+    height:600px;
+    
+}
+div#buttonMenuPanel  button#menuBtn {
+    width:100px;
+    color:green;
+    background:#BDdE99;
+    
+}
+div#buttonMenuPanel button#menuBtn:hover{
+    box-shadow:0px 0px 8px #BD5E2E !important;
+    
+    
+}
+#buttonMenuPanel{
+    position:relative;
+    
+    margin-right:10px;
+}
+
+#exportPanel{
+    position:absolute;
+    bottom:0px;
+}
+#contenuPrincipale,#contenuDroite3 span#lang form{
+    background:#fff;
+    
+}
+ div#droite{
+     position:relative;
+    left:2px;
+    
+    
+}
+#confrimDialogDrag{
+  
+    
+}
+#confirmDialogDrag div{
+     background-color:#F9FeEd;
+     overflow: hidden;
+    
+}
+#confirmDialogDrag >*{
+    margin:auto;
+   
+}
+#confirmDialogDrag button{
+    position:relative;
+    left:10px;
+    
+}
+span.dragDrop{
+    color:black;
+   
+}
+span.dragDrop span{
+    display:block;
+    width:200px;
+    
+}
+span.dragDrop span::before{
+    content:"  ";
+ 
+   
+    background:#E7B40B;
+    border-radius:90px;
+    display:inline-block;
+    height:10px;
+    width:10px;
+    vertical-align: middle;
+    margin-right:5px;
+    margin-bottom:2px;
+}
+table.dragDropTable {
+    border:none;
+    margin-left:10px;
+    min-width:200px;
+    max-width: 200px;
+    margin-bottom:20px;
+}
+table.dragDropTable tbody tr.ui-widget-content td:nth-child(odd){
+    color:white;
+    border-color:black;
+    min-width: 28px;
+}
+table.dragDropTable tbody tr.ui-widget-content td:nth-child(even){
+    max-width:172px;
+    min-width:172px;
+    color:#586400;
+}
+table.dragDropTable tbody tr.ui-widget-content:nth-child(odd){
+   
+    background-color:rgb(159,214,153);
+   
+}
+table.dragDropTable tbody tr.ui-widget-content:nth-child(even){
+    background-color:rgb(199,234,203);
+}
+table.dragDropTable .ui-widget-content,table.dragDropTable .ui-widget-content .ui-panelgrid-cell{
+    border:none;
+}
+#confirmDialogDrag form button{
+   position:relative;
+   left:-12px;
+   margin-left:60px;
+   height:25px;
+     width:25px;
+     padding-left:31px;
+}
+span.dragDropInfo {
+    color:red;
+    font-size:9px;
+    text-align:center;
+    margin:auto;
+    width:189px;
+    display:block;
+
+}

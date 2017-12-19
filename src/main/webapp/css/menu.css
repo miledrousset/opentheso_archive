@@ -1,5 +1,5 @@
 #titre {
-    float: left;
+  
     height: 50px;
     font-size: 23px;
     margin-left: 5px;
@@ -7,20 +7,20 @@
 }
 
 #help {
-    float: right;
+    /*float: right;*/
     margin-top: 5px;
     margin-right: 10px;
 }
 
 #menuHead{
-    height: 120px; 
-    min-width: 1000px;
+  /*  height: 120px; */
+
 }
 
 /***************************************** Liste langues *****************************************/
 
 #internationnal {
-    float: right;
+    /*float: right;*/
     margin-top: 5px;
     margin-right: 10px;
     text-align: center;
@@ -140,66 +140,76 @@
 /******************************************************** Boutons menu ********************************************/
 
 #onglets{
-    height:75px;
-    margin-top: -95px;
+    height:20px;
+    margin-top:0px;
 }
 
 #listeMenu{ 
-    display: table;
-    width: 600px;
-    margin: 100px auto;
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    height:20px;
+ /*   width: 600px;
+    margin: 100px auto;*/
     padding: 0;
-    background: linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
+    margin:0;
+    position:relative;
+    left:10px;
+  /*  background: linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -webkit-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -moz-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
     background: -ms-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
-    background: -o-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);
+    background: -o-linear-gradient(to bottom, #C17549 0%, #5D361F 100%);*/
     border-radius: 3px; 
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 
-        0 3px 5px rgba(0, 0, 0, .2), 
-        0 5px 10px rgba(0, 0, 0, .2), 
-        0 20px 20px rgba(0, 0, 0, .15);
+    
+  
 }
 
 #itemMenu{ 
-    display: table-cell;
+
 }
 
-#itemMenu a{ 
-    display: block;
+div#onglets div#listeMenu a{ 
+   /* display: block;*/
     text-align: center;
-    color: #FFFFFF;
+     color: #FFF;
     text-decoration: none;
-    padding: 8px 8px 17px 8px;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset, 
-        0 -1px 0 hsl(25, 60%, 7%) inset, 
-        0 -2px 0 hsl(25, 60%, 13%) inset, 
-        0 -3px 0 hsl(25, 60%, 19%) inset, 
-        0 -4px 0 hsl(25, 60%, 25%) inset, 
-        0 -5px 0 hsl(25, 60%, 35%) inset;
-    transition: padding .3s, background .3s;
-    position: relative;
+      list-style-type: none;
+    background:rgba(87,147,35,1);
+    display: block;
+      border:1px solid black;
+      transition:padding .3s, background .3s;
+      border-radius: 5px;
+       margin-top:2px;
+    margin-bottom:2px;
+    width:100px;
+   
+   
+    
+    
+    
+   
 }
 
-#itemMenu:first-child a{
+div#onglets div#listeMenu a:hover{
+  box-shadow:0px 0px 8px #cb794d ;  
+}
+/*#itemMenu:first-child a{
     border-radius: 3px 0 0 3px;
 }
 
 #itemMenu:last-child a{
     border-radius: 0 3px 3px 0;
+}*/
+/*
+#itemMenu li:hover, #itemMenu li:focus{
+    background: rgba(10,200,20,0.6); 
+    padding: 10px 12px 19px 12px;
+ 
+   
 }
-
-#itemMenu a:hover, #itemMenu a:focus{
-    background: rgba(255,255,255,.2); 
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset, 
-        0 -1px 0 hsl(25, 60%, 17%) inset, 
-        0 -2px 0 hsl(25, 60%, 23%) inset, 
-        0 -3px 0 hsl(25, 60%, 29%) inset, 
-        0 -4px 0 hsl(25, 60%, 35%) inset, 
-        0 -5px 0 hsl(25, 60%, 45%) inset;
-    padding: 8px 25px 17px 25px;
-}
-
+*/
 #itemMenu a:active{ 
     background: linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.1)); 
     box-shadow: 0 0 2px rgba(0,0,0,.3) inset;

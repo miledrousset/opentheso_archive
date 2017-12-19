@@ -318,9 +318,9 @@ public class SelectedTerme implements Serializable {
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
 
         if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idC, idTheso)) {
-            microTheso = groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
-
-            NodeGroup ncg = groupHelper.getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
+            microTheso = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
+         
+            NodeGroup ncg = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             nom = ncg.getLexicalValue();
             idArk = ncg.getConceptGroup().getIdARk();
@@ -556,11 +556,10 @@ public class SelectedTerme implements Serializable {
         GroupHelper groupHelper = new GroupHelper();
         String labelGroup;
         boolean first = true;
-        
-        ArrayList<String> idGroup = new ConceptHelper().getListGroupIdOfConcept(connect.getPoolConnexion(), idC, idTheso);
-        
-        for (String id : idGroup) {
-            labelGroup = groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), id, idTheso, idlangue);
+        ArrayList<String> idGroupList= groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(), idTheso, idC);
+       
+        for (String idGroup : idGroupList) {
+            labelGroup = groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), idGroup, idTheso, idlangue);
             if(first) {
                 microTheso = labelGroup;
                 first = false;
@@ -568,7 +567,7 @@ public class SelectedTerme implements Serializable {
                 microTheso += ", " + labelGroup;
             
             NodeGroupIdLabel nodeGroupIdLabeltmp = new NodeGroupIdLabel();
-            nodeGroupIdLabeltmp.setIdGroup(id);
+            nodeGroupIdLabeltmp.setIdGroup(idGroup);
             nodeGroupIdLabeltmp.setLabel(labelGroup);
             nodeGroupIdLabel.add(nodeGroupIdLabeltmp);            
         }
@@ -789,6 +788,7 @@ public class SelectedTerme implements Serializable {
                 idConcept, idTheso, idlangue, idDomaine,
                 typeDomaine, null, null, getSelectedTermComp(), null);
         //     nodeSe.getIdConcept(), nodeSe.getIdThesaurus(), nodeSe.getIdLang(), nodeSe.getIdGroup(), null, null, nodeSe.getLexical_value(), null);
+       
         majTerme(mtn);
     }
 

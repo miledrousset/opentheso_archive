@@ -20,10 +20,14 @@
                                     <f:selectItems value="#{accessThesaurusBean.listAccess}" var="th" itemLabel="#{listAccess.key}" itemValue="#{listAccess.value}" />
                                 </h:selectOneMenu>
                             </td>
-                            <td>
-                                <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.maj()}" 
-                                                 update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panelMenu,:footer" 
-                                                 styleClass="styleButton" />
+                            <td>                                                                                                           
+                                
+                                <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}"
+                                                  actionListener="#{theso.maj()}" 
+                                                 update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:footer,:accordeonTree:form:tree" 
+                                                 styleClass="styleButton" >
+                                  
+                                </p:commandButton>
                             </td>
 
                             <!-- CHOIX LANGUE DEBUT -->  

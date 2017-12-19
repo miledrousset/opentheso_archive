@@ -8,6 +8,7 @@ package mom.trd.opentheso.bdd.helper;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -2381,5 +2382,102 @@ public class GroupHelper {
             stmt.close();
         }
     }
+    /**
+     * moveSubGroupToSubGroup
+     * 
+     * méthode pour supprimer l'enregistrement de la bdd de donnée de la 
+     * précédente liaison ancien groupe  -> sous groupe de la table relation group
+     * pour ajouter la nouvelle relation nouveau groupe-> sous groupe
+     * de la table relation group
+     * 
+     * pour forcer le type passer en paramètre à être enreggistré dans la table
+     * concept_group
+     * @param conn
+     * @param originNodeIdConcept
+     * @param targetNodeIdConcept
+     * @param BTOrigin
+     * @param type
+     * @param idThesaurus
+     * @param idUser
+     * @return 
+     */
+     public boolean moveSubGroupToSubGroup(Connection conn, String originNodeIdConcept, String targetNodeIdConcept, String BTOrigin, String type, String idThesaurus, int idUser) {
+        PreparedStatement stmt;
+        boolean ret=true;
+        //on supprime la branche du BT d'origine
+        String sql="DELETE FROM relation_group WHERE id_group1=? AND id_thesaurus=? AND relation=? AND id_group2=?";
+        try{
+            
+        
+            stmt=conn.prepareStatement(sql);
+            stmt.setString(1,BTOrigin);
+            stmt.setString(2,idThesaurus);
+            stmt.setString(3,"sub");
+            stmt.setString(4,originNodeIdConcept);
+            
+            try{
+                stmt.execute();
+            }
+            finally{
+                stmt.close();
+        
+            }
+        
+        }
+        catch(SQLException e){
+            log.error("error while deleting in table relation_group for group1 :"+BTOrigin+" group 2"+originNodeIdConcept,e);
+            return false;
+            
+        }
+        //on ajoute la branche sur la targetNode
+        sql="INSERT INTO relation_group(id_group1,id_thesaurus,relation,id_group2) VALUES (?,?,?,?)";
+        try{
+            stmt=conn.prepareCall(sql);
+            stmt.setString(1,targetNodeIdConcept);
+            stmt.setString(2,idThesaurus);
+            stmt.setString(3,"sub");
+            stmt.setString(4,originNodeIdConcept);
+            try{
+                stmt.execute();
+            }
+            finally{
+                stmt.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while insert into table relation group for id_group 1 :"+targetNodeIdConcept+" id_group2"+originNodeIdConcept,e);
+            return false;
+        }
+        
+        //finalement on force le type dans la table concept_group
+        String typeCode="G";
+        switch(type){
+            case("collection"):
+            case("subCollection"):typeCode="C";
+            break;
+            case("group"):
+            case("subGroup"):typeCode="G";            
+            break;
+            case("thème"):
+            case("subThème"):typeCode="T";
+            break;
+            case("microTheso"):
+            case("subMicroTheso"):typeCode="MT";
+            break;
+        }
+        sql="UPDATE concept_group SET idtypecode=? WHERE idgroup=? AND idthesaurus=?";
+        try{
+            stmt=conn.prepareCall(sql);
+            stmt.setString(1,typeCode);
+            stmt.setString(2,originNodeIdConcept);
+            stmt.setString(3,idThesaurus);
+        }   
+        catch(SQLException e){
+            log.error("error while update concept_group for id group"+originNodeIdConcept,e);
+            return false;
+        }
+        return true;
+    }
+
 
 }

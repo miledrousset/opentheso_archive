@@ -11,29 +11,132 @@
         <h:panelGroup id="panelTree"  >
 
             <h:form id="form">
-
-                <p:tree id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
-                        selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
+                   <p:tree  id="tree-default" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
+                          selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="false" droppable="false" widgetVar="treeWidgetVar"
+                          
+                        rendered="#{user1.user.name == null}"
                         >
-                    <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" />
-                    <p:ajax event="dragdrop" listener="#{newtreeBean.onDragDrop}"  /> 
-                    <p:ajax event="select" 
-                            update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                            listener="#{newtreeBean.onNodeSelect}"/>
+                    <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
 
+                    <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                    
+                    <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag" />                       
+                    
+                   
+                    
+                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                            listener="#{newtreeBean.onNodeSelect}"/>
+                   
+                    
+                    <p:treeNode type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close"  >  
+                        <h:outputText  value="#{node}"  />  
+
+                    </p:treeNode>
                     <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
-                                collapsedIcon="ui-icon ui-icon-domaine-close">  
+                                collapsedIcon="ui-icon ui-icon-domaine-close" >  
                         <h:outputText value="#{node}"  />  
-                         
+
                     </p:treeNode>
                     <p:treeNode type="group" expandedIcon="ui-icon ui-icon-group-open" 
                                 collapsedIcon="ui-icon ui-icon-group-close" >  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
-                         
+   
                     </p:treeNode>  
                     <p:treeNode type="subGroup" expandedIcon="ui-icon ui-icon-sub-group-open" 
                                 collapsedIcon="ui-icon ui-icon-sub-group-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
+                        
+                    </p:treeNode>  
+                    <p:treeNode type="collection" expandedIcon="ui-icon ui-icon-collection-open" 
+                                collapsedIcon="ui-icon ui-icon-collection-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+
+                    </p:treeNode>  
+                    <p:treeNode type="subCollection" expandedIcon="ui-icon ui-icon-sub-collection-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-collection-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+
+                    </p:treeNode>  
+                    <p:treeNode type="thème" expandedIcon="ui-icon ui-icon-thème-open" 
+                                collapsedIcon="ui-icon ui-icon-thème-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" /> 
+ 
+                    </p:treeNode>  
+                    <p:treeNode type="subThème" expandedIcon="ui-icon ui-icon-sub-thème-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-thème-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" /> 
+
+                    </p:treeNode>  
+                    <p:treeNode type="microTheso" expandedIcon="ui-icon ui-icon-mircoTheso-open" 
+                                collapsedIcon="ui-icon ui-icon-mircoTheso-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />
+
+                    </p:treeNode>  
+                    <p:treeNode type="subMicroTheso" expandedIcon="ui-icon ui-icon-sub-mircoTheso-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-mircoTheso-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+
+                    </p:treeNode>  
+                    <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-folder-open-14" 
+                                collapsedIcon="ui-icon ui-icon-folder-closed-14">  
+                       
+                        <h:outputText value="#{node}"/>  
+
+                    </p:treeNode>  
+                    <p:treeNode type="fichier" icon="ui-icon ui-icon-file-12" >  
+                        <h:outputText value="#{node}"/>  
+                      
+                    </p:treeNode> 
+                    <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
+                        <h:outputText value="#{node}"/>  
+                      
+                    </p:treeNode> 
+                    <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close"> 
+                      
+                        <h:outputText value="#{node}"/> 
+                        
+                    </p:treeNode>
+
+
+                </p:tree>        
+                <h:outputText   rendered="#{user1.user.name != null and (user1.isHaveWriteToCurrentThesaurus2)}" class="dragDropInfo"  value="#{langueBean.getMsg('dragdrop.autho')}" />
+                <p:tree  id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
+                          selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
+                          
+                        rendered="#{user1.user.name != null and (user1.isHaveWriteToCurrentThesaurus2)}"
+                        >
+                    <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+
+                    <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                    <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag">                       
+                    
+                    </p:ajax>
+                    
+                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                            listener="#{newtreeBean.onNodeSelect}"/>
+                   
+                  
+                    <p:treeNode type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close"  >  
+                        <h:outputText  value="#{node}"  />  
+                        
+                    </p:treeNode>
+                    <p:treeNode type="domaine" expandedIcon="ui-icon ui-icon-domaine-open" 
+                                collapsedIcon="ui-icon ui-icon-domaine-close" >  
+                        <h:outputText value="#{node}"  />  
+                       
+                    </p:treeNode>
+                    <p:treeNode type="group" expandedIcon="ui-icon ui-icon-group-open" 
+                                collapsedIcon="ui-icon ui-icon-group-close" >  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                          
+                    </p:treeNode>  
+                    <p:treeNode type="subGroup" expandedIcon="ui-icon ui-icon-sub-group-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-group-close">  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                        
                     </p:treeNode>  
                     <p:treeNode type="collection" expandedIcon="ui-icon ui-icon-collection-open" 
                                 collapsedIcon="ui-icon ui-icon-collection-close">  
@@ -43,7 +146,7 @@
                     <p:treeNode type="subCollection" expandedIcon="ui-icon ui-icon-sub-collection-open" 
                                 collapsedIcon="ui-icon ui-icon-sub-collection-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
-                         
+                        
                     </p:treeNode>  
                     <p:treeNode type="thème" expandedIcon="ui-icon ui-icon-thème-open" 
                                 collapsedIcon="ui-icon ui-icon-thème-close">  
@@ -53,34 +156,37 @@
                     <p:treeNode type="subThème" expandedIcon="ui-icon ui-icon-sub-thème-open" 
                                 collapsedIcon="ui-icon ui-icon-sub-thème-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" /> 
-                        
+                       
                     </p:treeNode>  
                     <p:treeNode type="microTheso" expandedIcon="ui-icon ui-icon-mircoTheso-open" 
                                 collapsedIcon="ui-icon ui-icon-mircoTheso-close">  
-                        <h:outputText value="#{node}" styleClass="groupArbre" />  
+                        <h:outputText value="#{node}" styleClass="groupArbre" />
+                           
                     </p:treeNode>  
                     <p:treeNode type="subMicroTheso" expandedIcon="ui-icon ui-icon-sub-mircoTheso-open" 
                                 collapsedIcon="ui-icon ui-icon-sub-mircoTheso-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
-                        
+                       
                     </p:treeNode>  
                     <p:treeNode type="dossier" expandedIcon="ui-icon ui-icon-folder-open-14" 
                                 collapsedIcon="ui-icon ui-icon-folder-closed-14">  
                        
                         <h:outputText value="#{node}"/>  
-                    </p:treeNode>  
-                    <p:treeNode type="fichier" icon="ui-icon ui-icon-file-12">  
-                        <h:outputText value="#{node}"/>  
                      
+                    </p:treeNode>  
+                    <p:treeNode type="fichier" icon="ui-icon ui-icon-file-12" >  
+                        <h:outputText value="#{node}"/>  
+                      
                     </p:treeNode> 
                     <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
                         <h:outputText value="#{node}"/>  
-                       
+                      
                     </p:treeNode> 
                     <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close"> 
                       
-                        <h:outputText value="#{node}"/>  
+                        <h:outputText value="#{node}"/> 
+                        
                     </p:treeNode>
 
 

@@ -1361,7 +1361,7 @@ public class SelectedThesaurus implements Serializable {
         uTree.reInit();
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setFacette(false);
-        vue.setOnglet(3);
+        vue.setOnglet(2);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", editFacette + " " + langueBean.getMsg("theso.info4.2")));
     }
 
@@ -1373,7 +1373,7 @@ public class SelectedThesaurus implements Serializable {
         uTree.reInit();
         uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setFacette(false);
-        vue.setOnglet(3);
+        vue.setOnglet(2);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info5")));
     }
 
@@ -1387,7 +1387,7 @@ public class SelectedThesaurus implements Serializable {
             new FacetHelper().addFacetTraduction(connect.getPoolConnexion(), Integer.parseInt(idEdit), thesaurus.getId_thesaurus(), valueEdit, langueEdit.trim());
             valueEdit = "";
             vue.setFacette(false);
-            vue.setOnglet(3);
+            vue.setOnglet(2);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info6")));
         }
     }
@@ -1404,7 +1404,7 @@ public class SelectedThesaurus implements Serializable {
             uTree.reInit();
             uTree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             vue.setFacette(false);
-            vue.setOnglet(3);
+            vue.setOnglet(2);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info7")));
         }
     }

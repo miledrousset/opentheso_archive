@@ -10,20 +10,34 @@
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
+          <style >
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:last-child{
+               border: 3px  solid #956620;
+               box-shadow:0px 0px 5px #BD6060;
+            }
+        </style>
         <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Statistiques</h1>
             Les statistiques offrent la possibilité d'obtenir certaines informations concernant le thésaurus sélectionné.<br/><br/>
             Divers chiffres concernant le thésaurus ainsi que les concepts modifiés/supprimés sur une plage de date donnée sont donc visualisables sur cette page.
         </p:dialog>  
+       
         <div id="menuHead">
+            <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
-
-            <ui:include src="menuAll.xhtml" />
+            <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+           
+            </div>
+           
+                
         </div>
+        
         <div id="principaleConf">
             <h:panelGroup id="noStat" >
                 <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />

@@ -1,0 +1,31 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    <h:panelGroup  id="buttonMenuPanel">
+    
+    <p:panel id="panelMenu"   styleClass="panelNoBorder"> 
+       
+
+                    <div id="onglets">
+
+                        <div id="listeMenu" > 
+                            <h:outputLink value="index.xhtml"><h:outputText  value="#{langueBean.getMsg('theso')}"/></h:outputLink>
+                           <h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" onclick="#{gestCandidat.init()}" value="gestCandidat.xhtml"><h:outputText    value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink>
+                            <h:outputLink rendered="#{(user1.user.name != null) and (user1.isHaveWriteToCurrentThesaurus2)}" value="conf.xhtml"><h:outputText     value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink>
+
+                           <h:outputLink rendered="#{ ((user1.user.name != null) and (user1.haveRights(2)) ) or (user1.haveRights(1))}" class="edit" value="edition.xhtml"><h:outputText    value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink>
+                           <h:outputLink rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus2)}" value="statistic.xhtml"><h:outputText    value="Statistiques" /></h:outputLink>
+
+                        </div>   
+
+                    </div>
+
+     </p:panel>
+    
+    </h:panelGroup>
+
+
+</ui:composition>

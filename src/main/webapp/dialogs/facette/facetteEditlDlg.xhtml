@@ -43,7 +43,7 @@
                             </tr>
                         </table>
                         
-                        <p:commandButton value="Créer" styleClass="styleButton" actionListener="#{autoComp.newFacette()}" update=":accordeonTree,:panFacette" />
+                            <p:commandButton value="Créer" styleClass="styleButton" actionListener="#{autoComp.newFacette()}" oncomplete="PF('facetteEditDlg').hide();" update=":panFacette,:accordeonTree"  />
                     </h:form>
                 </fieldset>
                 <fieldset style="float: right; width: 200px; height: 120px;">

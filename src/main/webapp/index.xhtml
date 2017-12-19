@@ -14,13 +14,20 @@
             a:hover{color:black;}
             -->
         </style>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <!--<h:body style="background-image: url(./images/panda_roue.jpg)">-->
     <!--<h:body style="background-image: url(./images/panda_roue3.jpg)">-->
     <h:body>
-        
-       
-        
+        <style>
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:first-child{
+               border: 3px  solid #956620;
+               box-shadow:0px 0px 5px #BD6060;
+            }
+        </style>
+
+
+
         <f:metadata>
             <f:viewParam name="idc" value="#{theso.idCurl}"/>
             <f:viewParam name="idt" value="#{theso.idTurl}"/>
@@ -29,13 +36,17 @@
         </f:metadata>
         <ui:include src="metadata_et_commenteries.xhtml"/> <!-- cette archive est dans la racine Web Pages -->
         <div id="menuHead">
-            <ui:include src="logo.xhtml" />
-            <ui:include src="connection.xhtml" />
-            <ui:include src="panChoixThesoetLangue.xhtml"/>  <!-- cette archive est dans la racine Web Pages -->
-            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+            <div id="menuHeadTop">
+                <ui:include src="logo.xhtml" />
+                <ui:include src="connection.xhtml" />
+                <ui:include src="panChoixThesoetLangue.xhtml"/>  <!-- cette archive est dans la racine Web Pages -->
+                <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+            </div>
+           <ui:include src="menuThesaurus.xhtml" />
         </div>
-        <center style="border-top-width: 0px;border-top-style: solid;padding-top: 10px;">
-            <div id="clean" />
+        
+        <div id="center" style="border-top-width: 0px;border-top-style: solid;padding-top: 10px;">
+
             <ui:include src="includes.xhtml"/>  <!-- cette archive d'include est dans la racine -->
             <!-- GESTIONNAIRE DEBUT -->  
             <div id="SplitterVertical1">
@@ -45,20 +56,20 @@
                         <div id="principale">
                             <!-- CONTENU CENTRAL DEBUT -->                             
                             <ui:include src="contenuCentral/contenuCentral.xhtml"/> <!-- cette archive est dans Web Pages/contenuCentral   -->
-                            <div id="clean" ></div>
+
                         </div>
                         <div id="droite">
                             <div id="SplitterHorizDroit1">
-                            <!-- PANEL DROITE -->
-                            <ui:include src="panelDroite/panelDroite.xhtml"/>   <!-- cette archive est dans Web Pages/panelDroite  -->
+                                <!-- PANEL DROITE -->
+                                <ui:include src="panelDroite/panelDroite.xhtml"/>   <!-- cette archive est dans Web Pages/panelDroite  -->
                             </div>
                         </div>
                     </div>
                 </div>
-            </div><br/>
+            </div>
             <!-- GESTIONNAIRE FIN -->
             <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
-        </center>
+        </div>
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
@@ -69,5 +80,6 @@
                 </f:facet>
             </p:ajaxStatus>
         </ui:insert>
+    
     </h:body>
 </html>

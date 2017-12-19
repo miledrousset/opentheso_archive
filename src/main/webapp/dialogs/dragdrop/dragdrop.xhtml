@@ -1,0 +1,63 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+       
+    <p:dialog id="confirmDialogDrag"  showEffect="fade" hideEffect="fade"  style="line-space: 5px;" widgetVar="confirmDrag" closable="false">
+         <h:form>  
+             <span class="dragDrop">
+                 <h:outputText value="#{langueBean.getMsg('dragdrop.from')}"/>
+                    <h:outputText style="font-size: 15px;font-weight:bold;color:#586400" value="#{newtreeBean.draggedNode.data}" />     
+             </span>
+             <p:panelGrid columns="2"  class="dragDropTable">
+                        
+                 <h:outputText title="id concept" value="id :"/>
+                 <h:outputText style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.draggedNode.idConcept}" />
+                 <h:outputText value="TT :" title="Top Terme"/>
+                 <h:outputText style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.draggedNode.idTopConcept}" />
+                 <h:outputText value="G :" title="Groupe" />
+                 <h:outputText  style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.draggedNode.idCurrentGroup}" />  
+            </p:panelGrid>
+             <div>
+                 <h:outputText class="dragDropInfo" rendered="#{newtreeBean.droppedNode.isGroup or newtreeBean.droppedNode.isSubGroup}" value="#{langueBean.getMsg('dragdrop.topMess')}" /> 
+             </div>
+                <span class="dragDrop"> 
+                    <h:outputText value="#{langueBean.getMsg('dragdrop.to')}"/>
+                        <h:outputText style="font-size: 15px;font-weight:bold;color:#586400"  value="#{newtreeBean.droppedNode.data}" />
+                </span>
+                <p:panelGrid class="dragDropTable" columns="2">   
+                       
+                        <h:outputText title="id concept" value="id :"/>
+                        <h:outputText style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.droppedNode.idConcept}" />
+                        <h:outputText value="TT :" title="Top Terme"/>
+                        <h:outputText style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.droppedNode.idTopConcept}" />
+                        <h:outputText value="G :" title="Groupe " />
+                        <h:outputText  style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.droppedNode.idCurrentGroup}" />  
+                 
+                </p:panelGrid>
+                  
+                    
+                     
+                            
+                                      
+                    
+                   
+                        
+                    <h:outputText rendered="#{!newtreeBean.renderValid()}" style="text-align:center" value="vous ne pouvez pas confirmer cette action désolé.... "/>
+                    
+                    
+                    <p:commandButton  rendered="#{newtreeBean.renderValid()}" value=" "  styleClass="ui-confirmdialog-yes" icon="ui-icon-check"   >
+                              <p:ajax listener="#{newtreeBean.confirmDrop()}" update="accordeonTree:form:tree,:confirmDialogDrag" />
+                        
+                    </p:commandButton>
+                        
+                    <p:commandButton value="" actionListener="#{newtreeBean.infirmDrop()}" type="" styleClass="ui-confirmdialog-no" update="accordeonTree:form:tree,:confirmDialogDrag" icon="ui-icon-close">
+                                                     
+                    </p:commandButton>
+        </h:form>          
+     </p:dialog>  
+
+    
+</ui:composition>

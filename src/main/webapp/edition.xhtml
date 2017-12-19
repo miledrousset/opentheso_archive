@@ -10,6 +10,7 @@
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
         <script type="text/javascript">
             function selectText(containerid) {
                 if (document.selection) {
@@ -25,6 +26,13 @@
         </script>
     </h:head>
     <h:body>
+        <style >
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a.edit{
+               border: 3px  solid #956620;
+               box-shadow:0px 0px 5px #BD6060;
+            }
+        </style>
+       
         <ui:include src="conceptPopUp.xhtml" />
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Edition de thésaurus</h1>
@@ -37,19 +45,23 @@
                 <li>Importer/exporter un thésaurus Skos.</li>
             </ul>
         </p:dialog>  
+       
         <div id="menuHead">
+            <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
             <ui:include src="account.xhtml" />
-            <ui:include src="menuAll.xhtml" />
+            <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+           
+            </div>
+           
             <ui:include src="/dialogs/export/exportDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/export/exportTxtDlg.xhtml" />     
             <ui:include src="/dialogs/export/exportTxtNotesDlg.xhtml" />              
             <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
             <ui:include src="/dialogs/export/exportAltLabel.xhtml" />
-            <ui:include src="/dialogs/import/importDlg.xhtml" />
-
-            
+            <ui:include src="/dialogs/import/importDlg.xhtml" />  
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
