@@ -3,23 +3,28 @@ package mom.trd.opentheso.bdd.helper.nodes;
 
 public class NodePreference {
     private String sourceLang;
-    private int nbAlertCdt;
-    private boolean alertCdt;
+//    private int nbAlertCdt;
+//    private boolean alertCdt;
     private int identifierType;
     
     private boolean useArk;
     private String serveurArk;
+    private String idNaan;
+    private String userArk;
+    private String passArk;
+    
+    
     private String pathImage;
     private String dossierResize;
     
     
-/*    private String protcolMail;
+/*  private String protcolMail;
     private String hostMail;
     private int portMail;
     private boolean authMail;
     private String mailFrom;
     private String transportMail;
-*/    
+*/
     
     private boolean bddActive;
     private boolean bddUseId;
@@ -41,22 +46,6 @@ public class NodePreference {
 
     public void setSourceLang(String sourceLang) {
         this.sourceLang = sourceLang;
-    }
-
-    public int getNbAlertCdt() {
-        return nbAlertCdt;
-    }
-
-    public void setNbAlertCdt(int nbAlertCdt) {
-        this.nbAlertCdt = nbAlertCdt;
-    }
-
-    public boolean isAlertCdt() {
-        return alertCdt;
-    }
-
-    public void setAlertCdt(boolean alertCdt) {
-        this.alertCdt = alertCdt;
     }
 
     public int getIdentifierType() {
@@ -201,6 +190,30 @@ public class NodePreference {
 
     public void setWebservices(boolean webservices) {
         this.webservices = webservices;
+    }
+
+    public String getUserArk() {
+        return userArk;
+    }
+
+    public void setUserArk(String userArk) {
+        this.userArk = userArk;
+    }
+
+    public String getPassArk() {
+        return passArk;
+    }
+
+    public void setPassArk(String passArk) {
+        this.passArk = passArk;
+    }
+
+    public String getIdNaan() {
+        return idNaan;
+    }
+
+    public void setIdNaan(String idNaan) {
+        this.idNaan = idNaan;
     }
     
 

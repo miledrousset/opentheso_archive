@@ -5,7 +5,6 @@
  */
 package compare;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import connexion.ConnexionTest;
 import java.io.BufferedReader;
@@ -17,18 +16,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
-import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.TestGetSiteMap;
+import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
-import mom.trd.opentheso.bdd.helper.nodes.NodeTab2Levels;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
-import org.apache.commons.lang3.StringUtils;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -74,29 +70,50 @@ public class CompareConceptTest {
         String idGroup = "6";
         
         ConceptHelper conceptHelper = new ConceptHelper();
+        StringPlus stringPlus = new StringPlus();
+        
         NodeConcept nodeConcept;
         SearchHelper searchHelper = new SearchHelper();
         ArrayList<NodeSearch> nodeSearchs;
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-        String path = "/Users/Miled/Desktop/mots-clefs.csv";
+        String path = "/Users/Miled/Desktop/inist.csv";
        
        
         FileInputStream file = readFile(path);         
         if(file == null) return;
         String line;
         String lineTmp;
+        String[] lineOrigine;
+        
+        boolean first = true;
+        
+        stringBuilder.append("Numéro BDD\tnom d'origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
         
         BufferedReader bf = new BufferedReader(new InputStreamReader(file));
         try {
             while ((line = bf.readLine()) != null) {
-                lineTmp = removeStopWords(line);
+                lineOrigine = line.split("\t");
+                if(lineOrigine.length < 2) continue;
+                
+                lineTmp = removeStopWords(lineOrigine[1]);
+                
                 nodeSearchs = searchHelper.searchTerm(conn, lineTmp, idLang, idTheso, idGroup, 2, false);
-                stringBuilder.append(line);
+                
+                stringBuilder.append(lineOrigine[0]);
+                stringBuilder.append("\t");
+                stringBuilder.append(lineOrigine[1]);
                 //stringBuilder.append(" #### ");
                 stringBuilder.append("\t");
+                first = true;
                 for (NodeSearch nodeSearch : nodeSearchs) {
+                    if(!first){
+                        // stringBuilder.append(" $$$$ ");
+                        stringBuilder.append("\n");
+                        stringBuilder.append("\t");
+                        stringBuilder.append("\t");
+                    }
                     stringBuilder.append(nodeSearch.getLexical_value());
                     stringBuilder.append("\t");
                     stringBuilder.append(nodeSearch.getIdConcept());
@@ -116,16 +133,26 @@ public class CompareConceptTest {
                     stringBuilder.append("\t");
                     for (NodeNote nodeNote : nodeConcept.getNodeNotesTerm()) {
                         if(nodeNote.getNotetypecode().equalsIgnoreCase("definition"))
-                            stringBuilder.append(nodeNote.getLexicalvalue());
+                            stringBuilder.append(stringPlus.clearNewLine(nodeNote.getLexicalvalue()));
                     }
                     
-                   // stringBuilder.append(" $$$$ ");
-                    stringBuilder.append("\n");
+                    // BT
                     stringBuilder.append("\t");
+                    for (NodeBT nodeBT : nodeConcept.getNodeBT()) {
+                        stringBuilder.append(nodeBT.getTitle());
+                    }
                     
+                    // UF
+                    stringBuilder.append("\t");
+                    for (NodeEM nodeEM : nodeConcept.getNodeEM()) {
+                        stringBuilder.append(nodeEM.getLexical_value());
+                    }
+                    first = false;
                 }
 
+                
                 System.out.println(stringBuilder.toString());
+                
                 stringBuilder.delete(0, stringBuilder.capacity());
             }
         } catch (IOException ex) {

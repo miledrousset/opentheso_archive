@@ -6,7 +6,7 @@
     xmlns:p="http://primefaces.org/ui">
     
     <div id="langue" style="overflow-y: auto;">
-        <h:panelGroup id="contenuDroite3">
+        <h:panelGroup id="contenuDroite3" >
 
             <div id="titreSplinter">
                 <h:outputText value="#{langueBean.getMsg('index.trad')}" /> 
@@ -25,9 +25,9 @@
                 </div>
             </div>
             <h:panelGroup  id="lang">
-                <ui:repeat value="#{selectedTerme.langues}" var="item5">
+                <ui:repeat value="#{selectedTerme.langues}" var="item5" >
                     <h:form>
-                        <p:commandButton styleClass="termClick" value="#{item5.value} (#{item5.key})" 
+                        <p:commandButton styleClass="termClick" value="#{item5.value} (#{item5.key})"
                                          actionListener="#{theso.changeTermeTrad(selectedTerme.idC, item5.key, selectedTerme.type)}"  oncomplete="srollToSelected()"
                                          update=":panChoixTheso,:accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     </h:form>

@@ -7,18 +7,22 @@ package mom.trd.opentheso.SelectedBeans;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Named;
+import javax.enterprise.context.Dependent;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
+import org.primefaces.context.PrimeFacesContext;
 
 /**
  *
  * @author jm.prudham
  */
-@ManagedBean(name = "gestCandidat", eager = true)
+@ManagedBean(name = "searchCandidat", eager = true)
 @SessionScoped
-public class GestCandidatBean {
+public class SearchCandidatBean {
     @ManagedProperty(value="#{theso}")
     SelectedThesaurus st;
     private String textSearch1="";
@@ -32,9 +36,9 @@ public class GestCandidatBean {
     private List<NodeCandidatValue> filteredCandidatsA;
 
     /**
-     * Creates a new instance of GestCandidatBean
+     * Creates a new instance of SearchCandidatBean
      */
-    public GestCandidatBean() {
+    public SearchCandidatBean() {
               
     }
     

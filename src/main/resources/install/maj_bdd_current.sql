@@ -1536,7 +1536,8 @@ $$language plpgsql;
 create or replace function update_table_preferences_alert() returns void as $$
 begin
     IF EXISTS(SELECT *  FROM information_schema.columns where table_name='preferences' AND column_name='alert_cdt') THEN
-        execute'ALTER TABLE preferences DROP COLUMN "alert_cdt"';
+        execute 'ALTER TABLE preferences DROP COLUMN "alert_cdt";
+                 ALTER TABLE preferences DROP COLUMN "nb_alert_cdt"';
     END IF;
 end
 $$language plpgsql;
@@ -1626,6 +1627,7 @@ SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
 
 SELECT delete_colonne_preferences();
+SELECT update_table_preferences_alert();
 
 SELECT create_table_note_type();
 
@@ -1770,6 +1772,7 @@ SELECT delete_fonction ('delete_constraint_term_changer_concept_historique','');
 SELECT delete_fonction ('alignement_preferences','');
 SELECT delete_fonction ('gps_preferences','');
 SELECT delete_fonction ('delete_colonne_preferences','');
+SELECT delete_fonction ('update_table_preferences_alert','');
 SELECT delete_fonction ('primary_key_info','');
 SELECT delete_fonction('update_table_concept','');
 SELECT delete_fonction('relation_group','');

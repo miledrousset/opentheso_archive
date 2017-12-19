@@ -686,6 +686,16 @@ input[type="button"], input[type="submit"]{
     text-align: left; 
 }
 
+.candidatTexte {
+    background: none;
+    font-size: 13px;
+    text-shadow: none;
+    font-weight: normal;
+    color: darkgreen;
+    box-shadow: none;
+    text-align: left; 
+}
+
 .link {
     background: none;
     border: none;

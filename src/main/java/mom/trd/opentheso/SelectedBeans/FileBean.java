@@ -4,14 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -26,13 +24,9 @@ import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ImagesHelper;
-import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
 import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
 import mom.trd.opentheso.core.imports.helper.ImportTabulateHelper;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
-import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
-import mom.trd.opentheso.core.imports.tabulate.ImportTabuleIntoBDD;
-import mom.trd.opentheso.core.imports.tabulate.ReadFileTabule;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.filters.Caption;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -40,8 +34,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.skos.SKOSCreationException;
 
 @ManagedBean(name = "fileBean", eager = true)
 @SessionScoped

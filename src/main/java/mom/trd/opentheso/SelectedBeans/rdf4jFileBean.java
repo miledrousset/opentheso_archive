@@ -24,6 +24,7 @@ import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
+import org.eclipse.rdf4j.model.Model;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -97,6 +98,7 @@ public class rdf4jFileBean implements Serializable {
                 } catch (Exception ex) {
                     error = ex.getMessage();
                 }
+                if(readRdf4j==null) return;
                 progress = 100;
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
                 total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
@@ -196,6 +198,51 @@ public class rdf4jFileBean implements Serializable {
 
         }
     }
+    
+    /**
+     *
+     * @param event
+     */
+    public void chargeJson(FileUploadEvent event) {
+        progress = 0;
+
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            InputStream is = null;
+            try {
+                try {
+                    is = event.getFile().getInputstream();
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                ReadRdf4j readRdf4j = null;
+                try {
+                    readRdf4j = new ReadRdf4j(is, 3, this);
+                } catch (IOException ex) {
+                    error = ex.getMessage();
+                } catch (Exception ex) {
+                    error = ex.getMessage();
+                }
+                if(readRdf4j == null) return;
+
+                progress = 100;
+                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                uri = sKOSXmlDocument.getTitle();
+                uploadEnable = false;
+                BDDinsertEnable = true;
+                info = "File correctly loaded";
+            } catch (Exception e) {
+            } finally {
+                showError();
+            }
+
+        }
+    }    
 
     /**
      *

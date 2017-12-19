@@ -138,6 +138,7 @@ public class SelectedCandidat implements Serializable {
         selectedNvx = new NodeAutoCompletion();
         tradInsert = new ArrayList<>();
         setPreferences();
+        nomsProp = new ArrayList<>();
     }
 
     /**
@@ -156,6 +157,7 @@ public class SelectedCandidat implements Serializable {
         note = "";
         niveau = "";
         domaine = "";
+        nomsProp = new ArrayList<>();
     }
     
     private void setPreferences(){
@@ -231,10 +233,12 @@ public class SelectedCandidat implements Serializable {
         infoCdt.setNodesUser(new CandidateHelper().getListUsersOfCandidat(connect.getPoolConnexion(), selected.getIdConcept(), theso));
         infoCdt.setNodeTraductions(new CandidateHelper().getNodeTraductionCandidat(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, langue));
         nomsProp = new ArrayList<>();
+        if(infoCdt.getNodesUser().isEmpty())
+            reInit();
         for (NodeUser nuse : infoCdt.getNodesUser()) {
             nomsProp.add(nuse.getName());
         }
-        if (selected.getIdConcept() != null && !selected.getIdConcept().equals("")) {
+        if (selected.getIdConcept() != null && !selected.getIdConcept().isEmpty() && !infoCdt.getNodesUser().isEmpty()) {
             NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(), selected.getIdConcept(), theso, infoCdt.getNodesUser().get(0).getId());
             if (np == null) { // erreur
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error-BDD")));
@@ -363,7 +367,7 @@ public class SelectedCandidat implements Serializable {
             selected.setNbProp(selected.getNbProp() + 1);
 
             // envoie d'email d'alerte !!
-            int minAlert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).getNbAlertCdt();
+          /*  int minAlert = new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso).getNbAlertCdt();
             if (selected.getNbProp() >= minAlert) {
                 ArrayList<String> lesMails = new UserHelper().getMailAdmin(connect.getPoolConnexion(), idTheso);
                 for (String mail : lesMails) {
@@ -372,7 +376,7 @@ public class SelectedCandidat implements Serializable {
                         envoyerMailAlert(mail, message);
                     }
                 }
-            }
+            }*/
             initNewProposal();
             return true;
         } catch (SQLException ex) {
@@ -412,10 +416,13 @@ public class SelectedCandidat implements Serializable {
      * Un mail est envoyé à l'adresse mail passée en paramètre pour signaler
      * un évènmenet en paramètre
      *
+     * Deprecated
+     * 
      * @param dest
      * @param message
      * @return
      */
+    /*
     public boolean envoyerMailAlert(String dest, String message) {
         boolean status = false;
         try {
@@ -447,7 +454,7 @@ public class SelectedCandidat implements Serializable {
             Logger.getLogger(SelectedCandidat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
-    }    
+    }    */
 
 
     public boolean newTradCdt(String idT, String langue) {
@@ -527,13 +534,14 @@ public class SelectedCandidat implements Serializable {
                 lesMails.add(contrib);
             }
         }*/
+        /*
         for (NodeUser nodeUser : contribs) {
             if (nodeUser.getMail() != null &&  !nodeUser.getMail().trim().equals("")) {
                 String message =  "Votre candidat " + selected.getValue() + " a été validé par le(a) terminologue : " + theUser.getUser().getName() + ".";
                 message = message + "\n avec le message suivant : " + msgValid + ".";
                 envoyerMailAlert(nodeUser.getMail(), message);
             }
-        }
+        }*/
         msgValid = "";
         vue.setAddValidCdt(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info4")));
@@ -554,7 +562,7 @@ public class SelectedCandidat implements Serializable {
         // envoie d'email d'alerte !!
         ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
             selected.getIdConcept(), idTheso);
-        
+        /*
         for (NodeUser nodeUser : contribs) {
             if (nodeUser.getMail() != null && !nodeUser.getMail().trim().equals("")) {
                 String message = "Le candidat " + selected.getValue() + " a été refusé par le(a) terminologue : " + theUser.getUser().getName() + ".";
@@ -562,7 +570,7 @@ public class SelectedCandidat implements Serializable {
                 envoyerMailAlert(nodeUser.getMail(), message);
             }
 
-        }
+        }*/
         msgValid = "";
         vue.setAddValidCdt(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sCdt.info5")));
@@ -628,7 +636,7 @@ public class SelectedCandidat implements Serializable {
 
         ConceptHelper instance = new ConceptHelper();
 
-        instance.setIdentifierType(identifierType);
+        instance.setNodePreference(user.getNodePreference());
         Concept concept = new Concept();
         concept.setIdGroup(idGroups.get(0));
         concept.setIdThesaurus(idTheso);
@@ -648,7 +656,7 @@ public class SelectedCandidat implements Serializable {
     //    if (niveauEdit == null || niveauEdit.trim().equals("")) { // Top concept
      //       idc = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
       //  } else { // concept
-            idc = instance.addConcept(connect.getPoolConnexion(), niveauEdit, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
+            idc = instance.addConcept(connect.getPoolConnexion(), niveauEdit, concept, terme, theUser.getUser().getId());
        // }
         // permet d'ajouter les domaines au nouveau concept
         for (String idGroup : idGroups) {
@@ -675,20 +683,22 @@ public class SelectedCandidat implements Serializable {
         
         
         // message d'alerte 
-        ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
-            selected.getIdConcept(), idTheso);
+    /*    ArrayList<NodeUser> contribs = ch.getListUsersOfCandidat(connect.getPoolConnexion(),
+            selected.getIdConcept(), idTheso);*/
         
     /*    for (NodeUser nodeUser : contribs) {
             if (!lesMails.contains(contrib)) {
                 lesMails.add(contrib);
             }
         }*/
+    
+        /*
         for (NodeUser nodeUser : contribs) {
             if (nodeUser.getMail() != null &&  !nodeUser.getMail().trim().equals("")) {
                 String message =  "Votre candidat " + selected.getValue() + " a été intégré au thésaurus par le(a) terminologue : " + theUser.getUser().getName() + ".";
                 envoyerMailAlert(nodeUser.getMail(), message);
             }
-        }        
+        } */       
         
         
         

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
+import mom.trd.opentheso.bdd.tools.MD5Password;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
@@ -39,11 +40,17 @@ public class PreferencesHelper {
                     if (resultSet.next()) {
                         np = new NodePreference();
  //                       np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
-                        np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
+ //                       np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
                         np.setSourceLang(resultSet.getString("source_lang"));
                         np.setIdentifierType(resultSet.getInt("identifier_type"));
                         np.setUseArk(resultSet.getBoolean("use_ark"));
                         np.setServeurArk(resultSet.getString("server_ark"));
+                        
+                        np.setIdNaan(resultSet.getString("id_naan"));
+                        np.setUserArk(resultSet.getString("user_ark"));
+                        np.setPassArk(resultSet.getString("pass_ark"));
+                        
+                        
                         np.setPathImage(resultSet.getString("path_image"));
                         np.setDossierResize(resultSet.getString("dossier_resize"));
                         /*
@@ -113,59 +120,17 @@ public class PreferencesHelper {
         }
         return status;
     }    
+   
     
-    
-
-    /**
-     * Cette fonction permet de mettre à jour les préférences d'un thésaurus
-     *
-     * @param ds
-     * @param idThesaurus
-     * @param workLanguage
-     * @param nb_alert_cdt
-     * @param alert_cdt
-     */
-    public void updatePreferences(HikariDataSource ds, String idThesaurus,
-            String workLanguage, int nb_alert_cdt,
-            boolean alert_cdt) {
-        Connection conn;
-        Statement stmt;
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "UPDATE preferences set id_thesaurus  = '" + idThesaurus + "',"
-                            + " source_lang = '" + workLanguage + "',"
-                            + " nb_alert_cdt = " + nb_alert_cdt
-                            + " alert_cdt = " + alert_cdt
-                            + " WHERE id_thesaurus = '" + idThesaurus + "'";
-                    stmt.executeUpdate(query);
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     /**
      * Cette fonction permet d'initialiser les préférences d'un thésaurus
      *
      * @param ds
      * @param idThesaurus
      * @param workLanguage
-     * @param nb_alert_cdt
-     * @param alert_cdt
      */
     public void initPreferences(HikariDataSource ds, String idThesaurus,
-            String workLanguage, int nb_alert_cdt,
-            boolean alert_cdt) {
+            String workLanguage) {
         Connection conn;
         Statement stmt;
         try {
@@ -176,12 +141,10 @@ public class PreferencesHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "insert into preferences "
-                            + "(id_thesaurus,source_lang,nb_alert_cdt, alert_cdt)"
+                            + "(id_thesaurus,source_lang)"
                             + " values"
                             + " ('" + idThesaurus + "',"
-                            + "'" + workLanguage + "',"
-                            + nb_alert_cdt
-                            + "," + alert_cdt + ")";
+                            + "'" + workLanguage + "')";
                     stmt.executeUpdate(query);
                 } finally {
                     stmt.close();
@@ -192,43 +155,6 @@ public class PreferencesHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    /**
-     * Permet de mettre à jour la préférence d'un thésaurus
-     *
-     * @param ds
-     * @param np
-     * @param idThesaurus
-     * @return
-     */
-    public boolean updatePreferenceUser(HikariDataSource ds, NodePreference np, String idThesaurus) {
-        Connection conn;
-        Statement stmt;
-
-        boolean status = false;
-        try {
-            conn = ds.getConnection();
-
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "update preferences set source_lang='" + np.getSourceLang()
-                            + "', nb_alert_cdt=" + np.getNbAlertCdt() + ", alert_cdt=" + np.isAlertCdt() + " where"
-                            + " id_thesaurus = '" + idThesaurus + "'";
-                    stmt.executeUpdate(query);
-                    status = true;
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return status;
     }
 
     /**
@@ -244,6 +170,8 @@ public class PreferencesHelper {
         Statement stmt;
         boolean status = false;
         StringPlus stringPlus = new StringPlus();
+        
+        
 
         np = normalizeDatas(np);
         try {
@@ -254,12 +182,19 @@ public class PreferencesHelper {
                 try {
                     String query = "update preferences set "
                             + "source_lang='" + stringPlus.convertString(np.getSourceLang()) + "'"
-                            + ", nb_alert_cdt='" + np.getNbAlertCdt() + "'"
-                            + ", alert_cdt='" + np.isAlertCdt() + "'"
-                            + ",identifier_type='" + np.getIdentifierType() + "'"
-                            + ", use_ark='"+np.isUseArk() + "'"
-                            + ", server_ark='"+stringPlus.convertString(np.getServeurArk()) + "'"
-                            + ",path_image='"+stringPlus.convertString(np.getPathImage()) + "'"
+                         //   + ", nb_alert_cdt='" + np.getNbAlertCdt() + "'"
+                         //   + ", alert_cdt='" + np.isAlertCdt() + "'"
+                            + ", identifier_type='" + np.getIdentifierType() + "'"
+                            + ", use_ark='" + np.isUseArk() + "'"
+                            + ", server_ark='" + stringPlus.convertString(np.getServeurArk()) + "'"
+
+                            + ", id_naan='" + np.getIdNaan() + "'"
+                            + ", user_ark='" + np.getUserArk() + "'"
+                            //+ ", pass_ark='" + MD5Password.getEncodedPassword(np.getPassArk()) + "'"
+                            + ", pass_ark='" + np.getPassArk() + "'"
+
+                            
+                            + ", path_image='"+stringPlus.convertString(np.getPathImage()) + "'"
                             + ", dossier_resize='"+stringPlus.convertString(np.getDossierResize()) + "'"
                         /*    + ", protocol_mail='"+stringPlus.convertString(np.getProtcolMail()) + "'"
                             + ", host_mail='"+stringPlus.convertString(np.getHostMail()) + "'"
