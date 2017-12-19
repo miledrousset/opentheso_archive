@@ -18,6 +18,7 @@
         <ui:include src ="/admin/reorganizing.xhtml" />
         <ui:include src="admin/regenerateAllConceptId.xhtml" />
         <ui:include src="admin/regenerateArkId.xhtml" />
+        <ui:include src="admin/regenerateHandleId.xhtml" />        
         <ui:include src="/admin/baseDeDonnes/miseAJourEditDlg.xhtml"/>
         <ui:include src="/dialogs/settings/copyrightEditDlg.xhtml" />
 
@@ -152,6 +153,7 @@
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateHandle')}"  update=":idRegenerateHandleId" oncomplete="PF('regenerateHandleId').show();" styleClass="styleButton"/>                            
                             <p:separator/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('copyright.addCopyrightTo')}" action="#{copyrightBean.setDisplayBrutText(false)}" oncomplete="PF('copyrightEditDlg').show()"  styleClass="styleButton"/>
                         </p:menuButton>

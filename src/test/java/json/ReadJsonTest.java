@@ -5,28 +5,20 @@
  */
 package json;
 
-import java.io.StringReader;
 import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonValue;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author miled.rousset
  */
-public class ReadJson {
-
-    public ReadJson() {
-    }
+public class ReadJsonTest {
 
     @BeforeClass
     public static void setUpClass() {
@@ -47,7 +39,7 @@ public class ReadJson {
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
-    @Test
+ /*   @Test
     public void readJson1() {
         /*
         String personJSONData
@@ -85,10 +77,10 @@ public class ReadJson {
         
          */
 
-    }
+ //   }*/
 
-    @Test
-    public void readJson2() {
+ /*   @Test
+    private void readJson2() {
 
         String total = " {\"content\":[{\"nb_notices\":\"7\"}],\"debug\":\"\",\"error\":0}\" ";
 
@@ -124,5 +116,27 @@ public class ReadJson {
                     + ((JsonObject) jsonVal).getString("nb_notices"));
         }      
          */
+   // }*/
+
+    
+    @Test
+    public void getJsonData() {
+        String urlResource = "http://test.mom.fr";
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+    
+        builder.add("index", "1");
+        builder.add("type", "URL");
+
+        // Objet dans l'Objet
+        JsonObjectBuilder job = Json.createObjectBuilder();
+        job.add("format", "string");
+        job.add("value", urlResource);
+
+        builder.add("data", job.build());
+        
+        builder.add("ttl", "86400");
+        builder.add("permissions", "1110");
+        String test = builder.build().toString();
+        System.err.println(test);
     }
 }

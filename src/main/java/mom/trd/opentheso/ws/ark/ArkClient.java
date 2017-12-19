@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import javax.xml.namespace.QName;
 
-public final class Ark_Client {
+public final class ArkClient {
 
     private static final QName LOGIN_SERVICE_NAME = new QName("http://soap.arkeo.mom.fr/", "LoginService");
     private static final QName ARKMANAGER_SERVICE_NAME = new QName("http://soap.arkeo.mom.fr/", "ArkManagerService");
@@ -20,7 +20,7 @@ public final class Ark_Client {
     private Properties propertiesArk;  
     
     
-    public Ark_Client() {
+    public ArkClient() {
     }
 
     public void setPropertiesArk(Properties propertiesArk) {
@@ -59,7 +59,7 @@ public final class Ark_Client {
     }
     
     public String getArkId(String date, String url, String title, 
-            String creator, ArrayList<DcElement> dcElementsList, String type) {
+            String creator, ArrayList<DcElement> dcElementsList, String prefix) {
         Account account;
         try {
             account = login(
@@ -73,7 +73,7 @@ public final class Ark_Client {
                 inputArk.setUrlTarget(url);
                 inputArk.setTitle(title);
                 //prefixes à définir type DCMI
-                inputArk.setType(type);//"pcrt");
+                inputArk.setType(prefix);//"pcrt");
 
                 inputArk.setCreator(creator);
 

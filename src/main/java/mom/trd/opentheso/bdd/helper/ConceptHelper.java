@@ -35,7 +35,8 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
-import mom.trd.opentheso.ws.ark.Ark_Client;
+import mom.trd.opentheso.ws.ark.ArkClient;
+import mom.trd.opentheso.ws.handle.HandleClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -264,7 +265,7 @@ public class ConceptHelper {
             String idConcept, String idLang, String idTheso) {
         String idArk;
 
-        Ark_Client ark_Client = new Ark_Client();
+        ArkClient ark_Client = new ArkClient();
 
         Concept concept = getThisConcept(ds, idConcept, idTheso);
         
@@ -287,7 +288,7 @@ public class ConceptHelper {
         }
         // ici l'idArk est valide, on ne fait rien.
         return true;
-    }    
+    }
 
     /**
      * Pour préparer les données pour la création d'un idArk 
@@ -562,22 +563,33 @@ public class ConceptHelper {
                     term.getLang(),
                     term.getLexical_value());
 
-            // Si on arrive ici, c'est que tout va bien 
-            // alors c'est le moment de récupérer le code ARK
-            if (nodePreference.isUseArk()) {
-                NodeMetaData nodeMetaData = new NodeMetaData();
-                nodeMetaData.setCreator(term.getSource());
-                nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<>());
+            if(nodePreference != null) {
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de récupérer le code ARK
+                if (nodePreference.isUseArk()) {
+                    NodeMetaData nodeMetaData = new NodeMetaData();
+                    nodeMetaData.setCreator(term.getSource());
+                    nodeMetaData.setTitle(term.getLexical_value());
+                    nodeMetaData.setDcElementsList(new ArrayList<>());
 
-                if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                        nodeMetaData)) {
-                    conn.rollback();
-                    conn.close();
-                    Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La connexion Ark a échouée");
-                    return null;
+                    if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
+                            nodeMetaData)) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                        return null;
+                    }
                 }
-            }
+                // création de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
+                        return null;
+                    }
+                }
+            }       
 
             conn.commit();
             conn.close();
@@ -932,6 +944,23 @@ public class ConceptHelper {
                 conn.close();
                 return false;
             }
+            if(nodePreference != null){
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de supprimer le code ARK
+                if (nodePreference.isUseArk()) {
+                    // suppression de l'identifiant ARK
+                }
+                // suppression de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    String idHandle = getIdHandleOfConcept(ds, idConcept, idThesaurus);
+                    if (!deleteIdHandle(conn, idConcept, idHandle, idThesaurus)) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La suppression du Handle a échouée");
+                        return false;
+                    }
+                }
+            }
             conn.commit();
             conn.close();
             return true;
@@ -997,6 +1026,23 @@ public class ConceptHelper {
                 conn.close();
                 return false;
             }
+            if(nodePreference != null){
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de supprimer le code ARK
+                if (nodePreference.isUseArk()) {
+                    // suppression de l'identifiant ARK
+                }
+                // suppression de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    String idHandle = getIdHandleOfConcept(ds, idConcept, idThesaurus);
+                    if (!deleteIdHandle(conn, idConcept, idHandle, idThesaurus)) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La suppression du Handle a échouée");
+                        return false;
+                    }
+                }
+            }            
             conn.commit();
             conn.close();
             return true;
@@ -2037,9 +2083,10 @@ public class ConceptHelper {
          * récupération du code Ark via WebServices
          *
          */
+        if(nodePreference == null) return false;        
         if(!nodePreference.isUseArk()) return false;
         
-        Ark_Client ark_Client = new Ark_Client();
+        ArkClient ark_Client = new ArkClient();
 
         Properties propertiesArk = new Properties();
         propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
@@ -2053,7 +2100,7 @@ public class ConceptHelper {
                 nodeMetaData.getTitle(), // title
                 nodeMetaData.getCreator(), // creator
                 nodeMetaData.getDcElementsList(),
-                "pcrt" // pcrt : p= pactols, crt=code DCMI pour collection
+                nodePreference.getPrefixArk() // pcrt : p= pactols, crt=code DCMI pour collection
         ); // description
         if (idArk == null) {
             message = "La connexion Ark a échouée";
@@ -2063,7 +2110,177 @@ public class ConceptHelper {
         return updateArkIdOfConcept(conn, idConcept,
                 idThesaurus, idArk);
     }
+    
+    /**
+     * Permet de mettre à jour l'identifiant Handle
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return
+     */
+    public boolean updateIdHandle(HikariDataSource ds,
+            String idConcept,
+            String idThesaurus) {
+        if(nodePreference == null) return false;
+        if(!nodePreference.isUseHandle()) return false;
+        ConceptHelper conceptHelper = new ConceptHelper();
+        HandleClient handleClient = new HandleClient();
 
+        String idHandle = conceptHelper.getIdHandleOfConcept(ds, idConcept, idThesaurus);
+        String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
+        
+        if(idHandle == null || idHandle.isEmpty()) {// cas où le handle n'existe pas dans la base de données locales
+            idHandle = getNewHandleId();
+            // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
+            // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
+            idHandle = nodePreference.getPrefixIdHandle() + "/" +
+                    nodePreference.getPrivatePrefixHandle() + idHandle;
+            
+            idHandle = handleClient.putHandle(
+                    nodePreference.getPassHandle(),
+                    nodePreference.getPathKeyHandle(),
+                    nodePreference.getPathCertHandle(),
+                    nodePreference.getUrlApiHandle(),
+                    idHandle, 
+                    jsonData);
+            if(idHandle == null) {
+                message = handleClient.getMessage();
+                return false;
+            }
+            return updateHandleIdOfConcept(ds, idConcept,
+                    idThesaurus, idHandle);      
+        }
+        else { // cas où le handle existe en local
+            // on vérifie si le handle existe à distance
+            if(handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
+                    idHandle)) {
+                return true;
+            }
+            else {
+                idHandle = handleClient.putHandle(
+                        nodePreference.getPassHandle(),
+                        nodePreference.getPathKeyHandle(),
+                        nodePreference.getPathCertHandle(),
+                        nodePreference.getUrlApiHandle(),
+                        idHandle, 
+                        jsonData);
+                if(idHandle == null) {
+                    message = handleClient.getMessage();
+                    return false;
+                }
+                return updateHandleIdOfConcept(ds, idConcept,
+                        idThesaurus, idHandle);                      
+            }
+        }
+    }    
+    
+    /**
+     *
+     * @param conn
+     * @param idConcept
+     * @param idThesaurus
+     * @param urlSite
+     * @return
+     */
+    private boolean addIdHandle(Connection conn,
+            String idConcept,
+            String idThesaurus) {
+        /**
+         * récupération du code Handle via WebServices
+         *
+         */
+        if(nodePreference == null) return false;
+        if(!nodePreference.isUseHandle()) return false;
+        
+        HandleClient handleClient = new HandleClient();
+        String newId = getNewHandleId();
+        // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
+        // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
+        newId = nodePreference.getPrefixIdHandle() + "/" +
+                nodePreference.getPrivatePrefixHandle() + newId;
+        
+        String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
+        String idHandle = handleClient.putHandle(
+                nodePreference.getPassHandle(),
+                nodePreference.getPathKeyHandle(),
+                nodePreference.getPathCertHandle(),
+                nodePreference.getUrlApiHandle(),
+                newId, 
+                jsonData);
+        if(idHandle == null) {
+            message = handleClient.getMessage();
+            return false;
+        }
+        return updateHandleIdOfConcept(conn, idConcept,
+                idThesaurus, idHandle);
+    }
+    
+    /**
+     * permet de genérer un identifiant unique pour Handle 
+     * on controle la présence de l'identifiant sur handle.net 
+     * si oui, on regénère un autre.
+     * 
+     * @return 
+     */
+    private String getNewHandleId(){
+        ToolsHelper toolsHelper = new ToolsHelper();
+        boolean duplicateId = true;
+        String idHandle = null;
+        HandleClient handleClient = new HandleClient();        
+        
+        while (duplicateId) {
+            idHandle = toolsHelper.getNewId(10);
+            if(!handleClient.isHandleExist(
+                    nodePreference.getUrlApiHandle(),
+                    nodePreference.getPrefixIdHandle()+ "/" + idHandle)) {
+                duplicateId = false;
+            }
+            if(!handleClient.isHandleExist(
+                    " http://hdl.handle.net/",
+                    nodePreference.getPrefixIdHandle()+ "/" + idHandle)) {
+                duplicateId = false;
+            }            
+        }
+        return idHandle;
+    }
+    
+    /**
+     * Permet de supprimer un identifiant Handle de la table Concept
+     * et de la plateforme (handle.net) via l'API REST
+     * @param conn
+     * @param idConcept
+     * @param idThesaurus
+     * @param urlSite
+     * @return
+     */
+    private boolean deleteIdHandle(Connection conn,
+            String idConcept,
+            String idHandle,
+            String idThesaurus) {
+        /**
+         * récupération du code Handle via WebServices
+         *
+         */
+        if(nodePreference == null) return false;
+        if(!nodePreference.isUseHandle()) return false;
+        
+        HandleClient handleClient = new HandleClient();
+        boolean status = handleClient.deleteHandle(
+                nodePreference.getPassHandle(),
+                nodePreference.getPathKeyHandle(),
+                nodePreference.getPathCertHandle(),
+                nodePreference.getUrlApiHandle(),
+                idHandle
+                );
+        if(!status) {
+            message = handleClient.getMessage();
+            return false;
+        }
+        return updateHandleIdOfConcept(conn, idConcept,
+                idThesaurus, "");
+    }    
+    
     /**
      * Cette fonction permet d'ajouter un domaine à un Concept dans la table
      * Concept, en paramètre un objet Classe Concept
@@ -2160,7 +2377,7 @@ public class ConceptHelper {
                     String idArk = "";
                     if (isArkActive) {
                         ArrayList<DcElement> dcElementsList = new ArrayList<>();
-                        Ark_Client ark_Client = new Ark_Client();
+                        ArkClient ark_Client = new ArkClient();
                         idArk = ark_Client.getArkId(
                                 new FileUtilities().getDate(),
                                 urlSite + "?idc=" + concept.getIdConcept() + "&idt=" + concept.getIdThesaurus(),
@@ -2505,6 +2722,94 @@ public class ConceptHelper {
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
+     * qui n'ont pas d'identifiants Ark
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<String> getAllIdConceptOfThesaurusWithoutArk(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_thesaurus = '" + idThesaurus + "'"
+                            + " and (id_ark = '' or id_ark = null)";;
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdConcept of Thesaurus without Ark : " + idThesaurus, sqle);
+        }
+        return tabIdConcept;
+    }    
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
+     * qui n'ont pas d'identifiants Handle
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<String> getAllIdConceptOfThesaurusWithoutHandle(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where"
+                            + " id_thesaurus = '" + idThesaurus + "'" 
+                            + " and (id_handle = '' or id_handle = null)";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdConcept of Thesaurus without Handle : " + idThesaurus, sqle);
+        }
+        return tabIdConcept;
+    }    
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * en filtrant par Domaine/Group
      * @param ds
      * @param idThesaurus
@@ -2549,50 +2854,6 @@ public class ConceptHelper {
         } catch (SQLException sqle) {
             // Log exception
             log.error("Error while getting All IdConcept of Thesaurus by Group : " + idThesaurus, sqle);
-        }
-        return tabIdConcept;
-    }    
-    
-    /**
-     * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
-     * (cette fonction sert pour la génération de la table Permuté
-     *
-     * @param ds
-     * @param idThesaurus
-     * @return ArrayList
-     */
-    public ArrayList<String> getAllIdConceptOfThesaurusWithoutArk(HikariDataSource ds,
-            String idThesaurus) {
-
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        ArrayList<String> tabIdConcept = new ArrayList<>();
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "select id_concept from concept where id_thesaurus = '"
-                            + idThesaurus + "' and id_ark = ''";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-
-                    while (resultSet.next()) {
-                        tabIdConcept.add(resultSet.getString("id_concept"));
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while getting All IdConcept of Thesaurus : " + idThesaurus, sqle);
         }
         return tabIdConcept;
     }    
@@ -2812,6 +3073,50 @@ public class ConceptHelper {
         }
         return ark;
     }
+    
+    /**
+     * Cette fonction permet de récupérer l'identifiant Handle sinon renvoie un une
+     * chaine vide
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public String getIdHandleOfConcept(HikariDataSource ds, String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String handle = "";
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_handle from concept where"
+                            + " id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept = '" + idConcept + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    if (resultSet.next()) {
+
+                        handle = resultSet.getString("id_handle");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting idHandle of Concept : " + idConcept, sqle);
+        }
+        return handle;
+    }    
 
     /**
      * Cette fonction permet de récupérer l'identifiant du Concept d'après
@@ -4615,7 +4920,88 @@ public class ConceptHelper {
         }
         return status;
     }
+    
+   /**
+     * Cette fonction permet d'ajouter un Handle Id au concept ou remplacer l'Id
+     * existant
+     *
+     * @param conn
+     * @param idConcept
+     * @param idTheso
+     * @param idHandle
+     * @return
+     */
+    public boolean updateHandleIdOfConcept(Connection conn, String idConcept,
+            String idTheso, String idHandle) {
 
+        Statement stmt;
+        boolean status = false;
+        try {
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE concept "
+                            + "set id_handle='" + idHandle + "'"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus='" + idTheso + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                //      conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating or adding HandleId of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }    
+
+   /**
+     * Cette fonction permet d'ajouter un Handle Id au concept ou remplacer l'Id
+     * existant
+     *
+     * @param ds
+     * @param idConcept
+     * @param idTheso
+     * @param idHandle
+     * @return
+     */
+    public boolean updateHandleIdOfConcept(HikariDataSource ds, String idConcept,
+            String idTheso, String idHandle) {
+
+        Statement stmt;
+        boolean status = false;
+        Connection conn;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE concept "
+                            + "set id_handle='" + idHandle + "'"
+                            + " WHERE id_concept ='" + idConcept + "'"
+                            + " AND id_thesaurus='" + idTheso + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating HandleId of Concept : " + idConcept, sqle);
+        }
+        return status;
+    }        
+    
     /**
      * Cette fonction permet de mettre à jour la notation pour un concept
      *

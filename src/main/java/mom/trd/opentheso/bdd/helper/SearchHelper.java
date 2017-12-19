@@ -632,7 +632,7 @@ public class SearchHelper {
                             + " preferred_term.id_term, term.lang, term.id_thesaurus,"
                             + " idgroup, concept.top_concept"
                             + " FROM term, preferred_term, concept, concept_group_concept WHERE "
-                            + "concept_group_concept.idconcept = preferred_term.id_term AND "
+                            + "concept_group_concept.idconcept = preferred_term.id_concept AND "
                             + "concept_group_concept.idthesaurus = term.id_thesaurus AND"
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"

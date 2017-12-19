@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptDeleteDlg"  header="#{langueBean.getMsg('edit.delete')}" widgetVar="conceptDeleteDlg" modal="true" resizable="false" >
+        <!-- Cas de suppression d'un concept -->
+        <h:panelGroup id="confirmDelete" >
+            <h:form >
+                <p:messages showDetail="true" autoUpdate="true" />
+                <p:panelGrid columns="1"  styleClass="ui-noborder"  rendered="#{!newtreeBean.editPassed}">
+                    <p:row>
+                        <p:column colspan="1"><h:outputText id="messageDelete" value="Supprimer le concept : "/></p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="1"><h:outputText id="valueTerme" value="#{selectedTerme.nom}" style="color: red;" /></p:column>
+                    </p:row>
+                </p:panelGrid>
+                <p:panelGrid columns="3"  styleClass="ui-noborder" rendered="#{!newtreeBean.editPassed}"> 
+                    <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('edit.delete')}"
+                                     actionListener="#{newtreeBean.deleteConcept()}" 
+                                     update=":idConceptDeleteDlg,:accordeonTree,:panContenu"  oncomplete="PF('conceptEditDlg').hide();" styleClass="styleButton" >
+                        <p:confirm header="Confirmation" message="!!! Attention !!!! opération irréversible, le concept sera définitivement supprimé !" icon="ui-icon-alert" />
+                    </p:commandButton>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptDeleteDlg" oncomplete="PF('conceptDeleteDlg').hide();"  immediate="true"/>
+                </p:panelGrid>
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>

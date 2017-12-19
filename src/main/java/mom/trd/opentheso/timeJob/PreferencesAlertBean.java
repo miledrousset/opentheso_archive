@@ -57,7 +57,7 @@ public class PreferencesAlertBean {
         }
          PreferencesAlertHelper pah=new PreferencesAlertHelper();
          int ret=pah.setAlert(thesaurusEnAcces,this.alert,connect.getPoolConnexion());
-         System.out.println("retour de la fonction cancelAlert "+ret);
+    //     System.out.println("retour de la fonction cancelAlert "+ret);
          if(ret<1){
              insertRoutineMail();
          }
@@ -87,7 +87,7 @@ public class PreferencesAlertBean {
                  date_debut_envoi_cdt_valid,period_envoi_cdt_propos,
                  period_envoi_cdt_valid,connect.getPoolConnexion());
          
-         System.out.println("retour de la fonction addAlert "+ret);
+    //     System.out.println("retour de la fonction addAlert "+ret);
          if(ret<1){
              insertRoutineMail();
          }

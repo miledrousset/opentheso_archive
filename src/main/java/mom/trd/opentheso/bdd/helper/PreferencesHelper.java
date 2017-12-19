@@ -12,9 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
-import mom.trd.opentheso.bdd.tools.MD5Password;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
@@ -39,33 +37,34 @@ public class PreferencesHelper {
 
                     if (resultSet.next()) {
                         np = new NodePreference();
- //                       np.setAlertCdt(resultSet.getBoolean("alert_cdt"));
- //                       np.setNbAlertCdt(resultSet.getInt("nb_alert_cdt"));
                         np.setSourceLang(resultSet.getString("source_lang"));
                         np.setIdentifierType(resultSet.getInt("identifier_type"));
+                        
+                        // Ark
                         np.setUseArk(resultSet.getBoolean("use_ark"));
                         np.setServeurArk(resultSet.getString("server_ark"));
-                        
                         np.setIdNaan(resultSet.getString("id_naan"));
+                        np.setPrefixArk(resultSet.getString("prefix_ark"));
                         np.setUserArk(resultSet.getString("user_ark"));
                         np.setPassArk(resultSet.getString("pass_ark"));
                         
+                        // Handle
+                        np.setUseHandle(resultSet.getBoolean("use_handle"));
+                        np.setUserHandle(resultSet.getString("user_handle"));
+                        np.setPassHandle(resultSet.getString("pass_handle"));
+                        np.setPathKeyHandle(resultSet.getString("path_key_handle"));
+                        np.setPathCertHandle(resultSet.getString("path_cert_handle"));
+                        np.setUrlApiHandle(resultSet.getString("url_api_handle"));                        
+                        np.setPrefixIdHandle(resultSet.getString("prefix_handle"));
+                        np.setPrivatePrefixHandle(resultSet.getString("private_prefix_handle"));
                         
                         np.setPathImage(resultSet.getString("path_image"));
                         np.setDossierResize(resultSet.getString("dossier_resize"));
-                        /*
-                        np.setProtcolMail(resultSet.getString("protocol_mail"));
-                        np.setHostMail(resultSet.getString("host_mail"));
-                        np.setPortMail(resultSet.getInt("port_mail"));
-                        np.setAuthMail(resultSet.getBoolean("auth_mail"));
-                        np.setMailForm(resultSet.getString("mail_from"));
-                        np.setTransportMail(resultSet.getString("transport_mail"));
-                        */
                         np.setBddActive(resultSet.getBoolean("bdd_active"));
                         np.setBddUseId(resultSet.getBoolean("bdd_use_id"));
                         np.setUrlBdd(resultSet.getString("url_bdd"));
                         np.setUrlCounterBdd(resultSet.getString("url_counter_bdd"));
-                        np.setZ3950acif(resultSet.getBoolean("z3950actif"));
+                        np.setZ3950actif(resultSet.getBoolean("z3950actif"));
                         np.setCollectionAdresse(resultSet.getString("collection_adresse"));
                         np.setNoticeUrl(resultSet.getString("notice_url"));
                         np.setUrlEncode(resultSet.getString("url_encode"));
@@ -170,9 +169,6 @@ public class PreferencesHelper {
         Statement stmt;
         boolean status = false;
         StringPlus stringPlus = new StringPlus();
-        
-        
-
         np = normalizeDatas(np);
         try {
             conn = ds.getConnection();
@@ -185,29 +181,33 @@ public class PreferencesHelper {
                          //   + ", nb_alert_cdt='" + np.getNbAlertCdt() + "'"
                          //   + ", alert_cdt='" + np.isAlertCdt() + "'"
                             + ", identifier_type='" + np.getIdentifierType() + "'"
+                            
+                            // Ark
                             + ", use_ark='" + np.isUseArk() + "'"
                             + ", server_ark='" + stringPlus.convertString(np.getServeurArk()) + "'"
-
                             + ", id_naan='" + np.getIdNaan() + "'"
+                            + ", prefix_ark ='" + np.getPrefixArk() + "'"                            
                             + ", user_ark='" + np.getUserArk() + "'"
                             //+ ", pass_ark='" + MD5Password.getEncodedPassword(np.getPassArk()) + "'"
                             + ", pass_ark='" + np.getPassArk() + "'"
 
+                            // Handle
+                            + ", use_handle = '" + np.isUseHandle() + "'"
+                            + ", user_handle = '" + np.getUserHandle() + "'"
+                            + ", pass_handle = '" + np.getPassHandle() + "'"
+                            + ", path_key_handle = '" + np.getPathKeyHandle() + "'"
+                            + ", path_cert_handle = '" + np.getPathCertHandle() + "'"
+                            + ", url_api_handle = '" + np.getUrlApiHandle() + "'"
+                            + ", prefix_handle = '" + np.getPrefixIdHandle() + "'"
+                            + ", private_prefix_handle = '" + np.getPrivatePrefixHandle() + "'"
                             
                             + ", path_image='"+stringPlus.convertString(np.getPathImage()) + "'"
                             + ", dossier_resize='"+stringPlus.convertString(np.getDossierResize()) + "'"
-                        /*    + ", protocol_mail='"+stringPlus.convertString(np.getProtcolMail()) + "'"
-                            + ", host_mail='"+stringPlus.convertString(np.getHostMail()) + "'"
-                            + ", port_mail='"+np.getPortMail() + "'"
-                            + ", auth_mail='"+np.isAuthMail() + "'"
-                            + ", mail_from='"+stringPlus.convertString(np.getMailForm()) + "'"
-                            + ", transport_mail='"+stringPlus.convertString(np.getTransportMail()) + "'"
-                            */
                             + ", bdd_active='"+np.isBddActive() + "'"
                             + ", bdd_use_id='"+np.isBddUseId() + "'"
                             + ", url_bdd='"+stringPlus.convertString(np.getUrlBdd()) + "'"
                             + ", url_counter_bdd='"+stringPlus.convertString(np.getUrlCounterBdd()) + "'"
-                            + ", z3950actif='"+np.getZ3950acif() + "'"
+                            + ", z3950actif='"+np.isZ3950actif()+ "'"
                             + ", collection_adresse='"+stringPlus.convertString(np.getCollectionAdresse()) + "'"
                             + ", notice_url='"+ stringPlus.convertString(np.getNoticeUrl())+ "'"
                             + ", url_encode='"+stringPlus.convertString(np.getUrlEncode()) + "'"

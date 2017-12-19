@@ -18,6 +18,9 @@
                         
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
                         
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"
+                                    value="#{langueBean.getMsg('edit.delete')}" update=":idConceptDeleteDlg" oncomplete="PF('conceptDeleteDlg').show();" style="font-size: 12px;"/>                        
+                        
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
 
@@ -88,8 +91,12 @@
                 </h:panelGroup>
                 <h:outputText id="idC" value="id : "/>
                 <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
-                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="idArk : "/>
+                <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="ark: "/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" value ="#{selectedTerme.idArk}&lt;br/&gt;" escape="false" styleClass="textInfo"/>
+                
+                <h:outputText rendered="#{(selectedTerme.idHandle != null) and (selectedTerme.idHandle != '') }" id="idHandle" value="handle: "/>
+                <h:outputText rendered="#{(selectedTerme.idHandle != null) and (selectedTerme.idHandle != '') }" value ="#{selectedTerme.idHandle}&lt;br/&gt;" escape="false" styleClass="textInfo"/>                
+                
                 <h:outputText rendered="#{(selectedTerme.notation != '')}" value="notation : "/>
                 <h:outputText rendered="#{(selectedTerme.notation != '')}" value = "#{selectedTerme.notation} &lt;br/&gt;" escape="false" styleClass="textInfo" />                
                 

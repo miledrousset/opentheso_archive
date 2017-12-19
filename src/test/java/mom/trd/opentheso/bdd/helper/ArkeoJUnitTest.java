@@ -9,7 +9,7 @@ package mom.trd.opentheso.bdd.helper;
 import fr.mom.arkeo.soap.DcElement;
 import java.util.ArrayList;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
-import mom.trd.opentheso.ws.ark.Ark_Client;
+import mom.trd.opentheso.ws.ark.ArkClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -144,7 +144,7 @@ public class ArkeoJUnitTest {
     
     /*    HikariDataSource conn = openConnexionPool();
 */
-        Ark_Client ark_Client = new Ark_Client();
+        ArkClient ark_Client = new ArkClient();
 
         ArrayList<DcElement> dcElementsList = new ArrayList<>();
 

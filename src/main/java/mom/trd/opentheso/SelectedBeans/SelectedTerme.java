@@ -137,6 +137,7 @@ public class SelectedTerme implements Serializable {
     private int type; // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
     private int tree; // 0 pour newtreeBean, 2 pour underTree
     private String idArk;
+    private String idHandle;    
     private int contributor;
     private int creator;
 
@@ -270,6 +271,7 @@ public class SelectedTerme implements Serializable {
         dateC = "";
         dateM = "";
         idArk = "";
+        idHandle = "";
         type = 1;
 
         valueEdit = "";
@@ -312,15 +314,17 @@ public class SelectedTerme implements Serializable {
         majTAsso();
 
         GroupHelper groupHelper = new GroupHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term 
 
         if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idC, idTheso)) {
-            microTheso = new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
+            microTheso = groupHelper.getLexicalValueOfGroup(connect.getPoolConnexion(), idDomaine, idTheso, idlangue);
 
-            NodeGroup ncg = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
+            NodeGroup ncg = groupHelper.getThisConceptGroup(connect.getPoolConnexion(), idC, idTheso, idlangue);
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             nom = ncg.getLexicalValue();
             idArk = ncg.getConceptGroup().getIdARk();
+
             nomEdit = nom;
             idT = "";
             if (ncg.getCreated() != null && ncg.getModified() != null) {
@@ -334,7 +338,7 @@ public class SelectedTerme implements Serializable {
             majNotes();
 
         } else {
-            Concept concept = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
+            Concept concept = conceptHelper.getThisConcept(connect.getPoolConnexion(), idC, idTheso);
             if (concept == null) {
                 return;
             }
@@ -373,7 +377,8 @@ public class SelectedTerme implements Serializable {
                 majNoticeBdd();
             }
 
-            idArk = new ConceptHelper().getIdArkOfConcept(connect.getPoolConnexion(), idC, idTheso);
+            idArk = conceptHelper.getIdArkOfConcept(connect.getPoolConnexion(), idC, idTheso);
+            idHandle = conceptHelper.getIdHandleOfConcept(connect.getPoolConnexion(), idC, idTheso);
 
             reInitFacette();
             initTree();
@@ -478,8 +483,6 @@ public class SelectedTerme implements Serializable {
                     catch (Exception ex) {
                         System.out.println(ex.toString());
                     }
-
-
             }
 
         } catch (MalformedURLException ex) {
@@ -2577,7 +2580,7 @@ public class SelectedTerme implements Serializable {
     private int getNotice(String idTe) {
         //ResourceBundle bundlePref = getBundlePref();
         int nbNoticesT = 0;
-        if (user.getNodePreference().getZ3950acif()) {
+        if (user.getNodePreference().isZ3950actif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
             p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
@@ -3359,6 +3362,14 @@ public class SelectedTerme implements Serializable {
 
     public void setNodeGroupIdLabel(ArrayList<NodeGroupIdLabel> nodeGroupIdLabel) {
         this.nodeGroupIdLabel = nodeGroupIdLabel;
+    }
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
     }
 
 }

@@ -331,7 +331,7 @@ public class AlignmentHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "delete from alignement "
-                            + " where internal_id_concept = " + idConcept
+                            + " where internal_id_concept = '" + idConcept + "'"
                             + " and internal_id_thesaurus = '" + idThesaurus + "'";
 
                     stmt.executeUpdate(query);

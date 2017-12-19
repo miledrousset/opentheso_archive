@@ -1168,7 +1168,7 @@ input[type="button"], input[type="submit"]{
 .fieldReorga {
     float: right; 
     width: 300px !important; 
-    height: 100px !important; 
+    height: 80px !important; 
     text-align: center;
     border-radius: 5px;
 }

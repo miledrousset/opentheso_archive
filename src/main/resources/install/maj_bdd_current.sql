@@ -32,6 +32,30 @@ SET ROLE = opentheso;
 
 
 
+Il faut ajouter les modifs suivantes :
+table   Concept :  id_ark character varying DEFAULT ''::character varying,
+        id_handle character varying DEFAULT ''::character varying,
+
+
+table preferences
+        use_ark boolean DEFAULT false,
+        server_ark character varying DEFAULT 'http://ark.mondomaine.fr/ark:/'::character varying,
+        id_naan character varying NOT NULL DEFAULT '66666'::character varying,
+        prefix_ark character varying NOT NULL DEFAULT 'crt'::character varying,
+        user_ark character varying,
+        pass_ark character varying,
+        use_handle boolean DEFAULT false,
+        user_handle character varying,
+        pass_handle character varying,
+        path_key_handle character varying,
+        path_cert_handle character varying,
+        url_api_handle character varying NOT NULL DEFAULT 'https://handle-server.mondomaine.fr:8001/api/handles/'::character varying,
+        id_handle character varying NOT NULL DEFAULT '66.666.66666'::character varying,
+        prefix_handle character varying NOT NULL DEFAULT 'crt'::character varying,
+
+
+
+
 --- rechargement et optimisation des langues iso_latin1
 DROP TABLE languages_iso639;
 

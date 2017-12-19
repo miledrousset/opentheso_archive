@@ -65,7 +65,7 @@
                             </h:panelGrid>
                         </p:fieldset>
 
-                        <p:fieldset legend="ark" toggleable="true" collapsed="true" styleClass="styleButton2" >
+                        <p:fieldset legend="Ark" toggleable="true" collapsed="true" styleClass="styleButton2" >
 
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="use Ark :" />
@@ -77,7 +77,9 @@
                                 <h:outputLabel value="serveur Ark" />
                                 <h:inputText value="#{user1.nodePreference.serveurArk}" />
                                 <h:outputLabel value="id Naan"/>
-                                <h:inputText value="#{user1.nodePreference.idNaan}" />                                 
+                                <h:inputText value="#{user1.nodePreference.idNaan}" />
+                                <h:outputLabel value="prefixe Ark"/>
+                                <h:inputText value="#{user1.nodePreference.prefixArk}" />                                  
                                 <h:outputLabel value="user Ark" />
                                 <h:inputText value="#{user1.nodePreference.userArk}" />     
                                 <h:outputLabel value="passe Ark" />
@@ -85,6 +87,34 @@
 
                             </h:panelGrid>
                         </p:fieldset>
+                        
+                        <p:fieldset legend="Handle" toggleable="true" collapsed="true" styleClass="styleButton2" >
+
+                            <h:panelGrid columns="2" style="text-align: left">
+                                <h:outputLabel value="use Handle :" />
+                                <h:selectOneRadio value="#{user1.nodePreference.useHandle}">
+                                    <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
+                                    <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
+                                </h:selectOneRadio>
+
+                                <h:outputLabel value="path to Handle_key :" />
+                                <h:inputText value="#{user1.nodePreference.pathKeyHandle}" />
+                                <h:outputLabel value="path to Handle_certificat :"/>
+                                <h:inputText value="#{user1.nodePreference.pathCertHandle}" />
+                                <h:outputLabel value="URL to API Handle : "/>
+                                <h:inputText value="#{user1.nodePreference.urlApiHandle}" />
+                                <h:outputLabel value="prefixe Handle : "/>
+                                <h:inputText value="#{user1.nodePreference.prefixIdHandle}" />
+                                <h:outputLabel value="prefixe privé Handle :"/>
+                                <h:inputText value="#{user1.nodePreference.privatePrefixHandle}" />    
+                                
+                                <h:outputLabel value="user Handle" />
+                                <h:inputText value="#{user1.nodePreference.userHandle}" />     
+                                <h:outputLabel value="passe Handle" />
+                                <h:inputSecret value="#{user1.nodePreference.passHandle}" redisplay="true" />
+
+                            </h:panelGrid>
+                        </p:fieldset>                        
 
 
                         <p:fieldset legend="image" toggleable="true" collapsed="true" styleClass="styleButton2">
@@ -126,7 +156,7 @@
 
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="z3950 actif" />
-                                <h:selectOneRadio value="#{user1.nodePreference.z3950acif}">
+                                <h:selectOneRadio value="#{user1.nodePreference.z3950actif}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>

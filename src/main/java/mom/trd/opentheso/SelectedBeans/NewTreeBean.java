@@ -482,7 +482,8 @@ public class NewTreeBean implements Serializable {
         first.add(selectedTerme.getIdC());
         ArrayList<ArrayList<String>> paths = new ArrayList<>();
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
-        reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        if(paths !=null)
+            reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
         
      
     }
@@ -956,6 +957,33 @@ public class NewTreeBean implements Serializable {
         return false;
     }
 
+    /**
+     * Permet de supprimer un concept seul, 
+     * il ne faut pas qu'il est des fils, sinon la suppression va échouer
+     *
+     * @return
+     */
+    public boolean deleteConcept() {
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        if(selectedTerme.getUser().nodePreference == null) return false;
+        conceptHelper.setNodePreference(selectedTerme.getUser().nodePreference);
+        if (!conceptHelper.deleteConcept(connect.getPoolConnexion(), selectedTerme.getIdC(),
+                selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "La suppression a échoué !!"));
+            return false;
+        }
+
+        reInit();
+        initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.reInitTerme();
+        selectedTerme.setSelectedNode((MyTreeNode)selectedNode.getParent());
+        selectedTerme.majTerme((MyTreeNode)selectedNode.getParent());
+        selectedNode =  (MyTreeNode)selectedNode.getParent();        
+        reExpand();
+        return true;
+    }    
+    
     /**
      * Fonction recursive qui permet de supprimer une branche d'orphelins un
      * concept de tête et thesaurus. La suppression est descendante qui ne

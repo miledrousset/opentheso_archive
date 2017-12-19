@@ -3,28 +3,31 @@ package mom.trd.opentheso.bdd.helper.nodes;
 
 public class NodePreference {
     private String sourceLang;
-//    private int nbAlertCdt;
-//    private boolean alertCdt;
     private int identifierType;
     
+    // paramètres Ark
     private boolean useArk;
     private String serveurArk;
     private String idNaan;
+    private String prefixArk;
     private String userArk;
     private String passArk;
     
     
+    // paramètres Handle
+    private boolean useHandle;
+    private String userHandle;
+    private String passHandle;
+    private String pathKeyHandle;
+    private String pathCertHandle;
+    private String urlApiHandle;
+    private String prefixIdHandle;
+    private String privatePrefixHandle;    
+    
+    
+    
     private String pathImage;
     private String dossierResize;
-    
-    
-/*  private String protcolMail;
-    private String hostMail;
-    private int portMail;
-    private boolean authMail;
-    private String mailFrom;
-    private String transportMail;
-*/
     
     private boolean bddActive;
     private boolean bddUseId;
@@ -72,6 +75,104 @@ public class NodePreference {
         this.serveurArk = serveurArk;
     }
 
+    public String getIdNaan() {
+        return idNaan;
+    }
+
+    public void setIdNaan(String idNaan) {
+        this.idNaan = idNaan;
+    }
+
+    public String getPrefixArk() {
+        return prefixArk;
+    }
+
+    public void setPrefixArk(String prefixArk) {
+        this.prefixArk = prefixArk;
+    }
+
+    public String getUserArk() {
+        return userArk;
+    }
+
+    public void setUserArk(String userArk) {
+        this.userArk = userArk;
+    }
+
+    public String getPassArk() {
+        return passArk;
+    }
+
+    public void setPassArk(String passArk) {
+        this.passArk = passArk;
+    }
+
+    public boolean isUseHandle() {
+        return useHandle;
+    }
+
+    public void setUseHandle(boolean useHandle) {
+        this.useHandle = useHandle;
+    }
+
+    public String getUserHandle() {
+        return userHandle;
+    }
+
+    public void setUserHandle(String userHandle) {
+        this.userHandle = userHandle;
+    }
+
+    public String getPassHandle() {
+        return passHandle;
+    }
+
+    public void setPassHandle(String passHandle) {
+        this.passHandle = passHandle;
+    }
+
+    public String getPathKeyHandle() {
+        return pathKeyHandle;
+    }
+
+    public void setPathKeyHandle(String pathKeyHandle) {
+        this.pathKeyHandle = pathKeyHandle;
+    }
+
+    public String getPathCertHandle() {
+        return pathCertHandle;
+    }
+
+    public void setPathCertHandle(String pathCertHandle) {
+        this.pathCertHandle = pathCertHandle;
+    }
+
+    public String getUrlApiHandle() {
+        return urlApiHandle;
+    }
+
+    public void setUrlApiHandle(String urlApiHandle) {
+        this.urlApiHandle = urlApiHandle;
+    }
+
+    public String getPrefixIdHandle() {
+        return prefixIdHandle;
+    }
+
+    public void setPrefixIdHandle(String prefixIdHandle) {
+        this.prefixIdHandle = prefixIdHandle;
+    }
+
+    public String getPrivatePrefixHandle() {
+        return privatePrefixHandle;
+    }
+
+    public void setPrivatePrefixHandle(String privatePrefixHandle) {
+        this.privatePrefixHandle = privatePrefixHandle;
+    }
+
+
+
     public String getPathImage() {
         return pathImage;
     }
@@ -112,12 +213,20 @@ public class NodePreference {
         this.urlBdd = urlBdd;
     }
 
-    public boolean getZ3950acif() {
+    public String getUrlCounterBdd() {
+        return urlCounterBdd;
+    }
+
+    public void setUrlCounterBdd(String urlCounterBdd) {
+        this.urlCounterBdd = urlCounterBdd;
+    }
+
+    public boolean isZ3950actif() {
         return z3950actif;
     }
 
-    public void setZ3950acif(boolean z3950acif) {
-        this.z3950actif = z3950acif;
+    public void setZ3950actif(boolean z3950actif) {
+        this.z3950actif = z3950actif;
     }
 
     public String getCollectionAdresse() {
@@ -160,28 +269,12 @@ public class NodePreference {
         this.pathNotice2 = pathNotice2;
     }
 
-    public boolean isZ3950actif() {
-        return z3950actif;
-    }
-
-    public void setZ3950actif(boolean z3950actif) {
-        this.z3950actif = z3950actif;
-    }
-
     public String getCheminSite() {
         return cheminSite;
     }
 
     public void setCheminSite(String cheminSite) {
         this.cheminSite = cheminSite;
-    }
-
-    public String getUrlCounterBdd() {
-        return urlCounterBdd;
-    }
-
-    public void setUrlCounterBdd(String urlCounterBdd) {
-        this.urlCounterBdd = urlCounterBdd;
     }
 
     public boolean isWebservices() {
@@ -191,30 +284,4 @@ public class NodePreference {
     public void setWebservices(boolean webservices) {
         this.webservices = webservices;
     }
-
-    public String getUserArk() {
-        return userArk;
-    }
-
-    public void setUserArk(String userArk) {
-        this.userArk = userArk;
-    }
-
-    public String getPassArk() {
-        return passArk;
-    }
-
-    public void setPassArk(String passArk) {
-        this.passArk = passArk;
-    }
-
-    public String getIdNaan() {
-        return idNaan;
-    }
-
-    public void setIdNaan(String idNaan) {
-        this.idNaan = idNaan;
-    }
-    
-
 }

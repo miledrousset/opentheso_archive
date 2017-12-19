@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
-import mom.trd.opentheso.ws.ark.Ark_Client;
+import mom.trd.opentheso.ws.ark.ArkClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import skos.SKOSProperty;
@@ -44,7 +44,7 @@ public class ToolsHelper {
         ArrayList<String> tabIdConcept = conceptHelper.getAllIdConceptOfThesaurus(ds, idThesaurus);
 
         String idArk;
-        Ark_Client ark_Client = new Ark_Client();
+        ArkClient ark_Client = new ArkClient();
         ArrayList<DcElement> dcElementsList = new ArrayList<>();
         
         for (String idConcept : tabIdConcept) {

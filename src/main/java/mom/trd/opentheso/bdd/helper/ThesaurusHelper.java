@@ -23,7 +23,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.bdd.tools.StringPlus;
-import mom.trd.opentheso.ws.ark.Ark_Client;
+import mom.trd.opentheso.ws.ark.ArkClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -84,7 +84,7 @@ public class ThesaurusHelper {
 
                     if (isArkActive) {
                         ArrayList<DcElement> dcElementsList = new ArrayList<>();
-                        Ark_Client ark_Client = new Ark_Client();
+                        ArkClient ark_Client = new ArkClient();
                         idArk = ark_Client.getArkId(
                                 new FileUtilities().getDate(),
                                 urlSite + "?idt=" + idThesaurus,
@@ -167,7 +167,7 @@ public class ThesaurusHelper {
                      */
                     if (isArkActive) {
                         ArrayList<DcElement> dcElementsList = new ArrayList<>();
-                        Ark_Client ark_Client = new Ark_Client();
+                        ArkClient ark_Client = new ArkClient();
                         idArk = ark_Client.getArkId(
                                 new FileUtilities().getDate(),
                                 urlSite + "?idt=" + idThesaurus,

@@ -588,7 +588,7 @@ public class SelectedThesaurus implements Serializable {
             }*/
             //concept
             try {
-                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
+                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurusWithoutArk(connect.getPoolConnexion(), idTheso);
                 if (idConcepts == null || idConcepts.isEmpty()) {
                     throw new Exception("No concept in this thesaurus");
                 }
@@ -606,6 +606,88 @@ public class SelectedThesaurus implements Serializable {
         } catch (Exception ex) {
         }
     }
+    
+    /**
+     * Permet de générere les identifiants Handle manquants
+     *
+     * @param idTheso #MR
+     */
+    public void generateAllInexistantHandleId(String idTheso) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        try {
+            ArrayList<String> idGroup = null;
+
+            //group
+            /*  try {
+                if(!regenArkIdGroup(conn, idTheso)) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
+                throw new Exception("Error while regen id group ");
+            }*/
+            //concept
+            try {
+                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurusWithoutHandle(connect.getPoolConnexion(), idTheso);
+                if (idConcepts == null || idConcepts.isEmpty()) {
+                    throw new Exception("No concept in this thesaurus");
+                }
+
+                regenerateHAndleIdOfConcepts(idTheso, idConcepts);
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
+                throw new Exception("Error while regen id concept ");
+            }
+            maj();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+
+        } catch (SQLException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
+        } catch (Exception ex) {
+        }
+    }    
+    
+    /**
+     * Permet de vérifier si les Identifiants Handle sont valides s'ils n'existent
+     * pas, on les ajoutes s'ils exient, on ne fait rien.
+     *
+     * @param idTheso #MR
+     */
+    public void regenerateAllHandleId(String idTheso) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        try {
+            ArrayList<String> idGroup = null;
+
+            //group
+            /*  try {
+                if(!regenArkIdGroup(conn, idTheso)) {
+                    conn.rollback();
+                }
+            } catch (Exception ex) {
+                conn.rollback();
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id group :", ex.getMessage()));
+                throw new Exception("Error while regen id group ");
+            }*/
+            //concept
+            try {
+                ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
+                if (idConcepts == null || idConcepts.isEmpty()) {
+                    throw new Exception("No concept in this thesaurus");
+                }
+                regenerateHAndleIdOfConcepts(idTheso, idConcepts);
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
+                throw new Exception("Error while regen id concept ");
+            }
+            maj();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+
+        } catch (SQLException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
+        } catch (Exception ex) {
+        }
+    }    
 
     /**
      * Cette fonction remplace tout les id des groupes du théso
@@ -631,7 +713,26 @@ public class SelectedThesaurus implements Serializable {
     }
 
     /**
-     * Cette fonction remplace tous les id des concepts du théso
+     * Cette fonction regenère tous les idHandle des concepts du théso
+     * puis met à jour les identifiants Handle
+     */
+    private boolean regenerateHAndleIdOfConcepts(String idTheso, ArrayList<String> idConcepts) throws Exception {
+        //récup les concepts
+        ConceptHelper conceptHelper = new ConceptHelper();
+
+        /*Vérification et génération des nouveaux id Ark*/
+        for (String idConcept : idConcepts) {
+            if (!conceptHelper.updateIdHandle(connect.getPoolConnexion(),
+                    idConcept, idTheso)) {
+
+                throw new Exception("Error Handle :" + conceptHelper.getMessage());
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Cette fonction regenère tous les idArk des concepts du théso
      */
     private boolean regenArkIdConcept(String idTheso, ArrayList<String> idConcepts) throws Exception {
         //récup les concepts
@@ -647,7 +748,7 @@ public class SelectedThesaurus implements Serializable {
             }
         }
         return true;
-    }
+    }    
 
     public void reGenerateConceptId(String idConcept) {
         ConceptHelper conceptHelper = new ConceptHelper();
