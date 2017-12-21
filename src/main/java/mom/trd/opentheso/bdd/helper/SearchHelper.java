@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
@@ -24,6 +25,126 @@ public class SearchHelper {
     public SearchHelper() {
 
     }
+    
+    /**
+     * Cette fonction permet de faire une recherche par valeur sur les termes
+     * Préférés (la recherche est stricte, pas de troncature mais on ignore les majuscules
+     * et les accents)
+     *
+     * @param ds
+     * @param value
+     * @param idLang
+     * @param idThesaurus
+     * @param idGroup
+     * @return
+     */
+    public ArrayList<String> simpleSearchPreferredTerm(HikariDataSource ds,
+            String value, String idLang, String idThesaurus, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> listTerms = new ArrayList<>();
+        value = new StringPlus().convertString(value);
+        String query;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    query = "SELECT term.lexical_value"
+                            + " FROM term, concept_group_concept,"
+                            + " preferred_term"
+                            + " WHERE "
+                            + " term.id_term = preferred_term.id_term AND" 
+                            + " term.id_thesaurus = preferred_term.id_thesaurus AND"
+                            + " preferred_term.id_concept = concept_group_concept.idconcept AND"
+                            + " preferred_term.id_thesaurus = concept_group_concept.idthesaurus AND"
+                            
+                            + " term.id_thesaurus = '" + idThesaurus +"' AND"
+                            + " term.lang = '" + idLang + "' AND"
+                            + " concept_group_concept.idgroup = '" + idGroup + "'"
+                            + " and unaccent_string(term.lexical_value) ilike"
+                            + " unaccent_string('" + value + "')";
+                    
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        listTerms.add(resultSet.getString("lexical_value"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listTerms;
+    }    
+    
+    /**
+     * Cette fonction permet de faire une recherche par valeur sur les synonymes
+     * (la recherche est stricte, pas de troncature mais on ignore les majuscules
+     * et les accents)
+     *
+     * @param ds
+     * @param value
+     * @param idLang
+     * @param idThesaurus
+     * @param idGroup
+     * @return
+     */
+    public HashMap simpleSearchNonPreferredTerm(HikariDataSource ds,
+            String value, String idLang, String idThesaurus, String idGroup) {
+
+        HashMap<String, String> hmap = new HashMap<>();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        value = new StringPlus().convertString(value);
+        String query;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    query = "SELECT   term.lexical_value AS pref, non_preferred_term.lexical_value AS alt"
+                            + " FROM term, non_preferred_term, concept_group_concept,"
+                            + " preferred_term"
+                            + " WHERE "
+                            + " term.id_term = non_preferred_term.id_term AND"
+                            + " term.lang = non_preferred_term.lang AND"
+                            + " term.id_thesaurus = non_preferred_term.id_thesaurus AND"
+                            + " preferred_term.id_concept = concept_group_concept.idconcept AND"
+                            + " preferred_term.id_thesaurus = concept_group_concept.idthesaurus AND"
+                            + " non_preferred_term.id_term = preferred_term.id_term AND"
+                            + " non_preferred_term.id_thesaurus = preferred_term.id_thesaurus AND"
+                            
+                            + " non_preferred_term.id_thesaurus = '" + idThesaurus +"' AND"
+                            + " non_preferred_term.lang = '" + idLang + "' AND"
+                            + " concept_group_concept.idgroup = '" + idGroup + "'"
+                            + " and unaccent_string(non_preferred_term.lexical_value) ilike"
+                            + " unaccent_string('" + value + "')";
+                    
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        hmap.put(resultSet.getString("pref"), resultSet.getString("alt"));
+                   //     listTerms.add(resultSet.getString("lexical_value"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return hmap;
+    }        
     
     
     /**
