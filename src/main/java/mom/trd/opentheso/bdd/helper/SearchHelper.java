@@ -27,6 +27,68 @@ public class SearchHelper {
     }
     
     /**
+     * cette fonction permet de retourner la liste des concepts qui sont duppliqués
+     * C'est à dire : à la fois un concept et un synonyme
+     * 
+     * @param ds
+     * @param value
+     * @param idLang
+     * @param idThesaurus
+     * @param idGroup
+     * @return 
+     */
+    public ArrayList<NodeSearchError> getduplicateTermSynonym(HikariDataSource ds,
+            String value, String idLang, String idThesaurus, String idGroup){
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeSearchError> listTerms = new ArrayList<>();
+        String query;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    query = "SELECT term.lexical_value AS pref,"
+                            + " non_preferred_term.lexical_value AS alt,"
+                            + " preferred_term.id_concept"
+                            + " FROM concept_group_concept,"
+                            + " preferred_term, term, non_preferred_term"
+                            + " WHERE"
+                            + " preferred_term.id_thesaurus = term.id_thesaurus AND"
+                            + " preferred_term.id_concept = non_preferred_term.id_term AND"
+                            + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND"
+                            + " preferred_term.id_concept = concept_group_concept.idconcept AND"
+                            + " preferred_term.id_thesaurus = concept_group_concept.idthesaurus AND"
+                            + " term.lang = non_preferred_term.lang AND"
+                            
+                            + " term.id_thesaurus = '" + idThesaurus +"' AND"
+                            + " term.lang = '" + idLang + "' AND"
+                            + " concept_group_concept.idgroup = '" + idGroup + "' AND"
+                            + " term.lexical_value ILIKE non_preferred_term.lexical_value;";
+                    
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        NodeSearchError nodeSearchError = new NodeSearchError();
+                        nodeSearchError.setIdConcept(resultSet.getString("id_concept"));
+                        nodeSearchError.setPrefLabel(resultSet.getString("pref"));
+                        nodeSearchError.setAltLabel(resultSet.getString("alt"));
+                        listTerms.add(nodeSearchError);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listTerms;
+    }
+    
+    /**
      * Cette fonction permet de faire une recherche par valeur sur les termes
      * Préférés (la recherche est stricte, pas de troncature mais on ignore les majuscules
      * et les accents)

@@ -11,9 +11,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,21 +86,24 @@ public class CompareCandidatConceptTest {
 
         // lecture du fichier tabulé /Users/Miled/
         String path = "/Users/Miled/Desktop/candidatsPactols.csv";
+
        
        
-        FileInputStream file = readFile(path);         
-        if(file == null) return;
         String line;
        
         boolean first;
         
     //    stringBuilder.append("Numéro BDD\tnom d'origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
-        
-        BufferedReader bf = new BufferedReader(new InputStreamReader(file));
+
+            //    new InputStreamReader(file));
         
         BufferedWriter bw = openFile("/Users/Miled/Desktop/candidatsPactols_out.csv");
         if(bw == null) return;
         try {
+            File file = new File(path);  
+            BufferedReader bf = new BufferedReader(
+                  new InputStreamReader(
+                      new FileInputStream(file), "UTF8"));
             while ((line = bf.readLine()) != null) {
             /*    lineOrigine = line.split("\t");
                 if(lineOrigine.length < 2) continue;
@@ -145,9 +151,9 @@ public class CompareCandidatConceptTest {
     }
     
     private BufferedWriter openFile(String path) {
-        File file = new File(path);
         try {
-            BufferedWriter br = new BufferedWriter(new FileWriter(file));
+            BufferedWriter br = new BufferedWriter(
+                    (new OutputStreamWriter(new FileOutputStream(path), StandardCharsets.UTF_8)));
             return br;
         } catch (IOException e) {
             System.err.println(e.toString());
