@@ -8,7 +8,6 @@ package mom.trd.opentheso.timeJob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -59,7 +58,7 @@ public class BackgroundMailSender  {
     
     @PreDestroy
     public void destroy(){
-        System.out.println("in the destroy");
+       
         sjPropos.closeAllJob();
         sjValid.closeAllJob();
     }
