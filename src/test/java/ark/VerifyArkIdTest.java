@@ -13,7 +13,7 @@ import java.sql.Statement;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
-import mom.trd.opentheso.ws.ark.Ark_Client;
+import mom.trd.opentheso.ws.ark.ArkClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -252,7 +252,7 @@ public class VerifyArkIdTest {
          * récupération du code Ark via WebServices
          *
          */
-        Ark_Client ark_Client = new Ark_Client();
+        ArkClient ark_Client = new ArkClient();
         String idArk = ark_Client.getArkId(
                 new FileUtilities().getDate(),
                 urlSite + "?idc=" + idConcept + "&idt=" + idThesaurus,
