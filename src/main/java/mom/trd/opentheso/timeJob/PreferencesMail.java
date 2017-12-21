@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
@@ -84,20 +85,23 @@ public class PreferencesMail {
      * être séparés par une virgule dans la chaîne de caractère en paramètre
      * si il y a des crochets dans la chaîne ils sont supprimés(issus de toString)
      * Vérifie que les adresses passés dans la liste de destinataires sont au 
-     * bon format
-     * @param destinataires : String 
-     * @param corps_message : String
+     * bon format 
+     * @param message
      * @param sujet 
      */
     public void configMessage( MessageCdt message,String sujet){
             
             ArrayList<String> destinataires=message.getDestinataires();
+            Address [] dest=new Address[destinataires.size()];
+            int i=0;
             try{
                 for(String address:destinataires){
                     if(address.trim().matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")){
-                        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(address));
+                        dest[i++]=new InternetAddress(address);
                     }
+                   
                 }
+                 msg.setRecipients(Message.RecipientType.TO,dest);
             }
             catch(MessagingException e ){
                     log.error("error while set recipient internet address for message"+msg.toString(),e);

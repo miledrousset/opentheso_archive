@@ -2260,7 +2260,7 @@ public class CandidateHelper {
             conn=ds.getConnection();
             try{
                 String sql="SELECT DISTINCT concept_candidat.id_concept,concept_candidat.id_thesaurus,"
-                        + "concept_candidat.created,concept_candidat.modified,concept_candidat.status,concept_candidat.admin_message" +
+                        + "concept_candidat.created,concept_candidat.modified,concept_candidat.status,concept_candidat.admin_message," +
                         " concept_term_candidat.id_term,term_candidat.lexical_value," +
                         " proposition.id_user, thesaurus_label.title" +
                         " FROM concept_candidat "+

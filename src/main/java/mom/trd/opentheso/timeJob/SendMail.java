@@ -67,14 +67,11 @@ public class  SendMail implements Runnable {
         
         pm.loadConfig();
         pm.configMessage(mess,sujet);
+        for(String dest:mess.getDestinataires()){
+            System.out.println("destinataire :"+dest);
+        }
         pm.sendMessage();
-        try{
-        Thread.sleep(500);
-        }
-        catch(InterruptedException e){
-            
-        }
-    
+        System.out.println("message status "+pm.isStatus());
         return;
     }
     

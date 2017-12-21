@@ -7,6 +7,8 @@
 package mom.trd.opentheso.filters;
 
 import java.io.IOException;
+import java.util.Date;
+import javax.faces.context.FacesContext;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -32,6 +34,12 @@ public class loginFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         CurrentUser session = (CurrentUser) req.getSession().getAttribute("user1");
         String url = req.getRequestURI();
+        
+       /* if(req.getRequestedSessionId()==null || !req.isRequestedSessionIdValid()){
+            req.getSession(true);
+            resp.sendRedirect("/index.xhtml");
+       
+        }*/
         if(session != null) {
 //            resp.sendRedirect("./install.xhtml");
             if(session.getConnect().getPoolConnexion() == null) {
@@ -51,10 +59,15 @@ public class loginFilter implements Filter {
             resp.sendRedirect("./index.xhtml");//req.getServletContext().getContextPath());
         }
         else if(session == null || !session.isLogged()) {
+            
             if(url.contains("conf.xhtml") || url.contains("gestCandidat.xhtml") || url.contains("edition.xhtml") || url.contains("statistic.xhtml")) {
                 resp.sendRedirect(req.getServletContext().getContextPath());
             } else {
+               
+               
+                 
                 chain.doFilter(request, response);
+               
             }
         } else {
             if(url.contains("connect.xhtml")) {
