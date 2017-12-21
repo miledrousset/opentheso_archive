@@ -82,7 +82,7 @@ public class CompareCandidatConceptTest {
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-        String path = "/Users/Miled/Desktop/candidatsPactols.csv";
+        String path = "C:/Users/jm.prudham/Desktop/candidatsPactols.csv";
        
        
         FileInputStream file = readFile(path);         
@@ -95,8 +95,9 @@ public class CompareCandidatConceptTest {
         
         BufferedReader bf = new BufferedReader(new InputStreamReader(file));
         
-        BufferedWriter bw = openFile("/Users/Miled/Desktop/candidatsPactols_out.csv");
+        BufferedWriter bw = openFile("C:/Users/jm.prudham/Desktop/candidatsPactols_out.csv");
         if(bw == null) return;
+    //    int i=0;
         try {
             while ((line = bf.readLine()) != null) {
             /*    lineOrigine = line.split("\t");
@@ -132,10 +133,16 @@ public class CompareCandidatConceptTest {
                     first = false;
                 }
              
-                System.out.println(stringBuilder.toString());
+            //    System.out.println(stringBuilder.toString());
                 bw.write(stringBuilder.toString());
                 bw.newLine();
                 stringBuilder.delete(0, stringBuilder.capacity());
+              /*  i++;
+                if(i==50) {
+                    closeFile(bw);
+                    conn.close();
+                    return;
+                }*/
             }
         } catch (IOException ex) {
             Logger.getLogger(CompareConceptTest.class.getName()).log(Level.SEVERE, null, ex);
