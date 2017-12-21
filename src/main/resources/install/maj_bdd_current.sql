@@ -31,63 +31,6 @@ SET ROLE = opentheso;
 -- where id_concept !='' group by notetypecode, lexicalvalue, id_thesaurus, id_concept, lang having count(*)>1;
 
 
-
-        Il faut ajouter les modifs suivantes :
-        table   Concept :  id_ark character varying DEFAULT ''::character varying,
-                id_handle character varying DEFAULT ''::character varying,
-
-
-        -- Table: preferences
-
-        -- DROP TABLE preferences;
-
-        CREATE TABLE preferences
-        (
-          id_pref integer NOT NULL DEFAULT nextval('pref__id_seq'::regclass),
-          id_thesaurus character varying NOT NULL,
-          source_lang character varying(2) DEFAULT 'fr'::character varying,
-          identifier_type integer DEFAULT 2,
-          path_image character varying DEFAULT '/var/www/images/'::character varying,
-          dossier_resize character varying DEFAULT 'resize'::character varying,
-          bdd_active boolean DEFAULT false,
-          bdd_use_id boolean DEFAULT false,
-          url_bdd character varying DEFAULT 'http://www.mondomaine.fr/concept/##value##'::character varying,
-          url_counter_bdd character varying DEFAULT 'http://mondomaine.fr/concept/##conceptId##/total'::character varying,
-          z3950actif boolean DEFAULT false,
-          collection_adresse character varying DEFAULT 'KOHA/biblios'::character varying,
-          notice_url character varying DEFAULT 'http://catalogue.mondomaine.fr/cgi-bin/koha/opac-search.pl?type=opac&op=do_search&q=an=terme'::character varying,
-          url_encode character varying(10) DEFAULT 'UTF-8'::character varying,
-          path_notice1 character varying DEFAULT '/var/www/notices/repositories.xml'::character varying,
-          path_notice2 character varying DEFAULT '/var/www/notices/SchemaMappings.xml'::character varying,
-          chemin_site character varying DEFAULT 'http://mondomaine.fr/'::character varying,
-          webservices boolean DEFAULT true,
-          use_ark boolean DEFAULT false,
-          server_ark character varying DEFAULT 'http://ark.mondomaine.fr/ark:/'::character varying,
-          id_naan character varying NOT NULL DEFAULT '66666'::character varying,
-          prefix_ark character varying NOT NULL DEFAULT 'crt'::character varying,
-          user_ark character varying,
-          pass_ark character varying,
-          use_handle boolean DEFAULT false,
-          user_handle character varying,
-          pass_handle character varying,
-          path_key_handle character varying DEFAULT '/certificat/key.p12'::character varying,
-          path_cert_handle character varying DEFAULT '/certificat/cacerts2'::character varying,
-          url_api_handle character varying NOT NULL DEFAULT 'https://handle-server.mondomaine.fr:8001/api/handles/'::character varying,
-          prefix_handle character varying NOT NULL DEFAULT '66.666.66666'::character varying,
-          private_prefix_handle character varying NOT NULL DEFAULT 'crt'::character varying,
-          CONSTRAINT preferences_pkey PRIMARY KEY (id_pref),
-          CONSTRAINT preferences_id_thesaurus_key UNIQUE (id_thesaurus)
-        )
-        WITH (
-          OIDS=FALSE
-        );
-        ALTER TABLE preferences
-          OWNER TO opentheso;
-
-
-
-
-
 --- rechargement et optimisation des langues iso_latin1
 DROP TABLE languages_iso639;
 
@@ -1597,6 +1540,40 @@ begin
     END IF;
 end
 $$language plpgsql;
+
+--mise à jour de la table préférence pour Handle
+--
+create or replace function update_table_preferences_handle() returns void as $$
+begin
+    IF NOT EXISTS(SELECT *  FROM information_schema.columns where table_name='preferences' AND column_name='use_handle') THEN
+        execute 'ALTER TABLE preferences ADD COLUMN id_naan character varying DEFAULT ''66666''::character varying NOT NULL;
+                ALTER TABLE preferences ADD COLUMN prefix_ark character varying DEFAULT ''crt''::character varying NOT NULL;
+                ALTER TABLE preferences ADD COLUMN user_ark character varying;
+                ALTER TABLE preferences ADD COLUMN pass_ark character varying;
+                ALTER TABLE preferences ADD COLUMN use_handle boolean DEFAULT false;
+                ALTER TABLE preferences ADD COLUMN user_handle character varying;
+                ALTER TABLE preferences ADD COLUMN pass_handle character varying;
+                ALTER TABLE preferences ADD COLUMN path_key_handle character varying DEFAULT ''/certificat/key.p12''::character varying;
+                ALTER TABLE preferences ADD COLUMN path_cert_handle character varying DEFAULT ''/certificat/cacerts2''::character varying;
+                ALTER TABLE preferences ADD COLUMN url_api_handle character varying DEFAULT ''https://handle-server.mondomaine.fr:8001/api/handles/''::character varying NOT NULL;
+                ALTER TABLE preferences ADD COLUMN prefix_handle character varying DEFAULT ''66.666.66666''::character varying NOT NULL;
+                ALTER TABLE preferences ADD COLUMN private_prefix_handle character varying DEFAULT ''crt''::character varying NOT NULL;';
+    END IF;
+end
+$$language plpgsql;
+
+create or replace function update_table_concept_handle() returns void as $$
+begin
+    IF NOT EXISTS(SELECT *  FROM information_schema.columns where table_name='concept' AND column_name='id_handle') THEN
+        execute 'ALTER TABLE concept ADD COLUMN id_handle character varying DEFAULT ''''::character varying;
+                 ALTER TABLE concept ALTER COLUMN id_ark SET DEFAULT ''''::character varying';
+    END IF;
+end
+$$language plpgsql;
+
+
+
+
 -- mises à jour 
 --
 --
@@ -1714,6 +1691,10 @@ INSERT INTO roles (id, name, description) VALUES (5, 'images', 'gestion des imag
 --mise a jour de la table concept_group
 SELECT delete_column('concept_group','idparentgroup');
 SELECT delete_column('concept_group','idconcept');
+
+
+SELECT update_table_preferences_handle();
+SELECT update_table_concept_handle();
 
 /*
 -- Mise à jour de la table de types d'alignement
@@ -1833,7 +1814,8 @@ SELECT delete_fonction ('primary_key_info','');
 SELECT delete_fonction('update_table_concept','');
 SELECT delete_fonction('relation_group','');
 SELECT delete_fonction('create_table_concept_group_concept','');
-
+SELECT delete_fonction('update_table_preferences_handle','');
+SELECT delete_fonction('update_table_concept_handle','');
 
 --Ne pas toucher les prochaines fonctions
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
