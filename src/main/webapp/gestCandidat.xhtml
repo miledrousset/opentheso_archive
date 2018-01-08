@@ -15,17 +15,7 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
-       
-        <script type="text/javascript"  charset="">
-            function updateId(){
-            var elem=#("span[id$='dataTableCdtP']");
-      
-            Primefaces.ab({u:elem});
-             }
-    </script>
-                
-      
-        <style>
+         <style>
             div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:nth-child(2){
                border: 3px  solid #956620;
                box-shadow:0px 0px 5px #BD6060;
@@ -111,7 +101,7 @@
 
                         </table><br/>
                         <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" action="#{theso.creerCandidat()}"
-                                         update=":tableCdt,:panAjCdt,:panAjProp" onclick="updateId();" >
+                                         update=":tableCdt,:panAjCdt,:panAjProp" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});" >
                          
                         </p:commandButton>
                         
@@ -357,7 +347,7 @@
                         </table><br/>
                         <p:commandButton value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton" 
                                          actionListener= "#{selectedCandidat.toInsert()}"
-                                         update=":panInsertCdt,:tableCdt,:gestionCandidat,:dataTableCdtP" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});"/>
+                                         update=":panInsertCdt,:tableCdt,:gestionCandidat" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});"/>
                         <br/><br/>
                     </h:form>
                 </h:panelGroup>
@@ -381,7 +371,7 @@
 
                 <div style="clear: both;" />
                 <h:panelGroup id="panelCdt" >
-                    <h:form  id="tableCdt" >
+                    <h:form id="tableCdt" >
                        
                         
                         <p:tabView styleClass="styleTabViewCdt"  >
@@ -389,7 +379,7 @@
 
                                 <!-- Liste des candidats DEBUT -->
                                 <h:panelGroup id="dataTableCdtP">
-                                <p:dataTable   var="cdt"  value="#{searchCandidat.filteredCandidats}" selectionMode="single" selection="#{selectedCandidat.selected}" 
+                                <p:dataTable  var="cdt"  value="#{searchCandidat.filteredCandidats}" selectionMode="single" selection="#{selectedCandidat.selected}" 
                                              rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="450" filteredValue="#{theso.filteredCandidats}" 
                                              emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat"  >
                                     <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />

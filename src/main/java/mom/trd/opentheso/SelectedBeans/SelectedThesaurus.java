@@ -719,7 +719,7 @@ public class SelectedThesaurus implements Serializable {
     private boolean regenerateHAndleIdOfConcepts(String idTheso, ArrayList<String> idConcepts) throws Exception {
         //récup les concepts
         ConceptHelper conceptHelper = new ConceptHelper();
-
+        conceptHelper.setNodePreference(nodePreference);
         /*Vérification et génération des nouveaux id Ark*/
         for (String idConcept : idConcepts) {
             if (!conceptHelper.updateIdHandle(connect.getPoolConnexion(),

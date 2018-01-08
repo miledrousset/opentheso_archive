@@ -24,7 +24,6 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
-import skos.SKOSConceptScheme;
 import skos.SKOSDate;
 import skos.SKOSDocumentation;
 import skos.SKOSLabel;
