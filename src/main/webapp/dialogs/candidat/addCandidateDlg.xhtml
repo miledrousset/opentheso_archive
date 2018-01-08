@@ -8,10 +8,15 @@
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:p="http://primefaces.org/ui">
 
-        <p:dialog id="idAddProposalDlg"  header="#{langueBean.getMsg('cdt.btnAddProp')}" styleClass="styleText2" widgetVar="addProposalDlg" modal="true" resizable="false"  >
-            <h:panelGroup id="panAjProp7" style="background: transparent; box-shadow: none;">
+        <p:dialog id="idAddCandidateDlg"  header="#{langueBean.getMsg('cdt.btnAddCdt')}" styleClass="styleText2" widgetVar="addCandidateDlg" modal="true" resizable="false"  >
+            <h:panelGroup id="panAjCdt" style="background: transparent; box-shadow: none;">
                 <h:form>
+                    <p:messages showDetail="true" autoUpdate="true" />
                     <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.tabOpt1')}" /> : </td>
+                            <td><h:inputText id="lVCdt" value="#{selectedCandidat.valueEdit}" style="width: 200px;"/></td>
+                        </tr>
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
                             <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
@@ -20,7 +25,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
                             <td>
                                 <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
-                                                itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
+                                                itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt" >
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" width="200" >
                                             <f:facet name="header" rendered="#{(t.url) != null}">
@@ -31,19 +36,28 @@
                                             <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
                                             <h:outputText value="#{t.groupLexicalValue}" />
 
-                                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                            <h:outputText value="#{t.definition}" />
                                         </h:panelGrid>
                                     </f:facet>
                                 </p:autoComplete>
                             </td>
                         </tr>
 
-                    </table><br/>
-                    <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                     update=":idAddProposalDlg, :panelCdt" oncomplete="PF('addTgDlg').hide();"/>
+                    <br/>
+                    <tr>
+                        <td>
+                            <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerCandidat()}" action="#{searchCandidat.init()}"
+                                             oncomplete=":idAddCandidateDlg" />              
+                        </td>
+                        
+                        <td>
+                        <p:commandButton title="#{langueBean.getMsg('btnBack')}" icon="ui-icon-retour" styleClass="styleButton" 
+                                         update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').hide();"  immediate="true"/>
+                        </td>
+                    </tr>
+                    </table>
                 </h:form>
             </h:panelGroup>
+
         </p:dialog>
     </ui:composition>
 

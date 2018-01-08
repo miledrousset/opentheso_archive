@@ -405,17 +405,29 @@ public class ConceptHelper {
 
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if (nodePreference.isUseArk()) {
-                NodeMetaData nodeMetaData = new NodeMetaData();
-                nodeMetaData.setCreator(term.getSource());
-                nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<>());
+            if(nodePreference != null) {
+                if (nodePreference.isUseArk()) {
+                    NodeMetaData nodeMetaData = new NodeMetaData();
+                    nodeMetaData.setCreator(term.getSource());
+                    nodeMetaData.setTitle(term.getLexical_value());
+                    nodeMetaData.setDcElementsList(new ArrayList<>());
 
-                if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                       nodeMetaData)) {
-                    conn.rollback();
-                    conn.close();
-                    return null;
+                    if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
+                            nodeMetaData)) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                        return null;
+                    }
+                }
+                // création de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
+                        return null;
+                    }
                 }
             }
 
@@ -685,17 +697,31 @@ public class ConceptHelper {
 
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if (nodePreference.isUseArk()) {
-                NodeMetaData nodeMetaData = new NodeMetaData();
-                nodeMetaData.setCreator(term.getSource());
-                nodeMetaData.setTitle(term.getLexical_value());
-                nodeMetaData.setDcElementsList(new ArrayList<>());
+            if(nodePreference != null) {
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de récupérer le code ARK
+                if (nodePreference.isUseArk()) {
+                    NodeMetaData nodeMetaData = new NodeMetaData();
+                    nodeMetaData.setCreator(term.getSource());
+                    nodeMetaData.setTitle(term.getLexical_value());
+                    nodeMetaData.setDcElementsList(new ArrayList<>());
 
-                if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
-                        nodeMetaData)) {
-                    conn.rollback();
-                    conn.close();
-                    return null;
+                    if (!addIdArk(conn, idConcept, concept.getIdThesaurus(),
+                            nodeMetaData)) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                        return null;
+                    }
+                }
+                // création de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
+                        return null;
+                    }
                 }
             }
 
