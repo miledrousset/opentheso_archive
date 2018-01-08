@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Named;
 import javax.enterprise.context.Dependent;
+import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import org.primefaces.context.PrimeFacesContext;
@@ -25,6 +28,8 @@ import org.primefaces.context.PrimeFacesContext;
 public class SearchCandidatBean {
     @ManagedProperty(value="#{theso}")
     SelectedThesaurus st;
+    @ManagedProperty(value="#{selectedCandidat}")
+    SelectedCandidat sc;
     private String textSearch1="";
     private String textSearch2="";
     private String textSearch3="";
@@ -153,7 +158,76 @@ public class SearchCandidatBean {
     public void setFilteredCandidatsA(List<NodeCandidatValue> filteredCandidatsA) {
         this.filteredCandidatsA = filteredCandidatsA;
     }
+
+    public List<NodeCandidatValue> getCandidats() {
+        return candidats;
+    }
+
+    public void setCandidats(List<NodeCandidatValue> candidats) {
+        this.candidats = candidats;
+    }
+
+    public List<NodeCandidatValue> getCandidatsV() {
+        return candidatsV;
+    }
+
+    public void setCandidatsV(List<NodeCandidatValue> candidatsV) {
+        this.candidatsV = candidatsV;
+    }
+
+    public List<NodeCandidatValue> getCandidatsA() {
+        return candidatsA;
+    }
+
+    public void setCandidatsA(List<NodeCandidatValue> candidatsA) {
+        this.candidatsA = candidatsA;
+    }
+
+    public SelectedCandidat getSc() {
+        return sc;
+    }
+
+    public void setSc(SelectedCandidat sc) {
+        this.sc = sc;
+    }
     
+    public void creerCandidat(){
+       List<NodeCandidatValue> ret=st.creerCandidat();
+       candidats=(ret==null)? candidats : ret;
+       refreshView();
+
+    }
+    public void refreshView(){
+        FacesContext context=FacesContext.getCurrentInstance();
+        String viewId=context.getViewRoot().getViewId();
+        ViewHandler handler=context.getApplication().getViewHandler();
+        UIViewRoot root=handler.createView(context,viewId);
+        root.setViewId(viewId);
+        context.setViewRoot(root);
+        
+        
+    }
+    public void delPropCdt(){
+        sc.delPropCdt();
+        rendering();
+    }
+    public void rendering(){
+        init();
+        refreshView();
+    }
+    public void toRefus(){
+        sc.toRefus();
+        rendering();
+    }
+    public void toValid(){
+        sc.toValid();
+        rendering();
+        
+    }
+    public void insertCdt(){
+        sc.toInsert();
+        rendering();
+    }
     private List<NodeCandidatValue> getTextSearchIn(List<NodeCandidatValue> candidats,String textSearch) {
        textSearch=(textSearch.isEmpty() ? "" : textSearch );
         List<NodeCandidatValue> ret= new ArrayList<>();

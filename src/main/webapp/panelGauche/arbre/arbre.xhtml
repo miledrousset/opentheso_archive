@@ -103,8 +103,9 @@
                     </p:treeNode>
 
 
-                </p:tree>        
-                <h:outputText   rendered="#{user1.user.name != null and (user1.isHaveWriteToCurrentThesaurus2)}" class="dragDropInfo"  value="#{langueBean.getMsg('dragdrop.autho')}" />
+                </p:tree>  
+              
+              
                 <p:tree  id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
                           selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
                           

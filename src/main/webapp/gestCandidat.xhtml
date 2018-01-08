@@ -100,9 +100,9 @@
                             </tr>
 
                         </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" action="#{theso.creerCandidat()}"
-                                         update=":tableCdt,:panAjCdt,:panAjProp" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});" >
-                         
+                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" async="true" actionListener="#{searchCandidat.creerCandidat()}"
+                                          update=":tableCdt,:panAjCdt,:panAjProp"  >
+                            
                         </p:commandButton>
                         
                        
@@ -155,8 +155,8 @@
                             </tr>
                         </table><br/>
                         <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                         update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});" >
-                        
+                                         update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView"  >
+                            <p:ajax async="false"  listener="#{searchCandidat.init()}"  update=":tableCdt,:gestionCandidat" />
                         </p:commandButton>
                     </h:form>
                 </h:panelGroup>
@@ -240,7 +240,7 @@
                         <h:inputText value="#{selectedCandidat.valueEdit}" /><br/><br/>
                         <center>
                             <p:commandButton value="#{langueBean.getMsg('btnEdit')}" styleClass="styleButton" actionListener="#{selectedCandidat.editMyCandidat()}"
-                                             update=":panEditCdt,:tableCdt,:gestionCandidat" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});"/>
+                                             update=":panEditCdt,:tableCdt,:gestionCandidat" />
                         </center>
                     </h:form>
                 </h:panelGroup>
@@ -268,7 +268,10 @@
                             <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
                             <center>
                                 <p:commandButton value="#{langueBean.getMsg('cdt.refCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonRefus" 
-                                                 actionListener="#{selectedCandidat.toRefus()}" update=":panValidCdt,:tableCdt,:gestionCandidat" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});" />
+                                                 actionListener="#{searchCandidat.toRefus()}" update=":panValidCdt,:tableCdt,:gestionCandidat"  >
+                                  
+                                
+                                </p:commandButton>
                             </center>
                         </fieldset>
                     </h:form><br/>
@@ -280,7 +283,9 @@
                             <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
                             <center>
                                 <p:commandButton value="#{langueBean.getMsg('cdt.validCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonValid" 
-                                                 actionListener="#{selectedCandidat.toValid()}" update=":panValidCdt,:tableCdt,:gestionCandidat" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});"/>
+                                                 actionListener="#{searchCandidat.toValid()}" update=":panValidCdt,:tableCdt,:gestionCandidat" >
+                                 
+                                </p:commandButton>
                             </center>
                         </fieldset>
                     </h:form>
@@ -346,8 +351,10 @@
                             </tr>
                         </table><br/>
                         <p:commandButton value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton" 
-                                         actionListener= "#{selectedCandidat.toInsert()}"
-                                         update=":panInsertCdt,:tableCdt,:gestionCandidat" onclick="PrimeFaces.ab({u:'tableCdt:j_idt242:dataTableCdtP'});"/>
+                                         actionListener= "#{searchCandidat.insertCdt()}"
+                                         update=":panInsertCdt,:tableCdt,:gestionCandidat" >
+                             
+                        </p:commandButton>    
                         <br/><br/>
                     </h:form>
                 </h:panelGroup>
@@ -379,8 +386,8 @@
 
                                 <!-- Liste des candidats DEBUT -->
                                 <h:panelGroup id="dataTableCdtP">
-                                <p:dataTable  var="cdt"  value="#{searchCandidat.filteredCandidats}" selectionMode="single" selection="#{selectedCandidat.selected}" 
-                                             rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="450" filteredValue="#{theso.filteredCandidats}" 
+                                    <p:dataTable  var="cdt"  value="#{searchCandidat.candidats}" selectionMode="single" selection="#{selectedCandidat.selected}" 
+                                                  rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="450" filteredValue="#{searchCandidat.filteredCandidats}" 
                                              emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat"  >
                                     <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
                                   
@@ -493,8 +500,8 @@
                         <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">
                             <p:commandButton icon="ui-icon-edit-16-2"  styleClass="styleButton_db"  title="#{langueBean.getMsg('cdt.editProp')}"
                                      actionListener="#{selectedCandidat.initEditProp()}" update=":panEditProp" />
-                            <p:commandButton  icon="ui-icon-trash-16" title="#{langueBean.getMsg('cdt.btnDelProp')}" actionListener="#{selectedCandidat.delPropCdt()}" 
-                                             update=":gestionCandidat,:tableCdt" styleClass="styleButton_db" >
+                            <p:commandButton  icon="ui-icon-trash-16" title="#{langueBean.getMsg('cdt.btnDelProp')}" actionListener="#{searchCandidat.delPropCdt()}" 
+                                               update=":gestionCandidat,:tableCdt" styleClass="styleButton_db" >
                                 <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid1')}" icon="ui-icon-alert" />  
                             </p:commandButton>
 
