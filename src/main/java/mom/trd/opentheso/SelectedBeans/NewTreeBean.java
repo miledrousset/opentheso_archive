@@ -39,6 +39,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -440,7 +441,7 @@ public class NewTreeBean implements Serializable {
         vue.setOnglet(0);
         selectedTerme.setTree(0);
        // this.parentOrigine=(MyTreeNode)selectedNode.getParent();
-
+       RequestContext.getCurrentInstance().update("principale");
     }
 
     /**

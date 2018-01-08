@@ -12,7 +12,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -20,22 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
-import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.TestGetSiteMap;
-import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
-import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
-import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
-import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
-import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -85,8 +74,9 @@ public class CompareCandidatConceptTest {
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-        String path = "/Users/Miled/Desktop/candidatsPactols.csv";
+    //    String path = "/Users/Miled/Desktop/candidatsPactols.csv";
 
+        String path = "C:/Users/jm.prudham/Desktop/candidatsPactols.csv";
        
        
         String line;
@@ -97,8 +87,9 @@ public class CompareCandidatConceptTest {
 
             //    new InputStreamReader(file));
         
-        BufferedWriter bw = openFile("/Users/Miled/Desktop/candidatsPactols_out.csv");
+        BufferedWriter bw = openFile("C:/Users/jm.prudham/Desktop/candidatsPactols_out.csv");
         if(bw == null) return;
+      //  int i=0;
         try {
             File file = new File(path);  
             BufferedReader bf = new BufferedReader(
@@ -138,10 +129,16 @@ public class CompareCandidatConceptTest {
                     first = false;
                 }
              
-                System.out.println(stringBuilder.toString());
+            //    System.out.println(stringBuilder.toString());
                 bw.write(stringBuilder.toString());
                 bw.newLine();
                 stringBuilder.delete(0, stringBuilder.capacity());
+           /*     i++;
+                if(i==1000) {
+                    closeFile(bw);
+                    conn.close();
+                    return;
+                }*/
             }
         } catch (IOException ex) {
             Logger.getLogger(CompareConceptTest.class.getName()).log(Level.SEVERE, null, ex);

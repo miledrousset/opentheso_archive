@@ -69,7 +69,7 @@ public class CurrentUser implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-
+  
     @PostConstruct
     public void initUser() {
         user = new NodeUser();
@@ -177,7 +177,7 @@ public class CurrentUser implements Serializable {
                 if (userEdit != null) {
                     isActive = userEdit.isIsActive();
                 }
-
+             
                 if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
                     return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp
                 }
@@ -677,4 +677,5 @@ public class CurrentUser implements Serializable {
         this.authorizedTheso = authorizedTheso;
     }
 
+ 
 }
