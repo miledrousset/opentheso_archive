@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>autorisation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+        <div>
+            <h:form>
+            <p:commandButton value="test" actionListener="#{autorisation.init()}" update="listAuto"/>
+         
+            <p:dataList value="#{autorisation.listAutorisation}" var="auto" id="listAuto">
+                <h:outputText value="thesaurus : #{auto.thesaurus}  droit numérique : #{auto.typeDroitNum} droit libellé :#{auto.typeDroitValue}" />
+                
+                
+            </p:dataList>
+               </h:form>
+        </div>
+    </h:body>
+</html>
