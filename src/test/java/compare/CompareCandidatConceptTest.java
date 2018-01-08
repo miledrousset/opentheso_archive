@@ -11,28 +11,20 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
-import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.TestGetSiteMap;
-import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
-import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
-import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
-import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
-import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -82,23 +74,27 @@ public class CompareCandidatConceptTest {
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
+    //    String path = "/Users/Miled/Desktop/candidatsPactols.csv";
+
         String path = "C:/Users/jm.prudham/Desktop/candidatsPactols.csv";
        
        
-        FileInputStream file = readFile(path);         
-        if(file == null) return;
         String line;
        
         boolean first;
         
     //    stringBuilder.append("Numéro BDD\tnom d'origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
-        
-        BufferedReader bf = new BufferedReader(new InputStreamReader(file));
+
+            //    new InputStreamReader(file));
         
         BufferedWriter bw = openFile("C:/Users/jm.prudham/Desktop/candidatsPactols_out.csv");
         if(bw == null) return;
-    //    int i=0;
+      //  int i=0;
         try {
+            File file = new File(path);  
+            BufferedReader bf = new BufferedReader(
+                  new InputStreamReader(
+                      new FileInputStream(file), "UTF8"));
             while ((line = bf.readLine()) != null) {
             /*    lineOrigine = line.split("\t");
                 if(lineOrigine.length < 2) continue;
@@ -137,8 +133,8 @@ public class CompareCandidatConceptTest {
                 bw.write(stringBuilder.toString());
                 bw.newLine();
                 stringBuilder.delete(0, stringBuilder.capacity());
-              /*  i++;
-                if(i==50) {
+           /*     i++;
+                if(i==1000) {
                     closeFile(bw);
                     conn.close();
                     return;
@@ -152,9 +148,9 @@ public class CompareCandidatConceptTest {
     }
     
     private BufferedWriter openFile(String path) {
-        File file = new File(path);
         try {
-            BufferedWriter br = new BufferedWriter(new FileWriter(file));
+            BufferedWriter br = new BufferedWriter(
+                    (new OutputStreamWriter(new FileOutputStream(path), StandardCharsets.UTF_8)));
             return br;
         } catch (IOException e) {
             System.err.println(e.toString());

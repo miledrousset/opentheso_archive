@@ -57,7 +57,9 @@ public class BackgroundMailSenderHelper {
         ResultSet rs = null;
       
         ArrayList<AlertStruct> alertStructs=null;
-        
+        if(ds.getPoolConnexion()==null){
+            return new ArrayList<>();
+        }
         try{
         conn2=ds.getPoolConnexion().getConnection();
             try{

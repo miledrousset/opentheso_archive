@@ -13,7 +13,6 @@ import java.sql.Statement;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
-
 import mom.trd.opentheso.ws.ark.ArkClient;
 import org.junit.After;
 import org.junit.AfterClass;
