@@ -2628,7 +2628,7 @@ public class SelectedTerme implements Serializable {
 
         ArrayList<Entry<String, String>> types = new ArrayList<>();
         ArrayList<Entry<String, String>> temp = new ArrayList<>();
-        //if(connect.getPoolConnexion()==null)return null;
+        if(connect.getPoolConnexion()==null) return types;
         HashMap<String, String> map = new AlignmentHelper().getAlignmentType(connect.getPoolConnexion());
         temp.addAll(map.entrySet());
         for (Entry<String, String> e : temp) {

@@ -51,7 +51,11 @@ public class BackgroundMailSender  {
     @PostConstruct
     public void init(){
        BackgroundMailSenderHelper bmsh=new BackgroundMailSenderHelper();
+       
        this.pas=bmsh.getPoolAlert(connect);
+       if(this.pas==null){
+           return;
+       }
        this.routineCdtPropos();
        this.routineCdtValidInsertRefuse();
     }
