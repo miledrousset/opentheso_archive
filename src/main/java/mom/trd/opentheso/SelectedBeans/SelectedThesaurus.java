@@ -1167,7 +1167,7 @@ public class SelectedThesaurus implements Serializable {
     /**
      * Création d'un nouveau candidat avec vérification de la valeur en entrée
      */
-    public void creerCandidat() {
+    public List<NodeCandidatValue> creerCandidat() {
         if (candidat.getValueEdit() == null || candidat.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error2")));
         } else if (new CandidateHelper().isCandidatExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
@@ -1178,19 +1178,19 @@ public class SelectedThesaurus implements Serializable {
                     new StringPlus().addQuotes(candidat.getValueEdit().trim()), thesaurus.getId_thesaurus());
             if (idCandidat == null) {
                 cleanEditCandidat();
-                return;
+                return null;
             } else {
                 candidat.getSelected().setIdConcept(idCandidat);
                 vue.setAddPropCandidat(true);
                 // creerPropCdt();
-                return;
+                return null;
             }
         } else if (new TermHelper().isTermExist(connect.getPoolConnexion(), candidat.getValueEdit(), thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error4")));
         } else {
             String temp = candidat.getValueEdit();
             if (!candidat.newCandidat(thesaurus.getId_thesaurus(), thesaurus.getLanguage())) {
-                return;
+                return null;
             }
             vue.setAddCandidat(false);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info2.1") + " " + temp + " " + langueBean.getMsg("theso.info2.2")));
@@ -1200,6 +1200,7 @@ public class SelectedThesaurus implements Serializable {
         if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
             candidats = new CandidateHelper().getListCandidatsWaiting(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
+        return candidats;
     }
 
     public void creerPropCdt() {
@@ -1288,6 +1289,15 @@ public class SelectedThesaurus implements Serializable {
             selectedTerme.initTerme();
         }
         tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
+       /**modifiaction pour affiché le message pur le drag an drop #JM**/
+        
+       if( (user.getUser().getName()!= null) && (user.isIsHaveWriteToCurrentThesaurus()) )
+       {
+        String message="drag & dop activé !";
+        FacesContext context = FacesContext.getCurrentInstance();
+         
+        context.addMessage(null, new FacesMessage("Successful",  "info : " + message) );
+       }
     }
 
     /**

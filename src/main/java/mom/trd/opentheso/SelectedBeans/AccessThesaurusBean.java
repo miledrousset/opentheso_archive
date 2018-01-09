@@ -8,6 +8,7 @@ package mom.trd.opentheso.SelectedBeans;
 
 import java.io.IOException;
 import java.util.HashMap;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -79,6 +80,15 @@ public class AccessThesaurusBean {
             }
         }
         
+        /***message pour le drag and drop #jm****/
+         if( (user.getUser().getName()!= null) && (user.isIsHaveWriteToCurrentThesaurus()) )
+       {
+        String message="drag & dop activé !";
+        FacesContext context = FacesContext.getCurrentInstance();
+         
+        context.addMessage(null, new FacesMessage("Successful",  "info : " + message) );
+       }
+        /********************************************/
        
     }
    

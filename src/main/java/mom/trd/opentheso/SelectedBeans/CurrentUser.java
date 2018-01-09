@@ -188,9 +188,12 @@ public class CurrentUser implements Serializable {
                 Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+       
+       
         // utilisateur ou mot de passe n'existent pas
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
         return "";
+      
     }
 
     public boolean updateAuthorizedTheso() {
