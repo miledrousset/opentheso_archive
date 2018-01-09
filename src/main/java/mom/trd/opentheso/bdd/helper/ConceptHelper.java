@@ -570,11 +570,11 @@ public class ConceptHelper {
             }
 
             // cette fonction permet de remplir la table Permutée
-            termHelper.splitConceptForPermute(ds, idConcept,
+        /*    termHelper.splitConceptForPermute(ds, idConcept,
                     getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus()),
                     term.getId_thesaurus(),
                     term.getLang(),
-                    term.getLexical_value());
+                    term.getLexical_value());*/
 
             if(nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
@@ -2306,6 +2306,48 @@ public class ConceptHelper {
         }
         return updateHandleIdOfConcept(conn, idConcept,
                 idThesaurus, "");
+    }
+    
+    /**
+     * Permet de supprimer tous les identifiants Handle de la table Concept
+     * et de la plateforme (handle.net) via l'API REST pour un thésaurus donné 
+     * suite à une suppression d'un thésaurus
+     * @param ds
+     * @param idThesaurus
+     * @return
+     */
+    public boolean deleteAllIdHandle(HikariDataSource ds,
+            String idThesaurus) {
+        /**
+         * récupération du code Handle via WebServices
+         *
+         */
+        if(nodePreference == null) return false;
+        if(!nodePreference.isUseHandle()) return false;
+        HandleClient handleClient = new HandleClient();
+        boolean status;
+        boolean first = true;
+        
+        
+        ArrayList<String> tabIdHandle = getAllIdHandleOfThesaurus(ds, idThesaurus);
+        
+        for (String idHandle : tabIdHandle) {
+            status = handleClient.deleteHandle(
+                nodePreference.getPassHandle(),
+                nodePreference.getPathKeyHandle(),
+                nodePreference.getPathCertHandle(),
+                nodePreference.getUrlApiHandle(),
+                idHandle
+                );
+            if(!status) {
+                if(first) {
+                    message = "Id handle non supprimé :\n ";
+                    first = false;
+                }
+                message = message + idHandle + " ## ";
+            }
+        }
+        return true;
     }    
     
     /**
@@ -2746,6 +2788,51 @@ public class ConceptHelper {
         }
         return tabIdConcept;
     }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id Handle d'un thésaurus
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<String> getAllIdHandleOfThesaurus(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabId = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_handle from concept where id_thesaurus = '"
+                            + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        if(resultSet.getString("id_handle") != null) {
+                            if(!resultSet.getString("id_handle").isEmpty())
+                                tabId.add(resultSet.getString("id_handle"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdHandle of Thesaurus : " + idThesaurus, sqle);
+        }
+        return tabId;
+    }    
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus

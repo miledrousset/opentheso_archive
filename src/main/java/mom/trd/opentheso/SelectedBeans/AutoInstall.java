@@ -222,7 +222,7 @@ public class AutoInstall implements Serializable {
         //on fait la comprobation de que l'user n'exist pas
         //Si exist ne le creer pas
         messages += "<br>";
-        messages += "-> Conection établie";
+        messages += "-> Connexion établie";
         if (!baseDeDoneesHelper.isUserExist(poolConnexionInstall, nomAdmin)) {
             if (!baseDeDoneesHelper.createUser(poolConnexionInstall, nomAdmin, passwordAdmin)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("isnt.Err2")));
@@ -259,7 +259,7 @@ public class AutoInstall implements Serializable {
         }
         // injection des tables et initialisation des données dans la base
         messages += "<br>";
-        messages += "-> Connexion en cours a la nouvelle BDD !!!!!";
+        messages += "-> Connexion en cours à la nouvelle BDD !!!!!";
         messages += "<br>";
         //on prendre tout l'information à partir du fichier current
         InputStream inputStream = this.getClass().getResourceAsStream("/install/opentheso_current.sql");
