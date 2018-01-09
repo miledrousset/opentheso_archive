@@ -57,6 +57,7 @@ public class HandleClient {
         String output;
         String xmlRecord = "";
         try {
+            urlHandle = urlHandle.replace("https://", "http://");
             URL url = new URL(urlHandle + idHandle);
             
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -416,6 +417,7 @@ public class HandleClient {
     public boolean isHandleExist(
             String urlHandle, String idHandle) {
         try {
+            urlHandle = urlHandle.replace("https://","http://");
             URL url = new URL(urlHandle + idHandle);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");

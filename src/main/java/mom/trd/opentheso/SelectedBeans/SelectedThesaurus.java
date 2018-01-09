@@ -416,6 +416,7 @@ public class SelectedThesaurus implements Serializable {
         workLanguage = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
         Integer temp = user.getNodePreference().getIdentifierType();
         identifierType = temp.toString();//bundlePref.getString("identifierType");
+        nodePreference = user.getNodePreference();
     }
 
     @PostConstruct
@@ -1051,10 +1052,13 @@ public class SelectedThesaurus implements Serializable {
         } catch (SQLException ex) {
             Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.setNodePreference(nodePreference);
+        conceptHelper.deleteAllIdHandle(connect.getPoolConnexion(), id);
+        
         th.deleteThesaurus(connect.getPoolConnexion(), id);
-
         arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", conceptHelper.getMessage()));
     }
 
     /**
