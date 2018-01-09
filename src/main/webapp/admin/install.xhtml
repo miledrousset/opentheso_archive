@@ -4,11 +4,19 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Instalation OpenTheso</title>
+        <title>Installation OpenTheso</title>
+         <link rel="stylesheet" type="text/css"  href="/css/style.css" media="screen"/>
+         <style type="text/css" >
+             .install {
+               float: none; 
+               width: 600px; 
+               margin-left: 10px;
+               border-radius: 5px;
+                }
+         </style>
     </h:head>
     <h:body>
-        <h:outputText value="test pour voir " /> :
-        <center>
+         <center>
 
             <h:form id="InfoInstall">
                 <fieldset class="install">
@@ -50,6 +58,7 @@
                     </p:accordionPanel>    
                     <br/><br/>
                     <table>
+                        <tr><td colspan="2"><h:outputText  value="Renseignez les paramètres de votre base de donnée :" /></td></tr>
                         <tr>
                             <td><h:outputText value=" Host " /> :</td>
                             <td><h:inputText value="#{autoInstall.serverName}" /></td>
@@ -69,6 +78,7 @@
                         </tr>
                     </table><Br/><Br/>
                     <table>
+                        <tr><td colspan="2"> <h:outputText value="Entrez les valeurs que vous souhaitez pour l'application :" /></td></tr>
                         <tr>
                             <td><h:outputText value="Utilisateur admin sur la BDD de Opentheso" /> : </td>
                             <td><h:inputText value="#{autoInstall.nomAdmin}" /></td>

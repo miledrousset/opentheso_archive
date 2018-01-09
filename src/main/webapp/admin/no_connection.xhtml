@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Pas de connexion à la abse de donnée</title>
+    </h:head>
+    <h:body>
+        <div style="margin:auto;max-width:600px;border:1px solid black;background:#C2DF97 ">
+            <br/>
+            <p style="margin:auto;">
+                L'application n'a pas trouvé de connexion possible sur une base de donnée, si vous avez déjà lancé l'installation 
+                d'opentheso vous devez vérifier et changer les paramètres  contenus dans le fichier
+                <strong>WEB-INF/Classes/hikari.properties</strong> .
+            </p>
+            <br/>
+            <p style="margin:auto;">
+                Si vous n'avez jamais lancé l'installation d'opentheso vous pouvez le faire en suivant ce lien:
+                <p:link outcome="install.xhtml" value="installation automatique" />
+            </p>
+            <br/>
+        </div>
+    </h:body>
+</html>

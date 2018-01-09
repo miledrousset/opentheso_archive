@@ -95,7 +95,7 @@ public class AutoInstall implements Serializable {
             }
             br.close();
         } catch (Exception e) {
-        }
+        } 
         return true;
     }
 
@@ -187,8 +187,9 @@ public class AutoInstall implements Serializable {
         config.addDataSourceProperty("databaseName", localDatabaseName);
         config.addDataSourceProperty("serverName", serverName);
         config.addDataSourceProperty("portNumber", serverPort);
-
+        try{
         HikariDataSource poolConnexion1 = new HikariDataSource(config);
+        
         try {
             poolConnexion1.getConnection();
         } catch (SQLException ex) {
@@ -198,8 +199,15 @@ public class AutoInstall implements Serializable {
             poolConnexion1.close();
             return false;
         }
-        poolConnexionInstall = poolConnexion1;
-        return true;
+          poolConnexionInstall = poolConnexion1;
+          return true;
+        }
+        catch(Exception e){
+            return false;
+        }
+        
+      
+        
     }
 
     /**
