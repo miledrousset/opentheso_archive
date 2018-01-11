@@ -414,7 +414,7 @@ public class RelationsHelper {
             String idConcept2, String role, int idUser, String action) {
 
         Statement stmt;
-        boolean status = false;
+        boolean status = true;
 
         try {
             try {
@@ -607,18 +607,19 @@ public class RelationsHelper {
 
         Statement stmt;
         boolean status = false;
-
+        
+        if (!new RelationsHelper().addRelationHistorique(conn, idConceptBT, idThesaurus, idConceptNT, "NT", idUser, "DEL")) {
+                        return false;
+                    }
+        if (!new RelationsHelper().addRelationHistorique(conn, idConceptNT, idThesaurus, idConceptBT, "BT", idUser, "DEL")) {
+                        return false;
+                    }
         try {
 
             try {
                 stmt = conn.createStatement();
                 try {
-                    if (!new RelationsHelper().addRelationHistorique(conn, idConceptBT, idThesaurus, idConceptNT, "NT", idUser, "DEL")) {
-                        return false;
-                    }
-                    if (!new RelationsHelper().addRelationHistorique(conn, idConceptNT, idThesaurus, idConceptBT, "BT", idUser, "DEL")) {
-                        return false;
-                    }
+                  
                     String query = "delete from hierarchical_relationship"
                             + " where id_concept1 ='" + idConceptNT + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"

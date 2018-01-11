@@ -4,6 +4,7 @@ package mom.trd.opentheso.dragdrop;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.SelectedBeans.AutoCompletBean;
@@ -11,6 +12,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
+import static mom.trd.opentheso.skosapi.SKOSProperty.Collection;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -139,7 +141,7 @@ public class TreeChange {
      * @param idUser
      * @return 
      */
-    public boolean moveConceptTermToConceptTermOtherDomain(Connexion connect,String originNodeIdConcept,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
+    public boolean moveConceptTermToConceptTermOtherDomain(Connexion connect,String originNodeIdConcept,String originNodeIdGroup,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
         ConceptHelper conceptHelper = new ConceptHelper();
         GroupHelper groupHelper = new GroupHelper();
         try {
@@ -160,11 +162,25 @@ public class TreeChange {
             ArrayList<String> lisIds = new  ArrayList<>();
             lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus, lisIds);  
             
-            
+            //on récupère les identifiants des groups des BT #jm
+            ArrayList<String> listeBt=conceptHelper.getIdBtFromAConcept(connect.getPoolConnexion().getConnection(), idTheasurus, originNodeIdConcept);
+            ArrayList<String> listeIdGroupBT=new ArrayList<>();
+            for(String id :listeBt){
+               listeIdGroupBT.add(conceptHelper.getGroupIdOfConcept(connect.getPoolConnexion(), id, idTheasurus));
+                
+            }
+            int freq=Collections.frequency(listeIdGroupBT,originNodeIdGroup);
             // on supprime l'ancien Groupe de la branche 
-            ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus);
+            /*ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus);
             for (String domsOld1 : domsOld) {
                 if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, domsOld1, idTheasurus)) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }*/
+            if(freq==1){
+                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originNodeIdGroup, idTheasurus)) {
                     conn.rollback();
                     conn.close();
                     return false;

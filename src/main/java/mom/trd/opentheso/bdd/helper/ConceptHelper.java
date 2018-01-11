@@ -5427,6 +5427,38 @@ public class ConceptHelper {
             stmt.close();
         }
     }
+    /**
+     * Méthode pour récupérer une liste des identifiants BT à parti d'un  thesaurus et d'un concept
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     */
+    public ArrayList<String> getIdBtFromAConcept(Connection conn,String idTheso,String idConcept){
+        ArrayList<String> ret=new ArrayList();
+        PreparedStatement stmt;
+        ResultSet rs;
+        String sql="Select id_concept2 FROM hierarchical_relationship Where id_concept1=? and id_thesaurus=? and role=?";
+        try{
+            stmt=conn.prepareStatement(sql);
+            stmt.setString(1,idConcept);
+            stmt.setString(2, idTheso);
+            stmt.setString(3,"BT");
+            try{
+                rs=stmt.executeQuery();
+                while(rs.next()){
+                    ret.add(rs.getString("id_concept2"));
+                }
+            }
+            finally{
+                stmt.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while getting id BT from a concept Id",e);
+        }
+        return ret;
+    }
 
     public NodePreference getNodePreference() {
         return nodePreference;

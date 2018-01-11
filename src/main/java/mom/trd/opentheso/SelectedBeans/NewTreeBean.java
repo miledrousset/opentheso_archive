@@ -1547,7 +1547,7 @@ public class NewTreeBean implements Serializable {
     public void fromTTToTTOtherDomain(){
          for(String idBT :idsBTRemoveNode){
           TreeChange tc=new TreeChange();
-          tc.moveConceptTermToConceptTermOtherDomain( connect, draggedNode.getIdConcept(), idBT,droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+          tc.moveConceptTermToConceptTermOtherDomain( connect, draggedNode.getIdConcept(),draggedNode.getIdCurrentGroup(), idBT,droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
         }
        
         System.out.println("from to top term to top term other domain");
@@ -1645,7 +1645,7 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToTTOtherDomain(){
          for(String idBT :idsBTRemoveNode){
           TreeChange tc=new TreeChange();
-          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(),draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
         }
         
         System.out.println(" from concept m to top term other  domain");
@@ -1686,7 +1686,7 @@ public class NewTreeBean implements Serializable {
     
         for(String idBT :idsBTRemoveNode){
           TreeChange tc=new TreeChange();
-          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
+          tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(),draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),idThesoSelected,this.selectedTerme.getUser().getUser().getId() );
         }
         
         System.out.println("from concept to concept other domain");
