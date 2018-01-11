@@ -3371,5 +3371,7 @@ public class SelectedTerme implements Serializable {
     public void setIdHandle(String idHandle) {
         this.idHandle = idHandle;
     }
+    
+
 
 }

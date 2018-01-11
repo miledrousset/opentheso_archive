@@ -1907,6 +1907,13 @@ public class NewTreeBean implements Serializable {
         this.droppedNode = droppedNode;
     }
 
- 
+     /**
+     * permet de savoir si le concept est une branche ou non,
+     * si Null, on envoie true pour éviter la réponse (a des fils)
+     * @return 
+     */
+    public boolean isHaveChildren(){
+        return !selectedNode.isLeaf();
+    }
    
 }

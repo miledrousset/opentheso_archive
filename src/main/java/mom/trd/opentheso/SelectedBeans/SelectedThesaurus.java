@@ -753,15 +753,17 @@ public class SelectedThesaurus implements Serializable {
      * @param idConcept 
      */
     public void reGenerateConceptArkId(String idConcept) {
-        try {
-            ArrayList<String> idConcepts = new ArrayList<>();
-            idConcepts.add(idConcept);
-            if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
-            } else
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
-        } catch (Exception ex) {
-            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+        if(nodePreference.isUseArk()) {
+            try {
+                ArrayList<String> idConcepts = new ArrayList<>();
+                idConcepts.add(idConcept);
+                if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
+                } else
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
+            } catch (Exception ex) {
+                Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
     }    

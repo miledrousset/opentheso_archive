@@ -2970,7 +2970,58 @@ public class ConceptHelper {
             log.error("Error while getting All IdConcept of Thesaurus by Group : " + idThesaurus, sqle);
         }
         return tabIdConcept;
-    }    
+    }
+    
+    /**
+     * Permet de retourner tous les identifiants BT pour un concept donné dans le même groupe
+     * cette fonction permet de connaitre la polyhierarchie d'un concept dans un domaine
+     * @param ds
+     * @param idConcept
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     * #MR
+     */
+    public ArrayList<String> getAllBTOfConceptOfThisGroup(HikariDataSource ds, 
+            String idConcept, String idGroup, String idTheso) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdBT = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept2 from hierarchical_relationship, concept_group_concept" +
+                        " where" +
+                        "idconcept = id_concept2" +
+                        " and idgroup = '" + idGroup + "'" +
+                        " and role = 'BT'" +
+                        " and id_concept1 = '" + idConcept + "'" +
+                        " and id_thesaurus = '" + idTheso + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdBT.add(resultSet.getString("id_concept2"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdBT of this Group of Concept : " + idConcept, sqle);
+        }
+        return tabIdBT;        
+    }
+    
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus

@@ -527,7 +527,9 @@ public class FileBean implements Serializable {
                         resizeToBigImage(image.getName());
                     }
 
-                    resizeImage(image.getName());
+                    if(!resizeImage(image.getName())) {
+                        return;
+                    }
                     addFiligrane(image.getName(), source, suffix);
                     
                     addFiligrane(selectedTerme.getUser().nodePreference.getDossierResize()
@@ -538,6 +540,9 @@ public class FileBean implements Serializable {
 
                 } catch (IOException ex) {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
+                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.toString()));
+                     vue.setAddImage(false);
+                     return;
                 }
 
                 selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser));
@@ -549,21 +554,25 @@ public class FileBean implements Serializable {
         }
     }
 
-    public void resizeImage(String fileName) {
+    public boolean resizeImage(String fileName) {
         try {
-            Thumbnails.of(new File(pathImage + fileName))
-                    .size(160, 160)
-                    .toFile(new File(pathImage + dossierResize + "/" + fileName));
+            Thumbnails.of(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName))
+                    .size(200, 200)
+                    .toFile(new File(selectedTerme.getUser().nodePreference.getPathImage()
+                            + selectedTerme.getUser().nodePreference.getDossierResize() + "/" + fileName));
+            return true;
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", ex.toString()));
         }
+        return false;
     }
 
     public void resizeToBigImage(String fileName) {
         try {
-            Thumbnails.of(new File(pathImage + fileName))
+            Thumbnails.of(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName))
                     .size(1024, 768)
-                    .toFile(new File(pathImage + fileName));
+                    .toFile(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -573,7 +582,7 @@ public class FileBean implements Serializable {
 
         try {
             // Image to add a text caption to.
-            BufferedImage originalImage = ImageIO.read(new File(pathImage + fileName));
+            BufferedImage originalImage = ImageIO.read(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
             // Set up the caption properties
             Font font = new Font("Monospaced", Font.PLAIN, 15);
             Color c = Color.YELLOW;
@@ -583,7 +592,7 @@ public class FileBean implements Serializable {
             // Apply caption to the image
             Caption filter = new Caption(source, font, c, position, insetPixels);
             BufferedImage captionedImage = filter.apply(originalImage);
-            ImageIO.write(captionedImage, ext, new File(pathImage + fileName));
+            ImageIO.write(captionedImage, ext, new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
 
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -591,7 +600,7 @@ public class FileBean implements Serializable {
     }
 
     public String getCheminPix() {
-        return pathImage;
+        return selectedTerme.getUser().nodePreference.getPathImage();
     }
 
     public String getSource() {
@@ -627,7 +636,7 @@ public class FileBean implements Serializable {
     }
 
     public String getPathImage() {
-        return pathImage;
+        return selectedTerme.getUser().nodePreference.getPathImage();
     }
 
     public void setPathImage(String pathImage) {
