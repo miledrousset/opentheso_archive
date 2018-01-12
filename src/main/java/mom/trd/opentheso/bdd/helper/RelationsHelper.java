@@ -414,7 +414,7 @@ public class RelationsHelper {
             String idConcept2, String role, int idUser, String action) {
 
         Statement stmt;
-        boolean status = false;
+        boolean status = true;
 
         try {
             try {
@@ -607,18 +607,19 @@ public class RelationsHelper {
 
         Statement stmt;
         boolean status = false;
-
+        
+        if (!new RelationsHelper().addRelationHistorique(conn, idConceptBT, idThesaurus, idConceptNT, "NT", idUser, "DEL")) {
+                        return false;
+                    }
+        if (!new RelationsHelper().addRelationHistorique(conn, idConceptNT, idThesaurus, idConceptBT, "BT", idUser, "DEL")) {
+                        return false;
+                    }
         try {
 
             try {
                 stmt = conn.createStatement();
                 try {
-                    if (!new RelationsHelper().addRelationHistorique(conn, idConceptBT, idThesaurus, idConceptNT, "NT", idUser, "DEL")) {
-                        return false;
-                    }
-                    if (!new RelationsHelper().addRelationHistorique(conn, idConceptNT, idThesaurus, idConceptBT, "BT", idUser, "DEL")) {
-                        return false;
-                    }
+                  
                     String query = "delete from hierarchical_relationship"
                             + " where id_concept1 ='" + idConceptNT + "'"
                             + " and id_thesaurus = '" + idThesaurus + "'"
@@ -721,13 +722,12 @@ public class RelationsHelper {
      *
      * @param conn
      * @param idConcept
-     * @param idGroup
      * @param idThesaurus
      * @param idUser
      * @return boolean
      */
     public boolean deleteRelationTT(Connection conn,
-            String idConcept, String idGroup, String idThesaurus,
+            String idConcept, String idThesaurus,
             int idUser) {
 
         Statement stmt;
@@ -790,8 +790,7 @@ public class RelationsHelper {
                     /*    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConcept, "TT", idUser, "DEL")) {
                         return false;
                     }*/
-                    String query = "UPDATE concept_group_concept set"
-                            + " idgroup = '" + "" + "'"
+                    String query = "delete from concept_group_concept"
                             + " WHERE idconcept ='" + idConcept + "'"
                             + " AND idthesaurus = '" + idThesaurus + "'"
                             + " AND idgroup = '" + idGroup + "'";
@@ -863,7 +862,7 @@ public class RelationsHelper {
                     Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                log.error("Error while adding relation MT of Concept : " + idConcept, sqle);
+                log.error("Error while deleting relation Group for Concept : " + idConcept, sqle);
             }
         }
         return status;

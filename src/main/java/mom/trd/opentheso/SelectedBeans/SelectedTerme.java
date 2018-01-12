@@ -2109,7 +2109,7 @@ public class SelectedTerme implements Serializable {
 
                 if (TGisDomaine) {
                     if (!new RelationsHelper().deleteRelationTT(conn, idC,
-                            idDomaine, idTheso, user.getUser().getId())) {
+                            idTheso, user.getUser().getId())) {
                         conn.rollback();
                         conn.close();
                         return false;

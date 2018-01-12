@@ -1359,6 +1359,7 @@ public class ConceptHelper {
         return false;
     }
 
+
     /**
      * Cette fonction permet de déplacer une Branche vers un domaine Le domaine
      * de destination est le même que la branche (déplamcent dans le même
@@ -1396,7 +1397,36 @@ public class ConceptHelper {
         }
         return false;
     }
+    /**
+     * 
+     * @param conn
+     * @param idConcept
+     * @param idOldConceptBT
+     * @param oldMT
+     * @param idNewMT
+     * @param idThesaurus
+     * @param idUser
+     * @return 
+     */
+     public boolean moveTTToAnotherMT(Connection conn,
+            String idConcept,
+            String idOldConceptBT,
+            String oldMT,
+            String idNewMT,
+            String idThesaurus, int idUser) {
+        try {
+            RelationsHelper relationsHelper = new RelationsHelper();
+            conn.setAutoCommit(false);
 
+            return relationsHelper.setRelationMT(conn, idConcept,idNewMT,idThesaurus);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }
+   
     /**
      * Cette fonction permet de déplacer une Branche d'un domaine vers un
      * concept dans le thésaurus Le domaine de destination est le même que la
@@ -1418,7 +1448,7 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
             conn.setAutoCommit(false);
 
-            if (!relationsHelper.deleteRelationTT(conn, idConcept, idMT, idThesaurus, idUser)) {
+            if (!relationsHelper.deleteRelationTT(conn, idConcept, idThesaurus, idUser)) {
                 return false;
             }
             return relationsHelper.addRelationBT(conn, idConcept, idThesaurus, idNewConcept, idUser);
@@ -2997,7 +3027,7 @@ public class ConceptHelper {
                 try {
                     String query = "select id_concept2 from hierarchical_relationship, concept_group_concept" +
                         " where" +
-                        "idconcept = id_concept2" +
+                        " idconcept = id_concept2" +
                         " and idgroup = '" + idGroup + "'" +
                         " and role = 'BT'" +
                         " and id_concept1 = '" + idConcept + "'" +
@@ -5477,6 +5507,38 @@ public class ConceptHelper {
         } finally {
             stmt.close();
         }
+    }
+    /**
+     * Méthode pour récupérer une liste des identifiants BT à parti d'un  thesaurus et d'un concept
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     */
+    public ArrayList<String> getIdBtFromAConcept(Connection conn,String idTheso,String idConcept){
+        ArrayList<String> ret=new ArrayList();
+        PreparedStatement stmt;
+        ResultSet rs;
+        String sql="Select id_concept2 FROM hierarchical_relationship Where id_concept1=? and id_thesaurus=? and role=?";
+        try{
+            stmt=conn.prepareStatement(sql);
+            stmt.setString(1,idConcept);
+            stmt.setString(2, idTheso);
+            stmt.setString(3,"BT");
+            try{
+                rs=stmt.executeQuery();
+                while(rs.next()){
+                    ret.add(rs.getString("id_concept2"));
+                }
+            }
+            finally{
+                stmt.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while getting id BT from a concept Id",e);
+        }
+        return ret;
     }
 
     public NodePreference getNodePreference() {
