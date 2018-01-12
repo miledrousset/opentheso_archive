@@ -5,6 +5,14 @@
  */
 package mom.trd.opentheso.timeJob;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import org.apache.commons.logging.Log;
@@ -67,11 +75,34 @@ public class  SendMail implements Runnable {
         
         pm.loadConfig();
         pm.configMessage(mess,sujet);
-        for(String dest:mess.getDestinataires()){
-            System.out.println("destinataire :"+dest);
-        }
         pm.sendMessage();
-        System.out.println("message status "+pm.isStatus());
+        try{
+           File logmail=new File("C:/Users/jm.prudham/Desktop/logMail"+new Date().getTime()); 
+           BufferedWriter bfw=new BufferedWriter(new FileWriter(logmail));
+           bfw.write("----------------- log du mail---------------------------- ");
+           bfw.newLine();
+           bfw.write("   propriété :"+pm.getProperties().toString());
+           bfw.newLine();
+           bfw.write("\n------------------------------------------------------\n");
+           bfw.newLine();
+           bfw.write("    status :  "+pm.isStatus());
+           bfw.newLine();
+           for(String dest:mess.getDestinataires()){
+                bfw.write("   destinataire :"+dest);
+            }
+           bfw.newLine();
+            bfw.write("   message:     "+pm.getMsg());
+            bfw.newLine();
+            bfw.flush();
+            bfw.close();
+            
+        }
+        catch(   IOException e ){
+            log.error("error while writing log",e);
+        }
+        
+      
+        
         return;
     }
     
