@@ -61,13 +61,6 @@
         </resource-bundle>
         <message-bundle>preferences</message-bundle>
     </application>
-     <application>
-        <resource-bundle>
-            <base-name>ark</base-name>
-            <var>ark</var>
-        </resource-bundle>
-        <message-bundle>ark</message-bundle>
-    </application>    
     <application>
         <resource-bundle>
             <base-name>language/site</base-name>

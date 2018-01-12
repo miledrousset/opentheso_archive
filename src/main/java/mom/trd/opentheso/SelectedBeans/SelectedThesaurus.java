@@ -93,8 +93,6 @@ public class SelectedThesaurus implements Serializable {
     private String defaultThesaurusId;
     private String identifierType = "2";
 
-    private String idNaan;
-
     private NodePreference nodePreference;
     private String version;
     private boolean arkActive;
@@ -161,18 +159,6 @@ public class SelectedThesaurus implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
         return bundlePref;
-    }
-
-    /**
-     * Récupération des préférences Ark
-     *
-     * @return la ressourceBundle des préférences Ark
-     */
-    private ResourceBundle getBundlePrefArk() {
-        FacesContext context = FacesContext.getCurrentInstance();
-        ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "ark");
-        return bundlePref;
-
     }
 
     /**
@@ -381,8 +367,7 @@ public class SelectedThesaurus implements Serializable {
 
         ResourceBundle bundlePref = getBundlePref();
         defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
-        ResourceBundle bundlePrefArk = getBundlePrefArk();
-        idNaan = bundlePrefArk.getString("idNaan");
+
 
         idCurl = null;
         idGurl = null;
@@ -398,9 +383,7 @@ public class SelectedThesaurus implements Serializable {
             workLanguage = bundlePref.getString("workLanguage");
             return;
         }
-
         majPref();
-
     }
 
     public void majPref() {
@@ -770,15 +753,17 @@ public class SelectedThesaurus implements Serializable {
      * @param idConcept 
      */
     public void reGenerateConceptArkId(String idConcept) {
-        try {
-            ArrayList<String> idConcepts = new ArrayList<>();
-            idConcepts.add(idConcept);
-            if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
-            } else
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
-        } catch (Exception ex) {
-            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+        if(nodePreference.isUseArk()) {
+            try {
+                ArrayList<String> idConcepts = new ArrayList<>();
+                idConcepts.add(idConcept);
+                if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
+                } else
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
+            } catch (Exception ex) {
+                Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
     }    
@@ -2126,14 +2111,6 @@ public class SelectedThesaurus implements Serializable {
 
     public void setConceptbean(ConceptBean conceptbean) {
         this.conceptbean = conceptbean;
-    }
-
-    public String getIdNaan() {
-        return idNaan;
-    }
-
-    public void setIdNaan(String idNaan) {
-        this.idNaan = idNaan;
     }
 
     public ArrayList<String> getTablesList() {

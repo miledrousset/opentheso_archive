@@ -1359,6 +1359,7 @@ public class ConceptHelper {
         return false;
     }
 
+
     /**
      * Cette fonction permet de déplacer une Branche vers un domaine Le domaine
      * de destination est le même que la branche (déplamcent dans le même
@@ -1396,7 +1397,36 @@ public class ConceptHelper {
         }
         return false;
     }
+    /**
+     * 
+     * @param conn
+     * @param idConcept
+     * @param idOldConceptBT
+     * @param oldMT
+     * @param idNewMT
+     * @param idThesaurus
+     * @param idUser
+     * @return 
+     */
+     public boolean moveTTToAnotherMT(Connection conn,
+            String idConcept,
+            String idOldConceptBT,
+            String oldMT,
+            String idNewMT,
+            String idThesaurus, int idUser) {
+        try {
+            RelationsHelper relationsHelper = new RelationsHelper();
+            conn.setAutoCommit(false);
 
+            return relationsHelper.setRelationMT(conn, idConcept,idNewMT,idThesaurus);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+        return false;
+    }
+   
     /**
      * Cette fonction permet de déplacer une Branche d'un domaine vers un
      * concept dans le thésaurus Le domaine de destination est le même que la
@@ -1418,7 +1448,7 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
             conn.setAutoCommit(false);
 
-            if (!relationsHelper.deleteRelationTT(conn, idConcept, idMT, idThesaurus, idUser)) {
+            if (!relationsHelper.deleteRelationTT(conn, idConcept, idThesaurus, idUser)) {
                 return false;
             }
             return relationsHelper.addRelationBT(conn, idConcept, idThesaurus, idNewConcept, idUser);
@@ -2970,7 +3000,58 @@ public class ConceptHelper {
             log.error("Error while getting All IdConcept of Thesaurus by Group : " + idThesaurus, sqle);
         }
         return tabIdConcept;
-    }    
+    }
+    
+    /**
+     * Permet de retourner tous les identifiants BT pour un concept donné dans le même groupe
+     * cette fonction permet de connaitre la polyhierarchie d'un concept dans un domaine
+     * @param ds
+     * @param idConcept
+     * @param idGroup
+     * @param idTheso
+     * @return 
+     * #MR
+     */
+    public ArrayList<String> getAllBTOfConceptOfThisGroup(HikariDataSource ds, 
+            String idConcept, String idGroup, String idTheso) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdBT = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept2 from hierarchical_relationship, concept_group_concept" +
+                        " where" +
+                        " idconcept = id_concept2" +
+                        " and idgroup = '" + idGroup + "'" +
+                        " and role = 'BT'" +
+                        " and id_concept1 = '" + idConcept + "'" +
+                        " and id_thesaurus = '" + idTheso + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdBT.add(resultSet.getString("id_concept2"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdBT of this Group of Concept : " + idConcept, sqle);
+        }
+        return tabIdBT;        
+    }
+    
     
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus

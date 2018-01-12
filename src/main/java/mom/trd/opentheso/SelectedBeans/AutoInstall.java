@@ -95,7 +95,7 @@ public class AutoInstall implements Serializable {
             }
             br.close();
         } catch (Exception e) {
-        }
+        } 
         return true;
     }
 

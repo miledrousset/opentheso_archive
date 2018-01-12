@@ -11,6 +11,7 @@ import mom.trd.opentheso.SelectedBeans.AutoCompletBean;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import static mom.trd.opentheso.skosapi.SKOSProperty.Collection;
 import org.primefaces.model.DefaultTreeNode;
@@ -135,19 +136,24 @@ public class TreeChange {
      * 
      * @param connect
      * @param originNodeIdConcept
+     * @param originNodeIdGroup
      * @param BToriginNode
      * @param targetNodeIdConcept
+     * @param targetNodeIdGroupe
      * @param idTheasurus
      * @param idUser
      * @return 
      */
-    public boolean moveConceptTermToConceptTermOtherDomain(Connexion connect,String originNodeIdConcept,String originNodeIdGroup,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
+    public boolean moveConceptTermToConceptTermOtherDomain(Connexion connect,
+            String originNodeIdConcept,String originNodeIdGroup,String BToriginNode,
+            String targetNodeIdConcept,String targetNodeIdGroupe,String idTheasurus,int idUser){
         ConceptHelper conceptHelper = new ConceptHelper();
         GroupHelper groupHelper = new GroupHelper();
         try {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-
+            //on récupère les identifiants  des BT pour un groupe #jm
+            ArrayList<String> listeIdGroupBT=conceptHelper.getAllBTOfConceptOfThisGroup(connect.getPoolConnexion(),originNodeIdConcept,originNodeIdGroup, idTheasurus);
             // permet de déplacer une branche simplement, en cas d'erreur, rien n'est écrit 
             if (!conceptHelper.moveBranchToConceptOtherGroup(conn,
                    originNodeIdConcept,
@@ -161,42 +167,25 @@ public class TreeChange {
             // on récupère les Ids des concepts à modifier 
             ArrayList<String> lisIds = new  ArrayList<>();
             lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus, lisIds);  
-            
-            //on récupère les identifiants des groups des BT #jm
-            ArrayList<String> listeBt=conceptHelper.getIdBtFromAConcept(connect.getPoolConnexion().getConnection(), idTheasurus, originNodeIdConcept);
-            ArrayList<String> listeIdGroupBT=new ArrayList<>();
-            for(String id :listeBt){
-               listeIdGroupBT.add(conceptHelper.getGroupIdOfConcept(connect.getPoolConnexion(), id, idTheasurus));
+            if(listeIdGroupBT.size()==1){
                 
-            }
-            int freq=Collections.frequency(listeIdGroupBT,originNodeIdGroup);
-            // on supprime l'ancien Groupe de la branche 
-            /*ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus);
-            for (String domsOld1 : domsOld) {
-                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, domsOld1, idTheasurus)) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
-                }
-            }*/
-            if(freq==1){
                 if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originNodeIdGroup, idTheasurus)) {
                     conn.rollback();
                     conn.close();
                     return false;
                 }
+               
             }
-
-            // on ajoute le nouveau domaine à la branche
-            ArrayList<String> domsNew = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(),targetNodeIdConcept, idTheasurus);
-            for (String domsNew1 : domsNew) {
-
-                if (!groupHelper.setDomainToBranch(conn,lisIds, domsNew1, idTheasurus)) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
-                }
+            
+            listeIdGroupBT=conceptHelper.getAllBTOfConceptOfThisGroup(connect.getPoolConnexion(),originNodeIdConcept,targetNodeIdGroupe, idTheasurus);
+            if(listeIdGroupBT.isEmpty()){ 
+               if (!groupHelper.addDomainToBranch(conn,lisIds, targetNodeIdGroupe, idTheasurus,idUser)) {
+                             conn.rollback();
+                             conn.close();
+                             return false;
+                     }
             }
+            
             conn.commit();
             conn.close();
     }
@@ -232,7 +221,8 @@ public class TreeChange {
             }*/
             ConceptHelper conceptHelper = new ConceptHelper();
             GroupHelper groupHelper = new GroupHelper();
-
+            //on récupère les identifiants  des BT pour un groupe #jm
+            ArrayList<String> listeIdGroupBT=conceptHelper.getAllBTOfConceptOfThisGroup(connect.getPoolConnexion(),originNodeIdConcept,originDomain, idThesaurus);
             // on déplace la branche au domaine (on coupe les relations BT du concept, puis on afecte 
             // au concept la relation TT
             if (!conceptHelper.moveBranchToAnotherMT(conn, originNodeIdConcept,
@@ -250,23 +240,27 @@ public class TreeChange {
             ArrayList<String> lisIds = new  ArrayList<>();
             lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus, lisIds);
             
-            
+            if(listeIdGroupBT.size()==1){
             // on supprime l'ancien Groupe de la branche 
-            if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originDomain, idThesaurus)) {
-         
-                conn.rollback();
-                conn.close();
-                return false;
+                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originDomain, idThesaurus)) {
+
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
             }
 
             // on ajoute le nouveau domaine à la branche
-            if (!groupHelper.setDomainToBranch(conn, lisIds, TargetNodeDomaine, idThesaurus)) {
-            
-                conn.rollback();
-                conn.close();
-                return false;
-            }
+            listeIdGroupBT=conceptHelper.getAllBTOfConceptOfThisGroup(connect.getPoolConnexion(),originNodeIdConcept,TargetNodeDomaine, idThesaurus);
+            if(listeIdGroupBT.isEmpty()){ 
 
+                if (!groupHelper.addDomainToBranch(conn,lisIds, TargetNodeDomaine, idThesaurus,idUser)) {
+
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+            }
             conn.commit();
             conn.close();
       
@@ -342,7 +336,7 @@ public class TreeChange {
      * @return 
      */
     public boolean moveTopTermToConceptSameDomaine(Connexion connect,String originNodeIdConcept,String BToriginNode,String originIdDomain,String targetNodeIdConcept,String idThesaurus,int idUser){
-      
+       
 
         try {
             Connection conn = connect.getPoolConnexion().getConnection();
@@ -364,21 +358,55 @@ public class TreeChange {
 
             conn.commit();
             conn.close();
-         
-
-         
+          
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
-      
+    
+    public boolean moveTopTermToOtherDomaine(Connexion connect,
+            String originNodeIdConcept,String originIdDomain,
+            String targetNodeIdDomain,String idThesaurus,int idUser){
+             GroupHelper groupHelper=new GroupHelper();
+             ConceptHelper conceptHelper=new ConceptHelper();
+                // on récupère les Ids des concepts à modifier 
+            ArrayList<String> lisIds = new  ArrayList<>();
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus, lisIds);
+            try {
+                Connection conn = connect.getPoolConnexion().getConnection();
+                conn.setAutoCommit(false);
+
+
+                // on déplace la branche au nouveau concept puis création de TG-TS (on ajoute la relation BT du concept, puis on supprime  
+                // au concept la relation TT
+
+                /*on  modifie le domaine */
+                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originIdDomain, idThesaurus)) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                }
+                if (!groupHelper.addDomainToBranch(conn,lisIds, targetNodeIdDomain, idThesaurus,idUser)) {
+                                 conn.rollback();
+                                 conn.close();
+                                 return false;
+                }
+                conn.commit();
+                conn.close();
+                return true;
+             } catch (SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+             }
+            return false;
+    }  
+            
     /**
      * moveSubGroupToSubGroupDomain
      * 
      * déplace un sousgroupe vers un autre sous groupe
-     * note: c'est la seul façon de déplace un sous groupe
+     * note: c'est la seul façon de déplacer un sous groupe
      * 
      * @param connect
      * @param originNodeIdConcept
@@ -406,6 +434,55 @@ public class TreeChange {
                conn.close();
                return false;   
             }
+            conn.commit();
+            conn.close();
+         
+
+         
+            return true;
+        }
+        catch(SQLException ex) {
+            Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public boolean moveTopTermToConceptOtherDomaine(Connexion connect, String idConceptOrigin, String idBT, String idOriginGroup, String targetidConcept, String targetIGroup, String idThesoSelected, int id) {
+        try{
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            GroupHelper groupHelper = new GroupHelper();
+            ConceptHelper conceptHelper=new ConceptHelper();
+            RelationsHelper relationHelper=new RelationsHelper();
+            // on récupère les Ids des concepts à modifier 
+            ArrayList<String> lisIds = new  ArrayList<>();
+            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConceptOrigin, idThesoSelected, lisIds);  
+        
+                if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, idOriginGroup, idThesoSelected)) {
+                    conn.rollback();
+                    conn.close();
+                    return false;
+                }
+               
+          
+          
+               if (!groupHelper.addDomainToBranch(conn,lisIds, targetIGroup, idThesoSelected,id)) {
+                             conn.rollback();
+                             conn.close();
+                             return false;
+                     }
+            
+            if(!relationHelper.addRelationBT(conn, idConceptOrigin, idThesoSelected, targetidConcept, id)){
+               conn.rollback();
+               conn.close();
+               return false;  
+            }
+            if(!relationHelper.deleteRelationTT(conn, idConceptOrigin, idThesoSelected, id)){
+               conn.rollback();
+               conn.close();
+               return false;  
+            }
+                
             conn.commit();
             conn.close();
          

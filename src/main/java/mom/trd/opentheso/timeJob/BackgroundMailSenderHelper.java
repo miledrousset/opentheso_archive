@@ -38,14 +38,7 @@ public class BackgroundMailSenderHelper {
     /**
      * getPoolAlert
      * #JM
-     * Méthode pour récupérer les thesaurus où alert_cdt est à true dans
-     * la table routine_mail, on récupère dans le hashMap pool_alert 
-     * la date de début de période d'envoi de mail et la période d'envoi
-     * puis on retourne ce hashMap
-     * On attribut aussi au hashmap idTheso_since l'identifiant thésaurus 
-     * et la date depuis laquelle débute la période actuelle 
-     * pour chacunes des alerts
-     * 
+     *      
      * 
      * @param ds
      * 
