@@ -10,7 +10,7 @@
         <link rel="icon" href="images/icoTheso.jpg" />
         <link rel="stylesheet" type="text/css" href="css/style.css"/>
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
-         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
         <script type="text/javascript">
             function selectText(containerid) {
                 if (document.selection) {
@@ -28,11 +28,11 @@
     <h:body>
         <style >
             div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a.edit{
-               border: 3px  solid #956620;
-               box-shadow:0px 0px 5px #BD6060;
+                border: 3px  solid #956620;
+                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
-       
+
         <ui:include src="conceptPopUp.xhtml" />
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Edition de thésaurus</h1>
@@ -45,16 +45,16 @@
                 <li>Importer/exporter un thésaurus Skos.</li>
             </ul>
         </p:dialog>  
-       
+
         <div id="menuHead">
             <div id="menuHeadTop">
-            <ui:include src="logo.xhtml" />
-            <ui:include src="account.xhtml" />
-            <ui:include src="menuThesaurus.xhtml" />
-            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
-           
+                <ui:include src="logo.xhtml" />
+                <ui:include src="account.xhtml" />
+                <ui:include src="menuThesaurus.xhtml" />
+                <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+
             </div>
-           
+
             <ui:include src="/dialogs/export/exportDlg.xhtml" />
             <ui:include src="/dialogs/export/exportcsvDlg.xhtml" />
             <ui:include src="/dialogs/export/exportTxtDlg.xhtml" />     
@@ -134,34 +134,34 @@
                                 </f:facet>
                                 <h:form>
                                     <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-exp" />
-                                    
+
                                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditTheso" my="left top" at="left bottom">
-                                        
-                                        
-                                        
+
+
+
                                         <p:menuitem value="#{langueBean.getMsg('edit.export')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportDlg" oncomplete="PF('exportDlg').show();"
                                                     style="font-size: 12px;"/>
-                                        
-                                        
+
+
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportcsvDlg" oncomplete="PF('exportcsvDlg').show();"
                                                     style="font-size: 12px;"/>
-                                        
+
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcvs')}_Pro" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportTxtDlg" oncomplete="PF('exportTxtDlg').show();"
                                                     style="font-size: 12px;"/>                                                                                
                                         <p:menuitem value="#{langueBean.getMsg('edit.export')} PDF" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportPdfDlg" oncomplete="PF('exportPdfDlg').show();"
                                                     style="font-size: 12px;"/>
-                                        
+
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportAltlabel')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportAltLabel" oncomplete="PF('exportAltLabel').show();"
                                                     style="font-size: 12px;"/>
-                                        
-                                        
-                                        
+
+
+
                                     </p:menu>
                                 </h:form>
 
                             </h:column>
                             <h:column id="column3">
-                                
+
                                 <f:facet name="header">
                                     <h:outputText value="#{langueBean.getMsg('edit.tab1Opt2')}" />
                                 </f:facet>
@@ -214,13 +214,13 @@
                                 <h:inputText id="date" value="#{fileBean.formatDate}" />
                                 <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
                                 <br/><br/>
-                            
-                            
+
+
                                 <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
                                               cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
                                               update="@form,:panSkos2"  />
-                            
-                            
+
+
                                 <p:commandButton value="Insert into BDD"
                                                  disabled="#{fileBean.desabled}"
                                                  onclick="PF('pbAjax').start();PF('startButton2').disable();" 
@@ -248,7 +248,7 @@
                                     </h:form>
                                 </div>
                             </div>
-                            
+
                             <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/>
                         </div>
                     </h:panelGroup>
@@ -392,7 +392,7 @@
                                     <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('edit.create')}" 
                                                      actionListener="#{theso.ajouterTheso(user1.user.id, user1.user.idRole)}"
                                                      action="#{accessThesaurusBean.addVisibility()}"
-                                                      
+
                                                      styleClass="styleButton" update=":panCreer,:tableTheso"/>
                                 </div>
                             </h:form>
@@ -458,12 +458,12 @@
                                         <td><h:outputText value="#{langueBean.getMsg('edit.attTheso11')}" /> : </td>
                                         <td><h:inputText id="typeTheso" value="#{theso.editTheso.type}"/></td>
                                     </tr>
-                                    
+
                                 </table><br/>
                                 <div style="float: left; margin-left: 50px;">
                                     <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" 
                                                      action="#{theso.editerTheso}" 
-                                                     
+
                                                      styleClass="styleButton" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad"/>&nbsp;
                                 </div>
                             </h:form>
@@ -517,32 +517,32 @@
                                     </h:form>
                                 </div>
                             </div>
-                          
+
                             <h:outputLabel value="#{theso.editTheso.title}"/><br/>
                             <h:form id="visibleTrad" style="margin-top:2px;margin-bottom:2px" >
-                               
+
                                 <p:commandButton rendered="#{accessThesaurusBean.accessThesaurus.visibility}" title="#{langueBean.getMsg('visibility.toPublic')}" 
-                                                             value="#{langueBean.getMsg('visibility.private')}"
-                                                             action="#{accessThesaurusBean.changeVisibility()}"
-                                                             style="color:red;border-color:#2F556A;font-size:11px"
-                                                             update="visibleTrad">
-                                            <p:confirm header="Confirmation" message="êtes vous sûr ? " icon="ui-icon-alert" />
-                                        </p:commandButton>
+                                                 value="#{langueBean.getMsg('visibility.private')}"
+                                                 action="#{accessThesaurusBean.changeVisibility()}"
+                                                 style="color:red;border-color:#2F556A;font-size:11px"
+                                                 update="visibleTrad">
+                                    <p:confirm header="Confirmation" message="êtes vous sûr ? " icon="ui-icon-alert" />
+                                </p:commandButton>
                                 <p:commandButton rendered="#{!(accessThesaurusBean.accessThesaurus.visibility)}" title="#{langueBean.getMsg('visibility.toPrivate')}" 
-                                                             value="#{langueBean.getMsg('visibility.public')}"
-                                                             action="#{accessThesaurusBean.changeVisibility()}"
-                                                             style="color:green;border-color:#2F556A;font-size:11px"
-                                                             update="visibleTrad"
-                                                             >
-                                            <p:confirm header="Confirmation" message="êtes vous sûr de vouloir changer la visibilité du thesaurus ? " icon="ui-icon-alert" />
-                                        </p:commandButton>
-                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                            <p:commandButton value="#{langueBean.getMsg('yes')}"   type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />  
-                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" /> 
-                                                
-                                        </p:confirmDialog>
-                                        
-                                
+                                                 value="#{langueBean.getMsg('visibility.public')}"
+                                                 action="#{accessThesaurusBean.changeVisibility()}"
+                                                 style="color:green;border-color:#2F556A;font-size:11px"
+                                                 update="visibleTrad"
+                                                 >
+                                    <p:confirm header="Confirmation" message="êtes vous sûr de vouloir changer la visibilité du thesaurus ? " icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                    <p:commandButton value="#{langueBean.getMsg('yes')}"   type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />  
+                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" /> 
+
+                                </p:confirmDialog>
+
+
                             </h:form>
                             <div id="divTableTrad">
                                 <h:dataTable id="tableTrad" value="#{theso.arrayTrad}" var="entry" styleClass="styleTableTrad">
@@ -565,7 +565,7 @@
                                         <h:form>
                                             <p:commandButton id="cbAjTradTheso" styleClass="cbSupp" icon="ui-icon-edi" action="#{theso.afficheEditTheso(2,'',entry.key,theso.editTheso.id_thesaurus)}"
                                                              actionListener="#{accessThesaurusBean.accessAThesaurus(theso.editTheso.id_thesaurus)}" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad" />
-                                           
+
                                         </h:form>
                                     </h:column>
                                     <h:column id="columnTrad4">
@@ -585,7 +585,7 @@
                                         </h:form>
                                     </h:column>
                                 </h:dataTable>
-                                
+
                             </div><br/>
                             <div style="float: left; margin-left: 20px;">
                                 <h:form>
@@ -595,7 +595,7 @@
                             </div>
                             <h:form>
                                 <p:commandButton id="cbAnnulTradTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setLanguage(false)}"
-                                               update=":panSkos,:panCsv,:panTrad,:panAjTrad,:panModif" styleClass="styleButton"/>
+                                                 update=":panSkos,:panCsv,:panTrad,:panAjTrad,:panModif" styleClass="styleButton"/>
                             </h:form>
                         </div>
                     </h:panelGroup>
@@ -613,10 +613,10 @@
                         <p:commandButton id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
 
-                            
+
                             <p:menuitem value="#{langueBean.getMsg('edit.import')}"  update=":idImportDlg" oncomplete="PF('importDlg').show();" action="#{rdf4jFileBean.init()}"
-                                                    style="font-size: 12px;"/> 
-                                     
+                                        style="font-size: 12px;"/> 
+
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
                                         update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
 
