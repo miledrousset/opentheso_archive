@@ -394,7 +394,11 @@ public class SelectedTerme implements Serializable {
             p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
             p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
             Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
-            federated_search_proxy.init(p);
+            try {
+                federated_search_proxy.init(p);
+            } catch (Exception e) {
+            }
+
             try {
                 IRQuery e = new IRQuery();
                 //   e.collections = new Vector<String>();
@@ -414,9 +418,10 @@ public class SelectedTerme implements Serializable {
                         nbNotices += getNotice(idTe);
                     }
                 }
-
             } catch (TimeoutExceededException | SearchException srch_e) {
                 srch_e.printStackTrace();
+            }
+            catch (Exception ex) {
             }
             urlNotice = user.getNodePreference().getNoticeUrl();
             try {

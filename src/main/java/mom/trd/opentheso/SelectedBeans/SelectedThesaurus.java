@@ -1281,7 +1281,7 @@ public class SelectedThesaurus implements Serializable {
         String message="drag & dop activé !";
         FacesContext context = FacesContext.getCurrentInstance();
          
-        context.addMessage(null, new FacesMessage("Successful",  "info : " + message) );
+        context.addMessage(null, new FacesMessage("",  "info : " + message) );
        }
     }
 
