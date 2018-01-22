@@ -42,4 +42,4 @@ OpenTheso is released under the terms of the [CeCILL_C](http://www.cecill.info/l
 
 Contact Opentheso R&D director : miled.rousset[at]mom[dot]fr
 
-Please give us your feedback : contact[at]frantiq[dot]fr
+Please give us your feedback : opentheso[at]mom[dot]fr
