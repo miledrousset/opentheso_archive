@@ -2,16 +2,18 @@
 
 Opentheso est un gestionnaire de thésaurus multilingue et multi-hiérarchique. Il est conforme aux normes ISO 25964-1 2011 et ISO 25964-2:2012 (Information et documentation. Thésaurus et intéropérabilité avec d’autres vocabulaires)
 
-Il est développé pour la Fédération et ressources sur l'Antiquité ([FRANTIQ](http://www.frantiq.fr), Groupement de services du CNRS) sous la direction de Miled Rousset, responsable de la plateforme Têtes de Réseaux Documentaires (TRD, [Maison de l'Orient et de la Méditerranée](http://www.mom.fr)) et directeur informatique de FRANTIQ, avec des prestations de Carole Bonfré.
+Il a été développé à l'origine pour la Fédération et ressources sur l'Antiquité ([FRANTIQ](http://www.frantiq.fr), Groupement de services du CNRS) sous la direction de Miled Rousset, responsable de la plateforme Têtes de Réseaux Documentaires (TRD, [Maison de l'Orient et de la Méditerranée](http://www.mom.fr)) et directeur informatique de FRANTIQ.
 
 Ses fonctionnalités actuelles :
 - Gestion avancée des termes et des branches
+- Drag and Drop
 - Gestion collaborative avec 4 niveaux d'authentification (Superadmin, Admin, User et Traducteur)
-- Interopérable : génération automatique d'identifiants [ARK](http://ark.mom.fr) (ce service est assuré par le PSIR de la MOM)
-- WebServices SOAP, REST
-- import/export SKOS et CSV
+- Interopérable : génération automatique d'identifiants Handle et [ARK](http://ark.mom.fr) (ce service est assuré par le PSIR de la MOM)
+- WebServices REST
+- import : SKOS, Turtle, JsonLD 
+- export : SKOS, Turtle, JsonLD, CSV et PDF
 
-Son développement a été financé par le GDS FRANTIQ, la MOM et la Très Grande Infrastructure de Recherche Huma-Num via le Consortium Mémoire des archéologues et des sites archéologiques.
+Son développement a été en partie financé par le GDS FRANTIQ, la MOM et la TGIR Huma-Num via le Consortium (MASA) Mémoire des archéologues et des sites archéologiques.
 
 ## Qui utilise Opentheso ?
 
@@ -24,7 +26,7 @@ Opentheso est distribué sous licence [CeCILL_C](http://www.cecill.info/licences
 ## Contacts
 
 - Directeur informatique : miled.rousset[at]mom[dot]fr
-- Donnez-nous votre avis : contact[at]frantiq[dot]fr
+- Donnez-nous votre avis : opentheso[at]mom[dot]fr
 
 # What is Opentheso
 
@@ -42,4 +44,4 @@ OpenTheso is released under the terms of the [CeCILL_C](http://www.cecill.info/l
 
 Contact Opentheso R&D director : miled.rousset[at]mom[dot]fr
 
-Please give us your feedback : contact[at]frantiq[dot]fr
+Please give us your feedback : opentheso[at]mom[dot]fr
