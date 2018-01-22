@@ -177,3 +177,188 @@ span.dragDropInfo {
     display:block;
 
 }
+/***************************page statistic.xhtml* *****************************/
+
+div#principaleConf .ui-widget{
+    font-family: "Palatino linotype",Times,serif;
+    font-size:14px;
+   
+}
+div#principaleConf span#choixStat form:first-child{
+  
+    
+background: rgba(181,241,91,0.2);
+    font-weight:bold;
+    text-align:center;
+    margin:auto;
+    color:black;
+}
+div#principaleConf span#choixStat form:first-child:first-letter{
+     text-transform: capitalize;
+}
+div#principaleConf span#choixStat form:first-child select{
+    width:80px;
+}
+div#principaleConf .menuStat  {
+  background:transparent;
+    
+}
+div#principaleConf .menuStat div{
+    background:#579323;
+    position:relative;
+    top:-26px;
+    border:1px solid black;
+    box-shadow:inset 0 1px 0 #586400;
+}
+div#principaleConf .menuStat div.ui-state-hover{
+    box-shadow:0px 0px 8px  #BFBBA5 ; 
+}
+div#principaleConf .menuStat div.ui-state-active{
+    background:#c2df97;
+    box-shadow:0px 0px 4px  #BFBBA5,0px 0px 4px #BD5E2E; 
+    border: 3px solid #956620;
+}
+div#principaleConf .menuStat div{
+    text-shadow:none;
+    color:white;
+    border-radius:30px;
+}
+div#principaleConf span#choixStat form#selectAndExport{
+    height:20px;
+}
+div#principaleConf span#choixStat form#selectAndExport button {
+    background:#F1E655;
+    position:absolute;
+    right:5px;
+    top:36px;
+    height:18px;
+    border:1px solid black;
+    width:156px;
+    border-radius: 90px;
+}
+div#principaleConf span#choixStat form#selectAndExport button span{
+    position:relative;
+    top:-7px;
+    text-transform: capitalize
+    
+}
+div#principaleConf span#choixStat form#submitStat button{
+    background:#F1E655;
+
+  
+
+  
+    font-weight:bold;
+    border-radius: 90px;
+    height:20px;
+    width:156px;
+    border:1px solid  black;
+    box-shadow:0px 0px 1px 2px #721A3B;
+    z-index:10;
+    position:absolute;
+    top:11px;
+    right:5px;
+   
+}
+
+div#principaleConf span#choixStat form#submitStat button:hover{
+     
+    
+    box-shadow:0px 0px 1px 2px #721A3B,0px 0px 3px 5px #A52656;
+}
+div#principaleConf span#choixStat form#submitStat button span{
+    position:relative;
+    text-transform: Uppercase;
+   
+    letter-spacing: 1px;
+    left:0px;
+    top:-2px;
+    font-size:11px;
+    text-align:center;
+    color:#A52656;
+   
+}
+form#optionStat{
+    display:flex;
+    flex-direction:row;
+    align-items:flex-start;
+    justify-content:space-between; 
+    height:50px; 
+    font-size:10px;
+    width:83%;
+}
+
+form#optionStat div div{
+    flex-direction:row-reverse;
+}
+
+form#optionStat div{
+    display:flex;
+    flex-direction:column;
+    max-width: 290px;
+    
+    
+}
+form#optionStat >*{
+     min-width:90px;
+}
+form#optionStat input,form#optionStat span.ui-calendar,form#optionStat div.ui-selectonemenu,form#submitStat span.ui-spinner,form#submitStat span.ui-spinner input{
+    height:20px;
+  
+    padding:0px;
+    text-align:center;
+}
+form#optionStat span.ui-calendar,form#optionStat span.ui-calendar input{
+    width:80px;
+    
+}
+form#submitStat span.ui-spinner{
+  width:80px;
+
+}
+form#submitStat span.ui-spinner input{
+    border:1px solid black;
+    width:80px;
+    border-right:none;
+}
+form#optionStat div.ui-selectonemenu label{
+    position:relative;
+    top:-2px;
+    min-width: 200px;
+}
+form#submitStat {
+    margin-bottom:5px;
+}
+form#submitStat span.ui-spinner{
+   vertical-align:baseline;
+}
+form#submitStat span.ui-spinner a:first-child {
+    top:1px;
+    height:11px;
+}
+form#submitStat span.ui-spinner a:last-child{
+   bottom:-2px; 
+    height:11px;
+}
+form#submitStat span.ui-spinner a span span{
+  
+}
+
+div#principaleConf span#choixStat form#panStatConcept div div div table thead tr th,div#principaleConf span#choixStat form#panStatTheso div div div table thead tr th{
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#bbdd87+0,c2df97+47,c2df97+53,789162+100 */
+background: #bbdd87; /* Old browsers */
+background: -moz-linear-gradient(top, #bbdd87 0%, #c2df97 47%, #c2df97 53%, #789162 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, #bbdd87 0%,#c2df97 47%,#c2df97 53%,#789162 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, #bbdd87 0%,#c2df97 47%,#c2df97 53%,#789162 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bbdd87', endColorstr='#789162',GradientType=0 ); /* IE6-9 */
+}
+div#principaleConf span#choixStat form#panStatConcept div div.ui-widget-header,div#principaleConf span#choixStat form#panStatConcept div div div table thead tr th:last-child {
+    background:transparent;
+     border-color:transparent;
+}
+div#principaleConf span#choixStat form#panStatConcept div div  table tbody tr td:last-child form{
+    background: transparent;
+}
+div#principaleConf span#choixStat form#panStatConcept div div  table tbody tr:nth-child(even){
+    background: rgba(194,223,151,0.3);
+}

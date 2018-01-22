@@ -145,6 +145,8 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
+    
+    
 
     /**
      * ************************************ INITIALISATION
@@ -1244,7 +1246,7 @@ public class SelectedThesaurus implements Serializable {
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void maj() {
-
+     
         tree.getSelectedTerme().reInitTerme();
         tree.reInit();
         tree.initTree(null, null);
@@ -1269,6 +1271,8 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }
         vue.setCreat(false);
+        vue.setStatTheso(false);//#jm pour la page de statistiques
+        vue.setStatCpt(false);//idem
         majPref();
         if (selectedTerme != null) {
             selectedTerme.initTerme();
