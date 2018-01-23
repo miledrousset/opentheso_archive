@@ -31,14 +31,17 @@ div#menuHead{
     height:80px;
   
 }
-div#menuHead div#menuHeadTop{
+div#menuHead div#menuHeadTop,#menuHeadTop{
     display:flex;
     flex-direction:row;
     justify-content:center;
     align-content: center;
     height:55px;
+    width:900px;
+    margin:auto;
     
 }
+
 div#menuHead div#langueEtHelp{ 
     
     flex-direction:row;
