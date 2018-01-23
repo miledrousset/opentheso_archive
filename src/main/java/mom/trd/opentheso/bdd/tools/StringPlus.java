@@ -63,7 +63,6 @@ public class StringPlus {
         s = s.replace("\"", " ");
         s = s.replaceAll("\n", " ");
         s = s.replaceAll("\t", " ");
-        s = s.replaceAll("'", " ");
         return s.trim();
     }
 

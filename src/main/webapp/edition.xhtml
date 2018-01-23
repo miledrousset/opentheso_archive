@@ -116,7 +116,7 @@
         </center>
         <!-- POP UP DOWNLOAD SKOS THESO FIN -->
 
-        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+        <p:growl id="msgImport" showDetail="true" /> 
         <center>
             <div id="generalEdition">
                 <div id="listeTheso">
@@ -176,7 +176,8 @@
                                     <h:outputText value="#{langueBean.getMsg('edit.tab1Opt3')}" />
                                 </f:facet>
                                 <h:form>
-                                    <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{theso.supprimerTheso(entry.value)}" update=":panTable" >
+                                    <p:commandButton id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{theso.supprimerTheso(entry.value)}" update=":panTable"
+                                                     oncomplete="#{accessThesaurusBean.accessOwnerThesaurus()}">
                                         <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('edit.valid1')}" icon="ui-icon-alert" />  
                                     </p:commandButton>  
 
@@ -193,46 +194,7 @@
 
                 <!--<ui:include src="skosImport.xhtml" />-->
 
-                <!-- Section upload SKOS2 to theso -->
-                <h:panelGroup id="panSkos2">
-                    <h:panelGroup layout="block" rendered="#{vue.addSkos2 == true}" >
-                        <div class="importerTheso">
-                            <div id="titreEditTheso">
-                                <h:outputText value="#{langueBean.getMsg('edit.import')} new version" />
-                                <div id="divClose">
-                                    <h:form>
-                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
-                                                         actionListener="#{vue.setAddSkos2(false)}" update=":panSkos2" />
-                                    </h:form>
-                                </div>
-                            </div>
-                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
-                                <p:growl id="growl" /> 
-                                <p:messages showDetail="true" autoUpdate="true" />
-                                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
-                                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
-                                <h:inputText id="date" value="#{fileBean.formatDate}" />
-                                <p:watermark for="date" value="#{langueBean.getMsg('edit.defaultDate')}" />
-                                <br/><br/>
-
-
-                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
-                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.readSkos2}" process="@form"
-                                              update="@form,:panSkos2"  />
-
-
-                                <p:commandButton value="Insert into BDD"
-                                                 disabled="#{fileBean.desabled}"
-                                                 onclick="PF('pbAjax').start();PF('startButton2').disable();" 
-                                                 widgetVar="startButton2" 
-                                                 actionListener="#{fileBean.addSkosDatas2()}"/>  
-
-
-                            </h:form>
-                            <p:graphicImage binding="#{requestScope.foo}" value="/images/loading.gif" style="display: none;"/> 
-                        </div>
-                    </h:panelGroup>
-                </h:panelGroup>                
+            
 
 
 
@@ -618,7 +580,7 @@
                                         style="font-size: 12px;"/> 
 
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
-                                        update=":panSkos,:panSkos2,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
+                                        update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
 
                         </p:menu>
                     </h:form>

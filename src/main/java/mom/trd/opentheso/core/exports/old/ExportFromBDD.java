@@ -8,6 +8,7 @@ import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
@@ -21,6 +22,9 @@ public class ExportFromBDD {
     private String serverArk;
     private String serverAdress;
     private boolean isArkActive;
+    
+    private NodePreference nodePreference;
+    
     DownloadBean downloadBean;
 
     public void setServerArk(String serverArk) {
@@ -316,7 +320,8 @@ public class ExportFromBDD {
 
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
-        writeFileSKOS.setServerAdress(serverAdress);       
+        writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setNodePreference(nodePreference);
         
         writeFileSKOS.writeHeader();
 
@@ -352,9 +357,11 @@ public class ExportFromBDD {
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setNodePreference(nodePreference);
         
         writeFileSKOS.writeHeader();
         ConceptHelper conceptHelper = new ConceptHelper();
+
         
         NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
         if(nodeConcept == null) return null;
@@ -384,6 +391,7 @@ public class ExportFromBDD {
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setNodePreference(nodePreference);
         
         writeFileSKOS.writeHeader();
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -450,7 +458,7 @@ public class ExportFromBDD {
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
         
-        
+        writeFileSKOS.setNodePreference(nodePreference);
         ConceptHelper conceptHelper = new ConceptHelper();
         
         ArrayList<NodeConceptExport> listNodeConcept = conceptHelper.getMultiConceptForExport(ds, value, idThesaurus, lang, isArkActive);
@@ -485,6 +493,7 @@ public class ExportFromBDD {
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setNodePreference(nodePreference);
         
         
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -514,6 +523,7 @@ public class ExportFromBDD {
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setNodePreference(nodePreference);
         
         writeFileSKOS.writeHeader();
         NodeUri nodeUri = new NodeUri();
@@ -704,6 +714,14 @@ public class ExportFromBDD {
                 
                 downloadBean.setProgress_per_100((int) ((downloadBean.getProgress_abs()/downloadBean.getSizeOfTheso() ) * 100));
         
+    }
+
+    public NodePreference getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(NodePreference nodePreference) {
+        this.nodePreference = nodePreference;
     }
     
     

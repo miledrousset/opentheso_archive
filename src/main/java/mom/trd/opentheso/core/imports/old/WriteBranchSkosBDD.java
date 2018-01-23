@@ -251,8 +251,7 @@ public class WriteBranchSkosBDD {
         concept.setIdGroup(idGroup);
         concept = addDates(resource.getDateList(), concept, dateFormat);
 
-        conceptHelper.insertConceptInTable(ds, concept,
-                        adressSite, useArk, idUser);
+        conceptHelper.insertConceptInTable(ds, concept, idUser);
 
         //ajout des termes et traductions
         NodeTerm nodeTerm = new NodeTerm();
@@ -425,8 +424,7 @@ public class WriteBranchSkosBDD {
 
         if(idGroup.trim().isEmpty()) return;
 
-        conceptHelper.insertConceptInTable(ds, concept,
-                        adressSite, useArk, idUser);
+        conceptHelper.insertConceptInTable(ds, concept, idUser);
 
         //ajout des termes et traductions
         NodeTerm nodeTerm = new NodeTerm();
@@ -560,8 +558,7 @@ public class WriteBranchSkosBDD {
         concept.setIdGroup(idGroup);
         concept = addDates(resource.getDateList(), concept, dateFormat);
 
-        conceptHelper.insertConceptInTable(ds, concept,
-                        adressSite, useArk, idUser);
+        conceptHelper.insertConceptInTable(ds, concept, idUser);
 
         //ajout des termes et traductions
         NodeTerm nodeTerm = new NodeTerm();
@@ -686,8 +683,7 @@ public class WriteBranchSkosBDD {
 
         if(idGroup.trim().isEmpty()) return;
 
-        conceptHelper.insertConceptInTable(ds, concept,
-                        adressSite, useArk, idUser);
+        conceptHelper.insertConceptInTable(ds, concept, idUser);
 
         //ajout des termes et traductions
         NodeTerm nodeTerm = new NodeTerm();

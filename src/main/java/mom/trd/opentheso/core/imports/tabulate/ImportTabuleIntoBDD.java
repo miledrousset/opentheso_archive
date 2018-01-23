@@ -120,8 +120,6 @@ public class ImportTabuleIntoBDD {
                 concept.setIdGroup(idGroup);
                 conceptHelper.insertConceptInTable(ds,
                         concept,
-                        "",
-                        false,
                         idUser);
             }
         }

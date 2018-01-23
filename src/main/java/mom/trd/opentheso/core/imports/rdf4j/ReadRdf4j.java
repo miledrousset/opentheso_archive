@@ -30,7 +30,7 @@ public class ReadRdf4j {
 
     private static Model model;
     private SKOSXmlDocument sKOSXmlDocument;
-
+ 
     /**
      * constucteur
      */
@@ -44,7 +44,6 @@ public class ReadRdf4j {
      */
     public ReadRdf4j(InputStream is, int type, rdf4jFileBean fileBean) throws IOException {
         sKOSXmlDocument = new SKOSXmlDocument();
-
         switch (type) {
             case 0:
                 laodSkosModel(is);
@@ -59,7 +58,6 @@ public class ReadRdf4j {
                 laodJsonModel(is);
                 break;                
         }
-
         readModel(fileBean);
     }
 
@@ -439,12 +437,16 @@ public class ReadRdf4j {
     private boolean readIdentifier(ReadStruct readStruct) {
         if (readStruct.property.getLocalName().equals("identifier")) {
             readStruct.resource.setIdentifier(readStruct.literal.getLabel());
+            addEquivalenceIdArk(readStruct);
             return false;
         } else {
             return true;
         }
     }
 
+    private void addEquivalenceIdArk(ReadStruct readStruct){
+        sKOSXmlDocument.getEquivalenceUriArkHandle().put(readStruct.resource.getUri(),readStruct.literal.getLabel());
+    }
     /**
      *
      * @return l'objet qui contiens les données lus par readModel()

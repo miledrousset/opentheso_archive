@@ -117,9 +117,9 @@ public class AccessThesaurusBean {
      * 
      */
     public void accessOwnerThesaurus(){
-         if(listAccessCache!=null && !(listAccessCache.isEmpty())){
+    /*     if(listAccessCache!=null && !(listAccessCache.isEmpty())){
          return; 
-        }
+        }*/
         AccessThesaurusHelper ath=new AccessThesaurusHelper();
         int idUser=user.getUser().getId();
         String idLang=theso.getWorkLanguage();

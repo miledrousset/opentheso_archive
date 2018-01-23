@@ -1043,6 +1043,7 @@ public class SelectedThesaurus implements Serializable {
         
         th.deleteThesaurus(connect.getPoolConnexion(), id);
         arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+       
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", conceptHelper.getMessage()));
     }
 
@@ -1677,6 +1678,7 @@ public class SelectedThesaurus implements Serializable {
                     // cas d'un domaine ou  Groupe
                     if (tree.getSelectedTerme().getType() == 1) {
                         ExportFromBDD exportFromBDD = new ExportFromBDD();
+                        exportFromBDD.setNodePreference(nodePreference);
                         exportFromBDD.setServerArk(serverArk);
                         exportFromBDD.setServerAdress(cheminSite);
                         StringBuffer skos = exportFromBDD.exportThisGroup(
@@ -1696,6 +1698,7 @@ public class SelectedThesaurus implements Serializable {
                     // cas d'un concept
                     if (tree.getSelectedTerme().getType() == 2 || tree.getSelectedTerme().getType() == 3) {
                         ExportFromBDD exportFromBDD = new ExportFromBDD();
+                        exportFromBDD.setNodePreference(nodePreference);
                         exportFromBDD.setServerArk(serverArk);
                         exportFromBDD.setServerAdress(cheminSite);
                         StringBuffer skos = exportFromBDD.exportConcept(
@@ -1726,6 +1729,7 @@ public class SelectedThesaurus implements Serializable {
         if (thesaurus != null && thesaurus.getId_thesaurus() != null) {
             if (!thesaurus.getId_thesaurus().trim().isEmpty()) {
                 ExportFromBDD exportFromBDD = new ExportFromBDD();
+                exportFromBDD.setNodePreference(nodePreference);
                 exportFromBDD.setServerArk(serverArk);
                 exportFromBDD.setServerAdress(cheminSite);
                 StringBuffer skos = exportFromBDD.exportGroupsOfThesaurus(

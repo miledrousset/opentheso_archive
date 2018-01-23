@@ -259,8 +259,9 @@ public class DownloadBean implements Serializable {
         NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
         if(nodePreference == null) return null;
         
-        sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
+        sizeOfTheso = conceptHelper.getConceptCountOfThesaurus(connect.getPoolConnexion(), idTheso);
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setNodePreference(nodePreference);
         exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
         exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
         exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
@@ -422,6 +423,7 @@ public class DownloadBean implements Serializable {
      *
      * @param idConcept
      * @param idTheso
+     * @param type
      * @return
      */
     public StreamedContent conceptToFile(String idConcept, String idTheso, int type) {
@@ -447,6 +449,7 @@ public class DownloadBean implements Serializable {
         
         if(nodePreference == null) return null;
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setNodePreference(nodePreference);
         exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,nodePreference.getCheminSite());
         exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
@@ -556,7 +559,10 @@ public class DownloadBean implements Serializable {
         
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
         exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
+        exportRdf4jHelper.setNodePreference(nodePreference);
+        
         exportRdf4jHelper.addBranch(idTheso, idConcept);
+
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
 
         ByteArrayOutputStream out;

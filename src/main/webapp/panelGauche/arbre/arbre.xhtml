@@ -20,7 +20,7 @@
 
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     
-                    <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3"   >
+                    <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport"   >
                      
                     </p:ajax>
                   
@@ -118,7 +118,7 @@
                     
                     </p:ajax>
                     
-                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport" 
                             listener="#{newtreeBean.onNodeSelect}"/>
                    
                   

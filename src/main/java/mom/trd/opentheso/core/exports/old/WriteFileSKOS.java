@@ -5,6 +5,7 @@ import java.util.List;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -24,6 +25,8 @@ public class WriteFileSKOS {
 
     private String serverArk;
     private String serverAdress;
+    
+    private NodePreference nodePreference;
 
     public WriteFileSKOS() {
         skosBuff = new StringBuffer();
@@ -390,12 +393,6 @@ public class WriteFileSKOS {
      */
     private String getUri(NodeConceptExport nodeConceptExport) {
         String uri = "";
-
-        /**
-         * Cette partie est réservée pour l'export des PACTOLS de Frantiq vers
-         * Koha
-         */
-        // uri = serverAdress + "concept#" + nodeConceptExport.getConcept().getIdConcept();
         if (nodeConceptExport == null) {
             //      System.out.println("nodeConcept = Null");
             return uri;
@@ -404,19 +401,30 @@ public class WriteFileSKOS {
             //    System.out.println("nodeConcept.getConcept = Null");
             return uri;
         }
-        if (nodeConceptExport.getConcept().getIdArk() == null) {
-            //   System.out.println("nodeConcept.getConcept().getIdArk = Null");
-            uri = serverAdress + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
-                    + "&amp;idt=" + nodeConceptExport.getConcept().getIdThesaurus();
-            return uri;
+        
+        // Choix de l'URI pour l'export : 
+        // Si Handle est actif, on le prend en premier 
+        // sinon,  on vérifie si Ark est actif, 
+        // en dernier, on prend l'URL basique d'Opentheso
+        // 1 seule URI est possible pour l'export par concept
+        
+        // URI de type Handle
+        if (nodeConceptExport.getConcept().getIdHandle() != null) {
+            if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
+                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
+                return uri;
+            }
         }
-        if (nodeConceptExport.getConcept().getIdArk().trim().isEmpty()) {
-            uri = serverAdress + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
-                    + "&amp;idt=" + nodeConceptExport.getConcept().getIdThesaurus();
-        } else {
-            uri = serverArk + nodeConceptExport.getConcept().getIdArk();
+        // URI de type Ark
+        if (nodeConceptExport.getConcept().getIdArk() != null) {
+            if (!nodeConceptExport.getConcept().getIdArk().trim().isEmpty()) {
+                uri = nodePreference.getServeurArk() + nodeConceptExport.getConcept().getIdArk();
+                return uri;
+            }
         }
-
+        // si on ne trouve pas ni Handle, ni Ark
+        uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
+                        + "&amp;idt=" + nodeConceptExport.getConcept().getIdThesaurus();
         return uri;
     }
 
@@ -480,4 +488,14 @@ public class WriteFileSKOS {
     public StringBuffer getSkosBuff() {
         return skosBuff;
     }
+
+    public NodePreference getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(NodePreference nodePreference) {
+        this.nodePreference = nodePreference;
+    }
+    
+    
 }

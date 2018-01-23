@@ -9,32 +9,30 @@ package mom.trd.opentheso.bdd.helper.nodes;
  *
  * @author Quincy
  */
-public class NodeHieraRelation{
-        private NodeUri uri;
-        private String role;
+public class NodeHieraRelation {
+
+    private NodeUri uri;
+    private String role;
 
     public NodeHieraRelation() {
         uri = new NodeUri();
         role = new String();
     }
-        
-        
 
-        public NodeUri getUri() {
-            return uri;
-        }
-
-        public void setUri(NodeUri uri) {
-            this.uri = uri;
-        }
-
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(String role) {
-            this.role = role;
-        }
-        
-        
+    public NodeUri getUri() {
+        return uri;
     }
+
+    public void setUri(NodeUri uri) {
+        this.uri = uri;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+}

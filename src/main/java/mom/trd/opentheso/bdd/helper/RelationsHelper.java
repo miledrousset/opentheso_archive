@@ -14,11 +14,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Relation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
+import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
@@ -35,6 +36,56 @@ public class RelationsHelper {
 
     public RelationsHelper() {
     }
+   
+    /**
+     * Cette fonction permet d'ajouter une relation à la table
+     * hierarchicalRelationship
+     * Sert à l'import 
+     *
+     * @param ds
+     * @param idConcept1
+     * @param idTheso
+     * @param role
+     * @param idConcept2
+     * @return
+     * #MR
+     */
+    public boolean insertHierarchicalRelation(HikariDataSource ds,
+            String idConcept1, String idTheso,
+            String role, String idConcept2) {
+
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into hierarchical_relationship"
+                            + "(id_concept1, id_thesaurus, role, id_concept2)"
+                            + " values ("
+                            + "'" + idConcept1+ "'"
+                            + ",'" + idTheso + "'"
+                            + ",'" + role + "'"
+                            + ",'" + idConcept2 + "')";
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // To avoid dupplicate Key
+            //   System.out.println(sqle.toString());
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding hierarchical relation of Concept : " + idConcept1, sqle);
+            }
+        }
+        return status;
+    }    
 
     /**
      * Cette fonction permet de rajouter une relation type Groupe ou domaine à
@@ -281,6 +332,45 @@ public class RelationsHelper {
         }
         return list;
     }
+    
+    public ArrayList<String[]> getListIdAndRoleOfRT(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String[]> list = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept2,role from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and (role = '" + "RT" + "'"
+                            + " or role = 'RHP' or role = 'RPO')";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        String tab[] = {resultSet.getString("id_concept2"),resultSet.getString("role")};
+                        list.add(tab);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting list Ids of RT of Concept : " + idConcept, sqle);
+        }
+        return list;
+}    
     
     /**
      * recuperela la liste des ids et le role des NT dans une array liste de string[2]
@@ -1006,40 +1096,56 @@ public class RelationsHelper {
     }
 
     /**
-     * Cette fonction permet de rÃ©cupÃ©rer la liste des Id des termes
-     * gÃ©nÃ©riques d'un concept
-     *
+     * Cette fonction permet de récupérer la liste des Id des termes
+     * génériques d'un concept avec les identifiants pérennes (Ark, Handle)
+     * sert à l'export des données
+     * 
      * @param ds
      * @param idConcept
      * @param idThesaurus
      * @return Objet class Concept
+     * #MR
      */
-    public ArrayList<String[]> getListBT(HikariDataSource ds,
+    public ArrayList<NodeHieraRelation> getListBT(HikariDataSource ds,
             String idConcept, String idThesaurus) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList<String[]> listIdBT = null;
-
+        ArrayList<NodeHieraRelation> nodeListIdOfConcept = new ArrayList<>();
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept2,role from hierarchical_relationship"
-                            + " where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and role LIKE 'BT%'";
+                    String query = "select id_concept2, role, id_ark, id_handle "
+                        + " from hierarchical_relationship as hr"
+                        + " left join concept as con on id_concept = id_concept2"
+                        + " and hr.id_thesaurus = con.id_thesaurus"
+                        + " where hr.id_thesaurus = '"+ idThesaurus + "'"
+                        + " and id_concept1 = '" + idConcept + "'"
+                        + " and role LIKE 'BT%'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        listIdBT = new ArrayList<>();
-                        while (resultSet.next()) {
-                            String tab []={resultSet.getString("id_concept2"),resultSet.getString("role")};
-                            listIdBT.add(tab);
+                    while (resultSet.next()) {
+                        NodeHieraRelation nodeHieraRelation = new NodeHieraRelation();
+                        NodeUri nodeUri = new NodeUri();
+                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark") .trim().isEmpty())) {
+                            nodeUri.setIdArk("");
+                        } else {
+                            nodeUri.setIdArk(resultSet.getString("id_ark"));
                         }
+                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle") .trim().isEmpty())) {
+                            nodeUri.setIdHandle("");
+                        } else {
+                            nodeUri.setIdHandle(resultSet.getString("id_handle"));
+                        }
+                        nodeUri.setIdConcept(resultSet.getString("id_concept2"));
+                        
+                        nodeHieraRelation.setRole(resultSet.getString("role"));
+                        nodeHieraRelation.setUri(nodeUri);
+                        nodeListIdOfConcept.add(nodeHieraRelation);
                     }
                 } finally {
                     stmt.close();
@@ -1049,9 +1155,9 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while getting Liste ID of BT Concept : " + idConcept, sqle);
+            log.error("Error while getting Liste ID of BT Concept with ark and handle : " + idConcept, sqle);
         }
-        return listIdBT;
+        return nodeListIdOfConcept;
     }
     /**
      * Cette fonction permet de rÃ©cupÃ©rer la liste des Id des termes
@@ -1501,8 +1607,8 @@ public class RelationsHelper {
     }
 
     /**
-     * Cette fonction permet de rÃ©cupÃ©rer la liste des Ids des termes
-     * spÃ©cifiques d'un concept UtilisÃ©e pour l'export des Concepts
+     * Cette fonction permet de récupérer la liste des Ids des termes
+     * spécifiques d'un concept Utilisée pour l'export des Concepts
      *
      * @param ds
      * @param idConcept
@@ -1544,37 +1650,58 @@ public class RelationsHelper {
         }
         return nodeListIdsNT;
     }
-    
+
     /**
+     * Cette fonction permet de récupérer la liste des Id des termes
+     * spécifiques d'un concept avec les identifiants pérennes (Ark, Handle)
+     * sert à l'export des données
      * 
      * @param ds
      * @param idConcept
      * @param idThesaurus
-     * @return l'id et le role
+     * @return Objet class Concept
+     * #MR
      */
-    public ArrayList<String[]> getListOfNT(HikariDataSource ds,
+    public ArrayList<NodeHieraRelation> getListNT(HikariDataSource ds,
             String idConcept, String idThesaurus) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList<String[]> nodeListNT = new ArrayList<>();
-
+        ArrayList<NodeHieraRelation> nodeListIdOfConcept = new ArrayList<>();
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept2, role from hierarchical_relationship"
-                            + " where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and role LIKE 'NT%'";
+                    String query = "select id_concept2, role, id_ark, id_handle "
+                        + " from hierarchical_relationship as hr"
+                        + " left join concept as con on id_concept = id_concept2"
+                        + " and hr.id_thesaurus = con.id_thesaurus"
+                        + " where hr.id_thesaurus = '"+ idThesaurus + "'"
+                        + " and id_concept1 = '" + idConcept + "'"
+                        + " and role LIKE 'NT%'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
-                        String tab[] = {resultSet.getString("id_concept2"),resultSet.getString("role")};
-                        nodeListNT.add(tab);
+                        NodeHieraRelation nodeHieraRelation = new NodeHieraRelation();
+                        NodeUri nodeUri = new NodeUri();
+                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark") .trim().isEmpty())) {
+                            nodeUri.setIdArk("");
+                        } else {
+                            nodeUri.setIdArk(resultSet.getString("id_ark"));
+                        }
+                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle") .trim().isEmpty())) {
+                            nodeUri.setIdHandle("");
+                        } else {
+                            nodeUri.setIdHandle(resultSet.getString("id_handle"));
+                        }
+                        nodeUri.setIdConcept(resultSet.getString("id_concept2"));
+                        
+                        nodeHieraRelation.setRole(resultSet.getString("role"));
+                        nodeHieraRelation.setUri(nodeUri);
+                        nodeListIdOfConcept.add(nodeHieraRelation);
                     }
                 } finally {
                     stmt.close();
@@ -1584,10 +1711,12 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while getting List Ids of NT of Concept : " + idConcept, sqle);
+            log.error("Error while getting Liste ID of NT Concept with ark and handle : " + idConcept, sqle);
         }
-        return nodeListNT;
+        return nodeListIdOfConcept;
     }
+    
+
 
     /**
      * Cette fonction permet de savoir si le Concept a une relation NT si oui,
@@ -1710,125 +1839,60 @@ public class RelationsHelper {
         }
         return nodeListRT;
     }
-
-    /**
-     * Cette fonction permet de rÃ©cupÃ©rer la liste des Ids des termes
-     * associÃ©s d'un concept
-     *
-     * @param ds
-     * @param idConcept
-     * @param idThesaurus
-     * @return Objet class Concept
-     */
-    public ArrayList<String> getListIdsOfRT(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
-
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        ArrayList<String> listIdsOfRT = new ArrayList<>();
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "select id_concept2 from hierarchical_relationship"
-                            + " where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and (role = '" + "RT" + "'"
-                            + " or role = 'RHP' or role = 'RPO')";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    while (resultSet.next()) {
-                        listIdsOfRT.add(resultSet.getString("id_concept2"));
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while getting list Ids of RT of Concept : " + idConcept, sqle);
-        }
-        return listIdsOfRT;
-    }
-    
-    public ArrayList<String[]> getListIdAndRoleOfRT(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
-
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        ArrayList<String[]> list = new ArrayList<>();
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "select id_concept2,role from hierarchical_relationship"
-                            + " where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and (role = '" + "RT" + "'"
-                            + " or role = 'RHP' or role = 'RPO')";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    while (resultSet.next()) {
-                        String tab[] = {resultSet.getString("id_concept2"),resultSet.getString("role")};
-                        list.add(tab);
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while getting list Ids of RT of Concept : " + idConcept, sqle);
-        }
-        return list;
-    }
     
     /**
+     * Cette fonction permet de récupérer la liste des Id des termes
+     * associés d'un concept avec les identifiants pérennes (Ark, Handle)
+     * sert à l'export des données
      * 
      * @param ds
      * @param idConcept
      * @param idThesaurus
-     * @return l'id et le role
+     * @return Objet class Concept
+     * #MR
      */
-    public ArrayList<String> getListOfRT(HikariDataSource ds,
+    public ArrayList<NodeHieraRelation> getListRT(HikariDataSource ds,
             String idConcept, String idThesaurus) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
-        ArrayList<String> listOfRT = new ArrayList<>();
-
+        ArrayList<NodeHieraRelation> nodeListIdOfConcept = new ArrayList<>();
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept2 from hierarchical_relationship"
-                            + " where id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_concept1 = '" + idConcept + "'"
-                            + " and (role = '" + "RT" + "'"
+                    String query = "select id_concept2, role, id_ark, id_handle "
+                        + " from hierarchical_relationship as hr"
+                        + " left join concept as con on id_concept = id_concept2"
+                        + " and hr.id_thesaurus = con.id_thesaurus"
+                        + " where hr.id_thesaurus = '"+ idThesaurus + "'"
+                        + " and id_concept1 = '" + idConcept + "'"
+                         + " and (role = '" + "RT" + "'"
                             + " or role = 'RHP' or role = 'RPO')";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
-                        listOfRT.add(resultSet.getString("id_concept2"));
+                        NodeHieraRelation nodeHieraRelation = new NodeHieraRelation();
+                        NodeUri nodeUri = new NodeUri();
+                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark") .trim().isEmpty())) {
+                            nodeUri.setIdArk("");
+                        } else {
+                            nodeUri.setIdArk(resultSet.getString("id_ark"));
+                        }
+                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle") .trim().isEmpty())) {
+                            nodeUri.setIdHandle("");
+                        } else {
+                            nodeUri.setIdHandle(resultSet.getString("id_handle"));
+                        }
+                        nodeUri.setIdConcept(resultSet.getString("id_concept2"));
+                        
+                        nodeHieraRelation.setRole(resultSet.getString("role"));
+                        nodeHieraRelation.setUri(nodeUri);
+                        nodeListIdOfConcept.add(nodeHieraRelation);
                     }
-
                 } finally {
                     stmt.close();
                 }
@@ -1837,9 +1901,9 @@ public class RelationsHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while getting list Ids of RT of Concept : " + idConcept, sqle);
+            log.error("Error while getting Liste ID of BT Concept with ark and handle : " + idConcept, sqle);
         }
-        return listOfRT;
-    }
+        return nodeListIdOfConcept;
+    }    
 
 }

@@ -13,6 +13,7 @@ public class NodeTT {
 
     private String idConcept;
     private String idArk;
+    private String idHandle;
     private String idGroup;
 
     public NodeTT() {
@@ -41,6 +42,14 @@ public class NodeTT {
 
     public void setIdGroup(String idGroup) {
         this.idGroup = idGroup;
+    }
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
     }
 
 }

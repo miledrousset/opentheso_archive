@@ -24,6 +24,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
+import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
@@ -31,6 +32,7 @@ import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
@@ -56,7 +58,8 @@ public class ImportRdf4jHelper {
     private final ArrayList<String> idTopConcept;
     private ArrayList<String> idGroups;
     private String idGroupDefault;
-
+    private boolean defaultGroupToAdd;
+    
     private String langueSource;
     private HikariDataSource ds;
     private String formatDate;
@@ -64,7 +67,12 @@ public class ImportRdf4jHelper {
     private int idUser;
     private int idRole;
     private boolean useArk;
+    private String identifierType;
+    private String prefixHandle;
 
+    private NodePreference nodePreference;
+    private StringBuilder message;
+    
     String idTheso;
 
     private int resourceCount;
@@ -75,15 +83,48 @@ public class ImportRdf4jHelper {
     ArrayList<String> hasTopConcceptList = new ArrayList<>();
 
     private SKOSXmlDocument skosXmlDocument;
-    
-    private HashMap<String,String>codeRelationReciproque;
 
     public ImportRdf4jHelper() {
         idTopConcept = new ArrayList<>();
         idGroups = new ArrayList<>();
         idGroupDefault = "";
+        message = new StringBuilder();
+        defaultGroupToAdd = false;
     }
 
+    /**
+     * Classe pour construire un concept sépcifique
+     */
+    class AddConceptsStruct {
+
+        Concept concept;
+        ConceptHelper conceptHelper;
+        SKOSResource conceptResource;
+        // pour intégrer les coordonnées GPS 
+        NodeGps nodeGps = new NodeGps();
+        GpsHelper gpsHelper = new GpsHelper();
+        //ajout des termes et traductions
+        NodeTerm nodeTerm = new NodeTerm();
+        ArrayList<NodeTermTraduction> nodeTermTraductionList = new ArrayList<>();
+        //Enregister les synonymes et traductions
+        ArrayList<NodeEM> nodeEMList = new ArrayList<>();
+        // ajout des notes
+        ArrayList<NodeNote> nodeNotes = new ArrayList<>();
+        //ajout des relations 
+        ArrayList<HierarchicalRelationship> hierarchicalRelationships = new ArrayList<>();
+        // ajout des relations Groups
+        ArrayList<String> idGrps = new ArrayList<>();
+        // ajout des alignements 
+        ArrayList<NodeAlignment> nodeAlignments = new ArrayList<>();
+        TermHelper termHelper = new TermHelper();
+        NoteHelper noteHelper = new NoteHelper();
+        boolean isTopConcept = false;
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+
+        Term term = new Term();
+
+    }    
+    
     /**
      * initialisation des paramètres d'import
      *
@@ -115,6 +156,8 @@ public class ImportRdf4jHelper {
      * ajoute un seul concept en choisissant un concept père
      *
      * @param selectedTerme
+     * @throws java.sql.SQLException
+     * @throws java.text.ParseException
      */
     public void addSingleConcept(SelectedTerme selectedTerme) throws SQLException, ParseException {
 
@@ -130,7 +173,7 @@ public class ImportRdf4jHelper {
             addRelationNoBTHiera(acs);
             acs.concept.setTopConcept(false);
             acs.concept.setIdGroup(idGroup);
-            acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
+            acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
 
             //on lie le nouveau concept au concept père
             HierarchicalRelationship hierarchicalRelationship1 = new HierarchicalRelationship(acs.concept.getIdConcept(), idConceptPere, idTheso, "BT");
@@ -149,6 +192,8 @@ public class ImportRdf4jHelper {
      * ajoute une brache en choisissant un concept père
      *
      * @param selectedTerme
+     * @throws java.text.ParseException
+     * @throws java.sql.SQLException
      */
     public void addBranch(SelectedTerme selectedTerme) throws ParseException, SQLException {
 
@@ -166,7 +211,7 @@ public class ImportRdf4jHelper {
         addRelationNoBTHiera(acs);
         acs.concept.setTopConcept(false);
         acs.concept.setIdGroup(idGroup);
-        acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
+        acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
         //on lie le nouveau concept au concept père
         HierarchicalRelationship hierarchicalRelationship1 = new HierarchicalRelationship(acs.concept.getIdConcept(), idConceptPere, idTheso, "BT");
         HierarchicalRelationship hierarchicalRelationship2 = new HierarchicalRelationship(idConceptPere, acs.concept.getIdConcept(), idTheso, "NT");
@@ -184,7 +229,7 @@ public class ImportRdf4jHelper {
             addRelation(acs);
             acs.concept.setTopConcept(false);
             acs.concept.setIdGroup(idGroup);
-            acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
+            acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
             new GroupHelper().addConceptGroupConcept(ds, idGroup, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
             finalizeAddConceptStruct(acs);
         }
@@ -228,6 +273,7 @@ public class ImportRdf4jHelper {
      * elle retourne l'identifiant du thésaurus, sinon Null
      *
      * @return
+     * @throws java.sql.SQLException
      */
     public String addThesaurus() throws SQLException {
         thesaurus = new Thesaurus();
@@ -252,11 +298,11 @@ public class ImportRdf4jHelper {
         thesaurusHelper.setIdentifierType("2");
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
-        String idTheso;
+        String idTheso1;
         if (thesaurus.getLanguage() == null) {
             thesaurus.setLanguage(langueSource);
         }
-        if ((idTheso = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null) {
+        if ((idTheso1 = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null) {
             conn.rollback();
             conn.close();
             return null;
@@ -264,13 +310,13 @@ public class ImportRdf4jHelper {
         // Si le Titre du thésaurus n'est pas detecter, on donne un nom par defaut
         if (skosXmlDocument.getConceptScheme().getLabelsList().isEmpty()) {
             if (thesaurus.getTitle().isEmpty()) {
-                thesaurus.setTitle("theso_" + idTheso);
+                thesaurus.setTitle("theso_" + idTheso1);
                 //thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
             }
         }
 
-        thesaurus.setId_thesaurus(idTheso);
-        this.idTheso = idTheso;
+        thesaurus.setId_thesaurus(idTheso1);
+        this.idTheso = idTheso1;
         // boucler pour les traductions
         for (SKOSLabel label : skosXmlDocument.getConceptScheme().getLabelsList()) {
 
@@ -289,7 +335,7 @@ public class ImportRdf4jHelper {
         }
 
         UserHelper userHelper = new UserHelper();
-        if (!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
+        if (!userHelper.addRole(conn, idUser, idRole, idTheso1, "")) {
             conn.rollback();
             conn.close();
             return null;
@@ -349,22 +395,32 @@ public class ImportRdf4jHelper {
             groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, adressSite, useArk, idUser);
 
             //sub group
-            String idSubGroup = null;
+            String idSubGroup;
             //concept group concept
-            String idSubConcept = null;
+            String idSubConcept;
             for (SKOSRelation relation : group.getRelationsList()) {
                 int prop = relation.getProperty();
-                if (prop == SKOSProperty.subGroup) {
-                    idSubGroup = getIdFromUri(relation.getTargetUri());
-                    groupHelper.addSubGroup(ds, idGroup, idSubGroup, thesaurus.getId_thesaurus());
-                } else if (prop == SKOSProperty.member) {
-                    idSubConcept = getIdFromUri(relation.getTargetUri());
-                    groupHelper.addConceptGroupConcept(ds, idGroup, idSubConcept, thesaurus.getId_thesaurus());
-
-                    memberHashMap.put(relation.getTargetUri(), idGroup);
-                } else if (prop == SKOSProperty.hasTopConcept) {
-
-                    hasTopConcceptList.add(relation.getTargetUri());
+                switch (prop) {
+                    case SKOSProperty.subGroup:
+                        idSubGroup = getIdFromUri(relation.getTargetUri());
+                        groupHelper.addSubGroup(ds, idGroup, idSubGroup, thesaurus.getId_thesaurus());
+                        break;
+                    case SKOSProperty.member:
+                        // option cochée
+                     /*   if(identifierType.equalsIgnoreCase("sans")){
+                            idSubConcept = getIdFromUri(relation.getTargetUri());
+                        } else {*/
+                           // Récupération de l'Id d'origine sauvegardé à l'import (idArk -> identifier)
+                            idSubConcept = getOriginalId(relation.getTargetUri());
+                   //     }
+                        groupHelper.addConceptGroupConcept(ds, idGroup, idSubConcept, thesaurus.getId_thesaurus());
+                        memberHashMap.put(relation.getTargetUri(), idGroup);
+                        break;
+                    case SKOSProperty.hasTopConcept:
+                        hasTopConcceptList.add(relation.getTargetUri());
+                        break;
+                    default:
+                        break;
                 }
 
             }
@@ -380,7 +436,7 @@ public class ImportRdf4jHelper {
                 groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
             }
         }
-
+/*
         groupHelper.insertGroup(ds,
                 idGroupDefault,
                 thesaurus.getId_thesaurus(),
@@ -389,7 +445,7 @@ public class ImportRdf4jHelper {
                 adressSite,
                 useArk,
                 idUser);
-
+*/
         // Création du domaine par défaut 
         // ajouter les traductions des Groupes
         /*ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
@@ -402,36 +458,31 @@ public class ImportRdf4jHelper {
     }
 
     /**
-     *
+     * Permet d'ajouter le Groupe par défaut pour les concepts qui sont orphelins
+     * @return 
      */
-    class AddConceptsStruct {
+    private void addGroupDefault(){
+        if(defaultGroupToAdd) { 
+            GroupHelper groupHelper = new GroupHelper();
+            groupHelper.insertGroup(ds,
+                    idGroupDefault,
+                    thesaurus.getId_thesaurus(),
+                    "MT",
+                    "", //notation
+                    adressSite,
+                    useArk,
+                    idUser);
 
-        Concept concept;
-        ConceptHelper conceptHelper;
-        SKOSResource conceptResource;
-        // pour intégrer les coordonnées GPS 
-        NodeGps nodeGps = new NodeGps();
-        GpsHelper gpsHelper = new GpsHelper();
-        //ajout des termes et traductions
-        NodeTerm nodeTerm = new NodeTerm();
-        ArrayList<NodeTermTraduction> nodeTermTraductionList = new ArrayList<>();
-        //Enregister les synonymes et traductions
-        ArrayList<NodeEM> nodeEMList = new ArrayList<>();
-        // ajout des notes
-        ArrayList<NodeNote> nodeNotes = new ArrayList<>();
-        //ajout des relations 
-        ArrayList<HierarchicalRelationship> hierarchicalRelationships = new ArrayList<>();
-        // ajout des relations Groups
-        ArrayList<String> idGrps = new ArrayList<>();
-        // ajout des alignements 
-        ArrayList<NodeAlignment> nodeAlignments = new ArrayList<>();
-        TermHelper termHelper = new TermHelper();
-        NoteHelper noteHelper = new NoteHelper();
-        boolean isTopConcept = false;
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
+            // Création du domaine par défaut 
+            // ajouter les traductions des Groupes
+            ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
+            conceptGroupLabel.setIdgroup(idGroupDefault);
+            conceptGroupLabel.setIdthesaurus(thesaurus.getId_thesaurus());
 
-        Term term = new Term();
-
+            conceptGroupLabel.setLang(langueSource);
+            conceptGroupLabel.setLexicalvalue("groupDefault");
+            groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
+        }
     }
 
     public void addConcepts(rdf4jFileBean fileBean) throws SQLException, ParseException {
@@ -451,16 +502,16 @@ public class ImportRdf4jHelper {
                 if (acs.idGrps.isEmpty()) {
                     acs.concept.setTopConcept(acs.isTopConcept);
                     acs.concept.setIdGroup(idGroupDefault);
-                    acs.conceptHelper.insertConceptInTable(ds, acs.concept, adressSite, useArk, idUser);
+                    acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
 
                     new GroupHelper().addConceptGroupConcept(ds, idGroupDefault, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
+                    defaultGroupToAdd = true;
                 } else {
                     for (String idGrp : acs.idGrps) {
                         acs.concept.setTopConcept(acs.isTopConcept);
                         acs.concept.setIdGroup(idGrp);
                         
-                        if(!acs.conceptHelper.insertConceptInTable(ds, acs.concept,
-                                adressSite, useArk, idUser)){
+                        if(!acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser)){
                             System.out.println("Erreur sur le Concept = " + acs.concept.getIdConcept());
                         }
                     }
@@ -472,28 +523,28 @@ public class ImportRdf4jHelper {
         }
 
         addLangsToThesaurus(ds, idTheso);
+        addGroupDefault();
     }
 
     private void finalizeAddConceptStruct(AddConceptsStruct acs) throws SQLException {
         acs.termHelper.insertTerm(ds, acs.nodeTerm, idUser);
 
-        Connection conn = ds.getConnection();
-        conn.setAutoCommit(false);
-
-        if(acs.concept.getIdConcept().equalsIgnoreCase("gentilhomme_ordinaire_de_la_maison_du_roi")) {
-            int k = 0;
-        }
-        
+        RelationsHelper relationsHelper = new RelationsHelper();
+       
         for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
-            if(!acs.conceptHelper.addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
-              /*  conn.commit();
-                conn.close();
-                conn = ds.getConnection();*/
-                System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+            if(!relationsHelper.insertHierarchicalRelation(ds,
+                    hierarchicalRelationship.getIdConcept1(),
+                    hierarchicalRelationship.getIdThesaurus(),
+                    hierarchicalRelationship.getRole(),
+                    hierarchicalRelationship.getIdConcept2())) {
+                //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                message.append(System.getProperty("line.separator"));
+                message.append("Erreur sur la relation = ");
+                message.append(acs.concept.getIdConcept());
+                message.append(" ## ");
+                message.append(hierarchicalRelationship.getRole());
             } 
         }
-        conn.commit();
-        conn.close();
 
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote;
@@ -554,7 +605,18 @@ public class ImportRdf4jHelper {
     private void initAddConceptsStruct(AddConceptsStruct acs, SKOSResource conceptResource) throws ParseException {
         acs.conceptResource = conceptResource;
         acs.concept = new Concept();
-        acs.concept.setIdConcept(getIdFromUri(conceptResource.getUri()));
+        
+        String idConcept = getOriginalId(conceptResource.getUri());
+        acs.concept.setIdConcept(idConcept);
+        
+        // option cochée
+        if(identifierType.equalsIgnoreCase("ark")){
+            acs.concept.setIdArk(getIdArkFromUri(conceptResource.getUri()));
+        }
+        if(identifierType.equalsIgnoreCase("handle")){
+            acs.concept.setIdHandle(getIdHandleFromUri(conceptResource.getUri()));
+        }
+
         acs.concept.setIdThesaurus(idTheso);
 
         addNotation(acs);
@@ -584,7 +646,6 @@ public class ImportRdf4jHelper {
             if (value != null) {
                 acs.concept.setNotation(value);
             }
-
         }
     }
 
@@ -690,6 +751,7 @@ public class ImportRdf4jHelper {
     private void addRelationNoBTHiera(AddConceptsStruct acs) {
         HierarchicalRelationship hierarchicalRelationship;
         int prop;
+        String idConcept2;
         for (SKOSRelation relation : acs.conceptResource.getRelationsList()) {
             prop = relation.getProperty();
             hierarchicalRelationship = new HierarchicalRelationship();
@@ -724,7 +786,15 @@ public class ImportRdf4jHelper {
             }
             if (!role.equals("")) {
                 hierarchicalRelationship.setIdConcept1(acs.concept.getIdConcept());
-                hierarchicalRelationship.setIdConcept2(getIdFromUri(relation.getTargetUri()));
+                // option cochée
+                //if(identifierType.equalsIgnoreCase("sans")){
+                //    idConcept2 = getIdFromUri(relation.getTargetUri());
+                //} else {
+                   // Récupération des Id Ark ou Handle
+                    idConcept2 = getOriginalId(relation.getTargetUri());
+                //}
+                
+                hierarchicalRelationship.setIdConcept2(idConcept2);
                 hierarchicalRelationship.setIdThesaurus(idTheso);
                 hierarchicalRelationship.setRole(role);
                 acs.hierarchicalRelationships.add(hierarchicalRelationship);
@@ -759,6 +829,8 @@ public class ImportRdf4jHelper {
     private void addRelation(AddConceptsStruct acs) {
         HierarchicalRelationship hierarchicalRelationship;
         int prop;
+        String idConcept2;
+        
         for (SKOSRelation relation : acs.conceptResource.getRelationsList()) {
             prop = relation.getProperty();
 
@@ -805,7 +877,15 @@ public class ImportRdf4jHelper {
 
             if (!role.equals("")) {
                 hierarchicalRelationship.setIdConcept1(acs.concept.getIdConcept());
-                hierarchicalRelationship.setIdConcept2(getIdFromUri(relation.getTargetUri()));
+                
+                // option cochée
+                //if(identifierType.equalsIgnoreCase("sans")){
+                //    idConcept2 = getIdFromUri(relation.getTargetUri());
+                //} else {
+                   // Récupération des Id Ark ou Handle
+                    idConcept2 = getOriginalId(relation.getTargetUri());
+                //}
+                hierarchicalRelationship.setIdConcept2(idConcept2);
                 hierarchicalRelationship.setIdThesaurus(idTheso);
                 hierarchicalRelationship.setRole(role);
                 acs.hierarchicalRelationships.add(hierarchicalRelationship);
@@ -824,12 +904,12 @@ public class ImportRdf4jHelper {
             if (hasTopConcceptList.contains(acs.conceptResource.getUri())) {
                 acs.isTopConcept = true;
             }
-            String idConcept = acs.conceptResource.getUri();
-            String idPere = memberHashMap.get(idConcept);
+            String uri = acs.conceptResource.getUri();
+            String idPere = memberHashMap.get(uri);
 
             if (idPere != null) {
                 acs.idGrps.add(idPere);
-                memberHashMap.remove(idConcept);
+                memberHashMap.remove(uri);
             }
 
         }
@@ -876,7 +956,7 @@ public class ImportRdf4jHelper {
         return nodeTermTraductionList.isEmpty();
     }
 
-    public static String getIdFromUri(String uri) {
+    private static String getIdFromUri(String uri) {
         if (uri.contains("idg=")) {
             if (uri.contains("&")) {
                 uri = uri.substring(uri.indexOf("idg=") + 4, uri.indexOf("&"));
@@ -903,6 +983,50 @@ public class ImportRdf4jHelper {
         uri = stringPlus.normalizeStringForIdentifier(uri);
         return uri;
     }
+    
+    /**
+     * Permet de retourner l'id d'origine d'un concept SKOS
+     * en s'appuyant sur le DC:identifier sauvegardé à l'import
+     * Si l'identifiant d'origine n'a pas été trouvé, c'est l'ID de l'URI qui est récupéré
+     *     
+     * @return 
+     * #MR
+     */
+    private String getOriginalId(String uri) {
+        String originalId;
+        if(skosXmlDocument.getEquivalenceUriArkHandle().isEmpty() ||
+                skosXmlDocument.getEquivalenceUriArkHandle().get(uri) == null)
+            return getIdFromUri(uri);
+
+        originalId = skosXmlDocument.getEquivalenceUriArkHandle().get(uri).toString();
+        if(originalId == null) {
+            if(message.length() != 0)
+                message.append(System.getProperty("line.separator"));
+            message.append("Identifiant (DC:Identifier) non détecté pour l'URL:");
+            message.append(uri);
+            originalId = getIdFromUri(uri);
+            return originalId;
+        }
+        return originalId;
+    }
+    
+    private String getIdArkFromUri(String uri) {
+        // URI de type Ark
+        String id = null;
+        if (uri.contains("ark:/")) {
+            id = uri.substring(uri.indexOf("ark:/") + 5, uri.length());
+        } 
+        return id;
+    }
+    
+    private String getIdHandleFromUri(String uri) {
+        // URI de type Handle
+        String id = null;
+        if (uri.contains(prefixHandle)) {
+            id = uri.substring(uri.indexOf(prefixHandle), uri.length());
+        } 
+        return id;
+    }    
 
     public void addLangsToThesaurus(HikariDataSource ds, String idThesaurus) {
 
@@ -910,22 +1034,22 @@ public class ImportRdf4jHelper {
         ArrayList<String> tabListLang = thesaurusHelper.getAllUsedLanguagesOfThesaurus(ds, idThesaurus);
         for (int i = 0; i < tabListLang.size(); i++) {
             if (!thesaurusHelper.isLanguageExistOfThesaurus(ds, idThesaurus, tabListLang.get(i).trim())) {
-                Thesaurus thesaurus = new Thesaurus();
-                thesaurus.setId_thesaurus(idThesaurus);
-                thesaurus.setContributor("");
-                thesaurus.setCoverage("");
-                thesaurus.setCreator("");
-                thesaurus.setDescription("");
-                thesaurus.setFormat("");
-                thesaurus.setLanguage(tabListLang.get(i));
-                thesaurus.setPublisher("");
-                thesaurus.setRelation("");
-                thesaurus.setRights("");
-                thesaurus.setSource("");
-                thesaurus.setSubject("");
-                thesaurus.setTitle("theso_" + idThesaurus);
-                thesaurus.setType("");
-                thesaurusHelper.addThesaurusTraduction(ds, thesaurus);
+                Thesaurus thesaurus1 = new Thesaurus();
+                thesaurus1.setId_thesaurus(idThesaurus);
+                thesaurus1.setContributor("");
+                thesaurus1.setCoverage("");
+                thesaurus1.setCreator("");
+                thesaurus1.setDescription("");
+                thesaurus1.setFormat("");
+                thesaurus1.setLanguage(tabListLang.get(i));
+                thesaurus1.setPublisher("");
+                thesaurus1.setRelation("");
+                thesaurus1.setRights("");
+                thesaurus1.setSource("");
+                thesaurus1.setSubject("");
+                thesaurus1.setTitle("theso_" + idThesaurus);
+                thesaurus1.setType("");
+                thesaurusHelper.addThesaurusTraduction(ds, thesaurus1);
             }
         }
 
@@ -951,6 +1075,38 @@ public class ImportRdf4jHelper {
 
     public int getResourceCount() {
         return resourceCount;
+    }
+
+    public NodePreference getNodePreference() {
+        return nodePreference;
+    }
+
+    public void setNodePreference(NodePreference nodePreference) {
+        this.nodePreference = nodePreference;
+    }
+
+    public StringBuilder getMessage() {
+        return message;
+    }
+
+    public void setMessage(StringBuilder message) {
+        this.message = message;
+    }
+
+    public String getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(String identifierType) {
+        this.identifierType = identifierType;
+    }
+
+    public String getPrefixHandle() {
+        return prefixHandle;
+    }
+
+    public void setPrefixHandle(String prefixHandle) {
+        this.prefixHandle = prefixHandle;
     }
 
 }

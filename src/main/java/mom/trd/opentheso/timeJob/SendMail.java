@@ -77,7 +77,7 @@ public class  SendMail implements Runnable {
         pm.configMessage(mess,sujet);
         pm.sendMessage();
         try{
-           File logmail=new File("C:/Users/jm.prudham/Desktop/logMail"+new Date().getTime()); 
+           File logmail=new File("/data/opentheso/update/logMail"+new Date().getTime()); 
            BufferedWriter bfw=new BufferedWriter(new FileWriter(logmail));
            bfw.write("----------------- log du mail---------------------------- ");
            bfw.newLine();

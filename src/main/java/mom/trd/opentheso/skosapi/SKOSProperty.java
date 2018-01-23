@@ -2,7 +2,7 @@ package mom.trd.opentheso.skosapi;
 
 /**
  *
- * @author Djamel Ferhod
+ * @author Miled Rousset
  *
  */
 public interface SKOSProperty {
@@ -54,6 +54,9 @@ public interface SKOSProperty {
     public static final int created = 50;
     public static final int modified = 51;
     public static final int date = 52;
+    
+    //Identifier
+    public static final int identifier = 55;
 
     //Creation
     public static final int creator = 60;

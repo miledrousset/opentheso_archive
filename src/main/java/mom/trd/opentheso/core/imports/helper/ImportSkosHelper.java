@@ -720,15 +720,13 @@ public class ImportSkosHelper {
                 if(idGrps.isEmpty()) {
                     concept.setTopConcept(isTopConcept);
                     concept.setIdGroup(idGroupDefault);
-                    conceptHelper.insertConceptInTable(ds, concept,
-                            adressSite, useArk, idUser);
+                    conceptHelper.insertConceptInTable(ds, concept, idUser);
                 }
                 else {
                     for (String idGrp : idGrps) {
                         concept.setTopConcept(isTopConcept);
                         concept.setIdGroup(idGrp);
-                        conceptHelper.insertConceptInTable(ds, concept,
-                                adressSite, useArk, idUser);
+                        conceptHelper.insertConceptInTable(ds, concept, idUser);
                     }
                 }
 
@@ -1114,15 +1112,13 @@ public class ImportSkosHelper {
                 if(idGrps.isEmpty()) {
                     concept.setTopConcept(isTopConcept);
                     concept.setIdGroup(idGroupDefault);
-                    conceptHelper.insertConceptInTable(ds, concept,
-                            adressSite, useArk, idUser);
+                    conceptHelper.insertConceptInTable(ds, concept, idUser);
                 }
                 else {
                     for (String idGrp : idGrps) {
                         concept.setTopConcept(isTopConcept);
                         concept.setIdGroup(idGrp);
-                        conceptHelper.insertConceptInTable(ds, concept,
-                                adressSite, useArk, idUser);
+                        conceptHelper.insertConceptInTable(ds, concept, idUser);
                     }
                 }
 
@@ -1517,15 +1513,13 @@ public class ImportSkosHelper {
                 if(idGrps.isEmpty()) {
                     concept.setTopConcept(isTopConcept);
                     concept.setIdGroup(idGroupDefault);
-                    conceptHelper.insertConceptInTable(ds, concept,
-                            adressSite, useArk, idUser);
+                    conceptHelper.insertConceptInTable(ds, concept, idUser);
                 }
                 else {
                     for (String idGrp : idGrps) {
                         concept.setTopConcept(isTopConcept);
                         concept.setIdGroup(idGrp);
-                        conceptHelper.insertConceptInTable(ds, concept,
-                                adressSite, useArk, idUser);
+                        conceptHelper.insertConceptInTable(ds, concept, idUser);
                     }
                 }
 

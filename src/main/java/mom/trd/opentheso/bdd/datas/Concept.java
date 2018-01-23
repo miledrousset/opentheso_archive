@@ -6,7 +6,8 @@ public class Concept {
 
     private String idConcept;
     private String idThesaurus;
-    private String idArk;
+    private String idArk = "";
+    private String idHandle = "";
     private Date created;
     private Date modified;
     private String status;
@@ -109,6 +110,14 @@ public class Concept {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
     }
 
 }

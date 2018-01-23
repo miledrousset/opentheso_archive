@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
@@ -243,8 +241,7 @@ public class WriteSkosBDD {
         if (!idGroup.isEmpty()) {
             for (String idGroup1 : idGroup) {
                 concept.setIdGroup(getId(idGroup1));
-                conceptHelper.insertConceptInTable(ds, concept,
-                        adressSite, useArk, idUser);
+                conceptHelper.insertConceptInTable(ds, concept, idUser);
             }
         }
 

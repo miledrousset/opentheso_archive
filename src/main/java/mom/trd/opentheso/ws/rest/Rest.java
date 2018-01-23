@@ -984,8 +984,12 @@ public class Rest {
         }
 
         ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setNodePreference(nodePreference);
+        
+        
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        
         StringBuffer skos = exportFromBDD.exportConcept(ds, idTheso, idConcept);
         if (skos == null) {
             return new StringBuffer("");
@@ -1065,6 +1069,7 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
         StringBuffer skos = exportFromBDD.exportGroup(ds, idTheso, idGroup);
         return skos;
     }
@@ -1090,6 +1095,7 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
         StringBuffer skos = exportFromBDD.exportBranchOfConcept(ds, idTheso, idConcept);
         return skos;
     }
@@ -1122,6 +1128,8 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
+        
         StringBuffer skos = exportFromBDD.exportConceptByLot(ds, idTheso, tabId);
         return skos;
     }
@@ -1171,6 +1179,7 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
 
         StringBuffer skos = exportFromBDD.exportMultiConcept(
                 ds, idTheso, value, lang);
@@ -1203,6 +1212,7 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
 
         StringBuffer skos = exportFromBDD.exportMultiConcept(ds,
                 value,
@@ -1250,6 +1260,7 @@ public class Rest {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
+        exportFromBDD.setNodePreference(nodePreference);
 
         StringBuffer skos = exportFromBDD.exportConceptByLot(ds, idTheso, multiTabId);
         return skos;

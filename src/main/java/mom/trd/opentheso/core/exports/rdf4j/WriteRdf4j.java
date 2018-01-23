@@ -77,6 +77,7 @@ public class WriteRdf4j {
             writeMatch(concept);
             writeNotation(concept);
             writeDate(concept);
+            writeIdentifier(concept);
             writeCreator(concept);
             writeDocumentation(concept);
             writeGPS(concept);
@@ -93,6 +94,7 @@ public class WriteRdf4j {
             writeMatch(group);
             writeNotation(group);
             writeDate(group);
+            writeIdentifier(group);
             writeCreator(group);
             writeDocumentation(group);
             writeGPS(group);
@@ -114,6 +116,7 @@ public class WriteRdf4j {
         writeMatch(conceptScheme);
         writeNotation(conceptScheme);
         writeDate(conceptScheme);
+        writeIdentifier(conceptScheme);
         writeCreator(conceptScheme);
         writeDocumentation(conceptScheme);
         writeGPS(conceptScheme);
@@ -212,6 +215,12 @@ public class WriteRdf4j {
             }
         }
 
+    }
+    
+    private void writeIdentifier(SKOSResource resource) {
+        if (resource.getSdc() != null) {
+            builder.add(DCTERMS.IDENTIFIER, resource.getSdc().getIdentifier());
+        }
     }
 
     private void writeNotation(SKOSResource resource) {

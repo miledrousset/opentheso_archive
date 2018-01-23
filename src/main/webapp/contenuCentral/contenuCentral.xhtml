@@ -40,22 +40,23 @@
         </h:panelGroup>
         
     </div>
+    <h:panelGroup id="panExport">
      <div id="clean" />
              <div id="exportPanel" style="text-align: center;position:relative;top:-3px;">
 
-                <h:form  rendered="#{(selectedTerme.type == 1)}" style="float: left; margin-right: 5px;" >
+                 <h:form  rendered="#{(selectedTerme.idC != null) and ((newtreeBean.group) or (newtreeBean.subGroup))}" style="float: left; margin-right: 5px;" >
                     <!-- exporter le Group en SKOS -->
-                    <p:commandButton value="Skos" ajax="false" styleClass="link">
+                    <p:commandButton value="Skos_g" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.thisGroupToSkos(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                     </p:commandButton>
 
-                    <!-- exporter le grpup en JsonLd -->
-                    <p:commandButton value="JsonLd" ajax="false" styleClass="link">
+                    <!-- exporter le group en JsonLd -->
+                    <p:commandButton value="JsonLd_g" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.thisGroupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                     </p:commandButton>
                 </h:form>  
 
-                <h:form  rendered="#{(selectedTerme.idC != null) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
+                 <h:form  rendered="#{(selectedTerme.idC != null) and ((!newtreeBean.group) and (!newtreeBean.subGroup))}" style="float: left; margin-right: 5px;" >
                     <!-- exporter le concept en SKOS -->
                     <p:commandButton value="Skos" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.conceptToFile(selectedTerme.idC, selectedTerme.idTheso,0)}" />
@@ -67,7 +68,7 @@
                     </p:commandButton>
                 </h:form>                 
 
-                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type != 1)}" style="float: left; margin-right: 5px;" >
+                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and ((!newtreeBean.group) and (!newtreeBean.subGroup))}" style="float: left; margin-right: 5px;" >
                     <!-- exporter la branche en SKOS mode connecté -->
                     <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.brancheToFile(selectedTerme.idC, selectedTerme.idTheso,0)}" />
@@ -80,7 +81,7 @@
                 </h:form>  
 
 
-                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.type == 1)}" 
+                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and ((newtreeBean.group) or (newtreeBean.subGroup))}" 
                         style="float: left; margin-right: 5px;" >
                     <!-- exporter la branche en SKOS mode connecté -->
                     <p:commandButton value="skos_Group" ajax="false" styleClass="link">
@@ -106,6 +107,6 @@
 
                
             </div>
-            
+            </h:panelGroup>
             
 </ui:composition>

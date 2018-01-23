@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -20,11 +18,9 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.Connexion;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
-import org.eclipse.rdf4j.model.Model;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -43,6 +39,8 @@ public class rdf4jFileBean implements Serializable {
     @ManagedProperty(value = "#{newtreeBean}")
     private NewTreeBean tree;
     private int typeImport;
+    private String identifierType;
+    private String prefixHandle;
     /*
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;    
@@ -68,10 +66,11 @@ public class rdf4jFileBean implements Serializable {
         error = "";
         warning = "";
         uri = "";
-        formatDate = "";
+        formatDate = "yyyy-MM-dd";
         total = 0;
         uploadEnable = true;
         BDDinsertEnable = false;
+        identifierType = "sans";
     }
 
     public void chargeSkos(FileUploadEvent event) {
@@ -304,6 +303,9 @@ public class rdf4jFileBean implements Serializable {
             progress_abs = 0;
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
             importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setIdentifierType(identifierType);
+            importRdf4jHelper.setPrefixHandle(prefixHandle);
+            importRdf4jHelper.setNodePreference(tree.getSelectedTerme().getUser().nodePreference);
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addThesaurus();
@@ -333,6 +335,8 @@ public class rdf4jFileBean implements Serializable {
             total = 0;
 
             info = "Thesaurus correctly insert into data base";
+            info = info + "\n" + importRdf4jHelper.getMessage().toString();
+            showError();
 
         } catch (Exception e) {
 
@@ -539,6 +543,22 @@ public class rdf4jFileBean implements Serializable {
 
     public boolean warningIsEmpty() {
         return warning == null || warning.isEmpty();
+    }
+
+    public String getIdentifierType() {
+        return identifierType;
+    }
+
+    public void setIdentifierType(String identifierType) {
+        this.identifierType = identifierType;
+    }
+
+    public String getPrefixHandle() {
+        return prefixHandle;
+    }
+
+    public void setPrefixHandle(String prefixHandle) {
+        this.prefixHandle = prefixHandle;
     }
 
 }

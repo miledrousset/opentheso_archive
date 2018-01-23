@@ -1796,7 +1796,7 @@ public class NewTreeBean implements Serializable {
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
     }
-
+    
     public ArrayList<TreeNode> getSelectedNodes() {
         return selectedNodes;
     }

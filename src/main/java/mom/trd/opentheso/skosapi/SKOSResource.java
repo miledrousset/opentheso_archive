@@ -8,13 +8,14 @@ import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
  *
- * @author Djamel Ferhod
+ * @author Miled Rousset
  *
  */
 public class SKOSResource {
 
     private String uri;
     private String identifier;
+    private SKOSdc sdc;
     private int property;
     private ArrayList<SKOSLabel> labelsList;
     private ArrayList<SKOSRelation> relationsList;
@@ -27,14 +28,12 @@ public class SKOSResource {
 
     /**
      *
-     * @param uri un String URI de la ressource
-     * @param property le type de ressource
      */
     public SKOSResource() {
-        labelsList = new ArrayList<SKOSLabel>();
-        relationsList = new ArrayList<SKOSRelation>();
-        documentationsList = new ArrayList<SKOSDocumentation>();
-        dateList = new ArrayList<SKOSDate>();
+        labelsList = new ArrayList<>();
+        relationsList = new ArrayList<>();
+        documentationsList = new ArrayList<>();
+        dateList = new ArrayList<>();
         creatorList = new ArrayList<>();
         GPSCoordinates = new SKOSGPSCoordinates();
         notationList = new ArrayList<>();
@@ -44,10 +43,10 @@ public class SKOSResource {
 
     public SKOSResource(String uri, int property) {
 
-        labelsList = new ArrayList<SKOSLabel>();
-        relationsList = new ArrayList<SKOSRelation>();
-        documentationsList = new ArrayList<SKOSDocumentation>();
-        dateList = new ArrayList<SKOSDate>();
+        labelsList = new ArrayList<>();
+        relationsList = new ArrayList<>();
+        documentationsList = new ArrayList<>();
+        dateList = new ArrayList<>();
         creatorList = new ArrayList<>();
         GPSCoordinates = new SKOSGPSCoordinates();
         notationList = new ArrayList<>();
@@ -243,7 +242,7 @@ public class SKOSResource {
      * Méthode d'ajout des dates de création et de modification à la ressource,
      * dans une ArrayList
      *
-     * @param date un String date au format YYYY-MM-dd
+     * @param sDate
      * @param prop un int SKOSProperty
      */
     public void addDate(String sDate, int prop) {
@@ -254,6 +253,21 @@ public class SKOSResource {
             e.getMessage();
         }
     }
+    
+    /**
+     * Méthode d'ajout des Idetifier type DC
+     * @param identifier
+     * @param prop un int SKOSProperty
+     */
+    public void addIdentifier(String identifier, int prop){
+        try{
+            SKOSdc dc = new SKOSdc(identifier,prop);
+            this.sdc = dc;
+        }
+        catch(Exception e){
+            e.getMessage();
+        }
+    }    
 
     public void setGPSCoordinates(SKOSGPSCoordinates GPSCoordinates) {
         this.GPSCoordinates = GPSCoordinates;
@@ -267,12 +281,17 @@ public class SKOSResource {
         this.uri = uri;
     }
 
+    public SKOSdc getSdc() {
+        return sdc;
+    }
+    
     /**
      * Surcharge de la méthode toString() afin de mettre au format xml la
      * ressource
+     * @return 
      */
     public String toString() {
-        String xmlRessource = new String();
+        String xmlRessource;
         Iterator<SKOSLabel> itLab = labelsList.iterator();
         Iterator<SKOSRelation> itRel = relationsList.iterator();
         Iterator<SKOSDocumentation> itDoc = documentationsList.iterator();
@@ -293,6 +312,13 @@ public class SKOSResource {
         }
         while (itDate.hasNext()) {
             xmlRessource += "        " + itDate.next().toString();
+        }
+        if(sdc != null) {
+            if(sdc.getIdentifier() != null){
+                if(!sdc.getIdentifier().isEmpty()){
+                    xmlRessource += "        "+sdc.toString();
+                }
+            }
         }
 
         xmlRessource += "    </skos:Concept>\n";

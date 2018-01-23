@@ -12,7 +12,7 @@ public class SKOSDocumentation implements SKOSProperty{
 			this.property = prop;
 		}
 		else{
-			throw new Exception("Erreur : cette propri�t� n'est pas valide pour la documentation " + text);
+			throw new Exception("Erreur : cette propriété n'est pas valide pour la documentation " + text);
 		}
 	}
 	
