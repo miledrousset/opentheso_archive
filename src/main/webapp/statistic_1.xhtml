@@ -1,0 +1,261 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>OpenTheso - Statistiques</title>
+        <link rel="icon" href="images/icoTheso.jpg" />
+        <link rel="stylesheet" type="text/css" href="css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/menu.css"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
+    </h:head>
+    <h:body>
+          <style >
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:last-child{
+               border: 3px  solid #956620;
+               box-shadow:0px 0px 5px #BD6060;
+            }
+        </style>
+        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
+            <h1>Statistiques</h1>
+            Les statistiques offrent la possibilité d'obtenir certaines informations concernant le thésaurus sélectionné.<br/><br/>
+            Divers chiffres concernant le thésaurus ainsi que les concepts modifiés/supprimés sur une plage de date donnée sont donc visualisables sur cette page.
+        </p:dialog>  
+       
+        <div id="menuHead">
+            <div id="menuHeadTop">
+            <ui:include src="logo.xhtml" />
+            <ui:include src="account.xhtml" />
+            <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+           
+            </div>
+           
+                
+        </div>
+        
+        <div id="principaleConf">
+            <h:panelGroup id="noStat" >
+                <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />
+            </h:panelGroup>
+            <h:panelGroup id="choixStat" >
+                <table>
+                    <tr>
+                        <td>
+                            <h:form rendered="#{theso.thesaurus.id_thesaurus != null}">
+                                <table>
+                                    <tr>
+                                        <td>Langue : </td>
+                                        <td>
+                                            <h:selectOneMenu value="#{statBean.lang}" styleClass="listes">
+                                                <f:selectItems value="#{theso.getThisTrad()}" var="t" itemLabel="#{t.french_name}"  
+                                                               itemValue="#{t.id_iso639_1}" />
+                                               
+                                            </h:selectOneMenu>
+                                        </td>
+                                      
+                                         
+                                    </tr>
+                                </table>
+                            </h:form>
+                        </td>
+                        <td>
+                            <h:form id="selectAndExport" rendered="#{theso.thesaurus.id_thesaurus != null}" >
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <p:selectOneButton value="#{statBean.typeStat}">
+                                                <f:selectItem itemLabel="Statistiques thésaurus" itemValue="1" />
+                                                
+                                                <f:selectItem itemLabel="Statistiques concepts" itemValue="2" />
+                                                <p:ajax event="change" listener="#{statBean.managedVue(parent)}" update=":panStatConcept,:optionStat" />
+                                            </p:selectOneButton>
+                                        </td>
+                                       
+                                       
+                                        <td>
+                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="ExportET" my="left top" at="left top">
+                                            <p:menuitem value="#{langueBean.getMsg('exp.statheso')}"  style="font-size: 12px;" ajax="false">
+                                                 <p:fileDownload  value="#{baseDeDonnes.genererdocument()}" />
+                                            </p:menuitem>
+                                             <p:menuitem id="ExportETDPF" value="#{langueBean.getMsg('exp.stathesoPDF')}" title="#{langueBean.getMsg('exp.stathesoPDF')}"  style="font-size: 12px;" ajax="false">
+                                                 <p:fileDownload  value="#{baseDeDonnes.pdf()}" />
+                                             </p:menuitem>
+                                         </p:menu>
+                                        <p:commandButton rendered="#{vue.statTheso or vue.statCpt}" id="ExportET"  value="#{langueBean.getMsg('exp.statheso')}" title="#{langueBean.getMsg('exp.statheso')}" styleClass="styleButton"/> 
+                                        </td>
+                                    </tr>
+                                </table>
+                            </h:form>
+                        </td>
+                    </tr>
+                </table>
+                  <h:panelGroup id="optionStat" rendered="#{statBean.typeStat==2}">
+                     <table>
+                        <tr>
+                     <h:form >
+                       <td colspan="2">
+                        <p:selectBooleanCheckbox itemLabel="recherche par date" value="#{statBean.searchFromDate}" >
+                           
+                        </p:selectBooleanCheckbox>
+                       </td>
+                       <td colspan="2">
+                         <p:selectBooleanCheckbox itemLabel="recherche par groupe" value="#{statBean.searchFromGroup}">
+                           
+                        </p:selectBooleanCheckbox>
+                       </td>
+                    </h:form>
+                           </tr>  
+                    <h:form id="searchFromDate">
+                       
+                         <tr>
+                         <td><h:outputText value="#{langueBean.getMsg('stat.opt1')}"  /> : </td>
+                                <td>
+                                    <p:selectOneMenu value="#{statBean.typeDate}" >
+                                        <f:selectItem itemLabel="#{langueBean.getMsg('stat.opt2.1')}" itemValue="1" >
+                                    
+                                        </f:selectItem>
+                                        <f:selectItem itemLabel="#{langueBean.getMsg('stat.opt2.2')}" itemValue="2" >
+                                         
+                                        </f:selectItem>
+                                        <p:ajax event="change" listener="#{statBean.setTypeDate(parent.selected)}" />
+                                    </p:selectOneMenu>
+                                </td>
+                                <td><h:outputText value="groupe" /> </td>
+                                <td>
+                                    <p:selectOneMenu value="#{statBean.selectedGroup}">
+                                        <f:selectItems value="#{statBean.statTheso}" var="stat" itemLabel="#{stat.group}" itemValue="#{stat.group}" />
+                                       
+                                    </p:selectOneMenu>
+                                </td>
+                         </tr>
+                          <tr>
+                                <td style="padding-left: 30px;"><h:outputText value="#{langueBean.getMsg('stat.opt3')}" /> : </td>
+                                <td>
+                                    <p:calendar value="#{statBean.begin}" mode="popup">
+                                       
+                                    </p:calendar>
+                                
+                                </td>
+                          </tr>
+                           <tr>
+                                <td style="padding-left: 30px;"><h:outputText value="#{langueBean.getMsg('stat.opt4')}" /> : </td>
+                                <td>
+                                    <p:calendar value="#{statBean.end}" mode="popup">
+                                       
+                                    </p:calendar>   
+                                </td>
+                                <td>
+                                    
+                                </td>
+                                <td></td>
+                           </tr>
+                                
+                        </h:form>  
+                     </table>
+            </h:panelGroup>
+            <h:panelGroup id="submitStat" rendered="#{statBean.typeStat==1 or statBean.typeStat==2}" >
+                <h:form>
+                    <p:commandButton type="submit" actionListener="#{statBean.chooseStat(theso.thesaurus.id_thesaurus,theso.thesaurus.language)}" />
+                </h:form>
+            </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup id="panStatTheso">
+                <h:panelGroup rendered="#{vue.statTheso == true}">
+                    <br/>
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('theso')}" /> : </td>
+                            <td><h:outputText value="#{theso.thesaurus.title}"/></td>
+                            <td style="padding-left: 50px;">Nombre total de concept : </td>
+                            <td><h:outputText value="#{statBean.nbCpt}" /></td>
+                        </tr>
+                    </table><br/>
+
+                    <h:form>
+                       
+                        <p:dataTable var="st" value="#{statBean.statTheso}" scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
+                                     styleClass="styleTab">
+                            <p:column headerText="#{langueBean.getMsg('stat.statTheso1')}">
+                                <h:outputText value="#{st.group}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statTheso2')}">
+                                <h:outputText value="#{st.nbDescripteur}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statTheso3')}">
+                                <h:outputText value="#{st.nbNonDescripteur}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statTheso4')}">
+                                <h:outputText value="#{st.nbNoTrad}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statTheso5')}">
+                                <h:outputText value="#{st.nbNotes}" />
+                            </p:column>
+
+                        </p:dataTable>
+                        
+                        
+                    </h:form>
+                </h:panelGroup>
+            </h:panelGroup>
+          
+            <h:panelGroup id="panStatConcept">
+                <h:panelGroup rendered="#{vue.statCpt == true}">
+                    
+                        <h:form id="formTabStatCpt">
+                        <p:dataTable  var="sC" value="#{statBean.statConcept}" scrollable="true" scrollHeight="450" emptyMessage="#{langueBean.getMsg('index.noResultSearch')}"
+                                      styleClass="styleTab">
+                            <p:column headerText="#{langueBean.getMsg('stat.statCpt1')}">
+                                <h:outputText value="#{sC.value}(#{sC.idConcept})" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statCpt2')}">
+                                <h:outputText value="#{sC.dateCreat}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statCpt3')}">
+                                <h:outputText value="#{sC.dateEdit}" />
+                            </p:column>
+                            <p:column headerText="#{langueBean.getMsg('stat.statCpt4')}">
+                                <h:outputText value="#{sC.group}" />
+                            </p:column>
+                            <p:column width="10" style="padding-left: 1px;">
+                                <h:form>
+                                    <p:graphicImage id="seeTree" value="images/iconeTree.png" style="border: 1px grey solid; padding: 1px; border-radius: 4px;" />
+                                    <p:tooltip id="toolTipContent" for="seeTree">
+                                        <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                            <ui:repeat value="#{search.getHierachi(sC.idConcept)}" var="path" >
+                                                <ui:repeat value="#{path}" var="termeS" >
+                                                    <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
+                                                        <img src="images/conceptOpen.png" />
+                                                        <h:outputText value="#{search.getNom(termeS)}" />
+                                                    </div>
+                                                </ui:repeat>
+                                                <br/>
+                                            </ui:repeat>
+                                        </p:fieldset>
+                                    </p:tooltip>
+                                </h:form>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </h:panelGroup>
+            </h:panelGroup>
+        </div>
+        <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+        <ui:insert name="status">
+            <p:ajaxStatus>
+                <f:facet name="start">
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </ui:insert>
+    </h:body>
+</html>

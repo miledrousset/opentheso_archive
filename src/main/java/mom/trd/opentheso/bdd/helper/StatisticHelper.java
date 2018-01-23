@@ -184,13 +184,15 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT count(non_preferred_term.id_term) FROM concept, preferred_term,concept_group_concept, non_preferred_term WHERE"
-                            + " concept.id_concept=preferred_term.id_concept"
-                            + " and preferred_term.id_term=non_preferred_term.id_term"
-                            + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_concept IN ( SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = concept.id_thesaurus)"
-                            + " and non_preferred_term.lang = '" + langue + "'";
-
+                   //modification query SQL #JM
+                   String query="SELECT count(non_preferred_term.id_term) FROM non_preferred_term "
+                            + "INNER JOIN (SELECT DISTINCT preferred_term.id_concept,"
+                            + "preferred_term.id_term FROM preferred_term "
+                            + "WHERE preferred_term.id_concept IN "
+                            + "(SELECT DISTINCT idconcept FROM concept_group_concept "
+                            + "WHERE idgroup ='"+idGroup+"'  AND idthesaurus = '"+idThesaurus+"')) "
+                            + "as Tabl ON Tabl.id_term=non_preferred_term.id_term "
+                            + "WHERE non_preferred_term.lang='"+langue+"'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
@@ -222,13 +224,14 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT count(DISTINCT term.id_term) FROM concept, preferred_term,concept_group_concept, term WHERE"
-                            + " concept.id_concept = preferred_term.id_concept"
-                            + " and preferred_term.id_term = term.id_term"
-                            + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_concept IN ( SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = concept.id_thesaurus)"
-                            + " and term.lang = '" + langue + "'";
-
+                    //modification de la requête SQL #jm
+                    String query="SELECT count(distinct term.id_term) FROM term INNER JOIN "
+                            + "(SELECT preferred_term.id_concept,"
+                            + "preferred_term.id_term FROM preferred_term "
+                            + "WHERE preferred_term.id_concept IN "
+                            + "(SELECT idconcept FROM concept_group_concept "
+                            + "WHERE idgroup='"+idGroup+"' AND idthesaurus='"+idThesaurus+"'))"
+                            + " as Tabl ON Tabl.id_term=term.id_term WHERE term.lang='"+langue+"' AND id_thesaurus='"+idThesaurus+"'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
@@ -286,7 +289,7 @@ public class StatisticHelper {
         return count;
     }
     
-    public ArrayList<NodeStatConcept> getStatConceptCreat(HikariDataSource ds, String begin, String end, String idThesaurus, String langue) {
+    public ArrayList<NodeStatConcept> getStatConceptCreat(HikariDataSource ds, String begin, String end, String idThesaurus, String langue,int limit) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -309,7 +312,7 @@ public class StatisticHelper {
                             + " AND term.created >= '" + begin + "'"
                             + " AND term.lang = '" + langue.trim() + "'"
                             + " order by term.created DESC "
-                            + " LIMIT 500";
+                            + " LIMIT "+limit;
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
@@ -335,7 +338,7 @@ public class StatisticHelper {
         return list;
     }
     
-    public ArrayList<NodeStatConcept> getStatConceptEdit(HikariDataSource ds, String begin, String end, String idThesaurus, String langue) {
+    public ArrayList<NodeStatConcept> getStatConceptEdit(HikariDataSource ds, String begin, String end, String idThesaurus, String langue,int limit) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -358,7 +361,7 @@ public class StatisticHelper {
                             + " AND term.modified >= '" + begin + "'"
                             + " AND term.lang = '" + langue.trim() + "'"
                             + " order by term.modified DESC "
-                            + " LIMIT 500";
+                            + " LIMIT "+limit;
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
@@ -383,4 +386,69 @@ public class StatisticHelper {
         }
         return list;
     }
+    /**
+     * #JM
+     * méthode pour récupérer les concepts selon un groupe et des dates 
+     * la colonne modified ou created et intérrogée selon le paramètre column
+     * @param ds
+     * @param begin
+     * @param end
+     * @param column
+     * @param idThesaurus
+     * @param langue
+     * @param selectedGroup
+     * @param limit
+     * @return 
+     */
+    public ArrayList<NodeStatConcept> getStatConceptByGroupAndDate(HikariDataSource ds, String begin, String end, String column, String idThesaurus, String langue, String selectedGroup,int limit) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeStatConcept> list = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select DISTINCT concept.id_concept, term.created, term.modified,idgroup, term.lexical_value "
+                            + "FROM concept, preferred_term, term,concept_group_concept"
+                            + " WHERE concept.id_concept= preferred_term.id_concept"
+                            + " AND  preferred_term.id_term=term.id_term"
+                            + " AND concept_group_concept.idconcept = concept.id_concept"
+                            + " AND concept_group_concept.idthesaurus = concept.id_thesaurus"
+                            + " AND concept.id_thesaurus = '" + idThesaurus + "'"
+                            + " AND idgroup = '"+selectedGroup+"'"
+                            + " AND term."+column+" <= '" + end + "'"
+                            + " AND term."+column+" >= '" + begin + "'"
+                            + " AND term.lang = '" + langue.trim() + "'"
+                            + " order by term.created DESC "
+                            + " LIMIT "+limit;
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                     while (resultSet.next()) {
+                        NodeStatConcept nsc = new NodeStatConcept();
+                        nsc.setDateCreat(resultSet.getDate("created"));
+                        nsc.setDateEdit(resultSet.getDate("modified"));
+                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+                        nsc.setIdConcept(resultSet.getString("id_concept"));
+                        nsc.setValue(resultSet.getString("lexical_value"));
+                        list.add(nsc);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List statistic of Concept in thesaurus : " + idThesaurus, sqle);
+        }
+        return list;
+    }
+
+   
 }

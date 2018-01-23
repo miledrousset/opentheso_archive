@@ -30,6 +30,8 @@ public class AccessThesaurusBean {
     private SelectedThesaurus theso;
     @ManagedProperty(value = "#{user1}")
     private CurrentUser user;
+    @ManagedProperty(value="#{statBean}")
+    private StatBean statistic;
     
   
     //liste des thesaurus public ou privée de l'utilisateur si l'utilisateur est connecté
@@ -163,6 +165,7 @@ public class AccessThesaurusBean {
         this.listAccess=null;
         this.listAccessCache=null;
         this.onlyOwned=false;
+        this.statistic.reInit();
         FacesContext.getCurrentInstance().getExternalContext().redirect("deco.xhtml");
         
     }
@@ -288,6 +291,14 @@ public class AccessThesaurusBean {
         this.accessThesaurus.setVisibility(!(changeVisibility));
         this.addVisibility();
         System.out.println("visbility change "+this.accessThesaurus.isVisibility());
+    }
+
+    public StatBean getStatistic() {
+        return statistic;
+    }
+
+    public void setStatistic(StatBean statistic) {
+        this.statistic = statistic;
     }
     
     
