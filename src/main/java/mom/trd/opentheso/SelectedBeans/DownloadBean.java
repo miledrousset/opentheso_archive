@@ -444,6 +444,10 @@ public class DownloadBean implements Serializable {
                 format = RDFFormat.TURTLE;
                 extention = "_turtle.ttl";
                 break;
+            case 3:
+                format = RDFFormat.RDFJSON;
+                extention = "_turtle.ttl";
+                break;
         }
         NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
         
@@ -451,6 +455,7 @@ public class DownloadBean implements Serializable {
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
         exportRdf4jHelper.setNodePreference(nodePreference);
         exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso,nodePreference.getCheminSite());
+        exportRdf4jHelper.setNodePreference(nodePreference);
         exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
         WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
 

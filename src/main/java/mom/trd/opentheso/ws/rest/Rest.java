@@ -7,6 +7,7 @@ package mom.trd.opentheso.ws.rest;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +37,13 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.SearchHelper;
+import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
+import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
+import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
+import org.apache.bcel.generic.AALOAD;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.Rio;
 
 /**
  * REST Web Service
@@ -839,6 +847,54 @@ public class Rest {
         return Response.ok(jsonLd.toString()).header("Access-Control-Allow-Origin", "*").build();
         //return jsonLd.toString();
     }
+    
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus et
+     * une langue)
+     *
+     * @param value
+     * @param idLang
+     * @param idTheso
+     * @return
+     */
+    @Path("/json/concept/value={value}&lang={lang}&th={th}")
+    @GET
+    //@Produces("text/plain")
+    //@Produces("application/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response getConceptJsByValue(
+            @PathParam("value") String value,
+            @PathParam("lang") String idLang,
+            @PathParam("th") String idTheso) {
+        if (!getStatusOfWebservices(idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        String json = getJsonDatas(value, idLang, idTheso);
+        ds.close();
+        return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
+        //return jsonLd.toString();
+    }    
 
     /**
      * Permet de retourner les Concepts par value (en précisant un thésaurus, un
@@ -965,6 +1021,49 @@ public class Rest {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////    
+   
+    /**
+     * Temporaire à refaire (Miled)
+     * @param idConcept
+     * @param idTheso
+     * @return 
+     */
+    
+    private String getJsonDatas(String value,
+            String idLang, String idTheso){
+        ArrayList <String> listId = getListId(value, idLang, idTheso);
+        
+        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        if(nodePreference != null){
+            ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+            exportRdf4jHelper.setNodePreference(nodePreference1);
+            exportRdf4jHelper.setInfos(ds, "dd-mm-yyyy", false, idTheso,nodePreference1.getCheminSite());
+            exportRdf4jHelper.setNodePreference(nodePreference1);
+            for (String idConcept : listId) {
+                exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
+            }
+            WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+
+            ByteArrayOutputStream out;
+            out = new ByteArrayOutputStream();
+            Rio.write(writeRdf4j.getModel(), out, RDFFormat.RDFJSON);
+           // System.out.println(out.toString());
+            return out.toString();
+        }
+        return "";
+    }
+    
+    private ArrayList<String> getListId( 
+            String value, String idLang, String idTheso) {
+        ArrayList <String> listId = new ArrayList<>();
+        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idTheso, "", 1, false);
+        for (NodeSearch listRe : listRes) {
+            listId.add(listRe.getIdConcept());
+        }
+        return listId;
+    }
+            
+    
     /**
      * Fonction qui permet de récupérer un concept skos par identifiant
      *
