@@ -15,7 +15,7 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     private String idCurrentGroup;
     private String typeDomaine;
     private String idTopConcept;
-    private String idParent;//#jm
+    private String idParent;//#jm inutile ...?
     private boolean isGroup =false;
     private boolean isSubGroup = false;
     private boolean isTopConcept = false;

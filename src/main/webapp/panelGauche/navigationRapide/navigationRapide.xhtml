@@ -30,6 +30,8 @@
                             <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
                                         update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
+                         
+
                         </p:menu>
                     </h:form>
                 </td>

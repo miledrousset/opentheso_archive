@@ -87,6 +87,7 @@ public class ToolsHelper {
         RelationsHelper relationsHelper = new RelationsHelper();
         OrphanHelper orphanHelper = new OrphanHelper();
         ArrayList<String> idBT;
+        ArrayList<String> idConcept1WhereIsNT;
 
         // récupération de tous les Id concepts du thésaurus
         ArrayList<String> tabIdConcept = conceptHelper.getAllIdConceptOfThesaurus(ds, idThesaurus);
@@ -96,7 +97,8 @@ public class ToolsHelper {
             conn.setAutoCommit(false);
             for (String idConcept : tabIdConcept) {
                 idBT = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
-                if(idBT.isEmpty()) {
+                idConcept1WhereIsNT=relationsHelper.getListIdWhichHaveNt(ds, idConcept, idThesaurus);
+                if(idBT.isEmpty() && idConcept1WhereIsNT.isEmpty()) {
                     if(!conceptHelper.isTopConcept(ds, idConcept, idThesaurus)){
                         // le concept est orphelin
                         if(!orphanHelper.isOrphanExist(ds, idConcept, idThesaurus)) {
@@ -104,6 +106,34 @@ public class ToolsHelper {
                                 conn.rollback();
                                 conn.close();
                                 return false;
+                            }
+                        }
+                    }
+                }
+                else{
+                    if(!(idBT.containsAll(idConcept1WhereIsNT)) ){
+                        //alors il manque des BT
+                        ArrayList<String> BTmiss =new ArrayList<>(idConcept1WhereIsNT);
+                        BTmiss.removeAll(idBT);
+                         //on ajoute la différence
+                        for(String miss: BTmiss){
+                          if(!relationsHelper.insertHierarchicalRelation(conn, idConcept, idThesaurus,"BT", miss)){
+                              conn.rollback();
+                                conn.close();
+                               return false;
+                          }
+                        }
+                    }
+                     if(!(idConcept1WhereIsNT.containsAll(idBT))){
+                        //il manque des NT pour certain idBT
+                        ArrayList<String> NTmiss =new ArrayList<>(idBT);
+                        NTmiss.removeAll(idConcept1WhereIsNT);
+                        //on jaoute la différence
+                        for(String miss:NTmiss){
+                            if(!relationsHelper.insertHierarchicalRelation(conn, miss, idThesaurus,"NT", idConcept)){
+                              conn.rollback();
+                                conn.close();
+                              return false;
                             }
                         }
                     }

@@ -7,6 +7,7 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
@@ -86,6 +87,40 @@ public class RelationsHelper {
         }
         return status;
     }    
+    
+    public boolean insertHierarchicalRelation(Connection conn,
+            String idConcept1, String idTheso,
+            String role, String idConcept2) {
+
+      
+        Statement stmt;
+        boolean status = false;
+       try {
+            stmt = conn.createStatement();
+                try {
+                    String query = "Insert into hierarchical_relationship"
+                            + "(id_concept1, id_thesaurus, role, id_concept2)"
+                            + " values ("
+                            + "'" + idConcept1+ "'"
+                            + ",'" + idTheso + "'"
+                            + ",'" + role + "'"
+                            + ",'" + idConcept2 + "')";
+                    stmt.executeUpdate(query);
+                    status = true;
+                } 
+             finally {
+                stmt.close();
+            }
+        } catch (SQLException sqle) {
+            // To avoid dupplicate Key
+            //   System.out.println(sqle.toString());
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding hierarchical relation of Concept : " + idConcept1, sqle);
+            }
+        }
+        return status;
+    }    
+
 
     /**
      * Cette fonction permet de rajouter une relation type Groupe ou domaine à
@@ -1205,6 +1240,47 @@ public class RelationsHelper {
             log.error("Error while getting Liste ID of BT Concept : " + idConcept, sqle);
         }
         return listIdBT;
+    }
+    
+    public ArrayList<String> getListIdWhichHaveNt(HikariDataSource ds,
+            String idConcept, String idThesaurus){
+        
+        PreparedStatement stmt;  
+        ResultSet rs;
+        ArrayList<String> ret=new ArrayList();
+        try{
+            Connection conn=ds.getConnection();
+      
+            try{
+                String sql="SELECT id_concept1 FROM hierarchical_relationship WHERE id_concept2=? AND id_thesaurus=? AND role LIKE ?";
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1,idConcept);
+                stmt.setString(2, idThesaurus);
+                stmt.setString(3,"%NT%");
+                
+            
+                 try{
+                     rs=stmt.executeQuery();
+                     while(rs.next()){
+                         ret.add(rs.getString(1));
+                     }
+                  
+                }
+                 finally{
+                     stmt.close();
+                 }
+            }
+            finally{
+                conn.close();
+            }
+                
+        }
+        catch(SQLException e){
+                 log.error("Error while getting list id of concept 1 for NT and concept2 : " + idConcept, e); 
+        }
+        
+       
+        return ret;
     }
 
     /**
