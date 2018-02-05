@@ -8,13 +8,11 @@ package mom.trd.opentheso.SelectedBeans;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -33,8 +31,8 @@ import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
@@ -97,12 +95,23 @@ public class NewTreeBean implements Serializable {
     private MyTreeNode draggedNode;
     private MyTreeNode droppedNode;
     private String parentId;
-    ArrayList<StructIdBroaderTerm> idsBT;
-    ArrayList<String> idsBTRemoveNode;
+    private ArrayList<StructIdBroaderTerm> idsBT;
+    private ArrayList<String> idsBTRemoveNode;
 
     /**
      * ************************************************
      */
+    /**
+     * attributs pour l'alignement des comaines et des BT
+     * 
+     */
+      
+    public ArrayList<String> groupIds=new ArrayList<>();
+  
+    public String idGroupAlign="";
+    
+    
+    /*************************************************************************/
     /**
      *
      * @param idTheso
@@ -1344,7 +1353,7 @@ public class NewTreeBean implements Serializable {
         idsBT = new ArrayList<>();
         idsBTRemoveNode = new ArrayList<>();
         TreeChange treeChange = new TreeChange();
-        int dropIndex = event.getDropIndex();
+        //int dropIndex = event.getDropIndex();
         this.draggedNode = dragNode;
         this.parentId = dragNode.getIdParent();
         this.droppedNode = dropNode;
@@ -1491,7 +1500,7 @@ public class NewTreeBean implements Serializable {
 
     /*Fonction qui doivent gérer les déplacement des noeuds vis à vis de la bdd**/
     /**
-     * déplacement d'un groupe ce déplacement n'est pas prévu pour le moment *
+     * déplacement d'un groupe: ce déplacement n'est pas prévu pour le moment *
      */
     /**
      * ****************déplacement d'un sous groupe********************
@@ -1506,7 +1515,7 @@ public class NewTreeBean implements Serializable {
             tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println("from subgroup to group other domain");
+       // System.out.println("from subgroup to group other domain");
     }
 
     /**
@@ -1519,7 +1528,7 @@ public class NewTreeBean implements Serializable {
             tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println("from sub grou to subgroup other domain");
+       // System.out.println("from sub grou to subgroup other domain");
     }
 
     /* public void fromSubGroupToConceptOtherDomain(){
@@ -1536,7 +1545,7 @@ public class NewTreeBean implements Serializable {
             TreeChange tc = new TreeChange();
             tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
        
-        System.out.println("from top term to group other domain");
+       // System.out.println("from top term to group other domain");
     }
 
     /**
@@ -1547,7 +1556,7 @@ public class NewTreeBean implements Serializable {
           TreeChange tc = new TreeChange();
             tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
        
-        System.out.println("from top term to sub group other domain");
+        //System.out.println("from top term to sub group other domain");
     }
 
     /**
@@ -1564,7 +1573,7 @@ public class NewTreeBean implements Serializable {
         
         }
 
-        System.out.println("from to top term to top term other domain");
+       // System.out.println("from to top term to top term other domain");
     }
 
     /**
@@ -1578,7 +1587,7 @@ public class NewTreeBean implements Serializable {
           
         }
 
-        System.out.println("from top term to top term domain");
+       // System.out.println("from top term to top term domain");
     }
 
     /**
@@ -1591,7 +1600,7 @@ public class NewTreeBean implements Serializable {
             tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
            
         }
-        System.out.println(" from top term to concept  domain");
+      //  System.out.println(" from top term to concept  domain");
     }
 
     /**
@@ -1604,7 +1613,7 @@ public class NewTreeBean implements Serializable {
       tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
            
         }
-        System.out.println(" from top term to concept  other domain");
+        //System.out.println(" from top term to concept  other domain");
     }
 
     /**
@@ -1622,12 +1631,12 @@ public class NewTreeBean implements Serializable {
             tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println(" from concept to group other domain");
+       // System.out.println(" from concept to group other domain");
     }
 
     public void fromConceptToGroupDomain() {
 
-        System.out.println(" from concept to group  domain");
+       // System.out.println(" from concept to group  domain");
     }
 
     /**
@@ -1640,7 +1649,7 @@ public class NewTreeBean implements Serializable {
             tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println(" from concept  to  sub group other domain   domain");
+       // System.out.println(" from concept  to  sub group other domain   domain");
     }
 
     /**
@@ -1654,7 +1663,7 @@ public class NewTreeBean implements Serializable {
             tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println(" from   concept to sub group domain");
+       // System.out.println(" from   concept to sub group domain");
     }
 
     /**
@@ -1667,7 +1676,7 @@ public class NewTreeBean implements Serializable {
             tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println(" from concept m to top term other  domain");
+        //System.out.println(" from concept m to top term other  domain");
     }
 
     /**
@@ -1681,7 +1690,7 @@ public class NewTreeBean implements Serializable {
                     draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
 
         }
-        System.out.println(" from concept m to top term  domain");
+       // System.out.println(" from concept m to top term  domain");
     }
 
     /**
@@ -1696,7 +1705,7 @@ public class NewTreeBean implements Serializable {
                     draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
 
         }
-        System.out.println("from concept to concept domain");
+       // System.out.println("from concept to concept domain");
     }
 
     /**
@@ -1712,7 +1721,7 @@ public class NewTreeBean implements Serializable {
                     droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
         }
 
-        System.out.println("from concept to concept other domain");
+       // System.out.println("from concept to concept other domain");
     }
 
     /**
@@ -1771,8 +1780,73 @@ public class NewTreeBean implements Serializable {
     /**
      * *********************************fin des fonctions drag drop
      * ******************************************
-     * *****************************************************************************************************
+     * **********************************************************************
      */
+    
+    /*******fonction de contrôle de l'arbre *************************************/
+    
+    
+    
+    public void getGroupAndSubGroup(){
+        this.groupIds=new ArrayList<>();
+        ArrayList<NodeGroup> ncg=new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idThesoSelected,this.langueBean.getIdLangue());
+        for(NodeGroup ng:ncg){
+           
+            this.groupIds.add(ng.getConceptGroup().getIdgroup());
+           
+        }
+        
+    }
+    /**
+     * méthode pour vérifier et forcer que les éléments d'un groupe ou d'un 
+     * sous groupe possède bien le nom de ce groupe comme nom de  domaine
+     * sinon on doit l'ajouter 
+     * @param idgroup 
+     */
+    public void alignDomain(){
+        String idGroup=this.idGroupAlign;
+        for( TreeNode tn :this.root.getChildren()){
+            onNodeExpand(tn);
+            if(((MyTreeNode)tn).getIdCurrentGroup()==null)continue;
+            if(((MyTreeNode)tn).getIdCurrentGroup().equals(idGroup)){
+                    
+                    alignDomainAux(tn,idGroup);
+                  
+            }
+        }
+        
+    }
+    /**************fonction pour aligner les domaines**************************/
+    public void alignDomainAux(TreeNode mtn,String idGroup){
+        
+        for(TreeNode child : mtn.getChildren()){
+            onNodeExpand(child);
+            if( ((MyTreeNode)child).isIsSubGroup()){
+                alignDomainAux((MyTreeNode)child,((MyTreeNode)child).getIdCurrentGroup());
+            }
+            else if(((MyTreeNode)child).getIdCurrentGroup()!=idGroup ){
+                 //si le groupe du domaine n'est pas le groupe principal:
+                 //on regarde dans les other groupes   
+                if(!((MyTreeNode)child).getOtherGroup().contains(idGroup)){
+                   //si le groupe n'apparait aps dans les other groupe alors on ajoute
+                   //sur le noeud courant et dans la bdd
+                    ArrayList<String>otherGroup=((MyTreeNode)child).getOtherGroup();
+                   otherGroup.add(idGroup);
+                   ((MyTreeNode)child).setOtherGroup(otherGroup);
+                    GroupHelper gh=new GroupHelper();
+                    gh.addConceptGroupConcept(this.connect.getPoolConnexion(), idGroup,((MyTreeNode)child).getIdConcept(), this.idThesoSelected);
+                }    
+                alignDomainAux(child,idGroup);
+            }
+        }
+        
+    }
+    
+  
+    
+   
+    
+    /**fin fonction **/
     public Connexion getConnect() {
         return connect;
     }
@@ -1935,5 +2009,23 @@ public class NewTreeBean implements Serializable {
         if(selectedNode == null) return true;
         return !selectedNode.isLeaf();
     }
+
+    public ArrayList<String> getGroupIds() {
+        return groupIds;
+    }
+
+    public void setGroupIds(ArrayList<String> groupIds) {
+        this.groupIds = groupIds;
+    }
+
+
+    public String getIdGroupAlign() {
+        return idGroupAlign;
+    }
+
+    public void setIdGroupAlign(String idGroupAlign) {
+        this.idGroupAlign = idGroupAlign;
+    }
+    
 
 }

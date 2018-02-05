@@ -28,7 +28,8 @@
         <ui:include src="admin/regenerateHandleId.xhtml" />        
         <ui:include src="/admin/baseDeDonnes/miseAJourEditDlg.xhtml"/>
         <ui:include src="/dialogs/settings/copyrightEditDlg.xhtml" />
-
+        <!--inlcude pour l'alignement automatique des BT et des domaines -->
+        <ui:include src="dialogs/group/aligngroupDlg.xhtml"/>
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
@@ -175,12 +176,15 @@
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
+                            <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup()}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateHandle')}"  update=":idRegenerateHandleId" oncomplete="PF('regenerateHandleId').show();" styleClass="styleButton"/>                            
                             <p:separator/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('copyright.addCopyrightTo')}" action="#{copyrightBean.setDisplayBrutText(false)}" oncomplete="PF('copyrightEditDlg').show()"  styleClass="styleButton"/>
+                         
+
                         </p:menuButton>
                     </h:form>
                 </fieldset>

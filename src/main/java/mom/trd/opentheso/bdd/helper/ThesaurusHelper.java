@@ -8,6 +8,7 @@ package mom.trd.opentheso.bdd.helper;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -310,7 +311,8 @@ public class ThesaurusHelper {
         }
         return status;
     }
-
+    
+ 
     /**
      * Permet de rajouter une traduction à un Thésaurus existant suivant un l'id
      * du thésaurus et la langue retourne yes or No si l'opération a réussie ou
