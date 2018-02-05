@@ -870,9 +870,11 @@ public class DownloadBean implements Serializable {
         
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
         exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
+        exportRdf4jHelper.setNodePreference(nodePreference);
         exportRdf4jHelper.addThesaurus(idTheso, selectedLanguages);
         exportRdf4jHelper.addGroup(idTheso, selectedLanguages, selectedGroups);
         exportRdf4jHelper.addConcept(idTheso, this, selectedLanguages);
+
 
         WritePdf writePdf = new WritePdf(exportRdf4jHelper.getSkosXmlDocument(), codeLang, codeLang2, type);
 

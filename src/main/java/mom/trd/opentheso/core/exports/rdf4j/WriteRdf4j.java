@@ -5,6 +5,9 @@
  */
 package mom.trd.opentheso.core.exports.rdf4j;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.skosapi.SKOSCreator;
 import mom.trd.opentheso.skosapi.SKOSDate;
 import mom.trd.opentheso.skosapi.SKOSDocumentation;
@@ -254,29 +257,34 @@ public class WriteRdf4j {
 
     private void writeMatch(SKOSResource resource) {
         int prop;
+        IRI uri;
         for (SKOSMatch match : resource.getMatchList()) {
             prop = match.getProperty();
-            IRI uri = vf.createIRI(match.getValue());
-            switch (prop) {
-                case SKOSProperty.exactMatch:
-                    builder.add(SKOS.EXACT_MATCH, uri);
-                    break;
-                case SKOSProperty.closeMatch:
-                    builder.add(SKOS.CLOSE_MATCH, uri);
-                    break;
-                case SKOSProperty.broadMatch:
-                    builder.add(SKOS.BROAD_MATCH, uri);
-                    break;
-                case SKOSProperty.relatedMatch:
-                    builder.add(SKOS.RELATED_MATCH, uri);
-                    break;
-                case SKOSProperty.narrowMatch:
-                    builder.add(SKOS.NARROW_MATCH, uri);
-                    break;
-                default:
-                    break;
+            try {
+                uri = vf.createIRI(match.getValue());
+                switch (prop) {
+                    case SKOSProperty.exactMatch:
+                        builder.add(SKOS.EXACT_MATCH, uri);
+                        break;
+                    case SKOSProperty.closeMatch:
+                        builder.add(SKOS.CLOSE_MATCH, uri);
+                        break;
+                    case SKOSProperty.broadMatch:
+                        builder.add(SKOS.BROAD_MATCH, uri);
+                        break;
+                    case SKOSProperty.relatedMatch:
+                        builder.add(SKOS.RELATED_MATCH, uri);
+                        break;
+                    case SKOSProperty.narrowMatch:
+                        builder.add(SKOS.NARROW_MATCH, uri);
+                        break;
+                    default:
+                        break;
+                }                
+            } catch (Exception ex) {
+                Logger.getLogger(WriteRdf4j.class.getName()).log(Level.SEVERE,
+                        "Error URI Alignement : " + resource.getUri(), ex);
             }
-
         }
     }
 

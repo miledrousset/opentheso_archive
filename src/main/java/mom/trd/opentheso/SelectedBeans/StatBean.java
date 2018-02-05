@@ -89,7 +89,7 @@ public class StatBean implements Serializable {
                 findCptByGroup(idTheso,langue);
             }
             if(!searchFromDate && !searchFromGroup){
-                this.loadAllCpt(idTheso);
+                this.loadAllCpt(idTheso, langue);
             }
             if(searchFromDate && searchFromGroup){
                 this.findCptByGroupAndByDate(idTheso,langue);
@@ -155,12 +155,14 @@ public class StatBean implements Serializable {
         }
     }
     /**
-     * #jm
+     * 
      * méthode pour charger tous les concepts 
      * @param idTheso 
+     * #MR
+     * 
      */
-    public void loadAllCpt(String idTheso){
-        statConcept=new StatisticHelper().getStatConceptCreat(connect.getPoolConnexion(), ""+new java.sql.Date(0), ""+new Date(), idTheso, lang,this.limit);
+    public void loadAllCpt(String idTheso, String idLangue){
+        statConcept=new StatisticHelper().getStatConcept(connect.getPoolConnexion(), idTheso, idLangue,this.limit);
 
     }
     /**

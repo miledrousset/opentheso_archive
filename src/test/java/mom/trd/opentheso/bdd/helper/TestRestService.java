@@ -7,26 +7,12 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.FileInputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
-import mom.trd.opentheso.core.exports.tabulate.TabulateDocument;
-import mom.trd.opentheso.core.exports.helper.ExportTabulateHelper;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
-import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
-import mom.trd.opentheso.core.imports.old.WriteBranchSkosBDD;
-import mom.trd.opentheso.core.imports.old.WriteSkosBDD;
-import mom.trd.opentheso.core.imports.tabulate.ReadFileTabule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import skos.SKOSXmlDocument;
 
 /**
  *

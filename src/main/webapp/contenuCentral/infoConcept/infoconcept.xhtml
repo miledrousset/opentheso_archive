@@ -137,7 +137,7 @@
 
 
                 <!-- affichage du nombre total des notices de la branche -->
-                <h:panelGroup id="totalNoticesG" rendered="#{user.getNodePreference().z3950_actif}">
+                <h:panelGroup id="totalNoticesG" rendered="#{user1.nodePreference.z3950actif}">
                     <h:form>
                         <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
                                           id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />

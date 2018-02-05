@@ -15,6 +15,8 @@ import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +27,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
@@ -33,6 +36,7 @@ import skos.SKOSXmlDocument;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 
@@ -895,7 +899,151 @@ public class Rest {
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         //return jsonLd.toString();
     }    
+    
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus et
+     * une langue)
+     *
+     * @param uri
+     * @return
+     */
+    @Path("/searchJson")
+    @GET
+    //@Produces("text/plain")
+    //@Produces("application/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response searchJson(@Context UriInfo uri) {
+        String value = "";
+        String idLang = "";
+        String idTheso = "0";
+        
+//        @GET()
+//        @Path("param")
+//        public String param(@Context UriInfo uri) {
+//            String result = "";
+//            result += "path: " + uri.getPath();
+//            for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+//                for (String value : e.getValue()) {
+//                    result += " ";
+//                    result += e.getKey() + "=" + value;
+//                }
+//            }
+//            return result;
+//        }        
+        
+        for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+            for (String valeur : e.getValue()) {
+                if(e.getKey().equalsIgnoreCase("lang")) 
+                    idLang = valeur;
+                if(e.getKey().equalsIgnoreCase("value")) 
+                    value = valeur;
+                if(e.getKey().equalsIgnoreCase("th")) 
+                    idTheso = valeur;                 
+            }
+        }
+        
+        
+        if (!getStatusOfWebservices(idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
 
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        String json = getJsonDatas(value, idLang, idTheso);
+        ds.close();
+        return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();        
+    }    
+
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus et
+     * une langue)
+     *
+     * @param uri
+     * @return
+     */
+    @Path("/searchJsonld")
+    @GET
+    //@Produces("text/plain")
+    //@Produces("application/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response searchJsonld(@Context UriInfo uri) {
+        String value = "";
+        String idLang = "";
+        String idTheso = "0";
+        
+//        @GET()
+//        @Path("param")
+//        public String param(@Context UriInfo uri) {
+//            String result = "";
+//            result += "path: " + uri.getPath();
+//            for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+//                for (String value : e.getValue()) {
+//                    result += " ";
+//                    result += e.getKey() + "=" + value;
+//                }
+//            }
+//            return result;
+//        }        
+        
+        for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+            for (String valeur : e.getValue()) {
+                if(e.getKey().equalsIgnoreCase("lang")) 
+                    idLang = valeur;
+                if(e.getKey().equalsIgnoreCase("value")) 
+                    value = valeur;
+                if(e.getKey().equalsIgnoreCase("th")) 
+                    idTheso = valeur;                 
+            }
+        }
+        
+        
+        if (!getStatusOfWebservices(idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        String json = getJsonLdDatas(value, idLang, idTheso);
+        ds.close();
+        return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();        
+    }    
+    
     /**
      * Permet de retourner les Concepts par value (en précisant un thésaurus, un
      * doamine et une langue)
@@ -1024,11 +1172,15 @@ public class Rest {
    
     /**
      * Temporaire à refaire (Miled)
+     * */
+    
+    
+    /**
+     * 
      * @param idConcept
      * @param idTheso
      * @return 
      */
-    
     private String getJsonDatas(String value,
             String idLang, String idTheso){
         ArrayList <String> listId = getListId(value, idLang, idTheso);
@@ -1050,8 +1202,38 @@ public class Rest {
            // System.out.println(out.toString());
             return out.toString();
         }
-        return "";
+        return messageEmptyJson();
     }
+    
+    private String getJsonLdDatas(String value,
+            String idLang, String idTheso){
+        ArrayList <String> listId = getListId(value, idLang, idTheso);
+        
+        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        if(nodePreference != null){
+            ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+            exportRdf4jHelper.setNodePreference(nodePreference1);
+            exportRdf4jHelper.setInfos(ds, "dd-mm-yyyy", false, idTheso,nodePreference1.getCheminSite());
+            exportRdf4jHelper.setNodePreference(nodePreference1);
+            for (String idConcept : listId) {
+                exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
+            }
+            WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+
+            ByteArrayOutputStream out;
+            out = new ByteArrayOutputStream();
+            Rio.write(writeRdf4j.getModel(), out, RDFFormat.JSONLD);
+           // System.out.println(out.toString());
+            return out.toString();
+        }
+        return messageEmptyJson();
+    }    
+     /**
+     * Fin Temporaire à refaire (Miled)
+     */
+    
+    
+    
     
     private ArrayList<String> getListId( 
             String value, String idLang, String idTheso) {

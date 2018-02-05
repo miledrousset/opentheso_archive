@@ -23,6 +23,67 @@ public class UserHelper {
     }
 
     /**
+     * Cette fonction permet de savoir si le Pseudo existe
+     *
+     * @param ds
+     * @param pseudo
+     * @return
+     */
+    public boolean isPseudoExist(HikariDataSource ds, String pseudo) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_user FROM users WHERE username='" + pseudo + "'";
+                    resultSet = stmt.executeQuery(query);
+                    //resultSet.first();
+                    //resultSet.next();
+                    if (resultSet.next()) {
+                        existe = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return existe;
+    }
+    
+    public void updateMail(HikariDataSource ds, int idUser, String newMail) {
+        Connection conn;
+        Statement stmt;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE users set mail = '" + newMail
+                            + "' WHERE id_user = " + idUser;
+                    stmt.executeUpdate(query);
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
+    
+    /**
      * Cette fonction permet de récupérer l'Id de l'utilisateur d'après son
      * Login et son passe
      *
@@ -797,8 +858,9 @@ public class UserHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+ 
 
-    public void updateMail(HikariDataSource ds, int idUser, String newMail) {
+    public void updatePseudo(HikariDataSource ds, int idUser, String pseudo) {
         Connection conn;
         Statement stmt;
         try {
@@ -808,7 +870,7 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "UPDATE users set mail = '" + newMail
+                    String query = "UPDATE users set username = '" + pseudo
                             + "' WHERE id_user = " + idUser;
                     stmt.executeUpdate(query);
                 } finally {
