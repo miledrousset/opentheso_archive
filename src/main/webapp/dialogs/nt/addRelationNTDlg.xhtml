@@ -1,0 +1,55 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddRelationNTDlg"  header="#{langueBean.getMsg('panel.addRelationNT')}" widgetVar="addRelationNTDlg" modal="true" resizable="false" >
+        <!-- Ajout d'une relation NT sous le concept en cours -->
+        <h:form >
+        <p:messages showDetail="true" autoUpdate="true" />
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('panel.addRelationNT')}" /></legend>
+                <h:form>
+                    <table>
+                      
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
+                            <td>
+                                <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationNT}" var="concept"
+                                                forceSelection="true" active="true"  queryDelay="1000"
+                                                itemLabel="#{concept.termLexicalValue}" itemValue="#{concept}" converter="termConverter">
+                                    <p:column style="width:10%">
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}" style="color: green; font-style: italic"/>
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
+                                    </p:column>
+
+                                    <p:column>
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.termLexicalValue}" style="color: green; font-style: italic" />
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.termLexicalValue}" />
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}" style="color: green; font-style: italic"/>
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.groupLexicalValue}" />
+                                    </p:column>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center;">
+                                <h:form>
+                                    <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{newtreeBean.newRelationNT()}" 
+                                                     update=":idAddRelationNTDlg,:accordeonTree,:panContenu" styleClass="styleButton"
+                                                     oncomplete="PF('addRelationNTDlg').hide();">
+                                    </p:commandButton>  
+                           </h:form>
+
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

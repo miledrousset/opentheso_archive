@@ -12,7 +12,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.swing.event.ChangeEvent;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
@@ -53,12 +56,33 @@ public class AutoCompletBean implements Serializable {
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
 
-    public List<NodeAutoCompletion> completTerm(String query) {
+
+    /**
+     * permet de retourner la liste des concepts possibles 
+     * pour ajouter une relation NT
+     * (en ignorant les relations interdites) 
+     * on ignore les concepts de type TT
+     * on ignore les concepts de type RT
+     * @param value
+     * @return 
+     */
+    public List<NodeAutoCompletion> getAutoCompletForRelationNT(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletForRelationNT(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);
+        }
+        return liste;
+    }
+    
+    
+    public List<NodeAutoCompletion> completTerm(String value) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
         if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
             liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
-                    theso.getThesaurus().getLanguage(), query);
+                    theso.getThesaurus().getLanguage(), value);
         }
         return liste;
     }
@@ -124,6 +148,7 @@ public class AutoCompletBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
     }
 
+    
     public List<NodeAutoCompletion> completSearchTerm(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();

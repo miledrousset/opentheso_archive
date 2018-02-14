@@ -1661,6 +1661,16 @@ input[type="button"], input[type="submit"]{
     text-align: left;  
 }
 
+.textLink {
+    background: none;
+    font-size: 14px;
+    text-shadow: none;
+    font-weight: normal;
+    color: royalblue;
+    box-shadow: none;
+    text-align: left;  
+}
+
 .textInfoSmall {
     background: none;
     font-size: 12px;

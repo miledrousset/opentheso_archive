@@ -492,11 +492,12 @@ public class NewTreeBean implements Serializable {
         }
 
         String idTC;
-        if (type == 2) { //On vient d'un domaine
+        if (((MyTreeNode)selectedNode).isIsGroup() || ((MyTreeNode)selectedNode).isIsSubGroup()) {//type == 2) { //On vient d'un domaine
             idTC = id;
         } else {
             idTC = selectedTerme.getIdTopConcept();
         }
+                /// ????? à comprendre pourquoi ?????
         if (type == 0) {
             boolean temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), id, selectedTerme.getIdTheso()).isTopConcept();
             if (temp) {
@@ -880,6 +881,53 @@ public class NewTreeBean implements Serializable {
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
         createValid = true;
     }
+    
+    /**
+     * Permet d'ajouter une relation terme spécifique NT pour un concept
+     * #MR
+     */
+    public void newRelationNT() {
+        createValid = false;
+        if ((selectedTerme.getSelectedTermComp() == null ) || 
+                (selectedTerme.getSelectedTermComp().getIdConcept() == null) ||
+                (selectedTerme.getSelectedTermComp().getIdConcept().isEmpty())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }        
+        
+        // vérification si la relation est cohérente (NT et RT à la fois ?)  
+        if(!isAddRelationNTValid(selectedTerme.getIdC(), selectedTerme.getSelectedTermComp().getIdConcept())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorNTRT")));
+            return;        
+        } 
+        
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if (!relationsHelper.addRelationNT(connect.getPoolConnexion(), 
+                selectedTerme.getIdC(),
+                idThesoSelected,
+                selectedTerme.getSelectedTermComp().getIdConcept(),
+                selectedTerme.getUser().getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        }
+        
+        reInit();
+        reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :",
+                selectedTerme.getSelectedTermComp().getIdConcept() + " " + langueBean.getMsg("tree.info1")));
+        selectedTerme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }
+    
+    private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
+                idConcept1, idConcept2, idThesoSelected) == true) 
+            return false;
+        else
+            return true;
+    }
+    
 
     public void newSpecialTSpe() {
         createValid = false;

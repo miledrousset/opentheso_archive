@@ -521,6 +521,72 @@ public class RelationsHelper {
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de rajouter une relation terme spécifique à un
+     * concept
+     *
+     * @param ds
+     * @param idConcept
+     * @param idConceptNT
+     * @param idThesaurus
+     * @param idUser
+     * @return boolean
+     */
+    public boolean addRelationNT(HikariDataSource ds,
+            String idConcept, String idThesaurus,
+            String idConceptNT, int idUser) {
+
+        Statement stmt;
+        boolean status = false;
+        Connection conn;
+        try {
+            conn = ds.getConnection();
+            try {
+                conn.setAutoCommit(false);
+                stmt = conn.createStatement();
+                try {
+                    if (!new RelationsHelper().addRelationHistorique(conn, idConcept, idThesaurus, idConceptNT, "NT", idUser, "ADD")) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                    }
+
+                    String query = "Insert into hierarchical_relationship"
+                            + "(id_concept1, id_thesaurus, role, id_concept2)"
+                            + " values ("
+                            + "'" + idConcept + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'NT'"
+                            + ",'" + idConceptNT + "')";
+
+                    stmt.executeUpdate(query);
+                    query = "Insert into hierarchical_relationship"
+                            + "(id_concept1, id_thesaurus, role, id_concept2)"
+                            + " values ("
+                            + "'" + idConceptNT + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'BT'"
+                            + ",'" + idConcept + "')";
+                    stmt.executeUpdate(query);
+                    status = true;
+                    conn.commit();
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            //  if (sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding relation NT : " + idConcept + "-> " + idConceptNT, sqle);
+            }
+        }
+        return status;
+    }    
 
     /**
      * Cette fonction permet de rajouter une relation dans l'historique
@@ -1836,6 +1902,51 @@ public class RelationsHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le Concept1 a une relation RT avec le concept2 
+     * permet d'éviter l'ajout des relations NT et RT en même temps (c'est interdit par la norme)
+     * 
+     * @param ds
+     * @param idConcept1
+     * @param idConcept2
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public boolean isConceptHaveRelationRT(HikariDataSource ds,
+            String idConcept1, String idConcept2, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept1 from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept1 + "'"
+                            + " and id_concept2 = '" + idConcept2 + "'"
+                            + " and role LIKE 'RT%'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    existe = resultSet.next();
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if relation RT exist of Concept1 : " + idConcept1 + " for concept2 : " + idConcept2, sqle);
+        }
+        return existe;
+    }    
 
     /**
      * Cette fonction permet de rÃ©cupÃ©rer les termes associÃ©s d'un concept

@@ -81,11 +81,12 @@
                     <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                 </span>
                 <h:panelGroup rendered= "#{(selectedTerme.user.nodePreference.z3950actif) or (selectedTerme.user.nodePreference.bddActive)}">
-                    <h:outputText value="#{langueBean.getMsg('index.notice')}" />  : 
+                    
 
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
-                        <h:outputText rendered="#{(!selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti1" value="Notices liées &lt;br/&gt;" escape="false" styleClass="textInfo" />
-                        <h:outputText rendered="#{(selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti2" value="#{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textInfo" />
+                        <h:outputText rendered="#{(selectedTerme.user.nodePreference.bddUseId)}" value="#{langueBean.getMsg('index.notice')}" />   
+                        <h:outputText rendered="#{(!selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti1" value="notices liées &lt;br/&gt;" escape="false" styleClass="textLink" />
+                        <h:outputText rendered="#{(selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti2" value=" #{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textLink" />
                     </a>
 
                 </h:panelGroup>

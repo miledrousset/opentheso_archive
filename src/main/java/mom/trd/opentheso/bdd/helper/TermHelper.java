@@ -1763,6 +1763,119 @@ public class TermHelper {
     }    
     
     /**
+     * permet de retourner la liste des concepts possibles 
+     * pour ajouter une relation NT
+     * (en ignorant les relations interdites) 
+     * on ignore les concepts de type TT
+     * on ignore les concepts de type RT
+     * 
+     * On recherche aussi dans les Synonymes
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param text
+     * @param idLang
+     * @return Objet class NodeAutoCompletion
+     * #MR
+     */
+    public List<NodeAutoCompletion> getAutoCompletForRelationNT(HikariDataSource ds,
+            String idThesaurus, String idLang, String text) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        List<NodeAutoCompletion> nodeAutoCompletionList = new ArrayList<>();
+        text = new StringPlus().convertString(text);
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query
+                            = "SELECT DISTINCT term.lexical_value, concept.id_concept, concept_group_concept.idgroup "
+                            + "FROM preferred_term, term, concept,concept_group_concept "
+                            + "WHERE "
+                            + "idThesaurus = concept.id_thesaurus AND "
+                            + "concept_group_concept.idconcept = concept.id_concept AND "
+                            + "preferred_term.id_term = term.id_term AND "
+                            + "preferred_term.id_thesaurus = term.id_thesaurus AND "
+                            + "concept.id_concept = preferred_term.id_concept AND "
+                            + "concept.id_thesaurus = preferred_term.id_thesaurus AND "
+                            + "term.id_thesaurus = '" + idThesaurus + "' AND "
+                            + "term.lang = '" + idLang + "' AND "
+                            + "concept.status != 'hidden' AND "
+                            + "concept.top_concept != 'true' AND "
+                            + "unaccent_string(term.lexical_value) ILIKE unaccent_string('" + text + "%')"
+                            + " ORDER BY term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+
+                        while (resultSet.next()) {
+                            if (resultSet.getRow() != 0) {
+                                NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+
+                                nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                                nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                                nodeAutoCompletion.setGroupLexicalValue(
+                                        new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                                nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                                //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                                nodeAutoCompletion.setIsAltLabel(false);
+                                nodeAutoCompletionList.add(nodeAutoCompletion);
+                            }
+                        }
+                    }
+                    query = "SELECT DISTINCT "
+                            + "non_preferred_term.lexical_value,"
+                            + "concept.id_concept,"
+                            + "concept_group_concept.idgroup"
+                            + " FROM preferred_term, non_preferred_term, concept,concept_group_concept"
+                            + "  WHERE"
+                            + "  concept_group_concept.idthesaurus = concept.id_thesaurus "
+                            + "  AND"
+                            + "   concept_group_concept.idconcept = concept.id_concept"
+                            + " AND preferred_term.id_term = non_preferred_term.id_term "
+                            + " AND preferred_term.id_thesaurus = non_preferred_term.id_thesaurus "
+                            + " AND concept.id_concept = preferred_term.id_concept "
+                            + " AND concept.id_thesaurus = preferred_term.id_thesaurus "
+                            + " AND non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
+                            + " AND non_preferred_term.lang = '" + idLang + "'"
+                            + " AND concept.status != 'hidden'"
+                            + " AND concept.top_concept != 'true'"
+                            + " AND unaccent_string(non_preferred_term.lexical_value) ILIKE unaccent_string('" + text +"%') ORDER BY non_preferred_term.lexical_value ASC LIMIT 20";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+
+                        nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                        nodeAutoCompletion.setTermLexicalValue(resultSet.getString("lexical_value"));
+                        nodeAutoCompletion.setGroupLexicalValue(
+                                new GroupHelper().getLexicalValueOfGroup(ds, resultSet.getString("idgroup"), idThesaurus, idLang));
+                        nodeAutoCompletion.setIdGroup(resultSet.getString("idgroup"));
+                        //  if(!nodeAutoCompletionList.contains(nodeAutoCompletion))
+                        nodeAutoCompletion.setIsAltLabel(true);
+                        nodeAutoCompletionList.add(nodeAutoCompletion);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of autocompletion of Text : " + text, sqle);
+        }
+
+        return nodeAutoCompletionList;
+    }        
+        
+    /**
      * Cette fonction permet de récupérer une liste de termes pour
      * l'autocomplétion avec les synonymes
      *

@@ -8,6 +8,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 
 @FacesConverter("termConverterLexical")
 public class TermeConverterLexical implements Converter{
+    
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {
@@ -25,7 +26,8 @@ public class TermeConverterLexical implements Converter{
         if(o == null) {
             return null;
         } else {
-            return ((NodeAutoCompletion)o).getTermLexicalValue();
+           return ((NodeAutoCompletion)o).getTermLexicalValue();
         }
     }
+    
 }
