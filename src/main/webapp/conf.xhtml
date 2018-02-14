@@ -105,13 +105,27 @@
 
             <fieldset class="fieldMyAccount">
                 <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
-                <h:form id="formEditPwd">
+                <h:form id="formEditPseudo">
                     <table>
                         <tr>
                             <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{user1.user.name}" /><br/><br/>
+                                <h:outputText value="#{user1.user.name}" styleClass="textInfo" />
                             </td>
                         </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.editPseudo')}" /> : </td>
+                            <td><h:inputText value="#{user1.pseudo}" /></td>
+
+                            <td colspan="2" style="text-align: center;">
+                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editPseudo')}" actionListener="#{user1.renamePseudo}" 
+                                                      update=":formEditPseudo, :tabUser" />
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>
+                <hr/>
+                <h:form id="formEditPwd">
+                    <table>
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('conf.currentPwd')}" /> : </td>
                             <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
@@ -123,31 +137,29 @@
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('conf.newPwd2')}" /> :</td>
                             <td><h:inputSecret value="#{user1.pwdEdit3}" /></td>
-                        </tr>
-                        <tr>
+
                             <td colspan="2" style="text-align: center;">
-                                <br/><p:commandButton value="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{user1.changePwd()}" 
-                                                      update=":formEditPwd" styleClass="styleButton" />
+                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{user1.changePwd()}" 
+                                                      update=":formEditPwd" />
                             </td>
                         </tr>
                     </table>
                 </h:form>
-                <br/><hr/><br/>
+                <hr/>
                 <h:form id="formEditMail">
                     <table>
                         <tr>
                             <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{user1.user.mail}" /><br/><br/>
+                                <h:outputText value="#{user1.user.mail}" styleClass="textInfo"/>
                             </td>
                         </tr>
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('conf.newMail')}" /> : </td>
                             <td><h:inputText value="#{user1.mailEdit}" /></td>
-                        </tr>
-                        <tr>
+
                             <td colspan="2" style="text-align: center;">
-                                <br/><p:commandButton value="#{langueBean.getMsg('conf.editMail')}" actionListener="#{user1.changeMail()}" 
-                                                      update=":formEditMail" styleClass="styleButton" />
+                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editMail')}" actionListener="#{user1.changeMail()}" 
+                                                      update=":formEditMail" />
                             </td>
                         </tr>
                     </table>

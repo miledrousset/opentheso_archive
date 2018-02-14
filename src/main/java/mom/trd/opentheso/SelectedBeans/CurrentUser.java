@@ -30,6 +30,7 @@ public class CurrentUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private String name = null;
+    private String pseudo;
     private String pwd = null;
     private NodeUser user;
     private boolean isLogged = false;
@@ -286,7 +287,7 @@ public class CurrentUser implements Serializable {
         pwdEdit2 = "";
         pwdEdit3 = "";
     }
-
+  
     public void changeMail() {
         if (mailEdit == null || mailEdit.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
@@ -300,6 +301,21 @@ public class CurrentUser implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
         }
         mailEdit = "";
+    }    
+    
+
+    public void renamePseudo() {
+        if (pseudo == null || pseudo.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
+        } else if (new UserHelper().isPseudoExist(connect.getPoolConnexion(), pseudo)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
+        } else {
+            new UserHelper().updatePseudo(connect.getPoolConnexion(), user.getId(), pseudo);
+            user.setName(pseudo);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
+        }
+        name  = pseudo;
+        pseudo = "";
     }
 
     public void delUser(int idUser) {
@@ -678,6 +694,14 @@ public class CurrentUser implements Serializable {
 
     public void setAuthorizedTheso(List<String> authorizedTheso) {
         this.authorizedTheso = authorizedTheso;
+    }
+
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
     }
 
  

@@ -49,7 +49,6 @@ public class ConceptHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
-    
     //identifierType  1=numericId ; 2=alphaNumericId
     private NodePreference nodePreference;
     private String message = "";
@@ -152,7 +151,7 @@ public class ConceptHelper {
                 conn.commit();
                 conn.close();
                 return true;
-                
+
             } catch (SQLException e) {
                 conn.rollback();
                 conn.close();
@@ -160,7 +159,7 @@ public class ConceptHelper {
             }
 
         } catch (SQLException sqle) {
-            
+
         }
         return false;
     }
@@ -205,14 +204,15 @@ public class ConceptHelper {
 
         return idConcept;
     }
-    
+
     /**
-     * focntion qui permet de récupérer le Delta des Id concepts créés ou modifiéés 
-     * le format de la date est (yyyy-MM-dd)
+     * focntion qui permet de récupérer le Delta des Id concepts créés ou
+     * modifiéés le format de la date est (yyyy-MM-dd)
+     *
      * @param ds
      * @param idTheso
      * @param date
-     * @return 
+     * @return
      */
     public ArrayList<String> getConceptsDelta(HikariDataSource ds,
             String idTheso, String date) {
@@ -221,17 +221,17 @@ public class ConceptHelper {
         ResultSet resultSet;
 
         ArrayList<String> ids = new ArrayList<>();
-        
+
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept from concept where " +
-                        " id_thesaurus = '" + idTheso + "'" +
-                        " and (created > '" + date + "'" +
-                        " or modified > '" + date + "')";
+                    String query = "select id_concept from concept where "
+                            + " id_thesaurus = '" + idTheso + "'"
+                            + " and (created > '" + date + "'"
+                            + " or modified > '" + date + "')";
 
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
@@ -251,16 +251,15 @@ public class ConceptHelper {
     }
 
     /**
-     * permet de vérifier si l'id ark existe; 
-     * si oui, on ne fait rien, 
-     * s'il n'existe pas, on l'ajoute.
+     * permet de vérifier si l'id ark existe; si oui, on ne fait rien, s'il
+     * n'existe pas, on l'ajoute.
+     *
      * @param ds
      * @param url
      * @param idConcept
      * @param idLang
      * @param idTheso
-     * @return
-     * #MR
+     * @return #MR
      */
     public boolean regenerateArkId(HikariDataSource ds,
             String idConcept, String idLang, String idTheso) {
@@ -269,17 +268,17 @@ public class ConceptHelper {
         ArkClient ark_Client = new ArkClient();
 
         Concept concept = getThisConcept(ds, idConcept, idTheso);
-        
-        if(concept.getIdArk() == null) {
+
+        if (concept.getIdArk() == null) {
             // création d'un identifiant Ark
             return prepareToAddArkId(ds, idConcept, idLang, idTheso);
         }
 
-        if(concept.getIdArk().isEmpty()) {
+        if (concept.getIdArk().isEmpty()) {
             // création d'un identifiant Ark
             return prepareToAddArkId(ds, idConcept, idLang, idTheso);
         }
-        
+
         // ici, nous avons un  IdArk, on vérifie s'il est encore valide ?
         idArk = ark_Client.getInfosArkId(concept.getIdArk());
         // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
@@ -292,19 +291,19 @@ public class ConceptHelper {
     }
 
     /**
-     * Pour préparer les données pour la création d'un idArk 
-     * 
+     * Pour préparer les données pour la création d'un idArk
+     *
      * @param ds
      * @param url
      * @param idConcept
      * @param idLang
      * @param idTheso
      * @param idUser
-     * @return 
+     * @return
      */
-    private boolean prepareToAddArkId (HikariDataSource ds,
+    private boolean prepareToAddArkId(HikariDataSource ds,
             String idConcept, String idLang, String idTheso) {
-        
+
         ArrayList<DcElement> dc = new ArrayList<>();
         NodeConcept nodeConcept;
         nodeConcept = getConcept(ds, idConcept, idTheso, idLang);
@@ -328,10 +327,9 @@ public class ConceptHelper {
         } catch (SQLException ex) {
             Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return true;    
+        return true;
     }
-    
-    
+
     /*
         public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
             String idConceptDeTete,
@@ -405,7 +403,7 @@ public class ConceptHelper {
 
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if(nodePreference != null) {
+            if (nodePreference != null) {
                 if (nodePreference.isUseArk()) {
                     NodeMetaData nodeMetaData = new NodeMetaData();
                     nodeMetaData.setCreator(term.getSource());
@@ -570,13 +568,12 @@ public class ConceptHelper {
             }
 
             // cette fonction permet de remplir la table Permutée
-        /*    termHelper.splitConceptForPermute(ds, idConcept,
+            /*    termHelper.splitConceptForPermute(ds, idConcept,
                     getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus()),
                     term.getId_thesaurus(),
                     term.getLang(),
                     term.getLexical_value());*/
-
-            if(nodePreference != null) {
+            if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de récupérer le code ARK
                 if (nodePreference.isUseArk()) {
@@ -602,7 +599,7 @@ public class ConceptHelper {
                         return null;
                     }
                 }
-            }       
+            }
 
             conn.commit();
             conn.close();
@@ -619,11 +616,12 @@ public class ConceptHelper {
         }
         return null;
     }
-    
-     /**
-     * Cette fonction permet d'ajouter un Concept et de choisir le type de relation  complet à la base avec le
-     * libellé et les relations Si l'opération échoue, elle envoi un NULL et ne
-     * modifie pas la base de données
+
+    /**
+     * Cette fonction permet d'ajouter un Concept et de choisir le type de
+     * relation complet à la base avec le libellé et les relations Si
+     * l'opération échoue, elle envoi un NULL et ne modifie pas la base de
+     * données
      *
      * @param ds
      * @param idParent
@@ -636,7 +634,7 @@ public class ConceptHelper {
      */
     public String addConceptSpecial(HikariDataSource ds,
             String idParent,
-            Concept concept, Term term,String BTname,String NTname,
+            Concept concept, Term term, String BTname, String NTname,
             int idUser) {
 
         Connection conn = null;
@@ -697,7 +695,7 @@ public class ConceptHelper {
 
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
-            if(nodePreference != null) {
+            if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de récupérer le code ARK
                 if (nodePreference.isUseArk()) {
@@ -971,7 +969,7 @@ public class ConceptHelper {
                 conn.close();
                 return false;
             }
-            if(nodePreference != null){
+            if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de supprimer le code ARK
                 if (nodePreference.isUseArk()) {
@@ -1053,7 +1051,7 @@ public class ConceptHelper {
                 conn.close();
                 return false;
             }
-            if(nodePreference != null){
+            if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de supprimer le code ARK
                 if (nodePreference.isUseArk()) {
@@ -1069,7 +1067,7 @@ public class ConceptHelper {
                         return false;
                     }
                 }
-            }            
+            }
             conn.commit();
             conn.close();
             return true;
@@ -1359,7 +1357,6 @@ public class ConceptHelper {
         return false;
     }
 
-
     /**
      * Cette fonction permet de déplacer une Branche vers un domaine Le domaine
      * de destination est le même que la branche (déplamcent dans le même
@@ -1397,8 +1394,9 @@ public class ConceptHelper {
         }
         return false;
     }
+
     /**
-     * 
+     *
      * @param conn
      * @param idConcept
      * @param idOldConceptBT
@@ -1406,9 +1404,9 @@ public class ConceptHelper {
      * @param idNewMT
      * @param idThesaurus
      * @param idUser
-     * @return 
+     * @return
      */
-     public boolean moveTTToAnotherMT(Connection conn,
+    public boolean moveTTToAnotherMT(Connection conn,
             String idConcept,
             String idOldConceptBT,
             String oldMT,
@@ -1418,7 +1416,7 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
             conn.setAutoCommit(false);
 
-            return relationsHelper.setRelationMT(conn, idConcept,idNewMT,idThesaurus);
+            return relationsHelper.setRelationMT(conn, idConcept, idNewMT, idThesaurus);
 
         } catch (SQLException ex) {
             Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -1426,7 +1424,7 @@ public class ConceptHelper {
         }
         return false;
     }
-   
+
     /**
      * Cette fonction permet de déplacer une Branche d'un domaine vers un
      * concept dans le thésaurus Le domaine de destination est le même que la
@@ -1566,7 +1564,7 @@ public class ConceptHelper {
                 try {
 
                     if (!new RelationsHelper().addRelationHistorique(conn, hierarchicalRelationship.getIdConcept1(), hierarchicalRelationship.getIdThesaurus(), hierarchicalRelationship.getIdConcept2(), hierarchicalRelationship.getRole(), idUser, "ADD")) {
-                      /*  conn.rollback();
+                        /*  conn.rollback();
                         conn.close();
                         return false;*/
                     }
@@ -1702,7 +1700,7 @@ public class ConceptHelper {
                         }
                         concept.setIdConcept(idConcept);
                     } else {
-               //         getNumericConceptId(conn, concept.getIdThesaurus());
+                        //         getNumericConceptId(conn, concept.getIdThesaurus());
                         query = "select max(id) from concept";
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
@@ -2140,9 +2138,13 @@ public class ConceptHelper {
          * récupération du code Ark via WebServices
          *
          */
-        if(nodePreference == null) return false;        
-        if(!nodePreference.isUseArk()) return false;
-        
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+
         ArkClient ark_Client = new ArkClient();
 
         Properties propertiesArk = new Properties();
@@ -2150,7 +2152,7 @@ public class ConceptHelper {
         propertiesArk.setProperty("user", nodePreference.getUserArk());
         propertiesArk.setProperty("password", nodePreference.getPassArk());
         ark_Client.setPropertiesArk(propertiesArk);
-        
+
         String idArk = ark_Client.getArkId(
                 new FileUtilities().getDate(),
                 nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus,
@@ -2167,10 +2169,10 @@ public class ConceptHelper {
         return updateArkIdOfConcept(conn, idConcept,
                 idThesaurus, idArk);
     }
-    
+
     /**
      * Permet de mettre à jour l'identifiant Handle
-     * 
+     *
      * @param ds
      * @param idConcept
      * @param idThesaurus
@@ -2179,59 +2181,61 @@ public class ConceptHelper {
     public boolean updateIdHandle(HikariDataSource ds,
             String idConcept,
             String idThesaurus) {
-        if(nodePreference == null) return false;
-        if(!nodePreference.isUseHandle()) return false;
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseHandle()) {
+            return false;
+        }
         ConceptHelper conceptHelper = new ConceptHelper();
         HandleClient handleClient = new HandleClient();
 
         String idHandle = conceptHelper.getIdHandleOfConcept(ds, idConcept, idThesaurus);
         String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
-        
-        if(idHandle == null || idHandle.isEmpty()) {// cas où le handle n'existe pas dans la base de données locales
+
+        if (idHandle == null || idHandle.isEmpty()) {// cas où le handle n'existe pas dans la base de données locales
             idHandle = getNewHandleId();
             // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
             // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
-            idHandle = nodePreference.getPrefixIdHandle() + "/" +
-                    nodePreference.getPrivatePrefixHandle() + idHandle;
-            
+            idHandle = nodePreference.getPrefixIdHandle() + "/"
+                    + nodePreference.getPrivatePrefixHandle() + idHandle;
+
             idHandle = handleClient.putHandle(
                     nodePreference.getPassHandle(),
                     nodePreference.getPathKeyHandle(),
                     nodePreference.getPathCertHandle(),
                     nodePreference.getUrlApiHandle(),
-                    idHandle, 
+                    idHandle,
                     jsonData);
-            if(idHandle == null) {
+            if (idHandle == null) {
                 message = handleClient.getMessage();
                 return false;
             }
             return updateHandleIdOfConcept(ds, idConcept,
-                    idThesaurus, idHandle);      
-        }
-        else { // cas où le handle existe en local
+                    idThesaurus, idHandle);
+        } else { // cas où le handle existe en local
             // on vérifie si le handle existe à distance
-            if(handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
+            if (handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
                     idHandle)) {
                 return true;
-            }
-            else {
+            } else {
                 idHandle = handleClient.putHandle(
                         nodePreference.getPassHandle(),
                         nodePreference.getPathKeyHandle(),
                         nodePreference.getPathCertHandle(),
                         nodePreference.getUrlApiHandle(),
-                        idHandle, 
+                        idHandle,
                         jsonData);
-                if(idHandle == null) {
+                if (idHandle == null) {
                     message = handleClient.getMessage();
                     return false;
                 }
                 return updateHandleIdOfConcept(ds, idConcept,
-                        idThesaurus, idHandle);                      
+                        idThesaurus, idHandle);
             }
         }
-    }    
-    
+    }
+
     /**
      *
      * @param conn
@@ -2247,64 +2251,68 @@ public class ConceptHelper {
          * récupération du code Handle via WebServices
          *
          */
-        if(nodePreference == null) return false;
-        if(!nodePreference.isUseHandle()) return false;
-        
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseHandle()) {
+            return false;
+        }
+
         HandleClient handleClient = new HandleClient();
         String newId = getNewHandleId();
         // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
         // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
-        newId = nodePreference.getPrefixIdHandle() + "/" +
-                nodePreference.getPrivatePrefixHandle() + newId;
-        
+        newId = nodePreference.getPrefixIdHandle() + "/"
+                + nodePreference.getPrivatePrefixHandle() + newId;
+
         String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
         String idHandle = handleClient.putHandle(
                 nodePreference.getPassHandle(),
                 nodePreference.getPathKeyHandle(),
                 nodePreference.getPathCertHandle(),
                 nodePreference.getUrlApiHandle(),
-                newId, 
+                newId,
                 jsonData);
-        if(idHandle == null) {
+        if (idHandle == null) {
             message = handleClient.getMessage();
             return false;
         }
         return updateHandleIdOfConcept(conn, idConcept,
                 idThesaurus, idHandle);
     }
-    
+
     /**
-     * permet de genérer un identifiant unique pour Handle 
-     * on controle la présence de l'identifiant sur handle.net 
-     * si oui, on regénère un autre.
-     * 
-     * @return 
+     * permet de genérer un identifiant unique pour Handle on controle la
+     * présence de l'identifiant sur handle.net si oui, on regénère un autre.
+     *
+     * @return
      */
-    private String getNewHandleId(){
+    private String getNewHandleId() {
         ToolsHelper toolsHelper = new ToolsHelper();
         boolean duplicateId = true;
         String idHandle = null;
-        HandleClient handleClient = new HandleClient();        
-        
+        HandleClient handleClient = new HandleClient();
+
         while (duplicateId) {
             idHandle = toolsHelper.getNewId(10);
-            if(!handleClient.isHandleExist(
+            if (!handleClient.isHandleExist(
                     nodePreference.getUrlApiHandle(),
-                    nodePreference.getPrefixIdHandle()+ "/" + idHandle)) {
+                    nodePreference.getPrefixIdHandle() + "/" + idHandle)) {
                 duplicateId = false;
             }
-            if(!handleClient.isHandleExist(
+            if (!handleClient.isHandleExist(
                     " http://hdl.handle.net/",
-                    nodePreference.getPrefixIdHandle()+ "/" + idHandle)) {
+                    nodePreference.getPrefixIdHandle() + "/" + idHandle)) {
                 duplicateId = false;
-            }            
+            }
         }
         return idHandle;
     }
-    
+
     /**
-     * Permet de supprimer un identifiant Handle de la table Concept
-     * et de la plateforme (handle.net) via l'API REST
+     * Permet de supprimer un identifiant Handle de la table Concept et de la
+     * plateforme (handle.net) via l'API REST
+     *
      * @param conn
      * @param idConcept
      * @param idThesaurus
@@ -2319,9 +2327,13 @@ public class ConceptHelper {
          * récupération du code Handle via WebServices
          *
          */
-        if(nodePreference == null) return false;
-        if(!nodePreference.isUseHandle()) return false;
-        
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseHandle()) {
+            return false;
+        }
+
         HandleClient handleClient = new HandleClient();
         boolean status = handleClient.deleteHandle(
                 nodePreference.getPassHandle(),
@@ -2329,19 +2341,20 @@ public class ConceptHelper {
                 nodePreference.getPathCertHandle(),
                 nodePreference.getUrlApiHandle(),
                 idHandle
-                );
-        if(!status) {
+        );
+        if (!status) {
             message = handleClient.getMessage();
             return false;
         }
         return updateHandleIdOfConcept(conn, idConcept,
                 idThesaurus, "");
     }
-    
+
     /**
-     * Permet de supprimer tous les identifiants Handle de la table Concept
-     * et de la plateforme (handle.net) via l'API REST pour un thésaurus donné 
+     * Permet de supprimer tous les identifiants Handle de la table Concept et
+     * de la plateforme (handle.net) via l'API REST pour un thésaurus donné
      * suite à une suppression d'un thésaurus
+     *
      * @param ds
      * @param idThesaurus
      * @return
@@ -2352,25 +2365,28 @@ public class ConceptHelper {
          * récupération du code Handle via WebServices
          *
          */
-        if(nodePreference == null) return false;
-        if(!nodePreference.isUseHandle()) return false;
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseHandle()) {
+            return false;
+        }
         HandleClient handleClient = new HandleClient();
         boolean status;
         boolean first = true;
-        
-        
+
         ArrayList<String> tabIdHandle = getAllIdHandleOfThesaurus(ds, idThesaurus);
-        
+
         for (String idHandle : tabIdHandle) {
             status = handleClient.deleteHandle(
-                nodePreference.getPassHandle(),
-                nodePreference.getPathKeyHandle(),
-                nodePreference.getPathCertHandle(),
-                nodePreference.getUrlApiHandle(),
-                idHandle
-                );
-            if(!status) {
-                if(first) {
+                    nodePreference.getPassHandle(),
+                    nodePreference.getPathKeyHandle(),
+                    nodePreference.getPathCertHandle(),
+                    nodePreference.getUrlApiHandle(),
+                    idHandle
+            );
+            if (!status) {
+                if (first) {
                     message = "Id handle non supprimé :\n ";
                     first = false;
                 }
@@ -2378,8 +2394,8 @@ public class ConceptHelper {
             }
         }
         return true;
-    }    
-    
+    }
+
     /**
      * Cette fonction permet d'ajouter un domaine à un Concept dans la table
      * Concept, en paramètre un objet Classe Concept
@@ -2449,7 +2465,7 @@ public class ConceptHelper {
 
         Statement stmt;
         boolean status = false;
-        
+
         if (concept.getCreated() == null) {
             concept.setCreated(new java.util.Date());
         }
@@ -2458,12 +2474,14 @@ public class ConceptHelper {
         }
         if (concept.getStatus() == null) {
             concept.setStatus("D");
-        }    
-        if(concept.getIdArk() == null)
+        }
+        if (concept.getIdArk() == null) {
             concept.setIdArk("");
-        if(concept.getIdHandle()== null)
-            concept.setIdHandle("");        
-        
+        }
+        if (concept.getIdHandle() == null) {
+            concept.setIdHandle("");
+        }
+
         try {
             Connection conn = ds.getConnection();
             conn.setAutoCommit(false);
@@ -2502,12 +2520,10 @@ public class ConceptHelper {
         }
         return status;
     }
-  
-    
+
     /**
-     * deprecated by Miled
-     * Cette fonction permet d'insérrer un Concept dans la table Concept avec un
-     * idConcept existant (Import)
+     * deprecated by Miled Cette fonction permet d'insérrer un Concept dans la
+     * table Concept avec un idConcept existant (Import)
      *
      * @param ds
      * @param concept
@@ -2516,7 +2532,7 @@ public class ConceptHelper {
      * @param idUser
      * @return
      */
- /*   public boolean insertConceptInTable(HikariDataSource ds,
+    /*   public boolean insertConceptInTable(HikariDataSource ds,
             Concept concept, String urlSite, boolean isArkActive, int idUser) {
 
         Connection conn;
@@ -2539,12 +2555,11 @@ public class ConceptHelper {
                 conn.setAutoCommit(false);
                 stmt = conn.createStatement();
                 try {*/
-
-                    /**
-                     * récupération du code Ark via WebServices
-                     *
-                     */
-       /*             String idArk = "";
+    /**
+     * récupération du code Ark via WebServices
+     *
+     */
+    /*             String idArk = "";
                     if (isArkActive) {
                         ArrayList<DcElement> dcElementsList = new ArrayList<>();
                         Ark_Client ark_Client = new Ark_Client();
@@ -2556,11 +2571,10 @@ public class ConceptHelper {
                     } else {
                         concept.setIdArk("");
                     }*/
-
-                    /**
-                     * Ajout des informations dans la table Concept
-                     */
- /*                   if (!addConceptHistorique(conn, concept, idUser)) {
+    /**
+     * Ajout des informations dans la table Concept
+     */
+    /*                   if (!addConceptHistorique(conn, concept, idUser)) {
                         conn.rollback();
                         conn.close();
                         return false;
@@ -2610,7 +2624,6 @@ public class ConceptHelper {
         }
         return status;
     }*/
-
     /**
      * Cette fonction permet de récupérer un Concept par son id et son thésaurus
      * sous forme de classe Concept (sans les relations) ni le Terme
@@ -2715,6 +2728,7 @@ public class ConceptHelper {
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * (cette fonction sert pour la génération de la table Permuté
+     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2754,9 +2768,10 @@ public class ConceptHelper {
         }
         return tabIdConcept;
     }
-    
+
     /**
      * Cette fonction permet de récupérer le nombre de concepts d'un thésaurus
+     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2779,7 +2794,7 @@ public class ConceptHelper {
                             + idThesaurus + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         if (resultSet.getInt(1) != 0) {
                             count = resultSet.getInt(1);
                         }
@@ -2795,10 +2810,11 @@ public class ConceptHelper {
             log.error("Error while getting count of all IdConcept of Thesaurus : " + idThesaurus, sqle);
         }
         return count;
-    }    
-    
+    }
+
     /**
      * Cette fonction permet de récupérer la liste des Id Handle d'un thésaurus
+     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2823,9 +2839,10 @@ public class ConceptHelper {
                     resultSet = stmt.getResultSet();
 
                     while (resultSet.next()) {
-                        if(resultSet.getString("id_handle") != null) {
-                            if(!resultSet.getString("id_handle").isEmpty())
+                        if (resultSet.getString("id_handle") != null) {
+                            if (!resultSet.getString("id_handle").isEmpty()) {
                                 tabId.add(resultSet.getString("id_handle"));
+                            }
                         }
                     }
 
@@ -2840,11 +2857,12 @@ public class ConceptHelper {
             log.error("Error while getting All IdHandle of Thesaurus : " + idThesaurus, sqle);
         }
         return tabId;
-    }    
-    
+    }
+
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * qui n'ont pas d'identifiants Ark
+     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2884,11 +2902,12 @@ public class ConceptHelper {
             log.error("Error while getting All IdConcept of Thesaurus without Ark : " + idThesaurus, sqle);
         }
         return tabIdConcept;
-    }    
-    
+    }
+
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * qui n'ont pas d'identifiants Handle
+     *
      * @param ds
      * @param idThesaurus
      * @return ArrayList
@@ -2908,7 +2927,7 @@ public class ConceptHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "select id_concept from concept where"
-                            + " id_thesaurus = '" + idThesaurus + "'" 
+                            + " id_thesaurus = '" + idThesaurus + "'"
                             + " and (id_handle = '' or id_handle = null)";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -2928,16 +2947,16 @@ public class ConceptHelper {
             log.error("Error while getting All IdConcept of Thesaurus without Handle : " + idThesaurus, sqle);
         }
         return tabIdConcept;
-    }    
-    
+    }
+
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * en filtrant par Domaine/Group
+     *
      * @param ds
      * @param idThesaurus
      * @param idGroup
-     * @return ArrayList
-     * #MR
+     * @return ArrayList #MR
      */
     public ArrayList<String> getAllIdConceptOfThesaurusByGroup(HikariDataSource ds,
             String idThesaurus, String idGroup) {
@@ -2953,13 +2972,13 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT concept.id_concept" +
-                        " FROM concept, concept_group_concept" +
-                        " WHERE" +
-                        " concept.id_concept = concept_group_concept.idconcept AND" +
-                        " concept.id_thesaurus = concept_group_concept.idthesaurus AND" +
-                        " concept.id_thesaurus = '" + idThesaurus + "' AND " +
-                        " concept_group_concept.idgroup = '" + idGroup + "';";
+                    String query = "SELECT concept.id_concept"
+                            + " FROM concept, concept_group_concept"
+                            + " WHERE"
+                            + " concept.id_concept = concept_group_concept.idconcept AND"
+                            + " concept.id_thesaurus = concept_group_concept.idthesaurus AND"
+                            + " concept.id_thesaurus = '" + idThesaurus + "' AND "
+                            + " concept_group_concept.idgroup = '" + idGroup + "';";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
 
@@ -2979,18 +2998,19 @@ public class ConceptHelper {
         }
         return tabIdConcept;
     }
-    
+
     /**
-     * Permet de retourner tous les identifiants BT pour un concept donné dans le même groupe
-     * cette fonction permet de connaitre la polyhierarchie d'un concept dans un domaine
+     * Permet de retourner tous les identifiants BT pour un concept donné dans
+     * le même groupe cette fonction permet de connaitre la polyhierarchie d'un
+     * concept dans un domaine
+     *
      * @param ds
      * @param idConcept
      * @param idGroup
      * @param idTheso
-     * @return 
-     * #MR
+     * @return #MR
      */
-    public ArrayList<String> getAllBTOfConceptOfThisGroup(HikariDataSource ds, 
+    public ArrayList<String> getAllBTOfConceptOfThisGroup(HikariDataSource ds,
             String idConcept, String idGroup, String idTheso) {
         Connection conn;
         Statement stmt;
@@ -3003,13 +3023,13 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept2 from hierarchical_relationship, concept_group_concept" +
-                        " where" +
-                        " idconcept = id_concept2" +
-                        " and idgroup = '" + idGroup + "'" +
-                        " and role = 'BT'" +
-                        " and id_concept1 = '" + idConcept + "'" +
-                        " and id_thesaurus = '" + idTheso + "'";
+                    String query = "select id_concept2 from hierarchical_relationship, concept_group_concept"
+                            + " where"
+                            + " idconcept = id_concept2"
+                            + " and idgroup = '" + idGroup + "'"
+                            + " and role = 'BT'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idTheso + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
 
@@ -3027,10 +3047,9 @@ public class ConceptHelper {
             // Log exception
             log.error("Error while getting All IdBT of this Group of Concept : " + idConcept, sqle);
         }
-        return tabIdBT;        
+        return tabIdBT;
     }
-    
-    
+
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus
      * (cette fonction sert pour la génération des identifiants pour Wikidata)
@@ -3076,7 +3095,7 @@ public class ConceptHelper {
             log.error("Error while getting All Id of Concept _ Ark of Thesaurus : " + idThesaurus, sqle);
         }
         return nodeConceptArkIds;
-    }    
+    }
 
     public ArrayList<String> getAllIdConceptOfThesaurus(Connection conn,
             String idThesaurus) {
@@ -3246,10 +3265,10 @@ public class ConceptHelper {
         }
         return ark;
     }
-    
+
     /**
-     * Cette fonction permet de récupérer l'identifiant Handle sinon renvoie un une
-     * chaine vide
+     * Cette fonction permet de récupérer l'identifiant Handle sinon renvoie un
+     * une chaine vide
      *
      * @param ds
      * @param idConcept
@@ -3289,7 +3308,7 @@ public class ConceptHelper {
             log.error("Error while getting idHandle of Concept : " + idConcept, sqle);
         }
         return handle;
-    }    
+    }
 
     /**
      * Cette fonction permet de récupérer l'identifiant du Concept d'après
@@ -3673,8 +3692,8 @@ public class ConceptHelper {
     }
 
     /**
-     * Cettte fonction permet de retourner la liste des TopConcept avec IdArk et handle
-     * pour un groupe 
+     * Cettte fonction permet de retourner la liste des TopConcept avec IdArk et
+     * handle pour un groupe
      *
      * @param ds
      * @param idGroup
@@ -3705,18 +3724,18 @@ public class ConceptHelper {
                     resultSet = stmt.getResultSet();
                     while (resultSet.next()) {
                         NodeUri nodeUri = new NodeUri();
-                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark") .trim().isEmpty())) {
+                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark").trim().isEmpty())) {
                             nodeUri.setIdArk("");
                         } else {
                             nodeUri.setIdArk(resultSet.getString("id_ark"));
                         }
-                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle") .trim().isEmpty())) {
+                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle").trim().isEmpty())) {
                             nodeUri.setIdHandle("");
                         } else {
                             nodeUri.setIdHandle(resultSet.getString("id_handle"));
                         }
                         nodeUri.setIdConcept(resultSet.getString("id_concept"));
-                        
+
                         NodeUris.add(nodeUri);
                     }
                 } finally {
@@ -3729,7 +3748,7 @@ public class ConceptHelper {
             // Log exception
             log.error("Error while getting Liste ID of TT of Group with ark and handle : " + idGroup, sqle);
         }
-        return NodeUris;        
+        return NodeUris;
     }
 
     /**
@@ -3855,7 +3874,51 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_concept, status from concept where id_thesaurus = '"
+                    String query = "SELECT concept.status, concept.id_concept"
+                            + " FROM concept, concept_group_concept WHERE"
+                            + " concept_group_concept.idconcept = concept.id_concept AND"
+                            + " concept_group_concept.idthesaurus = concept.id_thesaurus AND"
+                            + " concept_group_concept.idgroup = '" + idGroup + "' AND"
+                            + " concept.id_thesaurus = '" + idThesaurus + "' AND"
+                            + " concept.top_concept = true";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    nodeConceptTree = new ArrayList<>();
+                    while (resultSet.next()) {
+                        NodeConceptTree nodeConceptTree1 = new NodeConceptTree();
+                        nodeConceptTree1.setIdConcept(resultSet.getString("id_concept"));
+                        nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
+                        nodeConceptTree1.setIdThesaurus(idThesaurus);
+                        nodeConceptTree1.setIdLang(idLang);
+                        nodeConceptTree1.setIsTopTerm(true);
+                        nodeConceptTree.add(nodeConceptTree1);
+                    }
+                    for (NodeConceptTree nodeConceptTree1 : nodeConceptTree) {
+                        query = "SELECT term.lexical_value FROM"
+                                + " preferred_term, term WHERE"
+                                + " preferred_term.id_term = term.id_term AND"
+                                + " preferred_term.id_thesaurus = term.id_thesaurus AND"
+                                + " term.lang = '" + idLang + "' AND"
+                                + " preferred_term.id_concept = '" + nodeConceptTree1.getIdConcept() + "' AND"
+                                + " term.id_thesaurus = '" + idThesaurus + "'";
+
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        if(resultSet.next()) {
+                            if (resultSet.getString("lexical_value").isEmpty()) {
+                                nodeConceptTree1.setTitle("");
+                            } else {
+                                nodeConceptTree1.setTitle(resultSet.getString("lexical_value"));
+                            }
+                            nodeConceptTree1.setHaveChildren(
+                                    haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
+                            );
+                        }
+                    }
+
+                    /// ancienne version supprimée par Miled
+                    /*    String query = "select id_concept, status from concept where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = '" + idThesaurus + "' )"
                             + " and top_concept = true";
@@ -3874,12 +3937,14 @@ public class ConceptHelper {
                         }
                     }
                     for (NodeConceptTree nodeConceptTree1 : nodeConceptTree) {
-                        query = "SELECT term.lexical_value FROM term, preferred_term"
-                                + " WHERE preferred_term.id_term = term.id_term"
-                                + " and preferred_term.id_concept ='" + nodeConceptTree1.getIdConcept() + "'"
-                                + " and term.lang = '" + idLang + "'"
-                                + " and term.id_thesaurus = '" + idThesaurus + "'";
 
+                        query = "SELECT term.lexical_value FROM preferred_term, term" +
+                                " WHERE preferred_term.id_thesaurus = term.id_thesaurus AND" +
+                                " term.id_term = preferred_term.id_term AND" +
+                                " term.lang = '" + idLang + "' AND" +
+                                " preferred_term.id_concept = '" + nodeConceptTree1.getIdConcept() + "' AND" +
+                                " term.id_thesaurus = '" + idThesaurus + "'";
+                        
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
                         if (resultSet != null) {
@@ -3896,8 +3961,9 @@ public class ConceptHelper {
                                     haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
                             );
                         }
+                    
                     }
-
+                     */
                 } finally {
                     stmt.close();
                 }
@@ -4335,13 +4401,13 @@ public class ConceptHelper {
         nodeConceptExport.setNodeAlignmentsList(nodeAlignmentList);
 
         //récupération des termes spécifiques
-        ArrayList<NodeHieraRelation> nodeListIdsOfNT_Ark = 
-                relationsHelper.getListNT(ds, idConcept, idThesaurus);
+        ArrayList<NodeHieraRelation> nodeListIdsOfNT_Ark
+                = relationsHelper.getListNT(ds, idConcept, idThesaurus);
         nodeConceptExport.setNodeListOfNT(nodeListIdsOfNT_Ark);
 
         //récupération des termes associés
-        ArrayList<NodeHieraRelation> nodeListIdsOfRT_Ark = 
-                relationsHelper.getListRT(ds, idConcept, idThesaurus);
+        ArrayList<NodeHieraRelation> nodeListIdsOfRT_Ark
+                = relationsHelper.getListRT(ds, idConcept, idThesaurus);
         nodeConceptExport.setNodeListIdsOfRT(nodeListIdsOfRT_Ark);
 
         //récupération des Non Prefered Term
@@ -4358,7 +4424,6 @@ public class ConceptHelper {
                 idThesaurus);
         nodeConceptExport.setNodeListIdsOfConceptGroup(nodeListIdsOfConceptGroup_Ark);
 
-       
         //récupération des notes du Terme
         String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
         nodeConceptExport.setNodeNoteTerm(new NoteHelper().getListNotesTermAllLang(ds, idTerm, idThesaurus));
@@ -4477,18 +4542,18 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
 
             // récupération des BT
-            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark = 
-                    relationsHelper.getListBT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark
+                    = relationsHelper.getListBT(ds, idConcept, idThesaurus);
             nce.setNodeListOfBT(nodeListIdOfBT_Ark);
 
             //récupération des termes spécifiques
-            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark = 
-                    relationsHelper.getListNT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark
+                    = relationsHelper.getListNT(ds, idConcept, idThesaurus);
             nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = 
-                    relationsHelper.getListRT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark
+                    = relationsHelper.getListRT(ds, idConcept, idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 
             //récupération des Non Prefered Term
@@ -4553,18 +4618,18 @@ public class ConceptHelper {
             RelationsHelper relationsHelper = new RelationsHelper();
 
             // récupération des BT
-            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark = 
-                    relationsHelper.getListBT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfBT_Ark
+                    = relationsHelper.getListBT(ds, idConcept, idThesaurus);
             nce.setNodeListOfBT(nodeListIdOfBT_Ark);
 
             //récupération des termes spécifiques
-            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark = 
-                    relationsHelper.getListNT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfNT_Ark
+                    = relationsHelper.getListNT(ds, idConcept, idThesaurus);
             nce.setNodeListOfNT(nodeListIdOfNT_Ark);
 
             //récupération des termes associés
-            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark = 
-                    relationsHelper.getListRT(ds, idConcept, idThesaurus);
+            ArrayList<NodeHieraRelation> nodeListIdOfRT_Ark
+                    = relationsHelper.getListRT(ds, idConcept, idThesaurus);
             nce.setNodeListIdsOfRT(nodeListIdOfRT_Ark);
 
             //récupération des Non Prefered Term
@@ -4641,7 +4706,7 @@ public class ConceptHelper {
         //récupération des notes du term        
         nodeConcept.setNodeNotesTerm(noteHelper.getListNotesTerm(ds, term.getId_term(),
                 idThesaurus, idLang));
-        
+
         GroupHelper groupHelper = new GroupHelper();
         nodeConcept.setNodeConceptGroup(groupHelper.getListGroupOfConcept(ds, idThesaurus, idConcept, idLang));
 
@@ -4747,8 +4812,9 @@ public class ConceptHelper {
 
     /**
      * Focntion récursive pour trouver le chemin complet d'un concept en partant
-     * du Concept lui même pour arriver à la tête en incluant les Groupes on peut rencontrer plusieurs
-     * têtes en remontant, alors on construit à chaque fois un chemin complet.
+     * du Concept lui même pour arriver à la tête en incluant les Groupes on
+     * peut rencontrer plusieurs têtes en remontant, alors on construit à chaque
+     * fois un chemin complet.
      *
      * @param ds
      * @param idConcept
@@ -4830,11 +4896,12 @@ public class ConceptHelper {
         }
         return tabIdInvert;
     }
-    
+
     /**
      * Focntion récursive pour trouver le chemin complet d'un concept en partant
-     * du Concept lui même pour arriver à la tête TT on peut rencontrer plusieurs
-     * têtes en remontant, alors on construit à chaque fois un chemin complet.
+     * du Concept lui même pour arriver à la tête TT on peut rencontrer
+     * plusieurs têtes en remontant, alors on construit à chaque fois un chemin
+     * complet.
      *
      * @param ds
      * @param idConcept
@@ -4863,7 +4930,7 @@ public class ConceptHelper {
         }
         if (resultat.isEmpty()) {
 
-     /*       String group;
+            /*       String group;
 
             do {
                 group = getGroupIdOfConcept(ds, idConcept, idThesaurus);
@@ -4874,7 +4941,7 @@ public class ConceptHelper {
                 path.add(group);
                 idConcept = group;
             } while (new GroupHelper().getIdFather(ds, group, idThesaurus) != null);
-            */
+             */
             ArrayList<String> pathTemp = new ArrayList<>();
             for (String path2 : firstPath) {
                 pathTemp.add(path2);
@@ -4895,8 +4962,8 @@ public class ConceptHelper {
 
         return tabId;
 
-    }    
-    
+    }
+
     public ArrayList<ArrayList<String>> getPathOfConceptWithoutGroup(HikariDataSource ds,
             String idConcept, String idThesaurus, ArrayList<String> path, ArrayList<ArrayList<String>> tabId) {
 
@@ -4915,7 +4982,7 @@ public class ConceptHelper {
             tabIdInvert.add(i, pathTemp);
         }
         return tabIdInvert;
-    }    
+    }
 
     public void updateGroupOfConcept(HikariDataSource ds, String idConcept, String idNewDomaine, String idOldDomaine, String idTheso) {
         Connection conn;
@@ -5063,8 +5130,8 @@ public class ConceptHelper {
         }
         return status;
     }
-    
-   /**
+
+    /**
      * Cette fonction permet d'ajouter un Handle Id au concept ou remplacer l'Id
      * existant
      *
@@ -5102,9 +5169,9 @@ public class ConceptHelper {
             log.error("Error while updating or adding HandleId of Concept : " + idConcept, sqle);
         }
         return status;
-    }    
+    }
 
-   /**
+    /**
      * Cette fonction permet d'ajouter un Handle Id au concept ou remplacer l'Id
      * existant
      *
@@ -5143,8 +5210,8 @@ public class ConceptHelper {
             log.error("Error while updating HandleId of Concept : " + idConcept, sqle);
         }
         return status;
-    }        
-    
+    }
+
     /**
      * Cette fonction permet de mettre à jour la notation pour un concept
      *
@@ -5456,35 +5523,36 @@ public class ConceptHelper {
             stmt.close();
         }
     }
+
     /**
-     * Méthode pour récupérer une liste des identifiants BT à parti d'un  thesaurus et d'un concept
+     * Méthode pour récupérer une liste des identifiants BT à parti d'un
+     * thesaurus et d'un concept
+     *
      * @param conn
      * @param idTheso
      * @param idConcept
-     * @return 
+     * @return
      */
-    public ArrayList<String> getIdBtFromAConcept(Connection conn,String idTheso,String idConcept){
-        ArrayList<String> ret=new ArrayList();
+    public ArrayList<String> getIdBtFromAConcept(Connection conn, String idTheso, String idConcept) {
+        ArrayList<String> ret = new ArrayList();
         PreparedStatement stmt;
         ResultSet rs;
-        String sql="Select id_concept2 FROM hierarchical_relationship Where id_concept1=? and id_thesaurus=? and role=?";
-        try{
-            stmt=conn.prepareStatement(sql);
-            stmt.setString(1,idConcept);
+        String sql = "Select id_concept2 FROM hierarchical_relationship Where id_concept1=? and id_thesaurus=? and role=?";
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, idConcept);
             stmt.setString(2, idTheso);
-            stmt.setString(3,"BT");
-            try{
-                rs=stmt.executeQuery();
-                while(rs.next()){
+            stmt.setString(3, "BT");
+            try {
+                rs = stmt.executeQuery();
+                while (rs.next()) {
                     ret.add(rs.getString("id_concept2"));
                 }
-            }
-            finally{
+            } finally {
                 stmt.close();
             }
-        }
-        catch(SQLException e){
-            log.error("error while getting id BT from a concept Id",e);
+        } catch (SQLException e) {
+            log.error("error while getting id BT from a concept Id", e);
         }
         return ret;
     }

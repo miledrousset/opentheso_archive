@@ -4,11 +4,11 @@
 
 -- Dumped from database version 9.4.1
 -- Dumped by pg_dump version 9.4.1
--- Started on 2018-01-08 15:09:33 CET
+-- Started on 2018-01-25 15:09:33 CET
 
 
 
--- version=4.3.5
+-- version=4.3.6
 
 SET role = opentheso;
 
@@ -1288,7 +1288,7 @@ PREFIX xml: <http://www.w3.org/XML/1998/namespace>
 SELECT ?instrument ?prop ?value where {
   <http://data.bnf.fr/ark:/12148/cb119367821> skos:narrower+ ?instrument.
   ?instrument ?prop ?value.
-  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, $##value##,"i") ) 
+  FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, ##value##,"i") ) 
     filter(lang(?value) =##lang##)
 } LIMIT 20', 'SPARQL', 'skos', 3, NULL, NULL, false);
 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Geoname', 'http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=opentheso', 'REST', 'xml', 4, NULL, 'test de geonames', true);

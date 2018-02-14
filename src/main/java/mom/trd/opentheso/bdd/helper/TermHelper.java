@@ -384,7 +384,7 @@ public class TermHelper {
                             + " id_thesaurus = '" + idThesaurus + "'"
                             + " and id_term  = '" + idTerm + "'"
                             + " and lang = '" + idLang + "'";
-                    stmt.executeQuery(query);
+                    stmt.executeUpdate(query);
                     status = true;
                 } finally {
                     stmt.close();
