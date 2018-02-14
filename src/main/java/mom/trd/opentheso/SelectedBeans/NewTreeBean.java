@@ -107,7 +107,7 @@ public class NewTreeBean implements Serializable {
      */
       
     public ArrayList<String> groupIds=new ArrayList<>();
-  
+    public ArrayList<String> groupLexicalValues=new ArrayList<>();
     public String idGroupAlign="";
     
     
@@ -1831,17 +1831,24 @@ public class NewTreeBean implements Serializable {
      * **********************************************************************
      */
     
-    /*******fonction de contrôle de l'arbre *************************************/
+    /*******fonction de contrôle de l'arbre
+    /***********************************************************************/
     
     
-    
-    public void getGroupAndSubGroup(){
+    /**
+     * 
+     * @param lang 
+     */
+    public void getGroupAndSubGroup(String lang){
         this.groupIds=new ArrayList<>();
-        ArrayList<NodeGroup> ncg=new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idThesoSelected,this.langueBean.getIdLangue());
+        this.groupLexicalValues=new ArrayList<>();
+        ArrayList<NodeGroup> ncg=new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idThesoSelected,lang);
         for(NodeGroup ng:ncg){
-           
+            
             this.groupIds.add(ng.getConceptGroup().getIdgroup());
-           
+          
+            
+            this.groupLexicalValues.add(  ng.getLexicalValue()+" ("+ng.getConceptGroup().getIdgroup()+")");
         }
         
     }
@@ -1849,10 +1856,16 @@ public class NewTreeBean implements Serializable {
      * méthode pour vérifier et forcer que les éléments d'un groupe ou d'un 
      * sous groupe possède bien le nom de ce groupe comme nom de  domaine
      * sinon on doit l'ajouter 
-     * @param idgroup 
+     * 
      */
     public void alignDomain(){
-        String idGroup=this.idGroupAlign;
+        String idGroup=null;
+       for(String gid :this.groupIds){
+        if(this.idGroupAlign.contains(gid)){
+            idGroup=gid;
+            break;
+        }
+       }
         for( TreeNode tn :this.root.getChildren()){
             onNodeExpand(tn);
             if(((MyTreeNode)tn).getIdCurrentGroup()==null)continue;
@@ -2074,6 +2087,14 @@ public class NewTreeBean implements Serializable {
     public void setIdGroupAlign(String idGroupAlign) {
         this.idGroupAlign = idGroupAlign;
     }
-    
 
+    public ArrayList<String> getGroupLexicalValues() {
+        return groupLexicalValues;
+    }
+
+    public void setGroupLexicalValues(ArrayList<String> groupLexicalValues) {
+        this.groupLexicalValues = groupLexicalValues;
+    }
+    
+    
 }

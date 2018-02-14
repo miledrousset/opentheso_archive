@@ -5,10 +5,17 @@
  */
 package mom.trd.opentheso.timeJob;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import mom.trd.opentheso.SelectedBeans.SelectedThesaurus;
 import mom.trd.opentheso.bdd.helper.Connexion;
 
@@ -21,8 +28,8 @@ import mom.trd.opentheso.bdd.helper.Connexion;
 public class PreferencesAlertBean {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    @ManagedProperty(value ="#{backgroundMailSender}")
-    private BackgroundMailSender bms;
+    @ManagedProperty(value ="#{backgroundTimeJob}")
+    private BackgroundTimeJob bms;
     @ManagedProperty(value="#{theso}")
     private SelectedThesaurus st;
     //attribut pour le helper
@@ -36,7 +43,15 @@ public class PreferencesAlertBean {
     private Date date_debut_envoi_cdt_valid;
     private int period_envoi_cdt_propos;
     private int period_envoi_cdt_valid;
-
+    //attribut pour le front end sparql
+    
+    private String adresse_serveur="";
+    private String mot_de_passe="";
+    private String nom_d_utilisateur="";
+    private String graph="";
+    private boolean synchronisation=false;
+    private Date heure=new Date();
+    
     /**
      * Creates a new instance of PrefrencesAlertBean
      */
@@ -62,12 +77,7 @@ public class PreferencesAlertBean {
              insertRoutineMail();
          }
         
-        if(this.bms.getSjPropos()!=null){
-            this.bms.getSjPropos().closeAllJob();
-         }
-         if(this.bms.getSjValid()!=null){
-            this.bms.getSjValid().closeAllJob();
-         }
+        this.bms.destroy();
         this.bms.init();
     }
     
@@ -190,6 +200,47 @@ public class PreferencesAlertBean {
         
         return ret;
     }
+    public boolean insertPreferencesSparql(){
+        boolean ret=false; 
+        PreferencesAlertHelper pah=new PreferencesAlertHelper();
+       
+        ret=pah.isYetInTablePreferencesSparql(thesaurusEnAcces,connect.getPoolConnexion());
+        if(ret){
+            ret=pah.updatePreferencesSparql(adresse_serveur,mot_de_passe,nom_d_utilisateur,
+                    graph,synchronisation,thesaurusEnAcces,
+                      new java.sql.Date(heure.getTime()),connect.getPoolConnexion());
+                            
+        }
+        else{
+            ret=pah.insertIntoPreferencesSparql(adresse_serveur, mot_de_passe,
+               nom_d_utilisateur, graph, synchronisation, thesaurusEnAcces,
+               new java.sql.Date(heure.getTime()),connect.getPoolConnexion());
+        }
+       if(!ret){
+   FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR+"", "problème  à l'insertion sur la table preferences sparql"));
+            } 
+       else {      
+       
+          FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.FACES_MESSAGES+"", "mise à jour de la table preferences sparql"));
+
+       }
+       bms.destroy();
+       bms.init();
+       return ret;
+    }
+    
+    public void loadPreferencesSparql(){
+        PreferencesAlertHelper pah=new PreferencesAlertHelper();
+        SparqlStruct ss=pah.getSparqlPreferences(thesaurusEnAcces,this.connect.getPoolConnexion());
+        this.adresse_serveur=ss.getAdresseServeur();
+        this.graph=ss.getGraph();
+        this.heure=ss.getHeure();
+        this.mot_de_passe=ss.getMot_de_passe();
+        this.nom_d_utilisateur=ss.getNom_d_utilisateur();
+        this.synchronisation=ss.isSynchro();
+        
+        
+    }
 
     public Connexion getConnect() {
         return connect;
@@ -199,11 +250,11 @@ public class PreferencesAlertBean {
         this.connect = connect;
     }
 
-    public BackgroundMailSender getBms() {
+    public BackgroundTimeJob getBms() {
         return bms;
     }
 
-    public void setBms(BackgroundMailSender bms) {
+    public void setBms(BackgroundTimeJob bms) {
         this.bms = bms;
     }
 
@@ -219,6 +270,62 @@ public class PreferencesAlertBean {
         this.as = null;
     }
 
+    public AlertStruct getAs() {
+        return as;
+    }
+
+    public void setAs(AlertStruct as) {
+        this.as = as;
+    }
+
+    public String getAdresse_serveur() {
+        return (adresse_serveur==null)?"" : adresse_serveur;
+    }
+
+    public void setAdresse_serveur(String adresse_serveur) {
+        this.adresse_serveur = adresse_serveur;
+    }
+
+    public String getMot_de_passe() {
+        return (mot_de_passe==null)?"":mot_de_passe;
+    }
+
+    public void setMot_de_passe(String mot_de_passe) {
+        this.mot_de_passe = mot_de_passe;
+    }
+
+    public String getNom_d_utilisateur() {
+        return (nom_d_utilisateur==null)?"":nom_d_utilisateur;
+    }
+
+    public void setNom_d_utilisateur(String nom_d_utilisateur) {
+        this.nom_d_utilisateur = nom_d_utilisateur;
+    }
+
+    public String getGraph() {
+        return (graph==null)?"":graph;
+    }
+
+    public void setGraph(String graph) {
+        this.graph = graph;
+    }
+
+    public boolean isSynchronisation() {
+        return synchronisation;
+    }
+
+    public void setSynchronisation(boolean synchronisation) {
+        this.synchronisation = synchronisation;
+    }
+
+    public Date getHeure() {
+        return (heure==null)? new Date():heure;
+    }
+
+    public void setHeure(Date heure) {
+        this.heure = heure;
+    }
+    
     
     public void multipleBeanAction(){
         st.majPref();

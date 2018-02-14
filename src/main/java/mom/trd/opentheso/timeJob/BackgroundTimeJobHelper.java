@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
@@ -24,9 +26,9 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jm.prudham
  */
-public class BackgroundMailSenderHelper {
+public class BackgroundTimeJobHelper {
     
-    private final Log log = LogFactory.getLog(BackgroundMailSenderHelper.class);
+    private final Log log = LogFactory.getLog(BackgroundTimeJobHelper.class);
     
     //la date de début de lancement de l'alerte et la période de l'alert :
     //private HashMap<Date,Integer> poolAlert=new HashMap<>();
@@ -210,7 +212,54 @@ public class BackgroundMailSenderHelper {
 
   
     
-    
+    public ArrayList<SparqlStruct> getSparqlSynchro(Connexion DS){
+      Connection conn;
+      PreparedStatement stmt = null;
+      ResultSet rs = null;
+      ArrayList<SparqlStruct> SparqlStructs=new ArrayList<>();
+        if(DS.getPoolConnexion()==null){
+            return new ArrayList<>();
+        }
+        try{
+            conn=DS.getPoolConnexion().getConnection();
+            try{
+                String sql="SELECT * FROM preferences_sparql WHERE synchronisation=TRUE";
+                stmt=conn.prepareStatement(sql);
+               try{
+                    rs=stmt.executeQuery();
+                    while(rs.next()){
+                        SparqlStruct result=new SparqlStruct();
+                        result.setAdresseServeur(rs.getString("adresse_serveur"));
+                        result.setGraph(rs.getString("graph"));
+                        result.setMot_de_passe(rs.getString("mot_de_passe"));
+                        result.setNom_d_utilisateur(rs.getString("nom_d_utilisateur"));
+                        result.setSynchro(true);
+                        result.setThesaurus(rs.getString("thesaurus"));
+                        SimpleDateFormat sdf=new SimpleDateFormat("HH:mm");
+                        String heureString=sdf.format(rs.getTime("heure"));
+                        try{
+                        result.setHeure(new java.sql.Date(sdf.parse(heureString).getTime()));
+                        }
+                        catch(ParseException e){
+                         log.error("parse exception in getSparqlPreferences ",e);
+                        }
+                        SparqlStructs.add(result);
+                    }
+                    rs.close();
+               }
+               finally{
+                 stmt.close();
+               }
+            }
+            finally{
+               conn.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("erreur dans getSparqlSynchro ",e);
+        }
+        return SparqlStructs;
+    }
 
    
 
