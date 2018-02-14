@@ -88,6 +88,16 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>virtuoso</groupId>
+            <artifactId>virtuosos</artifactId>
+            <version>4</version>
+        </dependency>
+        <dependency>
+            <groupId>virt_jena3</groupId>
+            <artifactId>virt_jena</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>
@@ -138,11 +148,18 @@
             <version>2.3.1</version>
         </dependency>
         
+       
         <dependency>
             <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>3.0.1</version>
+            <artifactId>jena-core</artifactId>
+            <version>3.6.0</version>
         </dependency>
+        <dependency>
+                <groupId>org.apache.jena</groupId>
+                 <artifactId>jena-arq</artifactId>
+              <version>3.6.0</version>
+        </dependency>
+                                
         <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-c14n</artifactId>

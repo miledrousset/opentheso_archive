@@ -5,8 +5,11 @@
  */
 package mom.trd.opentheso.timeJob;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
@@ -14,32 +17,39 @@ import javax.annotation.PreDestroy;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import mom.trd.opentheso.bdd.datas.ConceptGroup;
+import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.LanguageHelper;
+import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 
 /**
  *
  * @author jm.prudham
  */
-@ManagedBean(name="backgroundMailSender",eager=true)
+@ManagedBean(name="backgroundTimeJob",eager=true)
 @ApplicationScoped
-public class BackgroundMailSender  {
+public class BackgroundTimeJob  {
   @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
    
     //attribut liés au backgroundMailSenderHelper 
-       private ArrayList<AlertStruct> pas;
-    
+    private ArrayList<AlertStruct> pas;
+    //attribut pour la synchronisation sparql
+    private ArrayList<SparqlStruct> SparqlSyn;
 //attribut  ScheduleJob
-    private ScheduleJob sjPropos;//schedule job de la routine cdt proposés
-    private ScheduleJob sjValid;//schedule job de la routine insertion validation refus d'un candidat
-  
+    private ScheduleJob sjPropos;//schedule job de la routine mail cdt proposés
+    private ScheduleJob sjValid;//schedule job de la routine mail insertion validation refus d'un candidat
+    private ScheduleJob sjSparql;//schedule pour la synchronization avec le serveur sparql
     
   
     
     /**
      * Creates a new instance of BackgroundMailSender
      */
-     public BackgroundMailSender() {
+     public BackgroundTimeJob() {
     }
     
     /**
@@ -50,14 +60,22 @@ public class BackgroundMailSender  {
      */
     @PostConstruct
     public void init(){
-       BackgroundMailSenderHelper bmsh=new BackgroundMailSenderHelper();
+       BackgroundTimeJobHelper bmsh=new BackgroundTimeJobHelper();
        
        this.pas=bmsh.getPoolAlert(connect);
        if(this.pas==null){
+           return;//forcer à cause de  l'install automatique (?)
+       }
+       
+       this.SparqlSyn=bmsh.getSparqlSynchro(connect);
+       //précaution il n'y a prioiri pas de possibilité pour que ce soit null
+       if(this.SparqlSyn == null){
            return;
        }
+       
        this.routineCdtPropos();
        this.routineCdtValidInsertRefuse();
+       this.routineSparqlSynchronisation();
     }
     
     @PreDestroy
@@ -65,6 +83,7 @@ public class BackgroundMailSender  {
        
         sjPropos.closeAllJob();
         sjValid.closeAllJob();
+        sjSparql.closeAllJob();
     }
     /**
      * Fonction send()
@@ -154,8 +173,89 @@ public class BackgroundMailSender  {
         sjValid.sendPeriodicMultipleJob();
         
     }
+    
+    /**
+     * Les routines de synchronisation pour les serveurs sparql
+     * on suppose qu'elles sont de  15 minutes maximum
+     * donc on les décale de 15 minutes entre elles
+     * 
+     */
+    private void routineSparqlSynchronisation() {
+        int count=this.SparqlSyn.size();
+        int j=0;
+        long[] initialD=new long[count];
+        long[] period=new long[count];
+        Runnable[] job=new Runnable[count];
+        // today    
+        Calendar date = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
 
-   
+        // next day
+       // date.add(Calendar.DAY_OF_MONTH, 1);
+       
+        for(int i=0;i<count;i++){
+            
+          
+            
+            SimpleDateFormat sdf1=new SimpleDateFormat("HH");
+            SimpleDateFormat sdf2=new SimpleDateFormat("mm");
+            date.set(Calendar.HOUR_OF_DAY,Integer.parseInt(sdf1.format(this.SparqlSyn.get(i).getHeure())));
+            date.set(Calendar.MINUTE,Integer.parseInt(sdf2.format(this.SparqlSyn.get(i).getHeure())));
+            initialD[i]=(date.getTime().getTime()-new Date().getTime())/(1000*60);//en minute
+            if(initialD[i]<0)initialD[i]+=24*60;//si lheure est passé aujourd hui alors on ajoute  
+            period[i]=24*60;
+            job[i]=this.synchroSparql(i);
+            date.set(Calendar.HOUR_OF_DAY, 0);
+            date.set(Calendar.MINUTE, 0);
+          
+           
+        }
+        
+     
+        this.sjSparql=new ScheduleJob(count, initialD, period, TimeUnit.MINUTES, job);
+        this.sjSparql.sendPeriodicMultipleJob();
+    }
+
+    
+          
+    private Runnable synchroSparql(int key){
+        SynchroSparql run=new SynchroSparql();
+        run.setSparqlStruct(this.SparqlSyn.get(key));
+        ArrayList<Languages_iso639> listeLang=new LanguageHelper().
+                  getLanguagesOfThesaurus(this.connect.getPoolConnexion(),
+                          this.SparqlSyn.get(key).getThesaurus());
+        ArrayList<NodeLang> nol=new ArrayList<>();
+        for(Languages_iso639 lang:listeLang){
+          
+            NodeLang nd=new NodeLang();
+            nd.setValue(lang.getId_iso639_1());
+            nd.setCode(lang.getId_iso639_1());
+            nol.add(nd);
+        }
+        run.setListe_lang(nol);
+        ArrayList<String> nog=new GroupHelper().
+                getListIdOfGroup(this.connect.getPoolConnexion(),
+                        this.SparqlSyn.get(key).getThesaurus());
+        
+        ArrayList<NodeGroup> groupes=new ArrayList<>();
+        for(String group:nog){
+           
+            NodeGroup ng1=new NodeGroup();
+            ng1.setId_group(group);
+        
+            ConceptGroup cg=new ConceptGroup();
+            cg.setIdgroup(group);
+            ng1.setConceptGroup(cg);
+            groupes.add(ng1);
+        }
+        run.setListe_group(groupes);
+        run.setConn(this.connect);
+        return run;
+      }
   
     /**
      * calculInitialDelay
@@ -202,6 +302,7 @@ public class BackgroundMailSender  {
     public void setSjValid(ScheduleJob sjValid) {
         this.sjValid = sjValid;
     }
+
 
     
     

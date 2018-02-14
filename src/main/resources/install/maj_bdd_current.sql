@@ -1572,8 +1572,29 @@ end
 $$language plpgsql;
 
 
+---création de la table preferences_sparql
+---
+---
+create or replace function create_table_preferences_sparql() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='preferences_sparql' ) THEN
+        execute 'CREATE TABLE public.preferences_sparql
+                    (
+                        adresse_serveur character varying,
+                        mot_de_passe character varying,
+                        nom_d_utilisateur character varying,
+                        graph character varying,
+                        synchronisation boolean NOT NULL DEFAULT false,
+                        thesaurus character varying NOT NULL,
+                        heure time without time zone,
+                        CONSTRAINT preferences_sparql_pkey PRIMARY KEY (thesaurus)
+                      )';
+    END IF;
+end
+$$language plpgsql;
 
 
+----------------------------------------------------------------------------
 -- mises à jour 
 --
 --
@@ -1583,6 +1604,7 @@ $$language plpgsql;
 
 
 -- création ou mise à jour des séquences
+SELECT create_table_preferences_sparql();
 SELECT create_table_routine_mail();
 SELECT alter_table_thesaurus_private();
 SELECT create_table_copyright();
@@ -1760,6 +1782,7 @@ $BODY$
 --
 --Delete toutes les function
 --
+select delete_fonction ('create_table_preferences_sparql','');
 SELECT delete_fonction ('create_table_routine_mail','');
 SELECT delete_fonction ('alter_table_thesaurus_private','');
 SELECT delete_fonction ('create_table_copyright','');

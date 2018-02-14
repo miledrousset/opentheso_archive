@@ -39,7 +39,7 @@ public class SendMailValidedInsertedCdt extends SendMail implements Runnable {
     * @return 
     */
     MessageCdt getValue(String idTheso, Date d) {
-        return new BackgroundMailSenderHelper().
+        return new BackgroundTimeJobHelper().
                 selectMessageValidedInsertedCdt(idTheso,d,new Date(),poolConnexion);
     }
      /**
@@ -53,7 +53,7 @@ public class SendMailValidedInsertedCdt extends SendMail implements Runnable {
      */
     protected int updateDateRoutine( String idTheso, Date date) {
         String colonne="debut_env_cdt_valid";//colonne dans la bdd dans la table routine_mail
-        return new BackgroundMailSenderHelper().updateRoutine(this.poolConnexion,colonne,idTheso,date);
+        return new BackgroundTimeJobHelper().updateRoutine(this.poolConnexion,colonne,idTheso,date);
     }
     /**
      * 

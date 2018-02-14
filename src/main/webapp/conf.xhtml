@@ -30,7 +30,8 @@
         <ui:include src="/dialogs/settings/copyrightEditDlg.xhtml" />
         <!--inlcude pour l'alignement automatique des BT et des domaines -->
         <ui:include src="dialogs/group/aligngroupDlg.xhtml"/>
-
+        <!--include pour le serveur sparql -->
+        <ui:include src="dialogs/sparql/sparqlDialg.xhtml" />
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
             Depuis cette page, les administrateurs peuvent gérer les utilisateurs. Il leur est possible de créer/désactiver un compte ou de modifier les droit d'un utilisateur.
@@ -162,9 +163,12 @@
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
                             <p:separator />
                             <p:separator />
+                            <p:menuitem style="background: #CEF0C4" value="configurer un serveur sparql" update=":idSparqlPreferencesDlg" oncomplete="PF('sparqlPreferenceDlg').show();" action="#{preferencesAlertBean.loadPreferencesSparql()}" styleClass="styleButton"/>
+                                
+                            <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
-                            <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup()}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
+                            <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup(theso.thesaurus.language)}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>

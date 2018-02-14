@@ -5,13 +5,17 @@
  */
 package mom.trd.opentheso.timeJob;
 
+import com.ibm.icu.util.Calendar;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import java.util.GregorianCalendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -209,5 +213,164 @@ public class PreferencesAlertHelper {
         return ret;
     }
 
-  
+    public boolean insertIntoPreferencesSparql(String adresse_serveur,
+            String mot_de_passe,
+            String nom_d_utilisateur,String graph,boolean synchronisation,
+            String idtheso,java.sql.Date heure,HikariDataSource ds){
+      boolean ret=false;
+        Connection conn;
+        PreparedStatement stmt;
+        
+        try{
+            conn=ds.getConnection();
+            try{
+                String sql="INSERT INTO preferences_sparql(adresse_serveur,mot_de_passe,"
+                        + "nom_d_utilisateur,graph,"
+                        + "synchronisation,thesaurus,heure) "
+                        + "VALUES(?,?,?,?,?,?,?)";
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1, adresse_serveur);
+                stmt.setString(2,mot_de_passe);
+                stmt.setString(3,nom_d_utilisateur);
+                stmt.setString(4,graph);
+                stmt.setBoolean(5, synchronisation);
+                stmt.setString(6,idtheso);
+                GregorianCalendar gc=new GregorianCalendar();
+                gc.setTime(heure);
+                String heureString=gc.get(Calendar.HOUR_OF_DAY)+":"+(gc.get(Calendar.MINUTE)<10?"0"+gc.get(Calendar.MINUTE):gc.get(Calendar.MINUTE))+":00";
+                stmt.setTime(7,Time.valueOf(heureString));
+                try{
+                    ret=(0 != stmt.executeUpdate());
+                }
+                finally{
+                    stmt.close();
+                }
+            }
+            finally{
+                conn.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while insertIntoPreferencesSparql ",e);
+            ret=false;
+        }
+        
+        
+        
+        return ret;
+    }
+
+    SparqlStruct getSparqlPreferences(String id_thesaurus,HikariDataSource ds) {
+       Connection conn;
+       PreparedStatement stmt;
+       ResultSet rs;
+       SparqlStruct ss=new SparqlStruct();
+       try{
+           conn=ds.getConnection();
+           try{
+               String sql="SELECT * FROM preferences_sparql WHERE thesaurus=?";
+               stmt=conn.prepareStatement(sql);
+               stmt.setString(1,id_thesaurus);
+               try{
+                   rs=stmt.executeQuery();
+                   if(rs.next()){
+                     ss.setAdresseServeur(rs.getString("adresse_serveur"));
+                     ss.setGraph(rs.getString("graph"));
+                     SimpleDateFormat sdf=new SimpleDateFormat("HH:mm");
+                     String heureString=sdf.format(rs.getTime("heure"));
+                     try{
+                     ss.setHeure(new java.sql.Date(sdf.parse(heureString).getTime()));
+                     }
+                     catch(ParseException e){
+                         log.error("parse exception in getSparqlPreferences ",e);
+                     }
+                     ss.setMot_de_passe(rs.getString("mot_de_passe"));
+                     ss.setNom_d_utilisateur(rs.getString("nom_d_utilisateur"));
+                     ss.setSynchro(rs.getBoolean("synchronisation"));
+                     ss.setThesaurus(rs.getString("thesaurus"));
+                   }
+               }
+               finally{
+                   stmt.close();
+               }
+           }
+           finally{
+               conn.close();
+           }
+       }
+       catch(SQLException e){
+           log.error("error while getSparqlPreferences ",e);
+       }
+       return ss;
+    }
+
+    boolean isYetInTablePreferencesSparql(String thesaurusEnAcces, HikariDataSource poolConnexion) {
+        Connection conn;
+        PreparedStatement stmt;
+        ResultSet rs;
+        boolean ret=false;
+        String sql="Select count(*) as num From preferences_sparql WHERE thesaurus=?";
+        
+        try{
+            conn=poolConnexion.getConnection();
+            try{
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1,thesaurusEnAcces);
+                try{
+                    rs=stmt.executeQuery();
+                    rs.next();
+                    ret=(rs.getInt("num")==1);
+                }
+                finally{
+                    stmt.close();
+                }
+            }
+            finally{
+                conn.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while select in preferences sparql",e );
+        }
+        return ret;
+    }
+
+    boolean updatePreferencesSparql(String adresse_serveur, String mot_de_passe, String nom_d_utilisateur, String graph, boolean synchronisation, String thesaurusEnAcces, java.sql.Date date, HikariDataSource poolConnexion) {
+       Connection conn;
+       PreparedStatement stmt;
+       boolean ret=false;
+       String sql="UPDATE preferences_sparql SET adresse_serveur=? ,"
+               + "  mot_de_passe=?, nom_d_utilisateur=?, graph=?, synchronisation=?, "
+               + " heure=? WHERE thesaurus=? " ;
+       try{
+           conn=poolConnexion.getConnection();
+           try{
+               stmt=conn.prepareStatement(sql);
+               stmt.setString(1,adresse_serveur);
+               stmt.setString(2, mot_de_passe);
+               stmt.setString(3, nom_d_utilisateur);
+               stmt.setString(4,graph);
+               stmt.setBoolean(5, synchronisation);
+                GregorianCalendar gc=new GregorianCalendar();
+                gc.setTime(date);
+                String heureString=gc.get(Calendar.HOUR_OF_DAY)+":"+(gc.get(Calendar.MINUTE)<10?"0"+gc.get(Calendar.MINUTE):gc.get(Calendar.MINUTE))+":00";
+               stmt.setTime(6, Time.valueOf(heureString));
+               stmt.setString(7,thesaurusEnAcces);
+               try{
+                  ret=(stmt.executeUpdate() != 0);
+               }
+               finally{
+                   stmt.close();
+               }
+           }
+           finally{
+               conn.close();
+           }
+       }
+       catch(SQLException e){
+           log.error("erreur pendant l'update sur la table preferences sparql ",e);
+       }
+              
+       return ret;
+    }
 }

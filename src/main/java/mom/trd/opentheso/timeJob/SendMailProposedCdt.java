@@ -46,7 +46,7 @@ public class SendMailProposedCdt extends SendMail implements Runnable {
     public MessageCdt getValue(String idTheso, Date d) {
         
         
-        return new BackgroundMailSenderHelper().selectMessageProposedCdt(idTheso,d,new Date(),poolConnexion);
+        return new BackgroundTimeJobHelper().selectMessageProposedCdt(idTheso,d,new Date(),poolConnexion);
        
         
     }
@@ -63,7 +63,7 @@ public class SendMailProposedCdt extends SendMail implements Runnable {
         String colonne="debut_env_cdt_propos";//colonne dans la bdd dans la table routine_mail
           
        
-        return new BackgroundMailSenderHelper().updateRoutine(this.poolConnexion,colonne,idTheso,date);
+        return new BackgroundTimeJobHelper().updateRoutine(this.poolConnexion,colonne,idTheso,date);
     }
     /**
      * #JM
