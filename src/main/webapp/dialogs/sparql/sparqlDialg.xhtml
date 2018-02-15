@@ -5,30 +5,30 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
         
-    <p:dialog id="idSparqlPreferencesDlg"  header="sparql serveur" widgetVar="sparqlPreferenceDlg" modal="true" resizable="false" >
+    <p:dialog id="idSparqlPreferencesDlg"  header="#{langueBean.getMsg('sparqlDlg.header')}" widgetVar="sparqlPreferenceDlg" modal="true" resizable="false" >
     <!-- Gestion de la definition -->
     <h:form id="formSparqlPreferences" >
             <table>
             
                 <tr> <td colspan="2" style="text-align: center;"> <p:messages showDetail="true" autoUpdate="true" />     </td> </tr>   
             
-                <tr><td><h:outputLabel value="adresse serveur saprql" /></td>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparqlDlg.adresse')}" /></td>
                     <td><h:inputText value="#{preferencesAlertBean.adresse_serveur}"  /></td>
                 </tr>
-                <tr><td><h:outputLabel value="mot de passe du serveur" /></td><td><h:inputText value="#{preferencesAlertBean.mot_de_passe}" /> </td>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparql.mdp')}" /></td><td><h:inputText value="#{preferencesAlertBean.mot_de_passe}" /> </td>
                 </tr>
-                <tr><td><h:outputLabel value="nom d'utilisateur du serveur "/></td><td> <h:inputText value="#{preferencesAlertBean.nom_d_utilisateur}" /></td>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparql.nom')} "/></td><td> <h:inputText value="#{preferencesAlertBean.nom_d_utilisateur}" /></td>
                 </tr>
-                <tr><td><h:outputLabel value="nom du graph sur le serveur sparql" /> </td> <td> <h:inputText value="#{preferencesAlertBean.graph}" /></td>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparql.graph')}" /> </td> <td> <h:inputText value="#{preferencesAlertBean.graph}" /></td>
                 </tr>
-                <tr><td><h:outputLabel value="synchronisation ?" /></td><td><p:selectBooleanButton offLabel="non" onLabel="oui" value="#{preferencesAlertBean.synchronisation}" /></td>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparql.synch')}" /></td><td><p:selectBooleanButton offLabel="#{langueBean.getMsg('no')}" onLabel="#{langueBean.getMsg('yes')}" value="#{preferencesAlertBean.synchronisation}" /></td>
                 </tr>
-                <tr><td> <h:outputLabel value="thésaurus "/></td><td> <h:inputText disabled="true" value="#{preferencesAlertBean.thesaurusEnAcces}" /> </td>
+                <tr><td> <h:outputLabel value="#{langueBean.getMsg('theso')}"/></td><td> <h:inputText disabled="true" value="#{preferencesAlertBean.thesaurusEnAcces}" /> </td>
                 </tr>
-                <tr><td><h:outputLabel value="heure de synchronisation avec le serveur" /></td><td><p:calendar value="#{preferencesAlertBean.heure}" pattern="HH:mm" timeOnly="true" /></td></tr>
+                <tr><td><h:outputLabel value="#{langueBean.getMsg('sparql.heure')}" /></td><td><p:calendar value="#{preferencesAlertBean.heure}" pattern="HH:mm" timeOnly="true" /></td></tr>
            
                      <tr><td style="text-align: center;">
-                        <p:commandButton partialSubmit="true" process="@form" title="ok" type="submit" value="ok" icon="ui-icon" 
+                        <p:commandButton partialSubmit="true" process="@form" title="ok" type="submit" value="ok" icon="ui-icon-valider" 
                                          styleClass="styleButton" update=":idSparqlPreferencesDlg,:formSparqlPreferences" 
                                          action="submit" actionListener="#{preferencesAlertBean.insertPreferencesSparql()}" 
                                          oncomplete="PF('sparqlPreferenceDlg').hide();"  />

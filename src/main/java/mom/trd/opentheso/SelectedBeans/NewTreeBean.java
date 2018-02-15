@@ -1683,6 +1683,10 @@ public class NewTreeBean implements Serializable {
     }
 
     public void fromConceptToGroupDomain() {
+           for (String idBT : idsBTRemoveNode) {
+            TreeChange tc = new TreeChange();
+            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+        }
 
        // System.out.println(" from concept to group  domain");
     }
