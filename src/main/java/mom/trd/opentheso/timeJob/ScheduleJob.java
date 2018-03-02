@@ -79,8 +79,6 @@ public class ScheduleJob {
             scheduler.scheduleAtFixedRate(multipleJob[i], initialDelay[i], delay[i], tu);
            
         }
-     ///   System.out.println("les threads sont terminés ?"+scheduler.isTerminated());
-        
     }
     /**
      *sendUniqueJob

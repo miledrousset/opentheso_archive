@@ -1,0 +1,37 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idModifTypeGroupDlg"  header="#{langueBean.getMsg('group.modifType.header')}" widgetVar="modifTypeGroupDlg" modal="true" resizable="false" >
+        <!-- Cas de la modification du nom du terme -->
+        <h:form >
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <tr>
+                    <td colspan="2" style="text-align: center;"><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="type" />  </td>
+                    <td>
+                  
+                    <p:selectOneMenu id="modifType" value="#{addGroup.selectedGroupType}">
+                        <f:selectItems value="#{addGroup.listGroupType}"/>
+                    </p:selectOneMenu>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{newtreeBean.changeGroupType(addGroup.selectedGroupType)}" 
+                                         update=":idRenameGroupDlg,:accordeonTree,:panContenu" styleClass="styleButton"
+                                         oncomplete="PF('modifTypeGroupDlg').hide();"/>
+
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idRenameGroupDlg" oncomplete="PF('modifTypeGroupDlg').hide();"  immediate="true"/>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>

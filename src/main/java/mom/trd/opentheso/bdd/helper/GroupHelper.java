@@ -2479,5 +2479,35 @@ public class GroupHelper {
         return true;
     }
 
+    public void updateTypeGroup(HikariDataSource poolConnexion, String type, String idThesoSelected, String idConcept) {
+       PreparedStatement stmt;
+       Connection conn;
+      
+       try{
+           conn=poolConnexion.getConnection();
+           try{
+               String sql="UPDATE concept_group SET idtypecode=? WHERE idgroup=? AND idthesaurus=?";
+               stmt=conn.prepareStatement(sql);
+               stmt.setString(1, type);
+               stmt.setString(2, idConcept);
+               stmt.setString(3,idThesoSelected);
+               try{
+                   stmt.execute();
+               }
+               finally{
+                   stmt.close();
+               }
+           }
+           finally{
+               conn.close();
+           }
+       }
+       catch(SQLException e){
+           log.error("error while updating group type "+idConcept+" "+idThesoSelected+" "+type,e);
+       }
+       
+       
+    }
+
 
 }

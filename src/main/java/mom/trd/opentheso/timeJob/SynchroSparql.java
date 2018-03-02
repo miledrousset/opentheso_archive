@@ -35,8 +35,7 @@ public class SynchroSparql implements Runnable {
     private Connexion conn;
     @Override
     public void  run(){
-    System.out.println("je suis dans le thread");
-   //exemple String url="jdbc:virtuoso://omekas.mom.fr:1111";
+  
     String url=sparqlStruct.getAdresseServeur().replaceAll("http","jdbc:virtuoso").trim()+":1111";
     VirtGraph graph=new VirtGraph(sparqlStruct.getGraph(),url,sparqlStruct.getNom_d_utilisateur(),sparqlStruct.getMot_de_passe());
 
@@ -64,7 +63,7 @@ public class SynchroSparql implements Runnable {
         
         }
     graph.close();
-    System.out.println("je n'y suis plus");
+  
     }
 
     public SparqlStruct getSparqlStruct() {
