@@ -18,6 +18,7 @@
                             <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('panel.addRelationNT')}" update=":idAddRelationNTDlg" oncomplete="PF('addRelationNTDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="Terme spécifique spécial" update=":idNtEditDlg" oncomplete="PF('specialntEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('nt.multiple')}" update=":idNtEditDlg" oncomplete="PF('ntListImportDlg').show();" style="font-size:12px;" />
                             <p:menuitem value="#{langueBean.getMsg('sTerme.TrieTS')}" actionListener="#{selectedTerme.majTSpeConceptOrder()}" update=":speci" style="font-size: 12px;"/>
                             
                         </p:menu>  

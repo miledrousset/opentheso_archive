@@ -30,6 +30,9 @@ public class SearchBean implements Serializable {
     ArrayList<NodeSearch> result1 = new ArrayList<>();
     ArrayList<NodePermute> result2 = new ArrayList<>();
     private String idInfo;
+    //attributs pour la recherche déconnectée de l'arbre 
+    private String rechercheDeconn;
+    //private ArrayList<Concept> resultatDeconn;
     
     @ManagedProperty(value = "#{theso}")
     private SelectedThesaurus theso;
@@ -37,6 +40,34 @@ public class SearchBean implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
     
+    
+    
+    /**
+     * méthode pour la recherceh qui ne passe pas par l'arbre
+     */
+    public void researchDeconn(){
+        ConceptHelper ch=new ConceptHelper();
+        SearchHelper sh=new SearchHelper();
+    
+                if(onlyNote) {
+                    result1 = new SearchHelper().searchNote(connect.getPoolConnexion(), rechercheDeconn, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                    startByOrContain);
+                }
+                else {
+                    if(onlyNotation) {
+                        result1 = new SearchHelper().searchNotation(connect.getPoolConnexion(), rechercheDeconn, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup
+                        );
+                    }
+                    else {
+                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), rechercheDeconn, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                                startByOrContain, withNote);                        
+                    }
+                }
+          
+       
+            nbRes = result1.size();
+        
+    }
     public void research() {
         result1 = new ArrayList<>();
         result2 = new ArrayList<>();
@@ -121,7 +152,14 @@ public class SearchBean implements Serializable {
         
         return nom;
     }
-    
+    public void cleanSearch(){
+        this.result1=new ArrayList<>();
+        this.result2=new ArrayList<>();
+        this.rechercheDeconn="";
+        this.entry="";
+        this.nbRes=0;
+        
+    }
     public String getValueGroup(String idG) {
         return new GroupHelper().getLexicalValueOfGroup(connect.getPoolConnexion(), idG, theso.getThesaurus().getId_thesaurus(), theso.getThesaurus().getLanguage());
     }
@@ -246,6 +284,15 @@ public class SearchBean implements Serializable {
     public void setOnlyNotation(boolean onlyNotation) {
         this.onlyNotation = onlyNotation;
     }
+
+    public String getRechercheDeconn() {
+        return rechercheDeconn;
+    }
+
+    public void setRechercheDeconn(String rechercheDeconn) {
+        this.rechercheDeconn = rechercheDeconn;
+    }
+
     
     
     

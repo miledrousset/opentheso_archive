@@ -145,8 +145,7 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
-    
-    
+ 
 
     /**
      * ************************************ INITIALISATION
@@ -1247,7 +1246,7 @@ public class SelectedThesaurus implements Serializable {
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void maj() {
-     
+       
         tree.getSelectedTerme().reInitTerme();
         tree.reInit();
         tree.initTree(null, null);
@@ -2283,7 +2282,8 @@ public class SelectedThesaurus implements Serializable {
     public static void setRnd(SecureRandom rnd) {
         SelectedThesaurus.rnd = rnd;
     }
-    
+
+ 
 
     
 }

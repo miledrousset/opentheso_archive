@@ -175,7 +175,7 @@
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
                             <p:separator />
                             <p:separator />
-                            <p:menuitem style="background: #CEF0C4" value="configurer un serveur sparql" update=":idSparqlPreferencesDlg" oncomplete="PF('sparqlPreferenceDlg').show();" action="#{preferencesAlertBean.loadPreferencesSparql()}" styleClass="styleButton"/>
+                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.sparql')}" update=":idSparqlPreferencesDlg" oncomplete="PF('sparqlPreferenceDlg').show();" action="#{preferencesAlertBean.loadPreferencesSparql()}" styleClass="styleButton"/>
                                 
                             <p:separator />
                             <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>

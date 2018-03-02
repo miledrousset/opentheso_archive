@@ -1,0 +1,121 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+    <h:panelGroup >
+        <h:form style="width:300px;">
+            <p:inputText value="#{search.rechercheDeconn}" label="recherche"/>
+            <p:commandButton action="#{search.researchDeconn()}" icon="ui-icon-valider" update="idTabResultatDeconnecte,@form"  styleClass="cbEdit"  rendered="true"/>
+             <h:outputText rendered="#{search.nbRes != 0}" value="#{langueBean.getMsg('index.headerSearch')}:"/>
+            <h:outputText rendered="#{search.nbRes != 0}" value=" #{search.nbRes}"  style="color: green; font-weight: bold;"/>
+             
+             <table style="resize:vertical;">
+                         <tr>
+                            <td colspan="2">
+                                <p:selectOneRadio value="#{search.startByOrContain}"  >
+                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchContain')}" itemValue="1" />                                                    
+                                    <f:selectItem itemLabel="#{langueBean.getMsg('index.searchStartBy')}" itemValue="2" />
+                                </p:selectOneRadio>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="withNote" value="#{search.withNote}" >
+                                    <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchWithNote')}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="onlyNote" value="#{search.onlyNote}" >
+                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"/>
+                                    <p:ajax update="onlyNotation" listener="#{search.setOnlyNotation(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchNoteOnly')}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="left">
+
+                                <p:selectBooleanCheckbox id="onlyNotation" value="#{search.onlyNotation}" >
+                                    <p:ajax update="withNote" listener="#{search.setWithNote(false)}"  />
+                                    <p:ajax update="onlyNote" listener="#{search.setOnlyNote(false)}"  />
+                                </p:selectBooleanCheckbox>
+
+                                <h:outputText value="  #{langueBean.getMsg('index.searchNotationOnly')}"/>
+                           
+                            </td>
+                        </tr>                                        
+                        <tr>
+                            <td>
+                                <div align="left">
+                                    <h:outputText value="#{langueBean.getMsg('language')}:" /> 
+                                </div>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{search.langue}"  style="width: 180px;">
+                                    <f:selectItems value="#{theso.getTradForSearch()}" var="t" itemLabel="#{t.french_name}" 
+                                                   itemValue="#{t.id_iso639_1}" />
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div align="left">
+                                    <h:outputText value="#{langueBean.getMsg('index.tabSearch2')}:" />
+                                </div>
+                            </td>
+                            <td>
+                                <h:selectOneMenu value="#{search.idGroup}"  style="width: 180px;">
+                                    <f:selectItems value="#{theso.listeDomaine()}"/>
+                                </h:selectOneMenu>
+                            </td>
+                        </tr>
+               
+                    </table>
+                
+        
+            <p:dataTable id="idTabResultatDeconnecte"  var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="380"
+                             emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                 <p:ajax event="rowSelect"  listener="#{newtreeBean.majSearch2()}" update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+          <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                        <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />
+                        <h:panelGroup rendered="#{ts.preferredLabel == false}" >
+                            <h:outputText value="#{ts.lexical_value}" style="font-style: italic" />
+                        </h:panelGroup>
+                    </p:column>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60" >
+                        <h:outputText value="#{ts.groupLabel}" />
+                    </p:column>
+                    <p:column width="10" style="padding-left: 1px;">
+                        <h:form>
+                            <p:graphicImage id="seeTree" value="images/iconeTree.png" styleClass="hierarchicalSearch" />
+                            <p:tooltip id="toolTipContent" for="seeTree">
+                                <p:fieldset legend="#{langueBean.getMsg('index.titleTree')}" styleClass="pfFielset" >
+                                    <ui:repeat value="#{search.getHierachi(ts.idConcept)}" var="path" >
+                                        <ui:repeat value="#{path}" var="termeS" >
+                                            <div style="margin-left: #{path.indexOf(termeS)*35}px; margin-top: 4px;">
+                                                <img src="images/conceptOpen.png" />
+                                                <h:outputText value="#{search.getNom(termeS)}" />
+                                            </div>
+                                        </ui:repeat>
+                                        <br/>
+                                    </ui:repeat>
+                                </p:fieldset>
+                            </p:tooltip>
+                        </h:form>
+                    </p:column>
+        </p:dataTable>
+       </h:form>
+    </h:panelGroup>
+</ui:composition>

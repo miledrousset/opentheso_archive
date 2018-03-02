@@ -33,7 +33,7 @@
 
                         <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-
+                        <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" style="font-size: 12px;" update=":idModifTypeGroupDlg"/>
                         
                         
                         <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">

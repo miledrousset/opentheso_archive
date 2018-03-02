@@ -23,7 +23,7 @@
                             <td>                                                                                                           
                                 
                                 <p:commandButton id="cbSelectTheso" value="#{langueBean.getMsg('btnOk')}"
-                                                  actionListener="#{theso.maj()}" 
+                                                 actionListener="#{theso.maj()}" action="#{search.cleanSearch()}" 
                                                  update=":panContenu,:accordeonTree,:panChoixTheso,:contenuDroite1,:contenuDroite2,:contenuDroite3,:footer,:accordeonTree:form:tree,:buttonMenuPanel" 
                                                  styleClass="styleButton" >
                                   

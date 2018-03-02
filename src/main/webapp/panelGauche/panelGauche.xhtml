@@ -42,6 +42,14 @@
                 <!-- SOUS ARBRE DEBUT -->
                 <ui:include src="sousArbre/sousArbre.xhtml"/>
             </p:tab>
+          <p:tab id="tab3" titletip="recherche sans mise à jour de l'arbre">
+                
+                <f:facet name="title">
+                    <p:graphicImage value="images/search-16.png" style="width:15px;height: auto;" />
+                </f:facet>
+                <ui:include src="rechercheDirecte/rechercheDirecte.xhtml" />
+              
+          </p:tab>  
         </p:tabView>
     </div>
 </ui:composition>

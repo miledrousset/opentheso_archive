@@ -7,11 +7,17 @@ package mom.trd.opentheso.SelectedBeans;
 
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -20,6 +26,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.datas.Concept;
+import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
@@ -31,13 +38,14 @@ import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
-import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
+import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -102,7 +110,7 @@ public class NewTreeBean implements Serializable {
      * ************************************************
      */
     /**
-     * attributs pour l'alignement des comaines et des BT
+     * attributs pour l'alignement des domaines et des BT
      * 
      */
       
@@ -112,6 +120,10 @@ public class NewTreeBean implements Serializable {
     
     
     /*************************************************************************/
+    
+    /***atttribut pour l'ajout multiple de NT ****/
+    private byte[] multipleNT;
+    
     /**
      *
      * @param idTheso
@@ -277,6 +289,11 @@ public class NewTreeBean implements Serializable {
         reInit();
         reExpand();
 
+    }
+    public void majSearch2() {
+        selectedTerme.majSearch();
+        vue.setOnglet(3);
+        
     }
 
     /**
@@ -917,6 +934,44 @@ public class NewTreeBean implements Serializable {
         }
         return false;
     }
+    public void changeGroupType(String type){
+       MyTreeNode myTN=(MyTreeNode)this.selectedNode;
+       if(!myTN.isIsGroup() && !myTN.isIsSubGroup()){
+           //normalement impossible
+           return;
+       }
+       if(myTN.getTypeDomaine().equals(type)){
+           return;
+       }
+       else{
+           myTN.setTypeDomaine(type);
+           GroupHelper gh=new GroupHelper();
+           gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected,myTN.getIdConcept());
+           ConceptHelper ch=new ConceptHelper();
+           this.onNodeExpand(myTN);
+           for(TreeNode sbn: myTN.getChildren()){
+               if(((MyTreeNode)sbn).isIsSubGroup())changeGroupType(type,sbn);
+               
+           }
+       }
+       reInit();
+     this.initTree(idThesoSelected, myTN.getLangue());
+
+      reExpand();
+
+    }
+     public void changeGroupType(String type, TreeNode sbn ){
+       
+         
+        ((MyTreeNode)sbn).setTypeDomaine(type);
+        GroupHelper gh=new GroupHelper();
+        gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected,((MyTreeNode)sbn).getIdConcept());
+        this.onNodeExpand(sbn);
+           for(TreeNode sn: sbn.getChildren()){
+               if(((MyTreeNode)sn).isIsSubGroup())changeGroupType(type,sn);
+               
+           }
+     }
 
     /**
      * Permet de supprimer un concept seul, il ne faut pas qu'il est des fils,
@@ -1560,6 +1615,10 @@ public class NewTreeBean implements Serializable {
     }
 
     public void fromConceptToGroupDomain() {
+           for (String idBT : idsBTRemoveNode) {
+            TreeChange tc = new TreeChange();
+            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+        }
 
        // System.out.println(" from concept to group  domain");
     }
@@ -1780,9 +1839,46 @@ public class NewTreeBean implements Serializable {
         
     }
     
-  
+  /*fonction pour importer de multiples NT ****/
+    public void addMultipleNT(){
+         InputStream is=null;
+         ArrayList<String> narrowerTerm=new ArrayList<>();
+        try{
+        
+            BufferedReader buff=new BufferedReader(new InputStreamReader(new ByteArrayInputStream(this.multipleNT)));
+            String tmp=null;
+            while((tmp=buff.readLine())!=null){
+                String[] lineNT=tmp.split("\t");
+                for(String nt : lineNT){
+                    if(!nt.trim().equals(""))narrowerTerm.add(nt.trim());
+                }
+                
+            }
+        }
+        catch(Exception e){
+           System.out.println("Error while reading uploaded file "+e);
+        }
+        finally{
+            try{
+            if(is!=null)is.close();
+            }
+            catch(IOException e){
+                System.out.println("error closing inputSteeam in methodd addMultipleNT "+e );
+            }
+        }
+        for(String nt : narrowerTerm){
+            NodeAutoCompletion nac=new NodeAutoCompletion();
+            nac.setTermLexicalValue(nt);
+           this.selectedTerme.setSelectedTermComp(nac);
+           this.newTSpe();
+        }
+    }
     
-   
+     public void handleFileUpload(FileUploadEvent event){
+         this.multipleNT=event.getFile().getContents();
+        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
     
     /**fin fonction **/
     public Connexion getConnect() {
@@ -1965,6 +2061,6 @@ public class NewTreeBean implements Serializable {
     public void setGroupLexicalValues(ArrayList<String> groupLexicalValues) {
         this.groupLexicalValues = groupLexicalValues;
     }
-    
-    
+
+  
 }

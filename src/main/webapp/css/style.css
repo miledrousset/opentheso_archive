@@ -770,7 +770,11 @@ input[type="button"], input[type="submit"]{
 #accordeonTree{
     padding: 0;
     height: 100%;
+  
+   
+   
 }
+
 
 
 .styleFacetteTerm .ui-tree-container {
@@ -786,9 +790,11 @@ input[type="button"], input[type="submit"]{
 
 /*Division arbre thésaurus (haut gauche)*/
 #divArbreTheso {
-    height: 530px;
+    height: 523px;
     overflow-y: scroll;
     overflow-x: scroll;
+    resize: horizontal;
+    
 }
 
 .ui-tabs .ui-tabs-panel{
