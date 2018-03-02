@@ -66,6 +66,97 @@ public class LineCdt {
     
     
     public String getMessage(){
+        // #MR
+        StringBuilder message = new StringBuilder();
+        String status1;
+        switch(status){
+            case("a"):
+                status1="en attente";
+                break;
+            case("r"):
+                status1="refusé";
+                break;                        
+            case("v"):
+                status1="validé";
+                break;                     
+            case("i"):
+                status1="inséré";
+                break;                         
+            default:
+                status1="inconnu";
+                break;                 
+        }         
+        
+        message.append("<table style=\"width: 715px; height: 321px;\" border=\"0\">");
+        message.append("<tbody>"); 
+        message.append("<tr>");
+        message.append("<td style=\"width: 152.3px;\"><i> Candidat :");
+        message.append("</i></td>");
+        message.append("<td style=\"width: 546.7px;\"><b>");
+        message.append(valeur_lexical);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("<tr>");
+        message.append("<td><i>id :");
+        message.append("</i></td>");
+        message.append("<td><b>");
+        message.append(Id_concept);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("<tr>");
+        message.append("<td><i>créé le :");
+        message.append("</i></td>");
+        message.append("<td style=\"height: 18.2px;\"><b>");
+        message.append(created);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("<tr>");
+        message.append("<td><i>modifié le :");
+        message.append("</i></td>");
+        message.append("<td><b>");
+        message.append(modified);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("<tr>");
+        message.append("<td><i>Status :");
+        message.append("</i></td>");
+        message.append("<td><b>");
+        message.append(status1);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("<tr>");
+        message.append("<td><i>Note :");
+        message.append("</i></td>");
+        if(note != null && !note.isEmpty()) {
+            message.append("<td><b>");
+            message.append(note);
+            message.append("</b></td>");
+            message.append("</tr>");
+        }
+        if(admin_message != null && !admin_message.isEmpty()) {
+            message.append("<tr>");
+            message.append("<td><i>Message de l'admin :");
+            message.append("</i></td>");
+            message.append("<td><b>");
+            message.append(admin_message);
+            message.append("</b></td>");
+            message.append("</tr>");
+        }
+        message.append("<tr>");
+        message.append("<td><i>Thésaurus :");
+        message.append("</i></td>");
+        message.append("<td><b>");
+        message.append(title_thesaurus);
+        message.append("</b></td>");
+        message.append("</tr>");
+        message.append("</tbody>");
+        message.append("</table>");
+        message.append("<br>");
+        
+        return message.toString();
+        
+        // ancien formatage 
+        /*
         String ret="<table><legend>information sur le candidat</legend>";
         ret+="<tr><td>id_thesaurus</td><td>"+id_thesaurus+" </td><td> titre thésaurus </td><td>"+title_thesaurus+"</td></tr>";
         ret+="<tr><td>id_concept</td><td>"+Id_concept+" </td><td>valeur lexical du concept</td><td>"+valeur_lexical+"</td></tr>";
@@ -86,9 +177,9 @@ public class LineCdt {
         ret+=stat;
         ret+="<tr><td colspan='2'>Note</td> <td clospan='2' >"+note+"</td></tr>";
         ret+="<tr><td colspan='2'>Note</td> <td clospan='2' >"+admin_message+"</td></tr>";
-        ret+="</table>";        
+        ret+="</table>";    
         return ret;
-        
+        */    
     }
     
     

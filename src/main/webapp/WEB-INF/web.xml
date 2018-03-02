@@ -7,7 +7,7 @@
     </context-param>
     <context-param>
         <param-name>version</param-name>
-        <param-value>4.3.6</param-value>
+        <param-value>4.3.7</param-value>
     </context-param>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>

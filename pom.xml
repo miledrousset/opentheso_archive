@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.3.6</version>
+    <version>4.3.7</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -152,12 +152,14 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>3.6.0</version>
+            <version>3.3.0</version>
+            <type>jar</type>
         </dependency>
         <dependency>
                 <groupId>org.apache.jena</groupId>
                  <artifactId>jena-arq</artifactId>
-              <version>3.6.0</version>
+              <version>3.3.0</version>
+            <type>jar</type>
         </dependency>
                                 
         <dependency>

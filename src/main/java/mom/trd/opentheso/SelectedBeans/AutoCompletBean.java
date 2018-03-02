@@ -21,7 +21,9 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
+import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
+import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import org.primefaces.event.SelectEvent;
 
@@ -56,6 +58,7 @@ public class AutoCompletBean implements Serializable {
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
 
+    private boolean createValid = false;
 
     /**
      * permet de retourner la liste des concepts possibles 
@@ -194,6 +197,14 @@ public class AutoCompletBean implements Serializable {
         if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
         } else {
+            if(terme.getIdC().equalsIgnoreCase(selectedAtt.getIdConcept())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorRTNT")));
+                return;                 
+            }
+            if(!isAddRelationRTValid(terme.getIdC(),selectedAtt.getIdConcept())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorRTNT")));
+                return;    
+            }
             Term laValeur = terme.getTerme(selectedAtt.getIdConcept());
             if (laValeur == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
@@ -297,9 +308,159 @@ public class AutoCompletBean implements Serializable {
     }    
 
     /**
-     * Ajoute un terme spécifique
+     * Permet de créer un nouveau concept en vérifiant sa validité
      */
     public void newTSpe() {
+        createValid = false;
+        terme.setValueEdit(terme.getSelectedTermComp().getTermLexicalValue());
+        if (terme.getValueEdit().trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }
+
+        String valueEdit = terme.getValueEdit().trim();
+
+        // vérification si c'est le même nom, on fait rien
+        if (valueEdit.equalsIgnoreCase(terme.getNom())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
+            return;
+        }
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if ((idTerm = terme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = terme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            terme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return;
+        }
+
+        if (!terme.creerTermeSpe(((MyTreeNode) tree.getSelectedNode()))) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        } else {
+            tree.reInit();
+            tree.reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
+        }
+        terme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }
+    
+    /**
+     * Permet d'ajouter une relation terme spécifique NT pour un concept
+     * #MR
+     */
+    public void newRelationNT() {
+        createValid = false;
+        if ((terme.getSelectedTermComp() == null ) || 
+                (terme.getSelectedTermComp().getIdConcept() == null) ||
+                (terme.getSelectedTermComp().getIdConcept().isEmpty())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }        
+        
+        // vérification si la relation est cohérente (NT et RT à la fois ?)  
+        if(!isAddRelationNTValid(terme.getIdC(), terme.getSelectedTermComp().getIdConcept())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorNTRT")));
+            return;        
+        } 
+        
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if (!relationsHelper.addRelationNT(connect.getPoolConnexion(), 
+                terme.getIdC(),
+                terme.getIdTheso(),
+                terme.getSelectedTermComp().getIdConcept(),
+                terme.getUser().getUser().getId())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        }
+        
+        tree.reInit();
+        tree.reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :",
+                terme.getSelectedTermComp().getIdConcept() + " " + langueBean.getMsg("tree.info1")));
+        terme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }
+    
+    private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true) 
+            return false;
+        else
+            return true;
+    }
+    
+    private boolean isAddRelationRTValid(String idConcept1, String idConcept2) {
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true) 
+            return false;
+        else
+            return true;
+    }    
+    
+
+    public void newSpecialTSpe() {
+        createValid = false;
+        terme.setValueEdit(terme.getSelectedTermComp().getTermLexicalValue());
+        if (terme.getValueEdit().trim().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
+            return;
+        }
+
+        String valueEdit = terme.getValueEdit().trim();
+
+        // vérification si c'est le même nom, on fait rien
+        if (valueEdit.equalsIgnoreCase(terme.getNom())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
+            return;
+        }
+        String idTerm;
+        String idConceptLocal;
+        // vérification si le term à ajouter existe déjà 
+        if ((idTerm = terme.isTermExist(valueEdit)) != null) {
+            idConceptLocal = terme.getIdConceptOf(idTerm);
+            // on vérifie si c'est autorisé de créer une relation ici
+            terme.isCreateAuthorizedForTS(idConceptLocal);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+            return;
+        }
+
+        String BTtag = null;
+
+        switch (tree.getNTtag()) {
+            case "NTG":
+                BTtag = "BTG";
+                break;
+            case "NTP":
+                BTtag = "BTP";
+                break;
+            case "NTI":
+                BTtag = "BTI";
+                break;
+        }
+
+        if (!terme.creerSpecialTermeSpe(((MyTreeNode) tree.getSelectedNode()), BTtag, tree.getNTtag())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        } else {
+            tree.reInit();
+            tree.reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
+        }
+        terme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+    }    
+    
+    /**
+     * déprécié par #MR
+     * Ajoute un terme spécifique
+     */
+/*    public void newTSpe() {
         if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
             return;
@@ -317,7 +478,7 @@ public class AutoCompletBean implements Serializable {
         }
         selectedAtt = new NodeAutoCompletion();
 
-    }
+    }*/
 
     /**
      * Ajoute une facette
@@ -970,6 +1131,14 @@ public class AutoCompletBean implements Serializable {
 
     public void setRTtag(String RTtag) {
         this.RTtag = RTtag;
+    }
+
+    public boolean isCreateValid() {
+        return createValid;
+    }
+
+    public void setCreateValid(boolean createValid) {
+        this.createValid = createValid;
     }
 
 }

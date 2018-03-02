@@ -25,7 +25,7 @@
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
                                     </p:column>
 
-                                    <p:column>
+                                    <p:column style="width:60%">
                                         <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.termLexicalValue}" style="color: green; font-style: italic" />
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.termLexicalValue}" />
                                     </p:column>
@@ -39,7 +39,7 @@
                         <tr>
                             <td colspan="2" style="text-align: center;">
                                 <h:form>
-                                    <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{newtreeBean.newRelationNT()}" 
+                                    <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newRelationNT()}" 
                                                      update=":idAddRelationNTDlg,:accordeonTree,:panContenu" styleClass="styleButton"
                                                      oncomplete="PF('addRelationNTDlg').hide();">
                                     </p:commandButton>  
