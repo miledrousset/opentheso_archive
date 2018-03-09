@@ -100,15 +100,19 @@
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
-            <version>7.0</version>
+            <version>8.0</version>
             <scope>provided</scope>
         </dependency>
         
+        <!-- attention, la version 2.3 pose problème avec les dialogues -->
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.faces</artifactId>
-            <version>2.2.14</version>
+            <version>2.2.16</version>
         </dependency>  
+        
+        
+        
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
@@ -145,7 +149,7 @@
         <dependency>
             <groupId>org.glassfish.metro</groupId>
             <artifactId>webservices-rt</artifactId>
-            <version>2.3.1</version>
+            <version>2.4.0</version>
         </dependency>
         
        
@@ -257,7 +261,7 @@
         <dependency>  
             <groupId>org.primefaces</groupId>  
             <artifactId>primefaces</artifactId>  
-            <version>6.1</version>  
+            <version>6.2</version>  
         </dependency>
         
        <!-- Attention, il faut aussi tester la version 2.5.1 qui ne passe pas sur le serveur Debian avec java 1.7.0_85 -->
@@ -279,7 +283,7 @@
         <dependency>
             <groupId>org.glassfish.jersey.bundles</groupId>
             <artifactId>jaxrs-ri</artifactId>
-            <version>2.24.1</version>
+            <version>2.26</version>
         </dependency>
         
         

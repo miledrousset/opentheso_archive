@@ -55,7 +55,6 @@ public class CurrentUser implements Serializable {
     private List<String> selectedThesaurus;
 
     private boolean isHaveWriteToCurrentThesaurus = false;
-    private boolean isHaveWriteToCurrentThesaurus2 = false;
 
     private String versionOfOpentheso;
 
@@ -479,13 +478,6 @@ public class CurrentUser implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info6")));
     }
 
-//    public boolean isHaveWriteToCurrentThesaurus() {
-//        return authorizedTheso.contains(idTheso);
-//    }
-    public boolean isIsHaveWriteToCurrentThesaurus() {
-        return authorizedTheso.contains(idTheso);
-    }
-
     public boolean haveRights(int min) {
         if (user.getIdRole() < 1) {
             return false;
@@ -645,15 +637,15 @@ public class CurrentUser implements Serializable {
         this.selectedThesaurus = selectedThesaurus;
     }
 
-    public boolean isIsHaveWriteToCurrentThesaurus2() {
+    public boolean isIsHaveWriteToCurrentThesaurus() {
         if (idTheso == null) {
             return false;
         }
         return authorizedTheso.contains(idTheso);
     }
 
-    public void setIsHaveWriteToCurrentThesaurus2(boolean isHaveWriteToCurrentThesaurus2) {
-        this.isHaveWriteToCurrentThesaurus2 = isHaveWriteToCurrentThesaurus2;
+    public void setIsHaveWriteToCurrentThesaurus(boolean isHaveWriteToCurrentThesaurus) {
+        this.isHaveWriteToCurrentThesaurus = isHaveWriteToCurrentThesaurus;
     }
 
     public boolean isIsActive() {

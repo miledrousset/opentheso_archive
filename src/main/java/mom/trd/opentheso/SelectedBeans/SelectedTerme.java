@@ -388,43 +388,47 @@ public class SelectedTerme implements Serializable {
     private void majNoticeZ3950() {
         //ResourceBundle bundlePref = getBundlePref();
         if (user.getNodePreference().isZ3950actif()) {
-            Properties p = new Properties();
-            p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-            p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
-            p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-            p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
-            Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
-            federated_search_proxy.init(p);
             try {
-                IRQuery e = new IRQuery();
-                //   e.collections = new Vector<String>();
-                e.collections.add(user.getNodePreference().getCollectionAdresse());
-                e.hints.put("default_element_set_name", "f");
-                e.hints.put("small_set_setname", "f");
-                e.hints.put("record_syntax", "unimarc");
-                e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idC)).append("\"").toString());
-                SearchTask st = federated_search_proxy.createTask(e, null);
-                st.evaluate(5000);
-                nbNotices = st.getTaskResultSet().getFragmentCount();
-                st.destroyTask();
-                federated_search_proxy.destroy();
-                for (NodeFusion nf : getFusions()) {
-                    if (nf.getIdConcept1().equals(idC)) {
-                        String idTe = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), nf.getIdConcept2(), idTheso);
-                        nbNotices += getNotice(idTe);
+                Properties p = new Properties();
+                p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
+                p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
+                p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
+                p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
+                Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
+                federated_search_proxy.init(p);
+                try {
+                    IRQuery e = new IRQuery();
+                    //   e.collections = new Vector<String>();
+                    e.collections.add(user.getNodePreference().getCollectionAdresse());
+                    e.hints.put("default_element_set_name", "f");
+                    e.hints.put("small_set_setname", "f");
+                    e.hints.put("record_syntax", "unimarc");
+                    e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idC)).append("\"").toString());
+                    SearchTask st = federated_search_proxy.createTask(e, null);
+                    st.evaluate(5000);
+                    nbNotices = st.getTaskResultSet().getFragmentCount();
+                    st.destroyTask();
+                    federated_search_proxy.destroy();
+                    for (NodeFusion nf : getFusions()) {
+                        if (nf.getIdConcept1().equals(idC)) {
+                            String idTe = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), nf.getIdConcept2(), idTheso);
+                            nbNotices += getNotice(idTe);
+                        }
                     }
-                }
 
-            } catch (TimeoutExceededException | SearchException srch_e) {
-                srch_e.printStackTrace();
+                } catch (TimeoutExceededException | SearchException srch_e) {
+                 //   srch_e.printStackTrace();
+                }
+                urlNotice = user.getNodePreference().getNoticeUrl();
+                try {
+                    //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
+                    urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
+                } catch (UnsupportedEncodingException ex) {
+            //        Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (Exception e) {
             }
-            urlNotice = user.getNodePreference().getNoticeUrl();
-            try {
-                //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
-                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
         }
 
     }    

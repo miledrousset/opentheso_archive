@@ -109,7 +109,7 @@
                 <p:tree  id="tree" styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
                           selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar"
                           
-                        rendered="#{user1.user.name != null and (user1.isHaveWriteToCurrentThesaurus2)}"
+                        rendered="#{user1.user.name != null and (user1.isHaveWriteToCurrentThesaurus)}"
                         >
                     <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
 

@@ -1870,7 +1870,7 @@ public class NewTreeBean implements Serializable {
             NodeAutoCompletion nac=new NodeAutoCompletion();
             nac.setTermLexicalValue(nt);
            this.selectedTerme.setSelectedTermComp(nac);
-           this.newTSpe();
+       //    newTSpe();
         }
     }
     

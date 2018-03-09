@@ -90,9 +90,9 @@ public class LineCdt {
         message.append("<table style=\"width: 715px; height: 321px;\" border=\"0\">");
         message.append("<tbody>"); 
         message.append("<tr>");
-        message.append("<td style=\"width: 152.3px;\"><i> Candidat :");
+        message.append("<td><i> Candidat :");
         message.append("</i></td>");
-        message.append("<td style=\"width: 546.7px;\"><b>");
+        message.append("<td><b>");
         message.append(valeur_lexical);
         message.append("</b></td>");
         message.append("</tr>");
@@ -106,7 +106,7 @@ public class LineCdt {
         message.append("<tr>");
         message.append("<td><i>créé le :");
         message.append("</i></td>");
-        message.append("<td style=\"height: 18.2px;\"><b>");
+        message.append("<td><b>");
         message.append(created);
         message.append("</b></td>");
         message.append("</tr>");
@@ -151,8 +151,8 @@ public class LineCdt {
         message.append("</tr>");
         message.append("</tbody>");
         message.append("</table>");
+        message.append("<hr color=\"blue\"> ");
         message.append("<br>");
-        
         return message.toString();
         
         // ancien formatage 

@@ -790,7 +790,7 @@ input[type="button"], input[type="submit"]{
 
 /*Division arbre thésaurus (haut gauche)*/
 #divArbreTheso {
-    height: 523px;
+    height: 515px;
     overflow-y: scroll;
     overflow-x: scroll;
     resize: horizontal;
