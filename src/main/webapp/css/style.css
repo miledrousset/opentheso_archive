@@ -769,8 +769,7 @@ input[type="button"], input[type="submit"]{
 }
 #accordeonTree{
     padding: 0;
-    height: 100%;
-  
+    
    
    
 }
@@ -793,7 +792,7 @@ input[type="button"], input[type="submit"]{
     height: 523px;
     overflow-y: scroll;
     overflow-x: scroll;
-    resize: horizontal;
+    resize: both;
     
 }
 
@@ -832,7 +831,9 @@ input[type="button"], input[type="submit"]{
     padding-top: 10px;
     padding-left: 15px;
     padding-right: 15px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    overflow-x: scroll;
+    resize: vertical;
 }
 
 /*Divisions des termes/concepts*/

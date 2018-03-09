@@ -1594,6 +1594,17 @@ end
 $$language plpgsql;
 
 
+
+
+-----update de la table concept-group
+-----ajout d'une colonne pour  numérotation
+create or replace function update_table_concept_group() returns void as $$
+begin
+    IF NOT EXISTS(SELECT *  FROM information_schema.columns where table_name='concept_group' AND column_name='numerotation') THEN
+        execute 'ALTER TABLE public.concept_group ADD COLUMN numerotation integer';
+    END IF;
+end
+$$language plpgsql;
 ----------------------------------------------------------------------------
 -- mises à jour 
 --

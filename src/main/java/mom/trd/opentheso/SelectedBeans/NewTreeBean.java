@@ -9,9 +9,6 @@ import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,7 +23,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.datas.Concept;
-import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
@@ -39,7 +35,6 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
@@ -124,6 +119,14 @@ public class NewTreeBean implements Serializable {
     /***atttribut pour l'ajout multiple de NT ****/
     private byte[] multipleNT;
     
+    /**************************************************************************/
+    /************attribut pour la numérotation des groupes et des sous groupes
+     * 
+     */
+    
+    int nouveauSuffixe;
+    String ancienPrefixe;
+    
     /**
      *
      * @param idTheso
@@ -203,14 +206,14 @@ public class NewTreeBean implements Serializable {
         //      idThesoSelected = idTheso;
         //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
-
+        int count=1;//attribut pour la numérotation des groupes
         if (connect.getPoolConnexion() == null) {
             System.err.println("Opentheso n'a pas pu se connecter à la base de données");
             return;
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
-
+        ArrayList<MyTreeNode> listeNode=new ArrayList<>();
         // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
 
@@ -225,19 +228,51 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getConceptGroup().getIdgroup(), root);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-                new DefaultTreeNode("facette", dynamicTreeNode);
+               
+                 new DefaultTreeNode("facette", dynamicTreeNode);
             } else {
                 TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdthesaurus(),
                         nodegroup.getIdLang(), nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdtypecode(),
                         null,
-                        type, nodegroup.getLexicalValue(), root);
+                        type, nodegroup.getLexicalValue(), null);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
+                /****code pour la numérotation des groupes ******************/
+                GroupHelper groupHelper= new GroupHelper();
+                 String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(),nodegroup.getConceptGroup().getIdgroup());
+                    
+                    if(suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")){
+                     
+                       suffix=""+count;
+                       count++;
+                       groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup(),suffix);
+                    }
+                ((MyTreeNode)dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
+                ((MyTreeNode)dynamicTreeNode).setData(((MyTreeNode)dynamicTreeNode).getNumerotation()+" "+dynamicTreeNode.getData());
+                /*****fin de code pour la numérotation des groupes **********/
                 new DefaultTreeNode("facette", dynamicTreeNode);
+                listeNode.add((MyTreeNode)dynamicTreeNode);
+                
             }
-
+            
+          
+            
         }
+        /***ici on trie la liste des groupes d après le champ data***/
+             Collections.sort(listeNode,new TreeNodeComparator());
+             /*et on l'ajoute au root **/
+            for(MyTreeNode mtn :listeNode){
+                 MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
+                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
+                        mtn.getType(),mtn.getData(),root);
+                tmp.setPrefix(mtn.getPrefix());
+                tmp.setSuffix(mtn.getSuffix());
+              
+                tmp.setIsGroup(true);
+                new DefaultTreeNode(null, tmp);
+            }
+            /***fin ***/
         if (idTheso != null) {
             loadOrphan(idTheso, langue);
         }
@@ -359,25 +394,64 @@ public class NewTreeBean implements Serializable {
             /**
              * Ajout des sous_Groupes (MT, C, G, T ..)
              */
+            int count=0;//attribut pour la numérotation des sous groupes
+            ArrayList<MyTreeNode> listeTreeNode=new ArrayList<>();//attribut pour le trie
+            /*la partie de code suivant peut comporter des éléments inutiles**/
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
                 treeNode2 = null;
                 value = nodeConceptTreeGroup.getTitle();
                 if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
-
+                    
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
 
                     treeNode2 = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) treeNode).getIdTheso(),
                             ((MyTreeNode) treeNode).getLangue(), nodeConceptTreeGroup.getIdConcept(),
                             ((MyTreeNode) treeNode).getTypeDomaine(),
-                            idTC, icon, value, treeNode);
+                            idTC, icon, value, null);
                     ((MyTreeNode) treeNode2).setIsSubGroup(true);
+                    listeTreeNode.add(treeNode2);
+                   
                     ((MyTreeNode) treeNode2).setIdParent(myTreeNode.getIdConcept());
+                     /***code poour la numérotation des sous groupes ****/
+                    ((MyTreeNode)treeNode2).setPrefix(myTreeNode.getNumerotation());
+                    String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
+                    count+=5;
+                    //a priori par défaut un getInt renvoit 0 si champ vide (cf groupHelper.getSuffixFromNode)
+                    if(suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")){
+                     
+                       if(10<=count){suffix=""+count;}else {suffix="0"+count;}
+                       
+                       groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept(),suffix);
+                    }
+                    if(suffix.length()<2)suffix="0"+suffix;
+                    ((MyTreeNode)treeNode2).setSuffix(suffix);
+                    ((MyTreeNode)treeNode2).setData(((MyTreeNode)treeNode2).getNumerotation()+"  "+treeNode2.getData());
+                    /**fin code numérotation des sous groupes*****/
                     new DefaultTreeNode(null, treeNode2);
                 }
-
+            /**fin de la partie de code pouvant comporter des éléments inutiles*/
             }
-
+            /**afin de classer les sous groupes avec la numérotation on trie
+            *la liste de treeNode on est obligé de récréer un noeuds MyTreeNode pour
+            * chaque treenode de la liste, pour pouvoir l'accrocher à l'arbre
+            * 
+            *#jm
+             **/
+            
+            Collections.sort(listeTreeNode,new TreeNodeComparator());
+            for(MyTreeNode mtn : listeTreeNode){
+                MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
+                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
+                        mtn.getType(),mtn.getData(),treeNode);
+                tmp.setPrefix(mtn.getPrefix());
+                tmp.setSuffix(mtn.getSuffix());
+                tmp.setIdParent(myTreeNode.getIdConcept());
+                tmp.setIsSubGroup(true);
+                new DefaultTreeNode(null, tmp);
+                
+            }
+            /***fin du tri et des ajouts des sous groupes dans l'arbre ****/
             // Ajout dans l'arbre des concepts
             for (NodeConceptTree nodeConceptTree : listeConcept) {
                 isTopTerm = false;
@@ -2002,9 +2076,37 @@ public class NewTreeBean implements Serializable {
         FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
+     
+     
     
     /**fin fonction **/
-    public Connexion getConnect() {
+   
+     /**fonction pour changer la numérotation d'un souis groupe **************/
+     
+     public void changeNumerotation(){
+         GroupHelper gh= new GroupHelper();
+         gh.saveSuffixFromNode(this.connect.getPoolConnexion(), idThesoSelected, ((MyTreeNode)this.selectedNode).getIdConcept(), ""+this.nouveauSuffixe);
+          reInit();
+     this.initTree(idThesoSelected, ((MyTreeNode)this.selectedNode).getLangue());
+
+     // reExpand();
+         
+     }
+     
+     public void loadNumerotation(boolean group){
+         if(group){
+          this.ancienPrefixe=null;
+          this.nouveauSuffixe=Integer.parseInt(((MyTreeNode)this.selectedNode).getNumerotation());
+         }
+         else{
+         this.nouveauSuffixe=Integer.parseInt(((MyTreeNode)this.selectedNode).getSuffix());
+         this.ancienPrefixe=((MyTreeNode)this.selectedNode).getPrefix();
+         }
+     }
+     
+     /*********************************fin************************************/
+     
+     public Connexion getConnect() {
         return connect;
     }
 
@@ -2016,7 +2118,7 @@ public class NewTreeBean implements Serializable {
         return root;
     }
 
-    public void setRoot(TreeNode root) {
+    public void setRoot(MyTreeNode root) {
         this.root = root;
     }
 
@@ -2192,5 +2294,21 @@ public class NewTreeBean implements Serializable {
         this.groupLexicalValues = groupLexicalValues;
     }
 
+    public int getNouveauSuffixe() {
+        return nouveauSuffixe;
+    }
+
+    public void setNouveauSuffixe(int nouveauSuffixe) {
+        this.nouveauSuffixe = nouveauSuffixe;
+    }
+
+    public String getAncienPrefixe() {
+        return ancienPrefixe;
+    }
+
+    public void setAncienPrefixe(String ancienPrefixe) {
+        this.ancienPrefixe = ancienPrefixe;
+    }
+    
   
 }
