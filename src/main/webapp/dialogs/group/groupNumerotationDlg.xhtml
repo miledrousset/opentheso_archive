@@ -1,0 +1,39 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idGroupNumerotationDlg"  header="#{langueBean.getMsg('numerotation.header')}" widgetVar="groupNumerotationDlg" modal="true" resizable="false" >
+        <!-- Ajout d'un domaine/ group -->
+        <h:form >
+            <p:messages showDetail="true" autoUpdate="true" />
+            <table>
+                <tr>
+                    <td colspan="3"><p:outputLabel  value="#{langueBean.getMsg('numeroation.newSuffix')}" /></td> 
+                </tr>   
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:outputLabel rendered="#{newtreeBean.isSubGroup()}" for="numerotation" value="#{newtreeBean.ancienPrefixe}." /> 
+                    
+                        <p:inputNumber minValue="01" maxValue="500" id="numerotation" value="#{newtreeBean.nouveauSuffixe}" />
+                     
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('numerotation.change')}" actionListener="#{newtreeBean.changeNumerotation()}" 
+                                         update=":accordeonTree,:idGroupNumerotationDlg" styleClass="styleButton"
+                                         oncomplete="PF('groupAddDlg').hide();"/>
+
+                    </td>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idGroupNumerotationDlg" oncomplete="PF('groupAddDlg').hide();"  immediate="true"/>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+

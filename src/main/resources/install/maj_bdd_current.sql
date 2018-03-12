@@ -1086,7 +1086,7 @@ $$ LANGUAGE plpgsql;
 
 
 --
---Permet de change l'ancian constraint pour autre nouvelle
+--Permet de changer l'ancienne constrainte par une nouvelle
 --
 create or replace function changeconstraintalignement() returns void as $$
 begin
@@ -1107,9 +1107,17 @@ begin
 	'
             alter table alignement
             drop constraint alignement_internal_id_concept_internal_id_thesaurus_id_alignem;
+        ';
+        end if;
+        if exists (SELECT * from information_schema.table_constraints where table_name = 'alignement' and constraint_type = 'UNIQUE'
+	and constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key') then 
+	execute
+	'
+            alter table alignement
+            drop constraint alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key;
         alter table alignement 
-            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key unique 
-            (internal_id_concept, internal_id_thesaurus, id_alignement_source, alignement_id_type)
+            add constraint  alignement_internal_id_concept_internal_id_thesaurus_id_alignement_source_key2 unique 
+            (internal_id_concept, internal_id_thesaurus, id_alignement_source, alignement_id_type, uri_target)
         ';
         end if;
   end;
@@ -1594,6 +1602,17 @@ end
 $$language plpgsql;
 
 
+
+
+-----update de la table concept-group
+-----ajout d'une colonne pour  numérotation
+create or replace function update_table_concept_group() returns void as $$
+begin
+    IF NOT EXISTS(SELECT *  FROM information_schema.columns where table_name='concept_group' AND column_name='numerotation') THEN
+        execute 'ALTER TABLE public.concept_group ADD COLUMN numerotation integer';
+    END IF;
+end
+$$language plpgsql;
 ----------------------------------------------------------------------------
 -- mises à jour 
 --
@@ -1605,6 +1624,7 @@ $$language plpgsql;
 
 -- création ou mise à jour des séquences
 SELECT create_table_preferences_sparql();
+
 SELECT create_table_routine_mail();
 SELECT alter_table_thesaurus_private();
 SELECT create_table_copyright();
@@ -1639,6 +1659,7 @@ SELECT create_table_users_historique();
 SELECT add_primary_keyalignement_source();
 SELECT alignement_preferences();
 SELECT gps_preferences();
+
 
 
 SELECT primary_key_info();
@@ -1698,7 +1719,7 @@ ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('role_id_seq'::regcla
 SELECT create_table_concept_group_concept();
 SELECT update_table_concept();
 SELECT relation_group();
-
+SELECT update_table_concept_group();
 
 --
 -- création et mise à jour des tables
@@ -1782,6 +1803,7 @@ $BODY$
 --
 --Delete toutes les function
 --
+select delete_fonction ('update_table_concept_group','');
 select delete_fonction ('create_table_preferences_sparql','');
 SELECT delete_fonction ('create_table_routine_mail','');
 SELECT delete_fonction ('alter_table_thesaurus_private','');

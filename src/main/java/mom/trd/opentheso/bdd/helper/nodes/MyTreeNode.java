@@ -15,7 +15,9 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     private String idCurrentGroup;
     private String typeDomaine;
     private String idTopConcept;
-    private String idParent;//#jm inutile ...?
+    private String idParent;//déjà dans la super classe
+    private String prefix;//pour la numérotation
+    private String suffix;//pour la numérotation
     private boolean isGroup =false;
     private boolean isSubGroup = false;
     private boolean isTopConcept = false;
@@ -133,6 +135,35 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
     public void setIdParent(String idParent) {
         this.idParent = idParent;
     }
-    
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public String getNumerotation(){
+        if(this.isGroup){
+            return this.prefix;
+        }
+        else if(!(this.suffix==null || this.suffix.isEmpty())){
+            return this.prefix+"."+this.suffix;
+        }
+        return "";
+    }
+
+    public void setSuperParent(TreeNode treeNode) {
+        super.setParent(treeNode);
+    }
     
 }

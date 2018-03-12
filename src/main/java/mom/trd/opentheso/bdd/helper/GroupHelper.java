@@ -2509,5 +2509,63 @@ public class GroupHelper {
        
     }
 
+    public String getSuffixFromNode(HikariDataSource poolConnexion, String idThesaurus, String idGroup) {
+        PreparedStatement stmt;
+        Connection conn;
+        ResultSet rs;
+        String ret="";
+        try{
+            conn=poolConnexion.getConnection();
+            try{
+                String sql="SELECT numerotation FROM concept_group WHERE idthesaurus=? and idgroup=? ";
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1,idThesaurus);
+                stmt.setString(2,idGroup);
+                try{
+                    rs=stmt.executeQuery();
+                    rs.next();
+                    int tmp=rs.getInt("numerotation");
+                    ret=""+tmp; 
+                }
+                finally{
+                    stmt.close();
+                }
+            }finally{
+                conn.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("error while getting stuff from "+idGroup+" theso "+idThesaurus, e);
+        }
+        return ret;
+    }
 
+    public void saveSuffixFromNode(HikariDataSource poolConnexion, String idThesaurus, String idConcept, String suffix) {
+       Connection conn;
+       PreparedStatement stmt;
+       try{
+           conn=poolConnexion.getConnection();
+           try{
+               String sql="UPDATE concept_group SET numerotation=? WHERE idthesaurus=? AND idgroup=? ";
+               stmt=conn.prepareStatement(sql);
+               stmt.setInt(1,Integer.parseInt(suffix));
+               stmt.setString(2,idThesaurus);
+               stmt.setString(3,idConcept);
+               try{
+                   stmt.execute();
+               }
+               finally{
+                stmt.close();       
+                }
+           }
+           finally{
+               conn.close();
+           }
+           
+       }catch(SQLException e){
+           log.error("error while updating table concept group for thsaurus "+idThesaurus+" idconcept "+idConcept, e);
+       }
+    }
+
+   
 }

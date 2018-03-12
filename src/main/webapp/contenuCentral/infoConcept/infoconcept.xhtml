@@ -13,7 +13,7 @@
                 <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
-
+                          
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" action="#{newtreeBean.init()}" value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
                         
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
@@ -34,7 +34,8 @@
                         <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" style="font-size: 12px;" update=":idModifTypeGroupDlg"/>
-                        
+                        <p:menuitem rendered="#{newtreeBean.isSubGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" value="#{langueBean.getMsg('numerotation.header')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"  update=":idGroupNumerotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" value="#{langueBean.getMsg('numerotation.header2')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"  update=":idGroupNumerotationDlg, :accordeonTree" />
                         
                         <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
                             <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
@@ -91,7 +92,9 @@
 
                 </h:panelGroup>
                 <h:outputText id="idC" value="id : "/>
-                <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/><br/>
+                <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/>
+                <h:outputText  rendered="#{selectedTerme.selectedNode.isSubGroup or selectedTerme.selectedNode.isGroup}" value="      Numéro : " />
+                <h:outputText styleClass="textInfo" value=" #{selectedTerme.selectedNode.numerotation}" /> <br/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="ark: "/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" value ="#{selectedTerme.idArk}&lt;br/&gt;" escape="false" styleClass="textInfo"/>
                 
