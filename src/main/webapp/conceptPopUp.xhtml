@@ -25,7 +25,9 @@
                     <fieldset>
                         <legend><h:outputText value="#{langueBean.getMsg('popup.delOrphan')}" /></legend>
                         <h:form>
-                            <p:messages showDetail="true" autoUpdate="true" />
+                            <p:messages showDetail="true">
+                                   <p:autoUpdate />
+                            </p:messages>
                             <table>
                                     <tr>
                                         

@@ -8,7 +8,12 @@
         <!-- Cas de la modification du nom du terme -->
         <h:panelGroup id="confirm" >
             <h:form >
-                <p:messages showDetail="true" autoUpdate="true" />
+                <h:panelGroup id="confirm3" rendered="#{autoComp.editPassed}">
+                    <p:remoteCommand onstart="PF('conceptEditDlg').hide();"/>
+                </h:panelGroup> 
+                <p:messages rendered="#{!autoComp.editPassed}" showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
 
 
                 <p:panelGrid columns="1"  styleClass="ui-noborder"  rendered="#{!newtreeBean.editPassed}">
@@ -33,7 +38,7 @@
                 
                 <h:panelGroup id="confirm2" rendered="#{newtreeBean.duplicate}">
                     <p:panelGrid columns="1" styleClass="ui-noborder"> 
-                        <h:outputText value="Ce nom existe déjà, Voulez-vous continuer ?" />
+                        <h:outputText value="#{langueBean.getMsg('autoComp.dupplicate')}" />
                     </p:panelGrid>
                     <p:panelGrid columns="2" styleClass="ui-noborder"> 
                         <p:commandButton id="cbEditForced" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{newtreeBean.renameWithoutControl()}" 
@@ -42,7 +47,7 @@
                         <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>                        
                     </p:panelGrid> 
                 </h:panelGroup>
-                
+ 
                 
             </h:form>
         </h:panelGroup>

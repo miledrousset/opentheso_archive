@@ -519,7 +519,7 @@ public class TermHelper {
                 return false;
             }
             // cette fonction permet de remplir la table Permutée de NonPreferredTerm
-
+/*
             String idConcept = new ConceptHelper().getIdConceptOfTerm(ds, term.getId_term(), term.getId_thesaurus());
             String idGroup = new ConceptHelper().getGroupIdOfConcept(ds, idConcept, term.getId_thesaurus());
             splitConceptForNonPermuted(ds,
@@ -528,6 +528,7 @@ public class TermHelper {
                     term.getId_thesaurus(),
                     term.getLang(),
                     term.getLexical_value());
+            */
 
             conn.commit();
             conn.close();

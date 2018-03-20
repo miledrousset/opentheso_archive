@@ -1,0 +1,20 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAjouterTraductionGroupDlg"  header="#{langueBean.getMsg('edit.addTrad')}" widgetVar="ajouterTraductionGroupDlg" modal="true" resizable="false" >
+        <!-- Ajouter une Traduction -->
+        <h:form >
+                    
+                    <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : <h:inputText id="nomTermeTrad" value="#{selectedTerme.valueEdit}" /><br/><br/>
+                    <h:selectOneMenu value="#{selectedTerme.langueEdit}" styleClass="listes">
+                        <f:selectItems value="#{theso.languesTheso}"/>
+                    </h:selectOneMenu><br/><br/>
+                    <p:commandButton id="cbAjTradTradTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerTradterme()}" 
+                                     update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('ajouterTraductionGroupDlg').hide();"/>
+                </h:form>
+    </p:dialog>
+</ui:composition>

@@ -25,6 +25,8 @@ import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import org.primefaces.PrimeFaces;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
 @ManagedBean(name = "autoComp", eager = true)
@@ -59,6 +61,12 @@ public class AutoCompletBean implements Serializable {
     private LanguageBean langueBean;
 
     private boolean createValid = false;
+    
+    // pour permettre de forcer l'insertion des concepts en doublon (pour des besoins spécifiques
+    private boolean duplicate = false;
+    private boolean forced = false;
+    private boolean editPassed = false;    
+    
 
     /**
      * permet de retourner la liste des concepts possibles 
@@ -79,6 +87,11 @@ public class AutoCompletBean implements Serializable {
         return liste;
     }
     
+    public void init() {
+        duplicate = false;
+        forced = false;
+        editPassed = false;
+    }    
     
     public List<NodeAutoCompletion> completTerm(String value) {
         selectedAtt = new NodeAutoCompletion();
@@ -325,14 +338,11 @@ public class AutoCompletBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
             return;
         }
-        String idTerm;
-        String idConceptLocal;
+
         // vérification si le term à ajouter existe déjà 
-        if ((idTerm = terme.isTermExist(valueEdit)) != null) {
-            idConceptLocal = terme.getIdConceptOf(idTerm);
-            // on vérifie si c'est autorisé de créer une relation ici
-            terme.isCreateAuthorizedForTS(idConceptLocal);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+        if (terme.isTermExist(valueEdit) != null) {
+            duplicate = true;
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
             return;
         }
 
@@ -346,7 +356,30 @@ public class AutoCompletBean implements Serializable {
         }
         terme.setSelectedTermComp(new NodeAutoCompletion());
         createValid = true;
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("idNtEditDlg");
+        }
+//        RequestContext.getCurrentInstance().update("idNtEditDlg");
     }
+    
+    /**
+     * permet de créer un concept en doublon, après avoir eu la validation de l'utilisateur
+     */
+    public void newTSDupplicated() {
+        if (!terme.creerTermeSpe(((MyTreeNode) tree.getSelectedNode()))) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        } else {
+            tree.reInit();
+            tree.reExpand();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", terme.getSelectedTermComp().getTermLexicalValue() + " " + langueBean.getMsg("tree.info1")));
+        }
+        terme.setSelectedTermComp(new NodeAutoCompletion());
+        createValid = true;
+        duplicate = false;
+    }
+            
     
     /**
      * Permet d'ajouter une relation terme spécifique NT pour un concept
@@ -419,13 +452,9 @@ public class AutoCompletBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
             return;
         }
-        String idTerm;
-        String idConceptLocal;
+
         // vérification si le term à ajouter existe déjà 
-        if ((idTerm = terme.isTermExist(valueEdit)) != null) {
-            idConceptLocal = terme.getIdConceptOf(idTerm);
-            // on vérifie si c'est autorisé de créer une relation ici
-            terme.isCreateAuthorizedForTS(idConceptLocal);
+        if ((terme.isTermExist(valueEdit)) != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
             return;
         }
@@ -1139,6 +1168,30 @@ public class AutoCompletBean implements Serializable {
 
     public void setCreateValid(boolean createValid) {
         this.createValid = createValid;
+    }
+
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
+    }
+
+    public boolean isForced() {
+        return forced;
+    }
+
+    public void setForced(boolean forced) {
+        this.forced = forced;
+    }
+
+    public boolean isEditPassed() {
+        return editPassed;
+    }
+
+    public void setEditPassed(boolean editPassed) {
+        this.editPassed = editPassed;
     }
 
 }

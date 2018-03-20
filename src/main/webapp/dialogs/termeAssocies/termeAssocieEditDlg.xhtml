@@ -7,14 +7,16 @@
 
     <!-- Gestion de la note -->
     <p:dialog id="idTermeAssocieEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeAssocieEditDlg" modal="true" resizable="false">
-                        <fieldset>
-                            <h:form>
-                                <p:messages showDetail="true" autoUpdate="true" /><br/>
-                                <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
-                                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
-                                                itemLabel="#{t3.termLexicalValue}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
-                                    <f:facet name="itemtip">
-                                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+        <fieldset>
+            <h:form>
+                <p:messages showDetail="true">
+                    <p:autoUpdate />
+                </p:messages>  <br/>
+                <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
+                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
+                                itemLabel="#{t3.termLexicalValue}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
+                    <f:facet name="itemtip">
+                        <h:panelGrid columns="2" cellpadding="5" width="200" >
                             <f:facet name="header" rendered="#{(t3.url) != null}">
                                 <h:outputText value="ID : " />
                                 <h:outputText value="#{t3.idConcept}" />
@@ -34,4 +36,4 @@
             </h:form>
         </fieldset>
     </p:dialog>
-    </ui:composition>
+</ui:composition>

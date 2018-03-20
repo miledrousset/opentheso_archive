@@ -8,7 +8,9 @@
     <p:dialog id="idAddRelationNTDlg"  header="#{langueBean.getMsg('panel.addRelationNT')}" widgetVar="addRelationNTDlg" modal="true" resizable="false" >
         <!-- Ajout d'une relation NT sous le concept en cours -->
         <h:form >
-        <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('panel.addRelationNT')}" /></legend>
                 <h:form>

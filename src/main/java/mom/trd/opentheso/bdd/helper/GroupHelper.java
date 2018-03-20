@@ -982,69 +982,35 @@ public class GroupHelper {
 
     /**
      * Permet de retourner la liste des sous_groupes d'un Group (type G/C/MT/T)
-     *
+     * si le group n'est pas traduit, on récupère l'ID à la place 
+     * 
      * @param ds
      * @param idConceptGroup
      * @param idThesaurus
      * @param idLang
      * @return
+     * #MR
      */
     public ArrayList<NodeConceptTree> getRelationGroupOf(HikariDataSource ds,
             String idConceptGroup, String idThesaurus, String idLang) {
-        ArrayList<NodeConceptTree> nodeConceptTrees = null;
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        /*
-        Select * from concept_group_label where lang = 'fr' and idgroup = ( select id_group2 
-						from relation_group 
-						where relation ='sub' and id_group1='COL001' and id_thesaurus='8PWENn6esK'
-						)
-         */
+        ArrayList<NodeConceptTree> nodeConceptTrees;
+        ArrayList<String> lisIdGroups = getListGroupChildIdOfGroup(ds, idConceptGroup, idThesaurus);
+        if(lisIdGroups == null) return null;
+        if(lisIdGroups.isEmpty()) return null;
 
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "SELECT * FROM concept_group_label WHERE "
-                            + "lang = '" + idLang + "' and "
-                            + "idthesaurus = '" + idThesaurus + "' and "
-                            + "idgroup IN ("
-                            + "SELECT id_group2 FROM relation_group WHERE "
-                            + "relation = 'sub' and "
-                            + "id_group1 = '" + idConceptGroup + "' and "
-                            + "id_thesaurus = '" + idThesaurus + "' "
-                            + ")";
-
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    nodeConceptTrees = new ArrayList<>();
-                    while (resultSet.next()) {
-                        NodeConceptTree nodeConceptTree = new NodeConceptTree();
-                        nodeConceptTree.setIdConcept(resultSet.getString("idgroup"));
-                        nodeConceptTree.setIdLang(idLang);
-                        nodeConceptTree.setIdThesaurus(idThesaurus);
-                        nodeConceptTree.setTitle(resultSet.getString("lexicalvalue"));
-                        nodeConceptTree.setStatusConcept("");
-                        nodeConceptTree.setHaveChildren(true);
-                        nodeConceptTree.setIsGroup(false);
-                        nodeConceptTree.setIsSubGroup(true);
-                        nodeConceptTrees.add(nodeConceptTree);
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while  getChildrenOf: " + idThesaurus, sqle);
+        nodeConceptTrees = new ArrayList<>();
+        for (String idGroup : lisIdGroups) {
+            NodeConceptTree nodeConceptTree = new NodeConceptTree();
+            nodeConceptTree.setIdConcept(idGroup);
+            nodeConceptTree.setIdLang(idLang);
+            nodeConceptTree.setIdThesaurus(idThesaurus);
+            nodeConceptTree.setTitle(getLexicalValueOfGroup(ds, idGroup, idThesaurus, idLang));
+            nodeConceptTree.setStatusConcept("");
+            nodeConceptTree.setHaveChildren(true);
+            nodeConceptTree.setIsGroup(false);
+            nodeConceptTree.setIsSubGroup(true);
+            nodeConceptTrees.add(nodeConceptTree);
         }
-
         return nodeConceptTrees;
     }
 
@@ -1284,18 +1250,19 @@ public class GroupHelper {
     }
 
     /**
-     * Cette fonction permet de supprimer un Terme avec toutes les dépendances
-     * (Prefered term dans toutes les langues) et (nonPreferedTerm dans toutes
-     * les langues)
+     * Cette fonction permet de supprimer une traduciton à un groupe
      *
      * @param ds
-     * @param idTerm
+     * @param idGroup
      * @param idThesaurus
-     * @param idUser
+     * @param idLang
      * @return
+     * #MR
      */
-    public boolean deleteGroup(HikariDataSource ds,
-            String idTerm, String idThesaurus, int idUser) {
+    
+    public boolean deleteGroupTraduction(HikariDataSource ds,
+            String idGroup, String idThesaurus,
+            String idLang) {
 
         Connection conn;
         Statement stmt;
@@ -1306,24 +1273,12 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "delete from term where"
-                            + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_term  = '" + idTerm + "'";
-                    stmt.executeUpdate(query);
-
-                    // Suppression de la relation Term_Concept
-                    query = "delete from preferred_term where"
-                            + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_term  = '" + idTerm + "'";
-                    stmt.executeUpdate(query);
-
-                    // suppression des termes synonymes
-                    query = "delete from non_preferred_term where"
-                            + " id_thesaurus = '" + idThesaurus + "'"
-                            + " and id_term  = '" + idTerm + "'";
+                    String query = "delete from concept_group_label where"
+                            + " idthesaurus = '" + idThesaurus + "'"
+                            + " and idgroup = '" + idGroup + "'"
+                            + " and lang = '" + idLang + "'";
                     stmt.executeUpdate(query);
                     status = true;
-
                 } finally {
                     stmt.close();
                 }
@@ -1332,7 +1287,7 @@ public class GroupHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while deleting Term and relations : " + idTerm, sqle);
+            log.error("Error while deleting traduction of Group : " + idGroup, sqle);
         }
         return status;
     }

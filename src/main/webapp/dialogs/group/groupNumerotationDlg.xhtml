@@ -8,7 +8,9 @@
     <p:dialog id="idGroupNumerotationDlg"  header="#{langueBean.getMsg('numerotation.header')}" widgetVar="groupNumerotationDlg" modal="true" resizable="false" >
         <!-- Ajout d'un domaine/ group -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td colspan="3"><p:outputLabel  value="#{langueBean.getMsg('numeroation.newSuffix')}" /></td> 

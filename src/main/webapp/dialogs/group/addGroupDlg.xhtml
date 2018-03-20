@@ -8,7 +8,9 @@
     <p:dialog id="idGroupAddDlg"  header="#{langueBean.getMsg('group.add')}" widgetVar="groupAddDlg" modal="true" resizable="false" >
         <!-- Ajout d'un domaine/ group -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>

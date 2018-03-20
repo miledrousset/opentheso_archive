@@ -41,6 +41,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
+import org.primefaces.PrimeFaces;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
@@ -240,8 +241,10 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getLexicalValue(), null);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
+              
+                
                 /****code pour la numérotation des groupes ******************/
-                GroupHelper groupHelper= new GroupHelper();
+              /*  GroupHelper groupHelper= new GroupHelper();
                  String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(),nodegroup.getConceptGroup().getIdgroup());
                     
                     if(suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")){
@@ -253,6 +256,9 @@ public class NewTreeBean implements Serializable {
                 ((MyTreeNode)dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
                 ((MyTreeNode)dynamicTreeNode).setData(((MyTreeNode)dynamicTreeNode).getNumerotation()+" "+dynamicTreeNode.getData());
                 /*****fin de code pour la numérotation des groupes **********/
+              
+              
+              
                 new DefaultTreeNode("facette", dynamicTreeNode);
                 listeNode.add((MyTreeNode)dynamicTreeNode);
                 
@@ -262,9 +268,11 @@ public class NewTreeBean implements Serializable {
             
         }
         /***ici on trie la liste des groupes d après le champ data***/
-             Collections.sort(listeNode,new TreeNodeComparator());
+        //     Collections.sort(listeNode,new TreeNodeComparator());
              /*et on l'ajoute au root **/
-            for(MyTreeNode mtn :listeNode){
+   
+             
+             for(MyTreeNode mtn :listeNode){
                  MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
                 mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
                         mtn.getType(),mtn.getData(),root);
@@ -415,8 +423,9 @@ public class NewTreeBean implements Serializable {
                     listeTreeNode.add(treeNode2);
                    
                     ((MyTreeNode) treeNode2).setIdParent(myTreeNode.getIdConcept());
-                     /***code poour la numérotation des sous groupes ****/
-                    ((MyTreeNode)treeNode2).setPrefix(myTreeNode.getNumerotation());
+                  
+                    /***code poour la numérotation des sous groupes ****/
+            /*        ((MyTreeNode)treeNode2).setPrefix(myTreeNode.getNumerotation());
                     String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
                     count+=5;
                     //a priori par défaut un getInt renvoit 0 si champ vide (cf groupHelper.getSuffixFromNode)
@@ -430,6 +439,8 @@ public class NewTreeBean implements Serializable {
                     ((MyTreeNode)treeNode2).setSuffix(suffix);
                     ((MyTreeNode)treeNode2).setData(((MyTreeNode)treeNode2).getNumerotation()+"  "+treeNode2.getData());
                     /**fin code numérotation des sous groupes*****/
+           
+            
                     new DefaultTreeNode(null, treeNode2);
                 }
             /**fin de la partie de code pouvant comporter des éléments inutiles*/
@@ -441,7 +452,7 @@ public class NewTreeBean implements Serializable {
             *#jm
              **/
             
-            Collections.sort(listeTreeNode,new TreeNodeComparator());
+      //      Collections.sort(listeTreeNode,new TreeNodeComparator());
             for(MyTreeNode mtn : listeTreeNode){
                 MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
                 mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
@@ -551,7 +562,12 @@ public class NewTreeBean implements Serializable {
         vue.setOnglet(0);
         selectedTerme.setTree(0);
         // this.parentOrigine=(MyTreeNode)selectedNode.getParent();
-        RequestContext.getCurrentInstance().update("principale");
+//        RequestContext.getCurrentInstance().update("principale");
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("principale");
+        }
+        
     }
 
     /**
@@ -1125,7 +1141,7 @@ public class NewTreeBean implements Serializable {
          */
         // si c'est la même valeur, on fait rien
         if (selectedTerme.getNom().trim().equals(selectedTerme.getNomEdit())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("edit.same")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
             return;
         }
@@ -1822,6 +1838,9 @@ public class NewTreeBean implements Serializable {
 
     public boolean renderValid() {
         if (draggedNode != null && droppedNode != null) {
+            if(droppedNode.getType().equalsIgnoreCase("orphan")) return false;
+            if(draggedNode.getType().equalsIgnoreCase("orphan")) return false;
+            if(draggedNode.getIdCurrentGroup().equalsIgnoreCase("orphan")) return false;
             return draggedNode.isIsGroup() == false && ((draggedNode.isIsSubGroup() && droppedNode.isIsGroup()) || (draggedNode.isIsSubGroup() && droppedNode.isIsSubGroup()) || draggedNode.isIsSubGroup() == false);
         } else {
             return false;

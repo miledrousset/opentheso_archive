@@ -5,7 +5,9 @@
  */
 package mom.trd.opentheso.timeJob;
 
+import java.util.ArrayList;
 import java.util.Date;
+import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 
 /**
  *
@@ -21,7 +23,7 @@ public class LineCdt {
     private String status;
     private String admin_message;
     private String note;
-    
+    private ArrayList<NodeProposition> nodeProposition;
     
     
     public LineCdt() {
@@ -63,6 +65,16 @@ public class LineCdt {
     public void setNote(String note) {
         this.note = note;
     }
+
+    public ArrayList<NodeProposition> getNodeProposition() {
+        return nodeProposition;
+    }
+
+    public void setNodeProposition(ArrayList<NodeProposition> nodeProposition) {
+        this.nodeProposition = nodeProposition;
+    }
+
+
     
     
     public String getMessage(){
@@ -125,14 +137,37 @@ public class LineCdt {
         message.append("</b></td>");
         message.append("</tr>");
         message.append("<tr>");
-        message.append("<td><i>Note :");
-        message.append("</i></td>");
+        message.append("<td><i>proposé par :");
+        message.append("</i>");
+        
+        // données concernant les propositions faites par les utilisateurs
+        for (NodeProposition nodeProposition1 : nodeProposition) {
+            message.append("<tr>");
+            message.append("<td><b>");
+            message.append(nodeProposition1.getUser());
+            message.append("</b></td>");
+            message.append("</tr>");
+            
+            message.append("<tr>");
+            message.append("<td><b>");
+            message.append(nodeProposition1.getNote());
+            message.append("</b></td>");
+            message.append("</tr>");
+            
+            message.append("<tr>");
+            message.append("<td><b>");
+            message.append(nodeProposition1.getLabelConceptParent());
+            message.append("</b></td>");
+            message.append("</tr>");             
+        }
+        message.append("</td>");
+       /* 
         if(note != null && !note.isEmpty()) {
             message.append("<td><b>");
             message.append(note);
             message.append("</b></td>");
             message.append("</tr>");
-        }
+        }*/
         if(admin_message != null && !admin_message.isEmpty()) {
             message.append("<tr>");
             message.append("<td><i>Message de l'admin :");

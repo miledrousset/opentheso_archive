@@ -11,7 +11,9 @@
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
                 <h:form>
-                    <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                     <table>
                         <tr>
                             <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>

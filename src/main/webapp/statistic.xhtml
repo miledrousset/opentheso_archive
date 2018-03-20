@@ -19,7 +19,9 @@
                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
-        <p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" /> 
+        <p:growl id="growl" showDetail="true" sticky="true">
+            <p:autoUpdate />
+	</p:growl>
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Statistiques</h1>
             Les statistiques offrent la possibilité d'obtenir certaines informations concernant le thésaurus sélectionné.<br/><br/>

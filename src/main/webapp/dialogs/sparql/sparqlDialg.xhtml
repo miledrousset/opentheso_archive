@@ -10,7 +10,11 @@
     <h:form id="formSparqlPreferences" >
             <table>
             
-                <tr> <td colspan="2" style="text-align: center;"> <p:messages showDetail="true" autoUpdate="true" />     </td> </tr>   
+                <tr> <td colspan="2" style="text-align: center;">
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
+                    </td> </tr>   
             
                 <tr><td><h:outputLabel value="#{langueBean.getMsg('sparqlDlg.adresse')}" /></td>
                     <td><h:inputText value="#{preferencesAlertBean.adresse_serveur}"  /></td>

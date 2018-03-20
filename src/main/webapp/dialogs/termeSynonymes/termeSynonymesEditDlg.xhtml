@@ -7,10 +7,15 @@
 
     <!-- Creation de terme synonymes -->
     <p:dialog id="idTermeSynonymesEditDlg"  header="#{langueBean.getMsg('popup.addUSE')}" widgetVar="termeSynonymesEditDlg" modal="true" resizable="false">
-    
-        <fieldset>       
+        <h:panelGroup id="confirmAddUSE"> 
             <h:form>
-                <p:messages showDetail="true" autoUpdate="true" />
+   
+
+                <h:panelGroup id="confirm1" rendered="#{!selectedTerme.duplicate}"> 
+                <fieldset>    
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                 <table>
                     <tr>
                         <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
@@ -30,9 +35,24 @@
                 </table>
                 <br/>
                 <p:commandButton id="cbAjTSynoTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerTermeSyno()}"
-                                 update=":panContenu" styleClass="styleButton" oncomplete="PF('termeSynonymesEditDlg').hide();"/>
+                                 update=":confirmAddUSE,:panContenu" styleClass="styleButton"/>
+                 <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idTermeSynonymesEditDlg" oncomplete="PF('termeSynonymesEditDlg').hide();"  immediate="true"/>
+                </fieldset> 
+                </h:panelGroup>
+                <h:panelGroup id="confirm2" rendered="#{selectedTerme.duplicate}">
+                    <p:panelGrid columns="1" styleClass="ui-noborder"> 
+                        <h:outputText value="#{langueBean.getMsg('autoComp.dupplicate')}" />
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" styleClass="ui-noborder"> 
+                        <p:commandButton id="cbEditForced" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.creerTermeSyno()}" 
+                                         update=":idTermeSynonymesEditDlg,:accordeonTree,:panContenu" styleClass="styleButton" oncomplete="PF('termeSynonymesEditDlg').hide();" >
+                        </p:commandButton>
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" action="#{selectedTerme.init()}" update=":idTermeSynonymesEditDlg" oncomplete="PF('termeSynonymesEditDlg').show();"  immediate="true"/>                        
+                    </p:panelGrid> 
+                </h:panelGroup>
+                
             </h:form>
-        </fieldset>   
-    
+ 
+        </h:panelGroup>
     </p:dialog>
 </ui:composition>

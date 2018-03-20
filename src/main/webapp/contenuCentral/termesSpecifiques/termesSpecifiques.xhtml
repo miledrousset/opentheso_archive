@@ -15,7 +15,7 @@
                                     and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                      <p:commandButton id="trierTS" styleClass="cbEdit" icon="ui-icon-edit-16"/>                                                        
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="trierTS" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" action="#{autoComp.init()}" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('panel.addRelationNT')}" update=":idAddRelationNTDlg" oncomplete="PF('addRelationNTDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="Terme spécifique spécial" update=":idNtEditDlg" oncomplete="PF('specialntEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('nt.multiple')}" update=":idNtEditDlg" oncomplete="PF('ntListImportDlg').show();" style="font-size:12px;" />

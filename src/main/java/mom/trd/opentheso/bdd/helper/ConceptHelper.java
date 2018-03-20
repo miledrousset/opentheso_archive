@@ -969,6 +969,12 @@ public class ConceptHelper {
                 conn.close();
                 return false;
             }
+            
+            if (!deleteConceptFusion(conn, idThesaurus, idConcept)) {
+                conn.rollback();
+                conn.close();
+                return false;
+            }            
             if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de supprimer le code ARK
@@ -3797,6 +3803,50 @@ public class ConceptHelper {
         }
         return listIdOfTopConcept;
     }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Ids of Topconcepts
+     * d'un thésaurus
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return
+     * #MR
+     */
+    public ArrayList<String> getAllTopTermOfThesaurus(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> listIdOfTopConcept = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where id_thesaurus = '"
+                            + idThesaurus + "'"
+                            + " and top_concept = true";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listIdOfTopConcept.add(resultSet.getString("id_concept"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All Ids of TopConcept : " + idThesaurus, sqle);
+        }
+        return listIdOfTopConcept;
+    }    
 
     /**
      * Cette fonction permet de récupérer la liste des Ids of Topconcepts pour
@@ -5499,6 +5549,40 @@ public class ConceptHelper {
             stmt.close();
         }
     }
+    
+    /**
+     * permet de supprimer un concept dans la table concept_fusion
+     *
+     * @param conn
+     * @param idTheso
+     * @param idConcept
+     * @return
+     */
+    public boolean deleteConceptFusion(Connection conn, String idTheso, String idConcept) {
+        boolean status = false;
+        try {
+            Statement stmt;
+            stmt = conn.createStatement();
+
+            try {
+                String query = "delete from concept_fusion"
+                        + " WHERE id_concept1 = '" + idConcept + "'"
+                        + " AND id_thesaurus = '" + idTheso + "'";
+                query += ";";
+                query += "delete from concept_fusion"
+                        + " WHERE id_concept2 = '" + idConcept + "'"
+                        + " AND id_thesaurus = '" + idTheso + "'";
+                stmt.execute(query);
+                status = true;
+                
+            } finally {
+                stmt.close();
+            }
+        }   catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;        
+    }    
 
     /**
      * Change l'id d'un concept dans la table preferred_term

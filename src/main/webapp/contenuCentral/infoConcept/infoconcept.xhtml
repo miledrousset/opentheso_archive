@@ -18,7 +18,7 @@
                         
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
                         
-                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup() and !newtreeBean.isHaveChildren()}"
+                        <p:menuitem rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and !newtreeBean.isHaveChildren()}"
                                     value="#{langueBean.getMsg('edit.delete')}" update=":idConceptDeleteDlg" oncomplete="PF('conceptDeleteDlg').show();" style="font-size: 12px;"/>                        
                         
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>

@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idEditTraductionDlg"  header="#{langueBean.getMsg('btnEdit')}" widgetVar="editTraductionDlg" modal="true" resizable="false" >
+    <p:dialog id="idEditTraductionGroupDlg"  header="#{langueBean.getMsg('btnEdit')}" widgetVar="editTraductionGroupDlg" modal="true" resizable="false" >
         <!-- 2eme panel popups de modification de Traduction -->
         <h:form >
                     <p:messages showDetail="true">
@@ -27,12 +27,12 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: center;">
-                        <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.modifierTraduction()}" 
+                        <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.modifyGroupTraduction()}" 
                                          update=":lang, :idConceptEditDlg,:accordeonTree,:panContenu" styleClass="styleButton"
-                                         oncomplete="PF('conceptEditDlg').hide(); PF('editTraductionDlg').hide(); "  />
+                                         oncomplete="PF('conceptEditDlg').hide(); PF('editTraductionGroupDlg').hide(); "  />
                     </td>
                     <td colspan="3" style="text-align: center;">
-                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idConceptEditDlg" oncomplete="PF('editTraductionDlg').hide();"  immediate="true"/>
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idConceptEditDlg" oncomplete="PF('editTraductionGroupDlg').hide();"  immediate="true"/>
                     </td>
                 </tr>
             </table>

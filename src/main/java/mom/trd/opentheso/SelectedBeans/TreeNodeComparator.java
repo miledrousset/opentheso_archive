@@ -17,7 +17,11 @@ public class TreeNodeComparator implements Comparator<TreeNode> {
 
     @Override
     public int compare(TreeNode o1, TreeNode o2) {
-
+        if(o1 == null || o2 == null) return -1;
+        if(o1.getData().toString().split(" ")[0].isEmpty()) return 0; 
+        if(o2.getData().toString().split(" ")[0].isEmpty()) return 0;
+        
+        
         String[] tab=o1.getData().toString().split(" ")[0].split("\\.");
         String[] tab2=o2.getData().toString().split(" ")[0].split("\\.");
         int elem1=Integer.parseInt(tab[tab.length-1]);

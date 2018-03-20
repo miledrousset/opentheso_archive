@@ -20,7 +20,9 @@ public class NodeProposition {
     private Date created;
     private Date modified;
     private String idConceptParent;
+    private String labelConceptParent;
     private String idGroup;
+    private String labelGroup;
     
                
     public NodeProposition() {
@@ -80,6 +82,22 @@ public class NodeProposition {
 
     public void setModified(Date modified) {
         this.modified = modified;
+    }
+
+    public String getLabelConceptParent() {
+        return labelConceptParent;
+    }
+
+    public void setLabelConceptParent(String labelConceptParent) {
+        this.labelConceptParent = labelConceptParent;
+    }
+
+    public String getLabelGroup() {
+        return labelGroup;
+    }
+
+    public void setLabelGroup(String labelGroup) {
+        this.labelGroup = labelGroup;
     }
   
 }

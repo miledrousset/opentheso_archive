@@ -8,7 +8,9 @@
     <p:dialog id="idspecialntEditDlg"  header="#{langueBean.getMsg('index.NT')}" widgetVar="specialntEditDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du nom du terme -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('popup.addNewTerm')} #{newtreeBean.selectedTerme.nom}" /></legend>
                 <h:form>

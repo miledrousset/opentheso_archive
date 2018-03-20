@@ -26,7 +26,9 @@
                     <fieldset>
                         <legend><h:outputText value="#{langueBean.getMsg('group.add')}" /></legend>
                         <h:form>
-                            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                             <table>
                                 <tr>
                                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
@@ -48,7 +50,9 @@
                     <fieldset>
                         <legend><h:outputText value="#{langueBean.getMsg('group.delete')}" /></legend>
                         <h:form>
-                            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                             <table>
                                 <tr>
                                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>

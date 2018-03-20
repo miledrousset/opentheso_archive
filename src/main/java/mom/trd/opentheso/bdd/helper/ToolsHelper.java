@@ -146,6 +146,45 @@ public class ToolsHelper {
             Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }    
+    
+    /**
+     * Permet de supprimer les BT à un concept qui est Top terme, 
+     * c'est incohérent et ca provoque une boucle à l'infini
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean removeBTofTopTerm(HikariDataSource ds,
+            String idThesaurus) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        ArrayList<String> idBTs;
+
+        // récupération de tous les Id TT du thésaurus
+        ArrayList<String> tabIdTT = conceptHelper.getAllTopTermOfThesaurus(ds, idThesaurus);
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            for (String idConcept : tabIdTT) {
+                idBTs = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
+                for (String idBT : idBTs) {
+                    if(!idBT.isEmpty()) {
+                        if(!relationsHelper.deleteRelationBT(conn, idConcept, idThesaurus, idBT, 1)){
+                            conn.rollback();
+                            conn.close();
+                            return false;
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
     
     public String getNewId(int length) {

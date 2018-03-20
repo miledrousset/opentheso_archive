@@ -216,7 +216,7 @@ public class BackgroundTimeJob  {
         }
         
      
-        this.sjSparql=new ScheduleJob(count, initialD, period, TimeUnit.MINUTES, job);
+        this.sjSparql=new ScheduleJob(count, initialD, period, TimeUnit.DAYS, job);
         this.sjSparql.sendPeriodicMultipleJob();
     }
 

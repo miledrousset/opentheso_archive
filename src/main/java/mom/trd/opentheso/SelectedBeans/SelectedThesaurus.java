@@ -446,12 +446,23 @@ public class SelectedThesaurus implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing")));
 
             regenerateOrphan();
+            
+            // permet de supprimer les BT pour un TopTerm, c'est incohérent
+            removeBTofTopTerm();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
+    
+    private void removeBTofTopTerm(){
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return;
+        }
+        new ToolsHelper().removeBTofTopTerm(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
+    }
+    
 
     private final int LENGHT_ID_ALPHANUMERIQUE = 10;
 
@@ -1630,9 +1641,12 @@ public class SelectedThesaurus implements Serializable {
 
     }
 
+    
     /**
-     * Création d'un domaine avec mise à jour dans l'arbre
-     */
+     * Permet de supprimer un groupe
+     * déprécé
+     * #MR
+     * /
     public void deleteDomaine() {
         GroupHelper groupHelper = new GroupHelper();
         int idUser = tree.getSelectedTerme().getUser().getUser().getId();
@@ -1653,7 +1667,7 @@ public class SelectedThesaurus implements Serializable {
         tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", temp + " " + langueBean.getMsg("theso.info1.2")));
     }
-
+*/
     /**
      * Vérifie si le thésaurus courant a des traductions
      *

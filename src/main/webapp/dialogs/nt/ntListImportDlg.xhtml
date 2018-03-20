@@ -8,7 +8,9 @@
     <p:dialog id="idNtListImportDlg"  header="#{langueBean.getMsg('index.NT')}" widgetVar="ntListImportDlg" modal="true" resizable="false" >
         <!-- Importation d'une liste de termes venant d'un fichier tabulé-->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('nt.multiple.legend')} #{newtreeBean.selectedTerme.nom}" /></legend>
                 <h:outputText value="#{langueBean.getMsg('nt.multiple.text')}"  />

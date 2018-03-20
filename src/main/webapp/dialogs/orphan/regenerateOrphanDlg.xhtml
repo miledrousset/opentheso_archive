@@ -6,12 +6,16 @@
     xmlns:p="http://primefaces.org/ui">
 
     <p:dialog id="idRegenerateOrphanDlg"  header="#{langueBean.getMsg('tools.regenerateOrphan')}" widgetVar="regenerateOrphanDlg" modal="true" resizable="false" >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
 
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('tools.regenerateOrphan')}" /></legend>
                 <h:form>
-                    <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                     <table>
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('theso.infoRegenerationOrphan')}" /> </td>

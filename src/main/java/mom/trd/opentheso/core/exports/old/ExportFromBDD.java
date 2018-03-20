@@ -418,7 +418,7 @@ public class ExportFromBDD {
     public StringBuffer exportConcept(HikariDataSource ds, String arkId) {
        
         WriteFileSKOS writeFileSKOS = new WriteFileSKOS();
-        
+        writeFileSKOS.setNodePreference(nodePreference);
         // inititialisation des URI
         writeFileSKOS.setServerArk(serverArk);
         writeFileSKOS.setServerAdress(serverAdress);
