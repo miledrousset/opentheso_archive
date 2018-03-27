@@ -80,6 +80,7 @@ import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -175,8 +176,12 @@ public class SelectedTerme implements Serializable {
 
     public String messageAlig = "";
 
-    // Variables resourcesBundle
 
+    // variables pour le termes en doublons
+    private boolean duplicate = false;
+    private boolean forced = false;
+    private boolean editPassed = false;
+    
     NodeGps coordonnees;
 
     private String totalConceptOfBranch;
@@ -226,6 +231,12 @@ public class SelectedTerme implements Serializable {
         root = (TreeNode) new DefaultTreeNode("Root", null);
     }
 
+    public void init() {
+        duplicate = false;
+        forced = false;
+        editPassed = false;
+    }    
+    
     /**
      * Récupération des préférences
      *
@@ -388,43 +399,47 @@ public class SelectedTerme implements Serializable {
     private void majNoticeZ3950() {
         //ResourceBundle bundlePref = getBundlePref();
         if (user.getNodePreference().isZ3950actif()) {
-            Properties p = new Properties();
-            p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-            p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
-            p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-            p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
-            Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
-            federated_search_proxy.init(p);
             try {
-                IRQuery e = new IRQuery();
-                //   e.collections = new Vector<String>();
-                e.collections.add(user.getNodePreference().getCollectionAdresse());
-                e.hints.put("default_element_set_name", "f");
-                e.hints.put("small_set_setname", "f");
-                e.hints.put("record_syntax", "unimarc");
-                e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idC)).append("\"").toString());
-                SearchTask st = federated_search_proxy.createTask(e, null);
-                st.evaluate(5000);
-                nbNotices = st.getTaskResultSet().getFragmentCount();
-                st.destroyTask();
-                federated_search_proxy.destroy();
-                for (NodeFusion nf : getFusions()) {
-                    if (nf.getIdConcept1().equals(idC)) {
-                        String idTe = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), nf.getIdConcept2(), idTheso);
-                        nbNotices += getNotice(idTe);
+                Properties p = new Properties();
+                p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
+                p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
+                p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
+                p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
+                Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
+                federated_search_proxy.init(p);
+                try {
+                    IRQuery e = new IRQuery();
+                    //   e.collections = new Vector<String>();
+                    e.collections.add(user.getNodePreference().getCollectionAdresse());
+                    e.hints.put("default_element_set_name", "f");
+                    e.hints.put("small_set_setname", "f");
+                    e.hints.put("record_syntax", "unimarc");
+                    e.query = new PrefixString((new StringBuilder("@attrset bib-1 @attr 1=Koha-Auth-Number \"")).append(AsciiUtils.convertNonAscii("" + idC)).append("\"").toString());
+                    SearchTask st = federated_search_proxy.createTask(e, null);
+                    st.evaluate(5000);
+                    nbNotices = st.getTaskResultSet().getFragmentCount();
+                    st.destroyTask();
+                    federated_search_proxy.destroy();
+                    for (NodeFusion nf : getFusions()) {
+                        if (nf.getIdConcept1().equals(idC)) {
+                            String idTe = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), nf.getIdConcept2(), idTheso);
+                            nbNotices += getNotice(idTe);
+                        }
                     }
-                }
 
-            } catch (TimeoutExceededException | SearchException srch_e) {
-                srch_e.printStackTrace();
+                } catch (TimeoutExceededException | SearchException srch_e) {
+                 //   srch_e.printStackTrace();
+                }
+                urlNotice = user.getNodePreference().getNoticeUrl();
+                try {
+                    //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
+                    urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
+                } catch (UnsupportedEncodingException ex) {
+            //        Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (Exception e) {
             }
-            urlNotice = user.getNodePreference().getNoticeUrl();
-            try {
-                //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
-                urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
-            } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
         }
 
     }    
@@ -866,11 +881,6 @@ public class SelectedTerme implements Serializable {
         return conceptHelper.getIdConceptOfTerm(connect.getPoolConnexion(), idTerm, idTheso);
     }
 
-    public boolean isCreateAuthorizedForTS(String idConceptNew) {
-        RelationsHelper relationsHelper = new RelationsHelper();
-
-        return false;
-    }
 
     /**
      * *************************************** CREATION
@@ -989,7 +999,7 @@ public class SelectedTerme implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
             return false;
         }
-        instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
+    //    instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
         concept.getUserName();
         ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
         termesSpecifique = new ArrayList<>();
@@ -1004,18 +1014,28 @@ public class SelectedTerme implements Serializable {
         return true;
     }
 
+    /**
+     * permet de créer des termes synonymes avec un type défini
+     */
     public void creerTermeSyno() {
+        editPassed = false;
         if (valueEdit == null || valueEdit.trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error1")));
-        } else if (idT != null && !idT.equals("")) {
-            if (new TermHelper().isTermExist(connect.getPoolConnexion(), valueEdit, idTheso, idlangue)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
-                return;
+            return;
+        }
+        if (idT != null && !idT.equals("")) {
+            if(!duplicate){ // on controle si a accepté un doublon ou non
+                if (new TermHelper().isTermExist(connect.getPoolConnexion(), valueEdit, idTheso, idlangue)) {
+                    //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
+                    duplicate = true;
+                    return;
+                }
+                if (new TermHelper().isAltLabelExist(connect.getPoolConnexion(), valueEdit, idTheso, idlangue)) {
+                    //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error7")));
+                    duplicate = true;
+                    return;
+                }
             }
-            if (new TermHelper().isAltLabelExist(connect.getPoolConnexion(), valueEdit, idTheso, idlangue)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error7")));
-                return;
-            }            
             String leNom = valueEdit;
             Term temp = new Term();
             temp.setId_term(idT);
@@ -1054,6 +1074,11 @@ public class SelectedTerme implements Serializable {
             valueEdit = "";
             nomEdit = "";
             vue.setAddTSyno(0);
+            init();
+            PrimeFaces pf = PrimeFaces.current();
+            if (pf.isAjaxRequest()) {
+                pf.ajax().update("idTermeSynonymesEditDlg");
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", leNom + " " + langueBean.getMsg("sTerme.info1")));
         } else {
             vue.setAddTSyno(0);
@@ -1566,18 +1591,21 @@ public class SelectedTerme implements Serializable {
     }
 
     public void creerAlign() {
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+                
         if (valueEdit == null || valueEdit2 == null || linkEdit == null || /*valueEdit.equals("") || valueEdit2.equals("") ||*/ linkEdit.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error5")));
         } else {
-            new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(),
+            alignmentHelper.addNewAlignment(connect.getPoolConnexion(),
                     user.getUser().getId(), valueEdit2.trim(), valueEdit.trim(),
                     linkEdit.trim(), Integer.parseInt(statutEdit), idC, idTheso, 0);
             valueEdit = "";
             valueEdit2 = "";
             linkEdit = "";
             statutEdit = "";
-            align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
+            align = alignmentHelper.getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
             vue.setAddAlign(0);
+            
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info9")));
         }
     }
@@ -1906,6 +1934,37 @@ public class SelectedTerme implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
         majLangueConcept();
     }
+    
+    /**
+     * Cette fontion permet de modifier la traduction d'un group
+     * 
+     * #MR
+     */
+    public void modifyGroupTraduction() {
+        if(!editGroupName(idTheso, idDomaine, langEnTraduction, valueOfTraductionToModify)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
+        majLangueGroup();
+    }
+    
+    /**
+     * Cette fontion permet de supprimer la traduction d'un group
+     * 
+     * #MR
+     * @param lang
+     */
+    public void deletGroupTraduction(String lang) {
+        GroupHelper groupHelper = new GroupHelper();
+        if(!groupHelper.deleteGroupTraduction(connect.getPoolConnexion(),
+                idDomaine, idTheso, lang)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return;
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
+        majLangueGroup();
+    }       
 
     /**
      * Cette fonction permet de supprimer une note suivant son type
@@ -3415,6 +3474,30 @@ public class SelectedTerme implements Serializable {
 
     public void setIdHandle(String idHandle) {
         this.idHandle = idHandle;
+    }
+
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
+    }
+
+    public boolean isForced() {
+        return forced;
+    }
+
+    public void setForced(boolean forced) {
+        this.forced = forced;
+    }
+
+    public boolean isEditPassed() {
+        return editPassed;
+    }
+
+    public void setEditPassed(boolean editPassed) {
+        this.editPassed = editPassed;
     }
     
 

@@ -1946,7 +1946,52 @@ public class RelationsHelper {
             log.error("Error while asking if relation RT exist of Concept1 : " + idConcept1 + " for concept2 : " + idConcept2, sqle);
         }
         return existe;
-    }    
+    }
+    
+    /**
+     * Cette fonction permet de savoir si le Concept1 a une relation NT avec le concept2 
+     * permet d'éviter l'ajout des relations NT et RT en même temps (c'est interdit par la norme)
+     * 
+     * @param ds
+     * @param idConcept1
+     * @param idConcept2
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public boolean isConceptHaveRelationNTorBT(HikariDataSource ds,
+            String idConcept1, String idConcept2, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept1 from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept1 + "'"
+                            + " and id_concept2 = '" + idConcept2 + "'"
+                            + " and (role LIKE 'NT%' or role LIKE 'BT%') ";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    existe = resultSet.next();
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if relation NT or BT exist of Concept1 : " + idConcept1 + " for concept2 : " + idConcept2, sqle);
+        }
+        return existe;
+    }        
 
     /**
      * Cette fonction permet de rÃ©cupÃ©rer les termes associÃ©s d'un concept

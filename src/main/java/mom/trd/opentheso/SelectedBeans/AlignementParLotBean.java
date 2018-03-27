@@ -7,7 +7,6 @@ package mom.trd.opentheso.SelectedBeans;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.faces.application.FacesMessage;

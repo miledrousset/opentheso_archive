@@ -143,7 +143,7 @@
                                                     style="font-size: 12px;"/>
 
 
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportcsvDlg" oncomplete="PF('exportcsvDlg').show();"
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportcsv')}" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}"  update=":idExportcsvDlg" oncomplete="PF('exportcsvDlg').show();"
                                                     style="font-size: 12px;"/>
 
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportcvs')}_Pro" actionListener="#{skosExportBean.init(entry.value, theso.thisTheso.language)}" update=":idExportTxtDlg" oncomplete="PF('exportTxtDlg').show();"
@@ -232,7 +232,9 @@
                                 </div>
                             </div>
                             <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
-                                <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                                 <table>
                                     <tr>
                                         <td>
@@ -576,7 +578,7 @@
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
 
 
-                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  update=":idImportDlg" oncomplete="PF('importDlg').show();" action="#{rdf4jFileBean.init()}"
+                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"   oncomplete="PF('importDlg').show();" action="#{rdf4jFileBean.init()}"
                                         style="font-size: 12px;"/> 
 
                             <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 

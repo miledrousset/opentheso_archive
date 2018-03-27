@@ -8,7 +8,9 @@
     <p:dialog id="idRenameGroupDlg"  header="#{langueBean.getMsg('edit.rename')}" widgetVar="renameGroupDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du nom du terme -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td colspan="2" style="text-align: center;"><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>

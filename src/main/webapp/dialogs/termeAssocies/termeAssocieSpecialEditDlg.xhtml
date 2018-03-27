@@ -9,7 +9,9 @@
     <p:dialog id="idTermeAssocieSpecialEditDlg"  header="#{langueBean.getMsg('index.RT')} special" widgetVar="termeAssocieSpecialEditDlg" modal="true" resizable="false">
         <fieldset>
             <h:form>
-                <p:messages showDetail="true" autoUpdate="true" /><br/>
+                <p:messages showDetail="true">
+                    <p:autoUpdate />
+                </p:messages>  <br/>
                 <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
                 <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
                                 itemLabel="#{t3.termLexicalValue}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
@@ -26,16 +28,16 @@
                             <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
                             <h:outputText value="#{t3.definition}" />
 
-                            
+
                         </h:panelGrid>
                     </f:facet>
                 </p:autoComplete>
                 <h:panelGrid columns="2" cellpadding="5" width="200" >
-                 <h:outputText value="Type : " />
-                <p:selectOneMenu  value="#{autoComp.RTtag}" >
-                                <f:selectItem itemLabel="has part (RHP)" itemValue="RHP" />
-                                <f:selectItem itemLabel="is part of (RPO)" itemValue="RPO" />
-                </p:selectOneMenu>
+                    <h:outputText value="Type : " />
+                    <p:selectOneMenu  value="#{autoComp.RTtag}" >
+                        <f:selectItem itemLabel="has part (RHP)" itemValue="RHP" />
+                        <f:selectItem itemLabel="is part of (RPO)" itemValue="RPO" />
+                    </p:selectOneMenu>
                 </h:panelGrid>
                 <br/><br/>
                 <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newSpecialTAsso()}" 

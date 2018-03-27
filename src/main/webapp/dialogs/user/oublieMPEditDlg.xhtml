@@ -8,7 +8,9 @@
     <p:dialog id="idOublieMPEditDlg"  header="#{langueBean.getMsg('mot.info')}" widgetVar="oublieMPEditDlg" modal="true" resizable="false" >
         <!-- Recuperation de Mot de Pass -->
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />  
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td>

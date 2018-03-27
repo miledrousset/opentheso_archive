@@ -8,12 +8,16 @@
     <p:dialog id="idConceptMoveBranchToGroupDlg"  header="#{langueBean.getMsg('index.btnMT')}" widgetVar="conceptMoveBranchToGroupDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du nom du terme -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <!-- Cas de déplacement d'une branche vers un domaine -->
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('popup.moveToMT')}" /></legend>
                 <h:form>
-                    <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                     <table>
                         <tr>
                             <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>

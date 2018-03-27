@@ -11,7 +11,9 @@
         <p:dialog id="idAddCandidateDlg"  header="#{langueBean.getMsg('cdt.btnAddCdt')}" styleClass="styleText2" widgetVar="addCandidateDlg" modal="true" resizable="false"  >
             <h:panelGroup id="panAjCdt" style="background: transparent; box-shadow: none;">
                 <h:form>
-                    <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                     <table>
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('cdt.tabOpt1')}" /> : </td>

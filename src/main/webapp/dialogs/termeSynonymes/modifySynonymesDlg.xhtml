@@ -9,18 +9,20 @@
 
         <!-- Modifier une Traduction -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+            <p:messages showDetail="true">
+                <p:autoUpdate />
+            </p:messages>  
             <table>
                 <tr>
-                <td colspan="2" style="text-align: center;">
-                    <h:outputText value="#{selectedTerme.oldValue}"  />
-                </td>
+                    <td colspan="2" style="text-align: center;">
+                        <h:outputText value="#{selectedTerme.oldValue}"  />
+                    </td>
                 </tr>
                 <tr>
                     <td><h:outputText value="#{langueBean.getMsg('popup.name')}" />  </td>
                     <td>
                         <p:inputText id="nomTerme" value="#{selectedTerme.valueOfSynonymesToModify}">
-                            </p:inputText>
+                        </p:inputText>
 
                     </td>
                 </tr>
@@ -36,6 +38,6 @@
                 </tr>
             </table>
         </h:form>
-        
+
     </p:dialog>
 </ui:composition>

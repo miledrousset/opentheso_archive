@@ -28,7 +28,9 @@
         
         
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />
+            <p:messages showDetail="true">
+                <p:autoUpdate />
+             </p:messages>                
 
             <p:dataTable value="#{baseDeDonnes.info}" var="u"  reflow="true" rows="3"
                          style="font-family:'Palatino linotype',Times,serif;">

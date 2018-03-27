@@ -8,7 +8,9 @@
     <p:dialog id="idEditUserDlg" header="#{langueBean.getMsg('conf.popup1Title')}" widgetVar="editUserDlg" modal="true" resizable="false" >
         <!-- POPUP EDIT USER DEBUT -->        
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <td>
                     <p:panelGrid columns="2" >

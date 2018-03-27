@@ -8,7 +8,9 @@
     <p:dialog id="idDefinitionEditDlg"  header="#{langueBean.getMsg('index.note1')}" widgetVar="definitionEditDlg" modal="true" resizable="false" >
     <!-- Gestion de la definition -->
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />    
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>     
             <h:inputTextarea value="#{selectedTerme.definition}" styleClass="areaNote" /><br/>
                 <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{selectedTerme.editDef()}"
                                  update=":panEditNote,:note, :idDefinitionEditDlg" styleClass="styleButton" oncomplete="PF('definitionEditDlg').hide();"/>

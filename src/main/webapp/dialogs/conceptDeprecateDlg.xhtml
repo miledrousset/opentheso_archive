@@ -8,7 +8,9 @@
     <p:dialog header="#{langueBean.getMsg('index.depreciateCpt')}" widgetVar="conceptDeprecateDlg" modal="true" resizable="false">
         <!-- Cas de la désactivation du concept Deprecated -->
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <h:outputText escape="false" value="#{langueBean.getMsg('popup.validFusion')}" /><br/><br/>
             <table>
                <tr>

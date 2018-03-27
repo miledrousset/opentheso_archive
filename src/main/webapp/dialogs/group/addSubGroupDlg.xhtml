@@ -12,7 +12,9 @@
         <!-- Ajout d'un domaine/ group -->
         <h:form >
             <h:panelGroup id="addSubGroupValidation" rendered="#{(newtreeBean.group) or (newtreeBean.subGroup)}">
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td><h:outputText value="#{langueBean.getMsg('add.subGroup')} : " /> <h:outputText value="#{newtreeBean.selectedTerme.nom}" /> </td>

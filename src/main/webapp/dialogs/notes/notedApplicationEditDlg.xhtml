@@ -8,7 +8,9 @@
     <p:dialog id="idNotedApplicationEditDlg"  header="#{langueBean.getMsg('index.note2')}" widgetVar="notedApplicationEditDlg" modal="true" resizable="false" >
         <!-- Gestion de la note d'application-->
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />    
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>     
             <h:inputTextarea value="#{selectedTerme.noteApplication}" styleClass="areaNote" /><br/>
                 <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" actionListener="#{selectedTerme.editNoteApp()}"
                              update=":panEditNote,:note, :idNotedApplicationEditDlg" styleClass="styleButton" oncomplete="PF('notedApplicationEditDlg').hide();"/>
@@ -18,7 +20,7 @@
                                  update=":panEditNote,:note" styleClass="styleButton" oncomplete="PF('notedApplicationEditDlg').hide();" > 
                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert" />  
                 </p:commandButton> 
-                </td>
+                </td> 
 
                 <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
                     <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  

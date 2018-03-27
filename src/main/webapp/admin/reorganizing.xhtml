@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
    
-    <p:dialog id="idReorganizing"  header="#{langueBean.getMsg('admin.regenerateArk')}" widgetVar="reorganizing" modal="true" resizable="false" >
+    <p:dialog id="idReorganizing"  header="#{langueBean.getMsg('conf.reorganizing')}" widgetVar="reorganizing" modal="true" resizable="false" >
 
         <h:panelGroup rendered="#{user1.haveRights(2)}">
             <fieldset class="fieldReorga">
@@ -17,7 +17,8 @@
                             <td><h:outputText value="#{langueBean.getMsg('conf.explication')}" />  </td>
                         </tr>
                     </table>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}"  styleClass="styleButton" />
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}" 
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
                 </h:form> 
             </fieldset>
         </h:panelGroup>

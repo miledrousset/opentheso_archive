@@ -8,7 +8,9 @@
     <p:dialog id="idCopyrightEditDlg"  header="#{langueBean.getMsg('copyright.addModiCop')} #{theso.thesaurus.title}" widgetVar="copyrightEditDlg" modal="true" resizable="false" >
         <!-- Cas de la modification du copyright -->
         <h:form >
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
             <table>
                 <tr>
                     <td  style="text-align: center;"><h:outputText id="valueTerme" escape="false" value="#{theso.thesaurus.title}" /></td>

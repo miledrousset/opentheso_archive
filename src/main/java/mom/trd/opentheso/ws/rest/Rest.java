@@ -1297,6 +1297,7 @@ public class Rest {
         }
 
         ExportFromBDD exportFromBDD = new ExportFromBDD();
+        exportFromBDD.setNodePreference(nodePreference);
         exportFromBDD.setServerArk(nodePreference.getServeurArk());
         exportFromBDD.setServerAdress(nodePreference.getCheminSite());
         StringBuffer skos = exportFromBDD.exportConcept(ds, arkId);

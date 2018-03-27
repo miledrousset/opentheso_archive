@@ -8,7 +8,9 @@
     <p:dialog id="idAddUserDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="addUserDlg" modal="true" resizable="false" >
            <!-- POPUP ADD USER DEBUT -->
         <h:form>
-            <p:messages showDetail="true" autoUpdate="true" />
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
                <table>
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>

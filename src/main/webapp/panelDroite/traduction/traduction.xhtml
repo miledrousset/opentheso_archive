@@ -15,11 +15,18 @@
                     <h:form id="formEditTrad" 
                             rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and ( ((user1.haveRights(2))) or (user1.haveRights(4))) ) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                         <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit-16" />
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
+                        <p:menu rendered="#{!newtreeBean.isGroup() or !newtreeBean.isSubGroup()}" style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('edit.addTrad')}" update=":idAjouterTraductionEditDlg" oncomplete="PF('ajouterTraductionEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" update=":idDeleteTraductionEditDlg" oncomplete="PF('deleteTraductionEditDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('index.modifyTrad')}" update=":idModifierTraductionEditDlg" oncomplete="PF('modifierTraductionEditDlg').show();" style="font-size: 12px;"/>
                         </p:menu>
+                        
+                        <p:menu rendered="#{newtreeBean.isGroup() or newtreeBean.isSubGroup()}"
+                                style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('edit.addTrad')}" update=":idAjouterTraductionGroupDlg" oncomplete="PF('ajouterTraductionGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.delTrad')}" update=":idDeleteTraductionGroupDlg" oncomplete="PF('deleteTraductionGroupDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('index.modifyTrad')}" update=":idModifierTraductionGroupDlg" oncomplete="PF('modifierTraductionGroupDlg').show();" style="font-size: 12px;"/>
+                        </p:menu>                        
 
                     </h:form>
                 </div>

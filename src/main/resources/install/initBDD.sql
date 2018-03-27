@@ -49,6 +49,7 @@ delete from gps_preferences;
 delete from copyright;
 delete from info;
 delete from thesaurus_alignement_source;
+delete from preferences_sparql;
 
 
 

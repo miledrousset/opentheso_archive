@@ -2321,12 +2321,76 @@ public class CandidateHelper {
      * @param d2
      * @param poolConnexion
      * @return 
+     * modifié par #MR
      */
     public ArrayList<String> getListOfCdtDuringPeriod(String idTheso, Date d1,Date d2,HikariDataSource poolConnexion){
         ArrayList<String> listCdt=new ArrayList<>();
+        ResultSet resultSet;
+        Statement stmt;
+        java.sql.Date d11=new java.sql.Date(d1.getTime());
+        java.sql.Date d21=new java.sql.Date(d2.getTime()+(1000*60*60*24));         
+        try {
+            Connection conn=poolConnexion.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT \n" +
+                    "  concept_candidat.id_concept,\n" +
+                    "  concept_candidat.id_thesaurus, \n" +
+                    "  term_candidat.lexical_value, \n" +
+                    "  concept_candidat.created, \n" +
+                    "  concept_candidat.modified, \n" +
+                    "  concept_candidat.admin_message, \n" +
+                    "  concept_candidat.status\n" +
+                    "\n" +
+                    "FROM \n" +
+                    "  concept_term_candidat, \n" +
+                    "  concept_candidat, \n" +
+                    "  term_candidat\n" +
+                    "WHERE \n" +
+                    "  concept_term_candidat.id_concept = concept_candidat.id_concept AND\n" +
+                    "  concept_term_candidat.id_thesaurus = concept_candidat.id_thesaurus AND\n" +
+                    "  term_candidat.id_term = concept_term_candidat.id_term AND\n" +
+                    "  term_candidat.id_thesaurus = concept_term_candidat.id_thesaurus AND\n" +
+                    "  concept_candidat.id_thesaurus = '" + idTheso + "' AND \n" +
+                    "  concept_candidat.status = 'a' AND (\n" +
+                    "  concept_candidat.created BETWEEN '" + d11 + "' AND '" + d21 + "' OR \n" +
+                    "  concept_candidat.modified BETWEEN '"+ d11 + "' AND '" + d21 + "');";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while(resultSet.next()){
+                        LineCdt lCdt=new LineCdt();
+                        lCdt.setId_thesaurus(resultSet.getString("id_thesaurus"));
+                        lCdt.setTitle_thesaurus("");
+                        lCdt.setId_concept(resultSet.getString("id_concept"));
+                        lCdt.setValeur_lexical(resultSet.getString("lexical_value"));
+                        lCdt.setCreated(resultSet.getDate("created"));
+                        lCdt.setModified(resultSet.getDate("modified"));
+                        lCdt.setAdmin_message(resultSet.getString("admin_message"));
+                        lCdt.setStatus(resultSet.getString("status"));
+                        lCdt.setNodeProposition(
+                                getAllPropositionsOfCandidat(poolConnexion,
+                                        resultSet.getString("id_concept"),
+                                        idTheso));
+                        listCdt.add(lCdt.getMessage());
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting list of candidat between 2 dates of thesaurus : " + idTheso, sqle);
+        }
+        return listCdt;
+/*        
         try{
             Connection conn=poolConnexion.getConnection();
             try{
+                /*
                 String sql="SELECT DISTINCT concept_term_candidat.id_thesaurus,concept_term_candidat.id_concept,"
                         + "concept_term_candidat.id_term,proposition.id_user,proposition.created," +
                         "  proposition.modified,proposition.note,concept_candidat.status,concept_candidat.admin_message,"
@@ -2348,8 +2412,9 @@ public class CandidateHelper {
                 stmt.setDate(3,d21);
                 stmt.setDate(4,d11);
                 stmt.setDate(5,d21);
+                
                 try{
-                    rs=stmt.executeQuery();
+                    rs=stmt.executeQuery(query);
 
                         while(rs.next()){
                          
@@ -2363,11 +2428,7 @@ public class CandidateHelper {
                             lCdt.setAdmin_message(rs.getString("admin_message"));
                             lCdt.setStatus(rs.getString("status"));
                             lCdt.setNote(rs.getString("note"));
-                            
                             listCdt.add(lCdt.getMessage());
-
-
-
                         }
                     
                 }
@@ -2387,6 +2448,68 @@ public class CandidateHelper {
             log.error("error while getting concept term candidat from id thesaurus "+idTheso, e);
                 
         }
-       return listCdt;
+       return listCdt;*/
+    }
+    
+    /**
+     * Permet de retourner la liste de toutes les propositions sur un candidat 
+     * 
+     * @param ds
+     * @param idCandidat
+     * @param idThesaurus
+     * @return 
+     */
+    public ArrayList<NodeProposition> getAllPropositionsOfCandidat(
+            HikariDataSource ds,
+            String idCandidat,
+            String idThesaurus){
+        Statement stmt;
+        ResultSet resultSet;
+
+        ArrayList<NodeProposition> nodePropositions = new ArrayList<>();
+        try {
+            Connection conn=ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT \n" +
+                        "  proposition.concept_parent, \n" +
+                        "  proposition.id_group, \n" +
+                        "  proposition.note, \n" +
+                        "  users.username\n" +
+                        "FROM \n" +
+                        "  proposition, \n" +
+                        "  users\n" +
+                        "WHERE \n" +
+                        "  users.id_user = proposition.id_user AND\n" +
+                        "  proposition.id_concept = '" + idCandidat + "' AND \n" +
+                        "  proposition.id_thesaurus = '" + idThesaurus + "';";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeProposition nodeProposition = new NodeProposition();
+                        if(!resultSet.getString("concept_parent").isEmpty()){
+                            nodeProposition.setLabelConceptParent(new ConceptHelper().getLexicalValueOfConcept
+                            (ds, resultSet.getString("concept_parent"),
+                                    idThesaurus, "fr"));
+                        }
+                        nodeProposition.setIdConceptParent(resultSet.getString("concept_parent"));
+                        nodeProposition.setIdGroup(resultSet.getString("id_group"));
+                        nodeProposition.setUser(resultSet.getString("username"));
+                        nodeProposition.setNote(resultSet.getString("note"));
+                        nodePropositions.add(nodeProposition);
+                    }
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id of Candidat exist : " + idCandidat, sqle);
+        }
+        return nodePropositions;        
     }
 }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.SelectedBeans.SelectedTerme;
+//import mom.trd.opentheso.SelectedBeans.SelectedTerme;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.tools.AsciiUtils;
 import org.junit.After;
