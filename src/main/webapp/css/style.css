@@ -445,6 +445,15 @@ input[type="button"], input[type="submit"]{
 
 /***********************************Nouvelles icones / iconsDB***********************************/
 /* custom color #69B019   #284309 */
+
+.ui-icon-tool {
+    background: url("../images/tool-box.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;    
+
+}
 .ui-icon-ok-16 {
     background: url("../images/ok-16.png") no-repeat !important;
     background: none;

@@ -23,8 +23,9 @@
                         </h:selectOneMenu>
                     </p:panelGrid>
                     <br/>
-                        <h:outputText value="active"/>
+                    <h:outputText value="#{langueBean.getMsg('user.activate')} "/>
                         <p:selectBooleanCheckbox value="#{user1.isActive}" />
+                      
                 </td>
                 <td>
                     <p:panelGrid columns="1" >

@@ -1,42 +1,55 @@
-<ui:composition
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
-    xmlns:p="http://primefaces.org/ui">
-            <h:panelGroup id="navRapide"  >
-    <div id="rapidAccess" align="center" >
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+        xmlns:p="http://primefaces.org/ui">
+        <h:panelGroup id="navRapide"  >
+            <div id="rapidAccess" align="center" >
 
-        <table>
-            <tr>
-                <td>
-                    <h:form >
-                        <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                        minQueryLength="2" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                        a:placeholder="#{langueBean.getMsg('indexSearch')}" >
+                <table>
+                    <tr>
+                        <td>
+                            <h:form >
+                                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
+                                                minQueryLength="2" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
+                                                a:placeholder="#{langueBean.getMsg('indexSearch')}" >
 
-                            <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" oncomplete="srollToSelected()"  
-                                    update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
-                                    />
-                        </p:autoComplete>
-                    </h:form></td>
-                <!-- gestion des domaines ou groupes --> 
-                <td>
-                    <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
-                        <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="Tools"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
+                                    <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" oncomplete="srollToSelected()"  
+                                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
+                                            />
+                                </p:autoComplete>
+                            </h:form></td>
+                        <!-- gestion des domaines ou groupes --> 
+                        <td align="left">
+                            <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                                <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="#{langueBean.getMsg('cdt.MT')}"/>
+                                <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
+                                    <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
+                                    <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
+                                                update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
+                                </p:menu>
+                            </h:form>
+                        </td>
 
-                            <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
-                                        update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
-                          
+                        <td align="right">
+                            <h:form id="formTools" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                                <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
+                                <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
+                                    <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
+                                    <p:separator />                                    
+                                    <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup(theso.thesaurus.language)}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
 
-                        </p:menu>
-                    </h:form>
-                </td>
-            </tr>
-        </table>
+                                </p:menu>
+                            </h:form>
+                        </td>                
+                    </tr>
+                </table>
 
-    </div>        </h:panelGroup>
-</ui:composition>
+            </div>
+        </h:panelGroup>
+    </ui:composition>

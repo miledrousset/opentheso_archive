@@ -422,6 +422,7 @@ public class WriteFileSKOS {
                 return uri;
             }
         }
+    //    System.out.println(nodeConceptExport.getConcept().getIdConcept());
         // si on ne trouve pas ni Handle, ni Ark
         uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
                         + "&amp;idt=" + nodeConceptExport.getConcept().getIdThesaurus();

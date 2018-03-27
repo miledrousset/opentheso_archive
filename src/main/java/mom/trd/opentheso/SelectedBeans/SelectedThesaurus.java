@@ -449,6 +449,9 @@ public class SelectedThesaurus implements Serializable {
             
             // permet de supprimer les BT pour un TopTerm, c'est incohérent
             removeBTofTopTerm();
+            
+            // permet de supprimer les relations en boucle (100 -> BT -> 100) ou  (100 -> NT -> 100)ou (100 -> RT -> 100)
+            removeLoopRelations();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
@@ -461,6 +464,15 @@ public class SelectedThesaurus implements Serializable {
             return;
         }
         new ToolsHelper().removeBTofTopTerm(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
+    }
+    
+    private void removeLoopRelations() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return;
+        }
+        new ToolsHelper().removeLoopRelations(connect.getPoolConnexion(), "BT", thesaurus.getId_thesaurus());
+        new ToolsHelper().removeLoopRelations(connect.getPoolConnexion(), "NT", thesaurus.getId_thesaurus());
+        new ToolsHelper().removeLoopRelations(connect.getPoolConnexion(), "RT", thesaurus.getId_thesaurus());          
     }
     
 

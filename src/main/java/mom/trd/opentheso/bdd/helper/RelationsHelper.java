@@ -324,6 +324,57 @@ public class RelationsHelper {
     }
     
     /**
+     * Cette fonction permet de récupérer la liste des relations qui sont en boucle 
+     * pour une relation donnée (NT, BT, RT)
+     *
+     * @param ds
+     * @param role
+     * @param idThesaurus
+     * @return
+     * #MR
+     */
+    public ArrayList<HierarchicalRelationship> getListLoopRelations(HikariDataSource ds,
+            String role, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<HierarchicalRelationship> listRelations = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select * from hierarchical_relationship" +
+                            " where id_concept1 = id_concept2" +
+                            " and id_thesaurus = '" + idThesaurus + "'" + 
+                            " and role = '" + role + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        HierarchicalRelationship hierarchicalRelationship = new HierarchicalRelationship();
+                        hierarchicalRelationship.setIdConcept1(resultSet.getString("id_concept1"));
+                        hierarchicalRelationship.setIdConcept2(resultSet.getString("id_concept2"));
+                        hierarchicalRelationship.setIdThesaurus(idThesaurus);
+                        hierarchicalRelationship.setRole(role);
+                        listRelations.add(hierarchicalRelationship);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List of Loop relations of thesaurus : " + idThesaurus, sqle);
+        }
+        return listRelations;
+    }    
+    
+    /**
      * recuperela la liste des ids et le role des BT dans une array liste de string[2]
      * qui contien en [0] l'id et en [1] le role
      * @param ds
@@ -907,6 +958,54 @@ public class RelationsHelper {
         }
         return status;
     }
+    
+    /**
+     * Cette fonction permet de supprimer une relation bien définie
+     * c'est à dire une ligne dans la table 
+     * Sert pour corriger les incohérences
+     *
+     * @param ds
+     * @param idConcept1
+     * @param idThesaurus
+     * @param role
+     * @param idConcept2
+     * @return boolean
+     */
+    public boolean deleteThisRelation(HikariDataSource ds,
+            String idConcept1, String idThesaurus,
+            String role,
+            String idConcept2) {
+
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "delete from hierarchical_relationship"
+                            + " where id_concept1 ='" + idConcept1 + "'"
+                            + " and id_thesaurus = '" + idThesaurus + "'"
+                            + " and role = '" + role + "'"
+                            + " and id_concept2 = '" + idConcept2 + "'";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting one relation of Concept : " + idConcept1, sqle);
+        }
+        return status;
+    }    
 
     /**
      * Cette fonction permet de supprimer la relation TT d'un concept
