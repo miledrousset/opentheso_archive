@@ -1253,6 +1253,18 @@ public class NewTreeBean implements Serializable {
     }
 
     /**
+     * permet de savoir si le noeud sélectionné est un TopTerme
+     *
+     * @return
+     */
+    public boolean isTopTerm() {
+        if (selectedNode == null) {
+            return false;
+        }
+        return ((MyTreeNode) selectedNode).isIsTopConcept();
+    }     
+    
+    /**
      * permet de savoir si le noeud sélectionné est un sousGroupe
      *
      * @return
