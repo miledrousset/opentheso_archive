@@ -10,6 +10,7 @@ public class NodeUser implements Serializable {
     private String role;
     private String idThesaurus;
     private boolean isActive;
+    private boolean isAlertMail;
     
     public NodeUser() {
     }
@@ -68,6 +69,14 @@ public class NodeUser implements Serializable {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public boolean isIsAlertMail() {
+        return isAlertMail;
+    }
+
+    public void setIsAlertMail(boolean isAlertMail) {
+        this.isAlertMail = isAlertMail;
     }
     
     

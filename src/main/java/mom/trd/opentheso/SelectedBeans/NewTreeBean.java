@@ -1224,6 +1224,7 @@ public class NewTreeBean implements Serializable {
         if (selectedNode == null) {
             return false;
         }
+        if((MyTreeNode) selectedNode == null) return false;
         return ((MyTreeNode) selectedNode).isIsGroup();
     }
 
@@ -1236,6 +1237,7 @@ public class NewTreeBean implements Serializable {
         if (selectedNode == null) {
             return false;
         }
+        if((MyTreeNode) selectedNode == null) return false;
         return ((MyTreeNode) selectedNode).isIsSubGroup();
     }
     

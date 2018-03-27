@@ -49,8 +49,12 @@ public class SynchroSparql implements Runnable {
     DownloadBean db=new DownloadBean();
     db.setConnect(conn);
     StreamedContent file=db.thesoToFile(sparqlStruct.getThesaurus(), liste_lang, liste_group, 0);
-      
-    m.read(file.getStream(),null);
+    
+        try {
+            m.read(file.getStream(),null);
+        } catch (Exception e) {
+        }
+
     StmtIterator iter=m.listStatements();
     while(iter.hasNext()){
         Statement stmt=iter.nextStatement();

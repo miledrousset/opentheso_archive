@@ -81,7 +81,39 @@ public class UserHelper {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
+    
+    /**
+     * permet de mette à jour le status des alertes mail pour l'utilisateur
+     * @param conn
+     * @param idUser
+     * @param alertMail 
+     * @return 
+     * #MR
+     */
+    public boolean setAlertMailForUser(Connection conn, int idUser, boolean alertMail) {
+        Statement stmt;
+        boolean status = false;
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE users set alertmail = " + alertMail
+                            + " WHERE id_user = " + idUser;
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+               // conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }
+    
     
     /**
      * Cette fonction permet de récupérer l'Id de l'utilisateur d'après son
@@ -269,7 +301,7 @@ public class UserHelper {
                     String query = "SELECT roles.name, user_role.id_role,"
                             + " user_role.id_thesaurus,"
                             + " users.username, users.id_user, users.mail,"
-                            + " users.active"
+                            + " users.active, users.alertmail"
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id AND"
@@ -287,6 +319,7 @@ public class UserHelper {
                         nu.setMail(resultSet.getString("mail"));
                         nu.setIdRole(resultSet.getInt("id_role"));
                         nu.setIsActive(resultSet.getBoolean("active"));
+                        nu.setIsAlertMail(resultSet.getBoolean("alertmail"));
                         nu.setName(logName);
                         nu.setRole(resultSet.getString("name"));
                         nu.setIdThesaurus(idThesaurus);
@@ -325,7 +358,7 @@ public class UserHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT roles.name, user_role.id_role,"
-                            + " users.username, users.id_user, users.mail "
+                            + " users.username, users.id_user, users.mail, users.alertmail "
                             + " FROM users, user_role, roles WHERE"
                             + " users.id_user = user_role.id_user AND"
                             + " user_role.id_role = roles.id AND"
@@ -344,6 +377,7 @@ public class UserHelper {
                         nu.setIdRole(resultSet.getInt("id_role"));
                         nu.setName(logName);
                         nu.setRole(resultSet.getString("name"));
+                        nu.setIsAlertMail(resultSet.getBoolean("alertmail"));
                     }
                 } finally {
                     stmt.close();
@@ -358,6 +392,7 @@ public class UserHelper {
 
         return nu;
     }
+    
 
     /**
      * cette fonction permet de retourner l'identifiant du role de l'utilisateur

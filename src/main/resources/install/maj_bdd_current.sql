@@ -31,6 +31,17 @@ SET ROLE = opentheso;
 -- where id_concept !='' group by notetypecode, lexicalvalue, id_thesaurus, id_concept, lang having count(*)>1;
 
 
+-- pour supprimer les relations vers des concepts qui n'existent pas (cas de thésaurus conçus à la main et mal controlés 
+-- SELECT DISTINCT 
+--  hierarchical_relationship.id_concept2
+--FROM 
+--  public.hierarchical_relationship, 
+--  public.concept
+--WHERE 
+--  hierarchical_relationship.id_concept2 NOT IN (select concept.id_concept from concept where id_thesaurus = '167')
+--  and hierarchical_relationship.id_thesaurus = '167';
+
+
 --- rechargement et optimisation des langues iso_latin1
 DROP TABLE languages_iso639;
 
@@ -1631,10 +1642,26 @@ end
 $$language plpgsql;
 ----------------------------------------------------------------------------
 -- mises à jour 
+-- 
 --
+-- mise a jour de la table users (ajout de la colonne alertmail)
 --
---mise a jour de la table note
---
+create or replace function update_table_users_alert() returns void as $$
+begin
+    IF NOT EXISTS(SELECT *  FROM information_schema.columns where table_name='users' AND column_name='alertmail') THEN
+        execute 'ALTER TABLE users ADD COLUMN alertmail boolean DEFAULT false';
+    END IF;
+end
+$$language plpgsql;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1755,6 +1782,8 @@ SELECT delete_column('concept_group','idconcept');
 SELECT update_table_preferences_handle();
 SELECT update_table_concept_handle();
 
+SELECT update_table_users_alert();
+
 /*
 -- Mise à jour de la table de types d'alignement
 DROP TABLE alignement_type;
@@ -1800,7 +1829,7 @@ input_string text := $1;
 BEGIN
 
 input_string := translate(input_string, 'âãäåāăąÁÂÃÄÅĀĂĄ', 'aaaaaaaaaaaaaaa');
-input_string := translate(input_string, 'èééêëēĕėęěĒĔĖĘĚ', 'eeeeeeeeeeeeeee');
+input_string := translate(input_string, 'èééêëēĕėęěĒĔĖĘĚÉ', 'eeeeeeeeeeeeeeee');
 input_string := translate(input_string, 'ìíîïìĩīĭÌÍÎÏÌĨĪĬ', 'iiiiiiiiiiiiiiii');
 input_string := translate(input_string, 'óôõöōŏőÒÓÔÕÖŌŎŐ', 'ooooooooooooooo');
 input_string := translate(input_string, 'ùúûüũūŭůÙÚÛÜŨŪŬŮ', 'uuuuuuuuuuuuuuuu');
@@ -1877,6 +1906,7 @@ SELECT delete_fonction('relation_group','');
 SELECT delete_fonction('create_table_concept_group_concept','');
 SELECT delete_fonction('update_table_preferences_handle','');
 SELECT delete_fonction('update_table_concept_handle','');
+SELECT delete_fonction('update_table_users_alert','');
 
 --Ne pas toucher les prochaines fonctions
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');

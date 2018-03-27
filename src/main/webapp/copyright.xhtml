@@ -14,7 +14,9 @@
         <link rel="stylesheet" type="text/css" href="css/menu.css"/>
         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
+
     <h:body rendered="#{(newtreeBean.browserName != 'agent') }">
+            
         <div id="menuHead">
             <div id="menuHeadTop">
                <ui:include src="logo.xhtml" />
@@ -23,6 +25,13 @@
             </div>
         </div>
         <div style="margin: auto; width: 1000px; margin-top: 100px;">
+            <p:outputPanel>
+                <h:outputText escape="false" value="#{copyrightBean.copyright}"/>
+            </p:outputPanel>
+            <br/>
+            <hr color="green"/>
+            <br/><br/>
+
             
             Le thésaurus <b> <h:outputText value="#{theso.thisTheso.title}" /> </b> est accessible par webservices en : 
             <h:outputLink value="#{theso.cheminSite}webresources/application.wadl"> 
@@ -135,13 +144,7 @@
             
             </h:panelGroup>
             
-            <br/><br/>
-            <br/><br/>
-            
-            <p:outputPanel>
-                <h:outputText escape="false" value="#{copyrightBean.copyright}"/>
-            </p:outputPanel>
-            <br/>
+
 
             <br/><br/>
             <br/><br/>

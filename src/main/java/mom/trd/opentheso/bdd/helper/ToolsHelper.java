@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.ArkClient;
@@ -186,6 +187,39 @@ public class ToolsHelper {
         }
         return false;
     }
+    
+    /**
+     * Permet de supprimer les relations en boucle qui sont interdites 
+     * (100 -> BT -> 100) ou  (100 -> NT -> 100)ou (100 -> RT -> 100)
+     * c'est incohérent et ca provoque une boucle à l'infini
+     * @param ds
+     * @param role
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean removeLoopRelations(HikariDataSource ds,
+            String role,
+            String idThesaurus) {
+
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        // récupération des relations en Loop
+        ArrayList<HierarchicalRelationship> tabRelations = 
+                relationsHelper.getListLoopRelations(ds, role, idThesaurus);
+        if(!tabRelations.isEmpty()) {
+            for (HierarchicalRelationship relation : tabRelations) {
+                relationsHelper.deleteThisRelation(
+                        ds,
+                        relation.getIdConcept1(),
+                        idThesaurus,
+                        role,
+                        relation.getIdConcept2());
+            }
+        }
+        return true;
+    }    
+    
+    
     
     public String getNewId(int length) {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"; 

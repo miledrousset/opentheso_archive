@@ -145,6 +145,7 @@
                         </tr>
                     </table>
                 </h:form>
+                
                 <hr/>
                 <h:form id="formEditMail">
                     <table>
@@ -164,7 +165,21 @@
                         </tr>
                     </table>
                 </h:form>
-            </fieldset>
+                <hr/>
+                <h:form id="formEditAlertMail">
+                    <table>
+                        <tr>
+                            <td> <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/> : </td>
+                            <td><p:selectBooleanCheckbox value="#{user1.alertmail}" /></td>
+
+                            <td colspan="2" style="text-align: center;">
+                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.updateAlertMail()}" 
+                                                      update=":formEditMail" />
+                            </td>
+                        </tr>
+                    </table>
+                </h:form>                
+             </fieldset>
 
 
             <h:panelGroup rendered="#{user1.haveRights(2)}">

@@ -319,6 +319,7 @@ public class ExportRdf4jHelper {
         ArrayList<NodeHieraRelation> listChildren = relationsHelper.getListNT(ds, id, idThesaurus);
 
         for (NodeHieraRelation idChildren : listChildren) {
+    //        System.out.println(idChildren.getUri().getIdConcept());
             resource.addRelation(getUriFromNodeUri(idChildren.getUri(), idThesaurus), SKOSProperty.member);
             addMember(idChildren.getUri().getIdConcept(), idThesaurus, resource);
         }

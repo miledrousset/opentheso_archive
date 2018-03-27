@@ -43,6 +43,7 @@ public class CurrentUser implements Serializable {
     private String pwdEdit1 = "";
     private String pwdEdit2 = "";
     private String pwdEdit3 = "";
+    private boolean alertmail = false;
 
     //pref
     private String langSourceEdit;
@@ -85,7 +86,17 @@ public class CurrentUser implements Serializable {
             
         }*/
     }
-
+    
+    public void updateUser() {
+        if(user == null) return;
+        if (connect.getPoolConnexion() != null) {
+            if(user.getName() != null){
+                user = new UserHelper().getInfoUser(connect.getPoolConnexion(), user.getName(), idTheso);
+                alertmail = user.isIsAlertMail();
+            }
+        }
+    }
+    
     public void initUserNodePref(String idThesaurus) {
         PreferencesHelper preferencesHelper = new PreferencesHelper();
         nodePreference = preferencesHelper.getThesaurusPreference(connect.getPoolConnexion(), idThesaurus);
@@ -246,6 +257,29 @@ public class CurrentUser implements Serializable {
         return listeUser;
     }
 
+    
+    public boolean updateAlertMail() {
+        try {
+            UserHelper userHelper = new UserHelper();
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if(!userHelper.setAlertMailForUser(
+                    connect.getPoolConnexion().getConnection(),user.getId(), alertmail)){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                conn.rollback();
+                conn.close(); 
+                return false;
+            }
+            conn.commit();
+            conn.close();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("conf.alertMailMessage")));
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
     public ArrayList<Entry<String, String>> selectAllRoles() {
         return new UserHelper().getRoles(connect.getPoolConnexion());
     }
@@ -334,6 +368,7 @@ public class CurrentUser implements Serializable {
             Connection conn;
             conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
+            int idUser = -1;
 
             if (userHelper.isUserMailExist(conn, mailEdit)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.info7")));
@@ -350,7 +385,7 @@ public class CurrentUser implements Serializable {
                             return;
                         }
                         // récupération de l'Id du User
-                        int idUser = userHelper.getIdUser(conn, nameEdit);
+                        idUser = userHelper.getIdUser(conn, nameEdit);
                         if (idUser == -1) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
@@ -365,8 +400,6 @@ public class CurrentUser implements Serializable {
                             conn.close();
                             return;
                         }
-                        conn.commit();
-                        conn.close();
                     }
 
                     // Cas de création d'admin (par thésaurus)
@@ -379,7 +412,7 @@ public class CurrentUser implements Serializable {
                             return;
                         }
                         // récupération de l'Id du User
-                        int idUser = userHelper.getIdUser(conn, nameEdit);
+                        idUser = userHelper.getIdUser(conn, nameEdit);
                         if (idUser == -1) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
@@ -394,15 +427,25 @@ public class CurrentUser implements Serializable {
                             conn.close();
                             return;
                         }
-                        conn.commit();
-                        conn.close();
                     }
-
+                    // mise à jour des alerts mails pour l'utilisateur
+                    if(alertmail) {
+                        if(idUser != -1)
+                            if(!userHelper.setAlertMailForUser(conn,idUser, true)){
+                               FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                                conn.rollback();
+                                conn.close();
+                                return; 
+                            }
+                    }
+                    userHelper.updateAddUserHistorique(conn, nameEdit);
+                    
+                    conn.commit();
+                    conn.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                conn = connect.getPoolConnexion().getConnection();
-                userHelper.updateAddUserHistorique(conn, nameEdit);
+
                 mailEdit = "";
                 pwdEdit1 = "";
                 pwdEdit2 = "";
@@ -452,6 +495,7 @@ public class CurrentUser implements Serializable {
         UserHelper userHelper = new UserHelper();
         userEdit = userHelper.getInfoUser(connect.getPoolConnexion(), nameEdit, idTheso);
         isActive = userEdit.isIsActive();
+        alertmail = userEdit.isIsAlertMail();
     }
 
     public void reInit() {
@@ -694,6 +738,14 @@ public class CurrentUser implements Serializable {
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
+    }
+
+    public boolean isAlertmail() {
+        return alertmail;
+    }
+
+    public void setAlertmail(boolean alertmail) {
+        this.alertmail = alertmail;
     }
 
  

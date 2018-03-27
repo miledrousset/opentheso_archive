@@ -29,6 +29,10 @@
                        <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
                    </tr>
                    <tr>
+                       <td><h:outputText value="#{langueBean.getMsg('conf.alertMail')}  " /></td>
+                       <td><p:selectBooleanCheckbox value="#{user1.alertmail}" /></td>
+                   </tr>                   
+                   <tr>
                        <td>#{langueBean.getMsg('conf.tabUserOpt2')} : </td>
                        <td>
                            <h:selectOneMenu value="#{user1.roleEdit}">
