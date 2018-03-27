@@ -1,6 +1,7 @@
 package mom.trd.opentheso.dragdrop;
 
 
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
+import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import static mom.trd.opentheso.skosapi.SKOSProperty.Collection;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -494,6 +496,49 @@ public class TreeChange {
             Logger.getLogger(AutoCompletBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+
+    public ArrayList<String> getPathFromSelectedConcept(Connexion conn,MyTreeNode selectedNode) {
+         
+        String id=selectedNode.getIdConcept();
+        String theso=selectedNode.getIdTheso();
+      
+        GroupHelper gh=new GroupHelper();
+        ArrayList<NodeGroup> groups= gh.getListGroupOfConcept(conn.getPoolConnexion(), theso,id,selectedNode.getLangue());
+        
+        ConceptHelper ch=new ConceptHelper();
+        ArrayList<String> result=new ArrayList<>();
+        ArrayList<String> bt=new ArrayList<>();
+        ArrayList<String> groupIds=new ArrayList<>();
+        for(NodeGroup ng : groups ){
+        groupIds.add(ng.getConceptGroup().getIdgroup());
+        bt.addAll(ch.getAllBTOfConceptOfThisGroup(conn.getPoolConnexion(), id, ng.getConceptGroup().getIdgroup(), theso));
+        }
+        
+        result.addAll(bt);
+        while(!bt.isEmpty()){
+            ArrayList<String> tmp=new ArrayList<>();
+            for(String idBt : bt){
+                for(String idGroup : groupIds){
+                tmp.addAll(ch.getAllBTOfConceptOfThisGroup(conn.getPoolConnexion(), idBt, idGroup, theso));
+            
+                }
+            }
+            bt=new ArrayList<>(tmp);
+            result.addAll(bt);
+        }
+        for(String idGroup : groupIds){
+          String fat=gh.getIdFather(conn.getPoolConnexion(), idGroup, theso);
+          result.add(fat);
+          while(fat!=null && !fat.isEmpty()){
+              fat=gh.getIdFather(conn.getPoolConnexion(), fat, theso);
+              result.add(fat);
+          } 
+        }
+       
+        
+        result.addAll(groupIds);
+        return result;
     }
   
 }

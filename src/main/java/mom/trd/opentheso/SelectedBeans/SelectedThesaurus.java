@@ -1491,7 +1491,7 @@ public class SelectedThesaurus implements Serializable {
                 tree.getSelectedTerme().getIdTopConcept(), null, null, null);
         tree.getSelectedTerme().majTerme(mTN);
         thesaurus = new ThesaurusHelper().getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), l);
-        tree.reInit();
+        //tree.reInit();
         tree.reExpand();
         vue.setOnglet(0);
     }

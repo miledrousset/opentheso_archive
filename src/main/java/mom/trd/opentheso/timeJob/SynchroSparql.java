@@ -35,7 +35,7 @@ public class SynchroSparql implements Runnable {
     private Connexion conn;
     @Override
     public void  run(){
-  
+    System.out.println("dans le run saprtql");
     String url=sparqlStruct.getAdresseServeur().replaceAll("http","jdbc:virtuoso").trim()+":1111";
     VirtGraph graph=new VirtGraph(sparqlStruct.getGraph(),url,sparqlStruct.getNom_d_utilisateur(),sparqlStruct.getMot_de_passe());
 
@@ -50,7 +50,12 @@ public class SynchroSparql implements Runnable {
     db.setConnect(conn);
     StreamedContent file=db.thesoToFile(sparqlStruct.getThesaurus(), liste_lang, liste_group, 0);
       
-    m.read(file.getStream(),null);
+    try{
+        m.read(file.getStream(),null);
+    }
+    catch(Exception e){
+        //graph.close();
+    }
     StmtIterator iter=m.listStatements();
     while(iter.hasNext()){
         Statement stmt=iter.nextStatement();

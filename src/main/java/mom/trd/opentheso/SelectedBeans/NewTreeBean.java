@@ -207,13 +207,14 @@ public class NewTreeBean implements Serializable {
         //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
         int count=1;//attribut pour la numérotation des groupes
+         ArrayList<MyTreeNode> listeNode=new ArrayList<>();//idem
         if (connect.getPoolConnexion() == null) {
             System.err.println("Opentheso n'a pas pu se connecter à la base de données");
             return;
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
-        ArrayList<MyTreeNode> listeNode=new ArrayList<>();
+       
         // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
 
@@ -569,13 +570,15 @@ public class NewTreeBean implements Serializable {
      */
     public void majIndexRapidSearch() {
         selectedTerme.majIndexRapidSearch(idThesoSelected, defaultLanguage);
-        reInit();
+        //reInit();
         reExpand();
         vue.setOnglet(0);
     }
 
     public void changeTerme(String id, int type) {
 
+     
+            
         selectedNode.setSelected(false);
 
         for (TreeNode node : selectedNodes) {
@@ -601,13 +604,26 @@ public class NewTreeBean implements Serializable {
         MyTreeNode mTN = new MyTreeNode(type, id, selectedTerme.getIdTheso(),
                 selectedTerme.getIdlangue(), selectedTerme.getIdDomaine(), selectedTerme.getTypeDomaine(), idTC, null, null, null);
         selectedTerme.majTerme(mTN);
-
+        selectedNode=mTN;
         reExpand();
         vue.setOnglet(0);
     }
 
     public void reExpand() {
-        if (selectedNode == null) {
+        TreeChange tc=new TreeChange();
+       
+        tc.saveExpandedNodes(root);
+        this.reInit();
+        this.initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        ArrayList<String> ids =new ArrayList<>();
+        for(TreeNode tn:tc.getExpandedNodes()){
+            ids.add(((MyTreeNode)tn).getIdConcept());
+        }
+        ids.addAll(tc.getPathFromSelectedConcept(connect,(MyTreeNode)selectedNode));
+        ids.add(selectedTerme.getIdC());
+        reExpandNodes(root,ids,selectedTerme.getIdC());//code pour forcer le depliment de l'arbre
+    
+       if (selectedNode == null) {
             //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
         //    selectedNode.setSelected(false);
@@ -620,7 +636,7 @@ public class NewTreeBean implements Serializable {
         ArrayList<ArrayList<String>> paths = new ArrayList<>();
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
         if (paths != null) {
-            reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+      //  reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(),tc);
         }
 
     }
@@ -632,9 +648,10 @@ public class NewTreeBean implements Serializable {
      * @param idTheso
      * @param langue
      */
-    private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue) {
+    private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue,TreeChange tc) {
         //  if(selectedNodes.isEmpty()){
-
+        
+         ArrayList<MyTreeNode> listeNode=new ArrayList<>();//idem
         if (root.getChildCount() == 0) {
             // On recrÃ©e la racine
             List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
@@ -651,32 +668,49 @@ public class NewTreeBean implements Serializable {
                             nodegroup.getIdLang(), nodegroup.getConceptGroup().getIdgroup(), nodegroup.getConceptGroup().getIdtypecode(), null,
                             type, nodegroup.getConceptGroup().getIdgroup(), root);
                     ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
+                    new DefaultTreeNode("fake", dynamicTreeNode);
                 } else {
                     dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(), nodegroup.getConceptGroup().getIdthesaurus(),
                             nodegroup.getIdLang(), nodegroup.getConceptGroup().getIdgroup(),
                             nodegroup.getConceptGroup().getIdtypecode(), null,
-                            type, nodegroup.getLexicalValue(), root);
+                            type, nodegroup.getLexicalValue(), null);
                     ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
+                      /****code pour la numérotation des groupes ******************/
+                GroupHelper groupHelper= new GroupHelper();
+                 String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(),nodegroup.getConceptGroup().getIdgroup());
+                 
+                ((MyTreeNode)dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
+                ((MyTreeNode)dynamicTreeNode).setData(((MyTreeNode)dynamicTreeNode).getNumerotation()+" "+dynamicTreeNode.getData());
+                /*****fin de code pour la numérotation des groupes **********/
+                 listeNode.add((MyTreeNode)dynamicTreeNode);
                 }
-                new DefaultTreeNode("fake", dynamicTreeNode);
-
-                for (ArrayList<String> tabId : listeId) {
-                    // Si c'est le chemin, on Ã©tend
-                    if (tabId.size() > 1 && tabId.get(0) != null) {
-                        if (tabId.get(0).equals(nodegroup.getConceptGroup().getIdgroup())) {
-                            reExpandChild(tabId, (MyTreeNode) dynamicTreeNode, 1);
-                        }
-                    } else {
-                        if (tabId.get(1).equals(nodegroup.getConceptGroup().getIdgroup())) {
-                            dynamicTreeNode.setSelected(true);
-                            selectedNode = dynamicTreeNode;
-                            selectedNodes.add(dynamicTreeNode);
-                        } else {
-                            dynamicTreeNode.setSelected(false);
-                        }
-                    }
-                }
+             
+              
             }
+               
+                /***ici on trie la liste des groupes d après le champ data***/
+             Collections.sort(listeNode,new TreeNodeComparator());
+             /*et on l'ajoute au root **/
+             ArrayList idToExpand=new ArrayList<>();//on récupère les noeuds qui étaient étendus
+             for(TreeNode tn: tc.getExpandedNodes()){
+                 idToExpand.add(((MyTreeNode)tn).getIdConcept());
+             }
+            for(MyTreeNode mtn :listeNode){
+                 MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
+                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
+                        mtn.getType(),mtn.getData(),root);
+                tmp.setPrefix(mtn.getPrefix());
+                tmp.setSuffix(mtn.getSuffix());
+              
+                tmp.setIsGroup(true);
+                new DefaultTreeNode(null, tmp);
+                if(idToExpand.contains(mtn.getIdConcept())){
+                    mtn.setExpanded(true);
+                    this.onNodeExpand(mtn);
+                }
+                
+            }
+            /***fin ***/
             loadOrphan(idTheso, langue);
             //loadOrphan(idTheso, langue);
             for (TreeNode tn : root.getChildren()) {
@@ -795,6 +829,15 @@ public class NewTreeBean implements Serializable {
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
                     ((MyTreeNode) treeNode).setIdCurrentGroup(nodeConceptTreeGroup.getIdConcept());
                     new DefaultTreeNode("fake", treeNode);
+                    /***code poour la numérotation des sous groupes ****/
+                    ((MyTreeNode)treeNode).setPrefix(((MyTreeNode)node).getNumerotation());
+                    String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
+                    if(suffix.length()<2)suffix="0"+suffix;
+                    ((MyTreeNode)treeNode).setSuffix(suffix);
+                    ((MyTreeNode)treeNode).setData(((MyTreeNode)treeNode).getNumerotation()+"  "+treeNode.getData());
+                    /**fin code numérotation des sous groupes*****/
+                    if(listeId.contains(((MyTreeNode)treeNode).getIdConcept()))
+                            ((MyTreeNode)treeNode).setExpanded(true);
                     if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdConcept())) {
                         if (cpt + 1 < listeId.size()) {
                             treeNode.setSelected(false);
@@ -1338,7 +1381,7 @@ public class NewTreeBean implements Serializable {
      * @return
      */
     public boolean isGroup() {
-        if (selectedNode == null) {
+        if (selectedNode == null ) {
             return false;
         }
         return ((MyTreeNode) selectedNode).isIsGroup();
@@ -1940,6 +1983,21 @@ public class NewTreeBean implements Serializable {
             }
         }
     }
+    private void reExpandNodes(TreeNode tn,ArrayList<String> ids,String id ){
+        
+        for(TreeNode child : tn.getChildren()){
+            if(child==null || ((MyTreeNode)child).getIdConcept()==null)continue;
+            if(ids.contains(((MyTreeNode)child).getIdConcept())){
+                child.setExpanded(true);
+                this.onNodeExpand(child);
+                reExpandNodes(child,ids,id);
+            }
+            if((((MyTreeNode)child).getIdConcept()).equals(id)){
+               selectedNode=child; 
+               selectedNode.setSelected(true);
+            }
+        }
+    }
 
     public boolean renderValid() {
         if (draggedNode != null && droppedNode != null) {
@@ -2127,6 +2185,7 @@ public class NewTreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNode) {
+        if(selectedNode==null || !(selectedNode instanceof MyTreeNode))return;
         this.selectedNode = selectedNode;
     }
     
