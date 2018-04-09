@@ -15,13 +15,229 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroup;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUserRoleThesaurus;
 
 public class UserHelper {
 
     public UserHelper() {
-
     }
+    
+ //// restructuration de la classe User le 05/04/2018 //////    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Nouvelles fontions //////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////    
 
+    /**
+     * cette fonction permet de retourner les informations de l'utilisateur
+     * avec la liste de ses thésaurus et les roles qui vont avec ainsi que dans quel groupe il se trouve
+     *
+     * @param ds
+     * @param idUser
+     * @return
+     * #MR
+     */
+    public NodeUser getUser(HikariDataSource ds, int idUser) {
+        NodeUser nodeUser = null;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT \n" +
+                                    "  users.id_user, \n" +
+                                    "  users.username, \n" +
+                                    "  users.active, \n" +
+                                    "  users.mail, \n" +
+                                    "  users.passtomodify, \n" +
+                                    "  users.alertmail, \n" +
+                                    "  users.issuperadmin\n" +
+                                    " FROM users\n" +
+                                    " WHERE \n" +
+                                    "  users.id_user =" + idUser ;
+                    resultSet = stmt.executeQuery(query);
+                    if(resultSet.next()) {
+                        nodeUser = new NodeUser();
+                        nodeUser.setIdUser(idUser);
+                        nodeUser.setName(resultSet.getString("username"));
+                        nodeUser.setIsActive(resultSet.getBoolean("active"));                        
+                        nodeUser.setMail(resultSet.getString("mail"));
+                        nodeUser.setIsAlertMail(resultSet.getBoolean("alertmail"));
+                        nodeUser.setIsAlertMail(resultSet.getBoolean("passtomodify"));
+                        nodeUser.setIsAlertMail(resultSet.getBoolean("issuperadmin"));
+                        if( !nodeUser.isIsSuperAdmin()) {
+                            nodeUser.setNodeUserRoleThesaurus(getNodeUserRoleThesaurus(ds,idUser));
+                            nodeUser.setNodeUserGroup(getNodeUserGroup(ds, idUser));
+                        }
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeUser;
+    }
+    
+    /**
+     * cette fonction permet de retourner la liste des thésaurus avec les roles
+     * sur ses thésaurus pour un utilisateur
+     *
+     * @param ds
+     * @param idUser
+     * @return
+     * #MR
+     */
+    private ArrayList<NodeUserRoleThesaurus> getNodeUserRoleThesaurus(HikariDataSource ds, int idUser) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeUserRoleThesaurus> nodeUserRoleThesauruses = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT \n" +
+                                    "  user_role_thesaurus.id_role, \n" +
+                                    "  roles.name, \n" + 
+                                    "  user_role_thesaurus.id_group, \n" +                              
+                                    "  user_role_thesaurus.id_thesaurus, \n" +
+                                    "  user_role_thesaurus.id_thesaurus_domain\n" +
+                                    " FROM \n" +
+                                    "  user_role_thesaurus, \n" +
+                                    "  roles\n" +
+                                    " WHERE \n" +
+                                    "  roles.id = user_role_thesaurus.id_role AND\n" +
+                                    "  user_role_thesaurus.id_user = " + idUser ;
+                    resultSet = stmt.executeQuery(query);
+                    while(resultSet.next()) {
+                        NodeUserRoleThesaurus nodeUserRoleThesaurus = new NodeUserRoleThesaurus();
+                        nodeUserRoleThesaurus.setIdRole(resultSet.getInt("id_role"));
+                        nodeUserRoleThesaurus.setRoleName(resultSet.getString("name"));
+                        nodeUserRoleThesaurus.setIdGroup(resultSet.getInt("id_group"));                        
+                        nodeUserRoleThesaurus.setIdThesaurus(resultSet.getString("id_thesaurus"));
+                        nodeUserRoleThesaurus.setIdGroupThesaurus(resultSet.getString("id_thesaurus_domain"));
+                        nodeUserRoleThesauruses.add(nodeUserRoleThesaurus);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeUserRoleThesauruses;
+    } 
+    
+    /**
+     * cette fonction permet de retourner la liste des groupes pour un utilisateur
+     *
+     * @param ds
+     * @param idUser
+     * @return
+     * #MR
+     */
+    private ArrayList<NodeUserGroup> getNodeUserGroup(HikariDataSource ds, int idUser) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeUserGroup> nodeUserGroups = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT " +
+                                    "  user_group-label.label, \n" +
+                                    "  user_group_thesaurus.id_group\n" +
+                                    "  user_group_thesaurus.id_thesausurs\n" +                            
+                                    "  FROM \n" +
+                                    "  user_group_thesaurus, \n" +
+                                    "  user_group-label\n" +
+                                    "  WHERE \n" +
+                                    "  user_group.id_group = user_group-label.id_group AND\n" +
+                                    "  user_group.id_user = 1;" + idUser ;
+                    resultSet = stmt.executeQuery(query);
+
+                    while(resultSet.next()) {
+                        NodeUserGroup nodeUserGroup = new NodeUserGroup();
+                        nodeUserGroup.setIgGroup(resultSet.getInt("id_group"));
+                        nodeUserGroup.setGroupName(resultSet.getString("label"));
+                        nodeUserGroups.add(nodeUserGroup);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeUserGroups;
+    }
+    
+    /**
+     * Première fonction de connexion d'un utilisateur avec mot de passe
+     * si l'ulisateur existe ou si le mot de passe est faux, on retourne (-1)
+     * sinon, on retourne l'ID de l'utilisateur de retourner l'identifiant
+     *
+     * @param ds
+     * @param login
+     * @param pwd
+     * @return
+     */
+    public int getIdUser(HikariDataSource ds, String login, String pwd) {
+        int idUser = -1;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try { 
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_user FROM users WHERE username='" +
+                            login + "' AND password='" + pwd + "' and active=true";
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        idUser = resultSet.getInt("id_user");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return idUser;
+    }
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ //////// fin des nouvelles fontions ////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////    
+    
+    
+    
+    
+    
     /**
      * Cette fonction permet de savoir si le Pseudo existe
      *
@@ -835,11 +1051,11 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT DISTINCT roles.name, user_role.id_role,"
-                            + " users.username, users.id_user, users.mail, users.active "
-                            + " FROM users, user_role, roles WHERE"
-                            + " users.id_user = user_role.id_user AND"
-                            + " user_role.id_role = roles.id"
+                    String query = "SELECT roles.name, users.id_role,"
+                            + " users.username, users.id_user, users.mail, users.active,"
+                            + " users.alertmail "
+                            + " FROM users, roles WHERE"
+                            + " users.id_role = roles.id"
                             + " ORDER BY username";
 
                     /*query = "SELECT users.id_user, username, mail, id_role, "
@@ -854,7 +1070,8 @@ public class UserHelper {
                         nu.setIdRole(resultSet.getInt("id_role"));
                         nu.setName(resultSet.getString("username"));
                         nu.setRole(resultSet.getString("name"));
-                        nu.setIsActive(resultSet.getBoolean("active")); 
+                        nu.setIsActive(resultSet.getBoolean("active"));
+                        nu.setIsAlertMail(resultSet.getBoolean("alertmail"));
                         listUser.add(nu);
                     }
                 } finally {
@@ -1173,13 +1390,12 @@ public class UserHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT users.id_user FROM users, user_role"
+                    String query = "SELECT users.id_user FROM users"
                             + " WHERE "
-                            + " users.id_user = user_role.id_user"
-                            + " AND"
                             + " users.username = '" + userName + "'"
                             + " AND"
-                            + " user_role.id_role = 1";
+                            + " users.id_role = 1";
+                    
                     resultSet = stmt.executeQuery(query);
                     resultSet.next();
                     if (resultSet.getRow() != 0) {

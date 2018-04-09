@@ -1,27 +1,33 @@
 package mom.trd.opentheso.bdd.helper.nodes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class NodeUser implements Serializable {
-    private int id;
+    private int idUser;
     private String name;
     private String mail;
     private int idRole;
     private String role;
-    private String idThesaurus;
     private boolean isActive;
     private boolean isAlertMail;
+    private boolean isSuperAdmin = false;
+    private boolean passtomodify;
+    
+    ArrayList<NodeUserRoleThesaurus> nodeUserRoleThesaurus;
+    ArrayList<NodeUserGroup> nodeUserGroup;    
     
     public NodeUser() {
     }
 
-    public int getId() {
-        return id;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
+
 
     public String getName() {
         return name;
@@ -55,14 +61,6 @@ public class NodeUser implements Serializable {
         this.mail = mail;
     }
 
-    public String getIdThesaurus() {
-        return idThesaurus;
-    }
-
-    public void setIdThesaurus(String idThesaurus) {
-        this.idThesaurus = idThesaurus;
-    }
-
     public boolean isIsActive() {
         return isActive;
     }
@@ -78,7 +76,38 @@ public class NodeUser implements Serializable {
     public void setIsAlertMail(boolean isAlertMail) {
         this.isAlertMail = isAlertMail;
     }
-    
+
+    public boolean isIsSuperAdmin() {
+        return isSuperAdmin;
+    }
+
+    public void setIsSuperAdmin(boolean isSuperAdmin) {
+        this.isSuperAdmin = isSuperAdmin;
+    }
+
+    public boolean isPasstomodify() {
+        return passtomodify;
+    }
+
+    public void setPasstomodify(boolean passtomodify) {
+        this.passtomodify = passtomodify;
+    }
+
+    public ArrayList<NodeUserRoleThesaurus> getNodeUserRoleThesaurus() {
+        return nodeUserRoleThesaurus;
+    }
+
+    public void setNodeUserRoleThesaurus(ArrayList<NodeUserRoleThesaurus> nodeUserRoleThesaurus) {
+        this.nodeUserRoleThesaurus = nodeUserRoleThesaurus;
+    }
+
+    public ArrayList<NodeUserGroup> getNodeUserGroup() {
+        return nodeUserGroup;
+    }
+
+    public void setNodeUserGroup(ArrayList<NodeUserGroup> nodeUserGroup) {
+        this.nodeUserGroup = nodeUserGroup;
+    }
     
     
 }

@@ -23,26 +23,26 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.tools.MD5Password;
 
-@ManagedBean(name = "user1", eager = true)
+@ManagedBean(name = "currentUser", eager = true)
 @SessionScoped
 
 public class CurrentUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private String name = null;
-    private String pseudo;
+    private String pseudo = null;
+    private String pseudoEdit;
     private String pwd = null;
     private NodeUser user;
     private boolean isLogged = false;
 
     private NodeUser userEdit;
     private int idEdit;
-    private String nameEdit;
-    private String mailEdit;
-    private int roleEdit;
-    private String pwdEdit1 = "";
-    private String pwdEdit2 = "";
-    private String pwdEdit3 = "";
+    private String pseudoAdded;
+    private String mailAdded;
+    private int roleAdded;
+    private String pwdAdded1 = "";
+    private String pwdAdded2 = "";
+    private String pwdAdded3 = "";
     private boolean alertmail = false;
 
     //pref
@@ -54,8 +54,6 @@ public class CurrentUser implements Serializable {
     private List<String> authorizedTheso;
 
     private List<String> selectedThesaurus;
-
-    private boolean isHaveWriteToCurrentThesaurus = false;
 
     private String versionOfOpentheso;
 
@@ -111,8 +109,8 @@ public class CurrentUser implements Serializable {
      * @return
      */
     public NodePreference getThesaurusPreferences(String idThesaurus, String workLanguage) {
-
-        if(user.getId() == 1) { // superAdmin
+        if(user == null) return null;
+        if(user.isIsSuperAdmin()) { // superAdmin
             authorizedTheso = new ThesaurusHelper().getAllIdOfThesaurus(connect.getPoolConnexion());
         } else { 
             authorizedTheso = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
@@ -137,12 +135,11 @@ public class CurrentUser implements Serializable {
             versionOfOpentheso = new BaseDeDoneesHelper().getVersionOfOpentheso(connect.getPoolConnexion());
             return nodePreference;
         }
-        return null;
     }
  
 
     /**
-     * Connect l'utilisateur si le compte existe
+     * Connect l'utilisateur si son compte en récupérant toutes les informations lui concernant
      *
      * @return le lien de l'index si le compte existe, un message d'erreur sinon
      * init c'est une parametre que viens du "isUserExist" ou return une 1 si on
@@ -151,13 +148,38 @@ public class CurrentUser implements Serializable {
      * motpasstemp)
      */
     public String connect() {
-
+        int idUser;
         UserHelper userHelper = new UserHelper();
-        if (userHelper.isUserExist(connect.getPoolConnexion(), name, MD5Password.getEncodedPassword(pwd))) {
+        idUser = userHelper.getIdUser(connect.getPoolConnexion(), pseudo, MD5Password.getEncodedPassword(pwd));
+        if(idUser == -1) {
+            // utilisateur ou mot de passe n'existent pas
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+            return "";
+        }
+        
+        // on récupère le compte de l'utilisatreur 
+        user = userHelper.getUser(connect.getPoolConnexion(), idUser);
+        if(user == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
+            return "";            
+        }
+        isLogged = true;
+        if (user.isPasstomodify()) {
+            return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp
+        }
+        pseudo = "";
+        pwd = "";
+        return "index.xhtml?faces-redirect=true";
+                
+        /**
+         * code déprécié par #MR
+         */
+        /*
+        if (userHelper.isUserExist(connect.getPoolConnexion(), pseudo, MD5Password.getEncodedPassword(pwd))) {
             try {
                 // on vérifie si l'utilisateur est SuperAdmin, on lui donne tout les droits
-                if (userHelper.isAdminUser(connect.getPoolConnexion(), name)) {
-                    user = userHelper.getInfoAdmin(connect.getPoolConnexion(), name);
+                if (userHelper.isAdminUser(connect.getPoolConnexion(), pseudo)) {
+                    user = userHelper.getInfoAdmin(connect.getPoolConnexion(), pseudo);
                     if (user == null) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.roleError")));
                         return "";
@@ -170,16 +192,16 @@ public class CurrentUser implements Serializable {
                     baseDeDonnesHelper.updateVersionOpentheso(connect.getPoolConnexion(), version_Opentheso);
                 } // on récupère ses droits par rapport au thésaurus en cours
                 else {
-                    NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                    NodeUser nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), pseudo, idTheso);
                     if (nodeUserTemp == null) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", langueBean.getMsg("user.roleErrorAll")));
-                        nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), name);
+                        nodeUserTemp = userHelper.getInfoUser(connect.getPoolConnexion(), pseudo);
                         if (nodeUserTemp == null) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
                             return "";
                         }
                     } else {
-                        user = userHelper.getInfoUser(connect.getPoolConnexion(), name, idTheso);
+                        user = userHelper.getInfoUser(connect.getPoolConnexion(), pseudo, idTheso);
                     }
                     authorizedTheso = userHelper.getAuthorizedThesaurus(connect.getPoolConnexion(), user.getId());
                 }
@@ -189,22 +211,19 @@ public class CurrentUser implements Serializable {
                     isActive = userEdit.isIsActive();
                 }
              
-                if (userHelper.isChangeToPass(connect.getPoolConnexion(), name)) {
+                if (userHelper.isChangeToPass(connect.getPoolConnexion(), pseudo)) {
                     return "changePass.xhtml?faces-redirect=true";// nouvelle pass web pour changer le motpasstemp
                 }
-                name = null;
+                pseudo = null;
                 pwd = null;
                 return "index.xhtml?faces-redirect=true";
             } catch (SQLException ex) {
                 Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-       
-       
         // utilisateur ou mot de passe n'existent pas
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error1")));
-        return "";
-      
+        return "";*/
     }
 
     public boolean updateAuthorizedTheso() {
@@ -306,49 +325,49 @@ public class CurrentUser implements Serializable {
     }
 
     public void changePwd() {
-        if (pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || pwdEdit3 == null || pwdEdit3.equals("")) {
+        if (pwdAdded1 == null || pwdAdded1.equals("") || pwdAdded2 == null || pwdAdded2.equals("") || pwdAdded3 == null || pwdAdded3.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
-        } else if (!pwdEdit2.equals(pwdEdit3)) {
+        } else if (!pwdAdded2.equals(pwdAdded3)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
-        } else if (!new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdEdit1))) {
+        } else if (!new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdAdded1))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error4")));
         } else {
-            new UserHelper().updatePwd(connect.getPoolConnexion(), user.getId(), MD5Password.getEncodedPassword(pwdEdit2));
+            new UserHelper().updatePwd(connect.getPoolConnexion(), user.getId(), MD5Password.getEncodedPassword(pwdAdded2));
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
         }
-        pwdEdit1 = "";
-        pwdEdit2 = "";
-        pwdEdit3 = "";
+        pwdAdded1 = "";
+        pwdAdded2 = "";
+        pwdAdded3 = "";
     }
   
     public void changeMail() {
-        if (mailEdit == null || mailEdit.equals("")) {
+        if (mailAdded == null || mailAdded.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
-        } else if (!mailEdit.contains("@") || mailEdit.lastIndexOf(".") < mailEdit.indexOf("@")) {
+        } else if (!mailAdded.contains("@") || mailAdded.lastIndexOf(".") < mailAdded.indexOf("@")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error7")));
-        } else if (new UserHelper().isUserMailExist(connect.getPoolConnexion(), mailEdit)) {
+        } else if (new UserHelper().isUserMailExist(connect.getPoolConnexion(), mailAdded)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error8")));
         } else {
-            new UserHelper().updateMail(connect.getPoolConnexion(), user.getId(), mailEdit);
-            user.setMail(mailEdit);
+            new UserHelper().updateMail(connect.getPoolConnexion(), user.getId(), mailAdded);
+            user.setMail(mailAdded);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
         }
-        mailEdit = "";
+        mailAdded = "";
     }    
     
 
     public void renamePseudo() {
-        if (pseudo == null || pseudo.isEmpty()) {
+        if (pseudoEdit == null || pseudoEdit.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
-        } else if (new UserHelper().isPseudoExist(connect.getPoolConnexion(), pseudo)) {
+        } else if (new UserHelper().isPseudoExist(connect.getPoolConnexion(), pseudoEdit)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
         } else {
-            new UserHelper().updatePseudo(connect.getPoolConnexion(), user.getId(), pseudo);
-            user.setName(pseudo);
+            new UserHelper().updatePseudo(connect.getPoolConnexion(), user.getId(), pseudoEdit);
+            user.setName(pseudoEdit);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
         }
-        name  = pseudo;
-        pseudo = "";
+        pseudo  = pseudoEdit;
+        pseudoEdit = "";
     }
 
     public void delUser(int idUser) {
@@ -357,11 +376,11 @@ public class CurrentUser implements Serializable {
     }
 
     public void addUser() throws SQLException {
-        if (pwdEdit1 == null || pwdEdit1.equals("") || pwdEdit2 == null || pwdEdit2.equals("") || nameEdit == null || nameEdit.equals("") || mailEdit.equals("") || mailEdit == null) {
+        if (pwdAdded1 == null || pwdAdded1.equals("") || pwdAdded2 == null || pwdAdded2.equals("") || pseudoAdded == null || pseudoAdded.equals("") || mailAdded.equals("") || mailAdded == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
-        } else if (!pwdEdit1.equals(pwdEdit2)) {
+        } else if (!pwdAdded1.equals(pwdAdded2)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
-        } else if (new UserHelper().isUserLoginExist(connect.getPoolConnexion(), nameEdit)) {
+        } else if (new UserHelper().isUserLoginExist(connect.getPoolConnexion(), pseudoAdded)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
         } else {
             UserHelper userHelper = new UserHelper();
@@ -370,7 +389,7 @@ public class CurrentUser implements Serializable {
             conn.setAutoCommit(false);
             int idUser = -1;
 
-            if (userHelper.isUserMailExist(conn, mailEdit)) {
+            if (userHelper.isUserMailExist(conn, mailAdded)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.info7")));
             } else {
                 try {
@@ -378,14 +397,14 @@ public class CurrentUser implements Serializable {
                     // Cas de création de SuperAdmin
                     if (user.getIdRole() == 1) {
                         // ajout de l'utilisateur
-                        if (!userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                        if (!userHelper.addUser(conn, pseudoAdded, mailAdded, MD5Password.getEncodedPassword(pwdAdded1), roleAdded)) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
                             conn.close();
                             return;
                         }
                         // récupération de l'Id du User
-                        idUser = userHelper.getIdUser(conn, nameEdit);
+                        idUser = userHelper.getIdUser(conn, pseudoAdded);
                         if (idUser == -1) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
@@ -394,25 +413,27 @@ public class CurrentUser implements Serializable {
                         }
 
                         // ajout du role 
-                        if (!userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                            conn.rollback();
-                            conn.close();
-                            return;
+                        if(idTheso != null) { // si idTheso = null, cas où on a aucun thésaurus actif, on n'applique pas les droits au thésaurus en cours
+                            if (!userHelper.addRole(conn, idUser, roleAdded, idTheso, "")) {
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+                                conn.rollback();
+                                conn.close();
+                                return;
+                            }
                         }
                     }
 
                     // Cas de création d'admin (par thésaurus)
                     if (user.getIdRole() == 2) {
                         // ajout de l'utilisateur
-                        if (!userHelper.addUser(conn, nameEdit, mailEdit, MD5Password.getEncodedPassword(pwdEdit1), roleEdit)) {
+                        if (!userHelper.addUser(conn, pseudoAdded, mailAdded, MD5Password.getEncodedPassword(pwdAdded1), roleAdded)) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
                             conn.close();
                             return;
                         }
                         // récupération de l'Id du User
-                        idUser = userHelper.getIdUser(conn, nameEdit);
+                        idUser = userHelper.getIdUser(conn, pseudoAdded);
                         if (idUser == -1) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
@@ -421,7 +442,7 @@ public class CurrentUser implements Serializable {
                         }
 
                         // ajout du role 
-                        if (!userHelper.addRole(conn, idUser, roleEdit, idTheso, "")) {
+                        if (!userHelper.addRole(conn, idUser, roleAdded, idTheso, "")) {
                             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                             conn.rollback();
                             conn.close();
@@ -438,7 +459,7 @@ public class CurrentUser implements Serializable {
                                 return; 
                             }
                     }
-                    userHelper.updateAddUserHistorique(conn, nameEdit);
+                    userHelper.updateAddUserHistorique(conn, pseudoAdded);
                     
                     conn.commit();
                     conn.close();
@@ -446,10 +467,10 @@ public class CurrentUser implements Serializable {
                     Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                mailEdit = "";
-                pwdEdit1 = "";
-                pwdEdit2 = "";
-                nameEdit = "";
+                mailAdded = "";
+                pwdAdded1 = "";
+                pwdAdded2 = "";
+                pseudoAdded = "";
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info3")));
             }
         }
@@ -460,7 +481,7 @@ public class CurrentUser implements Serializable {
         try {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-            if (!userHelper.updateRoleUser(conn, idEdit, roleEdit, selectedThesaurus)) {
+            if (!userHelper.updateRoleUser(conn, idEdit, roleAdded, selectedThesaurus)) {
                 conn.rollback();
                 conn.close();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
@@ -480,29 +501,29 @@ public class CurrentUser implements Serializable {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
-        nameEdit = "";
+        pseudoAdded = "";
         vue.setEditUser(false);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info4")));
     }
 
     public void selectUser(NodeUser nu) {
-        nameEdit = nu.getName();
+        pseudoAdded = nu.getName();
         idEdit = nu.getId();
-        roleEdit = nu.getIdRole();
+        roleAdded = nu.getIdRole();
         vue.setEditUser(true);
         selectedThesaurus = new UserHelper().getAuthorizedThesaurus(connect.getPoolConnexion(),
                 idEdit);
         UserHelper userHelper = new UserHelper();
-        userEdit = userHelper.getInfoUser(connect.getPoolConnexion(), nameEdit, idTheso);
+        userEdit = userHelper.getInfoUser(connect.getPoolConnexion(), pseudoAdded, idTheso);
         isActive = userEdit.isIsActive();
         alertmail = userEdit.isIsAlertMail();
     }
 
     public void reInit() {
-        pwdEdit1 = "";
-        pwdEdit2 = "";
-        pwdEdit3 = "";
-        nameEdit = "";
+        pwdAdded1 = "";
+        pwdAdded2 = "";
+        pwdAdded3 = "";
+        pseudoAdded = "";
         vue.setEditUser(false);
         vue.setAddUser(false);
     }
@@ -545,12 +566,12 @@ public class CurrentUser implements Serializable {
         return MD5Password.getEncodedPassword("demo");
     }
 
-    public String getName() {
-        return name;
+    public String getPseudo() {
+        return pseudo;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
     }
 
     public String getPwd() {
@@ -585,44 +606,44 @@ public class CurrentUser implements Serializable {
         this.isLogged = isLogged;
     }
 
-    public String getPwdEdit1() {
-        return pwdEdit1;
+    public String getPwdAdded1() {
+        return pwdAdded1;
     }
 
-    public void setPwdEdit1(String pwdEdit1) {
-        this.pwdEdit1 = pwdEdit1;
+    public void setPwdAdded1(String pwdAdded1) {
+        this.pwdAdded1 = pwdAdded1;
     }
 
-    public String getPwdEdit2() {
-        return pwdEdit2;
+    public String getPwdAdded2() {
+        return pwdAdded2;
     }
 
-    public void setPwdEdit2(String pwdEdit2) {
-        this.pwdEdit2 = pwdEdit2;
+    public void setPwdAdded2(String pwdAdded2) {
+        this.pwdAdded2 = pwdAdded2;
     }
 
-    public String getPwdEdit3() {
-        return pwdEdit3;
+    public String getPwdAdded3() {
+        return pwdAdded3;
     }
 
-    public void setPwdEdit3(String pwdEdit3) {
-        this.pwdEdit3 = pwdEdit3;
+    public void setPwdAdded3(String pwdAdded3) {
+        this.pwdAdded3 = pwdAdded3;
     }
 
-    public String getNameEdit() {
-        return nameEdit;
+    public String getPseudoAdded() {
+        return pseudoAdded;
     }
 
-    public void setNameEdit(String nameEdit) {
-        this.nameEdit = nameEdit;
+    public void setPseudoAdded(String pseudoAdded) {
+        this.pseudoAdded = pseudoAdded;
     }
 
-    public int getRoleEdit() {
-        return roleEdit;
+    public int getRoleAdded() {
+        return roleAdded;
     }
 
-    public void setRoleEdit(int roleEdit) {
-        this.roleEdit = roleEdit;
+    public void setRoleAdded(int roleAdded) {
+        this.roleAdded = roleAdded;
     }
 
     public Vue getVue() {
@@ -649,12 +670,12 @@ public class CurrentUser implements Serializable {
         this.langueBean = langueBean;
     }
 
-    public String getMailEdit() {
-        return mailEdit;
+    public String getMailAdded() {
+        return mailAdded;
     }
 
-    public void setMailEdit(String mailEdit) {
-        this.mailEdit = mailEdit;
+    public void setMailAdded(String mailAdded) {
+        this.mailAdded = mailAdded;
     }
 
     public String getLangSourceEdit() {
@@ -682,6 +703,9 @@ public class CurrentUser implements Serializable {
     }
 
     public boolean isIsHaveWriteToCurrentThesaurus() {
+        if(user == null) return false;
+        if(user.getIdRole() == 1) return true;
+        
         if (idTheso == null) {
             return false;
         }
@@ -732,12 +756,12 @@ public class CurrentUser implements Serializable {
         this.authorizedTheso = authorizedTheso;
     }
 
-    public String getPseudo() {
-        return pseudo;
+    public String getPseudoEdit() {
+        return pseudoEdit;
     }
 
-    public void setPseudo(String pseudo) {
-        this.pseudo = pseudo;
+    public void setPseudoEdit(String pseudoEdit) {
+        this.pseudoEdit = pseudoEdit;
     }
 
     public boolean isAlertmail() {

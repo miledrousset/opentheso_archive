@@ -517,32 +517,33 @@ $$ LANGUAGE plpgsql;
 -- Table: public.user_role
 -- DROP TABLE public.user_role;
 -- permet de créer la table user_role qui n'existait pas avant la version 4.8
+-- deprecated 
 
-CREATE OR REPLACE FUNCTION createUser_role() RETURNS VOID AS $$
-DECLARE 
+--CREATE OR REPLACE FUNCTION createUser_role() RETURNS VOID AS $$
+--DECLARE 
 
-Begin
-	IF NOT EXISTs (SELECT * from information_schema.tables  where table_name = 'user_role') then
-		execute 'CREATE TABLE user_role 
-		(
-		  id_user integer NOT NULL,
-		  id_role integer NOT NULL,
-		  id_thesaurus character varying  DEFAULT ''''::character varying,
-		  id_group character varying,
-		  CONSTRAINT user_role_pkey PRIMARY KEY (id_user, id_role, id_thesaurus))
-		WITH (
-		  OIDS=FALSE
-		);
-
-		insert into user_role (id_user, id_role)
-		 SELECT id, id_role from users;
-
-
-		Alter Table users drop id_role;';
-
-		END IF;
-END;
-$$ LANGUAGE plpgsql;
+--Begin
+--	IF NOT EXISTs (SELECT * from information_schema.tables  where table_name = 'user_role') then
+--		execute 'CREATE TABLE user_role 
+--		(
+--		  id_user integer NOT NULL,
+--		  id_role integer NOT NULL,
+--		  id_thesaurus character varying  DEFAULT ''''::character varying,
+--		  id_group character varying,
+--		  CONSTRAINT user_role_pkey PRIMARY KEY (id_user, id_role, id_thesaurus))
+--		WITH (
+--		  OIDS=FALSE
+--		);
+--
+--		insert into user_role (id_user, id_role)
+--		 SELECT id, id_role from users;
+--
+--
+--		Alter Table users drop id_role;';
+--
+--		END IF;
+--END;
+--$$ LANGUAGE plpgsql;
 
 --
 -- permet d'ajouter la table user_historique
@@ -1656,6 +1657,46 @@ $$language plpgsql;
 
 
 
+----------------------------------------------------------------------------
+-- mises à jour de la table users pour intégrer le role de l'utilisateur
+-- transfert des roles de la table user_role vers users
+-- suppression de la table user_role
+-- création de la table user_thesaurus
+-- mise a jour de la table users (ajout de la colonne id_role)
+-- #MR
+
+create or replace function update_table_users() returns void as $$
+    declare
+	line RECORD;
+	begin 
+            if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_role') then
+                execute 'ALTER TABLE users ADD column id_role integer;';
+                execute 'CREATE TABLE user_thesaurus
+                        (
+                          id_user integer NOT NULL,
+                          id_thesaurus character varying NOT NULL,
+                          id_domain character varying NOT NULL DEFAULT ''all''::character varying,
+                          CONSTRAINT user_thesaurus_pkey PRIMARY KEY (id_user, id_thesaurus, id_domain)
+                        );';
+                for line in select id_user, id_role from user_role
+                    loop
+                        begin
+                            update users SET id_role = line.id_role WHERE line.id_user = users.id_user;
+                        EXCEPTION WHEN unique_violation THEN continue;
+                        end;
+                    end loop;
+                for line in select id_user, id_thesaurus from user_role
+                    loop
+                        begin
+                            INSERT INTO user_thesaurus (id_user, id_thesaurus) VALUES (line.id_user, line.id_thesaurus);
+                        EXCEPTION WHEN unique_violation THEN continue;
+                        end;
+                    end loop;
+                execute 'DROP TABLE user_role;';
+            end if;
+	end;
+	$$language plpgsql;
+
 
 
 
@@ -1687,7 +1728,7 @@ SELECT ajouter_sequence('role_id_seq');
 SELECT ajouter_sequence('term_historique__id_seq');
 SELECT ajouter_sequence('alignement_preferences_id_seq');
 SELECT ajouter_sequence('gps_preferences_id_seq');
-SELECT createUser_role();
+--SELECT createUser_role();
 SELECT updateColumnTerm('term');
 SELECT updateColumn_table('users','passtomodify','boolean');
 SELECT updateID_table();
@@ -1783,6 +1824,7 @@ SELECT update_table_preferences_handle();
 SELECT update_table_concept_handle();
 
 SELECT update_table_users_alert();
+SELECT update_table_users();
 
 /*
 -- Mise à jour de la table de types d'alignement
@@ -1875,7 +1917,7 @@ SELECT delete_fonction ('updatecolumn_alignement_source','');
 SELECT delete_fonction ('updatecolumnterm','TEXT');
 SELECT delete_fonction ('delete_table','TEXT');
 SELECT delete_fonction ('delete_sequence','TEXT');
-SELECT delete_fonction ('createuser_role','');
+--SELECT delete_fonction ('createuser_role','');
 SELECT delete_fonction ('create_table_aligenementsources','');
 SELECT delete_fonction ('ajouter_sequence','TEXT');
 SELECT delete_fonction ('addtype_auth_method','');
@@ -1907,6 +1949,7 @@ SELECT delete_fonction('create_table_concept_group_concept','');
 SELECT delete_fonction('update_table_preferences_handle','');
 SELECT delete_fonction('update_table_concept_handle','');
 SELECT delete_fonction('update_table_users_alert','');
+SELECT delete_fonction('update_table_users','');
 
 --Ne pas toucher les prochaines fonctions
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');
