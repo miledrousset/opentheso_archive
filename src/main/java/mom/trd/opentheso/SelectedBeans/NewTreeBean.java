@@ -619,7 +619,7 @@ public class NewTreeBean implements Serializable {
         for(TreeNode tn:tc.getExpandedNodes()){
             ids.add(((MyTreeNode)tn).getIdConcept());
         }
-        ids.addAll(tc.getPathFromSelectedConcept(connect,(MyTreeNode)selectedNode));
+        ids.addAll(tc.getPathFromSelectedConcept(connect,selectedTerme));
         ids.add(selectedTerme.getIdC());
         reExpandNodes(root,ids,selectedTerme.getIdC());//code pour forcer le depliment de l'arbre
     
