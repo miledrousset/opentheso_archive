@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.SelectedBeans.AutoCompletBean;
+import mom.trd.opentheso.SelectedBeans.SelectedTerme;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
@@ -498,13 +499,13 @@ public class TreeChange {
         return false;
     }
 
-    public ArrayList<String> getPathFromSelectedConcept(Connexion conn,MyTreeNode selectedNode) {
+    public ArrayList<String> getPathFromSelectedConcept(Connexion conn,SelectedTerme selectedTerme) {
          
-        String id=selectedNode.getIdConcept();
-        String theso=selectedNode.getIdTheso();
+        String id=selectedTerme.getIdC();
+        String theso=selectedTerme.getIdTheso();
       
         GroupHelper gh=new GroupHelper();
-        ArrayList<NodeGroup> groups= gh.getListGroupOfConcept(conn.getPoolConnexion(), theso,id,selectedNode.getLangue());
+        ArrayList<NodeGroup> groups= gh.getListGroupOfConcept(conn.getPoolConnexion(), theso,id,selectedTerme.getIdlangue());
         
         ConceptHelper ch=new ConceptHelper();
         ArrayList<String> result=new ArrayList<>();
