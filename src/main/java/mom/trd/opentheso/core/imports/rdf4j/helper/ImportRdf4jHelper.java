@@ -238,11 +238,15 @@ public class ImportRdf4jHelper {
 
     /**
      * detecte la racine d'une branche
+     * On cherche le concept qui n'a pas de relation BT(terme générique)
+     * Cette fonction n'importe qu'une branche entière (pas de fils en tête de liste)
+     * 
      *
      * @return root
      */
     private SKOSResource detectRootOfBranch() {
         SKOSResource root = null;
+        boolean haveBT = false;
         HashMap<String, String> uriRessourcePere = new HashMap<>();
         ArrayList<String> uriList = new ArrayList<>();
         for (SKOSResource resource : skosXmlDocument.getConceptList()) {
@@ -255,16 +259,21 @@ public class ImportRdf4jHelper {
                         || relationProp == SKOSProperty.broaderInstantive
                         || relationProp == SKOSProperty.broaderPartitive) {
                     uriRessourcePere.put(uri, relation.getTargetUri());
+                    haveBT = true;
                 }
             }
+            if(!haveBT) {
+                return resource;
+            }
+            haveBT = false;
         }
-        for (SKOSResource resource : skosXmlDocument.getConceptList()) {
+      /*  for (SKOSResource resource : skosXmlDocument.getConceptList()) {
             String uri = resource.getUri();
             //si la ressource n'a pas de père alors c'est la racine
             if (uriRessourcePere.get(uri) == null || !uriList.contains(uriRessourcePere.get(uri))) {
                 root = resource;
             }
-        }
+        }*/
         return root;
     }
 
@@ -570,7 +579,7 @@ public class ImportRdf4jHelper {
             acs.term.setId_term(acs.nodeTerm.getIdTerm());
             acs.term.setLexical_value(nodeEMList1.getLexical_value());
             acs.term.setLang(nodeEMList1.getLang());
-            acs.term.setId_thesaurus(thesaurus.getId_thesaurus());
+            acs.term.setId_thesaurus(idTheso);
             acs.term.setSource(nodeEMList1.getSource());
             acs.term.setStatus(nodeEMList1.getStatus());
             acs.termHelper.addNonPreferredTerm(ds, acs.term, idUser);
@@ -579,12 +588,12 @@ public class ImportRdf4jHelper {
         if (acs.nodeGps.getLatitude() != null && acs.nodeGps.getLongitude() != null) {
             // insertion des données GPS
             acs.gpsHelper.insertCoordonees(ds, acs.concept.getIdConcept(),
-                    thesaurus.getId_thesaurus(),
+                    idTheso,
                     acs.nodeGps.getLatitude(), acs.nodeGps.getLongitude());
         }
 
         for (String idTopConcept1 : idTopConcept) {
-            if (!acs.conceptHelper.setTopConcept(ds, idTopConcept1, thesaurus.getId_thesaurus())) {
+            if (!acs.conceptHelper.setTopConcept(ds, idTopConcept1, idTheso)) {
                 // erreur;
             }
         }

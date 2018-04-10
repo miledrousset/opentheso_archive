@@ -1205,6 +1205,12 @@ public class ConceptHelper {
                             + " id_thesaurus ='" + idThesaurus + "'"
                             + " and id_concept ='" + idConcept + "'";
                     stmt.executeUpdate(query);
+                    
+                    query ="delete from alignement "
+                            + " where internal_id_concept = '" + idConcept + "'"
+                            + " and internal_id_thesaurus = '" + idThesaurus + "'";                    
+                    stmt.executeUpdate(query);
+                    
                     status = true;
 
                 } finally {

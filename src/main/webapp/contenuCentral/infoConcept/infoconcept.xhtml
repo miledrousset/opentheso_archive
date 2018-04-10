@@ -65,10 +65,8 @@
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                        <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
-
+                        <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" update=":idDeleteOrphanDlg" oncomplete="PF('deleteOrphanDlg').show();"  style="font-size: 12px;"/>
                         <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idMoveBranchFromOrphanDlg" oncomplete="PF('moveBranchFromOrphanDlg').show();" style="font-size: 12px;"/>
-
                         <p:menuitem rendered="#{(selectedTerme.type == 3) }"   value="#{langueBean.getMsg('panel.addToMT')}" update=":idMoveBranchFromOrphanToGroupDlg" oncomplete="PF('moveBranchFromOrphanToGroupDlg').show();" style="font-size: 12px;"/>
                     </p:menu>
                 </h:form>
