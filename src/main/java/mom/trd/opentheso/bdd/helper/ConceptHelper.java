@@ -267,6 +267,12 @@ public class ConceptHelper {
 
         ArkClient ark_Client = new ArkClient();
 
+        Properties propertiesArk = new Properties();
+        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
+        propertiesArk.setProperty("user", nodePreference.getUserArk());
+        propertiesArk.setProperty("password", nodePreference.getPassArk());
+        ark_Client.setPropertiesArk(propertiesArk);
+        
         Concept concept = getThisConcept(ds, idConcept, idTheso);
 
         if (concept.getIdArk() == null) {
