@@ -25,6 +25,7 @@ public class  SendMail implements Runnable {
     protected final Log log = LogFactory.getLog(SendMail.class);
     protected HikariDataSource poolConnexion;
     protected HashMap<String,Date> id_theso;//<th_thesaurus,date debut période>
+    protected ArrayList<String> mails;
     //protected String idLang;
     
     
@@ -112,6 +113,14 @@ public class  SendMail implements Runnable {
      */ 
     protected String getTheso()  {
          return this.id_theso.entrySet().iterator().next().getKey();
+    }
+
+    public ArrayList<String> getMails() {
+        return mails;
+    }
+
+    public void setMails(ArrayList<String> mails) {
+        this.mails = mails;
     }
    
     

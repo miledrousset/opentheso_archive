@@ -27,6 +27,7 @@ public class SendMailValidedInsertedCdt extends SendMail implements Runnable {
        int ret=updateDateRoutine(idTheso,new Date());
       
        id_theso.replace(idTheso,new Date());
+       mess.setDestinataires(mails);
        this.send(mess);
     }
 

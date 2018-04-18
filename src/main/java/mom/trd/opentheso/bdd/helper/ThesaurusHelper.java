@@ -1253,4 +1253,35 @@ public class ThesaurusHelper {
         return state;
     }
 
+    public String getLangueSource(HikariDataSource poolConnexion, String idTheso) {
+        Connection conn;
+        PreparedStatement stmt;
+        ResultSet  rs;
+        String lang="";
+        try{
+            conn=poolConnexion.getConnection();
+            try{
+                String sql="SELECT source_lang FROM preferences WHERE id_thesaurus=? ";
+                stmt=conn.prepareStatement(sql);
+                stmt.setString(1,idTheso);
+                try{
+                    rs=stmt.executeQuery();
+                    rs.next();
+                    lang=rs.getString(1);
+                }
+                finally{
+                    stmt.close();
+                }
+                
+            }
+            finally{
+                conn.close();
+            }
+        }
+        catch(SQLException e){
+            log.error("erreur dans la méthode getLangueSource ", e);
+        }
+        return lang;
+    }
+
 }

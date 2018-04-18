@@ -11,6 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,6 +26,7 @@ import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 
@@ -44,6 +49,7 @@ public class BackgroundTimeJob  {
     private ScheduleJob sjValid;//schedule job de la routine mail insertion validation refus d'un candidat
     private ScheduleJob sjSparql;//schedule pour la synchronization avec le serveur sparql
     
+    private HashMap<String,Set<String>> thesaurus_Mail=new HashMap<>(); 
   
     
     /**
@@ -52,7 +58,41 @@ public class BackgroundTimeJob  {
      public BackgroundTimeJob() {
     }
     
-    /**
+    private void set_thesaurus_Mail(HashMap<Integer,String> userid_mail ){
+        
+        
+        UserHelper userhelper=new UserHelper();        
+        ArrayList<Integer> userId=new ArrayList<>();
+        ArrayList<String> mail=new ArrayList<>();
+        
+       
+        
+                for(Map.Entry<Integer,String> entry : userid_mail.entrySet()){            
+           userId.add(entry.getKey());
+          
+           mail.add(entry.getValue());
+        }
+        int    i=0;
+        for(Integer num: userId){
+        List<String> l=userhelper.getAuthorizedThesaurus(this.connect.getPoolConnexion(),num);
+   
+            for(String str: l){
+                    if(thesaurus_Mail.containsKey(str)){
+
+                        thesaurus_Mail.get(str).add(mail.get(i));
+                    }else{
+                        ConcurrentSkipListSet<String> set=new ConcurrentSkipListSet<>();
+                        set.add(mail.get(i));
+                        thesaurus_Mail.put((String)str,set);
+                    }
+
+            } 
+        i++;
+        }
+    }
+     
+     
+     /**
      * init
      * #JM
      * fonction qui doit lancer les routines avec le lancement du serveur(PostConstruct)
@@ -62,6 +102,11 @@ public class BackgroundTimeJob  {
     public void init(){
        BackgroundTimeJobHelper bmsh=new BackgroundTimeJobHelper();
        
+       HashMap<Integer,String> userId_mail=bmsh.getUserIdsUserMails(connect);
+       this.set_thesaurus_Mail(userId_mail);
+       //bmsh.cancelAlertTableRoutine(connect);
+       
+       //bmsh.setAlertTableRoutine(this.thesaurus_Mail,connect);
        this.pas=bmsh.getPoolAlert(connect);
        if(this.pas==null){
            return;//forcer à cause de  l'install automatique (?)
@@ -80,7 +125,7 @@ public class BackgroundTimeJob  {
     
     @PreDestroy
     public void destroy(){
-       
+        this.thesaurus_Mail=new HashMap<>();
         sjPropos.closeAllJob();
         sjValid.closeAllJob();
         sjSparql.closeAllJob();
@@ -100,6 +145,10 @@ public class BackgroundTimeJob  {
       id_theso.put(pas.get(key).getThesaurusEnAcces(),
               pas.get(key).getDate_debut_envoi_cdt_propos());
       smpc.setPool_id_theso_since(id_theso);
+      Set l=this.thesaurus_Mail.get(pas.get(key).getThesaurusEnAcces());
+      if(l!=null){
+      smpc.setMails(new ArrayList(l));
+      }
       return smpc;
       
        
@@ -119,6 +168,10 @@ public class BackgroundTimeJob  {
       id_theso.put(pas.get(key).getThesaurusEnAcces(),
               pas.get(key).getDate_debut_envoi_cdt_valid());
       smvic.setPool_id_theso_since(id_theso);
+      Set l=this.thesaurus_Mail.get(pas.get(key).getThesaurusEnAcces());
+      if(l!=null){
+      smvic.setMails(new ArrayList(l));
+      }
       return smvic;
     }
     

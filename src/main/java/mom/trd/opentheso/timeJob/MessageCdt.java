@@ -39,6 +39,10 @@ class MessageCdt {
     public boolean hasEmptyAddress(){
         return destinataires.isEmpty();
     }
+
+    public void setDestinataires(ArrayList<String> destinataires) {
+        this.destinataires = destinataires;
+    }
     
     
 }
