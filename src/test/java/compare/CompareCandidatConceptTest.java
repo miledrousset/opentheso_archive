@@ -67,53 +67,53 @@ public class CompareCandidatConceptTest {
         
         String idTheso = "TH_1";
         String idLang = "fr";
-        String idGroup = "6";
+        String idGroup = "5";
         SearchHelper searchHelper = new SearchHelper();
         ArrayList<String> nodeSearchTerm;
         HashMap<String, String> hashMapSyn;
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-    //    String path = "/Users/Miled/Desktop/candidatsPactols.csv";
+        String path = "/Users/Miled/Desktop/Lieux_nontrouvés.csv";
 
-        String path = "C:/Users/jm.prudham/Desktop/candidatsPactols.csv";
+    //    String path = "C:/Users/jm.prudham/Desktop/candidatsPactols.csv";
        
        
         String line;
-       
+        String[] lineOrigine;
         boolean first;
         
     //    stringBuilder.append("Numéro BDD\tnom d'origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
 
             //    new InputStreamReader(file));
         
-        BufferedWriter bw = openFile("C:/Users/jm.prudham/Desktop/candidatsPactols_out.csv");
+        BufferedWriter bw = openFile("/Users/Miled/Desktop/Lieux_nontrouvés_OK.csv");
         if(bw == null) return;
-      //  int i=0;
+        int i=0;
         try {
             File file = new File(path);  
             BufferedReader bf = new BufferedReader(
                   new InputStreamReader(
                       new FileInputStream(file), "UTF8"));
             while ((line = bf.readLine()) != null) {
-            /*    lineOrigine = line.split("\t");
+                lineOrigine = line.split("\t");
                 if(lineOrigine.length < 2) continue;
                 
-                lineTmp = removeStopWords(lineOrigine[1]);
-                */
-                nodeSearchTerm = searchHelper.simpleSearchPreferredTerm(conn, line.trim(), idLang, idTheso, idGroup);
-                hashMapSyn = searchHelper.simpleSearchNonPreferredTerm(conn, line.trim(), idLang, idTheso, idGroup);
+                //lineTmp = removeStopWords(lineOrigine[1]);
+                
+            //    nodeSearchTerm = searchHelper.simpleSearchPreferredTerm(conn, lineOrigine[1].trim(), idLang, idTheso, idGroup);
+                hashMapSyn = searchHelper.simpleSearchNonPreferredTerm(conn, lineOrigine[1].trim(), idLang, idTheso, idGroup);
                 stringBuilder.append(line.trim());
                 //stringBuilder.append(" #### ");
-                stringBuilder.append("\t");
-                first = true;
-                for (String term : nodeSearchTerm) {
+            //   stringBuilder.append("\t");
+            //    first = true;
+              /*  for (String term : nodeSearchTerm) {
                     if(!first){
                         stringBuilder.append("##"); 
                     }
                     stringBuilder.append(term);
                     first = false;
-                }
+                }*/
                 stringBuilder.append("\t");
                 first = true;
                 for (Map.Entry<String, String> entry : hashMapSyn.entrySet()) {
@@ -133,8 +133,8 @@ public class CompareCandidatConceptTest {
                 bw.write(stringBuilder.toString());
                 bw.newLine();
                 stringBuilder.delete(0, stringBuilder.capacity());
-           /*     i++;
-                if(i==1000) {
+            /*    i++;
+                if(i==10) {
                     closeFile(bw);
                     conn.close();
                     return;

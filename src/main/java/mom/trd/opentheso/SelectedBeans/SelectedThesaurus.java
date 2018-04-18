@@ -746,6 +746,7 @@ public class SelectedThesaurus implements Serializable {
         //récup les concepts
         ConceptHelper conceptHelper = new ConceptHelper();
 
+        conceptHelper.setNodePreference(nodePreference);
         /*Vérification et génération des nouveaux id Ark*/
         for (String idConcept : idConcepts) {
             if (!conceptHelper.regenerateArkId(connect.getPoolConnexion(),

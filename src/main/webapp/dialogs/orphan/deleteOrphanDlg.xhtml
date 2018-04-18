@@ -1,0 +1,46 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idDeleteOrphanDlg"  header="#{langueBean.getMsg('popup.delOrphan')}" widgetVar="deleteOrphanDlg" modal="true" resizable="false" >
+        <!-- Message de validation de la suppression de la branche -->
+        <h:panelGroup>
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('popup.delOrphan')}" /></legend>
+                <h:form>
+                    <p:messages showDetail="true">
+                    </p:messages>
+                    <table>
+                            <tr>
+
+                                <td><h:outputText value="#{selectedTerme.nom}  (#{selectedTerme.idC})" /></td>
+
+                                <td></td><td></td><td></td>
+                                <td>
+                                    <h:form>
+                                        <p:commandButton id="cbDelBranchOrhan" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:idDeleteOrphanDlg"
+                                                         actionListener="#{newtreeBean.delOrphans()}" oncomplete="PF('deleteOrphanDlg').hide();">
+                                            <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.validDelOrphan')}" icon="ui-icon-alert" />  
+                                        </p:commandButton>  
+
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                            <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                        </p:confirmDialog> 
+                                    </h:form>
+                                </td>
+                            </tr>
+
+                    </table>
+
+                </h:form>
+            </fieldset>
+        </h:panelGroup>                    
+    </p:dialog>
+</ui:composition>
+
+
+

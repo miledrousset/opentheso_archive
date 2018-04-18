@@ -30,7 +30,7 @@ public class ConnexionTest {
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");
         config.addDataSourceProperty("databaseName", "pactols");
-        config.addDataSourceProperty("portNumber", "5433");
+        config.addDataSourceProperty("portNumber", "5436");
         config.addDataSourceProperty("serverName", "localhost");
 
         /*      config.addDataSourceProperty("user", "pactols");

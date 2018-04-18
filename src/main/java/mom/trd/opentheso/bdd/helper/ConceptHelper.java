@@ -267,6 +267,12 @@ public class ConceptHelper {
 
         ArkClient ark_Client = new ArkClient();
 
+        Properties propertiesArk = new Properties();
+        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
+        propertiesArk.setProperty("user", nodePreference.getUserArk());
+        propertiesArk.setProperty("password", nodePreference.getPassArk());
+        ark_Client.setPropertiesArk(propertiesArk);
+        
         Concept concept = getThisConcept(ds, idConcept, idTheso);
 
         if (concept.getIdArk() == null) {
@@ -1205,6 +1211,12 @@ public class ConceptHelper {
                             + " id_thesaurus ='" + idThesaurus + "'"
                             + " and id_concept ='" + idConcept + "'";
                     stmt.executeUpdate(query);
+                    
+                    query ="delete from alignement "
+                            + " where internal_id_concept = '" + idConcept + "'"
+                            + " and internal_id_thesaurus = '" + idThesaurus + "'";                    
+                    stmt.executeUpdate(query);
+                    
                     status = true;
 
                 } finally {

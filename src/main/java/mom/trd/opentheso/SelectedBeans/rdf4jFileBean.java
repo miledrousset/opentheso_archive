@@ -105,9 +105,10 @@ public class rdf4jFileBean implements Serializable {
                 uploadEnable = false;
                 BDDinsertEnable = true;
 
-                info = "File correctly loaded";
+                info = "File correctly loaded, total : " + sKOSXmlDocument.getConceptList().size() ;
 
             } catch (Exception e) {
+                error = e.toString();
             } finally {
                 showError();
             }
@@ -396,14 +397,21 @@ public class rdf4jFileBean implements Serializable {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
             importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            importRdf4jHelper.setIdentifierType(identifierType); // pour signaler si on  récupère pas les identifiants (ARK ou Handle).
+            importRdf4jHelper.setNodePreference(tree.getSelectedTerme().getUser().nodePreference);
+    
+            
             try {
                 importRdf4jHelper.addBranch(selectedTerme);
             } catch (ParseException ex) {
-                error = ex.getMessage();
+                error = ex.toString();
+                System.out.println(ex.toString());
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                error = ex.toString();
+                System.out.println(ex.toString());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                error = ex.toString();
+                System.out.println(ex.toString());
             }
             tree.reInit();
             tree.reExpand();
@@ -413,7 +421,7 @@ public class rdf4jFileBean implements Serializable {
             BDDinsertEnable = false;
             uri = null;
             total = 0;
-
+            showError();
         } catch (Exception e) {
         } finally {
             showError();
