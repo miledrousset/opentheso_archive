@@ -193,8 +193,8 @@ public class BackgroundTimeJobHelper {
      */
     MessageCdt selectMessageProposedCdt(String idTheso, Date d1,Date d2,
             HikariDataSource poolConnexion) {
-        
-        ArrayList<String> ret=new CandidateHelper().getListOfCdtDuringPeriod(idTheso, d1,d2, poolConnexion);
+        String langue=new ThesaurusHelper().getLangueSource(poolConnexion, idTheso);
+        ArrayList<String> ret=new CandidateHelper().getListOfCdtDuringPeriod(idTheso, d1,d2, poolConnexion,langue);
         //ArrayList<String> destinataires=new UserHelper().getMailAdmin(poolConnexion, idTheso); 
        // ArrayList<String> dest=reduce(destinataires);
         MessageCdt mess=new MessageCdt(ret, new ArrayList<>());

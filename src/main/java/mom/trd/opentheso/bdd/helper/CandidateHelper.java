@@ -2326,7 +2326,7 @@ public class CandidateHelper {
      * @return 
      * modifié par #MR
      */
-    public ArrayList<String> getListOfCdtDuringPeriod(String idTheso, Date d1,Date d2,HikariDataSource poolConnexion){
+    public ArrayList<String> getListOfCdtDuringPeriod(String idTheso, Date d1,Date d2,HikariDataSource poolConnexion,String lang){
         ArrayList<String> listCdt=new ArrayList<>();
         ResultSet resultSet;
         Statement stmt;
@@ -2344,27 +2344,29 @@ public class CandidateHelper {
                     "  concept_candidat.created, \n" +
                     "  concept_candidat.modified, \n" +
                     "  concept_candidat.admin_message, \n" +
-                    "  concept_candidat.status\n" +
-                    "\n" +
+                    "  concept_candidat.status, \n" +
+                    "  thesaurus_label.title\n" +
                     "FROM \n" +
                     "  concept_term_candidat, \n" +
                     "  concept_candidat, \n" +
-                    "  term_candidat\n" +
+                    "  term_candidat, thesaurus_label \n" +
                     "WHERE \n" +
                     "  concept_term_candidat.id_concept = concept_candidat.id_concept AND\n" +
                     "  concept_term_candidat.id_thesaurus = concept_candidat.id_thesaurus AND\n" +
-                    "  term_candidat.id_term = concept_term_candidat.id_term AND\n" +
-                    "  term_candidat.id_thesaurus = concept_term_candidat.id_thesaurus AND\n" +
-                    "  concept_candidat.id_thesaurus = '" + idTheso + "' AND \n" +
+                    "  term_candidat.id_term = concept_term_candidat.id_term AND \n" +
+                    "  term_candidat.id_thesaurus = concept_term_candidat.id_thesaurus AND "+
+                    "  concept_term_candidat.id_thesaurus=thesaurus_label.id_thesaurus AND \n" +
+                    "  concept_candidat.id_thesaurus = '" + idTheso + "' AND  \n" +
                     "  concept_candidat.status = 'a' AND (\n" +
                     "  concept_candidat.created BETWEEN '" + d11 + "' AND '" + d21 + "' OR \n" +
-                    "  concept_candidat.modified BETWEEN '"+ d11 + "' AND '" + d21 + "');";
+                    "  concept_candidat.modified BETWEEN '"+ d11 + "' AND '" + d21 + "')"+
+                            "  AND term_candidat.lang='"+lang+"' AND thesaurus_label.lang='"+lang+"' ;";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     while(resultSet.next()){
                         LineCdt lCdt=new LineCdt();
                         lCdt.setId_thesaurus(resultSet.getString("id_thesaurus"));
-                        lCdt.setTitle_thesaurus("");
+                        lCdt.setTitle_thesaurus(resultSet.getString("title"));
                         lCdt.setId_concept(resultSet.getString("id_concept"));
                         lCdt.setValeur_lexical(resultSet.getString("lexical_value"));
                         lCdt.setCreated(resultSet.getDate("created"));
