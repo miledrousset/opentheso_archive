@@ -240,13 +240,13 @@ public class BackgroundTimeJob  {
         long[] period=new long[count];
         Runnable[] job=new Runnable[count];
         // today    
-        Calendar date = new GregorianCalendar();
-        // reset hour, minutes, seconds and millis
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
+        Calendar date = Calendar.getInstance();
+       
+        date.setTime(new Date());
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
-
+       
+        
         // next day
        // date.add(Calendar.DAY_OF_MONTH, 1);
        
@@ -258,7 +258,10 @@ public class BackgroundTimeJob  {
             SimpleDateFormat sdf2=new SimpleDateFormat("mm");
             date.set(Calendar.HOUR_OF_DAY,Integer.parseInt(sdf1.format(this.SparqlSyn.get(i).getHeure())));
             date.set(Calendar.MINUTE,Integer.parseInt(sdf2.format(this.SparqlSyn.get(i).getHeure())));
-            initialD[i]=(date.getTime().getTime()-new Date().getTime())/(1000*60);//en minute
+            Calendar calendar=Calendar.getInstance();
+            calendar.setTime(new Date());
+            initialD[i]=(date.getTimeInMillis()-calendar.getTimeInMillis())/(1000*60);
+//getTimeInMillis()- new Date().getTime())/(1000*60);//en minute
             if(initialD[i]<0)initialD[i]+=24*60;//si lheure est passé aujourd hui alors on ajoute  
             period[i]=24*60;
             job[i]=this.synchroSparql(i);
@@ -269,7 +272,7 @@ public class BackgroundTimeJob  {
         }
         
      
-        this.sjSparql=new ScheduleJob(count, initialD, period, TimeUnit.DAYS, job);
+        this.sjSparql=new ScheduleJob(count, initialD, period, TimeUnit.MINUTES, job);
         this.sjSparql.sendPeriodicMultipleJob();
     }
 
