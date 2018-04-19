@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mom.trd.opentheso.SelectedBeans.SelectedTerme;
-import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
+import mom.trd.opentheso.SelectedBeans.Rdf4jFileBean;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
@@ -360,7 +360,7 @@ public class ImportRdf4jHelper {
         return null;
     }
 
-    public void addGroups(rdf4jFileBean fileBean) {
+    public void addGroups(Rdf4jFileBean fileBean) {
         // récupération des groups ou domaine
         GroupHelper groupHelper = new GroupHelper();
 
@@ -494,7 +494,7 @@ public class ImportRdf4jHelper {
         }
     }
 
-    public void addConcepts(rdf4jFileBean fileBean) throws SQLException, ParseException {
+    public void addConcepts(Rdf4jFileBean fileBean) throws SQLException, ParseException {
 
         AddConceptsStruct acs = new AddConceptsStruct();
         acs.conceptHelper = new ConceptHelper();
@@ -535,6 +535,50 @@ public class ImportRdf4jHelper {
         addGroupDefault();
     }
 
+    /**
+     * permet d'ajouter un lot de concepts au thésaurus en utilisant les relations natives des concetps :
+     * ceci suppose que les concepts faisaient partie du thésaurus et étaient liés entre eux.
+     * cas de récupération d'anciens concepts pour les ajouter de nouveau.
+     * @param sKOSResources
+     * #MR 
+    */
+    public void addLotOfConcepts(ArrayList<SKOSResource> sKOSResources) throws ParseException, SQLException {
+
+        AddConceptsStruct acs = new AddConceptsStruct();
+        acs.conceptHelper = new ConceptHelper();
+        for (SKOSResource conceptResource : sKOSResources) {
+            initAddConceptsStruct(acs, conceptResource);
+            addRelation(acs);
+
+            // envoie du concept à la BDD 
+            if (!isConceptEmpty(acs.nodeTermTraductionList)) {
+                if (acs.idGrps.isEmpty()) {
+                    acs.concept.setTopConcept(acs.isTopConcept);
+                    acs.concept.setIdGroup(idGroupDefault);
+                    acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
+
+                    new GroupHelper().addConceptGroupConcept(ds, idGroupDefault, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
+                    defaultGroupToAdd = true;
+                } else {
+                    for (String idGrp : acs.idGrps) {
+                        acs.concept.setTopConcept(acs.isTopConcept);
+                        acs.concept.setIdGroup(idGrp);
+                        
+                        if(!acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser)){
+                            System.out.println("Erreur sur le Concept = " + acs.concept.getIdConcept());
+                        }
+                    }
+                }
+
+                finalizeAddConceptStruct(acs);
+
+            }
+        }
+
+        addLangsToThesaurus(ds, idTheso);
+        addGroupDefault();
+    }    
+    
     private void finalizeAddConceptStruct(AddConceptsStruct acs) throws SQLException {
         acs.termHelper.insertTerm(ds, acs.nodeTerm, idUser);
 

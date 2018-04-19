@@ -8,7 +8,7 @@ package mom.trd.opentheso.core.imports.rdf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
+import mom.trd.opentheso.SelectedBeans.Rdf4jFileBean;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import org.eclipse.rdf4j.model.IRI;
@@ -42,7 +42,7 @@ public class ReadRdf4j {
      * @param fileBean
      * @throws java.io.IOException
      */
-    public ReadRdf4j(InputStream is, int type, rdf4jFileBean fileBean) throws IOException {
+    public ReadRdf4j(InputStream is, int type, Rdf4jFileBean fileBean) throws IOException {
         sKOSXmlDocument = new SKOSXmlDocument();
         switch (type) {
             case 0:
@@ -105,7 +105,7 @@ public class ReadRdf4j {
      * Permet de lire un fichier RDF précédament charger avec la fonction
      * laodModel() les données sont stoqué dans la variable thesaurus
      */
-    private void readModel(rdf4jFileBean fileBean) {
+    private void readModel(Rdf4jFileBean fileBean) {
 
         ReadStruct readStruct = new ReadStruct();
         readStruct.resource = null;

@@ -29,7 +29,7 @@ import org.primefaces.event.FileUploadEvent;
  */
 @ManagedBean(name = "rdf4jFileBean")
 @ViewScoped
-public class rdf4jFileBean implements Serializable {
+public class Rdf4jFileBean implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;

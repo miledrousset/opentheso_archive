@@ -29,7 +29,7 @@ public class ConnexionTest {
         // Zoomathia
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");
-        config.addDataSourceProperty("databaseName", "pactols");
+        config.addDataSourceProperty("databaseName", "pactols_lieux_avant");
         config.addDataSourceProperty("portNumber", "5436");
         config.addDataSourceProperty("serverName", "localhost");
 
