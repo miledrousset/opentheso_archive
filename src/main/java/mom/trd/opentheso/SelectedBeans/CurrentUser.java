@@ -22,6 +22,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.tools.MD5Password;
+import mom.trd.opentheso.timeJob.BackgroundTimeJob;
 
 @ManagedBean(name = "user1", eager = true)
 @SessionScoped
@@ -70,6 +71,9 @@ public class CurrentUser implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    @ManagedProperty(value ="#{backgroundTimeJob}")
+    private BackgroundTimeJob backgroundtimeJob;
   
     @PostConstruct
     public void initUser() {
@@ -273,10 +277,13 @@ public class CurrentUser implements Serializable {
             conn.commit();
             conn.close();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("conf.alertMailMessage")));
-            return true;
+            this.backgroundtimeJob.destroy();
+            this.backgroundtimeJob.init();
+             return true;
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
         }
+       
         return false;
     }
     
@@ -747,6 +754,15 @@ public class CurrentUser implements Serializable {
     public void setAlertmail(boolean alertmail) {
         this.alertmail = alertmail;
     }
+
+    public BackgroundTimeJob getBackgroundtimeJob() {
+        return backgroundtimeJob;
+    }
+
+    public void setBackgroundtimeJob(BackgroundTimeJob backgroundtimeJob) {
+        this.backgroundtimeJob = backgroundtimeJob;
+    }
+    
 
  
 }

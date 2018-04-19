@@ -141,24 +141,26 @@ public class LineCdt {
         message.append("</i>");
         
         // données concernant les propositions faites par les utilisateurs
-        for (NodeProposition nodeProposition1 : nodeProposition) {
-            message.append("<tr>");
-            message.append("<td><b>");
-            message.append(nodeProposition1.getUser());
-            message.append("</b></td>");
-            message.append("</tr>");
-            
-            message.append("<tr>");
-            message.append("<td><b>");
-            message.append(nodeProposition1.getNote());
-            message.append("</b></td>");
-            message.append("</tr>");
-            
-            message.append("<tr>");
-            message.append("<td><b>");
-            message.append(nodeProposition1.getLabelConceptParent());
-            message.append("</b></td>");
-            message.append("</tr>");             
+        if(nodeProposition!=null){
+            for (NodeProposition nodeProposition1 : nodeProposition) {
+                message.append("<tr>");
+                message.append("<td><b>");
+                message.append(nodeProposition1.getUser());
+                message.append("</b></td>");
+                message.append("</tr>");
+
+                message.append("<tr>");
+                message.append("<td><b>");
+                message.append(nodeProposition1.getNote());
+                message.append("</b></td>");
+                message.append("</tr>");
+
+                message.append("<tr>");
+                message.append("<td><b>");
+                message.append(nodeProposition1.getLabelConceptParent());
+                message.append("</b></td>");
+                message.append("</tr>");             
+            }
         }
         message.append("</td>");
        /* 

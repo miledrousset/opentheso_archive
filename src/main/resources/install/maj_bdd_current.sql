@@ -1556,10 +1556,11 @@ begin
         execute 'CREATE TABLE routine_mail 
                     ( id_thesaurus character varying PRIMARY KEY,
                       alert_cdt boolean DEFAULT true,
-                      debut_env_cdt_propos DATE NOT NULL,
-                      debut_env_cdt_valid DATE NOT NULL,
-                      period_env_cdt_propos integer NOT NULL,
-                      period_env_cdt_valid integer NOT NULL
+                      debut_env_cdt_propos date NOT NULL DEFAULT CURRENT_DATE,
+                      debut_env_cdt_valid date NOT NULL DEFAULT CURRENT_DATE,
+                      period_env_cdt_propos integer NOT NULL DEFAULT 7,
+                      period_env_cdt_valid integer NOT NULL DEFAULT 7,
+                      CONSTRAINT routine_mail_pkey PRIMARY KEY (id_thesaurus)
                         )';
     END IF;
 end

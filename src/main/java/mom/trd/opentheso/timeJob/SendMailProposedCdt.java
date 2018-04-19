@@ -27,7 +27,7 @@ public class SendMailProposedCdt extends SendMail implements Runnable {
       MessageCdt mess=this.getValue(idTheso,date);
       int ret=this.updateDateRoutine(idTheso,new Date());
       id_theso.replace(idTheso,new Date());
-     
+      mess.setDestinataires(mails);
       this.send(mess);
       
     }
