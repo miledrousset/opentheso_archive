@@ -31,7 +31,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openide.util.Exceptions;
 import org.primefaces.model.ByteArrayContent;
 import org.primefaces.model.StreamedContent;
 
@@ -138,7 +137,7 @@ public class ExportSkosByLotTest {
 
         } catch (UnsupportedEncodingException ex) {
 
-            Exceptions.printStackTrace(ex);
+            System.out.println(ex);
 
         } finally {
 
@@ -148,7 +147,7 @@ public class ExportSkosByLotTest {
 
             } catch (IOException ex) {
 
-                Exceptions.printStackTrace(ex);
+                System.out.println(ex);
 
             }
 

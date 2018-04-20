@@ -187,7 +187,8 @@ public class ReadRdf4j {
             for (String b : nonReco) {
                 balises += "    " + b + "\n";
             }
-            fileBean.setWarning("Not readed RDF tag\n" + balises);
+            if(fileBean!=null)
+                fileBean.setWarning("Not readed RDF tag\n" + balises);
         }
     }
 

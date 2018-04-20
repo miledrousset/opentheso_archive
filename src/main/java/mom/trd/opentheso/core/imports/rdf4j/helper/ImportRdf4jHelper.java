@@ -541,42 +541,45 @@ public class ImportRdf4jHelper {
      * cas de récupération d'anciens concepts pour les ajouter de nouveau.
      * @param sKOSResources
      * #MR 
+     * @param idThesaurus 
+     * @param idGroup 
+     * @throws java.text.ParseException 
+     * @throws java.sql.SQLException 
     */
-    public void addLotOfConcepts(ArrayList<SKOSResource> sKOSResources) throws ParseException, SQLException {
+    public void addLotOfConcepts(ArrayList<SKOSResource> sKOSResources, 
+            String idThesaurus, String idGroup) throws ParseException, SQLException {
 
         AddConceptsStruct acs = new AddConceptsStruct();
         acs.conceptHelper = new ConceptHelper();
+        this.idTheso = idThesaurus;
         for (SKOSResource conceptResource : sKOSResources) {
             initAddConceptsStruct(acs, conceptResource);
             addRelation(acs);
 
             // envoie du concept à la BDD 
             if (!isConceptEmpty(acs.nodeTermTraductionList)) {
-                if (acs.idGrps.isEmpty()) {
                     acs.concept.setTopConcept(acs.isTopConcept);
-                    acs.concept.setIdGroup(idGroupDefault);
+                    acs.concept.setIdGroup(idGroup);
+                    acs.concept.setIdThesaurus(idThesaurus);
                     acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser);
+                    
+                    
+                    
+        /*    //on lie le nouveau concept au concept père
+            HierarchicalRelationship hierarchicalRelationship1 = new HierarchicalRelationship(acs.concept.getIdConcept(), idConceptPere, idTheso, "BT");
+            HierarchicalRelationship hierarchicalRelationship2 = new HierarchicalRelationship(idConceptPere, acs.concept.getIdConcept(), idTheso, "NT");
+            acs.hierarchicalRelationships.add(hierarchicalRelationship1);
+            acs.hierarchicalRelationships.add(hierarchicalRelationship2);      */              
 
-                    new GroupHelper().addConceptGroupConcept(ds, idGroupDefault, acs.concept.getIdConcept(), acs.concept.getIdThesaurus());
-                    defaultGroupToAdd = true;
-                } else {
-                    for (String idGrp : acs.idGrps) {
-                        acs.concept.setTopConcept(acs.isTopConcept);
-                        acs.concept.setIdGroup(idGrp);
-                        
-                        if(!acs.conceptHelper.insertConceptInTable(ds, acs.concept, idUser)){
-                            System.out.println("Erreur sur le Concept = " + acs.concept.getIdConcept());
-                        }
-                    }
-                }
-
-                finalizeAddConceptStruct(acs);
-
+                    new GroupHelper().addConceptGroupConcept(ds, idGroup, acs.concept.getIdConcept(), idThesaurus);
             }
-        }
+            finalizeAddConceptStruct(acs);
 
-        addLangsToThesaurus(ds, idTheso);
-        addGroupDefault();
+        }
+        new ToolsHelper().orphanDetectByGroup(ds, idThesaurus,idGroup);
+
+    //    addLangsToThesaurus(ds, idTheso);
+    //    addGroupDefault();
     }    
     
     private void finalizeAddConceptStruct(AddConceptsStruct acs) throws SQLException {
@@ -1048,8 +1051,14 @@ public class ImportRdf4jHelper {
     private String getOriginalId(String uri) {
         String originalId;
         if(skosXmlDocument.getEquivalenceUriArkHandle().isEmpty() ||
-                skosXmlDocument.getEquivalenceUriArkHandle().get(uri) == null)
-            return getIdFromUri(uri);
+                skosXmlDocument.getEquivalenceUriArkHandle().get(uri) == null){
+            originalId = new ConceptHelper().getIdConceptFromArkId(ds, getIdArkFromUri(uri));
+            if(originalId == null) {
+                return getIdFromUri(uri);
+            }
+            else
+                return originalId;
+        }
 
         originalId = skosXmlDocument.getEquivalenceUriArkHandle().get(uri).toString();
         if(originalId == null) {

@@ -7,43 +7,20 @@ package imports;
 
 import com.zaxxer.hikari.HikariDataSource;
 import connexion.ConnexionTest;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import javax.faces.event.PhaseId;
 import mom.trd.opentheso.SelectedBeans.SelectedTerme;
-import mom.trd.opentheso.bdd.helper.PreferencesHelper;
-import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
-import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
-import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
-import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
-import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.Rio;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openide.util.Exceptions;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.ByteArrayContent;
-import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -73,8 +50,8 @@ public class ImportSkosByLotTest {
     }
 
     @Test
-    private void importSkosByLot() {
-        String path = "/Users/Miled/Desktop/Lieux PACTOLS/lieux_supprimés.csv";
+    public void importSkosByLot() {
+        String path = "/Users/Miled/Desktop/Lieux_nontrouvés_exportés.rdf";
         
         SKOSXmlDocument sKOSXmlDocument;
         InputStream is = null;
@@ -96,9 +73,7 @@ public class ImportSkosByLotTest {
                     return;
                 }
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-                int total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-                String uri = sKOSXmlDocument.getTitle();
-
+                insertConcepts(sKOSXmlDocument);
 
             } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -114,44 +89,36 @@ public class ImportSkosByLotTest {
      * @param idRole
      * @param selectedTerme
      */
-    private void insertConcepts(SelectedTerme selectedTerme) {
-   /*     info = "";
-        error = "";
-        warning = "";
-        uri = "";
-        formatDate = "yyyy-MM-dd";
-        total = 0;
-        uploadEnable = true;
-        BDDinsertEnable = false;
-        identifierType = "sans";        
-        
+    private void insertConcepts(SKOSXmlDocument sKOSXmlDocument) {
+
+        String formatDate = "yyyy-MM-dd";
+        String idThesaurus = "TH_1";
+        String idGroup = "5";
+                
+
+        String identifierType = "ark";        
+        ConnexionTest connexionTest = new ConnexionTest();
+        conn = connexionTest.getConnexionPool();
         try {
-
-        } catch (Exception e) {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-            importRdf4jHelper.setInfos(conn, formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue() "fr");
- /*           importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            importRdf4jHelper.setInfos(conn, formatDate, true, "adresse", 1, 1, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
+            importRdf4jHelper.setIdentifierType(identifierType);
             try {
-                importRdf4jHelper.addSingleConcept(selectedTerme);
+                importRdf4jHelper.addLotOfConcepts(sKOSXmlDocument.getConceptList(),
+                        idThesaurus, idGroup);
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                 System.out.println(ex.getMessage());
             } catch (ParseException ex) {
-                error = ex.getMessage();
+                 System.out.println(ex.getMessage());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                 System.out.println(ex.getMessage());
             }
-            tree.reInit();
-            tree.reExpand();
-            tree.getSelectedTerme().majTerme((MyTreeNode) tree.getSelectedNode());
+        } catch (Exception e) {
 
-            uploadEnable = true;
-            BDDinsertEnable = false;
-            uri = null;
-            total = 0;
         } finally {
-            showError();
-        }*/
-
+        }
+        conn.close();
     }
 
 

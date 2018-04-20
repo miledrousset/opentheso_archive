@@ -91,7 +91,7 @@ public class GroupHelper {
                 try {
                     String query = "Insert into concept_group_concept "
                             + "(idgroup, idthesaurus, idconcept)"
-                            + "values ("
+                            + " values ("
                             + "'" + groupID + "'"
                             + ",'" + idThesaurus + "'"
                             + ",'" + conceptID + "'"

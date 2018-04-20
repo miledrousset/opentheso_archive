@@ -147,7 +147,81 @@ public class ToolsHelper {
             Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-    }    
+    }   
+    
+    /**
+     * Fonction qui permet de repérer les termes orphelins et les ranger dans les orphelins.
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean orphanDetectByGroup(HikariDataSource ds,
+            String idThesaurus, String idGroup) {
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        OrphanHelper orphanHelper = new OrphanHelper();
+        ArrayList<String> idBT;
+        ArrayList<String> idConcept1WhereIsNT;
+
+        // récupération de tous les Id concepts du thésaurus
+        ArrayList<String> tabIdConcept = conceptHelper.getAllIdConceptOfThesaurusByGroup(ds, idThesaurus, idGroup);
+        
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            for (String idConcept : tabIdConcept) {
+                idBT = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
+                idConcept1WhereIsNT=relationsHelper.getListIdWhichHaveNt(ds, idConcept, idThesaurus);
+                if(idBT.isEmpty() && idConcept1WhereIsNT.isEmpty()) {
+                    if(!conceptHelper.isTopConcept(ds, idConcept, idThesaurus)){
+                        // le concept est orphelin
+                        if(!orphanHelper.isOrphanExist(ds, idConcept, idThesaurus)) {
+                            if(!orphanHelper.addNewOrphan(conn, idConcept, idThesaurus)){
+                                conn.rollback();
+                                conn.close();
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else{
+                    if(!(idBT.containsAll(idConcept1WhereIsNT)) ){
+                        //alors il manque des BT
+                        ArrayList<String> BTmiss =new ArrayList<>(idConcept1WhereIsNT);
+                        BTmiss.removeAll(idBT);
+                         //on ajoute la différence
+                        for(String miss: BTmiss){
+                          if(!relationsHelper.insertHierarchicalRelation(conn, idConcept, idThesaurus,"BT", miss)){
+                              conn.rollback();
+                                conn.close();
+                               return false;
+                          }
+                        }
+                    }
+                     if(!(idConcept1WhereIsNT.containsAll(idBT))){
+                        //il manque des NT pour certain idBT
+                        ArrayList<String> NTmiss =new ArrayList<>(idBT);
+                        NTmiss.removeAll(idConcept1WhereIsNT);
+                        //on jaoute la différence
+                        for(String miss:NTmiss){
+                            if(!relationsHelper.insertHierarchicalRelation(conn, miss, idThesaurus,"NT", idConcept)){
+                              conn.rollback();
+                                conn.close();
+                              return false;
+                            }
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }       
     
     /**
      * Permet de supprimer les BT à un concept qui est Top terme, 
