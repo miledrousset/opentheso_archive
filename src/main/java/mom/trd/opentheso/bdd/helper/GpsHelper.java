@@ -34,11 +34,14 @@ public class GpsHelper {
             if (!updateCoordonees(ds, idC, idTheso, lat, lon)) {
                 return false;
             }
+            if (!setConceptGPS(ds, idC, idTheso, true)) {
+                return false;
+            }
         } else {
             if (!insertGpsCoordinate(ds, idC, idTheso, lat, lon)) {
                 return false;
             }
-            if (!updateConcept(ds, idC, idTheso)) {
+            if (!setConceptGPS(ds, idC, idTheso, true)) {
                 return false;
             }
         }
@@ -75,7 +78,8 @@ public class GpsHelper {
         return status;
     }
 
-    private boolean updateConcept(HikariDataSource ds, String idC, String idTheso) {
+    private boolean setConceptGPS(HikariDataSource ds,
+            String idC, String idTheso, boolean value) {
         Connection conn;
         Statement stmt;
         boolean status = false;
@@ -85,7 +89,8 @@ public class GpsHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "update concept set gps = true where"
+                    String query = "update concept set gps = " + value
+                            + "  where"
                             + " id_concept ='" + idC + "'"
                             + " and id_thesaurus ='" + idTheso + "'";
                     stmt.executeUpdate(query);
