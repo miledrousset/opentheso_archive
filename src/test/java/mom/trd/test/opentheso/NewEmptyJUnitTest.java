@@ -12,30 +12,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.bean.ManagedProperty;
 import mom.trd.opentheso.SelectedBeans.LanguageBean;
-import mom.trd.opentheso.SelectedBeans.SelectedThesaurus;
-import mom.trd.opentheso.SelectedBeans.StatBean;
-import mom.trd.opentheso.bdd.helper.Connexion;
-import mom.trd.opentheso.bdd.helper.GroupHelper;
-import mom.trd.opentheso.bdd.helper.StatisticHelper;
-import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
-import mom.trd.opentheso.bdd.helper.nodes.statistic.NodeStatConcept;
-import mom.trd.opentheso.bdd.helper.nodes.statistic.NodeStatTheso;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
