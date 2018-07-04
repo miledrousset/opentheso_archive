@@ -1301,6 +1301,7 @@ public class TermHelper {
                             nodeEM.setSource(resultSet.getString("source"));
                             nodeEM.setStatus(resultSet.getString("status"));
                             nodeEM.setHiden(resultSet.getBoolean("hiden"));
+                            nodeEM.setLang(idLang);                            
                             nodeEMList.add(nodeEM);
                         }
                     }

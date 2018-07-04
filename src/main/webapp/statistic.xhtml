@@ -31,6 +31,11 @@
         <div id="menuHead">
             <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
+            <h:panelGroup rendered="#{currentUser.user != null}">
+                <div id="disconnect">
+                    <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
+                </div>
+            </h:panelGroup>            
             <ui:include src="account.xhtml" />
             <ui:include src="menuThesaurus.xhtml" />
             <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
@@ -188,7 +193,7 @@
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
-                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="50" />
                 </f:facet>
 
                 <f:facet name="complete">

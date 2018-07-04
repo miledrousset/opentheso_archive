@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.3.7</version>
+    <version>4.3.8</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -96,6 +96,13 @@
             <groupId>virt_jena3</groupId>
             <artifactId>virt_jena</artifactId>
             <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.19.4</version>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -263,6 +270,11 @@
             <artifactId>primefaces</artifactId>  
             <version>6.2</version>  
         </dependency>
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>6.2.6</version>
+        </dependency>        
         
        <!-- Attention, il faut aussi tester la version 2.5.1 qui ne passe pas sur le serveur Debian avec java 1.7.0_85 -->
         <dependency>
@@ -285,6 +297,12 @@
             <artifactId>jaxrs-ri</artifactId>
             <version>2.26</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.11.3</version>
+        </dependency>        
         
         
         <!-- Pour l'envoie de Mail> 

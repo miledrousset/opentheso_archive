@@ -10,7 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 
 
@@ -19,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  *
- * @author jm.prudham
+ * @author miled.rousset
  */
 public class AccessThesaurusHelper {
    private final Log log = LogFactory.getLog(ThesaurusHelper.class);
@@ -29,6 +32,61 @@ public class AccessThesaurusHelper {
         
         
     }
+        
+ //// restructuration de la classe AccessThesaurusHelper le 05/04/2018 #MR//////    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Nouvelles fontions //////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////// 
+    
+    /**
+     * permet de mettre à jour la visibilité du thésaurus en publique ou privé 
+     * 
+     * @param ds
+     * @param idTheso
+     * @param isPrivate
+     * @return 
+     * #MR
+     */
+    public boolean updateVisibility(HikariDataSource ds,
+            String idTheso,
+            boolean isPrivate) {
+        
+        Statement stmt;
+        boolean status = false;
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE thesaurus SET private = " +
+                            isPrivate + 
+                            " WHERE id_thesaurus='" + 
+                            idTheso + "'";
+                    stmt.executeUpdate(query);
+                    status = true;                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException ex) {
+            log.error("error while updating visibility of thesaurus = " +idTheso, ex);
+        }
+        return status;        
+    }
+    
+  
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ //////// fin des nouvelles fontions ////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////      
+    
+    
     
     /**
      * getLisOfPrivateThesaurus
@@ -170,6 +228,12 @@ public class AccessThesaurusHelper {
         
     }
     
+    /**
+     * retourne la liste de tous les thésaurus (cas d'un SuperAdmin)
+     * @param ds
+     * @param idLang
+     * @return 
+     */
     public HashMap getListThesaurusSA(HikariDataSource ds,String idLang){
         
        Connection conn;
@@ -249,7 +313,7 @@ public class AccessThesaurusHelper {
                         th.setSubject(rs.getString("subject"));
                         th.setTitle(rs.getString("title"));
                         th.setType(rs.getString("type"));
-                        th.setVisibility(rs.getBoolean("private"));
+                        th.setPrivateTheso(rs.getBoolean("private"));
                         
                         
                     }

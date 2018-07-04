@@ -28,7 +28,6 @@ import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ForgetPasswordHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;

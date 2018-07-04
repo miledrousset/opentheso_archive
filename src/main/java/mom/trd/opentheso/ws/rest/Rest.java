@@ -29,7 +29,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import skos.SKOSXmlDocument;
@@ -45,7 +45,6 @@ import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
-import org.apache.bcel.generic.AALOAD;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
@@ -1185,7 +1184,7 @@ public class Rest {
             String idLang, String idTheso){
         ArrayList <String> listId = getListId(value, idLang, idTheso);
         
-        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if(nodePreference != null){
             ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
             exportRdf4jHelper.setNodePreference(nodePreference1);
@@ -1209,7 +1208,7 @@ public class Rest {
             String idLang, String idTheso){
         ArrayList <String> listId = getListId(value, idLang, idTheso);
         
-        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if(nodePreference != null){
             ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
             exportRdf4jHelper.setNodePreference(nodePreference1);
@@ -1259,7 +1258,7 @@ public class Rest {
             return null;
         }
 
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1291,7 +1290,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1319,7 +1318,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1343,7 +1342,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1369,7 +1368,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1395,7 +1394,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1427,7 +1426,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1453,7 +1452,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1486,7 +1485,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }
@@ -1517,7 +1516,7 @@ public class Rest {
         if (ds == null) {
             return null;
         }
-        nodePreference = new PreferencesHelper().getThesaurusPreference(ds, idTheso);
+        nodePreference = new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if (nodePreference == null) {
             return null;
         }

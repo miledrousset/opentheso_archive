@@ -10,18 +10,19 @@ package mom.trd.opentheso.bdd.helper.nodes;
  * @author miled.rousset
  */
 public class NodeUserGroup {
-    private int igGroup;
+    private int idGroup;
     private String groupName;
-
+    
     public NodeUserGroup() {
+        
+    }
+    
+    public int getIdGroup() {
+        return idGroup;
     }
 
-    public int getIgGroup() {
-        return igGroup;
-    }
-
-    public void setIgGroup(int igGroup) {
-        this.igGroup = igGroup;
+    public void setIdGroup(int idGroup) {
+        this.idGroup = idGroup;
     }
 
     public String getGroupName() {
@@ -31,5 +32,4 @@ public class NodeUserGroup {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-    
 }

@@ -7,43 +7,59 @@
 
     <p:dialog id="idAddUserDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="addUserDlg" modal="true" resizable="false" >
            <!-- POPUP ADD USER DEBUT -->
-        <h:form>
+           <h:form rendered="#{currentUser.selectedGroup != null}">
                     <p:messages showDetail="true">
                         <p:autoUpdate />
                     </p:messages>  
+                <p:panelGrid columns="2" >
+                    <h:outputText value="Groupe : " /> 
+                    <h:outputText value="#{currentUser.selectedGroupName}" style="color: green" />
+                </p:panelGrid>
                <table>
+                    <tr>
+                        <td></td>
+                        <td><h:outputText value="#{currentUser.nodeUserRoleOnThisGroup.groupName} " style="color: darkred; font-weight: bold"/></td>
+                   </tr>
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>
-                       <td><h:inputText value="#{user1.nameEdit}" /></td>
+                       <td><h:inputText value="#{currentUser.pseudoAdded}" /></td>
                    </tr>
+                   <h:form>
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('conf.mail')} : " /></td>
-                       <td><h:inputText value="#{user1.mailEdit}" /></td>
+                       <td>
+                           <p:inputText id="email1" value="#{currentUser.mailAdded}" >
+                                <f:validator validatorId="custom.emailValidator" />
+                           </p:inputText>
+                       </td>
                    </tr>
+                   </h:form>
+
+                   
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('co.att2')} : " /></td>
-                       <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
+                       <td><h:inputSecret value="#{currentUser.pwdAdded1}" /></td>
                    </tr>
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('conf.confPwd')} : " /></td>
-                       <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
+                       <td><h:inputSecret value="#{currentUser.pwdAdded2}" /></td>
                    </tr>
                    <tr>
                        <td><h:outputText value="#{langueBean.getMsg('conf.alertMail')}  " /></td>
-                       <td><p:selectBooleanCheckbox value="#{user1.alertmail}" /></td>
+                       <td><p:selectBooleanCheckbox value="#{currentUser.alertmail}" /></td>
                    </tr>                   
                    <tr>
                        <td>#{langueBean.getMsg('conf.tabUserOpt2')} : </td>
                        <td>
-                           <h:selectOneMenu value="#{user1.roleEdit}">
-                               <f:selectItems value="#{user1.selectAuthorizedRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
+                           <h:selectOneMenu value="#{currentUser.roleAdded}">
+                               <f:selectItems value="#{currentUser.getAuthorizedRoles()}"  var="r" itemLabel="#{r.value}" itemValue="#{r.key}"/>
                            </h:selectOneMenu>
                        </td>
                    </tr>
                    <tr style="text-align: right;">
                        <td >
                            <br/>
-                           <p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{user1.addUser()}"  update=":tabUser" 
+                           <p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{currentUser.addUser(currentUser.selectedGroup)}"  update=":tabUser, :messages" 
                                                  styleClass="styleButton" oncomplete="PF('addUserDlg').hide();"/>
                        </td>
                        <td >

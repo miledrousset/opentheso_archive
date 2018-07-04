@@ -31,7 +31,7 @@
                             </td>                                                        
                             <div id="imageEdition">
                                <h:form id="formEditNote" 
-                                       rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and ((user1.haveRights(2)) or (user1.haveRights(4))) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                                       rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and ((roleOnTheso.isAdminOnThisTheso) or (roleOnTheso.isManagerOnThisTheso)) and (selectedTerme.idDomaine != 'Orphan')}">
                                    <p:commandButton id="dynaButtonNote" rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                                    <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
                                        <p:menuitem value="#{langueBean.getMsg('index.note5')}"  oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>

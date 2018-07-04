@@ -2220,11 +2220,12 @@ public class ConceptHelper {
             return updateHandleIdOfConcept(ds, idConcept,
                     idThesaurus, idHandle);
         } else { // cas où le handle existe en local
-            // on vérifie si le handle existe à distance
-            if (handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
+            // on vérifie si le handle existe à distance, on le met à jour (URL + infos)
+            // sinon, on le créé
+        /*    if (handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
                     idHandle)) {
                 return true;
-            } else {
+            } else {*/
                 idHandle = handleClient.putHandle(
                         nodePreference.getPassHandle(),
                         nodePreference.getPathKeyHandle(),
@@ -2238,7 +2239,7 @@ public class ConceptHelper {
                 }
                 return updateHandleIdOfConcept(ds, idConcept,
                         idThesaurus, idHandle);
-            }
+        //    }
         }
     }
 

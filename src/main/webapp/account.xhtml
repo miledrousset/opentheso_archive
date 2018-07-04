@@ -11,7 +11,7 @@
             
             <h:form>
                 <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
-                <p:commandButton id="logout" icon="ui-icon-logout-20" styleClass="styleButton_db" title="#{langueBean.getMsg('menu.account2')}" actionListener="#{accessThesaurusBean.cleanSession()}" />
+                <p:commandButton id="logout" icon="ui-icon-logout-20" styleClass="styleButton_db" title="#{langueBean.getMsg('menu.account2')}" actionListener="#{roleOntheso.cleanSession()}" />
             </h:form>
         </div>
     </h:panelGroup>

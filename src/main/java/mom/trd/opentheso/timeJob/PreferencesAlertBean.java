@@ -5,19 +5,14 @@
  */
 package mom.trd.opentheso.timeJob;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.SelectedBeans.SelectedThesaurus;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 
 /**
  *
@@ -328,7 +323,7 @@ public class PreferencesAlertBean {
     
     
     public void multipleBeanAction(){
-        st.majPref();
+        st.setPreferenceOfThesaurus();
         if(this.as.isAlertB()!=this.alert){
             this.updatePreferenceAlert();
         }

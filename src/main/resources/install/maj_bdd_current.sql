@@ -7,12 +7,19 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.3.7
--- date : 14/03/2018
+-- version=4.3.8
+-- date : 17/04/2018
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
 SET ROLE = opentheso;
+
+
+
+Mise à jour de la table group pour ajouter la colonne idHandle
+
+
+
 -- 
 -- ajout des nouvelles fonctions
 --

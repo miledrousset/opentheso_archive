@@ -42,7 +42,6 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import mom.trd.opentheso.core.alignment.AlignmentQuery;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.ConceptGroupLabel;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
@@ -67,7 +66,6 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGroupIdLabel;
-import mom.trd.opentheso.bdd.helper.nodes.NodeGroupSousGroup;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.NodePermute;
@@ -206,6 +204,10 @@ public class SelectedTerme implements Serializable {
 
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;
+
 
     /**
      * *************************************** INITIALISATION
@@ -213,13 +215,10 @@ public class SelectedTerme implements Serializable {
      */
     @PostConstruct
     public void initTerme() {
-        if (user == null || user.getNodePreference() == null) {
+        if (roleOnTheso == null || roleOnTheso.getNodePreference() == null) {
             return;
         }
-
         majPref();
-
-        user.setIdTheso(idTheso);
         totalConceptOfBranch = "";
         totalNoticesOfBranch = "";
 
@@ -381,11 +380,11 @@ public class SelectedTerme implements Serializable {
             majTSpeConcept();
             align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
             //ResourceBundle bundlePref = getBundlePref();
-            if (user.getNodePreference().isZ3950actif()) {
-                majNoticeZ3950();
-            }
-            if (user.getNodePreference().isBddActive()) {
-                majNoticeBdd();
+            if (roleOnTheso.getNodePreference() != null) {
+                if(roleOnTheso.getNodePreference().isZ3950actif()) 
+                    majNoticeZ3950();
+                if (roleOnTheso.getNodePreference().isBddActive())
+                    majNoticeBdd();
             }
 
             idArk = conceptHelper.getIdArkOfConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -398,19 +397,19 @@ public class SelectedTerme implements Serializable {
     
     private void majNoticeZ3950() {
         //ResourceBundle bundlePref = getBundlePref();
-        if (user.getNodePreference().isZ3950actif()) {
+        if (roleOnTheso.getNodePreference().isZ3950actif()) {
             try {
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-                p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
+                p.put("RepositoryDataSourceURL", "file:" + roleOnTheso.getNodePreference().getPathNotice1());
                 p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-                p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
+                p.put("ConvertorConfigFile", roleOnTheso.getNodePreference().getPathNotice2());
                 Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
                 federated_search_proxy.init(p);
                 try {
                     IRQuery e = new IRQuery();
                     //   e.collections = new Vector<String>();
-                    e.collections.add(user.getNodePreference().getCollectionAdresse());
+                    e.collections.add(roleOnTheso.getNodePreference().getCollectionAdresse());
                     e.hints.put("default_element_set_name", "f");
                     e.hints.put("small_set_setname", "f");
                     e.hints.put("record_syntax", "unimarc");
@@ -430,10 +429,10 @@ public class SelectedTerme implements Serializable {
                 } catch (TimeoutExceededException | SearchException srch_e) {
                  //   srch_e.printStackTrace();
                 }
-                urlNotice = user.getNodePreference().getNoticeUrl();
+                urlNotice = roleOnTheso.getNodePreference().getNoticeUrl();
                 try {
                     //String url_notices = "http://catalogue.frantiq.fr/cgi-bin/koha/opac-search.pl?idx=su%2Cwrdl&q=terme&idx=kw&idx=kw&sort_by=relevance&do=OK";
-                    urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, user.getNodePreference().getUrlEncode()));
+                    urlNotice = urlNotice.replace("terme", URLEncoder.encode("" + idC, roleOnTheso.getNodePreference().getUrlEncode()));
                 } catch (UnsupportedEncodingException ex) {
             //        Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -501,15 +500,15 @@ public class SelectedTerme implements Serializable {
     private void majNoticeBdd() {
         //ResourceBundle bundlePref = getBundlePref();
         nbNotices = 0; //st.getTaskResultSet().getFragmentCount();
-        urlNotice = user.getNodePreference().getUrlBdd();
-        if (user.getNodePreference().isBddUseId()) {
+        urlNotice = roleOnTheso.getNodePreference().getUrlBdd();
+        if (roleOnTheso.getNodePreference().isBddUseId()) {
             urlNotice = urlNotice.replace("##value##", idC);
         } else {
             urlNotice = urlNotice.replace("##value##", nom);
         }
 
         // récupération du total des notices 
-        String urlCounterBdd = user.getNodePreference().getUrlCounterBdd();
+        String urlCounterBdd = roleOnTheso.getNodePreference().getUrlCounterBdd();
         urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
   
         //urlCounterBdd = "http://healthandco.test.o2sources.com/concept/40/total";
@@ -894,8 +893,8 @@ public class SelectedTerme implements Serializable {
      */
     public boolean creerTermeSpe(MyTreeNode selecedTerm) {
         ConceptHelper instance = new ConceptHelper();
-        if(user.nodePreference == null) return false;
-        instance.setNodePreference(user.getNodePreference());
+        if(roleOnTheso.getNodePreference() == null) return false;
+        instance.setNodePreference(roleOnTheso.getNodePreference());
         
         
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
@@ -976,8 +975,8 @@ public class SelectedTerme implements Serializable {
      */
     public boolean creerSpecialTermeSpe(MyTreeNode selecedTerm, String BTname, String NTname) {
         ConceptHelper instance = new ConceptHelper();
-        if(user.nodePreference == null) return false;
-        instance.setNodePreference(user.getNodePreference());        
+        if(roleOnTheso.getNodePreference() == null) return false;
+        instance.setNodePreference(roleOnTheso.getNodePreference());        
 
         Concept concept = new Concept();
         concept.setIdGroup(selecedTerm.getIdCurrentGroup());
@@ -1191,22 +1190,22 @@ public class SelectedTerme implements Serializable {
         //ResourceBundle bundlePref = getBundlePref();
         int total = 0;
         if (totalNoticesOfBranch.isEmpty()) {
-            if (user.getNodePreference().isZ3950actif()) {
+            if (roleOnTheso.getNodePreference().isZ3950actif()) {
                 ConceptHelper conceptHelper = new ConceptHelper();
                 ArrayList<String> lisIds = new ArrayList();
                 lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso, lisIds);
 
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-                p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
+                p.put("RepositoryDataSourceURL", "file:" + roleOnTheso.getNodePreference().getPathNotice1());
                 p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-                p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
+                p.put("ConvertorConfigFile", roleOnTheso.getNodePreference().getPathNotice2());
                 Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
                 federated_search_proxy.init(p);
                 try {
                     IRQuery e = new IRQuery();
                     //   e.collections = new Vector<String>();
-                    e.collections.add(user.getNodePreference().getCollectionAdresse());
+                    e.collections.add(roleOnTheso.getNodePreference().getCollectionAdresse());
                     e.hints.put("default_element_set_name", "f");
                     e.hints.put("small_set_setname", "f");
                     e.hints.put("record_syntax", "unimarc");
@@ -2684,18 +2683,18 @@ public class SelectedTerme implements Serializable {
     private int getNotice(String idTe) {
         //ResourceBundle bundlePref = getBundlePref();
         int nbNoticesT = 0;
-        if (user.getNodePreference().isZ3950actif()) {
+        if (roleOnTheso.getNodePreference().isZ3950actif()) {
             Properties p = new Properties();
             p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
-            p.put("RepositoryDataSourceURL", "file:" + user.getNodePreference().getPathNotice1());
+            p.put("RepositoryDataSourceURL", "file:" + roleOnTheso.getNodePreference().getPathNotice1());
             p.put("XSLConverterConfiguratorClassName", "com.k_int.IR.Syntaxes.Conversion.XMLConfigurator");
-            p.put("ConvertorConfigFile", user.getNodePreference().getPathNotice2());
+            p.put("ConvertorConfigFile", roleOnTheso.getNodePreference().getPathNotice2());
             Searchable federated_search_proxy = new HeterogeneousSetOfSearchable();
             federated_search_proxy.init(p);
             try {
                 IRQuery e = new IRQuery();
                 //   e.collections = new Vector<String>();
-                e.collections.add(user.getNodePreference().getCollectionAdresse());
+                e.collections.add(roleOnTheso.getNodePreference().getCollectionAdresse());
                 e.hints.put("default_element_set_name", "f");
                 e.hints.put("small_set_setname", "f");
                 e.hints.put("record_syntax", "unimarc");
@@ -3498,6 +3497,14 @@ public class SelectedTerme implements Serializable {
 
     public void setEditPassed(boolean editPassed) {
         this.editPassed = editPassed;
+    }
+
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
     
 

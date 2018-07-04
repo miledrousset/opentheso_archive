@@ -17,7 +17,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;

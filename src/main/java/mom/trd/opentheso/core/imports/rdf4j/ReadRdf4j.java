@@ -143,6 +143,8 @@ public class ReadRdf4j {
                 }
 
                 String uri = st.getSubject().stringValue();
+        //        System.out.println("URI = " + uri);
+                
                 readStruct.resource = new SKOSResource(uri, prop);
 
                 if (prop == SKOSProperty.ConceptScheme) {
@@ -151,6 +153,8 @@ public class ReadRdf4j {
                     sKOSXmlDocument.addGroup(readStruct.resource);
                 } else if (prop == SKOSProperty.Concept) {
                     sKOSXmlDocument.addconcept(readStruct.resource);
+                }else {
+        //            System.out.println("Erreur de type : " + prop);
                 }
 
             } //Labelling Properties
@@ -308,15 +312,21 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Labelling true sinon
      */
     private boolean readLabellingProperties(ReadStruct readStruct) {
-
+        String lang = "fr"; 
+        // si aucune langue n'est précisée, on applique la langue par défaut
+        if(readStruct.literal.getLanguage().isPresent()) {
+            lang = readStruct.literal.getLanguage().get();
+        }
+            
+            
         if (readStruct.property.getLocalName().equals("prefLabel")) {
-            readStruct.resource.addLabel(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.prefLabel);
+            readStruct.resource.addLabel(readStruct.literal.getLabel(), lang, SKOSProperty.prefLabel);
             return false;
         } else if (readStruct.property.getLocalName().equals("altLabel")) {
-            readStruct.resource.addLabel(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.altLabel);
+            readStruct.resource.addLabel(readStruct.literal.getLabel(), lang, SKOSProperty.altLabel);
             return false;
         } else if (readStruct.property.getLocalName().equals("hiddenLabel")) {
-            readStruct.resource.addLabel(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.hiddenLabel);
+            readStruct.resource.addLabel(readStruct.literal.getLabel(), lang, SKOSProperty.hiddenLabel);
             return false;
         } else {
             return true;
@@ -438,6 +448,7 @@ public class ReadRdf4j {
         if (readStruct.property.getLocalName().equals("identifier")) {
             readStruct.resource.setIdentifier(readStruct.literal.getLabel());
             addEquivalenceIdArk(readStruct);
+    //        System.out.println("id = " +  readStruct.literal.getLabel());
             return false;
         } else {
             return true;

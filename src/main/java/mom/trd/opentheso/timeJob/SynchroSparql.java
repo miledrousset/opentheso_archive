@@ -7,7 +7,7 @@ package mom.trd.opentheso.timeJob;
 
 import java.util.List;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.apache.jena.graph.Triple;

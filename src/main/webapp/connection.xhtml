@@ -6,31 +6,30 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 
-    <h:panelGroup rendered="#{currentUser.user.name != null}">
+    <h:panelGroup rendered="#{user1.user.name != null}">
         <div id="disconnect">
             
             <h:form>
-                <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/><br/>
-                <p:commandButton id="logout" icon="ui-icon-logout-20" styleClass="styleButton_db" title="#{langueBean.getMsg('menu.account2')}" actionListener="#{accessThesaurusBean.cleanSession()}" update=":panChoixTheso" />
+                <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{user1.user.name}"/><br/>
+                <p:commandButton id="logout" icon="ui-icon-logout-20" styleClass="styleButton_db" title="#{langueBean.getMsg('menu.account2')}" actionListener="#{roleOnTheso.cleanSession()}" update=":panChoixTheso" />
             </h:form>
         </div>
     </h:panelGroup>
  
-    <h:panelGroup id="coUser" rendered="#{currentUser.user.name == null}" >
+    <h:panelGroup id="coUser" rendered="#{user1.user.name == null}" >
         <div id="connect">
             <h:form>
                 <table>
                     <tr>
                         <td>
-                            <h:inputText id="ipLog" required="true" requiredMessage="#{langueBean.getMsg('co.msgErr1')}" value="#{currentUser.pseudo}" 
+                            <h:inputText id="ipLog" required="true" requiredMessage="#{langueBean.getMsg('co.msgErr1')}" value="#{user1.name}" 
                                          a:placeholder="#{langueBean.getMsg('co.att1')}" class="inputConnect" /><br/>
-                            <h:inputSecret id="ipPwd" required="true" requiredMessage="#{langueBean.getMsg('co.msgErr2')}e" value="#{currentUser.pwd}" 
+                            <h:inputSecret id="ipPwd" required="true" requiredMessage="#{langueBean.getMsg('co.msgErr2')}e" value="#{user1.pwd}" 
                                            a:placeholder="#{langueBean.getMsg('co.att2')}" class="inputConnect" />
                         </td>
                         <td>
                             <p:commandButton id="cbCo" icon="ui-icon-login-20" styleClass="styleButton_db"
-                                             title="#{langueBean.getMsg('co.title')}" action="#{currentUser.connect()}"  oncomplete="#{accessThesaurusBean.accessList()}" update=":panChoixTheso"/>
-                           
+                                             title="#{langueBean.getMsg('co.title')}" action="#{user1.connect()}"  oncomplete="#{roleOnTheso.getOwnerThesos()}" update=":panChoixTheso"/>
                         </td>
                     </tr>
                 </table>
@@ -39,6 +38,7 @@
                 <table>
                     <tr>
                         <td>
+
                             <p:commandLink id="passForgeted" value="#{langueBean.getMsg('mot.info')}" update=":idOublieMPEditDlg" oncomplete="PF('oublieMPEditDlg').show();" styleClass="linkSmall"  />
                         </td>
                     </tr>

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -29,7 +28,7 @@ import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.bdd.helper.CopyrightHelper;
 import mom.trd.opentheso.bdd.helper.FacetHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
@@ -42,7 +41,6 @@ import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.VerificationInternet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
-import mom.trd.opentheso.bdd.helper.nodes.NodeGroupType;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
@@ -66,8 +64,7 @@ public class SelectedThesaurus implements Serializable {
     private Thesaurus thesaurus;
     private Thesaurus editTheso;
     private NodeGroup nodeCG;
-    private String langueTrad = "";
-    private String nomTrad = "";
+
     private ArrayList<Entry<String, String>> arrayTheso;
     private ArrayList<Entry<String, String>> arrayTrad;
     private ArrayList<Entry<String, String>> arrayFacette;
@@ -139,28 +136,21 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{conceptbean}")
     private ConceptBean conceptbean;
-
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+   
+    @ManagedProperty(value = "#{currentUser}")
+    private CurrentUser2 currentUser;
 
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
  
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;
 
     /**
      * ************************************ INITIALISATION
      * *************************************
      */
-    /**
-     * Récupération des préférences
-     *
-     * @return la ressourceBundle des préférences
-     */
-    private ResourceBundle getBundlePref() {
-        FacesContext context = FacesContext.getCurrentInstance();
-        ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
-        return bundlePref;
-    }
+
 
     /**
      * récupère la variable URL et affiche le terme qu'elle désigne
@@ -208,7 +198,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-            user.initUserNodePref(idTurl);
+            roleOnTheso.initUserNodePref(idTurl);
 
             // Initialisation du terme séléctionné et de l'arbre
             int type;
@@ -272,7 +262,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-            user.initUserNodePref(idTurl);
+            roleOnTheso.initUserNodePref(idTurl);
             // Initialisation du terme séléctionné et de l'arbre
             int type = 1;
 
@@ -338,7 +328,7 @@ public class SelectedThesaurus implements Serializable {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-            user.initUserNodePref(idTurl);
+            roleOnTheso.initUserNodePref(idTurl);
             // Initialisation du terme séléctionné et de l'arbre
             //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
             /*
@@ -365,11 +355,6 @@ public class SelectedThesaurus implements Serializable {
      * Constructeur
      */
     public SelectedThesaurus() {
-
-        ResourceBundle bundlePref = getBundlePref();
-        defaultThesaurusId = bundlePref.getString("defaultThesaurusId");
-
-
         idCurl = null;
         idGurl = null;
         idTurl = null;
@@ -379,28 +364,6 @@ public class SelectedThesaurus implements Serializable {
         thesaurus = new Thesaurus();
         editTheso = new Thesaurus();
         nodeCG = new NodeGroup();
-
-        if (user == null || user.getNodePreference() == null) {
-            workLanguage = bundlePref.getString("workLanguage");
-            return;
-        }
-        majPref();
-    }
-
-    public void majPref() {
-        if (user == null || user.getNodePreference() == null) {
-            return;
-        }
-        user.initUserNodePref(thesaurus.getId_thesaurus());
-        cheminSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
-        version = "";
-        //String useArk = bundlePref.getString("useArk");
-        arkActive = user.getNodePreference().isUseArk();//useArk.equals("true");
-        serverArk = user.getNodePreference().getServeurArk();//bundlePref.getString("serverArk");
-        workLanguage = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
-        Integer temp = user.getNodePreference().getIdentifierType();
-        identifierType = temp.toString();//bundlePref.getString("identifierType");
-        nodePreference = user.getNodePreference();
     }
 
     @PostConstruct
@@ -408,8 +371,11 @@ public class SelectedThesaurus implements Serializable {
         // récupération de la langue de travail préférée à partir du fichier de conf (péférences.properties)
 
         if (connect.getPoolConnexion() != null) {
+            workLanguage = connect.getWorkLanguage();
+            defaultThesaurusId = connect.getDefaultThesaurusId();
             // langueSource = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
-            arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), workLanguage).entrySet());
+            roleOnTheso.showListTheso();
+        //    arrayTheso = new ArrayList<>(new ThesaurusHelper().getListThesaurus(connect.getPoolConnexion(), connect.getWorkLanguage()).entrySet());
             langues = new LanguageHelper().getSelectItemLanguages(connect.getPoolConnexion());
             //bundlePref.getString("langueSource");
             internetConection = new VerificationInternet().isConected();
@@ -535,12 +501,16 @@ public class SelectedThesaurus implements Serializable {
 
     /**
      * Permet de vérifier si les Identifiants Ark sont valides s'ils n'existent
-     * pas, on les ajoutes s'ils exient, on ne fait rien.
+     * pas, on les ajoutes s'ils existent, on ne fait rien.
      *
      * @param idTheso #MR
      */
     public void regenerateAllArkId(String idTheso) {
         ConceptHelper conceptHelper = new ConceptHelper();
+        if (!nodePreference.isUseArk()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ark non activé : ", "Vérifiez les paramètres du thésaurus"));
+            return;
+        }         
         try {
             ArrayList<String> idGroup = null;
 
@@ -581,6 +551,10 @@ public class SelectedThesaurus implements Serializable {
      */
     public void generateAllInexistantArkId(String idTheso) {
         ConceptHelper conceptHelper = new ConceptHelper();
+        if (!nodePreference.isUseArk()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ark non activé : ", "Vérifiez les paramètres du thésaurus"));
+            return;
+        }        
         try {
             ArrayList<String> idGroup = null;
 
@@ -622,6 +596,10 @@ public class SelectedThesaurus implements Serializable {
      */
     public void generateAllInexistantHandleId(String idTheso) {
         ConceptHelper conceptHelper = new ConceptHelper();
+        if (!nodePreference.isUseHandle()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Handle non activé : ", "Vérifiez les paramètres du thésaurus"));
+            return;
+        }        
         try {
             ArrayList<String> idGroup = null;
 
@@ -664,6 +642,10 @@ public class SelectedThesaurus implements Serializable {
      */
     public void regenerateAllHandleId(String idTheso) {
         ConceptHelper conceptHelper = new ConceptHelper();
+        if (!nodePreference.isUseHandle()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Handle non activé : ", "Vérifiez les paramètres du thésaurus"));
+            return;
+        }
         try {
             ArrayList<String> idGroup = null;
 
@@ -906,9 +888,9 @@ public class SelectedThesaurus implements Serializable {
     private ArrayList<String> createNewId(ArrayList<String> idList, int nbOfId) {
 
         ArrayList<String> newIdConcepts = new ArrayList<>();
-        if (user != null
-                && user.getNodePreference() != null
-                && user.getNodePreference().getIdentifierType() == 2) { // numérique
+        if (currentUser.getUser() != null
+                && roleOnTheso.getNodePreference() != null
+                && roleOnTheso.getNodePreference().getIdentifierType() == 2) { // numérique
             int offset = 0;
             for (int i = 0; i < nbOfId; i++) {
                 boolean idNotFinded = true;
@@ -940,82 +922,19 @@ public class SelectedThesaurus implements Serializable {
     }
 
     /**
-     * Création d'un nouveau thésaurus avec le role
+     * mise à jour après la création d'un thésaurus
      *
-     * @param idUser
-     * @param idRole
      */
-    public void ajouterTheso(int idUser, int idRole) {
-        if (editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
-        } else {
-
-            ThesaurusHelper th = new ThesaurusHelper();
-            th.setIdentifierType(identifierType);
-
-            try {
-                Connection conn = connect.getPoolConnexion().getConnection();
-                conn.setAutoCommit(false);
-
-                String idThesaurus = th.addThesaurusRollBack(conn, null, arkActive);
-                if (idThesaurus == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
-                    conn.rollback();
-                    conn.close();
-                    return;
-                }
-                if (editTheso.getTitle().isEmpty()) {
-                    thesaurus.setTitle("theso_" + idThesaurus);
-                }
-                if (editTheso.getLanguage() == null) {
-                    editTheso.setLanguage(workLanguage);
-                }
-                editTheso.setId_thesaurus(idThesaurus);
-
-                if (!th.addThesaurusTraductionRollBack(conn, editTheso)) {
-                    conn.rollback();
-                    conn.close();
-                    return;
-                }
-
-                
-                // ajout de role pour le thésaurus à l'utilisateur en cours
-                UserHelper userHelper = new UserHelper();
-                if (!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-                    conn.rollback();
-                    conn.close();
-                    return;
-                }
-                conn.commit();
-                conn.close();
-
-            } catch (SQLException ex) {
-                Logger.getLogger(CurrentUser.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            maj();
-            arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
-            tree.getSelectedTerme().getUser().updateAuthorizedTheso();
-            vue.setCreat(false);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
-            
-       //     editTheso = new Thesaurus();
-        }
-        // tree.getSelectedTerme().getUser().getUser().getId();
+    public void updateAfterNewTheso() {
+        roleOnTheso.showListTheso();
+ //      initRoleOnThisTheso();
+    //    arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
+    //    tree.getSelectedTerme().getUser().updateAuthorizedTheso();
+        vue.setCreat(false);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
     }
 
-    /**
-     * Modification d'un thésaurus
-     */
-    public void editerTheso() {
-        if (editTheso.getTitle() == null || editTheso.getTitle().trim().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
-        } else {
-            new ThesaurusHelper().UpdateThesaurus(connect.getPoolConnexion(), editTheso);
-            vue.setEdit(false);
-        }
 
-    }
 
     public void getAllTables() {
         ExportPrivatesDatas exportData = new ExportPrivatesDatas();
@@ -1075,35 +994,9 @@ public class SelectedThesaurus implements Serializable {
      * ************************************ EDITION TRAD BDD
      * *************************************
      */
-    /**
-     * Suppréssion d'un traduction d'un thésaurus
-     *
-     * @param id l'identifiant du thésaurus
-     * @param l la langue de la traduction à supprimer
-     */
-    public void supprimerTradTheso(String id, String l) {
-        new ThesaurusHelper().deleteThesaurusTraduction(connect.getPoolConnexion(), id, l);
-        remplirArrayTrad(id);
-    }
 
-    /**
-     * Création d'une traduction d'un thésaurus
-     */
-    public void ajouterTraduction() {
-        if (nomTrad.trim().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
-        } else {
-            vue.setTrad(false);
-            String id = editTheso.getId_thesaurus();
-            Thesaurus thesoTemp = new Thesaurus();
-            thesoTemp.setId_thesaurus(id);
-            thesoTemp.setLanguage(langueTrad);
-            thesoTemp.setTitle(nomTrad);
-            new ThesaurusHelper().addThesaurusTraduction(connect.getPoolConnexion(), thesoTemp);
-            remplirArrayTrad(editTheso.getId_thesaurus());
-        }
-        nomTrad = "";
-    }
+
+
 
     /**
      * ************************************ CANDIDATS
@@ -1260,6 +1153,27 @@ public class SelectedThesaurus implements Serializable {
     public void majCdt() {
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
     }
+    
+    /**
+     * Après une connexion, 
+     * permet de récupérer les droits / roles sur le thésaurus en cours 
+     * au cas où l'utilisateur actuel n'a pas droit au thésaurus déjà chargé
+     * on se repositionne sur le premier thésaurus de l'utilisateur
+     */
+    public void initRoleOnThisTheso() {
+        // idTheso est le nouveau thésaurus qu'on a 
+        if(roleOnTheso.getAuthorizedTheso().isEmpty()) {
+            thesaurus.setId_thesaurus(null);
+            return;
+        }
+        if(!roleOnTheso.getAuthorizedTheso().contains(thesaurus.getId_thesaurus())) { // le thésaurus actuel n'est pas dans la liste des thesos de l'utilisateur
+            thesaurus.setId_thesaurus(roleOnTheso.getAuthorizedTheso().get(0));
+                    // si après connection, le thésaurus actuel n'appartient pas à l'utilisateur,
+                    //on se positionne sur le premier thésaurus de l'utilisateur 
+        }
+        roleOnTheso.setIdTheso(thesaurus.getId_thesaurus());
+        roleOnTheso.setUserRoleOnThisTheso();
+    }
 
     /**
      * ************************************ MISE A JOUR
@@ -1275,7 +1189,9 @@ public class SelectedThesaurus implements Serializable {
         tree.initTree(null, null);
         statBean.reInit();
         ThesaurusHelper th = new ThesaurusHelper();
-        nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+
+        initRoleOnThisTheso();
+        setPreferenceOfThesaurus();
         if (th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang()) != null) {
             thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), nodePreference.getSourceLang());
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
@@ -1296,27 +1212,40 @@ public class SelectedThesaurus implements Serializable {
         vue.setCreat(false);
         vue.setStatTheso(false);//#jm pour la page de statistiques
         vue.setStatCpt(false);//idem
-        majPref();
+
         if (selectedTerme != null) {
             selectedTerme.initTerme();
         }
-        tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
+//        currentUser.setIdTheso(thesaurus.getId_thesaurus());
+        if(currentUser.getUser() != null) {
+            roleOnTheso.setIdTheso(thesaurus.getId_thesaurus());
+   //         roleOnTheso.showListTheso();
+        }
+      //  tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
        /**modifiaction pour affiché le message pur le drag an drop #JM**/
         
-       if( (user.getUser().getName()!= null) && (user.isIsHaveWriteToCurrentThesaurus()) )
+  /*     if( (user.getUser()!= null) && (user.isIsHaveWriteToCurrentThesaurus()) )
        {
-        String message="drag & dop activé !";
-        FacesContext context = FacesContext.getCurrentInstance();
-         
-        context.addMessage(null, new FacesMessage("",  "info : " + message) );
-       }
+            String message="drag & dop activé !";
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage("",  "info : " + message) );
+       }*/
     }
 
+    /**
+     * permet d'initialiser les préférences d'un thésaurus
+     */
+    public void setPreferenceOfThesaurus(){
+        roleOnTheso.initUserNodePref(thesaurus.getId_thesaurus());
+        nodePreference = roleOnTheso.getNodePreference();
+    }
+    
     /**
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void StartDefaultThesauriTree() {
-        tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
+        roleOnTheso.setIdTheso(thesaurus.getId_thesaurus());
+    //    tree.getSelectedTerme().getUser().setIdTheso(thesaurus.getId_thesaurus());
         if (connect.getPoolConnexion() == null) {
             System.err.println("!!!!! Opentheso n'a pas pu se connecter à la base de données 2!!!!!!! ");
             return;
@@ -1342,13 +1271,11 @@ public class SelectedThesaurus implements Serializable {
             languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
             vue.setCreat(false);
-            nodePreference = tree.getSelectedTerme().getUser().getThesaurusPreferences(thesaurus.getId_thesaurus(), workLanguage);
+            setPreferenceOfThesaurus();
             tree.setIdThesoSelected(thesaurus.getId_thesaurus());
             tree.setDefaultLanguage(thesaurus.getLanguage());
         }
-
-        user.initUserNodePref(thesaurus.getId_thesaurus());
-        majPref();
+        setPreferenceOfThesaurus();
     }
 
     /**
@@ -1916,6 +1843,15 @@ public class SelectedThesaurus implements Serializable {
         }
         return arrayTheso;
     }
+    
+    public String getCopyright(){
+        if(thesaurus == null) return null;
+        if(thesaurus.getId_thesaurus() == null) return null;
+
+        CopyrightHelper copyrightHelper = new CopyrightHelper();
+        return copyrightHelper.getCopyright(connect.getPoolConnexion(),
+                    thesaurus.getId_thesaurus());
+    }
 
     private ArrayList<Entry<String, String>> allTheso;
 
@@ -1957,22 +1893,6 @@ public class SelectedThesaurus implements Serializable {
 
     public SelectItem[] getLangues() {
         return langues;
-    }
-
-    public String getLangueTrad() {
-        return langueTrad;
-    }
-
-    public void setLangueTrad(String langueTrad) {
-        this.langueTrad = langueTrad;
-    }
-
-    public String getNomTrad() {
-        return nomTrad;
-    }
-
-    public void setNomTrad(String nomTrad) {
-        this.nomTrad = nomTrad;
     }
 
     public Vue getVue() {
@@ -2285,14 +2205,6 @@ public class SelectedThesaurus implements Serializable {
         this.fileDownload = fileDownload;
     }
 
-    public CurrentUser getUser() {
-        return user;
-    }
-
-    public void setUser(CurrentUser user) {
-        this.user = user;
-    }
-
     public SelectedTerme getSelectedTerme() {
         return selectedTerme;
     }
@@ -2307,6 +2219,22 @@ public class SelectedThesaurus implements Serializable {
 
     public static void setRnd(SecureRandom rnd) {
         SelectedThesaurus.rnd = rnd;
+    }
+
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
 
  

@@ -36,7 +36,7 @@ public class ThesaurusHelper {
 
     private final Log log = LogFactory.getLog(ThesaurusHelper.class);
 
-    private String identifierType = "1";
+    private String identifierType = "2";
 
     public String getIdentifierType() {
         return identifierType;
@@ -128,7 +128,6 @@ public class ThesaurusHelper {
      * @param conn
      * @param urlSite
      * @param isArkActive
-     * @param visible
      * @return String Id du thésaurus rajouté
      */
     public String addThesaurusRollBack(Connection conn,
@@ -398,9 +397,12 @@ public class ThesaurusHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select * from thesaurus_label where id_thesaurus = '"
-                            + idThesaurus + "' and lang = '"
-                            + idLang + "'";
+                    String query = "select * from thesaurus, thesaurus_label where"
+                            + " thesaurus.id_thesaurus = thesaurus_label.id_thesaurus"
+                            + " and "
+                            + " thesaurus_label.id_thesaurus = '" + idThesaurus + "'"
+                            + " and thesaurus_label.lang = '" + idLang +"'";
+
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet.next()) {
@@ -422,6 +424,7 @@ public class ThesaurusHelper {
                             thesaurus.setSubject(resultSet.getString("subject"));
                             thesaurus.setTitle(resultSet.getString("title"));
                             thesaurus.setType(resultSet.getString("type"));
+                            thesaurus.setPrivateTheso(resultSet.getBoolean("private"));
                            
                         }
                     }
@@ -439,6 +442,48 @@ public class ThesaurusHelper {
         }
         return thesaurus;
     }
+    
+    /**
+     * Permet de retourner le titre du thésaurus par identifiant et par langue
+     *
+     * @param ds le pool de connexion
+     * @param idThesaurus
+     * @param idLang
+     * @return Objet Class Thesaurus
+     * #MR
+     */
+    public String getTitleOfThesaurus(HikariDataSource ds, String idThesaurus, String idLang) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String title = null;
+        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select title from thesaurus_label where id_thesaurus = '"
+                            + idThesaurus + "' and lang = '"
+                            + idLang + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        title = resultSet.getString("title");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting title of Thesaurus : " + idThesaurus, sqle);
+        }
+        return title;
+    }    
 
     /**
      * Permet de retourner un thésaurus par identifiant sous forme de
@@ -534,22 +579,27 @@ public class ThesaurusHelper {
      * Retourne la liste des Ids des thésaurus existants
      *
      * @param ds
+     * @param withPrivateTheso
      * @return
      */
-    public List getAllIdOfThesaurus(HikariDataSource ds) {
+    public List getAllIdOfThesaurus(HikariDataSource ds, boolean withPrivateTheso) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
         List tabIdThesaurus = new ArrayList();
-
+        String query ="";
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_thesaurus from thesaurus";
+                    if(withPrivateTheso) 
+                        query = "select id_thesaurus from thesaurus order by id_thesaurus";
+                    else
+                        // uniquement pour les SuperAdmin
+                        query = "select id_thesaurus from thesaurus where thesaurus.private != true order by id_thesaurus";
 
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
@@ -642,7 +692,8 @@ public class ThesaurusHelper {
         Statement stmt;
         ResultSet resultSet;
         Map map = new HashMap();
-        List tabIdThesaurus = getAllIdOfThesaurus(ds);
+        boolean withPrivateTheso = true;
+        List tabIdThesaurus = getAllIdOfThesaurus(ds, withPrivateTheso);
 
         try {
             // Get connection from pool

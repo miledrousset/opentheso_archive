@@ -24,7 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
 import skos.SKOSXmlDocument;

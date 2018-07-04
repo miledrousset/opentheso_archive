@@ -27,7 +27,6 @@ import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
@@ -619,7 +618,7 @@ public class NewTreeBean implements Serializable {
         for(TreeNode tn:tc.getExpandedNodes()){
             ids.add(((MyTreeNode)tn).getIdConcept());
         }
-        ids.addAll(tc.getPathFromSelectedConcept(connect,(MyTreeNode)selectedNode));
+        ids.addAll(tc.getPathFromSelectedConcept(connect,selectedTerme));
         ids.add(selectedTerme.getIdC());
         reExpandNodes(root,ids,selectedTerme.getIdC());//code pour forcer le depliment de l'arbre
     
@@ -2016,7 +2015,7 @@ public class NewTreeBean implements Serializable {
     
     /**fin fonction **/
    
-     /**fonction pour changer la numérotation d'un souis groupe **************/
+     /**fonction pour changer la numérotation d'un sous groupe **************/
      
      public void changeNumerotation(){
          GroupHelper gh= new GroupHelper();

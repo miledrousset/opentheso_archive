@@ -4,38 +4,24 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
-
-    <p:dialog id="idPrefDlg"  header="#{langueBean.getMsg('conf.field3')}" widgetVar="prefDlg" modal="true" resizable="false" >
-
-        <h:panelGroup rendered="#{user1.haveRights(2)}" >
-
-
-
+    <h:panelGroup rendered="#{(roleOnTheso.isAdminOnThisTheso) || (currentUser.user.isSuperAdmin)}" >
             <h:form id="formEditPref">
-                <h:panelGrid columns="1" >
-                    <p:scrollPanel style="width:350px;height:400px; border: 5px;" mode="native">
-                    
-
+                <h:panelGrid columns="1" style="background: #bbdd87">
+                    <p:scrollPanel style="width:450px;height:540px; border: 5px;" mode="native">
                         <p:fieldset  legend="générale" toggleable="true" collapsed="false" styleClass="styleButton2"   >
                             <h:panelGrid columns="2" style="text-align: left">
-
                                 <h:outputLabel value="chemin site" />
-                                <h:inputText value="#{user1.nodePreference.cheminSite}" />
-
+                                <h:inputText value="#{roleOnTheso.nodePreference.cheminSite}" />
                                 <h:outputLabel for="prefLangueSource"  value="#{langueBean.getMsg('conf.langSource')} :" /> 
-                                <h:selectOneMenu id="prefLangueSource" value="#{user1.langSourceEdit}" style="width: 100px;">
+                                <h:selectOneMenu id="prefLangueSource" value="#{roleOnTheso.nodePreference.sourceLang}" style="width: 100px;">
                                     <f:selectItem itemValue="fr" itemLabel="Français" />
                                     <f:selectItem itemValue="en" itemLabel="Anglais" />
                                     <f:selectItem itemValue="de" itemLabel="Allemand" />
                                     <f:selectItem itemValue="es" itemLabel="Espagnole" />
                                     <f:selectItem itemValue="it" itemLabel="Italien" />
                                 </h:selectOneMenu>
-
-                                
-
-
                                 <h:outputLabel value="identifier type : " />
-                                <h:selectOneMenu value="#{user1.nodePreference.identifierType}" >
+                                <h:selectOneMenu value="#{roleOnTheso.nodePreference.identifierType}" >
                                     <f:selectItem itemValue="1" itemLabel="alphanumérique" />
                                     <f:selectItem itemValue="2" itemLabel="numérique" />
                                 </h:selectOneMenu>
@@ -64,136 +50,127 @@
                                           
                             </h:panelGrid>
                         </p:fieldset>
-
                         <p:fieldset legend="Ark" toggleable="true" collapsed="true" styleClass="styleButton2" >
-
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="use Ark :" />
-                                <h:selectOneRadio value="#{user1.nodePreference.useArk}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.useArk}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>
 
                                 <h:outputLabel value="serveur Ark" />
-                                <h:inputText value="#{user1.nodePreference.serveurArk}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.serveurArk}" />
                                 <h:outputLabel value="id Naan"/>
-                                <h:inputText value="#{user1.nodePreference.idNaan}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.idNaan}" />
                                 <h:outputLabel value="prefixe Ark"/>
-                                <h:inputText value="#{user1.nodePreference.prefixArk}" />                                  
+                                <h:inputText value="#{roleOnTheso.nodePreference.prefixArk}" />                                  
                                 <h:outputLabel value="user Ark" />
-                                <h:inputText value="#{user1.nodePreference.userArk}" />     
+                                <h:inputText value="#{roleOnTheso.nodePreference.userArk}" />     
                                 <h:outputLabel value="passe Ark" />
-                                <h:inputSecret value="#{user1.nodePreference.passArk}" redisplay="true" />
+                                <h:inputSecret value="#{roleOnTheso.nodePreference.passArk}" redisplay="true" />
 
                             </h:panelGrid>
                         </p:fieldset>
-                        
                         <p:fieldset legend="Handle" toggleable="true" collapsed="true" styleClass="styleButton2" >
-
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="use Handle :" />
-                                <h:selectOneRadio value="#{user1.nodePreference.useHandle}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.useHandle}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>
 
                                 <h:outputLabel value="path to Handle_key :" />
-                                <h:inputText value="#{user1.nodePreference.pathKeyHandle}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.pathKeyHandle}" />
                                 <h:outputLabel value="path to Handle_certificat :"/>
-                                <h:inputText value="#{user1.nodePreference.pathCertHandle}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.pathCertHandle}" />
                                 <h:outputLabel value="URL to API Handle : "/>
-                                <h:inputText value="#{user1.nodePreference.urlApiHandle}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.urlApiHandle}" />
                                 <h:outputLabel value="prefixe Handle : "/>
-                                <h:inputText value="#{user1.nodePreference.prefixIdHandle}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.prefixIdHandle}" />
                                 <h:outputLabel value="prefixe privé Handle :"/>
-                                <h:inputText value="#{user1.nodePreference.privatePrefixHandle}" />    
+                                <h:inputText value="#{roleOnTheso.nodePreference.privatePrefixHandle}" />    
                                 
                                 <h:outputLabel value="user Handle" />
-                                <h:inputText value="#{user1.nodePreference.userHandle}" />     
+                                <h:inputText value="#{roleOnTheso.nodePreference.userHandle}" />     
                                 <h:outputLabel value="passe Handle" />
-                                <h:inputSecret value="#{user1.nodePreference.passHandle}" redisplay="true" />
+                                <h:inputSecret value="#{roleOnTheso.nodePreference.passHandle}" redisplay="true" />
 
                             </h:panelGrid>
                         </p:fieldset>                        
-
-
                         <p:fieldset legend="image" toggleable="true" collapsed="true" styleClass="styleButton2">
 
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="path image" />
-                                <h:inputText value="#{user1.nodePreference.pathImage}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.pathImage}" />
 
                                 <h:outputLabel value="dosier resize" />
-                                <h:inputText value="#{user1.nodePreference.dossierResize}" />
+                                <h:inputText value="#{roleOnTheso.nodePreference.dossierResize}" />
 
                             </h:panelGrid>
                         </p:fieldset>
-
-
                         <p:fieldset legend="BDD" toggleable="true" collapsed="true" styleClass="styleButton2">
 
                             <h:panelGrid columns="2" style="text-align: left">
 
                                 <h:outputLabel value="BDD active" />
-                                <h:selectOneRadio value="#{user1.nodePreference.bddActive}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.bddActive}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>
 
                                 <h:outputLabel value="BDD use id" />
-                                <h:selectOneRadio value="#{user1.nodePreference.bddUseId}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.bddUseId}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>    
 
                                 <h:outputLabel value="url bdd"/>
-                                <h:inputText value="#{user1.nodePreference.urlBdd}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.urlBdd}"  />
                                 <h:outputLabel value="url counter bdd"/>
-                                <h:inputText value="#{user1.nodePreference.urlCounterBdd}"  />                                
+                                <h:inputText value="#{roleOnTheso.nodePreference.urlCounterBdd}"  />                                
                             </h:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="SIGB" toggleable="true" collapsed="true" styleClass="styleButton2">
 
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="z3950 actif" />
-                                <h:selectOneRadio value="#{user1.nodePreference.z3950actif}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.z3950actif}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>
 
                                 <h:outputLabel value="collection addresse"/>
-                                <h:inputText value="#{user1.nodePreference.collectionAdresse}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.collectionAdresse}"  />
 
                                 <h:outputLabel value="notice url"/>
-                                <h:inputText value="#{user1.nodePreference.noticeUrl}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.noticeUrl}"  />
 
                                 <h:outputLabel value="url encode"/>
-                                <h:inputText value="#{user1.nodePreference.urlEncode}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.urlEncode}"  />
 
                                 <h:outputLabel value="path notice 1"/>
-                                <h:inputText value="#{user1.nodePreference.pathNotice1}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.pathNotice1}"  />
 
                                 <h:outputLabel value="path notice 2"/>
-                                <h:inputText value="#{user1.nodePreference.pathNotice2}"  />
+                                <h:inputText value="#{roleOnTheso.nodePreference.pathNotice2}"  />
                             </h:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="Webservices" toggleable="true" collapsed="true" styleClass="styleButton2">
 
                             <h:panelGrid columns="2" style="text-align: left">
                                 <h:outputLabel value="Webservices :" />
-                                <h:selectOneRadio value="#{user1.nodePreference.webservices}">
+                                <h:selectOneRadio value="#{roleOnTheso.nodePreference.webservices}">
                                     <f:selectItem itemValue="true" itemLabel="#{langueBean.getMsg('yes')}" />
                                     <f:selectItem itemValue="false" itemLabel="#{langueBean.getMsg('no')}" />
                                 </h:selectOneRadio>
                             </h:panelGrid>
                         </p:fieldset>                        
                 </p:scrollPanel>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.editAllPref()}" action="#{preferencesAlertBean.multipleBeanAction()}" styleClass="styleButton" oncomplete="PF('prefDlg').hide();" />
+                </h:panelGrid>
+                <h:panelGrid columns="2" style="width: 450px; text-align: center">
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{roleOnTheso.updatePreferences()}" 
+                                     action="#{preferencesAlertBean.multipleBeanAction()}" styleClass="styleButton" update=":confAll, :messages" />
                 </h:panelGrid>
             </h:form> 
-
         </h:panelGroup>
-
-    </p:dialog>
-
 </ui:composition>

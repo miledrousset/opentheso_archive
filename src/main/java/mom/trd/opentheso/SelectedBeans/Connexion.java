@@ -1,4 +1,4 @@
-package mom.trd.opentheso.bdd.helper;
+package mom.trd.opentheso.SelectedBeans;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -7,12 +7,11 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
 
 
 @ManagedBean (name = "poolConnexion", eager = true)
@@ -20,10 +19,18 @@ import javax.faces.context.FacesContext;
 public class Connexion implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
-//    private static final Log log = LogFactory.getLog("opentheso.log");
     
     private HikariDataSource poolConnexion = null;
+    private String workLanguage = "fr";
+    private String defaultThesaurusId;
+    
+    @PostConstruct
+    public void initPref() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
+        workLanguage = bundlePref.getString("workLanguage");
+        defaultThesaurusId = bundlePref.getString("defaultThesaurusId");        
+    }    
     
     public ResourceBundle getBundlePool(){
         FacesContext context = FacesContext.getCurrentInstance();
@@ -35,7 +42,7 @@ public class Connexion implements Serializable {
         }
         return null;
     }
-
+ 
     public Connexion() {
         this.poolConnexion = openConnexionPool();
     }
@@ -90,6 +97,22 @@ public class Connexion implements Serializable {
 
     void close() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public String getWorkLanguage() {
+        return workLanguage;
+    }
+
+    public void setWorkLanguage(String workLanguage) {
+        this.workLanguage = workLanguage;
+    }
+
+    public String getDefaultThesaurusId() {
+        return defaultThesaurusId;
+    }
+
+    public void setDefaultThesaurusId(String defaultThesaurusId) {
+        this.defaultThesaurusId = defaultThesaurusId;
     }
     
 }

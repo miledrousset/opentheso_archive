@@ -17,11 +17,17 @@ import mom.trd.opentheso.bdd.tools.StringPlus;
 
 /**
  *
- * @author Quincy
+ * @author Miled.Rousset
  */
 public class PreferencesHelper {
-
-    public NodePreference getThesaurusPreference(HikariDataSource ds, String idThesaurus) {
+    
+    /**
+     * permet de retourner les préferences d'un thésaurus 
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public NodePreference getThesaurusPreferences(HikariDataSource ds, String idThesaurus) {
         NodePreference np = null;
         Connection conn;
         Statement stmt;
@@ -86,6 +92,44 @@ public class PreferencesHelper {
             Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return np;
+    }
+    
+    /**
+     * Permet de retourner la langue de préference pour un thésaurus 
+     * @param ds
+     * @param idThesourus
+     * @return 
+     */
+    public String getWorkLanguageOfTheso(HikariDataSource ds, String idThesourus){
+        String workLanguage = null;
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select source_lang from preferences where" +
+                            " id_thesaurus = '" + idThesourus + "'";
+                    resultSet = stmt.executeQuery(query);
+
+                    if (resultSet.next()) {
+                        workLanguage = resultSet.getString("source_lang");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return workLanguage;        
     }
     
     public boolean isWebservicesOn(HikariDataSource ds, String idThesaurus) {
@@ -232,6 +276,89 @@ public class PreferencesHelper {
 
         return status;
     }
+    
+    /**
+     * Permet de mettre à jour toutes les préférence
+     *
+     * @param ds
+     * @param np
+     * @param idThesaurus
+     * @return
+     */
+    public boolean addPreference(HikariDataSource ds, NodePreference np, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+        boolean status = false;
+        StringPlus stringPlus = new StringPlus();
+        np = normalizeDatas(np);
+        try {
+            conn = ds.getConnection();
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "insert into preferences("
+                            + "id_thesaurus, source_lang, identifier_type, path_image,"
+                            + " dossier_resize, bdd_active, bdd_use_id, url_bdd,"
+                            + " url_counter_bdd, z3950actif, collection_adresse,"
+                            + " notice_url, url_encode, path_notice1, path_notice2," 
+                            + " chemin_site, webservices, use_ark, server_ark," 
+                            + " id_naan, prefix_ark, user_ark, pass_ark, use_handle,"
+                            + " user_handle, pass_handle, path_key_handle, path_cert_handle,"
+                            + " url_api_handle, prefix_handle, private_prefix_handle)"
+ 
+                            + " values('" + idThesaurus + "'"
+                            + ",'" + stringPlus.convertString(np.getSourceLang()) + "'"
+                            + ",'" + np.getIdentifierType() + "'"
+                            + ",'"+stringPlus.convertString(np.getPathImage()) + "'"                            
+                            + ",'"+stringPlus.convertString(np.getDossierResize()) + "'"
+                            + ",'"+np.isBddActive() + "'"
+                            + ",'"+np.isBddUseId() + "'"
+                            + ",'"+stringPlus.convertString(np.getUrlBdd()) + "'"
+                            + ",'"+stringPlus.convertString(np.getUrlCounterBdd()) + "'"
+                            + ",'"+np.isZ3950actif()+ "'"
+                            + ",'"+stringPlus.convertString(np.getCollectionAdresse()) + "'"
+                            + ",'"+ stringPlus.convertString(np.getNoticeUrl())+ "'"
+                            + ",'"+stringPlus.convertString(np.getUrlEncode()) + "'"
+                            + ",'"+stringPlus.convertString(np.getPathNotice1()) + "'"
+                            + ",'"+stringPlus.convertString(np.getPathNotice2()) + "'"
+                            + ",'"+stringPlus.convertString(np.getCheminSite())+"'"
+                            + ",'" + np.isWebservices()+"'"                            
+                            
+                            
+                            // Ark
+                            + ",'" + np.isUseArk() + "'"
+                            + ",'" + stringPlus.convertString(np.getServeurArk()) + "'"
+                            + ",'" + np.getIdNaan() + "'"
+                            + ",'" + np.getPrefixArk() + "'"                            
+                            + ",'" + np.getUserArk() + "'"
+                            //+ ", pass_ark='" + MD5Password.getEncodedPassword(np.getPassArk()) + "'"
+                            + ",'" + np.getPassArk() + "'"
+
+                            // Handle
+                            + ",'" + np.isUseHandle() + "'"
+                            + ",'" + np.getUserHandle() + "'"
+                            + ",'" + np.getPassHandle() + "'"
+                            + ",'" + np.getPathKeyHandle() + "'"
+                            + ",'" + np.getPathCertHandle() + "'"
+                            + ",'" + np.getUrlApiHandle() + "'"
+                            + ",'" + np.getPrefixIdHandle() + "'"
+                            + ",'" + np.getPrivatePrefixHandle() + "')";
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return status;
+    }    
     
     /**
      * permet de nettoyer les "/" et préparer les paramètres correctement 

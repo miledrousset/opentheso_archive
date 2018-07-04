@@ -10,7 +10,7 @@
 
         <div class="contenuTerme">
             <div id="imageEdition">
-                <h:form id="formEditTInfo" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine != 'Orphan')}">
+                <h:form id="formEditTInfo" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine != 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                           
@@ -61,7 +61,7 @@
                     </p:menu>
                 </h:form>
                 <!--options pour les orphelins -->
-                <h:form id="formEditTInfoOrphan" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.idDomaine == 'Orphan')}">
+                <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine == 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -171,10 +171,10 @@
 
                         <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
                         <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
-                                      value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
+                                      value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
                             <span>
                                 <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
-                                              value="#{theso.getCheminSite()}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
+                                              value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.getLienTerme()}" styleClass="linkSmall"/>
 
                             </span>
                         </h:outputLink>                                

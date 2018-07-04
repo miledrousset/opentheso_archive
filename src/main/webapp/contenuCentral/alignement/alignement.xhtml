@@ -9,10 +9,9 @@
             <h:outputText value="#{langueBean.getMsg('index.align')}" />
             <div id="imageEdition">
                 <h:form id="formEditAlign"  
-                        rendered="#{(user1.user.name != null) 
+                        rendered="#{(currentUser.user.name != null) 
                                     and (selectedTerme.idC != null)
-                                    and (user1.haveRights(2)) 
-                                    and (user1.isHaveWriteToCurrentThesaurus)
+                                    and (roleOnTheso.isAdminOnThisTheso) 
                                     and (selectedTerme.status != 'hidden') 
                                     and (selectedTerme.idDomaine != 'Orphan')}">
 
@@ -26,10 +25,7 @@
                              <p:menuitem value="#{langueBean.getMsg('alig.gestion')}" update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show();"  style="font-size: 12px;"/>
                              <p:menuitem value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('editAlignementSourceEditDlg').show();" action="#{editAlignement.exporterSource()}" update=":panelAlignement"  style="font-size: 12px;"/>
                         </p:menu>
-                        
-
                     </p:commandButton>
-
                     <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                      styleClass="cbEdit" icon="ui-icon-edit-16" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">
@@ -40,11 +36,8 @@
                             <p:menuitem value="#{langueBean.getMsg('alig.PLnom')}" actionListener="#{selectedTerme.setAlignementSources()}" 
                                         action="#{alignementparlot.getListChildren(selectedTerme.idTheso, selectedTerme.idC)}"
                                         update=":idAjouterParLotEditDlg" oncomplete="PF('ajouterParLotEditDlg').show();" style="font-size: 12px;"/>
-                           
-                            
                         </p:menu>
                     </p:commandButton>
-
                 </h:form>    
             </div>
         </div>

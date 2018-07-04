@@ -1,0 +1,69 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddUserSuperAdminDlg"  header="#{langueBean.getMsg('popup.name')}" widgetVar="addUserSuperAdminDlg" modal="true" resizable="false" >
+        <!-- POPUP ADD USER DEBUT -->
+        <h:form id="addUserSA" rendered="#{currentUser.user.isSuperAdmin}">
+
+            <table>
+                <p:messages showDetail="true">
+                    <p:autoUpdate />
+                </p:messages>  
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('co.att1')} : " /></td>
+                    <td><h:inputText value="#{currentUser.pseudoAdded}" /></td>
+                </tr>
+
+                    <tr>
+                        <td><h:outputText value="#{langueBean.getMsg('conf.mail')} : " /></td>
+                        <td>
+                            <p:inputText id="email1" value="#{currentUser.mailAdded}" >
+                                <f:validator validatorId="custom.emailValidator" />
+                            </p:inputText>
+                        </td>
+                    </tr>
+
+
+
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('co.att2')} : " /></td>
+                    <td><h:inputSecret value="#{currentUser.pwdAdded1}" /></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('conf.confPwd')} : " /></td>
+                    <td><h:inputSecret value="#{currentUser.pwdAdded2}" /></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{langueBean.getMsg('conf.alertMail')}  " /></td>
+                    <td><p:selectBooleanCheckbox value="#{currentUser.alertmail}" /></td>
+                </tr>                   
+            </table>
+
+            <p:panelGrid id="roleAndGroup" columns="2" layout="grid">            
+                <h:outputText value="#{langueBean.getMsg('conf.tabUserOpt2')}: " /> 
+                <h:selectOneMenu id="selectRole" value="#{currentUser.roleAdded}">
+                            <f:selectItems value="#{currentUser.authorizedRoles}"  var="role" itemLabel="#{role.value}" itemValue="#{role.key}"/>
+                            <p:ajax event="change"  update=":addUserSA:roleAndGroup"/>
+                </h:selectOneMenu>
+                
+                <h:outputText rendered="#{(currentUser.roleAdded != 1) and (currentUser.roleAdded != -1)}"  value="droit sur le groupe : " />
+                
+                <p:selectOneMenu id="SelectGroup" rendered="#{(currentUser.roleAdded != 1) and (currentUser.roleAdded != -1)}" value="#{currentUser.groupAdded}"   autoWidth="false">
+                    <f:selectItems value="#{currentUser.listeGroupsOfUser.entrySet()}" var="group" itemLabel="#{group.value}" itemValue="#{group.key}"/>
+                </p:selectOneMenu>
+            </p:panelGrid>
+
+        <br/>
+            <p:panelGrid columns="2" layout="grid">
+                <p:commandButton value="#{langueBean.getMsg('edit.create')}" actionListener="#{currentUser.addUser(currentUser.groupAdded)}"  update=" :tabListSuperAdmin, :messages" 
+                                 styleClass="styleButton" oncomplete="PF('addUserSuperAdminDlg').hide();"/>
+                <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton" update=":tabListSuperAdmin" oncomplete="PF('addUserSuperAdminDlg').hide();"  immediate="true"/>
+            </p:panelGrid> 
+
+        </h:form> 
+    </p:dialog>
+</ui:composition>

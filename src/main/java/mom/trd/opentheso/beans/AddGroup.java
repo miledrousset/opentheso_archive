@@ -9,7 +9,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 

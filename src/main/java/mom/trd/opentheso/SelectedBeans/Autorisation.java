@@ -13,7 +13,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.event.ActionEvent;
 import mom.trd.opentheso.autorisation.AutorisationHelper;
 import mom.trd.opentheso.autorisation.AutorisationStruct;
-import mom.trd.opentheso.bdd.helper.Connexion;
 
 /**
  *

@@ -17,7 +17,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
@@ -256,7 +255,7 @@ public class DownloadBean implements Serializable {
         progress_abs = 0;
         ConceptHelper conceptHelper = new ConceptHelper();
 
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
         if(nodePreference == null) return null;
         
         sizeOfTheso = conceptHelper.getConceptCountOfThesaurus(connect.getPoolConnexion(), idTheso);
@@ -449,7 +448,7 @@ public class DownloadBean implements Serializable {
                 extention = "_turtle.ttl";
                 break;
         }
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
         
         if(nodePreference == null) return null;
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
@@ -559,7 +558,7 @@ public class DownloadBean implements Serializable {
                 extention = "_turtle.ttl";
                 break;
         }
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
         if(nodePreference == null) return null;
         
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
@@ -863,7 +862,7 @@ public class DownloadBean implements Serializable {
         progress_per_100 = 0;
         progress_abs = 0;
 
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
         if(nodePreference == null) return null;
         
         sizeOfTheso = new ConceptHelper().getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
@@ -903,7 +902,7 @@ public class DownloadBean implements Serializable {
         progress_per_100 = 0;
         progress_abs = 0;
 
-        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreference(connect.getPoolConnexion(), idTheso);
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
         if(nodePreference == null) return null;
         
 

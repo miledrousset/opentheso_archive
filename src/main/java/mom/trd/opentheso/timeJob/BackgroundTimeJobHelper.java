@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.bdd.helper.UserHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

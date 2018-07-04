@@ -22,7 +22,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ImagesHelper;
 import mom.trd.opentheso.core.imports.helper.ImportSkosHelper;
 import mom.trd.opentheso.core.imports.helper.ImportTabulateHelper;

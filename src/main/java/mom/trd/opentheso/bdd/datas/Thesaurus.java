@@ -22,7 +22,7 @@ public class Thesaurus {
     private String subject = "";
     private String title = "";
     private String type = "";
-    private boolean visibility;
+    private boolean privateTheso;
  
     private ArrayList <DcElement> dcElement;
 
@@ -216,15 +216,15 @@ public class Thesaurus {
      * #JM
      * @return 
      */
-    public boolean isVisibility() {
-        return visibility;
+    public boolean isPrivateTheso() {
+        return privateTheso;
     }
     /**
      * #JM
-     * @param visibility 
+     * @param privateTheso 
      */
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
+    public void setPrivateTheso(boolean privateTheso) {
+        this.privateTheso = privateTheso;
     }
     
 

@@ -14,209 +14,139 @@
     </h:head>
     <h:body>
          <style >
-            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:nth-child(3){
+            div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:nth-child(4){
                border: 3px  solid #956620;
                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
-        <ui:include src="dialogs/user/addUserDlg.xhtml" />
-        <ui:include src="dialogs/user/editUserDlg.xhtml" />
-        <ui:include src="dialogs/prefDlg.xhtml" />
-        <ui:include src ="/admin/reorganizing.xhtml" />
-        <ui:include src="admin/regenerateAllConceptId.xhtml" />
-        <ui:include src="admin/regenerateArkId.xhtml" />
-        <ui:include src="admin/regenerateHandleId.xhtml" />        
-        <ui:include src="/admin/baseDeDonnes/miseAJourEditDlg.xhtml"/>
-        <ui:include src="/dialogs/settings/copyrightEditDlg.xhtml" />
-        <!--inlcude pour l'alignement automatique des BT et des domaines -->
-        <ui:include src="dialogs/group/alignGroupDlg.xhtml"/>
-        <!--include pour le serveur sparql -->
-        <ui:include src="dialogs/sparql/sparqlDialg.xhtml" />
+
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
-            Depuis cette page, les administrateurs peuvent gérer les utilisateurs. Il leur est possible de créer/désactiver un compte ou de modifier les droit d'un utilisateur.
+            Depuis cette page, les administrateurs peuvent gérer les péférences du logiciel et des thésaurus.
             <br/><br/>
-            La modification du mot de passe du compte courant est également effective.
-            <br/><br/>
-            Le choix de la langue de travail préférée de l'utilisateur (pour avoir automatiquement le thésaurus dans cette langue) et la possibilité de modifier le nombre de 
-            propositions nécessaires à un candidat pour l'envois automatique d'un e-mail (qui préviendra les administrateurs que ce candidat est fortement demandé) sont à venir.
         </p:dialog>  
        
         <div id="menuHead">
             <div id="menuHeadTop">
             <ui:include src="logo.xhtml" />
+            <h:panelGroup rendered="#{currentUser.user != null}">
+                <div id="disconnect">
+                    <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
+                </div>
+            </h:panelGroup>            
             <ui:include src="account.xhtml" />
             <ui:include src="menuThesaurus.xhtml" />
             <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
-           
             </div>
-           
-               
         </div>
-        <center>
 
+        <h:panelGroup id="confAll">
 
-            <!-- gestion des utilisateurs -->
-        </center>
+        <!-- gestion des actions pour les admins par thésaurus (accessible aux admins et au SuperAdmins) -->
         <div id="principaleConf">
-            <h:panelGroup rendered="#{user1.haveRights(2)}">
+
+            <h:panelGroup rendered="#{roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin}">
                 <fieldset class="fieldUser">
-                    <legend><h:outputText value="#{langueBean.getMsg('conf.field1')}" /></legend>
-                    <h:form>
-                        <p:commandButton value="#{langueBean.getMsg('conf.btnAddUser')}"  update=":idAddUserDlg" oncomplete="PF('addUserDlg').show();" styleClass="styleButton" />
-
-                    </h:form><br/>
-                    <p:dataTable id="tabUser" value="#{user1.selectAuthorizedUser()}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                    <h:form id="formPrefAdmin">
+                    <p:dataTable id="tabPrefsAdmin" rendered="#{roleOnTheso.idTheso != null}"
+                                 value="#{conf.nodePrefsAdmins}" var="prefsAdmin" scrollable="true" resizableColumns="true" scrollHeight="260" style="font-family:'Palatino linotype',Times,serif;">
                         <f:facet name="header">
-                            <h:outputText value="#{langueBean.getMsg('conf.tabUser')}" />
-                        </f:facet>
-                        <p:column width="150" headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{!u.isActive}">
-                            <h:outputText title="user désactivé" value="#{u.name}" style="color: red; font-style: oblique" />
+                        </f:facet> 
+                        <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (admin)" >
+                            <h:outputText value="#{prefsAdmin.pref}"/>
                         </p:column>
-                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt1')}" rendered="#{u.isActive}">
-                            <h:outputText value="#{u.name}"/>
-                        </p:column>
-                        <p:column headerText="#{langueBean.getMsg('conf.tabUserOpt2')}">
-                            <h:outputText value="#{u.role}" />
-                        </p:column>
-                        <p:column width="20" >
-                            <h:form>
-                                <p:commandButton id="cbEditTheso" styleClass="cbSupp" icon="ui-icon-edi" actionListener="#{user1.selectUser(u)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
-                            </h:form>
-                        </p:column>
-                        <p:column width="20" >
-                            <h:form>
-                                <p:commandButton id="cbSuppTheso" title="Suprimer l'utilisateur, pour desactive dans edition de l'user" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{user1.delUser(u.id)}" update=":tabUser" >
-                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('conf.valid1')}" icon="ui-icon-alert" />  
-                                </p:commandButton>  
+                        
 
-                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                                </p:confirmDialog> 
-                            </h:form>
+                        <p:column width="20" >
+                            <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                              title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
+                                <f:setPropertyActionListener value="#{prefsAdmin}" target="#{conf.selectedPrefAdmin}" />
+                            </p:commandButton>
                         </p:column>
                     </p:dataTable>
-                </fieldset>
-            </h:panelGroup>
-
-            <!-- Fin gestion des utilisateurs -->
-
-
-            <fieldset class="fieldMyAccount">
-                <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
-                <h:form id="formEditPseudo">
-                    <table>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{user1.user.name}" styleClass="textInfo" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.editPseudo')}" /> : </td>
-                            <td><h:inputText value="#{user1.pseudo}" /></td>
-
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editPseudo')}" actionListener="#{user1.renamePseudo}" 
-                                                      update=":formEditPseudo, :tabUser" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-                <hr/>
-                <h:form id="formEditPwd">
-                    <table>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.currentPwd')}" /> : </td>
-                            <td><h:inputSecret value="#{user1.pwdEdit1}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd1')}" /> : </td>
-                            <td><h:inputSecret value="#{user1.pwdEdit2}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd2')}" /> :</td>
-                            <td><h:inputSecret value="#{user1.pwdEdit3}" /></td>
-
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{user1.changePwd()}" 
-                                                      update=":formEditPwd" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-                
-                <hr/>
-                <h:form id="formEditMail">
-                    <table>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{user1.user.mail}" styleClass="textInfo"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newMail')}" /> : </td>
-                            <td><h:inputText value="#{user1.mailEdit}" /></td>
-
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editMail')}" actionListener="#{user1.changeMail()}" 
-                                                      update=":formEditMail" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-                <hr/>
-                <h:form id="formEditAlertMail">
-                    <table>
-                        <tr>
-                            <td> <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/> : </td>
-                            <td><p:selectBooleanCheckbox value="#{user1.alertmail}" /></td>
-
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{user1.updateAlertMail()}" 
-                                                      update=":formEditMail" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>                
-             </fieldset>
-
-
-            <h:panelGroup rendered="#{user1.haveRights(2)}">
-                <fieldset class="fieldAdmin">
-                    <legend><h:outputText value="#{langueBean.getMsg('menu.div1')}" /></legend>
-                    <h:form>
-                        <p:menuButton  value="Admin" style="font-family:'Palatino linotype',Times,serif; font-size: 11px;" >
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.modifPref')}"  update=":idPrefDlg" oncomplete="PF('prefDlg').show();" styleClass="styleButton"/>
-                            <p:separator />
-                            <p:separator />
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.sparql')}" update=":idSparqlPreferencesDlg" oncomplete="PF('sparqlPreferenceDlg').show();" action="#{preferencesAlertBean.loadPreferencesSparql()}" styleClass="styleButton"/>
-                                
-                            <p:separator />
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.newId')}"  update=":idRegenerateAllConceptId" oncomplete="PF('regenerateAllConceptId').show();" styleClass="styleButton"/>
-                            <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup(theso.thesaurus.language)}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
-                            <p:separator />
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('bdd.act')}"  update=":idMiseAJourEditDlg" oncomplete="PF('miseAJourEditDlg').show();" styleClass="styleButton"/>
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateArk')}"  update=":idRegenerateArkId" oncomplete="PF('regenerateArkId').show();" styleClass="styleButton"/>
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('admin.regenerateHandle')}"  update=":idRegenerateHandleId" oncomplete="PF('regenerateHandleId').show();" styleClass="styleButton"/>                            
-                            <p:separator/>
-                            <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('copyright.addCopyrightTo')}" action="#{copyrightBean.setDisplayBrutText(false)}" oncomplete="PF('copyrightEditDlg').show()"  styleClass="styleButton"/>
-                         
-
-                        </p:menuButton>
                     </h:form>
+                    <!-- actions superAdmin -->
+                    <h:form id="formPrefSuperAdmin" rendered="#{currentUser.user.isSuperAdmin}">
+                        <p:dataTable id="tabPrefsSuperAdmin" 
+                                     value="#{conf.nodePrefsSuperAdmins}" var="prefsSuperAdmin" scrollable="true" resizableColumns="true" scrollHeight="100" style="font-family:'Palatino linotype',Times,serif;">
+                            <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (superAdmin)" style="color: #BD6060" >
+                                <h:outputText value="#{prefsSuperAdmin.pref}"/>
+                            </p:column>                       
+                            <p:column width="20" >
+                                <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                         title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
+                                    <f:setPropertyActionListener value="#{prefsSuperAdmin}" target="#{conf.selectedPrefSuperAdmin}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                   </h:form>                    
                 </fieldset>
             </h:panelGroup>
+            
+            <!-- vue Admins -->
+            
+            <!-- vue preférences générales -->
+            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '1'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/preference.xhtml" />
+                </fieldset>
+            </h:panelGroup>
+            <!-- vue regénérer des nouveaux identifiants -->            
+            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '2'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/regenerateAllConceptId.xhtml" />
+                </fieldset>
+            </h:panelGroup>            
 
-
+            
+            <!-- vue ajout de copyright -->            
+            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '3'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/copyrightEdit.xhtml" />
+                </fieldset>                
+            </h:panelGroup>
+            
+            <!-- vue ARK -->            
+            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '4'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/regenerateArkId.xhtml" />
+                </fieldset>                
+            </h:panelGroup>
+            
+            <!-- vue Handle -->            
+            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '5'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/regenerateHandleId.xhtml" />
+                </fieldset>                
+            </h:panelGroup>             
+            
+            
+            <!-- vue SuperAdmins -->
+            
+            <!-- vue sparql -->            
+            <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '1'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/sparqlPreference.xhtml" />
+                </fieldset>                
+            </h:panelGroup>
+            
+            <!-- vue BDD -->            
+            <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '2'}" >
+                <fieldset class="fieldUser">
+                    <ui:include src="admin/prefs/miseAJourBDD.xhtml" />
+                </fieldset>                
+            </h:panelGroup>               
+            
+            
+            
 
         </div>
+        </h:panelGroup>
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
-                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="50" />
                 </f:facet>
 
                 <f:facet name="complete">

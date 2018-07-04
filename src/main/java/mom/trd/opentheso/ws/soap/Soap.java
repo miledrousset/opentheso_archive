@@ -19,7 +19,7 @@ import javax.faces.context.FacesContext;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 
 /**

@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!--    <p:dialog id="idRegenerateArkId" header="{langueBean.getMsg('admin.regenerateArk')}" widgetVar="regenerateArkId"
+                  modal="true" resizable="true" width="350" height="200"> -->
+    <div >
+        <h:panelGroup id="idRegenerateArkId" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
+            <h:form id="formRegenerateArk">
+                <fieldset class="fieldReorga" width="200" height="80">
+                    <legend><h:outputText value="#{langueBean.getMsg('admin.regenerateArk')}" /></legend>
+                    <h:outputText value="#{langueBean.getMsg('admin.regenerateArk.help')}" /> 
+                </fieldset>
+                <center>
+                    <p:commandButton value="#{langueBean.getMsg('admin.regenerateArk')}" actionListener="#{theso.regenerateAllArkId(theso.thesaurus.id_thesaurus)}"   
+                                     update=":idRegenerateArkId, :messages" styleClass="styleButton">
+                        <p:confirm header="Confirmation" message="!!! Attention !!!! cette opération peut prendre beaucoup de temps !" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                    <br/><br/>
+                    <p:commandButton value="#{langueBean.getMsg('admin.regenerateArkInexistant')}" actionListener="#{theso.generateAllInexistantArkId(theso.thesaurus.id_thesaurus)}"   
+                                     update=":idRegenerateArkId, :messages" styleClass="styleButton">
+                        <p:confirm header="Confirmation" message="!!! Attention !!!! cette opération peut prendre beaucoup de temps !" icon="ui-icon-alert"/>
+                    </p:commandButton>                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </center>          
+            </h:form>
+        </h:panelGroup>
+    </div>
+
+</ui:composition>

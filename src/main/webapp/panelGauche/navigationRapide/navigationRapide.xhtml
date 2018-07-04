@@ -37,7 +37,7 @@
                         </td>
 
                         <td align="right">
-                            <h:form id="formTools" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                            <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                 <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
                                 <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
                                     <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>

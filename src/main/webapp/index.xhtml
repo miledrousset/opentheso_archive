@@ -38,7 +38,8 @@
         <div id="menuHead">
             <div id="menuHeadTop">
                 <ui:include src="logo.xhtml" />
-                <ui:include src="connection.xhtml" />
+            <!--    <ui:include src="connection.xhtml" />-->
+                <ui:include src="connection2.xhtml" />                
                 <ui:include src="panChoixThesoetLangue.xhtml"/>  <!-- cette archive est dans la racine Web Pages -->
                 <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
             </div>
@@ -73,7 +74,7 @@
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
-                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="200" />
+                    <p:graphicImage id="iconeLoad" value="/images/loading.gif" width="100" />
                 </f:facet>
                 <f:facet name="complete">
                     <h:outputText value="" />

@@ -1,0 +1,40 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idMoveThesoToAnotherGroupDlg" header="#{langueBean.getMsg('profile.moveTheso')}" widgetVar="moveThesoToAnotherGroupDlg" modal="true" resizable="false" >
+        <h:form id="moveThesoToGroup">
+            <table>
+                <tr>
+                    <td>
+                        <p:panelGrid  columns="2" >
+                            <h:outputText value="déplacer " /> 
+                            <h:outputText value="#{currentUser.nodeUserGroupThesaurusSelected.thesaurusName}" style="color: green" />
+                            
+                            <h:outputText value="du groupe " /> 
+                            <h:outputText value="#{currentUser.nodeUserGroupThesaurusSelected.groupName}" style="color: green" />
+
+                            <h:outputText value="vers ->  " /> 
+                            <p:selectOneMenu id="listGroup" value="#{currentUser.groupAdded}" autoWidth="false">
+                                <f:selectItems value="#{currentUser.listeGroupsOfUser.entrySet()}" var="group" itemLabel="#{group.value}" itemValue="#{group.key}"/>
+                            </p:selectOneMenu>
+                            
+                        </p:panelGrid>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left;">
+                        <p:commandButton value="#{langueBean.getMsg('btnOk')}" actionListener="#{currentUser.moveThesoToGroup()}" 
+                                              update=":listUsers,:formEditPseudo, :messages" styleClass="styleButton" oncomplete="PF('moveThesoToAnotherGroupDlg').hide();"/>
+                    </td>
+                    <td style="text-align: center;">
+                        <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton"  oncomplete="PF('moveThesoToAnotherGroupDlg').hide();"  actionListener="#{currentUser.reInit()}" immediate="true"/>
+                    </td>                    
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>

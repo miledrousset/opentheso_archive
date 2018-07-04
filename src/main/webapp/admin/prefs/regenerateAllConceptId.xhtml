@@ -1,0 +1,44 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!--    <p:dialog id="idRegenerateAllConceptId"  header="{langueBean.getMsg('conf.newId')}" widgetVar="regenerateAllConceptId" modal="true" resizable="false" >-->
+
+
+    <h:panelGroup id="idRegenerateAllConceptId" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isHaveWriteToCurrentThesaurus}">
+        <h:form id="formRegenerateAllConceptId">
+            <fieldset class="fieldReorga">
+
+                <legend><h:outputText value="#{langueBean.getMsg('conf.newId')}" /></legend><br/>
+
+                <table>
+                    <tr>
+                        <td><h:outputText value="#{langueBean.getMsg('conf.newIdExplication')}" />  </td>
+                    </tr>
+                    <br/><br/><br/>
+
+                    <tr>
+                        <td>
+                            <p:commandButton title="#{langueBean.getMsg('conf.newId')}" actionListener="#{theso.regenAllId(theso.thesaurus.id_thesaurus)}"
+                                             update=":idRegenerateAllConceptId, :messages" 
+                                             icon="ui-icon-ok-16" styleClass="styleButton_db">
+                                <p:confirm header="Confirmation" message="!!! Attention !!!! opération irréversible, tous les identifiants du thésaurus seront modifiés !" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+
+
+        </h:form> 
+
+    </h:panelGroup>
+
+</ui:composition>

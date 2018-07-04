@@ -11,8 +11,8 @@
             <div id="imageEdition">
 
                 <h:form id="formEditTSpe" 
-                        rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.isHaveWriteToCurrentThesaurus) 
-                                    and (user1.haveRights(2)) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) 
+                                   and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                      <p:commandButton id="trierTS" styleClass="cbEdit" icon="ui-icon-edit-16"/>                                                        
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="trierTS" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" action="#{autoComp.init()}" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>

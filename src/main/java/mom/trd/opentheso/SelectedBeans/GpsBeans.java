@@ -19,7 +19,6 @@ import mom.trd.opentheso.bdd.datas.Languages_iso639;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;

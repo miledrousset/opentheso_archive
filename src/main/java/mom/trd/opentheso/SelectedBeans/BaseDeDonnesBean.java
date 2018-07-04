@@ -34,7 +34,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.ForgetPasswordHelper;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.helper.ExportStatistiques;

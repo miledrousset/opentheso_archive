@@ -21,9 +21,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import mom.trd.opentheso.SelectedBeans.CurrentUser;
+import mom.trd.opentheso.SelectedBeans.CurrentUser2;
 import mom.trd.opentheso.SelectedBeans.SelectedCandidat;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;
 
 public class loginFilter implements Filter {
 
@@ -36,7 +38,7 @@ public class loginFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        CurrentUser session = (CurrentUser) req.getSession().getAttribute("user1");
+        CurrentUser2 session = (CurrentUser2) req.getSession().getAttribute("currentUser");
         String url = req.getRequestURI();
        
         Connexion conn=(Connexion)request.getServletContext().getAttribute("poolConnexion");
@@ -73,11 +75,11 @@ public class loginFilter implements Filter {
         }
         
         if(url.contains("deco.xhtml")) {
-            CurrentUser temp = (CurrentUser)req.getSession().getAttribute("user1");
+            CurrentUser2 temp = (CurrentUser2)req.getSession().getAttribute("currentUser");
             
-            temp.setUser(new NodeUser());
+            temp.setUser(null);
             temp.setIsLogged(false);
-            req.getSession().setAttribute("user1", temp);
+            req.getSession().setAttribute("currentUser", temp);
             
             ((SelectedCandidat)req.getSession().getAttribute("selectedCandidat")).reInit();
             

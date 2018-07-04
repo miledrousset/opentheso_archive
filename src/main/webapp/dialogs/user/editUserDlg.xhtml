@@ -8,46 +8,33 @@
     <p:dialog id="idEditUserDlg" header="#{langueBean.getMsg('conf.popup1Title')}" widgetVar="editUserDlg" modal="true" resizable="false" >
         <!-- POPUP EDIT USER DEBUT -->        
         <h:form>
-                    <p:messages showDetail="true">
-                        <p:autoUpdate />
-                    </p:messages>  
             <table>
-                <td>
-                    <p:panelGrid columns="2" >
-                        <h:outputText value="#{langueBean.getMsg('conf.popup1opt1')}" /> 
-                        <h:outputText value="#{user1.nameEdit}" style="color: green" />
-
-                        <h:outputText value="#{langueBean.getMsg('conf.popup1Opt2')}" /> 
-                        <h:selectOneMenu value="#{user1.roleEdit}">
-                            <f:selectItems value="#{user1.selectAuthorizedRoles()}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
-                        </h:selectOneMenu>
-                    </p:panelGrid>
-                    <br/>
-                    <h:outputText value="#{langueBean.getMsg('user.activate')} "/>
-                        <p:selectBooleanCheckbox value="#{user1.isActive}" />
-                      
-                </td>
-                <td>
-                    <p:panelGrid columns="1" >
-                        <p:outputLabel title="sélectionnez un ou plusieurs"  value="#{langueBean.getMsg('theso')}" />
-                    </p:panelGrid>
-                    <p:scrollPanel  mode="native" style="width:200px;height:100px">
-                        <p:selectManyCheckbox rendered="#{user1.roleEdit != 1}" id="advanced" value="#{user1.selectedThesaurus}" layout="grid" columns="1" >
-                            <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                        </p:selectManyCheckbox>
-                    </p:scrollPanel>
-                </td>                
                 <tr>
-                    <td colspan="1" style="text-align: center;">
-                        <br/><p:commandButton value="#{langueBean.getMsg('btnOk')}" actionListener="#{user1.editUserRole()}" 
-                                              update=":tabUser" styleClass="styleButton" oncomplete="PF('editUserDlg').hide();"/>
-                    </td>
-                    <td >
+                    <td>
+                        <p:panelGrid columns="2" >
+                            <h:outputText value="#{langueBean.getMsg('conf.popup1opt1')}" /> 
+                            <h:outputText value="#{currentUser.userEdit.name}" style="color: green" />
+                        </p:panelGrid>
                         <br/>
-                         <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton"  oncomplete="PF('editUserDlg').hide();"  actionListener="#{user1.reInit()}" immediate="true"/>
+                        <p:panelGrid columns="2" >
+                            <h:outputText value="#{langueBean.getMsg('user.activate')} "/>
+                            <p:selectBooleanCheckbox value="#{currentUser.userEdit.isActive}" />
+
+                            <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/>
+                            <p:selectBooleanCheckbox value="#{currentUser.userEdit.isAlertMail}" />                          
+                        </p:panelGrid>
+                        <br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left;">
+                        <p:commandButton value="#{langueBean.getMsg('btnOk')}" actionListener="#{currentUser.updateUser()}" 
+                                              update=":tabUser, :messages" styleClass="styleButton" oncomplete="PF('editUserDlg').hide();"/>
+                    </td>
+                    <td style="text-align: center;">
+                        <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton"  oncomplete="PF('editUserDlg').hide();"  actionListener="#{currentUser.reInit()}" immediate="true"/>
                     </td>                    
                 </tr>
-
             </table>
         </h:form>
     </p:dialog>

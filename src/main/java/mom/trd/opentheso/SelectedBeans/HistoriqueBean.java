@@ -10,7 +10,6 @@ import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Relation;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
-import mom.trd.opentheso.bdd.helper.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;

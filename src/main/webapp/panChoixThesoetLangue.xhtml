@@ -17,7 +17,7 @@
                             <td style="padding-right: 5px;">
                                 <h:outputText value="#{langueBean.getMsg('theso')}" /><br/>
                                 <h:selectOneMenu value="#{theso.thesaurus.id_thesaurus}" class="inputConnect" >
-                                    <f:selectItems value="#{accessThesaurusBean.listAccess}" var="th" itemLabel="#{listAccess.key}" itemValue="#{listAccess.value}" />
+                                    <f:selectItems value="#{roleOnTheso.listTheso}" var="th" itemLabel="#{listAccess.key}" itemValue="#{listAccess.value}" />
                                 </h:selectOneMenu>
                             </td>
                             <td>                                                                                                           
@@ -45,25 +45,6 @@
                                     </h:form>
                                 </h:panelGroup>
                             </td>
-                            <td id="thesos">
-                                <table>
-                                    <h:form rendered="#{(user1.user.name != null)}" >
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('theso.my')}" /><br/>
-                                            <p:selectBooleanCheckbox value="#{accessThesaurusBean.onlyOwned}" >
-                                                <p:ajax listener="#{accessThesaurusBean.accessOwnerThesaurus()}" update=":liste1"  />
-                                            </p:selectBooleanCheckbox>
-                                        </td>
-                                    </h:form>
-                                </table>
-                            </td>
-                            <!-- 
-                             <td>
-                                 <h:outputText value="#{langueBean.getMsg('theso.langue')}"/>
-                                 <h:outputText value="#{theso.thesaurus.language}" />
-                                 <br/>
-                             </td>
-                            -->
                         </tr>
                     </table>
                 </h:form>

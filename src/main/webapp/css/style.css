@@ -48,7 +48,9 @@ input[type="button"], input[type="submit"]{
     color: black !important;
 }
 
-
+.whitespacePrewrap {
+	white-space : pre-wrap;
+}
 
 .infoAcordionPanel{
     color: #3333ff !important;
@@ -443,9 +445,25 @@ input[type="button"], input[type="submit"]{
 }
 
 
-/***********************************Nouvelles icones / iconsDB***********************************/
+/***********************************Nouvelles icones / iconsDB icondb***********************************/
 /* custom color #69B019   #284309 */
 
+.ui-icon-html-24 {
+    background: url("../images/html-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;      
+
+}
+.ui-icon-not-html-24 {
+    background: url("../images/not-html-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;      
+
+}
 .ui-icon-tool {
     background: url("../images/tool-box.png") no-repeat !important;
     background: none;
@@ -467,6 +485,34 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
   
 }
+.ui-plus-5-16 {
+    background: url("../images/plus-5-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+  
+}
+
+.ui-icon-theso-15 {
+    background: url("../images/iconeTree2.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-theso-24 {
+    background: url("../images/icon-theso-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;  
+}
+.ui-change-theso-24 {
+    background: url("../images/change-theso-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;  
+}
+
 .ui-icon-trash-16 {
     background: url("../images/trash-16.png") no-repeat !important;
     background: none;
@@ -483,6 +529,31 @@ input[type="button"], input[type="submit"]{
 
 .ui-icon-edit-16-2 {
     background: url("../images/edit-16-2.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-icon-access-16 {
+    background: url("../images/access-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-delete-access-16 {
+    background: url("../images/delete-access-16.png") no-repeat !important;
+    background: none ;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+
+.ui-icon-delete-16 {
+    background: url("../images/delete-16.png") no-repeat !important;
     background: none ;
     border-radius: 0px;
     height: 16px;
@@ -561,7 +632,58 @@ input[type="button"], input[type="submit"]{
     border: none;
     box-shadow: none;
 }
+.ui-icon-user-16 {
+    background: url("../images/user-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+.ui-icon-checked-user-24 {
+    background: url("../images/checked-user-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;
+}
 
+
+.ui-icon-superadmin-16 {
+    background: url("../images/superadmin-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ui-icon-superadmin-24 {
+    background: url("../images/superadmin-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;
+}
+.ui-icon-group-16 {
+    background: url("../images/group-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+.ui-icon-new-group-24 {
+    background: url("../images/new-group-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;
+}
+.ui-icon-space-24 {
+    background: url("../images/space.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;
+}
 
 
 /***********************************Barre recherche***********************************/
@@ -1158,7 +1280,7 @@ input[type="button"], input[type="submit"]{
 
 .fieldUser {
     float: left; 
-    width: 340px;
+    width: 450px;
     border-radius: 5px;
 }
 
@@ -1184,8 +1306,8 @@ input[type="button"], input[type="submit"]{
 }
 .fieldReorga {
     float: right; 
-    width: 300px !important; 
-    height: 80px !important; 
+    width: 400px !important; 
+    height: 220px !important; 
     text-align: center;
     border-radius: 5px;
 }

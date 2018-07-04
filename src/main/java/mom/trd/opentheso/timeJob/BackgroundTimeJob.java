@@ -19,7 +19,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import mom.trd.opentheso.bdd.datas.ConceptGroup;
 import mom.trd.opentheso.bdd.datas.Languages_iso639;
-import mom.trd.opentheso.bdd.helper.Connexion;
+import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
