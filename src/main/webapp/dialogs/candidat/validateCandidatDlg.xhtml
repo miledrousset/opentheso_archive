@@ -1,0 +1,51 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <p:dialog id="idValidateCandidatDlg"  header="#{langueBean.getMsg('cdt.editProp')}" styleClass="styleText2" widgetVar="validateCandidatDlg" modal="true" resizable="true"  >
+            <h:panelGroup id="panValidCdt" style="background: transparent; box-shadow: none;">
+                <h:form>
+                    <fieldset style="text-align: left;">
+                        <legend><h:outputText value="#{langueBean.getMsg('cdt.refCdt')}" /></legend>
+                        <h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :<br/>
+                        <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
+                        <center>
+                            <p:commandButton value="#{langueBean.getMsg('cdt.refCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonRefus" 
+                                             actionListener="#{searchCandidat.toRefus()}" update=":panValidCdt,:tableCdt,:gestionCandidat" 
+                                             oncomplete="PF('validateCandidatDlg').hide();">
+
+
+                            </p:commandButton>
+                        </center>
+                    </fieldset>
+                </h:form><br/>
+                <h:outputText value="#{langueBean.getMsg('or')}" /><br/><br/>
+                <h:form>
+                    <fieldset style="text-align: left;">
+                        <legend><h:outputText value="#{langueBean.getMsg('cdt.validCdt')}" /></legend>
+                        <h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :<br/>
+                        <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
+                        <center>
+                            <p:commandButton value="#{langueBean.getMsg('cdt.validCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonValid" 
+                                             actionListener="#{searchCandidat.toValid()}" update=":panValidCdt,:tableCdt,:gestionCandidat" 
+                                             oncomplete="PF('validateCandidatDlg').hide();">
+                            </p:commandButton>
+                        </center>
+                    </fieldset>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+    </ui:composition>
+
+
+
+
+
+
+

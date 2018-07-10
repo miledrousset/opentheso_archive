@@ -39,7 +39,8 @@
                 
                 
                 <br/> 
-                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.inserBranch(idUser, idRole,selectedTerme)}" 
+                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
+                                 actionListener="#{rdf4jFileBean.inserBranch(editionBean.selectedUserGroup,selectedTerme)}" 
                                  onclick="PrimeFaces.monitorDownload(start_import_branche);PF('pbAjax').start();" 
                                  oncomplete="PrimeFaces.monitorDownload(stop_import_branche);PF('importBranchDlg').hide();" 
                                  update=":idImportBranchDlg,:accordeonTree,:panContenu"

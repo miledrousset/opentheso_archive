@@ -92,7 +92,6 @@ public class RelationsHelper {
             String idConcept1, String idTheso,
             String role, String idConcept2) {
 
-      
         Statement stmt;
         boolean status = false;
        try {

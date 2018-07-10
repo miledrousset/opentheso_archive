@@ -87,7 +87,44 @@ public class CandidateHelper {
         return tabIdCandidat;
     }
     
-    
+    /**
+     * 
+     * @param ds
+     * @param idTheso
+     * @return 
+     */
+    public int getCountOfCandidat(HikariDataSource ds,
+            String idTheso) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        int tot = 0;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select count(id_concept) from concept_candidat where id_thesaurus = '" + idTheso + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if(resultSet.next()) {
+                        tot = resultSet.getInt(1);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting count of candidat of thesaurus : " + idTheso, sqle);
+        }
+        return tot;
+    }  
     
     
     /**

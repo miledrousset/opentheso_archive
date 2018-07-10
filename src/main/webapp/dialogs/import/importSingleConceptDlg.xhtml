@@ -39,7 +39,8 @@
                 
                 
                 <br/> 
-                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.inserSingleConcept(idUser, idRole,selectedTerme)}" 
+                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" 
+                                 actionListener="#{rdf4jFileBean.inserSingleConcept(editionBean.selectedUserGroup,selectedTerme)}" 
                                  onclick="PrimeFaces.monitorDownload(start_import_concept);PF('pbAjax').start();" 
                                  oncomplete="PrimeFaces.monitorDownload(stop_import_concept);PF('importSingleConceptDlg').hide();" 
                                  update="idImportSingleConceptDlg,:accordeonTree,:panContenu"

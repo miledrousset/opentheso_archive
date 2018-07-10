@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import mom.trd.opentheso.SelectedBeans.SelectedTerme;
 import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -29,6 +31,7 @@ import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
@@ -65,8 +68,10 @@ public class ImportRdf4jHelper {
     private String formatDate;
     private String adressSite;
     private int idUser;
-    private int idRole;
-    private boolean useArk;
+    private int idGroupUser;
+
+
+//    private boolean useArk;
     private String identifierType;
     private String prefixHandle;
 
@@ -130,25 +135,20 @@ public class ImportRdf4jHelper {
      *
      * @param ds
      * @param formatDate
-     * @param useArk
-     * @param adressSite
+     * @param idGroup
      * @param idUser
-     * @param idRole
      * @param langueSource
      * @return
      */
     public boolean setInfos(HikariDataSource ds,
-            String formatDate, boolean useArk, String adressSite, int idUser,
-            int idRole,
+            String formatDate, int idUser,
+            int idGroupUser,
             String langueSource) {
         this.ds = ds;
         this.formatDate = formatDate;
-        this.useArk = useArk;
-        this.adressSite = adressSite;
         this.idUser = idUser;
-        this.idRole = idRole;
+        this.idGroupUser = idGroupUser;
         this.langueSource = langueSource;
-
         return true;
     }
 
@@ -302,7 +302,7 @@ public class ImportRdf4jHelper {
         if (thesaurus.getLanguage() == null) {
             thesaurus.setLanguage(langueSource);
         }
-        if ((idTheso1 = thesaurusHelper.addThesaurusRollBack(conn, adressSite, useArk)) == null) {
+        if ((idTheso1 = thesaurusHelper.addThesaurusRollBack(conn, "", false)) == null) {
             conn.rollback();
             conn.close();
             return null;
@@ -319,14 +319,11 @@ public class ImportRdf4jHelper {
         this.idTheso = idTheso1;
         // boucler pour les traductions
         for (SKOSLabel label : skosXmlDocument.getConceptScheme().getLabelsList()) {
-
-            if (thesaurus.getLanguage() == null) {
-                String workLanguage = "fr"; //test
-                thesaurus.setLanguage(workLanguage);
-            }
             thesaurus.setTitle(label.getLabel());
             thesaurus.setLanguage(label.getLanguage());
-
+            if (thesaurus.getLanguage() == null) {
+                thesaurus.setLanguage("fr"); // cas où la langue n'est pas définie dans le SKOS
+            }
             if (!thesaurusHelper.addThesaurusTraductionRollBack(conn, thesaurus)) {
                 conn.rollback();
                 conn.close();
@@ -334,11 +331,15 @@ public class ImportRdf4jHelper {
             }
         }
 
-        UserHelper userHelper = new UserHelper();
-        if (!userHelper.addRole(conn, idUser, idRole, idTheso1, "")) {
-            conn.rollback();
-            conn.close();
-            return null;
+        // ajouter le thésaurus dans le group de l'utilisateur
+        if(idGroupUser != -1){ // si le groupeUser = - 1, c'est le cas d'un SuperAdmin, alors on n'intègre pas le thésaurus dans un groupUser
+            UserHelper2 userHelper = new UserHelper2();
+            if (!userHelper.addThesoToGroup(conn, thesaurus.getId_thesaurus(),
+                    idGroupUser)) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
         }
         conn.commit();
         conn.close();
@@ -392,7 +393,7 @@ public class ImportRdf4jHelper {
                     type = "T";
                     break;
             }
-            groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, adressSite, useArk, idUser);
+            groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, "", false, idUser);
 
             //sub group
             String idSubGroup;
@@ -469,8 +470,8 @@ public class ImportRdf4jHelper {
                     thesaurus.getId_thesaurus(),
                     "MT",
                     "", //notation
-                    adressSite,
-                    useArk,
+                    "",
+                    false,
                     idUser);
 
             // Création du domaine par défaut 

@@ -1,0 +1,74 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+        <p:dialog id="idInsertCandidatDlg"  header="#{langueBean.getMsg('cdt.editProp')}" styleClass="styleText2" widgetVar="insertCandidatDlg" modal="true" resizable="true"  >
+            <h:panelGroup id="panInsertCdt" style="background: transparent; box-shadow: none;">
+                <h:form>
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :</td>
+                            <td><p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h:outputText value="#{langueBean.getMsg('cdt.nvxNeed')}" />
+                                : 
+                            </td>
+                            <td>
+                                <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
+                                                itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
+                                    <f:facet name="itemtip">
+                                        <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                            <f:facet name="header" rendered="#{(t.url) != null}">
+                                                <h:outputText value="ID : " />
+                                                <h:outputText value="#{t.idConcept}" />
+                                            </f:facet>
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                            <h:outputText value="#{t.groupLexicalValue}" />
+
+                                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
+                                            <h:outputText value="#{t.definition}" />
+                                        </h:panelGrid>
+                                    </f:facet>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('cdt.tradNeed')}" /> : </td>
+                            <td>
+                                <p:selectManyCheckbox layout="grid" columns="1" value="#{selectedCandidat.tradInsert}">
+                                    <c:if test="#{selectedCandidat.selected.value != ''}" >
+                                        <f:selectItem itemLabel="#{selectedCandidat.selected.value}(#{selectedCandidat.langueTheso})" itemValue="#{selectedCandidat.langueTheso}" />
+                                    </c:if>
+                                    <f:selectItems value="#{selectedCandidat.infoCdt.nodeTraductions}" var="trad" itemLabel="#{trad.title}(#{trad.idLang})" itemValue="#{trad.idLang}" />
+                                </p:selectManyCheckbox>
+                            </td>
+                        </tr>
+                    </table><br/>
+                    <p:commandButton value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton" 
+                                     actionListener= "#{searchCandidat.insertCdt()}"
+                                     update=":panInsertCdt,:tableCdt,:gestionCandidat"
+                                     oncomplete="PF('insertCandidatDlg').hide();">
+
+                    </p:commandButton>    
+                    <br/><br/>
+                </h:form>
+            </h:panelGroup>
+        </p:dialog>
+    </ui:composition>
+
+
+
+
+
+
+

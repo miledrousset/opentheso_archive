@@ -66,7 +66,8 @@
             <ui:include src="/dialogs/export/exportTxtNotesDlg.xhtml" />              
             <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
             <ui:include src="/dialogs/export/exportAltLabel.xhtml" />
-            <ui:include src="/dialogs/import/importDlg.xhtml" />  
+            <ui:include src="/dialogs/import/importDlg.xhtml" />
+            <ui:include src="/dialogs/import/importCSVDlg.xhtml" />            
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
@@ -143,68 +144,6 @@
 
 
 
-                <!-- Section upload CSV to theso -->
-                <h:panelGroup id="panCsv">
-                    <h:panelGroup layout="block" rendered="#{vue.addCsv == true}">
-                        <div class="importerTheso">
-                            <div id="titreEditTheso">
-                                <h:outputText value="#{langueBean.getMsg('edit.import')}" />
-                                <div id="divClose">
-                                    <h:form>
-                                        <p:commandButton styleClass="cbClose" icon="ui-icon-fermer" 
-                                                         actionListener="#{vue.setAddCsv(false)}" update=":panCsv" />
-                                    </h:form>
-                                </div>
-                            </div>
-                            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('theso.id')}" /> <p:graphicImage id="question1" value="images/iconeQuestion.png" /> :
-                                            <p:tooltip id="toolTipFade1" for="question1" value="" />
-                                        </td>
-                                        <td><h:inputText value="#{fileBean.idTheso}" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('edit.sep1')}" /> <p:graphicImage id="question2" value="images/iconeQuestion.png" /> :
-                                            <p:tooltip id="toolTipFade2" for="question2" value="" />
-                                        </td>
-                                        <td><h:inputText value="#{fileBean.sepCol}" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('edit.sep2')}" /> <p:graphicImage id="question3" value="images/iconeQuestion.png" /> :
-                                            <p:tooltip id="toolTipFade3" for="question3" value="" />
-                                        </td>
-                                        <td><h:inputText value="#{fileBean.sepChamps}" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('edit.sep3')}" /> <p:graphicImage id="question4" value="images/iconeQuestion.png" /> :
-                                            <p:tooltip id="toolTipFade4" for="question4" value="" />
-                                        </td>
-                                        <td><h:inputText value="#{fileBean.sepLangue}" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question5" value="images/iconeQuestion.png" /> :
-                                            <p:tooltip id="toolTipFade5" for="question5" value="#{langueBean.getMsg('edit.dateExemple')}" />
-                                        </td>
-                                        <td><h:inputText value="#{fileBean.formatDate}" /></td>
-                                    </tr>
-                                </table><br/>
-                                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(csv)$/"
-                                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{fileBean.chargeCsv}" process="@form"
-                                              update="@form,:panCsv,:tableTheso" />
-                            </h:form>
-                        </div>
-                    </h:panelGroup>
-                </h:panelGroup>
-
-
-        
-        
         
         
         
@@ -247,13 +186,13 @@
                             </p:column>
                             <p:column id="column4" width="5">
                                 <h:form>
-                                    <p:commandButton title="#{langueBean.getMsg('edit.tab1Opt3')}" id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp" actionListener="#{theso.supprimerTheso(entry.value)}" update=":panTable"
-                                                     oncomplete="#{roleOnTheso}">
+                                    <p:commandButton title="#{langueBean.getMsg('edit.tab1Opt3')}" id="cbSuppTheso" styleClass="cbSupp" icon="ui-icon-supp"
+                                                     actionListener="#{editionBean.supprimerTheso(listTheso.value)}" action="#{roleOnTheso.showListTheso()}" update=":panTable,:tableTheso, :messages">
                                         <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('edit.valid1')}" icon="ui-icon-alert" />  
                                     </p:commandButton>  
 
                                     <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                        <p:commandButton value="#{langueBean.getMsg('yes')}" actionListener="#{roleOnTheso.supprVisibility(entry.value)}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                        <p:commandButton value="#{langueBean.getMsg('yes')}"  type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
                                         <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
                                     </p:confirmDialog> 
                                 </h:form>
@@ -475,7 +414,7 @@
                 </h:panelGroup>
 
 
-                <!-- la partie pour la traduction -->
+                <!-- la partie pour ajouter une traduction -->
                 <h:panelGroup id="panAjTrad">
                     <h:panelGroup layout="block" rendered="#{vue.trad == true}">
                         <div id="modifTradTheso">
@@ -524,7 +463,7 @@
                                 </div>
                             </div>
                             <h:form>
-                                <table>
+                                <table id="tabModifTheso">
                                     <tr>
                                         <td><h:outputText value="lang : #{editionBean.editTraduction.language}" style="color: red; font-weight: bold "/>  </td>
                                     </tr>   
@@ -581,11 +520,11 @@
                                 <div style="float: left; margin-left: 50px;">
                                     <p:commandButton id="cbAjTheso" value="#{langueBean.getMsg('cdt.validCdt')}" 
                                                      action="#{editionBean.editerTheso}" 
-                                                     styleClass="styleButton" update=":panTrad,:panModif,:panAjTrad,:tableTheso,:tableTrad"/>&nbsp;
+                                                     styleClass="styleButton" update=":tableTrad,:panTrad,:panModif,:panAjTrad,:tableTheso"/>&nbsp;
                                 </div>
                             </h:form>
                             <h:form>
-                                <p:commandButton id="cbAnnulEditTheso" value="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setEdit(false)}" 
+                                <p:commandButton id="cbAnnulEditTheso" icon="ui-icon-retour" title="#{langueBean.getMsg('btnBack')}" actionListener="#{vue.setEdit(false)}" 
                                                  update=":panModif" styleClass="styleButton"/>
                             </h:form>
                         </div>
@@ -603,35 +542,29 @@
 
 
 
-
-
-
-
-
-
-
-
-
+                <!-- partie pour l'action de la création de thesaurus --> 
                 <div style="clear: both"></div>
                 <div style="float: left;">
                     <h:form>
-                        <p:commandButton  id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{theso.setVueCreat(true)}" 
-                                          action="#{roleOnTheso.setAccessThesaurus(null)}" 
+                        <p:commandButton  id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{editionBean.init()}" 
+                                          action="#{theso.setVueCreat(true)}" 
                                           update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
                     </h:form>
                 </div>
+                
+                
+                
+                
+                
+                <!-- partie pour l'import SKOS et CSV --> 
                 <div style="float: left; margin-left: 40px;">
                     <h:form>
                         <p:commandButton  id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
-
-
-                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"   oncomplete="PF('importDlg').show();" action="#{rdf4jFileBean.init()}"
+                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importDlg').show();" 
                                         style="font-size: 12px;"/> 
-
-                            <p:menuitem value="#{langueBean.getMsg('edit.importcsv')}" actionListener="#{vue.setAddCsv(true)}" 
-                                        update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" style="font-size: 12px;"/>
-
+                            <p:menuitem title="Bug en cours de correction !!!" disabled="true" value="#{langueBean.getMsg('edit.importcsv')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importCSVDlg').show();" 
+                                        style="font-size: 12px;"/> 
                         </p:menu>
                     </h:form>
 

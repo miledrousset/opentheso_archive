@@ -46,6 +46,9 @@ public class AlignmentHelper {
         Connection conn;
         Statement stmt;
         ResultSet rs;
+        StringPlus stringPlus = new StringPlus();
+        urlTarget = stringPlus.addQuotes(urlTarget);        
+        
         try {
             // Get connection from pool
             conn = ds.getConnection();

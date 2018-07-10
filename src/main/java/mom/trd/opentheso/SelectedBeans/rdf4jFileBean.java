@@ -37,14 +37,18 @@ public class rdf4jFileBean implements Serializable {
 
     @ManagedProperty(value = "#{newtreeBean}")
     private NewTreeBean tree;
+    
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;    
+    
     private int typeImport;
-    private String identifierType;
+    private String selectedIdentifier ="sans";
     private String prefixHandle;
     /*
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;    
      */
-    private String formatDate;
+    private String formatDate = "yyyy-MM-dd";
     private String uri;
     private double total;
 
@@ -58,7 +62,6 @@ public class rdf4jFileBean implements Serializable {
 
     /**
      *
-     * @param event
      */
     public void init() {
         info = "";
@@ -69,7 +72,7 @@ public class rdf4jFileBean implements Serializable {
         total = 0;
         uploadEnable = true;
         BDDinsertEnable = false;
-        identifierType = "sans";
+        selectedIdentifier = "sans";
     }
 
     public void chargeSkos(FileUploadEvent event) {
@@ -289,20 +292,32 @@ public class rdf4jFileBean implements Serializable {
     /**
      * insrt un thésaurus dans la BDD
      *
-     * @param idUser
-     * @param idRole
+     * @param selectedUserGroup
      */
-    public void insertBDD(int idUser, int idRole) {
+    public void insertBDD(String selectedUserGroup) {
         error = "";
         info = "";
         warning = "";
 
+        int idGroup; 
+        
+        if(currentUser.getUser().isIsSuperAdmin()) 
+            idGroup = -1;
+        else
+            idGroup = Integer.parseInt(selectedUserGroup);
+        
         try {
             progress = 0;
             progress_abs = 0;
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
-            importRdf4jHelper.setIdentifierType(identifierType);
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(),
+                    formatDate, 
+                    currentUser.getUser().getIdUser(), idGroup,
+                    connect.getWorkLanguage());
+            
+            // pour récupérer les identifiants pérennes type Ark ou Handle
+            importRdf4jHelper.setIdentifierType(selectedIdentifier);
+            
             importRdf4jHelper.setPrefixHandle(prefixHandle);
             importRdf4jHelper.setNodePreference(tree.getSelectedTerme().getUser().nodePreference);
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
@@ -348,16 +363,24 @@ public class rdf4jFileBean implements Serializable {
     /**
      * ajoute un seul concept a la base de données
      *
-     * @param idUser
-     * @param idRole
+     * @param selectedUserGroup
      * @param selectedTerme
      */
-    public void inserSingleConcept(int idUser, int idRole, SelectedTerme selectedTerme) {
+    public void inserSingleConcept(String selectedUserGroup, SelectedTerme selectedTerme) {
+        int idGroup; 
+        
+        if(currentUser.getUser().isIsSuperAdmin()) 
+            idGroup = -1;
+        else
+            idGroup = Integer.parseInt(selectedUserGroup);        
         try {
 
         } catch (Exception e) {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, 
+                    currentUser.getUser().getIdUser(),
+                    idGroup, 
+                    connect.getWorkLanguage());
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addSingleConcept(selectedTerme);
@@ -385,15 +408,22 @@ public class rdf4jFileBean implements Serializable {
     /**
      * ajoute une branche a la base de données
      *
-     * @param idUser
-     * @param idRole
+     * @param selectedUserGroup
      * @param selectedTerme
      */
-    public void inserBranch(int idUser, int idRole, SelectedTerme selectedTerme) {
-
+    public void inserBranch(String selectedUserGroup, SelectedTerme selectedTerme) {
+        int idGroup; 
+        
+        if(currentUser.getUser().isIsSuperAdmin()) 
+            idGroup = -1;
+        else
+            idGroup = Integer.parseInt(selectedUserGroup);     
         try {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, uploadEnable, "adresse", idUser, idRole, /*langueBean.getIdLangue()*/ "fr");
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, 
+                    currentUser.getUser().getIdUser(),
+                    idGroup, 
+                    connect.getWorkLanguage());
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addBranch(selectedTerme);
@@ -544,12 +574,12 @@ public class rdf4jFileBean implements Serializable {
         return warning == null || warning.isEmpty();
     }
 
-    public String getIdentifierType() {
-        return identifierType;
+    public String getSelectedIdentifier() {
+        return selectedIdentifier;
     }
 
-    public void setIdentifierType(String identifierType) {
-        this.identifierType = identifierType;
+    public void setSelectedIdentifier(String selectedIdentifier) {
+        this.selectedIdentifier = selectedIdentifier;
     }
 
     public String getPrefixHandle() {
@@ -558,6 +588,14 @@ public class rdf4jFileBean implements Serializable {
 
     public void setPrefixHandle(String prefixHandle) {
         this.prefixHandle = prefixHandle;
+    }
+
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
     }
 
 }

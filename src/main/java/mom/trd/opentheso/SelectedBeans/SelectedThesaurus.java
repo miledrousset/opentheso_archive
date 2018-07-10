@@ -942,53 +942,7 @@ public class SelectedThesaurus implements Serializable {
         tablesListPrivate = exportData.showPrivateTables(connect.getPoolConnexion());
     }
 
-    /**
-     * Suppréssion d'un thésaurus
-     *
-     * @param id
-     */
-    public void supprimerTheso(String id) {
-        ThesaurusHelper th = new ThesaurusHelper();
 
-        // on vérifie si l'utilisateur n'a plus aucun thésaurus, on garde son dernier role sans thésaurus
-        // cette action est temporaire le temps de mettre en place une gestion complète des users et des groupes
-        UserHelper userHelper = new UserHelper();
-        Connection conn;
-        try {
-            conn = connect.getPoolConnexion().getConnection();
-            conn.setAutoCommit(false);
-            if (userHelper.isLastThesoOfUser(
-                    connect.getPoolConnexion(),
-                    tree.getSelectedTerme().getUser().getUser().getId())) {
-                if (!userHelper.deleteOnlyTheThesoFromRole(
-                        conn, id)) {
-                    conn.rollback();
-                    conn.close();
-                    return;
-                }
-            } else {
-                if (!userHelper.deleteThisRoleForThisThesaurus(
-                        conn, tree.getSelectedTerme().getUser().getUser().getId(),
-                        id)) {
-                    conn.rollback();
-                    conn.close();
-                    return;
-                }
-            }
-            conn.commit();
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        ConceptHelper conceptHelper = new ConceptHelper();
-        conceptHelper.setNodePreference(nodePreference);
-        conceptHelper.deleteAllIdHandle(connect.getPoolConnexion(), id);
-        
-        th.deleteThesaurus(connect.getPoolConnexion(), id);
-        arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
-       
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", conceptHelper.getMessage()));
-    }
 
     /**
      * ************************************ EDITION TRAD BDD
@@ -1010,9 +964,10 @@ public class SelectedThesaurus implements Serializable {
     public List<NodeCandidatValue> listeCandidats() {
         List<NodeCandidatValue> candidats = new ArrayList<>();
 
-        if (mesCandidats) {
+        if ((mesCandidats)) {
             if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {
-                candidats = new CandidateHelper().getListMyCandidatsWait(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage(), tree.getSelectedTerme().getUser().getUser().getId());
+                candidats = new CandidateHelper().getListMyCandidatsWait(connect.getPoolConnexion(), thesaurus.getId_thesaurus(),
+                        thesaurus.getLanguage(), currentUser.getUser().getIdUser());
             }
         } else {
             if (thesaurus.getId_thesaurus() != null && thesaurus.getLanguage() != null && connect.getPoolConnexion() != null) {

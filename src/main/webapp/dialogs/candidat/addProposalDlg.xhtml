@@ -9,7 +9,7 @@
         xmlns:p="http://primefaces.org/ui">
 
         <p:dialog id="idAddProposalDlg"  header="#{langueBean.getMsg('cdt.btnAddProp')}" styleClass="styleText2" widgetVar="addProposalDlg" modal="true" resizable="false"  >
-            <h:panelGroup id="panAjProp7" style="background: transparent; box-shadow: none;">
+            <h:panelGroup id="panAjProp" style="background: transparent; box-shadow: none;">
                 <h:form>
                     <table>
                         <tr>
@@ -38,10 +38,14 @@
                                 </p:autoComplete>
                             </td>
                         </tr>
-
                     </table><br/>
-                    <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                     update=":idAddProposalDlg, :panelCdt" oncomplete="PF('addTgDlg').hide();"/>
+                    <center>
+                        <p:commandButton title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider" styleClass="styleButton"
+                                         actionListener="#{theso.creerPropCdt()}" 
+                                         update=":gestionCandidat"
+                                         oncomplete="PF('addProposalDlg').hide();"
+                                         />
+                    </center>
                 </h:form>
             </h:panelGroup>
         </p:dialog>

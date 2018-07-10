@@ -19,7 +19,7 @@
                             <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
                         </p:column>
                         <p:column >
-                            <h:inputText value="#{rdf4jFileBean.formatDate}"/>
+                            <h:inputText value="#{rdf4jFileBean.formatDate}" style="font-size: smaller"/>
                         </p:column>
                     </p:row>
                     <p:row>
@@ -27,14 +27,27 @@
                             <p:outputLabel for="idTypeImportSingle" value="#{langueBean.getMsg('export.type')}" />
                         </p:column>
                         <p:column >
-                            <p:selectOneMenu id="idTypeImportSingle" value="#{rdf4jFileBean.typeImport}">
+                            <p:selectOneMenu id="idTypeImportSingle" value="#{rdf4jFileBean.typeImport}" style="font-size: smaller">
                                 <f:selectItem itemLabel="Skos" itemValue="0" />
                                 <f:selectItem itemLabel="Json-ld" itemValue="1" />
                                 <f:selectItem itemLabel="Turtle" itemValue="2" />
                             </p:selectOneMenu>
                         </p:column>
                     </p:row>
+                    <p:row>
+                        <p:column>
+                            <h:outputText rendered="#{!currentUser.user.isSuperAdmin}" value="User Group :" />
+                        </p:column>
+                        <p:column>
+                            <p:selectOneMenu rendered="#{!currentUser.user.isSuperAdmin}" id="idGroupSelected" 
+                                             value="#{editionBean.selectedUserGroup}" style="font-size: smaller">
+                                <f:selectItems value="#{editionBean.userRoleGroups.entrySet()}" var="varSelectedGroup" 
+                                               itemLabel="#{varSelectedGroup.value}" itemValue="#{varSelectedGroup.key}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>                    
                 </p:panelGrid>
+                
                 
                 <br/>
                 
@@ -43,7 +56,7 @@
                         <h:outputText value="Récupération de l'identifiant pérenne (ARK ou Handle)" />
                     </f:facet>
                     <p:row>
-                        <p:selectOneRadio id="customRadio" value="#{rdf4jFileBean.identifierType}" layout="custom">
+                        <p:selectOneRadio id="customRadio" value="#{rdf4jFileBean.selectedIdentifier}" layout="custom">
                             <f:selectItem itemLabel="Sans" itemValue="sans" />
                             <f:selectItem itemLabel="Ark" itemValue="ark" />
                             <f:selectItem itemLabel="Handle" itemValue="handle" />
@@ -96,7 +109,8 @@
                 <br/> 
                 <h:outputText value="#{langueBean.getMsg('import.total')} : #{rdf4jFileBean.total}" />
                 <br/> 
-                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}" actionListener="#{rdf4jFileBean.insertBDD(user1.user.id, user1.user.idRole)}" 
+                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
+                                 actionListener="#{rdf4jFileBean.insertBDD(editionBean.selectedUserGroup)}" 
                                  onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
                                  oncomplete="#{roleOnTheso}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
                                  update=":idImportDlg,:panSkos,:tableTheso"

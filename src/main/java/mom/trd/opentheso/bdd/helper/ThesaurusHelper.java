@@ -260,7 +260,10 @@ public class ThesaurusHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding Traduction Thesaurus : " + thesaurus.getTitle(), sqle);
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding Traduction Thesaurus : " + thesaurus.getTitle(), sqle);
+                return false;
+            }
         }
         return status;
     }
@@ -1235,8 +1238,7 @@ public class ThesaurusHelper {
                             + "delete from thesaurus_alignement_source where id_thesaurus = '" + idThesaurus + "';"
                             + "delete from concept_group_concept where idthesaurus = '" + idThesaurus + "';"
                             + "delete from relation_group where id_thesaurus = '" + idThesaurus + "';"
-                            + "delete from preferences where id_thesaurus = '" + idThesaurus + "';"
-                            + "delete from user_role where id_thesaurus = '" + idThesaurus + "';";
+                            + "delete from preferences where id_thesaurus = '" + idThesaurus + "';";
 
                     stmt.executeUpdate(query);
                     state = true;

@@ -15,10 +15,10 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
-         <style>
+        <style>
             div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:nth-child(3){
-               border: 3px  solid #956620;
-               box-shadow:0px 0px 5px #BD6060;
+                border: 3px  solid #956620;
+                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
 
@@ -42,626 +42,367 @@
         </p:dialog>  
         <div id="menuHead">
             <div id="menuHeadTop">
-            <ui:include src="logo.xhtml" />
-            <h:panelGroup rendered="#{currentUser.user != null}">
-                <div id="disconnect">
-                    <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
-                </div>
-            </h:panelGroup>            
-            <ui:include src="account.xhtml" />
-            <ui:include src="menuThesaurus.xhtml" />
-            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
-           
+                <ui:include src="logo.xhtml" />
+                <h:panelGroup rendered="#{currentUser.user != null}">
+                    <div id="disconnect">
+                        <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
+                    </div>
+                </h:panelGroup>            
+                <ui:include src="account.xhtml" />
+                <ui:include src="menuThesaurus.xhtml" />
+                <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+
             </div>
-           
-              <ui:include src="dialogs/candidat/addProposalDlg.xhtml" />        
+
+            <ui:include src="dialogs/candidat/addProposalDlg.xhtml"/>
+            <ui:include src="dialogs/candidat/addCandidateDlg.xhtml"/>
+            <ui:include src="dialogs/candidat/editProposalDlg.xhtml"/>
+            <ui:include src="dialogs/candidat/editCandidatDlg.xhtml"/> 
+            <ui:include src="dialogs/candidat/validateCandidatDlg.xhtml"/>
+            <ui:include src="dialogs/candidat/insertCandidatDlg.xhtml"/>
+            
+
         </div>
         <center>
 
-            <!-- POP UP AJOUT CANDIDAT DEBUT -->
-            <h:panelGroup id="panAjCdt" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.addCandidat == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.addCandidat == true}" styleClass="popUp" style="width: 300px;">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('cdt.btnAddCdt')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbCloseCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddCandidat(false)}" 
-                                                 update=":panAjCdt" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
+
+            <h:panelGroup id="globalCd">    
+
+                <div id="principaleCandidat">
+
+                    <div id="titreCandidat2"><h3><h:outputText value="#{langueBean.getMsg('cdt.editCdt')}" style="color: green;" /></h3></div>
+
+
+
+
+                    <!-- Pour afficher mes candidats -->
                     <h:form>
-                    <p:messages showDetail="true">
-                        <p:autoUpdate />
-                    </p:messages>  
-                        <table>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.tabOpt1')}" /> : </td>
-                                <td><h:inputText id="lVCdt" value="#{selectedCandidat.valueEdit}" style="width: 200px;"/></td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
-                                <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
-                                <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
-                                                    itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt" >
-                                        <f:facet name="itemtip">
-                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
-                                                <f:facet name="header" rendered="#{(t.url) != null}">
-                                                    <h:outputText value="ID : " />
-                                                    <h:outputText value="#{t.idConcept}" />
-                                                </f:facet>
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                                                <h:outputText value="#{t.groupLexicalValue}" />
-
-                                            </h:panelGrid>
-                                        </f:facet>
-                                    </p:autoComplete>
-                                </td>
-                            </tr>
-
-                        </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" async="true" actionListener="#{searchCandidat.creerCandidat()}"
-                                          update=":tableCdt,:panAjCdt,:panAjProp"  >
-                            
-                        </p:commandButton>
-                        
-                       
+                        <h:panelGrid columns="2" style="margin-bottom:10px; color: green; " cellpadding="5">
+                            <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}"/>
+                            <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
+                                <p:ajax  listener="#{theso.listeCandidats()}" />
+                                <p:ajax  listener="#{searchCandidat.init()}"  update=":tableCdt,:panelCdt,:gestionCandidat" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGrid>                    
                     </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP AJOUT CANDIDAT FIN -->
 
-            <!-- POP UP AJOUT PROPOSITION DEBUT -->
-            <h:panelGroup id="panAjProp" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.addPropCandidat == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.addPropCandidat == true}" styleClass="popUp" style="width: 300px;">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('cdt.btnAddProp')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddPropCandidat(false)}" 
-                                                 update=":panAjProp" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
-                                <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
-                                <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
-                                                    itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
-                                        <f:facet name="itemtip">
-                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
-                                                <f:facet name="header" rendered="#{(t.url) != null}">
-                                                    <h:outputText value="ID : " />
-                                                    <h:outputText value="#{t.idConcept}" />
-                                                </f:facet>
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                                                <h:outputText value="#{t.groupLexicalValue}" />
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                                <h:outputText value="#{t.definition}" />
-                                            </h:panelGrid>
-                                        </f:facet>
-                                    </p:autoComplete>
-                                </td>
-                            </tr>
-                        </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerPropCdt()}" 
-                                         update=":panAjProp,:gestionCandidat,:panAjCdt,:panInsertCdt,:tableCdt,:formTabView"  >
-                            <p:ajax async="false"  listener="#{searchCandidat.init()}"  update=":tableCdt,:gestionCandidat" />
-                        </p:commandButton>
-                    </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP AJOUT PROPOSITION FIN -->
-
-            <!-- POP UP EDIT PROPOSITION DEBUT -->
-            <h:panelGroup id="panEditProp" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.editPropCandidat == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.editPropCandidat == true}" styleClass="popUp" style="width: 300px;">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('cdt.btnAddProp')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setEditPropCandidat(false)}" 
-                                                 update=":panEditProp,:gestionCandidat,:tableCdt" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.note')}" /> : </td>
-                                <td><h:inputTextarea value="#{selectedCandidat.noteEdit}" styleClass="areaCdt"/></td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
-                                <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="tep" forceSelection="true"
-                                                    itemLabel="#{tep.termLexicalValue}" itemValue="#{tep}" converter="termConverter" styleClass="styleAutoCompCdt">
-                                        <f:facet name="itemtip">
-                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
-                                                <f:facet name="header" rendered="#{(tep.url) != null}">
-                                                    <h:outputText value="ID : " />
-                                                    <h:outputText value="#{tep.idConcept}" />
-                                                </f:facet>
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                                                <h:outputText value="#{tep.groupLexicalValue}" />
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                                <h:outputText value="#{tep.definition}" />
-                                            </h:panelGrid>
-                                        </f:facet>
-                                    </p:autoComplete>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.MT')}" /> : </td>
-                                <td>
-                                    <h:selectOneMenu value="#{selectedCandidat.domaineEdit}" styleClass="listes" style="width: 200px;">
-                                        <f:selectItems value="#{theso.listeDomaine()}"/>
-                                    </h:selectOneMenu>                                
-                                </td>
-                            </tr>
-                        </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('btnEdit')}" styleClass="styleButton" actionListener="#{selectedCandidat.editMyProp(theso.thesaurus.language)}" 
-                                         update=":panEditProp,:gestionCandidat"/>
-                    </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP EDIT PROPOSITION FIN -->
+                    <p:outputLabel value="tot = #{selectedCandidat.totalOfCandidat()}" /> 
 
 
-            <!-- POP UP EDIT CANDIDAT DEBUT -->
-            <h:panelGroup id="panEditCdt" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.editCandidat == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.editCandidat == true}" styleClass="popUp">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('btnEdit')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbCloseEditCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setEditCandidat(false)}" 
-                                                 update=":panEditCdt" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
-                    <h:form style="padding: 5px;">
-                        <h:inputText value="#{selectedCandidat.valueEdit}" /><br/><br/>
-                        <center>
-                            <p:commandButton value="#{langueBean.getMsg('btnEdit')}" styleClass="styleButton" actionListener="#{selectedCandidat.editMyCandidat()}"
-                                             update=":panEditCdt,:tableCdt,:gestionCandidat" />
-                        </center>
-                    </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP EDIT CANDIDAT FIN -->
 
-            <!-- POP UP VALIDATION DEBUT -->
-            <h:panelGroup id="panValidCdt" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.addValidCdt == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.addValidCdt == true}" styleClass="popUp">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('cdt.btnValid')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddValidCdt(false)}" 
-                                                 update=":panValidCdt" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
-                    <h:form>
-                        <fieldset style="text-align: left;">
-                            <legend><h:outputText value="#{langueBean.getMsg('cdt.refCdt')}" /></legend>
-                            <h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :<br/>
-                            <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
-                            <center>
-                                <p:commandButton value="#{langueBean.getMsg('cdt.refCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonRefus" 
-                                                 actionListener="#{searchCandidat.toRefus()}" update=":panValidCdt,:tableCdt,:gestionCandidat"  >
-                                  
-                                
-                                </p:commandButton>
-                            </center>
-                        </fieldset>
-                    </h:form><br/>
-                    <h:outputText value="#{langueBean.getMsg('or')}" /><br/><br/>
-                    <h:form>
-                        <fieldset style="text-align: left;">
-                            <legend><h:outputText value="#{langueBean.getMsg('cdt.validCdt')}" /></legend>
-                            <h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :<br/>
-                            <p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea><br/><br/>
-                            <center>
-                                <p:commandButton value="#{langueBean.getMsg('cdt.validCdt')} #{langueBean.getMsg('cdt.btnCdt')}" styleClass="styleButtonValid" 
-                                                 actionListener="#{searchCandidat.toValid()}" update=":panValidCdt,:tableCdt,:gestionCandidat" >
-                                 
-                                </p:commandButton>
-                            </center>
-                        </fieldset>
-                    </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP VALIDATION FIN -->
-
-            <!-- POP UP INSERTION DEBUT -->
-            <h:panelGroup id="panInsertCdt" style="background: transparent; box-shadow: none;">
-                <h:panelGroup rendered="#{vue.addInsertCdt == true}" styleClass="overlay" />
-                <h:panelGroup rendered="#{vue.addInsertCdt == true}" styleClass="popUp">
-                    <div id="titreAllEdit">
-                        <h:outputText value="#{langueBean.getMsg('cdt.btnInsert')}" />
-                        <div id="divClose">
-                            <h:form>
-                                <p:commandButton id="cbClosePropCdt" styleClass="cbClose" icon="ui-icon-fermer" actionListener="#{vue.setAddInsertCdt(false)}" 
-                                                 update=":panInsertCdt" />
-                            </h:form>
-                        </div>
-                    </div>
-                    <br/>
-                    <h:form>
-                        <table>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.msgRef')}" /> :</td>
-                                <td><p:inputTextarea style="width: 310px;" value="#{selectedCandidat.msgValid}" ></p:inputTextarea></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <h:outputText value="#{langueBean.getMsg('cdt.nvxNeed')}" />
-                                    : 
-                                </td>
-                                <td>
-                                    <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="t" forceSelection="true"
-                                                    itemLabel="#{t.termLexicalValue}" itemValue="#{t}" converter="termConverter" styleClass="styleAutoCompCdt">
-                                        <f:facet name="itemtip">
-                                            <h:panelGrid columns="2" cellpadding="5" width="200" >
-                                                <f:facet name="header" rendered="#{(t.url) != null}">
-                                                    <h:outputText value="ID : " />
-                                                    <h:outputText value="#{t.idConcept}" />
-                                                </f:facet>
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                                                <h:outputText value="#{t.groupLexicalValue}" />
-
-                                                <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                                <h:outputText value="#{t.definition}" />
-                                            </h:panelGrid>
-                                        </f:facet>
-                                    </p:autoComplete>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><h:outputText value="#{langueBean.getMsg('cdt.tradNeed')}" /> : </td>
-                                <td>
-                                    <p:selectManyCheckbox layout="grid" columns="1" value="#{selectedCandidat.tradInsert}">
-                                        <c:if test="#{selectedCandidat.selected.value != ''}" >
-                                            <f:selectItem itemLabel="#{selectedCandidat.selected.value}(#{selectedCandidat.langueTheso})" itemValue="#{selectedCandidat.langueTheso}" />
-                                        </c:if>
-                                        <f:selectItems value="#{selectedCandidat.infoCdt.nodeTraductions}" var="trad" itemLabel="#{trad.title}(#{trad.idLang})" itemValue="#{trad.idLang}" />
-                                    </p:selectManyCheckbox>
-                                </td>
-                            </tr>
-                        </table><br/>
-                        <p:commandButton value="#{langueBean.getMsg('cdt.btnInsert')}" styleClass="styleButton" 
-                                         actionListener= "#{searchCandidat.insertCdt()}"
-                                         update=":panInsertCdt,:tableCdt,:gestionCandidat" >
-                             
-                        </p:commandButton>    
-                        <br/><br/>
-                    </h:form>
-                </h:panelGroup>
-            </h:panelGroup>
-            <!-- POP UP INSERTION FIN -->
-
-            <div id="principaleCandidat">
-
-                <div id="titreCandidat2"><h3><h:outputText value="#{langueBean.getMsg('cdt.editCdt')}" style="color: green;" /></h3></div>
-
-                <h:form>
-            
-                    <h:panelGrid columns="2" style="margin-bottom:10px; color: green; " cellpadding="5">
-                        <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}"/>
-                        <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
-                            <p:ajax  listener="#{theso.listeCandidats()}" />
-                            <p:ajax  listener="#{searchCandidat.init()}"  update=":tableCdt,:gestionCandidat" />
-                        </p:selectBooleanCheckbox>
-                    </h:panelGrid>                    
-                </h:form>
-
-                <div style="clear: both;" />
-                <h:panelGroup id="panelCdt" >
-                    <h:form id="tableCdt" >
-                       
-                        
-                        <p:tabView styleClass="styleTabViewCdt"  >
-                            <p:tab  title="#{langueBean.getMsg('cdt.tab1Name')}" >
-
-                                <!-- Liste des candidats DEBUT -->
-                                <h:panelGroup id="dataTableCdtP">
+                    <!-- Liste des candidats  -->                    
+                    <div style="clear: both;" />
+                    <h:panelGroup id="panelCdt" >
+                        <h:form id="tableCdt" >
+                            <p:tabView styleClass="styleTabViewCdt"  >
+                                <p:tab  title="#{langueBean.getMsg('cdt.tab1Name')}" >
+                                    <!-- Liste des candidats DEBUT -->
                                     <p:dataTable  var="cdt"  value="#{searchCandidat.candidats}" selectionMode="single" selection="#{selectedCandidat.selected}" 
                                                   rowKey="#{cdt.idConcept}" scrollable="true" scrollHeight="450" filteredValue="#{searchCandidat.filteredCandidats}" 
-                                             emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat"  >
-                                    <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
-                                  
-                                    <p:column  sortBy="#{cdt.value}" filterMatchMode="contains" filterBy="#{cdt.value}"  styleClass="candidatTexte" >
-                                        <h:outputText value="#{cdt.value}(#{cdt.idConcept})" styleClass="candidatTexte"/>
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}"  width="40" sortBy="#{cdt.nbProp}" styleClass="candidatTexte">
-                                        <h:outputText value="#{cdt.nbProp}" styleClass="candidatTexte"/>
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" width="80" styleClass="candidatTexte">
-                                        <h:outputText value="#{langueBean.getMsg('cdt.stateA')}" styleClass="candidatTexte"/>
-                                    </p:column>
-                                </p:dataTable>
-                                </h:panelGroup>
-                                
-                                <div style="clear: both;" />
-                                <!-- Liste des candidats FIN -->
-                            </p:tab>
+                                                  emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat"  >
+                                        <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
 
-                            <p:tab  title="#{langueBean.getMsg('cdt.tab2Name')}">
-                                <!--barre de recherche de candidat traités -->
-                                <p:outputPanel>
-                                    <p:inputText value="#{searchCandidat.textSearch2}" style="width:100px"  placeholder="#{langueBean.getMsg('cdt.searchLabel')}" styleClass="candidatTexte">
-                                        <p:ajax event="keyup" listener="#{searchCandidat.filter2()}" update="dataTableCdtV"/>
-                                    </p:inputText>
-                                </p:outputPanel>
-                                <!--fin barre de recherche-->
+                                        <p:column  sortBy="#{cdt.value}" filterMatchMode="contains" filterBy="#{cdt.value}"  styleClass="candidatTexte" >
+                                            <h:outputText value="#{cdt.value}(#{cdt.idConcept})" styleClass="candidatTexte"/>
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}"  width="40" sortBy="#{cdt.nbProp}" styleClass="candidatTexte">
+                                            <h:outputText value="#{cdt.nbProp}" styleClass="candidatTexte"/>
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" width="80" styleClass="candidatTexte">
+                                            <h:outputText value="#{langueBean.getMsg('cdt.stateA')}" styleClass="candidatTexte"/>
+                                        </p:column>
+                                    </p:dataTable>
 
+                                    <div style="clear: both;" />
+                                    <!-- Liste des candidats FIN -->
+                                </p:tab>
 
-                                <!-- Liste des validation DEBUT -->
-                                <p:dataTable id="dataTableCdtV" var="cdtV" value="#{searchCandidat.filteredCandidatsV}" selectionMode="single" selection="#{selectedCandidat.selected}" 
-                                             rowKey="#{cdtV.idConcept}" scrollable="true" scrollHeight="300" filteredValue="#{theso.filteredCandidatsV}" 
-                                             emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat">
-                                    <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt1')}" sortBy="#{cdtV.value}" styleClass="candidatTexte" >
-                                        <h:outputText value="#{cdtV.value}(#{cdtV.idConcept})" />
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}" sortBy="#{cdtV.nbProp}" width="40" styleClass="candidatTexte">
-                                        <h:outputText value="#{cdtV.nbProp}" />
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" width="80" styleClass="candidatTexte">
-                                        <h:outputText value="#{langueBean.getMsg('cdt.stateV')}" />
-                                    </p:column>
-                                </p:dataTable>
-                               
-                                <div style="clear: both;" />
-                                <!-- Liste des validation FIN -->
-                            </p:tab>
-                            <p:tab  title="#{langueBean.getMsg('cdt.tab3Name')}">
-                                <!--barre de recherche de candidat archivés -->
-                              
-                                     
-                                        <p:outputPanel>
-                                            <p:inputText value="#{searchCandidat.textSearch3}" style="width:100px"  placeholder="#{langueBean.getMsg('cdt.searchLabel')}" styleClass="candidatTexte">
-                                                <p:ajax event="keyup" listener="#{searchCandidat.filter3()}" update="dataTableCdtA"/>
-                                            </p:inputText>
-                                        </p:outputPanel>
-                                
-                                
-                                <!--fin barre de recherche-->
-                                <!-- Liste des archives DEBUT -->
-                                <p:dataTable id="dataTableCdtA" var="cdtA" value="#{searchCandidat.filteredCandidatsA}" selectionMode="single" selection="#{selectedCandidat.selected}" 
-                                             rowKey="#{cdtA.idConcept}" scrollable="true" scrollHeight="300" filteredValue="#{theso.filteredCandidatsA}" 
-                                             emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat">
-                                    <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
-                                  
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt1')}" sortBy="#{cdtA.value}" styleClass="candidatTexte">
-                                        <h:outputText value="#{cdtA.value}(#{cdtA.idConcept})" />
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}" sortBy="#{cdtA.nbProp}" width="40" styleClass="candidatTexte">
-                                        <h:outputText value="#{cdtA.nbProp}" />
-                                    </p:column>
-                                    <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" sortBy="#{cdtA.etat}" width="80" styleClass="candidatTexte">
-                                        <h:outputText rendered="#{cdtA.etat == 'a'}" value="#{langueBean.getMsg('cdt.stateA')}" />
-                                        <h:outputText rendered="#{cdtA.etat == 'v'}" value="#{langueBean.getMsg('cdt.stateV')}" />
-                                        <h:outputText rendered="#{cdtA.etat == 'i'}" value="#{langueBean.getMsg('cdt.stateI')}" />
-                                        <h:outputText rendered="#{cdtA.etat == 'r'}" value="#{langueBean.getMsg('cdt.stateR')}" />
-                                    </p:column>
-                                </p:dataTable>
-                                
-                                <div style="clear: both;" />
-                                <!-- Liste des archives FIN -->
-                            </p:tab>
-                        </p:tabView>
-                    </h:form>
-                </h:panelGroup>
-                <h:panelGroup id="gestionCandidat">
-
-                    <div style="float: left; margin-left: 30px;">
-                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null)}">
-                            <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-plus-16" title="#{langueBean.getMsg('cdt.btnAddCdt')}"
-                                             actionListener="#{vue.setAddCandidat(true)}" update=":panelCdt,:gestionCandidat,:tableCdt,:panAjCdt," /><br/>
-                        </h:form>
-                    </div>
-
-                    <div style="float: right; margin-right: 30px;">
-                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'a') and (user1.haveRights(2))}">
-                            <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-ok-16" title="#{langueBean.getMsg('cdt.btnValid')}"
-                                             actionListener="#{vue.setAddValidCdt(true)}" update=":tableCdt,:panValidCdt,:panelCdt" /><br/>
-                        </h:form>
-                    </div>
-
-                    <div style="float: right; margin-right: 30px;">
-                        
-                        <h:form  rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.userHaveProp() != true) and (selectedCandidat.selected.etat == 'a')}">
-                            <p:commandButton id="cbAjPropCandidat" styleClass="styleButton_db" icon="ui-icon-addfile-16"  title="#{langueBean.getMsg('cdt.btnAddProp')}"
-                                             actionListener="#{vue.setAddPropCandidat(true)}" update=":panAjProp,:gestionCandidat,:tableCdt" />
-                        </h:form>
-                        
-                        <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">
-                            <p:commandButton icon="ui-icon-edit-16-2"  styleClass="styleButton_db"  title="#{langueBean.getMsg('cdt.editProp')}"
-                                     actionListener="#{selectedCandidat.initEditProp()}" update=":panEditProp" />
-                            <p:commandButton  icon="ui-icon-trash-16" title="#{langueBean.getMsg('cdt.btnDelProp')}" actionListener="#{searchCandidat.delPropCdt()}" 
-                                               update=":gestionCandidat,:tableCdt" styleClass="styleButton_db" >
-                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid1')}" icon="ui-icon-alert" />  
-                            </p:commandButton>
-
-                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                            </p:confirmDialog>
-                        </h:form>
-
-                        <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0) and (selectedCandidat.selected.etat == 'v') and (user1.haveRights(2))}">
-                            <p:commandButton id="cbInsertCdt" title="#{langueBean.getMsg('cdt.btnInsert')}"  icon="ui-icon-add" styleClass="styleButton_db" 
-                                             actionListener="#{vue.setAddInsertCdt(true)}" update=":panInsertCdt" />
-                        </h:form>
-                    </div>
-                    <div style="clear: both;" />
-                    <h:panelGroup id="infoCandidat1">
-                        <div id="infoCandidat">
-                            <table style="text-align: center;">
-                                <tr>
-                                    <td>
-                                        <b><h:outputText value="#{selectedCandidat.selected.value}  " /></b>
-                                        <div id="imageEdition">
-                                            <h:form id="formEditTCdt" >
-                                                <p:commandButton id="cbEditTCdt" actionListener="#{vue.setEditCandidat(true)}" update=":panEditCdt"
-                                                                 rendered="#{(selectedCandidat.userHaveProp() == true) and (selectedCandidat.infoCdt.nodesUser.size() == 1) and (selectedCandidat.selected.etat == 'a')}" 
-                                                                 styleClass="cbEdit" icon="ui-icon-edit-16"  />
-                                            </h:form>
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <h:outputText value="nb : " style="padding-left: 20px"/>
-                                        <b><h:outputText value="#{selectedCandidat.selected.nbProp}" /></b>
-                                    </td>
-                                    <td>
-                                        <h:outputText value="#{langueBean.getMsg('cdt.state')} : " style="padding-left: 20px"/>                                        
-                                        <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'a'}" value="#{langueBean.getMsg('cdt.stateA')}" /></b>
-                                        <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'v'}" value="#{langueBean.getMsg('cdt.stateV')}" /></b>
-                                        <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'i'}" value="#{langueBean.getMsg('cdt.stateI')}" /></b>
-                                        <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'r'}" value="#{langueBean.getMsg('cdt.stateR')}" /></b>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </h:panelGroup>
+                                <p:tab  title="#{langueBean.getMsg('cdt.tab2Name')}">
+                                    <!--barre de recherche de candidat traités -->
+                                    <p:outputPanel>
+                                        <p:inputText value="#{searchCandidat.textSearch2}" style="width:100px"  placeholder="#{langueBean.getMsg('cdt.searchLabel')}" styleClass="candidatTexte">
+                                            <p:ajax event="keyup" listener="#{searchCandidat.filter2()}" update="dataTableCdtV"/>
+                                        </p:inputText>
+                                    </p:outputPanel>
+                                    <!--fin barre de recherche-->
 
 
-                    <div id="clean" />
-                    <h:panelGroup id="messageRefus1" rendered="#{selectedCandidat.selected.etat == 'r'}">
-                        <div class="messageRefus">
-                            <h:outputText value="#{langueBean.getMsg('cdt.refAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
-                            <h:outputText value="#{selectedCandidat.msgAdm.message}" />
-                        </div>
-                    </h:panelGroup>
-                    <h:panelGroup id="messageValid1" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                        <div class="messageValid">
-                            <h:outputText value="#{langueBean.getMsg('cdt.valAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
-                            <h:outputText value="#{selectedCandidat.msgAdm.message}" />
-                        </div>
-                    </h:panelGroup>
-                    
-                    <h:panelGroup id="manuelInsertion" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                        <h:form rendered="#{(user1.haveRights(2))}">
-                            <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
-                            <p:commandButton icon="ui-icon-ok" update=":gestionCandidat,:panValidCdt,:tableCdt"
-                                             actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
-                                           
-                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid3')}" icon="ui-icon-alert" />  
-                            </p:commandButton>   
+                                    <!-- Liste des validation DEBUT -->
+                                    <p:dataTable id="dataTableCdtV" var="cdtV" value="#{searchCandidat.filteredCandidatsV}" selectionMode="single" selection="#{selectedCandidat.selected}" 
+                                                 rowKey="#{cdtV.idConcept}" scrollable="true" scrollHeight="300" filteredValue="#{theso.filteredCandidatsV}" 
+                                                 emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat">
+                                        <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt1')}" sortBy="#{cdtV.value}" styleClass="candidatTexte" >
+                                            <h:outputText value="#{cdtV.value}(#{cdtV.idConcept})" />
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}" sortBy="#{cdtV.nbProp}" width="40" styleClass="candidatTexte">
+                                            <h:outputText value="#{cdtV.nbProp}" />
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" width="80" styleClass="candidatTexte">
+                                            <h:outputText value="#{langueBean.getMsg('cdt.stateV')}" />
+                                        </p:column>
+                                    </p:dataTable>
 
-                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                            </p:confirmDialog> 
-                        </h:form>
-                     </h:panelGroup>
-                    
-                    
-                    
-                    <h:panelGroup id="messageInsert1" rendered="#{selectedCandidat.selected.etat == 'i'}">
-                        <div class="messageValid">
-                            <h:outputText value="#{langueBean.getMsg('cdt.insAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
-                            <h:outputText value="#{selectedCandidat.msgAdm.message}" />
-                        </div>
-                    </h:panelGroup><br/>
-                    <div id="proposition"   >
-                        <h:form  id="formTabView" >
-                            <p:tabView orientation="left" scrollable="false" value="#{selectedCandidat.nomsProp}" var="nom" styleClass="candidatTexte" style="width: 500px; height: 235px;" >
-                                <p:ajax event="tabChange" listener="#{selectedCandidat.onChange}" update=":formTabView" />
-                                <p:tab title="#{nom}">
-                                    
-                                    
-                                    <h:panelGrid columns="2" cellpadding="5" >
-                                        <h:outputText value="#{langueBean.getMsg('cdt.date')}:" /> 
-                                        <h:outputText value="#{selectedCandidat.modifiedProposition}" /> 
-                                        <h:outputText value="Note" />
-                                        <p:scrollPanel mode="native" style="height:120px; width:250px; border: none;" styleClass="candidatTexte" >
-                                            <h:outputText value="#{selectedCandidat.note}" styleClass="candidatTexte" />
-                                        </p:scrollPanel>
-                                        <h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> 
-                                        <h:outputText rendered="#{selectedCandidat.niveau != ''}" value="#{selectedCandidat.niveau}/ #{selectedCandidat.domaine}" />
-                                    </h:panelGrid>
-                                   
+                                    <div style="clear: both;" />
+                                    <!-- Liste des validation FIN -->
+                                </p:tab>
+                                <p:tab  title="#{langueBean.getMsg('cdt.tab3Name')}">
+                                    <!--barre de recherche de candidat archivés -->
+
+
+                                    <p:outputPanel>
+                                        <p:inputText value="#{searchCandidat.textSearch3}" style="width:100px"  placeholder="#{langueBean.getMsg('cdt.searchLabel')}" styleClass="candidatTexte">
+                                            <p:ajax event="keyup" listener="#{searchCandidat.filter3()}" update="dataTableCdtA"/>
+                                        </p:inputText>
+                                    </p:outputPanel>
+
+
+                                    <!--fin barre de recherche-->
+                                    <!-- Liste des archives DEBUT -->
+                                    <p:dataTable id="dataTableCdtA" var="cdtA" value="#{searchCandidat.filteredCandidatsA}" selectionMode="single" selection="#{selectedCandidat.selected}" 
+                                                 rowKey="#{cdtA.idConcept}" scrollable="true" scrollHeight="300" filteredValue="#{theso.filteredCandidatsA}" 
+                                                 emptyMessage="#{langueBean.getMsg('cdt.noCdt')}" styleClass="listeCandidat">
+                                        <p:ajax event="rowSelect" listener="#{theso.majCdt()}" update=":gestionCandidat" />
+
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt1')}" sortBy="#{cdtA.value}" styleClass="candidatTexte">
+                                            <h:outputText value="#{cdtA.value}(#{cdtA.idConcept})" />
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt2')}" sortBy="#{cdtA.nbProp}" width="40" styleClass="candidatTexte">
+                                            <h:outputText value="#{cdtA.nbProp}" />
+                                        </p:column>
+                                        <p:column headerText="#{langueBean.getMsg('cdt.tabOpt3')}" sortBy="#{cdtA.etat}" width="80" styleClass="candidatTexte">
+                                            <h:outputText rendered="#{cdtA.etat == 'a'}" value="#{langueBean.getMsg('cdt.stateA')}" />
+                                            <h:outputText rendered="#{cdtA.etat == 'v'}" value="#{langueBean.getMsg('cdt.stateV')}" />
+                                            <h:outputText rendered="#{cdtA.etat == 'i'}" value="#{langueBean.getMsg('cdt.stateI')}" />
+                                            <h:outputText rendered="#{cdtA.etat == 'r'}" value="#{langueBean.getMsg('cdt.stateR')}" />
+                                        </p:column>
+                                    </p:dataTable>
+
+                                    <div style="clear: both;" />
+                                    <!-- Liste des archives FIN -->
                                 </p:tab>
                             </p:tabView>
-                        </h:form>   
-                    
-                    </div><br/><br/>
-                       
-                    
-                    <div id="traduction">
-                         <h:form id="ajoutTrad" rendered="#{selectedCandidat.selected.etat == 'a'}">
-                             <p:outputLabel value="#{langueBean.getMsg('cdt.addTrad')}"   styleClass="candidatTexte"/> 
-                            <h:selectOneMenu value="#{selectedCandidat.langueEdit}" styleClass="listes">
-                                <f:selectItems value="#{theso.languesTheso}"/>
-                            </h:selectOneMenu>&nbsp;
-                            <h:inputText id="motTrad" value="#{selectedCandidat.valueEdit}"/>&nbsp;
-                            <p:commandButton title="#{langueBean.getMsg('cdt.btnAddTrad')}" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.creerTradCdt()}" update=":tableTradCdt,:tableCdt,:infoCandidat1" 
-                                             styleClass="styleButton"/>
-                           
                         </h:form>
-                        <h:form id="tableTradCdt">
-                            <p:dataTable var="tradCdt" value="#{selectedCandidat.infoCdt.nodeTraductions}"
-                                         emptyMessage="#{langueBean.getMsg('cdt.noTrad')}" styleClass="candidatTexte"> 
-                                <p:column headerText="#{langueBean.getMsg('cdt.tradOpt1')}" width="50">
-                                    <h:outputText value="#{tradCdt.idLang}" />
-                                </p:column>
-                                <p:column headerText="#{langueBean.getMsg('cdt.tradOpt2')}">
-                                    <h:outputText value="#{tradCdt.title}" />
-                                </p:column>
-                                <p:column headerText="#{langueBean.getMsg('cdt.tradOpt3')}">
-                                    <h:outputText value="#{tradCdt.user}" />
-                                </p:column>
-                                <p:column width="25" rendered="#{selectedCandidat.selected.etat == 'a'}">
-                                    <h:form rendered="#{(tradCdt.user == user1.user.name) or (user1.haveRights(2))}">
-                                        <p:commandButton id="cbSuppTheso" icon="ui-icon-supp" update=":tableTradCdt,:tableCdt"
-                                                         actionListener="#{selectedCandidat.delTradCdt(tradCdt.idLang)}" styleClass="cbSupp" >
-                                            <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  
-                                        </p:commandButton>  
+                    </h:panelGroup>
 
-                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                            <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                                        </p:confirmDialog> 
-                                    </h:form>
-                                </p:column>
-                            </p:dataTable>
-                        </h:form>
-                    </div>
-                </h:panelGroup>
-            </div>
 
-<ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
+
+
+
+                    <!-- Panel droit pour les actions et les contributions -->
+                    <h:panelGroup id="gestionCandidat">
+
+                        <div style="float: left; margin-left: 30px;">
+                            <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null)}">
+                                <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-plus-16" 
+                                                 update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').show();"
+                                                 title="#{langueBean.getMsg('cdt.btnAddCdt')}"/><br/>
+                            </h:form>
+                        </div>
+
+                        <div style="float: right; margin-right: 30px;">
+                            <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0)
+                                                and (selectedCandidat.selected.etat == 'a') and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
+                                <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-ok-16" title="#{langueBean.getMsg('cdt.btnValid')}"
+                                                 update=":idValidateCandidatDlg" oncomplete="PF('validateCandidatDlg').show();" /><br/>
+                            </h:form>
+                        </div>
+
+                        <div style="float: right; margin-right: 30px;">
+
+                            <h:form  rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0)
+                                                 and (selectedCandidat.userHaveProp() != true) and (selectedCandidat.selected.etat == 'a')}">
+                                <p:commandButton id="cbAjPropCandidat" styleClass="styleButton_db" icon="ui-icon-addfile-16"  title="#{langueBean.getMsg('cdt.btnAddProp')}"
+                                                 actionListener="#{selectedCandidat.initNewProposal()}"
+                                                 oncomplete="PF('addProposalDlg').show();"/>
+                            </h:form>
+
+                            <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">
+                                <p:commandButton icon="ui-icon-edit-16-2"  styleClass="styleButton_db"  title="#{langueBean.getMsg('cdt.editProp')}"
+                                                 actionListener="#{selectedCandidat.initNewProposal()}" 
+                                                 update=":idEditProposalDlg" oncomplete="PF('editProposalDlg').show();"
+                                                 />
+
+
+
+                                <p:commandButton  icon="ui-icon-trash-16" title="#{langueBean.getMsg('cdt.btnDelProp')}" actionListener="#{searchCandidat.delPropCdt()}" 
+                                                  update=":gestionCandidat,:tableCdt" styleClass="styleButton_db" >
+                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid1')}" icon="ui-icon-alert" />  
+                                </p:commandButton>
+
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                </p:confirmDialog>
+                            </h:form>
+
+                            <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0)
+                                                and (selectedCandidat.selected.etat == 'v') and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
+                                <p:commandButton id="cbInsertCdt" title="#{langueBean.getMsg('cdt.btnInsert')}"  icon="ui-icon-add" styleClass="styleButton_db" 
+                                                 update=":idInsertCandidatDlg" oncomplete="PF('insertCandidatDlg').show();"
+                                                 />
+                            </h:form>
+                        </div>
+                        <div style="clear: both;" />
+                        <h:panelGroup id="infoCandidat1">
+                            <div id="infoCandidat">
+                                <table style="text-align: center;">
+                                    <tr>
+                                        <!-- modifier mon candidat -->
+                                        <td>
+                                            <b><h:outputText value="#{selectedCandidat.selected.value}" /></b>
+                                            <div id="imageEdition">
+                                                <h:form id="formEditTCdt" >
+                                                    <p:commandButton id="cbEditTCdt" 
+                                                                     rendered="#{(selectedCandidat.userHaveProp() == true) and (selectedCandidat.infoCdt.nodesUser.size() == 1) and (selectedCandidat.selected.etat == 'a')}" 
+                                                                     update=":idEditCandidatDlg" oncomplete="PF('editCandidatDlg').show();"
+                                                                     title="#{langueBean.getMsg('edit.rename')} #{langueBean.getMsg('cdt.btnCdt')}"                                                               
+                                                                     styleClass="cbEdit" icon="ui-icon-edit-16"  />
+                                                </h:form>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <h:outputText value="nb : " style="padding-left: 20px"/>
+                                            <b><h:outputText value="#{selectedCandidat.selected.nbProp}" /></b>
+                                        </td>
+                                        <td>
+                                            <h:outputText value="#{langueBean.getMsg('cdt.state')} : " style="padding-left: 20px"/>                                        
+                                            <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'a'}" value="#{langueBean.getMsg('cdt.stateA')}" /></b>
+                                            <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'v'}" value="#{langueBean.getMsg('cdt.stateV')}" /></b>
+                                            <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'i'}" value="#{langueBean.getMsg('cdt.stateI')}" /></b>
+                                            <b><h:outputText rendered="#{selectedCandidat.selected.etat == 'r'}" value="#{langueBean.getMsg('cdt.stateR')}" /></b>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </h:panelGroup>
+
+
+                        <div id="clean" />
+                        <h:panelGroup id="messageRefus1" rendered="#{selectedCandidat.selected.etat == 'r'}">
+                            <div class="messageRefus">
+                                <h:outputText value="#{langueBean.getMsg('cdt.refAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
+                                <h:outputText value="#{selectedCandidat.msgAdm.message}" />
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup id="messageValid1" rendered="#{selectedCandidat.selected.etat == 'v'}">
+                            <div class="messageValid">
+                                <h:outputText value="#{langueBean.getMsg('cdt.valAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
+                                <h:outputText value="#{selectedCandidat.msgAdm.message}" />
+                            </div>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="manuelInsertion" rendered="#{selectedCandidat.selected.etat == 'v'}">
+                            <h:form rendered="#{(user1.haveRights(2))}">
+                                <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
+                                <p:commandButton icon="ui-icon-ok" update=":gestionCandidat,:panValidCdt,:tableCdt"
+                                                 actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
+
+                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid3')}" icon="ui-icon-alert" />  
+                                </p:commandButton>   
+
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                    <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                    <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                </p:confirmDialog> 
+                            </h:form>
+                        </h:panelGroup>
+
+
+
+                        <h:panelGroup id="messageInsert1" rendered="#{selectedCandidat.selected.etat == 'i'}">
+                            <div class="messageValid">
+                                <h:outputText value="#{langueBean.getMsg('cdt.insAut')}" />&nbsp;<h:outputText value="#{selectedCandidat.msgAdm.user}" /> <br/>
+                                <h:outputText value="#{selectedCandidat.msgAdm.message}" />
+                            </div>
+                        </h:panelGroup><br/>
+                        <div id="proposition"   >
+                            <h:form  id="formTabView" >
+                                <p:tabView orientation="left" scrollable="false" value="#{selectedCandidat.nomsProp}" var="nom" styleClass="candidatTexte" style="width: 500px; height: 235px;" >
+                                    <p:ajax event="tabChange" listener="#{selectedCandidat.onChange}" update=":formTabView" />
+                                    <p:tab title="#{nom}">
+                                        <h:panelGrid columns="2" cellpadding="5" >
+                                            <h:outputText value="#{langueBean.getMsg('cdt.date')}:" /> 
+                                            <h:outputText value="#{selectedCandidat.modifiedProposition}" /> 
+                                            <h:outputText value="Note" />
+                                            <p:scrollPanel mode="native" style="height:120px; width:250px; border: none;" styleClass="candidatTexte" >
+                                                <h:outputText value="#{selectedCandidat.note}" styleClass="candidatTexte" />
+                                            </p:scrollPanel>
+                                            <h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> 
+                                            <h:outputText rendered="#{selectedCandidat.niveau != ''}" value="#{selectedCandidat.niveau}/ #{selectedCandidat.domaine}" />
+                                        </h:panelGrid>
+
+                                    </p:tab>
+                                </p:tabView>
+                            </h:form>   
+
+                        </div><br/><br/>
+
+
+                        <div id="traduction">
+                            <h:form id="ajoutTrad" rendered="#{selectedCandidat.selected.etat == 'a'}">
+                                <p:outputLabel value="#{langueBean.getMsg('cdt.addTrad')}"   styleClass="candidatTexte"/> 
+                                <h:selectOneMenu value="#{selectedCandidat.langueEdit}" styleClass="listes">
+                                    <f:selectItems value="#{theso.languesTheso}"/>
+                                </h:selectOneMenu>&nbsp;
+                                <h:inputText id="motTrad" value="#{selectedCandidat.valueEdit}"/>&nbsp;
+                                <p:commandButton title="#{langueBean.getMsg('cdt.btnAddTrad')}" value="#{langueBean.getMsg('btnOk')}" actionListener="#{theso.creerTradCdt()}" update=":tableTradCdt,:tableCdt,:infoCandidat1" 
+                                                 styleClass="styleButton"/>
+
+                            </h:form>
+                            <h:form id="tableTradCdt">
+                                <p:dataTable var="tradCdt" value="#{selectedCandidat.infoCdt.nodeTraductions}"
+                                             emptyMessage="#{langueBean.getMsg('cdt.noTrad')}" styleClass="candidatTexte"> 
+                                    <p:column headerText="#{langueBean.getMsg('cdt.tradOpt1')}" width="50">
+                                        <h:outputText value="#{tradCdt.idLang}" />
+                                    </p:column>
+                                    <p:column headerText="#{langueBean.getMsg('cdt.tradOpt2')}">
+                                        <h:outputText value="#{tradCdt.title}" />
+                                    </p:column>
+                                    <p:column headerText="#{langueBean.getMsg('cdt.tradOpt3')}">
+                                        <h:outputText value="#{tradCdt.user}" />
+                                    </p:column>
+                                    <p:column width="25" rendered="#{selectedCandidat.selected.etat == 'a'}">
+                                        <h:form rendered="#{(tradCdt.user == user1.user.name) or (user1.haveRights(2))}">
+                                            <p:commandButton id="cbSuppTheso" icon="ui-icon-supp" update=":tableTradCdt,:tableCdt"
+                                                             actionListener="#{selectedCandidat.delTradCdt(tradCdt.idLang)}" styleClass="cbSupp" >
+                                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  
+                                            </p:commandButton>  
+
+                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                            </p:confirmDialog> 
+                                        </h:form>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </div>
+                    </h:panelGroup>
+                </div>            
+
+
+                <!-- POP UP EDIT PROPOSITION DEBUT -->
+
+                <!-- POP UP EDIT PROPOSITION FIN -->
+
+
+                <!-- POP UP EDIT CANDIDAT DEBUT -->
+
+                <!-- POP UP EDIT CANDIDAT FIN -->
+
+                <!-- POP UP VALIDATION DEBUT -->
+ 
+                <!-- POP UP VALIDATION FIN -->
+
+                <!-- POP UP INSERTION DEBUT -->
+               
+                <!-- POP UP INSERTION FIN -->
+            </h:panelGroup>
+
+
+            <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         </center>
         <ui:insert name="status">
             <p:ajaxStatus>

@@ -7,14 +7,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.Term;
@@ -35,9 +34,10 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import org.primefaces.event.TabChangeEvent;
 
-@ManagedBean(name = "selectedCandidat", eager = true)
-@SessionScoped
-public class SelectedCandidat implements Serializable {
+@ManagedBean(name = "candidat", eager = true)
+@ViewScoped
+
+public class Candidat implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private NodeCandidatValue selected;
@@ -98,8 +98,7 @@ public class SelectedCandidat implements Serializable {
     /**
      * ************************** INITIALISATION ****************************
      */
-    public SelectedCandidat() {
-        setPreferences();
+    public Candidat() {
     }
 
     /**
@@ -156,14 +155,6 @@ public class SelectedCandidat implements Serializable {
         nodePreference = roleOnThesoBean.getNodePreference();
     }
 
-    /**
-     * permet de retourner le total des candidats d'un thésaurus 
-     * @return 
-     */
-    public int totalOfCandidat(){
-        CandidateHelper candidateHelper = new CandidateHelper();
-        return candidateHelper.getCountOfCandidat(connect.getPoolConnexion(), idTheso);
-    }
     /**
      * ************************** MISE A JOUR ****************************
      */
@@ -222,7 +213,6 @@ public class SelectedCandidat implements Serializable {
         // if(theso == null) return;
         idTheso = theso;
         langueTheso = langue;
-        domaine = "";
 
         infoCdt.setNodesUser(new CandidateHelper().getListUsersOfCandidat(connect.getPoolConnexion(), selected.getIdConcept(), theso));
         infoCdt.setNodeTraductions(new CandidateHelper().getNodeTraductionCandidat(connect.getPoolConnexion(), selected.getIdConcept(), idTheso, langue));
@@ -299,7 +289,7 @@ public class SelectedCandidat implements Serializable {
         return true;
     }
     
-    public void initNewProposal() {
+    private void initNewProposal() {
         selectedNvx = new NodeAutoCompletion();
         noteEdit = "";
         domaineEdit = "";

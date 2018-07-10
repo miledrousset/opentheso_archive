@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedProperty;
@@ -19,6 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.AccessThesaurusHelper;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
@@ -247,8 +250,53 @@ public class EditionBean implements Serializable {
             editTraduction.setId_thesaurus(idTheso);
             new ThesaurusHelper().UpdateThesaurus(connect.getPoolConnexion(), editTraduction);
             vue.setEdit(false);
+            initTraductionTheso(idTheso);
             return true;
         }
+    }
+    
+    /**
+     * Permet de supprimer le thésaurus
+     * @param idTheso1
+     * @return 
+     */
+    public boolean supprimerTheso(String idTheso1) {
+        PreferencesHelper preferencesHelper = new PreferencesHelper();
+        NodePreference nodePreference = preferencesHelper.getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", "manque préférences !! "));
+            return false;
+        }
+        
+        // suppression des Identifiants Handle
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.setNodePreference(nodePreference);
+        conceptHelper.deleteAllIdHandle(connect.getPoolConnexion(), idTheso1);        
+        
+        
+        // suppression du thesaurus du group/projet
+        UserHelper2 userHelper = new UserHelper2();
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if(!userHelper.deleteThesoFromGroup(conn, idTheso1)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", "BDD problem !! "));
+                conn.rollback();
+                conn.commit();
+                return false;
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        // suppression complète du thésaurus        
+        ThesaurusHelper th = new ThesaurusHelper();
+        th.deleteThesaurus(connect.getPoolConnexion(), idTheso1);
+ 
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", langueBean.getMsg("edition.ThesoDeleted")));
+        return true;
     }    
     
     /**

@@ -887,7 +887,7 @@ public class UserHelper2 {
             Connection conn = ds.getConnection();
             conn.setAutoCommit(false);
             
-            if(!deleteThesoFromGroup(conn, idTheso, oldGroup)) {
+            if(!deleteThesoFromGroup(conn, idTheso/*, oldGroup*/)) {
                 conn.rollback();
                 conn.close();
                 return false;                
@@ -934,12 +934,11 @@ public class UserHelper2 {
      * permet de supprimer l'appartenance d'un thesaurus à un groupe/projet
      * @param conn
      * @param idTheso
-     * @param idGroup
      * @return 
      * #MR
      */
     public boolean deleteThesoFromGroup(Connection conn, 
-            String idTheso, int idGroup) {
+            String idTheso) {
         Statement stmt;
         boolean status = false;
         try {
@@ -947,8 +946,7 @@ public class UserHelper2 {
                 stmt = conn.createStatement();
                 try {
                     String query = "delete from user_group_thesaurus where"
-                            + " id_thesaurus ='" + idTheso + "'"
-                            + " and id_group = " + idGroup;
+                            + " id_thesaurus ='" + idTheso + "'";
                     stmt.executeUpdate(query);
                     status = true;                    
                 } finally {

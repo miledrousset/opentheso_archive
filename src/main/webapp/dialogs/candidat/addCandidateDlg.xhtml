@@ -47,8 +47,9 @@
                     <br/>
                     <tr>
                         <td>
-                            <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{theso.creerCandidat()}" action="#{searchCandidat.init()}"
-                                             oncomplete=":idAddCandidateDlg" />              
+                            <p:commandButton value="#{langueBean.getMsg('btnAdd')}" styleClass="styleButton" actionListener="#{searchCandidat.creerCandidat()}"  action="#{theso.listeCandidats()}"
+                                             oncomplete=":panelCdt, :globalCd"/>
+
                         </td>
                         
                         <td>
