@@ -694,7 +694,18 @@ public class AlignmentHelper {
         return les_types;
     }
 
-    public boolean injenctdansBDAlignement(HikariDataSource ds, List<String> listThesos, AlignementSource alignement,
+    /**
+     * permet d'ajouter une nouvelle source d'alignement dans la base de données
+     * Si currentIdTheso =null, on associe pas la source au thésaurus, sinon, on l'associe
+     * automatiquement au thésaurus en cours
+     * 
+     * @param ds
+     * @param alignement
+     * @param id_user
+     * @param currentIdTheso
+     * @return 
+     */
+    public boolean addNewAlignment(HikariDataSource ds, AlignementSource alignement,
             int id_user, String currentIdTheso) {
         int id_alignement;
         boolean status = false;
@@ -708,9 +719,9 @@ public class AlignmentHelper {
                 conn.close();
                 return false;
             }
-            for (String listTheso : listThesos) {
+            if(currentIdTheso != null) {
                 id_alignement = getId_Alignement(conn, alignement.getSource());
-                if (!insertSourceAlignementToTheso(conn, listTheso, id_alignement)) {
+                if (!insertSourceAlignementToTheso(conn, currentIdTheso, id_alignement)) {
                     conn.rollback();
                     conn.close();
                     return false;

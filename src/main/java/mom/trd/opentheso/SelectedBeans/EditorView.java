@@ -62,7 +62,7 @@ public class EditorView {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Pas de thésaurus sélectionné"));
             }
         } else {
-            if (!copyrightHelper.insertCopyright(connect.getPoolConnexion(),
+            if (!copyrightHelper.addCopyright(connect.getPoolConnexion(),
                     theso.getThesaurus().getId_thesaurus(), text)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Pas de thésaurus sélectionné"));
             }

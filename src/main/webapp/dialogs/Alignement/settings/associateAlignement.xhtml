@@ -1,0 +1,78 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+
+        <p:dialog id="idAssociateAlignement"  header="#{langueBean.getMsg('alig.edi')}" widgetVar="associateAlignement" modal="true" resizable="true" >
+
+            <h:panelGroup  id="panelAssociateAlignement" >
+                <h:form> 
+                    <h:selectOneMenu  value="#{editAlignement.idThesoForAssosAlig}" style="font-size: 12px;"  rendered="#{editAlignement.exporSource}" > 
+                        <p:ajax event="change" update=":panelAssociateAlignement"
+                                listener="#{editAlignement.selectSourceOfThesoInTable(editAlignement.idThesoForAssosAlig)}" />   
+                        <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue="" />
+                        <f:selectItems value="#{roleOnTheso.listTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" 
+                                       />
+                    </h:selectOneMenu>
+                </h:form>
+                
+
+                <h:panelGroup id="tabSourcesAlignement" > 
+
+                        <h:form>
+                            <!-- ASSOCIATION ALIGNEMENT--> 
+                            <p:dataTable rendered="#{editAlignement.exporSource and (editAlignement.idThesoForAssosAlig.length() != 0)}"
+                                         var="alig" value="#{editAlignement.listeAlignementSources}" 
+                                         rowKey="#{alig.source}" selection="#{editAlignement.alignementSources}"
+                                         scrollHeight="300"
+                                         editable="false" 
+                                         scrollable="true" 
+                                         emptyMessage="**************************************" 
+                                         style="width: 390px; height: 350px; font-size: 12px;">
+
+                                <p:ajax event="rowSelect"   listener="#{editAlignement.onRowSelect}" 
+                                        update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
+                                <p:ajax event="rowSelectCheckbox"   listener="#{editAlignement.onRowSelect}" 
+                                        update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
+                                <p:ajax event="toggleSelect"   listener="#{editAlignement.onRowSelect}" 
+                                        update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
+                                
+                                <p:ajax event="rowUnselectCheckbox" update=":panelAlignement" />
+                                <p:ajax event="rowUnselect" update=":panelAlignement" />
+
+
+                                <p:column selectionMode="multiple" style="width:16px;text-align:center" />
+
+                                <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
+
+                                    <h:outputText  value="#{alig.source}" />
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+
+
+
+                </h:panelGroup>  
+
+
+                    <h:form>   
+                        <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider" rendered="#{editAlignement.exporSource and ((editAlignement.idThesoForAssosAlig.length() != 0))}"
+                                     action="#{editAlignement.exportAlignement(editAlignement.idThesoForAssosAlig)}" 
+                                     update=":panelAssociateAlignement" oncomplete="PF('associateAlignement').hide()"
+                                     />
+
+                        <p:commandButton icon="ui-icon-retour" title="Retour" update=":idAssociateAlignement"  
+                                         action="#{editAlignement.cancel}" oncomplete="PF('associateAlignement').hide()"/> 
+                    </h:form>
+                    
+            </h:panelGroup>
+
+        </p:dialog>
+    </ui:composition>

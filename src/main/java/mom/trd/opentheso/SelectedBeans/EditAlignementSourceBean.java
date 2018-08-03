@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -24,7 +23,7 @@ import org.primefaces.event.ToggleSelectEvent;
 
 /**
  *
- * @author antonio.perez
+ * @author Miled.Rousset
  */
 @ManagedBean(name = "editAlignement", eager = true)
 @SessionScoped
@@ -63,8 +62,11 @@ public class EditAlignementSourceBean implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
 
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser theUser;
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnThesoBean;    
 
     public EditAlignementSourceBean() {
     }
@@ -76,21 +78,20 @@ public class EditAlignementSourceBean implements Serializable {
     }
 
     public void setListeAlignementSources(String idTheso) {
-        int role = theUser.getUser().getIdRole();
-        if (role == 1 || role == 2) {
+        if (currentUser.getUser().isIsSuperAdmin() || roleOnThesoBean.isIsAdminOnThisTheso()) {
             AlignmentHelper alignmentHelper = new AlignmentHelper();
             listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
             cancel();
         }
     }
 
-    public void initNewAlignement(List<String> authorizedThesaurus) {
+    public void initNewAlignement() {
         initVariables();
         viewAlignement = false;
         editAlignement = false;
         newAlignement = true;
         exporSource = false;
-        selectedThesaurus = authorizedThesaurus;
+        selectedThesaurus = roleOnThesoBean.getAuthorizedTheso();//authorizedThesaurus;
     }
 
     public void cancel() {
@@ -138,9 +139,7 @@ public class EditAlignementSourceBean implements Serializable {
 
         //ajout
         AlignmentHelper alignementHelper = new AlignmentHelper();
-        List<String> selectedTheso = new ArrayList<>();
-        selectedTheso.add(currentIdTheso);
-        alignementHelper.injenctdansBDAlignement(connect.getPoolConnexion(), selectedTheso, dupplicateAlignement, id_user, currentIdTheso);
+        alignementHelper.addNewAlignment(connect.getPoolConnexion(), dupplicateAlignement, id_user, currentIdTheso);
 
         //update
         updateSource(currentIdTheso);
@@ -159,7 +158,12 @@ public class EditAlignementSourceBean implements Serializable {
 
     }
 
-    public void insertIntoAlignementSource(String currentIdTheso, List<String> selectedThesaurus, int id_user) {
+    /**
+     * permet d'ajouter la source d'alignement au thésaurus en cours 
+     * @param currentIdTheso
+     * @param id_user 
+     */
+    public void insertIntoAlignementSource(String currentIdTheso, int id_user) {
 
         AlignementSource alignementSource = new AlignementSource();
         alignementSource.setAlignement_format(alignement_format);
@@ -170,7 +174,7 @@ public class EditAlignementSourceBean implements Serializable {
         alignementSource.setTypeRequete(type_rqt);
 
         AlignmentHelper alignementHelper = new AlignmentHelper();
-        alignementHelper.injenctdansBDAlignement(connect.getPoolConnexion(), selectedThesaurus, alignementSource, id_user, currentIdTheso);
+        alignementHelper.addNewAlignment(connect.getPoolConnexion(), alignementSource, id_user, currentIdTheso);
 
         setListeAlignementSources(currentIdTheso);
         cancel();
@@ -196,7 +200,6 @@ public class EditAlignementSourceBean implements Serializable {
         editAlignement = false;
         newAlignement = false;
         exporSource = true;
-
     }
 
     public void exportAlignement(String idTheso) {
@@ -376,13 +379,23 @@ public class EditAlignementSourceBean implements Serializable {
         this.exporSource = exporSource;
     }
 
-    public CurrentUser getTheUser() {
-        return theUser;
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
     }
 
-    public void setTheUser(CurrentUser theUser) {
-        this.theUser = theUser;
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
     }
+
+    public RoleOnThesoBean getRoleOnThesoBean() {
+        return roleOnThesoBean;
+    }
+
+    public void setRoleOnThesoBean(RoleOnThesoBean roleOnThesoBean) {
+        this.roleOnThesoBean = roleOnThesoBean;
+    }
+
+
 
     public void onRowSelect(SelectEvent event) {
         if (exporSource) {

@@ -5,32 +5,25 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idGpsAutomatiqueEditDlg"  header="Il y a #{gps.listOfChildrenInConcept.size()} concepts" widgetVar="gpsAutomatiqueEditDlg" modal="true" resizable="false" >
+    <p:dialog id="idGpsAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="gpsAutomatiqueEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
         <h:outputText value="#{langueBean.getMsg('popup.addAlign2')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
 
 
-        <h:panelGroup id="panelAutomatique" >
+        <h:panelGroup id="panelAutomatique"  rendered="#{(gps.alignementSources !=null) and (gps.alignementSources.size() != 0)}">
             <!--<h:outputText value="{langueBean.getMsg('alig.majAlig')}"/><br/>
             <p:selectBooleanCheckbox value="{gps.mettreAJour}"/> -->
 
-            <br/><br/><br/>
-            <h:panelGrid columns="2" >
-                <p:dataTable   var="alig" value="#{gps.alignementSources}" selectionMode="single"
-                               rowKey="#{alig.source}" selection="#{gps.alignement_source}"
-                               editable="false" style="width: 250px"
-                               scrollable="true" scrollHeight="100"  
-                               emptyMessage="**************************************" >
-                    <p:ajax event="rowSelect"   listener="#{gps.onRowSelect}" 
-                            update=":panelAutomatique"
-                            />
-                    <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
-                        <h:outputText  value="#{alig.source}" />
-                    </p:column>
-                </p:dataTable>
-            </h:panelGrid>
             <h:form>
+                <fieldset class="fieldGps">
+                    <legend><h:outputText value="#{langueBean.getMsg('alig.sous')}" /></legend>
+                    <h:panelGrid columns="2">
+                        <p:selectOneRadio id="alignementSourcesGPS"  value="#{gps.selectedAlignement}" layout="grid" columns="1">
+                            <f:selectItems value="#{gps.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
+                        </p:selectOneRadio>
+                    </h:panelGrid>       
+                </fieldset>
                 <br/>
                 <table>
                     <tr>
@@ -61,8 +54,12 @@
 
                 <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
                                  action="#{gps.creerAlignAuto(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.nom, selectedTerme.idlangue)}" styleClass="styleButton"
-                                 update=":idGpsAutomatique_suiteEditDlg"  oncomplete="PF('gpsAutomatique_suiteEditDlg').show(); PF('gpsAutomatiqueEditDlg').hide(); "/>
+                                 update=":idGpsAutomatique_suiteEditDlg"
+                                 oncomplete="PF('gpsAutomatique_suiteEditDlg').show(); PF('gpsAutomatiqueEditDlg').hide(); "/>
             </h:form>
-        </h:panelGroup>                                                
+        </h:panelGroup>
+        <h:panelGroup id="sourceAlignementGps2" rendered="#{gps.alignementSources == null || gps.alignementSources.size() == 0}" >
+            <h:outputText value="#{langueBean.getMsg('alig.NeedToParameter')}" style="color: red"/>
+        </h:panelGroup>           
     </p:dialog>
 </ui:composition>

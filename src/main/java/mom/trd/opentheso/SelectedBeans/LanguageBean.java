@@ -20,8 +20,8 @@ public class LanguageBean implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
 
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+
+
 
     private ResourceBundle getBundleLangue(String l) {
         FacesContext context = FacesContext.getCurrentInstance();
@@ -38,13 +38,14 @@ public class LanguageBean implements Serializable {
 
     @PostConstruct
     public void InitLanguageBean() {
-        user.setLangueBean(this);
-        if (connect.getPoolConnexion() != null && user != null && user.getNodePreference() != null) {
+//        user.setLangueBean(this);
+        if (connect.getPoolConnexion() != null){// && user != null){//&& connect.roleOnThesoBean.getNodePreference() != null) {
             FacesContext context = FacesContext.getCurrentInstance();
+            
             //ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
-            String langInit =  user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
-                    // String langInit = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
-                    currentBundle = "langue_" + langInit;
+            String langInit = connect.getWorkLanguage();//bundlePref.getString("workLanguage");
+            // String langInit = new UserHelper().getPreferenceUser(connect.getPoolConnexion()).getSourceLang();
+            currentBundle = "langue_" + langInit;
             idLangue = langInit.toUpperCase();
         } else {
             currentBundle = "langue_fr";
@@ -85,13 +86,5 @@ public class LanguageBean implements Serializable {
         this.currentBundle = currentBundle;
     }
 
-    public CurrentUser getUser() {
-        return user;
-    }
 
-    public void setUser(CurrentUser user) {
-        this.user = user;
-    }
-    
-    
 }

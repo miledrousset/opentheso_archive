@@ -10,10 +10,10 @@
         
             
         
-        <p:commandButton value="save workFlow"  action="#{alignementparlot.enregister_Des_Progres(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" update=":panContenu" />
+        <p:commandButton value="save workFlow"  action="#{alignementparlot.enregister_Des_Progres(currentUser.user.idUser)}" oncomplete="PF('finalizeDlg').hide();" update=":panContenu" />
         <br/>
         <br/>
-        <p:commandButton value="initialiser" action="#{alignementparlot.initAlign(user1.user.id)}" oncomplete="PF('finalizeDlg').hide();" />
+        <p:commandButton value="initialiser" action="#{alignementparlot.initAlign(currentUser.user.idUser)}" oncomplete="PF('finalizeDlg').hide();" />
         
     </p:dialog>
 </ui:composition>

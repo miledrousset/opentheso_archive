@@ -101,7 +101,7 @@ public class CopyrightHelper {
      * @param copyright
      * @return 
      */
-    public boolean insertCopyright(HikariDataSource ds, String idTheso, 
+    public boolean addCopyright(HikariDataSource ds, String idTheso, 
             String copyright){
 
         String query;
@@ -115,7 +115,7 @@ public class CopyrightHelper {
             try {
                 stmt = conn.createStatement();
                 query = "INSERT INTO copyright (id_thesaurus,copyright) VALUES ('"+
-                        idTheso + "'" + copyright + "' WHERE id_thesaurus='" + idTheso + "'";
+                        idTheso + "','" + copyright + "')";
                 stmt.executeUpdate(query);
                 status = true; 
             } finally {

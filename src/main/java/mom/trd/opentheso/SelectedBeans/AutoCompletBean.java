@@ -404,7 +404,7 @@ public class AutoCompletBean implements Serializable {
                 terme.getIdC(),
                 terme.getIdTheso(),
                 terme.getSelectedTermComp().getIdConcept(),
-                terme.getUser().getUser().getId())) {
+                terme.getUser().getUser().getIdUser())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             return;
         }
@@ -547,7 +547,7 @@ public class AutoCompletBean implements Serializable {
 
         // permet de déplacer une branche simplement, en cas d'erreur, rien n'est écrit 
         if (!conceptHelper.moveBranch(ds,
-                terme.getIdC(), idOld, selectedAtt.getIdConcept(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+                terme.getIdC(), idOld, selectedAtt.getIdConcept(), terme.getIdTheso(), terme.getUser().getUser().getIdUser())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             return false;
         }
@@ -587,7 +587,7 @@ public class AutoCompletBean implements Serializable {
                     selectedAtt.getIdConcept(),
                     terme.getIdDomaine(),
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -633,7 +633,7 @@ public class AutoCompletBean implements Serializable {
             // au concept la relation TT
             if (!conceptHelper.moveBranchToMT(conn, terme.getIdC(),
                     idOld, terme.getIdDomaine(), terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -685,7 +685,7 @@ public class AutoCompletBean implements Serializable {
                     idOld, terme.getIdDomaine(), // ancien Group
                     selectedAtt.getIdGroup(), // nouveau Group
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -756,7 +756,7 @@ public class AutoCompletBean implements Serializable {
                     selectedAtt.getIdConcept(),
                     terme.getIdDomaine(),
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -831,7 +831,7 @@ public class AutoCompletBean implements Serializable {
                     idOld,
                     selectedAtt.getIdConcept(),
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 return false;
             }
@@ -910,7 +910,7 @@ public class AutoCompletBean implements Serializable {
                     idOld,
                     selectedAtt.getIdConcept(),
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 return false;
             }
@@ -944,7 +944,7 @@ public class AutoCompletBean implements Serializable {
             }
             
             OrphanHelper orphanHelper = new OrphanHelper();
-            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -993,7 +993,7 @@ public class AutoCompletBean implements Serializable {
                     idOld, terme.getIdDomaine(), // ancien Group
                     selectedAtt.getIdGroup(), // nouveau Group
                     terme.getIdTheso(),
-                    terme.getUser().getUser().getId())) {
+                    terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -1022,7 +1022,7 @@ public class AutoCompletBean implements Serializable {
             }
             
             OrphanHelper orphanHelper = new OrphanHelper();
-            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getId())) {
+            if(!orphanHelper.deleteOrphanBranch2(conn, terme.getIdC(), terme.getIdTheso(), terme.getUser().getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();

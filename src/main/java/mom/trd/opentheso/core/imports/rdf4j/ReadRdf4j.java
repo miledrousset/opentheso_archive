@@ -312,6 +312,7 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Labelling true sinon
      */
     private boolean readLabellingProperties(ReadStruct readStruct) {
+        if(readStruct.literal == null) return true;
         String lang = "fr"; 
         // si aucune langue n'est précisée, on applique la langue par défaut
         if(readStruct.literal.getLanguage().isPresent()) {

@@ -8,7 +8,7 @@
     <h:panelGroup id="resultSearch" style="height: 100px">
             <h:form id="tableSearch1" rendered="#{search.typeSearch == 1}">
                 <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
-                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="500"
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="700"
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
                     <p:ajax event="rowSelect" listener="#{newtreeBean.majSearch()}" 
                             update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />

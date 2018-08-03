@@ -56,6 +56,7 @@ public class GpsBeans {
     GpsPreferences nodePreference;
 
     private String selectedAlignement;
+    
     private String centerGeoMap = "41.850033, -87.6500523";
     private String coordennees = null;
     private String codeid;
@@ -97,12 +98,16 @@ public class GpsBeans {
     //////
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser theUser;
+
     @ManagedProperty(value = "#{selectedTerme}")
     private SelectedTerme selectedTerme;
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
+    
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;     
 
     @PostConstruct
     public void init() {
@@ -210,6 +215,7 @@ public class GpsBeans {
                 initcoordonees();
             }
         }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", "Alignement OK"));
         return status;
     }
 
@@ -222,7 +228,7 @@ public class GpsBeans {
     private boolean alignementautomatique(String idTerm) {
         boolean status = false;
         AlignmentHelper alignmentHelper = new AlignmentHelper();
-        if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), theUser.getUser().getId(),
+        if (alignmentHelper.addNewAlignment(connect.getPoolConnexion(), currentUser.getUser().getIdUser(),
                 alignment_choisi.getName(), alignementPreferences.getSource(),
                 alignment_choisi.getIdUrl(), 1, id_concept, id_theso, alignementPreferences.getId())) {
 
@@ -277,10 +283,10 @@ public class GpsBeans {
                     if (termHelper.isTermExist(connect.getPoolConnexion(),
                             termTemp.getLexical_value(), termTemp.getId_thesaurus(), termTemp.getLang())) {
                         if (remplacerTraduction) { // si le terme existe et on a autorisé le remplacement, on remplace la traduction
-                            termHelper.updateTermTraduction(connect.getPoolConnexion(), termTemp, theUser.getUser().getId());
+                            termHelper.updateTermTraduction(connect.getPoolConnexion(), termTemp, currentUser.getUser().getIdUser());
                         }
                     } else { // on ajoute simplement la traduction
-                        termHelper.addTraduction(connect.getPoolConnexion(), termTemp, theUser.getUser().getId());
+                        termHelper.addTraduction(connect.getPoolConnexion(), termTemp, currentUser.getUser().getIdUser());
                     }
                 }
             }
@@ -304,6 +310,7 @@ public class GpsBeans {
      *
      * @param id_Theso
      * @param id_lang
+     * @param id_user
      */
     public void validateParamretagesGps(String id_Theso, String id_lang, int id_user) {
         boolean status = true;
@@ -330,12 +337,11 @@ public class GpsBeans {
     }
 
     public void creerAlignAuto(String idC, String idTheso, String nom, String idlangue) throws ParserConfigurationException, SAXException {
-
         GpsQuery gpsQuery = new GpsQuery();
         GpsHelper gpsHelper = new GpsHelper();
         if (selectedAlignement != null) {
             for (AlignementSource alignementSource : alignementSources) {
-                if (alignementSource.getRequete() == null ? selectedAlignement == null : alignementSource.getRequete().equals(selectedAlignement)) {
+                if (alignementSource.getRequete() == null ? selectedAlignement == null : alignementSource.getSource().equals(selectedAlignement)) {
                     alignementPreferences = alignementSource;
                 }
             }
@@ -388,8 +394,7 @@ public class GpsBeans {
      * @param idTheso
      */
     public void setListeAlignementSources(String idTheso) {
-        int role = theUser.getUser().getIdRole();
-        if (role == 1 || role == 2) {
+        if (roleOnTheso.isIsAdminOnThisTheso() || currentUser.getUser().isIsSuperAdmin()) {
             AlignmentHelper alignmentHelper = new AlignmentHelper();
             listeAlignementSources = alignmentHelper.getAlignementSourceSAdmin(connect.getPoolConnexion());
         }
@@ -708,8 +713,6 @@ public class GpsBeans {
     }
 
     public void onRowSelect(SelectEvent event) {
-
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
         GpsHelper gpsHelper = new GpsHelper();
         GpsPreferences gpsPreferences;
         gpsPreferences = gpsHelper.getGpsPreferences(connect.getPoolConnexion(), id_theso, id_user1, ((AlignementSource) event.getObject()).getId());
@@ -817,7 +820,6 @@ public class GpsBeans {
     }
 
     public void setSelectedAlignement(String selectedAlignement) {
-
         this.selectedAlignement = selectedAlignement;
     }
 
@@ -832,15 +834,9 @@ public class GpsBeans {
         alignementSources = gpsHelper.getAlignementSource(connect.getPoolConnexion());
         if (!alignementSources.isEmpty()) {
             selectedAlignement = alignementSources.get(0).getSource();
+            setSelectedAlignement(selectedAlignement);
+            
         }
-    }
-
-    public CurrentUser getTheUser() {
-        return theUser;
-    }
-
-    public void setTheUser(CurrentUser theUser) {
-        this.theUser = theUser;
     }
 
     public NodeAlignment getAlignment_choisi() {
@@ -1129,6 +1125,22 @@ public class GpsBeans {
 
     public void setNodeAli(NodeAlignment nodeAli) {
         this.nodeAli = nodeAli;
+    }
+
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
 
 }

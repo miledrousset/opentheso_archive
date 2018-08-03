@@ -39,11 +39,12 @@
                         
                         <h:outputText rendered="#{selectedTerme.listAlignValues.size() == 0}" value="#{langueBean.getMsg('gps.noResult')}" style="color: red; text-align: center" />
                         <br/>
-                        <p:commandButton rendered="#{selectedTerme.listAlignValues.size() != 0}" id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{selectedTerme.ajouterAlignAuto()}"
-                                         update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg.hide()';"  />
+                        <p:commandButton rendered="#{selectedTerme.listAlignValues.size() != 0}" id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" action="#{selectedTerme.ajouterAlignAuto()}"
+                                         update=":idAjouterAutomatique_suiteEditDlg,:idAjouterAutomatiqueEditDlg,:panContenu,:formEditAlign, :messages"
+                                         styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg').hide();"  />
 
                         <p:commandButton rendered="#{selectedTerme.listAlignValues.size() == 0}" id="cbAjAllAlignAuto_cancel" title="#{langueBean.getMsg('btnBack')}" 
-                                         update=":contenuDroite3, :panContenu" icon="ui-icon-annuler" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg.hide()';"  />
+                                         update=":contenuDroite3, :panContenu" icon="ui-icon-annuler" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg').hide();"  />
                         
                     </p:layoutUnit>
                 </p:layout>

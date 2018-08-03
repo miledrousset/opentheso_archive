@@ -54,12 +54,12 @@ public class DownloadBean implements Serializable {
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean languageBean;
 
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;  
 
-    private String serverArk;
-    private boolean arkActive;
-    private String serverAdress;
     private String nomUsu;
 
     private int progress_per_100 = 0;
@@ -93,15 +93,9 @@ public class DownloadBean implements Serializable {
 
     @PostConstruct
     public void initTerme() {
-        if (user == null || user.getNodePreference() == null) {
+        if (currentUser.getUser() == null || roleOnTheso.getNodePreference() == null) {
             return;
         }
-
-        //ResourceBundle bundlePref = getBundlePref();
-        //String temp = bundlePref.getString("useArk");
-        arkActive = user.getNodePreference().isUseArk();//temp.equals("true");
-        serverArk = user.getNodePreference().getServeurArk();//bundlePref.getString("serverArk");
-        serverAdress = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
     }
 
     /**
@@ -118,9 +112,9 @@ public class DownloadBean implements Serializable {
     public String conceptSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         return exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso,
@@ -131,18 +125,18 @@ public class DownloadBean implements Serializable {
 
     public String groupSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         return exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup).toString();
     }
 
     public String groupJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
@@ -176,9 +170,9 @@ public class DownloadBean implements Serializable {
     }*/
     public void branchGroupSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer temp = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
         if (temp.length() <= 1500000) {
@@ -218,9 +212,9 @@ public class DownloadBean implements Serializable {
          */
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
         InputStream stream;
@@ -321,9 +315,9 @@ public class DownloadBean implements Serializable {
         sizeOfTheso = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso).size();
 
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportThesaurusAdvanced(
                 connect.getPoolConnexion(), idTheso,
@@ -398,9 +392,9 @@ public class DownloadBean implements Serializable {
     public StreamedContent conceptToSkos(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         InputStream stream;
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
@@ -478,9 +472,9 @@ public class DownloadBean implements Serializable {
     public StreamedContent conceptToJsonLd(String idC, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
 
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         InputStream stream;
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
@@ -514,9 +508,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent brancheToSkos(String idConcept, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportBranchOfConcept(connect.getPoolConnexion(), idTheso, idConcept);
 
@@ -586,9 +580,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent brancheToJsonLd(String idConcept, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportBranchOfConcept(connect.getPoolConnexion(), idTheso, idConcept);
 
@@ -616,9 +610,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent thisGroupToSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
@@ -643,9 +637,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent thisGroupToJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
@@ -673,9 +667,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent groupToSkos(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
@@ -700,9 +694,9 @@ public class DownloadBean implements Serializable {
      */
     public StreamedContent groupToJsonLd(String idGroup, String idTheso) {
         ExportFromBDD exportFromBDD = new ExportFromBDD();
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer skos_local = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
@@ -763,9 +757,9 @@ public class DownloadBean implements Serializable {
          */
         // ExportFromBDD exportFromBDD = new ExportFromBDD();
 
-        exportFromBDD.setServerAdress(serverAdress);
-        exportFromBDD.setServerArk(serverArk);
-        exportFromBDD.setArkActive(arkActive);
+        exportFromBDD.setServerAdress(roleOnTheso.getNodePreference().getCheminSite());
+        exportFromBDD.setServerArk(roleOnTheso.getNodePreference().getServeurArk());
+        exportFromBDD.setArkActive(roleOnTheso.getNodePreference().isUseArk());
 
         StringBuffer temp = exportFromBDD.exportThesaurus(connect.getPoolConnexion(), idTheso);
         if (temp.length() <= 1500000) {
@@ -998,44 +992,21 @@ public class DownloadBean implements Serializable {
         this.connect = connect;
     }
 
-    public CurrentUser getUsesr() {
-        return user;
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
     }
 
-    public void setUsesr(CurrentUser usesr) {
-        this.user = usesr;
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
     }
 
-    public String getServerArk() {
-        return serverArk;
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
     }
 
-    public void setServerArk(String serverArk) {
-        this.serverArk = serverArk;
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
 
-    public boolean isArkActive() {
-        return arkActive;
-    }
-
-    public void setArkActive(boolean arkActive) {
-        this.arkActive = arkActive;
-    }
-
-    public String getServerAdress() {
-        return serverAdress;
-    }
-
-    public void setServerAdress(String serverAdress) {
-        this.serverAdress = serverAdress;
-    }
-
-    public CurrentUser getUser() {
-        return user;
-    }
-
-    public void setUser(CurrentUser user) {
-        this.user = user;
-    }
 
 }

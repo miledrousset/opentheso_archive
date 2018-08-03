@@ -38,14 +38,6 @@
                                 </p:autoComplete>
                             </td>
                         </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('cdt.MT')}" /> : </td>
-                            <td>
-                                <h:selectOneMenu value="#{selectedCandidat.domaineEdit}" styleClass="listes" style="width: 200px;">
-                                    <f:selectItems value="#{theso.listeDomaine()}"/>
-                                </h:selectOneMenu>                                
-                            </td>
-                        </tr>
                     </table><br/>
                     <center>
                     <p:commandButton title="#{langueBean.getMsg('cdt.validCdt')}" styleClass="styleButton" actionListener="#{selectedCandidat.editMyProp(theso.thesaurus.language)}" 

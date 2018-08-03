@@ -9,7 +9,7 @@
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(poolConnexion.poolConnexion != null) and (newtreeBean.browserName != 'agent')}">
             <h1>Gestionnaire de thésaurus</h1>
-            <h:outputText value="version :  #{user1.versionOfOpentheso}" /><br/>
+            <h:outputText value="version :  #{currentUser.versionOfOpentheso}" /><br/>
             <br/>
             <h:outputLink  value="https://github.com/miledrousset/opentheso/wiki" target="_blank" style="color: forestgreen"> 
                         <h:outputText value="La doc complète d'Opentheso sur Github" />

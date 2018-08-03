@@ -48,7 +48,7 @@
                         <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
                     </div>
                 </h:panelGroup>            
-                <ui:include src="account.xhtml" />
+                <!--<ui:include src="account.xhtml" />-->
                 <ui:include src="menuThesaurus.xhtml" />
                 <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
 
@@ -76,22 +76,23 @@
 
 
                     <!-- Pour afficher mes candidats -->
-                    <h:form>
-                        <h:panelGrid columns="2" style="margin-bottom:10px; color: green; " cellpadding="5">
+                    <h:form id="myCandidat">
+                        <h:panelGrid columns="3" style="margin-bottom:10px; color: green; " cellpadding="5">
                             <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}"/>
                             <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
                                 <p:ajax  listener="#{theso.listeCandidats()}" />
-                                <p:ajax  listener="#{searchCandidat.init()}"  update=":tableCdt,:panelCdt,:gestionCandidat" />
+                                <p:ajax  listener="#{searchCandidat.init()}"  update="myCandidat,:tableCdt,:panelCdt,:gestionCandidat" />
                             </p:selectBooleanCheckbox>
+                            <p:outputLabel value="tot = #{searchCandidat.candidats.size()}"/>
                         </h:panelGrid>                    
                     </h:form>
 
-                    <p:outputLabel value="tot = #{selectedCandidat.totalOfCandidat()}" /> 
+                     
 
 
 
                     <!-- Liste des candidats  -->                    
-                    <div style="clear: both;" />
+
                     <h:panelGroup id="panelCdt" >
                         <h:form id="tableCdt" >
                             <p:tabView styleClass="styleTabViewCdt"  >
@@ -195,6 +196,7 @@
                         <div style="float: left; margin-left: 30px;">
                             <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null)}">
                                 <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-plus-16" 
+                                                 actionListener="#{selectedCandidat.initNewProposal()}"
                                                  update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').show();"
                                                  title="#{langueBean.getMsg('cdt.btnAddCdt')}"/><br/>
                             </h:form>
@@ -219,14 +221,14 @@
 
                             <h:form rendered="#{selectedCandidat.userHaveProp() == true and selectedCandidat.selected.etat == 'a'}">
                                 <p:commandButton icon="ui-icon-edit-16-2"  styleClass="styleButton_db"  title="#{langueBean.getMsg('cdt.editProp')}"
-                                                 actionListener="#{selectedCandidat.initNewProposal()}" 
+                                                 actionListener="#{selectedCandidat.initEditProp()}" 
                                                  update=":idEditProposalDlg" oncomplete="PF('editProposalDlg').show();"
                                                  />
 
 
 
                                 <p:commandButton  icon="ui-icon-trash-16" title="#{langueBean.getMsg('cdt.btnDelProp')}" actionListener="#{searchCandidat.delPropCdt()}" 
-                                                  update=":gestionCandidat,:tableCdt" styleClass="styleButton_db" >
+                                                  update=":myCandidat,:gestionCandidat,:tableCdt" styleClass="styleButton_db" >
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>
 
@@ -294,7 +296,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup id="manuelInsertion" rendered="#{selectedCandidat.selected.etat == 'v'}">
-                            <h:form rendered="#{(user1.haveRights(2))}">
+                            <h:form rendered="#{(currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                 <h:outputText value="#{langueBean.getMsg('cdt.messageToInsert')}" />
                                 <p:commandButton icon="ui-icon-ok" update=":gestionCandidat,:panValidCdt,:tableCdt"
                                                  actionListener="#{selectedCandidat.setStatusCandidat(selectedCandidat.selected.idConcept)}" styleClass="cbSupp" >
@@ -364,7 +366,7 @@
                                         <h:outputText value="#{tradCdt.user}" />
                                     </p:column>
                                     <p:column width="25" rendered="#{selectedCandidat.selected.etat == 'a'}">
-                                        <h:form rendered="#{(tradCdt.user == user1.user.name) or (user1.haveRights(2))}">
+                                        <h:form rendered="#{(tradCdt.user == currentUser.user.name) or (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                             <p:commandButton id="cbSuppTheso" icon="ui-icon-supp" update=":tableTradCdt,:tableCdt"
                                                              actionListener="#{selectedCandidat.delTradCdt(tradCdt.idLang)}" styleClass="cbSupp" >
                                                 <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('cdt.valid2')}" icon="ui-icon-alert" />  

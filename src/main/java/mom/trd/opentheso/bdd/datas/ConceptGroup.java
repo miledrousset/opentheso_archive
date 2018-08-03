@@ -13,6 +13,7 @@ public class ConceptGroup {
     private String idgroup;
     private String idthesaurus;
     private String idARk;
+    private String idHandle;    
     private String idtypecode;
     private String idparentgroup;
     private String notation;
@@ -86,10 +87,13 @@ public class ConceptGroup {
     public void setIdARk(String idARk) {
         this.idARk = idARk;
     }
-    
-    
-    
-    
-    
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
+    }
     
 }

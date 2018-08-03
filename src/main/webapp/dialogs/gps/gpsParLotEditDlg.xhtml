@@ -77,8 +77,8 @@
                 </p:layout>
                 <br/>
                 <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
-                                 actionListener="#{gps.validateParamretagesGps(selectedTerme.idTheso, selectedTerme.idlangue, user1.user.id)}"
-                                 action="#{gps.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.idlangue, user1.user.id)}"
+                                 actionListener="#{gps.validateParamretagesGps(selectedTerme.idTheso, selectedTerme.idlangue, currentUser.user.idUser)}"
+                                 action="#{gps.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, selectedTerme.idlangue, currentUser.user.idUser)}"
                                  styleClass="styleButton"  
                                  update=":idGpsParLot_suiteDlg" oncomplete="PF('gpsParLot_suiteDlg').show(); PF('gpsParLotEditDlg').hide();"/>
             </h:panelGroup>

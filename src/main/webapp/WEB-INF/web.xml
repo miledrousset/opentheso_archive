@@ -45,7 +45,9 @@
     <error-page>
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/errorPages/timeOut.xhtml</location>
-    </error-page>  
+    </error-page>
+
+    
 <!--   
     <error-page>
         <exception-type>java.lang.NullPointerException</exception-type>

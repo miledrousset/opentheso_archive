@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,7 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
+import mom.trd.opentheso.ws.handle.HandleHelper;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
@@ -70,6 +72,9 @@ public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{conceptbean}")
     private ConceptBean conceptbean;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;    
 
     private TreeNode root;
     private TreeNode selectedNode;
@@ -987,7 +992,37 @@ public class NewTreeBean implements Serializable {
      * Supprime le groupe sélectionné
      */
     public void delGroup() {
-        new GroupHelper().deleteConceptGroup(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId());
+        Connection conn;
+        try {
+            conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if(!new GroupHelper().deleteConceptGroupRollBack(conn,
+                    selectedTerme.getIdC(),
+                    selectedTerme.getIdTheso(),
+                    selectedTerme.getUser().getUser().getIdUser())){
+                conn.rollback();
+                conn.close();
+                FacesContext.getCurrentInstance().addMessage(null, 
+                        new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
+                return;
+            }
+            // pour supprimer le Handle si c'est activé
+            if(roleOnTheso.getNodePreference() != null) {
+                if(roleOnTheso.getNodePreference().isUseHandle()) {
+                    HandleHelper handleHelper = new HandleHelper(roleOnTheso.getNodePreference());
+                    if(!handleHelper.deleteIdHandle(selectedTerme.getIdHandle(), selectedTerme.getIdTheso())) {
+                        conn.rollback();
+                        conn.close();
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
+                        return;
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info7")));
         reInit();
         initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
@@ -1002,7 +1037,7 @@ public class NewTreeBean implements Serializable {
      */
     public boolean delOrphans() {
         if (!deleteOrphanBranch(connect.getPoolConnexion(),
-                selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId())) {
+                selectedTerme.getIdC(), selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getIdUser())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
             return false;
         }
@@ -1098,12 +1133,12 @@ public class NewTreeBean implements Serializable {
     public boolean deleteConcept() {
 
         ConceptHelper conceptHelper = new ConceptHelper();
-        if (selectedTerme.getUser().nodePreference == null) {
+        if (roleOnTheso.getNodePreference() == null) {
             return false;
         }
-        conceptHelper.setNodePreference(selectedTerme.getUser().nodePreference);
+        conceptHelper.setNodePreference(roleOnTheso.getNodePreference());
         if (!conceptHelper.deleteConcept(connect.getPoolConnexion(), selectedTerme.getIdC(),
-                selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getId())) {
+                selectedTerme.getIdTheso(), selectedTerme.getUser().getUser().getIdUser())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "La suppression a échoué !!"));
             return false;
         }
@@ -1344,7 +1379,7 @@ public class NewTreeBean implements Serializable {
             selectedTerme.setConceptFusionAlign(null);
             selectedTerme.setConceptFusionNodeRT(null);
         } else {
-            int idUser = selectedTerme.getUser().getUser().getId();
+            int idUser = selectedTerme.getUser().getUser().getIdUser();
             for (NodeRT rt : selectedTerme.getConceptFusionNodeRT()) {
                 HierarchicalRelationship hr = new HierarchicalRelationship(rt.getIdConcept(), selectedTerme.getConceptFusionId(), selectedTerme.getIdTheso(), "RT");
                 new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, idUser);
@@ -1608,7 +1643,10 @@ public class NewTreeBean implements Serializable {
     public void fromSubGroupToGroupOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(),
+                    idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(),
+                    droppedNode.getIdConcept(), idThesoSelected,
+                    this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println("from subgroup to group other domain");
@@ -1621,7 +1659,10 @@ public class NewTreeBean implements Serializable {
     public void fromSubGoupToSubGroupOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), 
+                    idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(),
+                    droppedNode.getIdConcept(), idThesoSelected,
+                    this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println("from sub grou to subgroup other domain");
@@ -1639,7 +1680,9 @@ public class NewTreeBean implements Serializable {
     public void fromTTToGroupOtherDomain() {
        
             TreeChange tc = new TreeChange();
-            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), 
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
        
        // System.out.println("from top term to group other domain");
     }
@@ -1650,7 +1693,9 @@ public class NewTreeBean implements Serializable {
      */
     public void fromTTToSubGroupOtherDomain() {
           TreeChange tc = new TreeChange();
-            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(),
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
        
         //System.out.println("from top term to sub group other domain");
     }
@@ -1665,7 +1710,7 @@ public class NewTreeBean implements Serializable {
             tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(),
                     draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),
                     droppedNode.getIdCurrentGroup(), idThesoSelected,
-                    this.selectedTerme.getUser().getUser().getId());
+                    this.selectedTerme.getUser().getUser().getIdUser());
         
         }
 
@@ -1679,7 +1724,9 @@ public class NewTreeBean implements Serializable {
     public void fromTTToTT() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
           
         }
 
@@ -1693,7 +1740,9 @@ public class NewTreeBean implements Serializable {
     public void fromTTToConceptDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT, 
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), 
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
            
         }
       //  System.out.println(" from top term to concept  domain");
@@ -1706,7 +1755,9 @@ public class NewTreeBean implements Serializable {
     public void fromTTToConceptOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-      tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+      tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(), idBT,
+              draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),
+              idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
            
         }
         //System.out.println(" from top term to concept  other domain");
@@ -1724,7 +1775,10 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToGroupOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT,
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
+                    droppedNode.getIdCurrentGroup(), idThesoSelected,
+                    this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println(" from concept to group other domain");
@@ -1733,7 +1787,9 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToGroupDomain() {
            for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(),
+                    idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println(" from concept to group  domain");
@@ -1746,7 +1802,10 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToSubGroupOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveConceptToGroupOtherDomain(connect, draggedNode.getIdConcept(),
+                    idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
+                    droppedNode.getIdCurrentGroup(), idThesoSelected,
+                    this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println(" from concept  to  sub group other domain   domain");
@@ -1760,7 +1819,9 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToSubGroupDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(), idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(),
+                    idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println(" from   concept to sub group domain");
@@ -1773,7 +1834,10 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToTTOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(), draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+            tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(),
+                    draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),
+                    droppedNode.getIdCurrentGroup(), idThesoSelected,
+                    this.selectedTerme.getUser().getUser().getIdUser());
         }
 
         //System.out.println(" from concept m to top term other  domain");
@@ -1787,7 +1851,7 @@ public class NewTreeBean implements Serializable {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
             tc.moveConceptTermToConceptTermSameDomain(connect,
-                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
 
         }
        // System.out.println(" from concept m to top term  domain");
@@ -1802,7 +1866,7 @@ public class NewTreeBean implements Serializable {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
             tc.moveConceptTermToConceptTermSameDomain(connect,
-                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
 
         }
        // System.out.println("from concept to concept domain");
@@ -1818,7 +1882,7 @@ public class NewTreeBean implements Serializable {
             TreeChange tc = new TreeChange();
             tc.moveConceptTermToConceptTermOtherDomain(connect, draggedNode.getIdConcept(),
                     draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),
-                    droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getId());
+                    droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
        // System.out.println("from concept to concept other domain");
@@ -2243,6 +2307,14 @@ public class NewTreeBean implements Serializable {
 
     public void setAncienPrefixe(String ancienPrefixe) {
         this.ancienPrefixe = ancienPrefixe;
+    }
+
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
     
   

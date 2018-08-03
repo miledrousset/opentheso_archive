@@ -697,13 +697,7 @@ public class ExportRdf4jHelper {
         // en dernier, on prend l'URL basique d'Opentheso
         // 1 seule URI est possible pour l'export par concept
         
-        // URI de type Handle
-        if (nodeConceptExport.getConcept().getIdHandle() != null) {
-            if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
-                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
-                return uri;
-            }
-        }
+
         // URI de type Ark
         if (nodeConceptExport.getConcept().getIdArk() != null) {
             if (!nodeConceptExport.getConcept().getIdArk().trim().isEmpty()) {
@@ -711,6 +705,13 @@ public class ExportRdf4jHelper {
                 return uri;
             }
         }
+        // URI de type Handle
+        if (nodeConceptExport.getConcept().getIdHandle() != null) {
+            if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
+                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
+                return uri;
+            }
+        }        
         // si on ne trouve pas ni Handle, ni Ark
         uri = nodePreference.getCheminSite() + nodeConceptExport.getConcept().getIdConcept();
         return uri;

@@ -45,9 +45,6 @@ public class FileBean implements Serializable {
     private boolean desabled = true;
 
     private String source = "";
-    private String pathImage;
-    private String dossierResize;
-    private String langueSource;
    
     // Import SKOS
     private String formatDate;
@@ -74,30 +71,14 @@ public class FileBean implements Serializable {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
     
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
-
-    /**
-     * Récupération des préférences
-     *
-     * @return la ressourceBundle de spréférences
-     */
-    private ResourceBundle getBundlePref() {
-        FacesContext context = FacesContext.getCurrentInstance();
-        ResourceBundle bundlePref = context.getApplication().getResourceBundle(context, "pref");
-        return bundlePref;
-    }
+    @ManagedProperty(value = "#{currentUser}")
+    private CurrentUser2 user;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;     
 
     @PostConstruct
     public void initFileBean() {
-        ///ResourceBundle bundlePref = getBundlePref();
-        if(user == null || user.getNodePreference() == null){
-            return;
-        }
-        
-        pathImage = user.getNodePreference().getPathImage();//bundlePref.getString("pathImage");
-        langueSource = user.getNodePreference().getSourceLang();//bundlePref.getString("workLanguage");
-        dossierResize =user.getNodePreference().getDossierResize(); //bundlePref.getString("dossierResize");
 
     }
 
@@ -203,17 +184,19 @@ public class FileBean implements Serializable {
             event.queue();
         } else {
             UploadedFile file = event.getFile();
-            if (formatDate == null || formatDate.equals("") || user == null || user.getNodePreference() == null  ) {
+            if (formatDate == null || formatDate.equals("") || user == null || roleOnTheso.getNodePreference() == null  ) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error2")));
             } else {
                 try {
                     boolean useArk = false;
-                    useArk = user.getNodePreference().isUseArk();
+                    useArk = roleOnTheso.getNodePreference().isUseArk();
                     
 
-                    String adressSite = user.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
-                    int idUser = selectedTerme.getUser().getUser().getId();
-                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser, langueSource);
+                    String adressSite = roleOnTheso.getNodePreference().getCheminSite();//bundlePref.getString("cheminSite");
+                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(),
+                            formatDate, useArk, adressSite,
+                            user.getUser().getIdUser(),
+                            roleOnTheso.getNodePreference().getSourceLang());
                 } catch (IOException ex) {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
@@ -442,7 +425,7 @@ public class FileBean implements Serializable {
                     }
                 //    ArrayList<String> fields = importTabulateHelper.getFieldsList();
                 //    ArrayList<TabulateDocument> tabulateDocuments = importTabulateHelper.getTabulateDocumentList();
-                    if(!importTabulateHelper.insertIntoBDD(connect.getPoolConnexion(), idTheso, selectedTerme.getUser().getUser().getId())){
+                    if(!importTabulateHelper.insertIntoBDD(connect.getPoolConnexion(), idTheso, selectedTerme.getUser().getUser().getIdUser())){
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error3")));   
                     }
                 //    System.out.println(fields);
@@ -487,8 +470,8 @@ public class FileBean implements Serializable {
     }*/
 
     public void chargeImage(FileUploadEvent event) {
-        int idUser = selectedTerme.getUser().getUser().getId();
-        if(selectedTerme.getUser().nodePreference == null) return;
+        int idUser = selectedTerme.getUser().getUser().getIdUser();
+        if(roleOnTheso.getNodePreference() == null) return;
         
         if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
             event.setPhaseId(PhaseId.INVOKE_APPLICATION);
@@ -502,7 +485,7 @@ public class FileBean implements Serializable {
                     // Traitement
                     String suffix = FilenameUtils.getExtension(file.getFileName());
                     InputStream input = file.getInputstream();
-                    String path = selectedTerme.getUser().nodePreference.getPathImage();//pathImage; 
+                    String path = roleOnTheso.getNodePreference().getPathImage();//pathImage; 
                     
 
 
@@ -531,7 +514,7 @@ public class FileBean implements Serializable {
                     }
                     addFiligrane(image.getName(), source, suffix);
                     
-                    addFiligrane(selectedTerme.getUser().nodePreference.getDossierResize()
+                    addFiligrane(roleOnTheso.getNodePreference().getDossierResize()
                             /*dossierResize*/ 
                             + "/" + image.getName(), source, suffix);
 
@@ -544,7 +527,7 @@ public class FileBean implements Serializable {
                      return;
                 }
 
-                selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser));
+                selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso()));
 
                 vue.setAddImage(false);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("file.info1.1") + " " + source + langueBean.getMsg("file.info1.2") + "."));
@@ -555,10 +538,10 @@ public class FileBean implements Serializable {
 
     public boolean resizeImage(String fileName) {
         try {
-            Thumbnails.of(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName))
+            Thumbnails.of(new File(roleOnTheso.getNodePreference().getPathImage() + fileName))
                     .size(200, 200)
-                    .toFile(new File(selectedTerme.getUser().nodePreference.getPathImage()
-                            + selectedTerme.getUser().nodePreference.getDossierResize() + "/" + fileName));
+                    .toFile(new File(roleOnTheso.getNodePreference().getPathImage()
+                            + roleOnTheso.getNodePreference().getDossierResize() + "/" + fileName));
             return true;
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -569,9 +552,9 @@ public class FileBean implements Serializable {
 
     public void resizeToBigImage(String fileName) {
         try {
-            Thumbnails.of(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName))
+            Thumbnails.of(new File(roleOnTheso.getNodePreference().getPathImage() + fileName))
                     .size(1024, 768)
-                    .toFile(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
+                    .toFile(new File(roleOnTheso.getNodePreference().getPathImage() + fileName));
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -581,7 +564,7 @@ public class FileBean implements Serializable {
 
         try {
             // Image to add a text caption to.
-            BufferedImage originalImage = ImageIO.read(new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
+            BufferedImage originalImage = ImageIO.read(new File(roleOnTheso.getNodePreference().getPathImage() + fileName));
             // Set up the caption properties
             Font font = new Font("Monospaced", Font.PLAIN, 15);
             Color c = Color.YELLOW;
@@ -591,7 +574,7 @@ public class FileBean implements Serializable {
             // Apply caption to the image
             Caption filter = new Caption(source, font, c, position, insetPixels);
             BufferedImage captionedImage = filter.apply(originalImage);
-            ImageIO.write(captionedImage, ext, new File(selectedTerme.getUser().nodePreference.getPathImage() + fileName));
+            ImageIO.write(captionedImage, ext, new File(roleOnTheso.getNodePreference().getPathImage() + fileName));
 
         } catch (IOException ex) {
             Logger.getLogger(ImagesHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -599,7 +582,7 @@ public class FileBean implements Serializable {
     }
 
     public String getCheminPix() {
-        return selectedTerme.getUser().nodePreference.getPathImage();
+        return roleOnTheso.getNodePreference().getPathImage();
     }
 
     public String getSource() {
@@ -632,22 +615,6 @@ public class FileBean implements Serializable {
 
     public void setConnect(Connexion connect) {
         this.connect = connect;
-    }
-
-    public String getPathImage() {
-        return selectedTerme.getUser().nodePreference.getPathImage();
-    }
-
-    public void setPathImage(String pathImage) {
-        this.pathImage = pathImage;
-    }
-
-    public String getDossierResize() {
-        return dossierResize;
-    }
-
-    public void setDossierResize(String dossierResize) {
-        this.dossierResize = dossierResize;
     }
 
     public LanguageBean getLangueBean() {
@@ -698,14 +665,6 @@ public class FileBean implements Serializable {
         this.idTheso = idTheso;
     }    
 
-    public String getLangueSource() {
-        return langueSource;
-    }
-
-    public void setLangueSource(String langueSource) {
-        this.langueSource = langueSource;
-    }
-
     public boolean isCreateNewId() {
         return createNewId;
     }
@@ -714,20 +673,20 @@ public class FileBean implements Serializable {
         this.createNewId = createNewId;
     }
 
-    public CurrentUser getUsesr() {
+    public CurrentUser2 getUser() {
         return user;
     }
 
-    public void setUsesr(CurrentUser usesr) {
-        this.user = usesr;
-    }
-
-    public CurrentUser getUser() {
-        return user;
-    }
-
-    public void setUser(CurrentUser user) {
+    public void setUser(CurrentUser2 user) {
         this.user = user;
     }
 
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
+    }
+    
 }

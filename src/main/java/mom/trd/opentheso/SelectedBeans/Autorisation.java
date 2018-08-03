@@ -24,8 +24,10 @@ import mom.trd.opentheso.autorisation.AutorisationStruct;
 public class Autorisation {
 @ManagedProperty(value = "#{poolConnexion}")
 private Connexion connect;
-@ManagedProperty(value = "#{user1}")
-private CurrentUser user;
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;
+
+
 private ArrayList<AutorisationStruct> listAutorisation=new ArrayList<>();
 /**
      * Creates a new instance of autorisation
@@ -37,7 +39,7 @@ private ArrayList<AutorisationStruct> listAutorisation=new ArrayList<>();
     }
     public void init(){
         AutorisationHelper ah=new AutorisationHelper();
-        listAutorisation=ah.getRights(connect.getPoolConnexion(),user.getUser().getId());
+        listAutorisation=ah.getRights(connect.getPoolConnexion(),currentUser.getUser().getIdUser());
     }
 
     public ArrayList<AutorisationStruct> getListAutorisation() {
@@ -56,13 +58,12 @@ private ArrayList<AutorisationStruct> listAutorisation=new ArrayList<>();
         this.connect = connect;
     }
 
-    public CurrentUser getUser() {
-        return user;
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
     }
 
-    public void setUser(CurrentUser user) {
-        this.user = user;
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
     }
-    
     
 }

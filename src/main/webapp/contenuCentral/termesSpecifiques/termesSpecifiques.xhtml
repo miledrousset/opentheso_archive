@@ -11,7 +11,8 @@
             <div id="imageEdition">
 
                 <h:form id="formEditTSpe" 
-                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) 
+                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null)
+                                    and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso) 
                                    and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                      <p:commandButton id="trierTS" styleClass="cbEdit" icon="ui-icon-edit-16"/>                                                        
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="trierTS" my="left top" at="left bottom">

@@ -21,6 +21,7 @@
                         <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                         <td>
                             <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTermFromThisGroup}" var="t1"
+                                            scrollHeight="300"
                                             itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
                                 <f:facet name="itemtip">
                                     <h:panelGrid columns="2" cellpadding="5" width="200" >

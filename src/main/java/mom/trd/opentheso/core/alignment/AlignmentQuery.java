@@ -31,6 +31,13 @@ import skos.SKOSProperty;
 import skos.SKOSResource;
 import skos.SKOSXmlDocument;
 
+
+
+import com.bordercloud.sparql.Endpoint;
+import com.bordercloud.sparql.EndpointException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  *
  * @author Carole
@@ -393,6 +400,75 @@ public class AlignmentQuery {
         return listeAlign;
     }
     
+    
+    
+    
+    ///  https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q324926&languages=en|de|fr&format=json
+    
+    
+    // pour alignement Wikidata en Json et récupération des traductions, altLabel, description (toutes les langues) 
+    // plus la récupération des alignements AAT ...
+            /*
+        URL pour les images 
+        https://commons.wikimedia.org/wiki/File:Fibula_LACMA_50.22.6.jpg
+        */
+
+    
+    /////// à faire pour wikiData 
+    public ArrayList<NodeAlignment> queryWikidata(String idC, String idTheso,
+            String lexicalValue, String lang, 
+            String requete, String source) {
+        listeAlign = new ArrayList<>();
+        try {
+            Endpoint sp = new Endpoint("https://query.wikidata.org/sparql", false);
+
+    /*        String querySelect = "SELECT ?item ?itemLabel ?itemDescription WHERE {" +
+                                    "  ?item rdfs:label \"fibula\"@en." +
+                                    "  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }" +
+                                    "}";*/
+
+            requete = requete.replaceAll("##value##", lexicalValue);
+            requete = requete.replaceAll("##lang##", lang);
+            HashMap<String, HashMap> rs = sp.query(requete);
+
+            ArrayList<HashMap<String, Object>> rows_queryWikidata = (ArrayList) rs.get("result").get("rows");
+            for (HashMap<String, Object> hashMap : rows_queryWikidata) {
+                NodeAlignment na = new NodeAlignment();
+                na.setInternal_id_concept(idC);
+                na.setInternal_id_thesaurus(idTheso);
+                
+                // label ou Nom
+                if(hashMap.get("itemLabel") != null)
+                    na.setConcept_target(hashMap.get("itemLabel").toString());
+                else
+                    continue;
+                
+                // description
+                if(hashMap.get("itemDescription") != null)
+                    na.setDef_target(hashMap.get("itemDescription").toString());
+                else 
+                    na.setDef_target("");
+                
+                na.setThesaurus_target(source);
+                                
+                // URI
+                if(hashMap.get("item") != null)
+                    na.setUri_target(hashMap.get("item").toString());
+                else 
+                    continue;
+                
+                listeAlign.add(na);
+                
+              /*  System.out.println("URI : " + hashMap.get("item"));
+                System.out.println("URI : " + hashMap.get("itemLabel"));
+                System.out.println("URI : " + hashMap.get("itemDescription"));*/
+            }
+        } catch (EndpointException eex) {
+            System.out.println(eex);
+            eex.printStackTrace();
+        }
+        return listeAlign;
+    }   
     
 
     

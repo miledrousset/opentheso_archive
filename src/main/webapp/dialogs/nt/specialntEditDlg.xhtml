@@ -22,7 +22,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
                                 <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                forceSelection="false" active="true"  queryDelay="1000"
+                                                forceSelection="false" active="true"  queryDelay="1000" scrollHeight="300"
                                                 itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverterLexical">
 
                                     <f:facet name="itemtip">

@@ -10,7 +10,10 @@
             <h:outputText value="#{langueBean.getMsg('index.RT')}" rendered="#{(newtreeBean.browserName != 'agent')}" /> 
             <div id="imageEdition">
                 <h:form id="formEditTAsso"
-                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and ((roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine != 'Orphan'))}">
+                        rendered="#{currentUser.user.name != null 
+                                    and selectedTerme.idC != null 
+                                    and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                    and selectedTerme.idDomaine != 'Orphan'}">
                     <p:commandButton id="dynaButtonTAsso" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTAsso" my="left top" at="left bottom">
                          <p:menuitem value="#{langueBean.getMsg('popup.addRel')}" update=":idTermeAssocieEditDlg" oncomplete="PF('termeAssocieEditDlg').show();" style="font-size: 12px;"/>

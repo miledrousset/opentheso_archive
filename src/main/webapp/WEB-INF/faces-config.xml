@@ -97,6 +97,10 @@
         <message-bundle>language/site_it</message-bundle>
     </application>
   
+    <factory>
+        <exception-handler-factory>mom.trd.opentheso.session.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+    </factory>
+  
     <Context docBase="/var/www/images" path="/pix" />
     <Context docBase2="install" pathInstall="install" />
     <filter>

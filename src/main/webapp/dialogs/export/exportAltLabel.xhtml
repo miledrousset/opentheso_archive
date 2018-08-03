@@ -18,7 +18,7 @@
                     <div style="align-content: center">
 
 
-                        <h:panelGroup  id="panelExportAltLabel" rendered="#{user1.haveRights(2)}">
+                        <h:panelGroup  id="panelExportAltLabel" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
                         <p:outputLabel value="type : CSV" />  
 
                             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">

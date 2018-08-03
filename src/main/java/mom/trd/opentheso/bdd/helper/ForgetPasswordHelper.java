@@ -18,12 +18,10 @@ package mom.trd.opentheso.bdd.helper;
 import com.sun.mail.smtp.SMTPTransport;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.SelectedBeans.LanguageBean;
 import mom.trd.opentheso.bdd.tools.MD5Password;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import javax.faces.bean.ManagedProperty;
@@ -34,7 +32,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import mom.trd.opentheso.SelectedBeans.CurrentUser;
+import mom.trd.opentheso.SelectedBeans.CurrentUser2;
 
 /**
  *
@@ -52,8 +50,8 @@ public class ForgetPasswordHelper {
     private String emailMessage;
     private String pseudoMessage;
 
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+    @ManagedProperty(value = "#{currentUser}") 
+    private CurrentUser2 currentUser;
 
     /**
      * s'appeléer depuis donwloadBean ou on pass le nom et le mail del usuaire
@@ -279,6 +277,14 @@ public class ForgetPasswordHelper {
 
     public void setPseudoMessage(String pseudoMessage) {
         this.pseudoMessage = pseudoMessage;
+    }
+
+    public CurrentUser2 getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(CurrentUser2 currentUser) {
+        this.currentUser = currentUser;
     }
 
 }

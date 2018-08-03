@@ -14,7 +14,7 @@
                     <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
 
                     <div>
-                        <h:panelGroup  id="panelExport" rendered="#{user1.haveRights(2)}">
+                        <h:panelGroup  id="panelExport" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
 
                             <fieldset class="fieldLang"  >
                                 <legend><h:outputText value="#{langueBean.getMsg('export.langOfTheso')}" styleClass="textInfoSmall" /></legend>

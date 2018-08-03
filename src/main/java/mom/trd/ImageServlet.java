@@ -10,14 +10,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import mom.trd.opentheso.SelectedBeans.CurrentUser;
+import mom.trd.opentheso.SelectedBeans.CurrentUser2;
 
 
 @WebServlet("/pix/*")
 public class ImageServlet extends HttpServlet {
     
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+    @ManagedProperty(value = "#{currentUser}")
+    private CurrentUser2 user;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -93,12 +93,14 @@ public class ImageServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    public CurrentUser getUser() {
+    public CurrentUser2 getUser() {
         return user;
     }
 
-    public void setUser(CurrentUser user) {
+    public void setUser(CurrentUser2 user) {
         this.user = user;
     }
+
+
 
 }

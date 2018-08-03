@@ -26,7 +26,8 @@
                             </h:form></td>
                         <!-- gestion des domaines ou groupes --> 
                         <td align="left">
-                            <h:form id="formAjDom" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                            <h:form id="formAjDom" rendered="#{(currentUser.user != null) and (theso.getThisTheso() != null)
+                                                               and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}">
                                 <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="#{langueBean.getMsg('cdt.MT')}"/>
                                 <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
                                     <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
@@ -35,7 +36,7 @@
                                 </p:menu>
                             </h:form>
                         </td>
-
+                        <!-- boite à outils admins-->
                         <td align="right">
                             <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                 <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>

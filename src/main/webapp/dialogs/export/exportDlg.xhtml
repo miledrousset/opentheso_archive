@@ -22,14 +22,9 @@
                         <f:selectItem itemLabel="Json-ld" itemValue="1" />
                         <f:selectItem itemLabel="Turtle" itemValue="2" />
                     </p:selectOneMenu>
-                    
                     </h:panelGrid>
-
-
-
-
                     <div>
-                        <h:panelGroup  id="panelExport" rendered="#{user1.haveRights(2)}">
+                        <h:panelGroup  id="panelExport" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
 
                             <fieldset class="fieldLang"  >
                                 <legend><h:outputText value="#{langueBean.getMsg('export.langOfTheso')}" styleClass="textInfoSmall" /></legend>
@@ -54,19 +49,14 @@
                                         </p:dataTable>
                                     </p:tab>
                                 </p:accordionPanel>
-
                             </fieldset>
-
-
 
                             <fieldset class="fieldDomain" >
                                 <legend><h:outputText value="#{langueBean.getMsg('stat.statTheso1')}" styleClass="textInfoSmall" /></legend>
-
                                 <p:accordionPanel styleClass="accordionMenu" activeIndex="-2">
                                     <p:tab title="..."    titleStyleClass="titleAccordion">
                                         <p:dataTable id="checkboxGroup" var="groupOfTheso" value="#{skosExportBean.groupList}" selection="#{skosExportBean.selectedGroups}" rowKey="#{groupOfTheso.conceptGroup.idgroup}" style="width:300px;margin-bottom:0">
                                             <f:facet name="header" >
-
                                             </f:facet>
                                             <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
                                             <p:column headerText="Id" width="30" styleClass="styleText2">
@@ -76,13 +66,10 @@
                                                 <h:outputText value="#{groupOfTheso.lexicalValue}" styleClass="styleText2"/>
                                             </p:column>
                                             <f:facet name="footer">
-
                                             </f:facet>
-
                                         </p:dataTable>                    
                                     </p:tab>
                                 </p:accordionPanel>
-
                             </fieldset>
                         </h:panelGroup>
                     </div>

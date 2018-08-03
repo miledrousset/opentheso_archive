@@ -8,7 +8,7 @@
 --  !!!!!!! Attention !!!!!!!!! 
 
 -- version=4.3.8
--- date : 17/04/2018
+-- date : 31/07/2018
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -16,7 +16,7 @@ SET ROLE = opentheso;
 
 
 
-Mise à jour de la table group pour ajouter la colonne idHandle
+
 
 
 
@@ -1664,45 +1664,7 @@ $$language plpgsql;
 
 
 
-----------------------------------------------------------------------------
--- mises à jour de la table users pour intégrer le role de l'utilisateur
--- transfert des roles de la table user_role vers users
--- suppression de la table user_role
--- création de la table user_thesaurus
--- mise a jour de la table users (ajout de la colonne id_role)
--- #MR
 
-create or replace function update_table_users() returns void as $$
-    declare
-	line RECORD;
-	begin 
-            if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_role') then
-                execute 'ALTER TABLE users ADD column id_role integer;';
-                execute 'CREATE TABLE user_thesaurus
-                        (
-                          id_user integer NOT NULL,
-                          id_thesaurus character varying NOT NULL,
-                          id_domain character varying NOT NULL DEFAULT ''all''::character varying,
-                          CONSTRAINT user_thesaurus_pkey PRIMARY KEY (id_user, id_thesaurus, id_domain)
-                        );';
-                for line in select id_user, id_role from user_role
-                    loop
-                        begin
-                            update users SET id_role = line.id_role WHERE line.id_user = users.id_user;
-                        EXCEPTION WHEN unique_violation THEN continue;
-                        end;
-                    end loop;
-                for line in select id_user, id_thesaurus from user_role
-                    loop
-                        begin
-                            INSERT INTO user_thesaurus (id_user, id_thesaurus) VALUES (line.id_user, line.id_thesaurus);
-                        EXCEPTION WHEN unique_violation THEN continue;
-                        end;
-                    end loop;
-                execute 'DROP TABLE user_role;';
-            end if;
-	end;
-	$$language plpgsql;
 
 
 
@@ -1785,7 +1747,7 @@ SELECT ajoutercolumn_alignement();
 
 UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
 SELECT id_alignements();
-SELECT changeconstraintalignement();
+--SELECT changeconstraintalignement();
 
 SELECT delete_constraint_term_changer_concept_historique();
 
@@ -1817,10 +1779,10 @@ SELECT update_table_concept_group();
 --
 delete from roles;
 INSERT INTO roles (id, name, description) VALUES (1, 'superAdmin', 'Super Administrateur pour tout gérer tout thésaurus et tout utilisateur');
-INSERT INTO roles (id, name, description) VALUES (2, 'admin', 'administrateur par thésaurus ou plus');
-INSERT INTO roles (id, name, description) VALUES (3, 'user', 'utilisateur par thésaurus ou plus');
-INSERT INTO roles (id, name, description) VALUES (4, 'traducteur', 'traducteur par thésaurus ou plus');
-INSERT INTO roles (id, name, description) VALUES (5, 'images', 'gestion des images par thésaurus ou plus');
+INSERT INTO roles (id, name, description) VALUES (2, 'admin', 'administrateur pour un domaine ou parc de thésaurus');
+INSERT INTO roles (id, name, description) VALUES (3, 'manager', 'gestionnaire de thésaurus, pas de création de thésaurus');
+INSERT INTO roles (id, name, description) VALUES (4, 'contributor', 'traducteur, notes, candidats, images');
+
    
 --mise a jour de la table concept_group
 SELECT delete_column('concept_group','idparentgroup');
@@ -1831,7 +1793,7 @@ SELECT update_table_preferences_handle();
 SELECT update_table_concept_handle();
 
 SELECT update_table_users_alert();
-SELECT update_table_users();
+
 
 /*
 -- Mise à jour de la table de types d'alignement
@@ -1889,11 +1851,149 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
 --Changer id_alignement_source a 0 si est null
 
-  
+
+
+
+
+
+
+
+
+
+
+
+--
+-- version 4.3.8
+-- #MR
+
+--fonction pour insérrer la colonne id_handle à la table concept_group
+create or replace function alter_table_concept_group_addColumn_id_handle() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='concept_group' AND column_name='id_handle' ) THEN
+        execute 'ALTER TABLE concept_group ADD COLUMN id_handle character varying DEFAULT ''''::character varying;';
+    END IF;
+end;
+$$language plpgsql;
+
+---création de la table user_role_group
+create or replace function create_table_user_role_group() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='user_role_group' ) THEN
+        execute 'CREATE TABLE user_role_group
+                    (
+                      id_user integer NOT NULL,
+                      id_role integer NOT NULL,
+                      id_group integer NOT NULL,
+                      CONSTRAINT user_role_pkey PRIMARY KEY (id_user, id_role, id_group)
+                    )';
+    END IF;
+end
+$$language plpgsql;
+
+---création de la table user_role_only_on
+create or replace function create_table_user_role_only_on() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='user_role_only_on' ) THEN
+        execute 'CREATE TABLE user_role_only_on
+                    (
+                      id_user integer NOT NULL,
+                      id_role integer NOT NULL,
+                      id_theso character varying NOT NULL,
+                      id_theso_domain character varying NOT NULL DEFAULT ''all''::character varying,
+                      CONSTRAINT user_role_only_on_pkey PRIMARY KEY (id_user, id_role, id_theso)
+                    )';
+    END IF;
+end
+$$language plpgsql;
+
+---création de la table user_group_thesaurus
+create or replace function user_group_thesaurus() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='user_group_thesaurus' ) THEN
+        execute 'CREATE TABLE user_group_thesaurus
+                    (
+                      id_group integer NOT NULL,
+                      id_thesaurus character varying NOT NULL,
+                      CONSTRAINT user_group_thesaurus_pkey PRIMARY KEY (id_group, id_thesaurus),
+                      CONSTRAINT user_group_thesaurus_id_thesaurus_key UNIQUE (id_thesaurus)
+                    )';
+    END IF;
+end
+$$language plpgsql;
+
+---création de la table user_group_label
+create or replace function user_group_label() returns void as $$
+begin
+    IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='user_group_label' ) THEN
+        execute 'CREATE TABLE public.user_group_label
+                    (
+                      id_group integer NOT NULL DEFAULT nextval(''user_group_label__id_seq''::regclass),
+                      label_group character varying,
+                      CONSTRAINT "user_group-label_pkey" PRIMARY KEY (id_group)
+                    )';
+    END IF;
+end
+$$language plpgsql;
+
+
+----------------------------------------------------------------------------
+-- récupération des roles pour adaptation à la nouvelle utilisation des roles
+-- ajout de la colonne issuperadmin à la table users
+create or replace function update_table_users() returns void as $$
+    declare
+	line RECORD;
+	begin 
+            if exists (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_role') then
+                execute 'ALTER TABLE users ADD COLUMN issuperadmin boolean DEFAULT false;';
+
+                for line in select id_user, id_role from user_role
+                    loop
+                        begin
+                            update users SET issuperadmin = 'true' WHERE line.id_user = users.id_user and line.id_role = 1;
+                        EXCEPTION WHEN unique_violation THEN continue;
+                        end;
+                    end loop;
+                execute 'DROP TABLE user_role;';
+            end if;
+	end;
+$$language plpgsql;
+
+
+
+-- execution des fonctions 
+SELECT alter_table_concept_group_addColumn_id_handle();
+SELECT update_table_users();
+SELECT create_table_user_role_group();
+SELECT create_table_user_role_only_on();
+SELECT user_group_thesaurus();
+SELECT ajouter_sequence('user_group_label__id_seq');
+SELECT user_group_label();
+
+-- suppression des fonctions 
+select delete_fonction('alter_table_concept_group_addColumn_id_handle','');
+select delete_fonction('update_table_users','');
+select delete_fonction('create_table_user_role_group','');
+select delete_fonction('create_table_user_role_only_on','');
+select delete_fonction('user_group_thesaurus','');
+select delete_fonction('user_group_label','');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --
 --Delete toutes les function
 --
@@ -1939,7 +2039,7 @@ SELECT delete_fonction ('create_table_alignement_type','');
 SELECT delete_fonction ('create_table_note_type','');
 SELECT delete_fonction ('adjouteconstraint_alignement_source','');
 SELECT delete_fonction ('drop_constraint_alignement_source','');
-SELECT delete_fonction ('changeconstraintalignement','');
+--SELECT delete_fonction ('changeconstraintalignement','');
 SELECT delete_fonction ('add_primary_keyalignement','');
 SELECT delete_fonction ('id_alignements','');
 SELECT delete_fonction ('add_primary_keyalignement_source','');
@@ -1956,7 +2056,11 @@ SELECT delete_fonction('create_table_concept_group_concept','');
 SELECT delete_fonction('update_table_preferences_handle','');
 SELECT delete_fonction('update_table_concept_handle','');
 SELECT delete_fonction('update_table_users_alert','');
-SELECT delete_fonction('update_table_users','');
+
+
+
+--
+--
 
 --Ne pas toucher les prochaines fonctions
 SELECT delete_fonction ('ajoutercolumn_alignement_source','');

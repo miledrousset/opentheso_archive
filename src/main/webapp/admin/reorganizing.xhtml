@@ -7,7 +7,7 @@
    
     <p:dialog id="idReorganizing"  header="#{langueBean.getMsg('conf.reorganizing')}" widgetVar="reorganizing" modal="true" resizable="false" >
 
-        <h:panelGroup rendered="#{user1.haveRights(2)}">
+        <h:panelGroup rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
             <fieldset class="fieldReorga">
 
                 <legend><h:outputText value="#{langueBean.getMsg('conf.reorganizing')}" /></legend><br/>

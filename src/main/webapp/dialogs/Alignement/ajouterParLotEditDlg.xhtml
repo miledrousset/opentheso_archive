@@ -8,44 +8,54 @@
     <p:dialog id="idAjouterParLotEditDlg"  header="#{langueBean.getMsg('alig.PLnom')} " widgetVar="ajouterParLotEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
-        <h:form>         
-            <p:layout style="min-width:500px;min-height:300px; max-width:500px; max-height:300px" >
-                <p:layoutUnit position="north" size="45" resizable="false" maxSize="45"  >
-                    <h:outputText value=" #{langueBean.getMsg('alig.bran')} "/>
-                    <h:outputText value= "#{selectedTerme.nom}" style="font-weight: bold"/> 
-                    <h:outputText value= " #{langueBean.getMsg('alig.cnt')}" />
-                    <h:outputText value= "#{alignementparlot.listOfChildrenInConcept.size()} " style="font-weight: bold" />
-                    <h:outputText value="#{langueBean.getMsg('alig.concept')}."/>     
-                </p:layoutUnit>
+ 
+        <h:panelGroup id="sourceAlignementLot" rendered="#{(selectedTerme.alignementSources !=null) and (selectedTerme.alignementSources.size() != 0)}" >
+            <h:form>         
+                <p:layout style="min-width:500px;min-height:300px; max-width:500px; max-height:300px" >
+                    <p:layoutUnit position="north" size="45" resizable="false" maxSize="45"  >
+                        <h:outputText value=" #{langueBean.getMsg('alig.bran')} "/>
+                        <h:outputText value= "#{selectedTerme.nom}" style="font-weight: bold"/> 
+                        <h:outputText value= " #{langueBean.getMsg('alig.cnt')}" />
+                        <h:outputText value= "#{alignementparlot.listOfChildrenInConcept.size()} " style="font-weight: bold" />
+                        <h:outputText value="#{langueBean.getMsg('alig.concept')}."/>     
+                    </p:layoutUnit>
 
-                <p:layoutUnit position="west" resizable="false" size="300" minSize="200" maxSize="300">
-                    <h:outputText value="#{langueBean.getMsg('alig.metho')} "/>
-                    <p:commandButton id="imageBtn" styleClass="cbEdit" icon="ui-icon-question"  />
-                        <p:overlayPanel id="imagePanel" for="imageBtn" hideEffect="fade">
-                            <h:outputText value="#{langueBean.getMsg('alig.expl1')}" /><br/>
-                            <h:outputText value="#{langueBean.getMsg('alig.expl2')}" /><br/>
-                            <h:outputText value="#{langueBean.getMsg('alig.expl3')}" /><br/>
-                        </p:overlayPanel>
-                    <br/>
-                    <hr/>
-                    <br/>
-                    <p:selectOneRadio  value="#{alignementparlot.optionOfAlignement}"  layout="grid" columns="1" style="text-align: left;">
-                            <f:selectItems value="#{alignementparlot.options.entrySet()}" var="c" itemLabel="#{c.value}" itemValue="#{c.key}" />
-                    </p:selectOneRadio>
-                </p:layoutUnit>
-                <p:layoutUnit position="center" resizable="false" size="200" minSize="250" maxSize="200">
-                    <h:outputText value="#{langueBean.getMsg('file.info1.2')}:" /><br/>
-                    <hr/>
-                    <br/>
-                        <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
-                            <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
+                    <p:layoutUnit position="west" resizable="false" size="300" minSize="200" maxSize="300">
+                        <h:outputText value="#{langueBean.getMsg('alig.metho')} "/>
+                        <p:commandButton id="imageBtn" styleClass="cbEdit" icon="ui-icon-question"  />
+                            <p:overlayPanel id="imagePanel" for="imageBtn" hideEffect="fade">
+                                <h:outputText value="#{langueBean.getMsg('alig.expl1')}" /><br/>
+                                <h:outputText value="#{langueBean.getMsg('alig.expl2')}" /><br/>
+                                <h:outputText value="#{langueBean.getMsg('alig.expl3')}" /><br/>
+                            </p:overlayPanel>
+                        <br/>
+                        <hr/>
+                        <br/>
+                        <p:selectOneRadio  value="#{alignementparlot.optionOfAlignement}"  layout="grid" columns="1" style="text-align: left;">
+                                <f:selectItems value="#{alignementparlot.options.entrySet()}" var="c" itemLabel="#{c.value}" itemValue="#{c.key}" />
                         </p:selectOneRadio>
-                </p:layoutUnit>
-            </p:layout> 
-            <br/>
-            <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
-                             actionListener="#{alignementparlot.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, user1.user.id)}" styleClass="styleButton"
-                             update=":idAjouterParLot_suiteEditDlg"  oncomplete="PF('ajouterParLot_suiteEditDlg').show(); PF('ajouterParLotEditDlg').hide(); "/>
-        </h:form>                                                
+                    </p:layoutUnit>
+                    <p:layoutUnit position="center" resizable="false" size="200" minSize="250" maxSize="200">
+                        <h:outputText value="#{langueBean.getMsg('file.info1.2')}:" /><br/>
+                        <hr/>
+                        <br/>
+                            <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
+                                <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
+                            </p:selectOneRadio>
+                    </p:layoutUnit>
+                </p:layout> 
+                <br/>
+                <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}"
+                                 actionListener="#{alignementparlot.getPreliereElement(selectedTerme.idC, selectedTerme.idTheso, currentUser.user.idUser)}" styleClass="styleButton"
+                                 update=":idAjouterParLot_suiteEditDlg"  oncomplete="PF('ajouterParLot_suiteEditDlg').show(); PF('ajouterParLotEditDlg').hide(); "/>
+            </h:form>
+        </h:panelGroup>
+        
+        
+        
+        <h:panelGroup id="sourceAlignementLot2" rendered="#{selectedTerme.alignementSources == null || selectedTerme.alignementSources.size() == 0}" >
+            <h:outputText value="#{langueBean.getMsg('alig.NeedToParameter')}" style="color: red"/>
+        </h:panelGroup>        
+        
     </p:dialog>
 </ui:composition>

@@ -9,16 +9,26 @@
     <p:dialog id="idAjouterAutomatiqueEditDlg"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="ajouterAutomatiqueEditDlg" modal="true" resizable="false" >
         <!-- Ajouter alignement automatique 
         Cette function appelarais a  AjouterAutomatique2EditDlg -->
-        <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
-        <h:form>
-            <h:panelGrid columns="2">
-                <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
-                    <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
-                </p:selectOneRadio>
-            </h:panelGrid>
-        <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
-                         actionListener="#{selectedTerme.creerAlignAuto(selectedTerme.idC, selectedTerme.nom)}"
-                         update="idAjouterAutomatique_suiteEditDlg" styleClass="styleButton" oncomplete="PF('ajouterAutomatique_suiteEditDlg').show(); PF('ajouterAutomatiqueEditDlg').hide();"/>
-        </h:form>
+        <h:panelGroup id="sourceAlignement" rendered="#{(selectedTerme.alignementSources !=null) and (selectedTerme.alignementSources.size() != 0)}" >
+            <h:outputText value="#{langueBean.getMsg('popup.addAlign1')}" /> '<h:outputText value="#{selectedTerme.nom}" />' :
+            <h:form>
+                <h:panelGrid columns="2">
+                    <p:selectOneRadio id="alignementSources"  value="#{selectedTerme.selectedAlignement}" layout="grid" columns="1">
+                        <f:selectItems value="#{selectedTerme.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>
+                    </p:selectOneRadio>
+                </h:panelGrid>
+                <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
+                                 action="#{selectedTerme.creerAlignAuto(selectedTerme.idC, selectedTerme.nom)}"
+                                 update=":idAjouterAutomatique_suiteEditDlg"
+                                 styleClass="styleButton" oncomplete="PF('ajouterAutomatiqueEditDlg').hide();PF('ajouterAutomatique_suiteEditDlg').show();"/>
+                
+                <p:commandButton id="AlignementManager_cancel" title="#{langueBean.getMsg('btnBack')}" 
+                                  icon="ui-icon-annuler" styleClass="styleButton" 
+                                 oncomplete="PF('ajouterAutomatiqueEditDlg').hide();"  />                
+            </h:form>
+        </h:panelGroup>
+        <h:panelGroup id="sourceAlignement2" rendered="#{selectedTerme.alignementSources == null || selectedTerme.alignementSources.size() == 0}" >
+            <h:outputText value="#{langueBean.getMsg('alig.NeedToParameter')}" style="color: red"/>
+        </h:panelGroup>        
     </p:dialog>
 </ui:composition>

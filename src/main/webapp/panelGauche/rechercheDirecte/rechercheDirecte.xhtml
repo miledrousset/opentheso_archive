@@ -82,10 +82,10 @@
                         </tr>
                
                     </table>
-                
+
         
             <p:dataTable id="idTabResultatDeconnecte"  var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
-                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="380"
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="300" 
                              emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
                  <p:ajax event="rowSelect"  listener="#{newtreeBean.majSearch2()}" update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
           <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">

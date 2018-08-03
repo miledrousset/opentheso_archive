@@ -18,7 +18,7 @@
 
                 <h:form>
                     <p:commandButton  styleClass="cbEdit" icon="ui-icon-plus"  title="#{langueBean.getMsg('alig.new')}" rendered="#{!editAlignement.exporSource}" 
-                                      action="#{editAlignement.initNewAlignement(theso.authorizedThesaurus)}" 
+                                      action="#{editAlignement.initNewAlignement()}" 
                                       update=":panelAlignement,:creeAlignementSource,:vueAlignementSource"/>
                     &nbsp;
 
@@ -33,22 +33,36 @@
                     <p:commandButton styleClass="cbEdit" icon="ui-icon-duppliqer" title="#{langueBean.getMsg('align.duppl')}" rendered="#{editAlignement.id!=0
                                                                                            and !editAlignement.exporSource
                                                                                            and !editAlignement.newAlignement}" 
-                                     action="#{editAlignement.duplicate(theso.thesaurus.id_thesaurus, user1.user.id)}"
+                                     action="#{editAlignement.duplicate(theso.thesaurus.id_thesaurus, currentUser.user.idUser)}"
                                      update=":panelAlignement,:tabSources"
                                      />
-
-
+                    &nbsp;
+                    <p:commandButton title="#{langueBean.getMsg('alig.delete')}" icon="ui-icon-supp" styleClass="cbEdit"
+                                     rendered="#{editAlignement.id!=0
+                                    and !editAlignement.exporSource
+                                    and !editAlignement.newAlignement}" 
+                                     actionListener="#{editAlignement.effaceAlignementSource(theso.thesaurus.id_thesaurus)}" 
+                                     update=":panelAlignement" >
+                        <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('alig.delete')}" icon="ui-icon-alert"  />  
+                    </p:commandButton> 
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                        <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                        <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                    </p:confirmDialog>                     
                 </h:form>
                 <h:form> 
-                    <p:selectOneMenu  value="#{editAlignement.idThesoForAssosAlig}"  rendered="#{editAlignement.exporSource}" > 
+                    <h:selectOneMenu  value="#{editAlignement.idThesoForAssosAlig}"  rendered="#{editAlignement.exporSource}" > 
                         <p:ajax event="change" update=":panelAlignement"
                                 listener="#{editAlignement.selectSourceOfThesoInTable(editAlignement.idThesoForAssosAlig)}" />   
-                        <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue=""  />.id
-                        <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" 
+                        <f:selectItem itemLabel=" - #{langueBean.getMsg('theso')} -" itemValue=""  />
+                        <f:selectItems value="#{roleOnTheso.listTheso}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" 
                                        />
-                    </p:selectOneMenu>
+                    </h:selectOneMenu>
                 </h:form>
 
+                
+                
+                <!--partie pour lister les sources d'alignement -->
                 <h:panelGroup id="tabSources" rendered="#{!editAlignement.newAlignement}"> 
                     <fieldset>
                         <h:form>
@@ -92,14 +106,11 @@
                                 <p:ajax event="rowSelect"   listener="#{editAlignement.onRowSelect}" 
                                         update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" />
 
-
                                 <p:column headerText="#{langueBean.getMsg('alig.sous')}" >
 
                                     <h:outputText  value="#{alig.source}" />
                                 </p:column>
                             </p:dataTable>
-
-
                         </h:form>
                     </fieldset>
                 </h:panelGroup>                          
@@ -115,13 +126,22 @@
                                 <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}: "/>
                                 <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/>
                                 <p:scrollPanel mode="native" style="width:550px;height:60px">
-                                    <h:outputText value="#{editAlignement.singleAlignementSources.requete}"/></p:scrollPanel>     
+                                    <h:outputText value="#{editAlignement.singleAlignementSources.requete}"/>
+                                </p:scrollPanel>     
+                                <br/>
                                 <h:outputText style="font-weight: bold" value="Description: "/>
+                                
                                 <h:outputText value="#{editAlignement.singleAlignementSources.description}"/>
                             </h:form>
                         </div> 
                     </fieldset>
                 </h:panelGroup>
+                
+                
+                
+                
+                
+                <!--partie pour ajouter un nouvel alignement source -->                
                 <h:panelGroup id="creeAlignementSource" rendered="#{editAlignement.newAlignement}" >
                     <fieldset>
                         <div> 
@@ -139,20 +159,15 @@
                                 <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
                                 <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
                                 <h:inputTextarea rows="4" cols="65" value="#{editAlignement.requete}" />
+                                <br/> 
                                 <h:outputText style="font-weight: bold" value="Description: "/>
+                                <br/> 
                                 <h:inputTextarea rows="2" cols="65"  value="#{editAlignement.description}"/><br/>                               
-                                <h:panelGrid>
-                                    <h:outputText value="#{langueBean.getMsg('theso')}" />
 
-                                    <p:scrollPanel  mode="native" style="width:200px;height:100px">
-                                        <p:selectManyCheckbox  id="advanced" value="#{user1.selectedThesaurus}" layout="grid" columns="1" >
-                                            <f:selectItems value="#{theso.authorizedThesaurus}" var="th" itemLabel="#{th.key}" itemValue="#{th.value}" />
-                                        </p:selectManyCheckbox>
-                                    </p:scrollPanel>
-                                </h:panelGrid>
 
                                 <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
-                                                 action="#{editAlignement.insertIntoAlignementSource(theso.thesaurus.id_thesaurus, user1.selectedThesaurus, user1.user.id)}" 
+                                                 action="#{editAlignement.insertIntoAlignementSource(theso.thesaurus.id_thesaurus,
+                                                           currentUser.user.idUser)}" 
                                                  update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" 
                                                  />
                                 <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
@@ -162,6 +177,11 @@
                         </div> 
                     </fieldset>
                 </h:panelGroup>
+
+
+
+                
+                <!--partie pour modifier un alignement source -->
                 <h:panelGroup id="panupdate" rendered="#{editAlignement.editAlignement}">
                     <fieldset>
                         <h:form>
@@ -178,21 +198,12 @@
                             <h:outputText style="font-weight: bold" value="#{langueBean.getMsg('alig.rqt')}"/>
                             <h:outputText style="color: slateblue" value="#{langueBean.getMsg('alig.LeV')}: "/><br/>
                             <h:inputTextarea rows="4" cols="65" value="#{editAlignement.singleAlignementSources.requete}" />
+                            <br/>
                             <h:outputText style="font-weight: bold" value="Description: "/><br/>
                             <h:inputTextarea rows="2" cols="65"  value="#{editAlignement.singleAlignementSources.description}"/><br/>
                             <p:commandButton title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
                                              action="#{editAlignement.updateSource(theso.thesaurus.id_thesaurus)}"
                                              update=":panelAlignement,:vueAlignementSource,:creeAlignementSource" />                    
-
-                            <p:commandButton title="Effacer" icon="ui-icon-supp" 
-                                             actionListener="#{editAlignement.effaceAlignementSource(theso.thesaurus.id_thesaurus)}" 
-                                             update=":panelAlignement" >
-                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('sTerme.Delnote')}" icon="ui-icon-alert"  />  
-                            </p:commandButton> 
-                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
-                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
-                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
-                            </p:confirmDialog> 
 
                             <p:commandButton title="cancel" action="#{editAlignement.cancel}" icon="ui-icon-retour"
                                              update=":panelAlignement,:creeAlignementSource,:vueAlignementSource" 

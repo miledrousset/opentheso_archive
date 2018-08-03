@@ -355,12 +355,19 @@ public class SearchHelper {
                         + " idgroup, preferred_term.id_concept,"
                         + " concept.top_concept"
                         + " FROM non_preferred_term, preferred_term,concept_group_concept, concept WHERE "
-                        + "concept_group_concept.idconcept = non_preferred_term.id_term AND "
-                        + "concept_group_concept.idthesaurus = preferred_term.id_thesaurus AND "
-                        + " preferred_term.id_term = non_preferred_term.id_term AND"
-                        + " preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND"
-                        + " concept.id_concept = preferred_term.id_concept AND"
-                        + " concept.id_thesaurus = preferred_term.id_thesaurus"
+                            
+                        
+                        + "  concept.id_concept = concept_group_concept.idconcept AND" +
+                        "  concept.id_thesaurus = concept_group_concept.idthesaurus AND" +
+                        "  preferred_term.id_term = non_preferred_term.id_term AND" +
+                        "  preferred_term.id_concept = concept.id_concept AND" +
+                        "  preferred_term.id_thesaurus = concept.id_thesaurus AND" +
+                        "  preferred_term.id_thesaurus = non_preferred_term.id_thesaurus "
+                            
+
+                            
+                            
+                            
                         + multivaluesSynonyme
                         + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
                         + langSynonyme

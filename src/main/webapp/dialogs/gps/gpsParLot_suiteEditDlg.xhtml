@@ -45,7 +45,7 @@
                                     styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg').hide();PF('finalizeGPSDlg').show();"  />
 
                     <p:commandButton rendered="#{!gps.fin}" id="ajouterAllAlignAuto" title="#{langueBean.getMsg('conf.btnValid')}"  icon="ui-icon-valider"
-                                     action="#{gps.doForLot(user1.user.id)}"
+                                     action="#{gps.doForLot(currentUser.user.idUser)}"
                                      update="idGpsParLot_suiteDlg" 
                                      oncomplete="PF('gpsParLot_suiteDlg').show();" styleClass="styleButton" />
                     
@@ -71,7 +71,7 @@
         <h:form rendered="#{alignementparlot.fin}">
             <br/><br/>
             <p:commandButton id="finAllAlignAutoFin" value="fini" actionListener="#{gps.reinitTotal()}"
-                             action="#{gps.enregister_Des_Progres(user1.user.id)}"
+                             action="#{gps.enregister_Des_Progres(currentUser.user.idUser)}"
                              update=":panContenu" styleClass="styleButton" oncomplete="PF('gpsParLot_suiteDlg.hide()';"  />
             <br/><br/>
             <h:outputText value="#{alignementparlot.erreur}" style="color: red" />

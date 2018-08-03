@@ -13,16 +13,8 @@
                 <h:panelGroup>
                     <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
 
-
-
-                    <!-- Ajouter alignement automatique 
-                    Cette function appelarais a  AjouterAutomatique2EditDlg -->
-
-                    <div>
-                        <h:panelGroup  id="panelExport" rendered="#{user1.haveRights(2)}"/>
-                    </div>
                     <div style="align-content: center">
-                        <h:panelGroup  id="panelExportPDF" rendered="#{user1.haveRights(2)}">
+                        <h:panelGroup  id="panelExportPDF" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
                             <!-- Liste des langues -->
                             <h:panelGrid columns="2">
                                 <p:outputLabel for="idLangExport" value="#{langueBean.getMsg('export.langOfTheso')} :" />    

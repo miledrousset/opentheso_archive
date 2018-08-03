@@ -8,7 +8,9 @@
     
      <p:tab title="#{langueBean.getMsg('index.underTree')}">
                 <div id="imageEdition" style="margin-bottom: 2px; margin-top: 1px; margin-right: 4px; height: 20px;">
-            <h:form id="formAjFacette" rendered="#{(user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (theso.getThisTheso() != null)}">
+                    <h:form id="formAjFacette" rendered="#{(currentUser.user != null)
+                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)
+                                and (theso.getThisTheso() != null)}">
                 <p:commandButton id="cbAjFacette" 
                                  styleClass="cbEdit" icon="ui-icon-edit-16" 
                                  update=":idFacetteEditDlg,:panFacette" oncomplete="PF('facetteEditDlg').show();" />

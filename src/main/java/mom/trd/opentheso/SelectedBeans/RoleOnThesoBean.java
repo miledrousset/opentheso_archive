@@ -213,7 +213,8 @@ public class RoleOnThesoBean {
         if(idTheso == null) {
             nodeUserRoleGroup = null;
             return;
-        }        
+        }   
+        initRoles();
         UserHelper2 userHelper = new UserHelper2();
         
         if(user.getUser().isIsSuperAdmin()) {
@@ -232,16 +233,16 @@ public class RoleOnThesoBean {
             setIsManagerOnThisTheso(true);
         if(nodeUserRoleGroup.getIdRole() == 4) 
             setIsContributorOnThisTheso(true);        
-    }    
+    }  
     
-    
-    public Map<String, String> testGetListTheso() {
-        Map <String, String> listThesos = new HashMap<>();
-        listThesos.put("listTheso"," idTheso");
-        listThesos.put("listTheso2"," idTheso2");        
-        return listThesos;
+    private void initRoles(){
+        setIsSuperAdmin(false);        
+        setIsAdminOnThisTheso(false);
+        setIsManagerOnThisTheso(false);
+        setIsContributorOnThisTheso(false);   
     }
     
+   
     
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////

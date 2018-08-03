@@ -68,7 +68,9 @@
                     </p:commandButton>
                 </h:form>                 
 
-                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and ((!newtreeBean.group) and (!newtreeBean.subGroup))}" style="float: left; margin-right: 5px;" >
+                <h:form rendered="#{(selectedTerme.idC != null) and (currentUser.user != null) and 
+                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                    and ((!newtreeBean.group) and (!newtreeBean.subGroup))}" style="float: left; margin-right: 5px;" >
                     <!-- exporter la branche en SKOS mode connecté -->
                     <p:commandButton value="skos_Branch" ajax="false" styleClass="link">
                         <p:fileDownload  value="#{downloadBean.brancheToFile(selectedTerme.idC, selectedTerme.idTheso,0)}" />
@@ -81,7 +83,9 @@
                 </h:form>  
 
 
-                <h:form rendered="#{(selectedTerme.idC != null) and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and ((newtreeBean.group) or (newtreeBean.subGroup))}" 
+                <h:form rendered="#{(selectedTerme.idC != null) and (currentUser.user != null) 
+                                    and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                    and ((newtreeBean.group) or (newtreeBean.subGroup))}" 
                         style="float: left; margin-right: 5px;" >
                     <!-- exporter la branche en SKOS mode connecté -->
                     <p:commandButton value="skos_Group" ajax="false" styleClass="link">
@@ -97,7 +101,9 @@
 
 
                 
-                <h:form rendered="#{selectedTerme.status == 'hidden' and (user1.user.name != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus)}" style="float: left;" >
+                <h:form rendered="#{selectedTerme.status == 'hidden' and (currentUser.user != null) and 
+                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)}"
+                        style="float: left;" >
                     <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{newtreeBean.reactivConcept()}"
                                      update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                                      styleClass="styleButtonValid" >

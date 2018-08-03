@@ -9,23 +9,25 @@
             <h:outputText value="#{langueBean.getMsg('index.align')}" />
             <div id="imageEdition">
                 <h:form id="formEditAlign"  
-                        rendered="#{(currentUser.user.name != null) 
+                        rendered="#{(currentUser.user != null) 
                                     and (selectedTerme.idC != null)
-                                    and (roleOnTheso.isAdminOnThisTheso) 
+                                    and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso) 
                                     and (selectedTerme.status != 'hidden') 
                                     and (selectedTerme.idDomaine != 'Orphan')}">
 
 
-                    <p:commandButton id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
+                    <p:commandButton rendered="#{(roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
+                                     id="buttonParamAlign" title="Paramètre de l'alignement source" actionListener="#{editAlignement.setListeAlignementSources(theso.thesaurus.id_thesaurus)}"
                                      styleClass="cbEdit" 
                                      icon="ui-icon-settings-16" >
-                  
-                        
-                         <p:menu style="background: #CEF0C4" overlay="true" trigger="buttonParamAlign" my="left top" at="left bottom">
+                         <p:menu  style="background: #CEF0C4" overlay="true" trigger="buttonParamAlign" my="left top" at="left bottom">
                              <p:menuitem value="#{langueBean.getMsg('alig.gestion')}" update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show();"  style="font-size: 12px;"/>
-                             <p:menuitem value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('editAlignementSourceEditDlg').show();" action="#{editAlignement.exporterSource()}" update=":panelAlignement"  style="font-size: 12px;"/>
+                             <p:menuitem 
+                                 value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('associateAlignement').show();" 
+                                 action="#{editAlignement.exporterSource()}" update=":idAssociateAlignement"  style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>
+
                     <p:commandButton id="dynaButtonAlign" rendered="#{selectedTerme.type != 1}" 
                                      styleClass="cbEdit" icon="ui-icon-edit-16" >
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonAlign" my="left top" at="left bottom">

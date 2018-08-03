@@ -11,7 +11,8 @@
             <h:panelGroup id="panFormEditTGen">
                 <div id="imageEdition">
                     <h:form id="formEditTGen" 
-                            rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) 
+                            rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) 
+                                        and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso) 
                                         and (selectedTerme.status != 'hidden') 
                                         and (selectedTerme.idDomaine != 'Orphan') and (selectedTerme.type != 1)
                                         and (!newtreeBean.topTerm)}">

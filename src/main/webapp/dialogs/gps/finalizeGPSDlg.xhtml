@@ -10,10 +10,10 @@
         
             
         
-        <p:commandButton value="save workFlow"  action="#{gps.enregister_Des_Progres(user1.user.id)}" oncomplete="PF('finalizeGPSDlg').hide();" update=":panContenu" />
+        <p:commandButton value="save workFlow"  action="#{gps.enregister_Des_Progres(currentUser.user.idUser)}" oncomplete="PF('finalizeGPSDlg').hide();" update=":panContenu" />
           <br/>
           <br/>
-          <p:commandButton value="initialiser" action="#{gps.initAlign(user1.user.id)}" oncomplete="PF('finalizeGPSDlg').hide();" />
+          <p:commandButton value="initialiser" action="#{gps.initAlign(currentUser.user.idUser)}" oncomplete="PF('finalizeGPSDlg').hide();" />
         
     </p:dialog>
     

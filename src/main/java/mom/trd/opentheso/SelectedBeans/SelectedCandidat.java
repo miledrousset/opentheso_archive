@@ -739,8 +739,12 @@ public class SelectedCandidat implements Serializable {
         NodeProposition np = new CandidateHelper().getNodePropositionOfUser(connect.getPoolConnexion(),
                 selected.getIdConcept(), idTheso, currentUser.getUser().getIdUser());
         noteEdit = np.getNote();
-        niveauEdit = np.getIdConceptParent();
-        domaineEdit = np.getIdGroup();
+        niveauEdit = niveau;//np.getIdConceptParent();
+        domaineEdit =domaine;
+        selectedNvx.setIdConcept(np.getIdConceptParent());
+        selectedNvx.setDefinition(noteEdit);
+        selectedNvx.setTermLexicalValue(niveau);
+        
         vue.setEditPropCandidat(true);
     }
 
@@ -805,7 +809,7 @@ public class SelectedCandidat implements Serializable {
     public String fchangepass() throws SQLException {
         boolean sort = false;
         ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
-        CurrentUser user = new CurrentUser();
+
         if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass)) {
             sort = true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));

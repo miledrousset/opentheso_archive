@@ -734,10 +734,12 @@ input[type="button"], input[type="submit"]{
 .styleTab  {
     height: 400px;
 }
-/*
-.ui-datatable .ui-datatable-scrollable-body{
-   height: 399px !important;
+
+/*.ui-datatable .ui-datatable-scrollable-body{
+   height: 770px !important;
 }*/
+
+
 
 .panelNoBorder, .panelNoBorder tr, .panelNoBorder td{
     border: hidden;
@@ -920,7 +922,7 @@ input[type="button"], input[type="submit"]{
 
 /*Division arbre thésaurus (haut gauche)*/
 #divArbreTheso {
-    height: 523px;
+    height: 838px;
     overflow-y: scroll;
     overflow-x: scroll;
     resize: both;
@@ -934,7 +936,7 @@ input[type="button"], input[type="submit"]{
 }
 
 .ui-tree {
-    width: 250px;
+    width: 350px;
 }
 
 .ui-tree .ui-tree-container {
@@ -957,7 +959,7 @@ input[type="button"], input[type="submit"]{
 #contenuPrincipale {
     position: relative;
     width: 520px;
-    height: 580px;
+    height: 900px;
     padding-bottom: 10px;
     padding-top: 10px;
     padding-left: 15px;

@@ -13,7 +13,11 @@
 
                 <div id="imageEdition">
                     <h:form id="formEditTrad" 
-                            rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (theso.haveTrad() and ( ((roleOnTheso.isAdminOnThisTheso)) or (roleOnTheso.isManagerOnThisTheso)) ) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+                            rendered="#{currentUser.user.name != null
+                                        and selectedTerme.idC != null
+                                        and (theso.haveTrad())
+                                        and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                        and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                         <p:commandButton id="cbEditThesoTrad" styleClass="cbEdit" icon="ui-icon-edit-16" />
                         <p:menu rendered="#{!newtreeBean.isGroup() or !newtreeBean.isSubGroup()}" style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTrad" my="left top" at="left bottom">
                             <p:menuitem value="#{langueBean.getMsg('edit.addTrad')}" update=":idAjouterTraductionEditDlg" oncomplete="PF('ajouterTraductionEditDlg').show();" style="font-size: 12px;"/>

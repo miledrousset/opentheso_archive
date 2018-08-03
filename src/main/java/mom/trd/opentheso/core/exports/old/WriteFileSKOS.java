@@ -408,13 +408,7 @@ public class WriteFileSKOS {
         // en dernier, on prend l'URL basique d'Opentheso
         // 1 seule URI est possible pour l'export par concept
         
-        // URI de type Handle
-        if (nodeConceptExport.getConcept().getIdHandle() != null) {
-            if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
-                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
-                return uri;
-            }
-        }
+
         // URI de type Ark
         if (nodeConceptExport.getConcept().getIdArk() != null) {
             if (!nodeConceptExport.getConcept().getIdArk().trim().isEmpty()) {
@@ -422,6 +416,13 @@ public class WriteFileSKOS {
                 return uri;
             }
         }
+        // URI de type Handle
+        if (nodeConceptExport.getConcept().getIdHandle() != null) {
+            if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
+                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
+                return uri;
+            }
+        }        
     //    System.out.println(nodeConceptExport.getConcept().getIdConcept());
         // si on ne trouve pas ni Handle, ni Ark
         uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()

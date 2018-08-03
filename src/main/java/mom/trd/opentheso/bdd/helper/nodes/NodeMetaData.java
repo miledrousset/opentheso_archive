@@ -54,8 +54,5 @@ public class NodeMetaData {
     public void setDcElementsList(ArrayList<DcElement> dcElementsList) {
         this.dcElementsList = dcElementsList;
     }
-
-
-
    
 }

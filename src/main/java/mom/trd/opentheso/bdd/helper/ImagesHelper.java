@@ -78,7 +78,7 @@ public class ImagesHelper {
      * @return
      */
     public ArrayList <NodeImage> getImage(HikariDataSource ds,
-            String idConcept, String idThesausus, int idUser) {
+            String idConcept, String idThesausus) {
 
 
         Connection conn;

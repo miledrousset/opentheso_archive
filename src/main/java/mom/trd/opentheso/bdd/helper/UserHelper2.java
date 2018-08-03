@@ -916,7 +916,7 @@ public class UserHelper2 {
                     String query = "insert into user_group_thesaurus(id_group, id_thesaurus)" +
                             " values('" +
                             newGroup + "'," +
-                            idTheso + ")";
+                            "'" + idTheso + "')";
                     stmt.executeUpdate(query);
                     status = true;
                 } finally {

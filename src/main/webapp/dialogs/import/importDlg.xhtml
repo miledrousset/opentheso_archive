@@ -112,7 +112,7 @@
                 <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
                                  actionListener="#{rdf4jFileBean.insertBDD(editionBean.selectedUserGroup)}" 
                                  onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
-                                 oncomplete="#{roleOnTheso}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
+                                 oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
                                  update=":idImportDlg,:panSkos,:tableTheso"
                                  style="color: green"
                                  />

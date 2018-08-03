@@ -25,7 +25,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
                                 <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="concept"
-                                                forceSelection="false" active="true"  queryDelay="1000"
+                                                forceSelection="false" active="true"  queryDelay="1000" scrollHeight="300" 
                                                 itemLabel="#{concept.termLexicalValue}" itemValue="#{concept}" converter="termConverterLexical">
                                     <p:column style="width:10%">
                                         <h:outputText value="#{concept.idConcept}"/>

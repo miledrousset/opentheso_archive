@@ -6,7 +6,6 @@
 package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
-import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -35,9 +34,9 @@ import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
-import mom.trd.opentheso.bdd.tools.FileUtilities;
-import mom.trd.opentheso.ws.ark.ArkClient;
-import mom.trd.opentheso.ws.handle.HandleClient;
+import mom.trd.opentheso.ws.ark.ArkClientRest;
+import mom.trd.opentheso.ws.ark.ArkHelper;
+import mom.trd.opentheso.ws.handle.HandleHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -255,7 +254,6 @@ public class ConceptHelper {
      * n'existe pas, on l'ajoute.
      *
      * @param ds
-     * @param url
      * @param idConcept
      * @param idLang
      * @param idTheso
@@ -263,9 +261,14 @@ public class ConceptHelper {
      */
     public boolean regenerateArkId(HikariDataSource ds,
             String idConcept, String idLang, String idTheso) {
-        String idArk;
 
-        ArkClient ark_Client = new ArkClient();
+        ArkClientRest arkClientRest = new ArkClientRest();
+        Properties propertiesArk = new Properties();
+        propertiesArk.setProperty("serverHost", nodePreference.getServeurArk());
+        propertiesArk.setProperty("idNaan", "");
+        propertiesArk.setProperty("user", "");
+        propertiesArk.setProperty("password", "" );
+        arkClientRest.setPropertiesArk(propertiesArk);            
 
         Concept concept = getThisConcept(ds, idConcept, idTheso);
 
@@ -280,14 +283,16 @@ public class ConceptHelper {
         }
 
         // ici, nous avons un  IdArk, on vérifie s'il est encore valide ?
-        idArk = ark_Client.getInfosArkId(concept.getIdArk());
-        // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
-        if (idArk == null) {
-            // l'idArk n'est plus valide, il faut le créer 
-            return prepareToAddArkId(ds, idConcept, idLang, idTheso);
+        if(arkClientRest.isArkExist(concept.getIdArk())) {
+            return false;
         }
+        // exp :  idArk = ark_Client.getInfosArkId("66666/pcrtgG3244vfqgI8");
+    //    if (arkClientRest.getIdArk() == null) {
+            // l'idArk n'est plus valide, il faut le créer 
+        return prepareToAddArkId(ds, idConcept, idLang, idTheso);
+    //    }
         // ici l'idArk est valide, on ne fait rien.
-        return true;
+    //    return true;
     }
 
     /**
@@ -303,8 +308,6 @@ public class ConceptHelper {
      */
     private boolean prepareToAddArkId(HikariDataSource ds,
             String idConcept, String idLang, String idTheso) {
-
-        ArrayList<DcElement> dc = new ArrayList<>();
         NodeConcept nodeConcept;
         nodeConcept = getConcept(ds, idConcept, idTheso, idLang);
         NodeMetaData nodeMetaData = new NodeMetaData();
@@ -2140,40 +2143,27 @@ public class ConceptHelper {
             String idConcept,
             String idThesaurus,
             NodeMetaData nodeMetaData) {
-        /**
-         * récupération du code Ark via WebServices
-         *
-         */
         if (nodePreference == null) {
             return false;
         }
         if (!nodePreference.isUseArk()) {
             return false;
         }
-
-        ArkClient ark_Client = new ArkClient();
-
-        Properties propertiesArk = new Properties();
-        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
-        propertiesArk.setProperty("user", nodePreference.getUserArk());
-        propertiesArk.setProperty("password", nodePreference.getPassArk());
-        ark_Client.setPropertiesArk(propertiesArk);
-
-        String idArk = ark_Client.getArkId(
-                new FileUtilities().getDate(),
-                nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus,
-                nodeMetaData.getTitle(), // title
-                nodeMetaData.getCreator(), // creator
-                nodeMetaData.getDcElementsList(),
-                nodePreference.getPrefixArk() // pcrt : p= pactols, crt=code DCMI pour collection
-        ); // description
-        if (idArk == null) {
-            message = "La connexion Ark a échouée";
+        String privateUri = "?idc=" + idConcept + "&idt=" + idThesaurus;
+        ArkHelper arkHelper = new ArkHelper(nodePreference);
+        if(!arkHelper.addIdArk(privateUri, nodeMetaData)) {
+            message = arkHelper.getMessage();
             return false;
         }
-
-        return updateArkIdOfConcept(conn, idConcept,
-                idThesaurus, idArk);
+       
+        String idArk = arkHelper.getIdArk();
+        String idHandle = arkHelper.getIdHandle();
+        
+        if(!updateArkIdOfConcept(conn, idConcept,
+                idThesaurus, idArk))
+            return false;
+        
+        return updateHandleIdOfConcept(conn, idConcept, idThesaurus, idHandle);
     }
 
     /**
@@ -2194,53 +2184,18 @@ public class ConceptHelper {
             return false;
         }
         ConceptHelper conceptHelper = new ConceptHelper();
-        HandleClient handleClient = new HandleClient();
 
         String idHandle = conceptHelper.getIdHandleOfConcept(ds, idConcept, idThesaurus);
-        String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
-
-        if (idHandle == null || idHandle.isEmpty()) {// cas où le handle n'existe pas dans la base de données locales
-            idHandle = getNewHandleId();
-            // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
-            // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
-            idHandle = nodePreference.getPrefixIdHandle() + "/"
-                    + nodePreference.getPrivatePrefixHandle() + idHandle;
-
-            idHandle = handleClient.putHandle(
-                    nodePreference.getPassHandle(),
-                    nodePreference.getPathKeyHandle(),
-                    nodePreference.getPathCertHandle(),
-                    nodePreference.getUrlApiHandle(),
-                    idHandle,
-                    jsonData);
-            if (idHandle == null) {
-                message = handleClient.getMessage();
-                return false;
-            }
-            return updateHandleIdOfConcept(ds, idConcept,
-                    idThesaurus, idHandle);
-        } else { // cas où le handle existe en local
-            // on vérifie si le handle existe à distance, on le met à jour (URL + infos)
-            // sinon, on le créé
-        /*    if (handleClient.isHandleExist(nodePreference.getUrlApiHandle(),
-                    idHandle)) {
-                return true;
-            } else {*/
-                idHandle = handleClient.putHandle(
-                        nodePreference.getPassHandle(),
-                        nodePreference.getPathKeyHandle(),
-                        nodePreference.getPathCertHandle(),
-                        nodePreference.getUrlApiHandle(),
-                        idHandle,
-                        jsonData);
-                if (idHandle == null) {
-                    message = handleClient.getMessage();
-                    return false;
-                }
-                return updateHandleIdOfConcept(ds, idConcept,
-                        idThesaurus, idHandle);
-        //    }
+        
+        String privateUri = "?idc=" + idConcept + "&idt=" + idThesaurus;
+        HandleHelper handleHelper = new HandleHelper(nodePreference);
+        idHandle = handleHelper.updateIdHandle(idHandle, privateUri);
+        if(idHandle == null) {
+            message = handleHelper.getMessage();
+            return false;
         }
+        return updateHandleIdOfConcept(ds, idConcept,
+                idThesaurus, idHandle);        
     }
 
     /**
@@ -2254,67 +2209,25 @@ public class ConceptHelper {
     private boolean addIdHandle(Connection conn,
             String idConcept,
             String idThesaurus) {
-        /**
-         * récupération du code Handle via WebServices
-         *
-         */
         if (nodePreference == null) {
             return false;
         }
         if (!nodePreference.isUseHandle()) {
             return false;
         }
-
-        HandleClient handleClient = new HandleClient();
-        String newId = getNewHandleId();
-        // construction de l'identifiant exp : 20.500.11942/crtQByCq18rkW
-        // prefixHandle = 20.500.11942, privatePrefix = crt, internalId = rtQByCq18rkW
-        newId = nodePreference.getPrefixIdHandle() + "/"
-                + nodePreference.getPrivatePrefixHandle() + newId;
-
-        String jsonData = handleClient.getJsonData(nodePreference.getCheminSite() + "?idc=" + idConcept + "&idt=" + idThesaurus);
-        String idHandle = handleClient.putHandle(
-                nodePreference.getPassHandle(),
-                nodePreference.getPathKeyHandle(),
-                nodePreference.getPathCertHandle(),
-                nodePreference.getUrlApiHandle(),
-                newId,
-                jsonData);
-        if (idHandle == null) {
-            message = handleClient.getMessage();
+        String privateUri = "?idc=" + idConcept + "&idt=" + idThesaurus;
+        HandleHelper handleHelper = new HandleHelper(nodePreference);
+        
+        String idHandle = handleHelper.addIdHandle(privateUri);
+        if(idHandle == null) {
+            message = handleHelper.getMessage();
             return false;
         }
         return updateHandleIdOfConcept(conn, idConcept,
                 idThesaurus, idHandle);
     }
 
-    /**
-     * permet de genérer un identifiant unique pour Handle on controle la
-     * présence de l'identifiant sur handle.net si oui, on regénère un autre.
-     *
-     * @return
-     */
-    private String getNewHandleId() {
-        ToolsHelper toolsHelper = new ToolsHelper();
-        boolean duplicateId = true;
-        String idHandle = null;
-        HandleClient handleClient = new HandleClient();
 
-        while (duplicateId) {
-            idHandle = toolsHelper.getNewId(10);
-            if (!handleClient.isHandleExist(
-                    nodePreference.getUrlApiHandle(),
-                    nodePreference.getPrefixIdHandle() + "/" + idHandle)) {
-                duplicateId = false;
-            }
-            if (!handleClient.isHandleExist(
-                    " http://hdl.handle.net/",
-                    nodePreference.getPrefixIdHandle() + "/" + idHandle)) {
-                duplicateId = false;
-            }
-        }
-        return idHandle;
-    }
 
     /**
      * Permet de supprimer un identifiant Handle de la table Concept et de la
@@ -2340,17 +2253,9 @@ public class ConceptHelper {
         if (!nodePreference.isUseHandle()) {
             return false;
         }
-
-        HandleClient handleClient = new HandleClient();
-        boolean status = handleClient.deleteHandle(
-                nodePreference.getPassHandle(),
-                nodePreference.getPathKeyHandle(),
-                nodePreference.getPathCertHandle(),
-                nodePreference.getUrlApiHandle(),
-                idHandle
-        );
-        if (!status) {
-            message = handleClient.getMessage();
+        HandleHelper handleHelper = new HandleHelper(nodePreference);
+        if(!handleHelper.deleteIdHandle(idHandle, idThesaurus)){
+            message = handleHelper.getMessage();
             return false;
         }
         return updateHandleIdOfConcept(conn, idConcept,
@@ -2368,38 +2273,19 @@ public class ConceptHelper {
      */
     public boolean deleteAllIdHandle(HikariDataSource ds,
             String idThesaurus) {
-        /**
-         * récupération du code Handle via WebServices
-         *
-         */
         if (nodePreference == null) {
             return false;
         }
         if (!nodePreference.isUseHandle()) {
             return false;
         }
-        HandleClient handleClient = new HandleClient();
-        boolean status;
-        boolean first = true;
-
         ArrayList<String> tabIdHandle = getAllIdHandleOfThesaurus(ds, idThesaurus);
-
-        for (String idHandle : tabIdHandle) {
-            status = handleClient.deleteHandle(
-                    nodePreference.getPassHandle(),
-                    nodePreference.getPathKeyHandle(),
-                    nodePreference.getPathCertHandle(),
-                    nodePreference.getUrlApiHandle(),
-                    idHandle
-            );
-            if (!status) {
-                if (first) {
-                    message = "Id handle non supprimé :\n ";
-                    first = false;
-                }
-                message = message + idHandle + " ## ";
-            }
+        HandleHelper handleHelper = new HandleHelper(nodePreference);
+        if(!handleHelper.deleteAllIdHandle(tabIdHandle)) {
+            message = handleHelper.getMessage();
+            return false;
         }
+        message = handleHelper.getMessage();
         return true;
     }
 

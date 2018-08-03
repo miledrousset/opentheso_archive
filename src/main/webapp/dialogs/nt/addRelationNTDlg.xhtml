@@ -20,7 +20,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
                                 <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationNT}" var="concept"
-                                                forceSelection="true" active="true"  queryDelay="1000"
+                                                forceSelection="true" active="true"  queryDelay="1000" scrollHeight="300"
                                                 itemLabel="#{concept.termLexicalValue}" itemValue="#{concept}" converter="termConverter">
                                     <p:column style="width:10%">
                                         <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}" style="color: green; font-style: italic"/>

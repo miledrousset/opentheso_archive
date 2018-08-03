@@ -795,7 +795,6 @@ public class Candidat implements Serializable {
     public String fchangepass() throws SQLException {
         boolean sort = false;
         ForgetPasswordHelper forgetPassword = new ForgetPasswordHelper();
-        CurrentUser user = new CurrentUser();
         if (newPass == null ? confirmPass != null : !newPass.equals(confirmPass)) {
             sort = true;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));

@@ -10,7 +10,6 @@
         <div style="text-align: left; max-width: 600px; max-height: 500px; overflow: auto;" >
             <h:form>
                 <table>
-
                     <tr>
                         <h:panelGrid rendered="#{gps.listAlignValues.size() != 0}" columns="2" style="margin-bottom:10px">
                             <p:outputLabel for="RadioGps" />
@@ -19,26 +18,20 @@
                             </p:selectOneRadio>
                         </h:panelGrid>
                     </tr>
-                    
-                    
                     <h:outputText rendered="#{gps.listAlignValues.size() == 0}" value="#{langueBean.getMsg('gps.noResult')}" style="color: red; text-align: center" />
-                    
                     <tr>
-                        
                         <td colspan="2" style="text-align: center;">
                             <br/>
                             <p:commandButton rendered="#{gps.listAlignValues.size() != 0}" id="cbAjAllAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
-                                             actionListener="#{gps.doAll(selectedTerme.idC, selectedTerme.idTheso, user1.user.id, 
+                                             actionListener="#{gps.doAll(selectedTerme.idC, selectedTerme.idTheso,currentUser.user.idUser, 
                                                                selectedTerme.idlangue, selectedTerme.idT)}"
                                              action="#{selectedTerme.updateGps()}"
-                                             update=":contenuDroite3, :panContenu" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg.hide()';"  />
+                                             update=":contenuDroite3, :panContenu,:messages" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg').hide();"  />
                             
                             <p:commandButton rendered="#{gps.listAlignValues.size() == 0}" id="cbAjAllAlignAuto_cancel" title="#{langueBean.getMsg('btnBack')}" 
-                                             update=":contenuDroite3, :panContenu" icon="ui-icon-annuler" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg.hide()';"  />
-                            
+                                             update=":contenuDroite3, :panContenu" icon="ui-icon-annuler" styleClass="styleButton" oncomplete="PF('gpsAutomatique_suiteEditDlg').hide();"  />
                         </td>
                     </tr>
-                    
                 </table>
             </h:form>
         </div>

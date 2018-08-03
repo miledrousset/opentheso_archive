@@ -214,8 +214,10 @@ public class FileBean_progress implements Serializable {
                     }
 
                     String adressSite = bundlePref.getString("cheminSite");
-                    int idUser = selectedTerme.getUser().getUser().getId();
-                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(), formatDate, useArk, adressSite, idUser,"");
+                    new ReadFileSKOS().readFile(connect.getPoolConnexion(), file.getInputstream(),
+                            formatDate, useArk, adressSite,
+                            selectedTerme.getUser().getUser().getIdUser()
+                            ,"");
                 } catch (IOException ex) {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
@@ -251,12 +253,13 @@ public class FileBean_progress implements Serializable {
                     }
 
                     String adressSite = bundlePref.getString("cheminSite");
-                    int idUser = selectedTerme.getUser().getUser().getId();
                     
                     // lecture du fichier SKOS
                     importSkosHelper = new ImportSkosHelper();
                     importSkosHelper.setInfos(connect.getPoolConnexion(), 
-                            formatDate, useArk, adressSite, idUser, langueSource);
+                            formatDate, useArk, adressSite,
+                            selectedTerme.getUser().getUser().getIdUser(),
+                            langueSource);
                     if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
                         FacesContext.getCurrentInstance().addMessage(null, 
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
@@ -352,12 +355,13 @@ public class FileBean_progress implements Serializable {
                     }
 
                     String adressSite = bundlePref.getString("cheminSite");
-                    int idUser = selectedTerme.getUser().getUser().getId();
                     
                     // lecture du fichier SKOS
                     ImportSkosHelper importSkosHelper = new ImportSkosHelper();
                     importSkosHelper.setInfos(connect.getPoolConnexion(), 
-                            formatDate, useArk, adressSite, idUser, langueSource);
+                            formatDate, useArk, adressSite,
+                            selectedTerme.getUser().getUser().getIdUser(),
+                            langueSource);
                     if(! importSkosHelper.readFile(file.getInputstream(), file.getFileName())) {
                         FacesContext.getCurrentInstance().addMessage(null, 
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", importSkosHelper.getMessage()));
@@ -437,7 +441,7 @@ public class FileBean_progress implements Serializable {
                     }
                 //    ArrayList<String> fields = importTabulateHelper.getFieldsList();
                 //    ArrayList<TabulateDocument> tabulateDocuments = importTabulateHelper.getTabulateDocumentList();
-                    if(!importTabulateHelper.insertIntoBDD(connect.getPoolConnexion(), idTheso, selectedTerme.getUser().getUser().getId())){
+                    if(!importTabulateHelper.insertIntoBDD(connect.getPoolConnexion(), idTheso, selectedTerme.getUser().getUser().getIdUser())){
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("file.error3")));   
                     }
                 //    System.out.println(fields);
@@ -482,7 +486,7 @@ public class FileBean_progress implements Serializable {
     }*/
 
     public void chargeImage(FileUploadEvent event) {
-        int idUser = selectedTerme.getUser().getUser().getId();
+        int idUser = selectedTerme.getUser().getUser().getIdUser();
         if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
             event.setPhaseId(PhaseId.INVOKE_APPLICATION);
             event.queue();
@@ -527,7 +531,7 @@ public class FileBean_progress implements Serializable {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), idUser));
+                selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso()));
 
                 vue.setAddImage(false);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("file.info1.1") + " " + source + langueBean.getMsg("file.info1.2") + "."));

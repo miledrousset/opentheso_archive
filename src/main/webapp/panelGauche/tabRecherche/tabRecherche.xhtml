@@ -8,20 +8,18 @@
     <div id="recherche" >
 
         <h:form rendered="#{theso.thesaurus.id_thesaurus != null}">
-            <br/>
-
-
             <h:inputText value="#{search.entry}" a:placeholder="#{langueBean.getMsg('index.search')}"  class="inputConnect" style="width: 180px; text-align:left;"   />
 
             <p:commandButton icon="ui-icon-valider" actionListener="#{search.research()}" id="idSearchcommandButton" 
                              update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
                              styleClass="cbEdit"  rendered="true"/>
 
-
             <br/>
             <h:outputText rendered="#{search.nbRes != 0}" value="#{langueBean.getMsg('index.headerSearch')}:"/>
             <h:outputText rendered="#{search.nbRes != 0}" value=" #{search.nbRes}"  style="color: green; font-weight: bold;"/>
             <br/>
+
+
             <p:accordionPanel id = "idaccordionPanelRechcerche" styleClass="accordionMenu" activeIndex="-2" >
                 <p:tab title="..."    titleStyleClass="titleAccordion">
                     <table>
@@ -122,9 +120,9 @@
         </h:form>
         <h:outputText rendered="#{theso.thesaurus.id_thesaurus == null}" value="#{langueBean.getMsg('index.noSearch')}" />
 
-        <div>
+        <div style="height: 800px">
             <!-- TAB RESULTAT RECHERCHE DEBUT -->
-            <ui:include src="../tabResultatRecherche/tabResultatRecherche.xhtml"/>
+            <ui:include src="tabResultatRecherche.xhtml"/>
         </div>
 
     </div>

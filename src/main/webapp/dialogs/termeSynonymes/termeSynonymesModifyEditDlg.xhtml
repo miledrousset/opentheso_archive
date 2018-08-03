@@ -5,7 +5,7 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <!-- Modifier une terme synonymes -->
+    <!-- Modifier un terme synonyme -->
     <p:dialog id="idTermeSynonymesModifyEditDlg"  header="#{langueBean.getMsg('index.dateE')}" widgetVar="termeSynonymesModifyEditDlg" modal="true" resizable="false">
          <h:panelGroup  id="synoModify">
             <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
@@ -28,9 +28,11 @@
                 </table>
             </ui:repeat>
         </h:panelGroup>
-        <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}"
+        <h:outputText rendered="#{(currentUser.user != null) and (selectedTerme.idC != null)
+                                  and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}"
                       value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
-        <h:panelGroup  id="synoP1" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (user1.haveRights(2)) and (user1.isHaveWriteToCurrentThesaurus) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+        <h:panelGroup  id="synoP1" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null)
+                                               and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
             <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">  
                  <table>
                 <tr>

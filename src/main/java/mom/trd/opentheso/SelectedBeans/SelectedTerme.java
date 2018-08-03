@@ -193,8 +193,8 @@ public class SelectedTerme implements Serializable {
     @ManagedProperty(value = "#{vue}")
     private Vue vue;
 
-    @ManagedProperty(value = "#{user1}")
-    private CurrentUser user;
+    @ManagedProperty(value = "#{currentUser}")
+    private CurrentUser2 user;
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -334,6 +334,7 @@ public class SelectedTerme implements Serializable {
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             nom = ncg.getLexicalValue();
             idArk = ncg.getConceptGroup().getIdARk();
+            idHandle = ncg.getConceptGroup().getIdHandle();
 
             nomEdit = nom;
             idT = "";
@@ -372,7 +373,7 @@ public class SelectedTerme implements Serializable {
             creator = t.getCreator();
             contributor = t.getContributor();
 
-            images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso, user.getUser().getId());
+            images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso);
             majNotes();
             majLangueConcept();
             majSyno();
@@ -913,7 +914,7 @@ public class SelectedTerme implements Serializable {
             terme.setSource("");
             terme.setStatus("");
 
-            if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getId()) == null) {
+            if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getIdUser()) == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
@@ -946,7 +947,7 @@ public class SelectedTerme implements Serializable {
             //String idTC = idTopConcept;
             String idP = idC;
 
-            if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, user.getUser().getId()) == null) {
+            if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, user.getUser().getIdUser()) == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
@@ -994,7 +995,7 @@ public class SelectedTerme implements Serializable {
         //String idTC = idTopConcept;
         String idP = idC;
 
-        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme, BTname, NTname, user.getUser().getId()) == null) {
+        if (instance.addConceptSpecial(connect.getPoolConnexion(), idP, concept, terme, BTname, NTname, user.getUser().getIdUser()) == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
             return false;
         }
@@ -1048,7 +1049,7 @@ public class SelectedTerme implements Serializable {
             }
             temp.setStatus(statutEdit);
             temp.setSource(String.valueOf(user.getUser().getName()));
-            if (!new TermHelper().addNonPreferredTerm(connect.getPoolConnexion(), temp, user.getUser().getId())) {
+            if (!new TermHelper().addNonPreferredTerm(connect.getPoolConnexion(), temp, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 return;
             }
@@ -1096,7 +1097,7 @@ public class SelectedTerme implements Serializable {
         hr.setIdConcept2(idC2);
         hr.setIdThesaurus(idTheso);
         hr.setRole("RT");
-        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getId());
+        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getIdUser());
         ArrayList<NodeRT> tempRT = new RelationsHelper().getListRT(connect.getPoolConnexion(), idC, idTheso, idlangue);
         termesAssocies = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
@@ -1113,7 +1114,7 @@ public class SelectedTerme implements Serializable {
         hr.setIdConcept2(idC2);
         hr.setIdThesaurus(idTheso);
         hr.setRole(role);
-        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getId());
+        new ConceptHelper().addAssociativeRelation(connect.getPoolConnexion(), hr, user.getUser().getIdUser());
         ArrayList<NodeRT> tempRT = new RelationsHelper().getListRT(connect.getPoolConnexion(), idC, idTheso, idlangue);
         termesAssocies = new ArrayList<>();
         HashMap<String, String> tempMap = new HashMap<>();
@@ -1155,7 +1156,7 @@ public class SelectedTerme implements Serializable {
                     c.setTopConcept(false);
                     c.setStatus("D");
                     if (!new GroupHelper().addConceptGroupConcept(conn, s, idConcept, idTheso)) {
-                      //      !new ConceptHelper().addNewGroupOfConcept(conn, c, user.getUser().getId())) {
+                      //      !new ConceptHelper().addNewGroupOfConcept(conn, c, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
@@ -1248,7 +1249,7 @@ public class SelectedTerme implements Serializable {
             }
 
             //On ajoute la realtion BT au concept
-            if (!new RelationsHelper().addRelationBT(conn, idNT, idTheso, idBT, user.getUser().getId())) {
+            if (!new RelationsHelper().addRelationBT(conn, idNT, idTheso, idBT, user.getUser().getIdUser())) {
                 conn.rollback();
                 conn.close();
                 return false;
@@ -1298,7 +1299,7 @@ public class SelectedTerme implements Serializable {
             }
 
             //On ajoute la realtion BT au concept
-            if (!relationsHelper.addRelationBT(conn, idConcept, idTheso, idNewConceptBT, user.getUser().getId())) {
+            if (!relationsHelper.addRelationBT(conn, idConcept, idTheso, idNewConceptBT, user.getUser().getIdUser())) {
                 conn.rollback();
                 conn.close();
                 return false;
@@ -1309,7 +1310,7 @@ public class SelectedTerme implements Serializable {
             lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idTheso, lisIds);
 
             // on ajoute le nouveau domaine à la branche
-            if (!groupHelper.addDomainToBranch(conn, lisIds, idNewGroup, idTheso, user.getUser().getId())) {
+            if (!groupHelper.addDomainToBranch(conn, lisIds, idNewGroup, idTheso, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
                 conn.rollback();
                 conn.close();
@@ -1350,7 +1351,7 @@ public class SelectedTerme implements Serializable {
                     c.setIdThesaurus(idTheso);
                     c.setStatus("D");
 
-                    String idConcept = conceptHelper.addConceptInTable(conn, c, user.getUser().getId());
+                    String idConcept = conceptHelper.addConceptInTable(conn, c, user.getUser().getIdUser());
                     // si ça se passe mal, on ajoute rien;
                     if (idConcept == null) {
                         conn.rollback();
@@ -1365,7 +1366,7 @@ public class SelectedTerme implements Serializable {
                     return false;
                 }
                 //On crée les relations
-                if (!new RelationsHelper().addRelationBT(conn, idCNT, idTheso, idC, user.getUser().getId())) {
+                if (!new RelationsHelper().addRelationBT(conn, idCNT, idTheso, idC, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -1384,7 +1385,7 @@ public class SelectedTerme implements Serializable {
 
                 if (new ConceptHelper().haveThisGroup(connect.getPoolConnexion(), idCNT, idC, idTheso)) {
 
-                    if (!new RelationsHelper().setRelationTopConcept(conn, idCNT, idTheso, idC, true, user.getUser().getId())) {
+                    if (!new RelationsHelper().setRelationTopConcept(conn, idCNT, idTheso, idC, true, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
@@ -1397,7 +1398,7 @@ public class SelectedTerme implements Serializable {
                         conn.close();
                         return false;
                     }
-                    if (!new RelationsHelper().setRelationTopConcept(conn, idCNT, idTheso, idC, true, user.getUser().getId())) {
+                    if (!new RelationsHelper().setRelationTopConcept(conn, idCNT, idTheso, idC, true, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
@@ -1429,7 +1430,7 @@ public class SelectedTerme implements Serializable {
                 }
 
                 //On crée les relations
-                if (!new RelationsHelper().addRelationBT(conn, idCNT, idTheso, idC, user.getUser().getId())) {
+                if (!new RelationsHelper().addRelationBT(conn, idCNT, idTheso, idC, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -1496,7 +1497,7 @@ public class SelectedTerme implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
                 return;
             }
-            if (!cgh.addGroupTraduction(connect.getPoolConnexion(), cgl, user.getUser().getId())) {
+            if (!cgh.addGroupTraduction(connect.getPoolConnexion(), cgl, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
@@ -1519,8 +1520,8 @@ public class SelectedTerme implements Serializable {
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
-            terme.setContributor(user.getUser().getId());
-            terme.setCreator(user.getUser().getId());
+            terme.setContributor(user.getUser().getIdUser());
+            terme.setCreator(user.getUser().getIdUser());
             terme.setSource("");
             terme.setStatus("");
             if (termHelper.isTermExist(connect.getPoolConnexion(),
@@ -1530,7 +1531,7 @@ public class SelectedTerme implements Serializable {
                 return;
             }
 
-            if (!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())) {
+            if (!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
@@ -1553,8 +1554,8 @@ public class SelectedTerme implements Serializable {
             terme.setLang(langueEdit);
             terme.setLexical_value(valueEdit);
             terme.setId_term(idT);
-            terme.setContributor(user.getUser().getId());
-            terme.setCreator(user.getUser().getId());
+            terme.setContributor(user.getUser().getIdUser());
+            terme.setCreator(user.getUser().getIdUser());
             terme.setSource("");
             terme.setStatus("");
             if (termHelper.isTermExist(connect.getPoolConnexion(),
@@ -1564,7 +1565,7 @@ public class SelectedTerme implements Serializable {
                 return;
             }
 
-            if (!ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getId())) {
+            if (!ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
@@ -1596,7 +1597,7 @@ public class SelectedTerme implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error5")));
         } else {
             alignmentHelper.addNewAlignment(connect.getPoolConnexion(),
-                    user.getUser().getId(), valueEdit2.trim(), valueEdit.trim(),
+                    user.getUser().getIdUser(), valueEdit2.trim(), valueEdit.trim(),
                     linkEdit.trim(), Integer.parseInt(statutEdit), idC, idTheso, 0);
             valueEdit = "";
             valueEdit2 = "";
@@ -1656,6 +1657,12 @@ public class SelectedTerme implements Serializable {
                         //ici il faut appeler le filtre de Wikipédia 
                         //         listAlignValues = alignmentQuery.queryDBPedia(idC, idTheso, nom.trim(), idlangue);
                     }
+                    // action JSON (HashMap (Wikidata)
+                    if ("json".equals(alignementSource1.getAlignement_format())) {
+                        //ici il faut appeler le filtre de Wikidata 
+                        listAlignValues = alignmentQuery.queryWikidata(idConcept, idTheso, lexicalValue.trim(),
+                                idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
+                    }                    
 
                 }
                 //si type Json
@@ -1707,13 +1714,14 @@ public class SelectedTerme implements Serializable {
         }
         for (NodeAlignment na : listAlignValues) {
             if (na.isSave()) {
-                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), na.getConcept_target(), na.getThesaurus_target(),
+                new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), 
+                        user.getUser().getIdUser(), na.getConcept_target(), na.getThesaurus_target(),
                         na.getUri_target(), na.getAlignement_id_type(), idC, idTheso, alignementSource.getId());
             }
         }
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
-        vue.setAddAlign(0);
+     //   vue.setAddAlign(0);
     }
 
     public void addOtherThesoAlign(NodeAutoCompletion term, String idOtherTheso, int alignType) {
@@ -1725,7 +1733,7 @@ public class SelectedTerme implements Serializable {
 
         String termUri = "test/" + term.getIdConcept();
 
-        new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), term.getIdConcept(), idOtherTheso,
+        new AlignmentHelper().addNewAlignment(connect.getPoolConnexion(), user.getUser().getIdUser(), term.getIdConcept(), idOtherTheso,
                 termUri, alignType, idC, idTheso, -1);
 
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -1744,7 +1752,7 @@ public class SelectedTerme implements Serializable {
         AlignmentHelper alignmentHelper = new AlignmentHelper();
 
         NoteHelper noteHelper = new NoteHelper();
-        if (!alignmentHelper.addNewAlignment(connect.getPoolConnexion(), user.getUser().getId(), nodeAlignment.getConcept_target(),
+        if (!alignmentHelper.addNewAlignment(connect.getPoolConnexion(), user.getUser().getIdUser(), nodeAlignment.getConcept_target(),
                 nodeAlignment.getThesaurus_target(), nodeAlignment.getUri_target(),
                 nodeAlignment.getAlignement_id_type(), nodeAlignment.getInternal_id_concept(), idTheso, alignementSource.getId())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
@@ -1753,7 +1761,7 @@ public class SelectedTerme implements Serializable {
         if (addDefinition) {
             StringPlus stringPlus = new StringPlus();
             String dejaBonString = stringPlus.clearAngles(nodeAlignment.getDef_target());
-            if (!noteHelper.addTermNote(connect.getPoolConnexion(), id_term, idlangue, idTheso, dejaBonString, "definition", user.getUser().getId())) {
+            if (!noteHelper.addTermNote(connect.getPoolConnexion(), id_term, idlangue, idTheso, dejaBonString, "definition", user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
                 return false;
             }
@@ -1789,11 +1797,11 @@ public class SelectedTerme implements Serializable {
         // vérification si le Groupe est traduit déjà, on fait un update 
         if(groupHelper.isHaveTraduction(connect.getPoolConnexion(),
                 idGroup, idTheso, idLangue)) {
-            if(!groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId())) {
+            if(!groupHelper.updateConceptGroupLabel(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getIdUser())) {
                 return false;
             }
         } else {
-            if(!groupHelper.addGroupTraduction(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getId())) {
+            if(!groupHelper.addGroupTraduction(connect.getPoolConnexion(), conceptGroupLabel, user.getUser().getIdUser())) {
                 return false;
             }
         }
@@ -1813,7 +1821,7 @@ public class SelectedTerme implements Serializable {
             t.setId_term(idT);
             t.setId_thesaurus(idTheso);
             t.setLang(idlangue);
-            new TermHelper().updateTermTraduction(connect.getPoolConnexion(), t, user.getUser().getId());
+            new TermHelper().updateTermTraduction(connect.getPoolConnexion(), t, user.getUser().getIdUser());
         } else if (cas == 2) {
             //le terme n'existe pas, il faut le créer
             String idTerme = new TermHelper().getIdTermOfConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -1826,8 +1834,8 @@ public class SelectedTerme implements Serializable {
             termTemp.setId_thesaurus(idTheso);
             termTemp.setLang(idlangue);
             termTemp.setLexical_value(nomEdit);
-            termTemp.setSource(String.valueOf(user.getUser().getId()));
-            new TermHelper().addTraduction(connect.getPoolConnexion(), termTemp, user.getUser().getId());
+            termTemp.setSource(String.valueOf(user.getUser().getIdUser()));
+            new TermHelper().addTraduction(connect.getPoolConnexion(), termTemp, user.getUser().getIdUser());
         } 
         vue.setAddTInfo(0);
         nom = nomEdit;
@@ -1839,7 +1847,7 @@ public class SelectedTerme implements Serializable {
      * Crée ou modifie la définition du terme courant
      */
     public void editDef() {
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         if (definition.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
@@ -1858,7 +1866,7 @@ public class SelectedTerme implements Serializable {
      *
      */
     public void editNote() {
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         if (note.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
@@ -1901,7 +1909,7 @@ public class SelectedTerme implements Serializable {
 
     public void modifierSynonyme() {
 
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         Term term = new Term();
         term.setLexical_value(valueOfSynonymesToModify);
         term.setId_term(idT);
@@ -1920,7 +1928,7 @@ public class SelectedTerme implements Serializable {
      */
     public void modifierTraduction() {
 
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         Term term = new Term();
         term.setLexical_value(valueOfTraductionToModify);
         term.setId_term(idT);
@@ -1971,7 +1979,7 @@ public class SelectedTerme implements Serializable {
      * @param noteTypeCode
      */
     public void deleteThisNoteOfConcept(String noteTypeCode) {
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         new NoteHelper().deletethisNoteOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, noteTypeCode);
 
         majNotes();
@@ -1985,7 +1993,7 @@ public class SelectedTerme implements Serializable {
      * @param noteTypeCode
      */
     public void deleteThisNoteOfTerm(String noteTypeCode) {
-        int idUser = user.getUser().getId();
+        int idUser =user.getUser().getIdUser();
         new NoteHelper().deleteThisNoteOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, noteTypeCode);
 
         majNotes();
@@ -1993,7 +2001,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public void editNoteApp() {
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         if (noteApplication.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
@@ -2011,7 +2019,7 @@ public class SelectedTerme implements Serializable {
      * Crée ou modifie la note historique du terme courant
      */
     public void editNoteHisto() {
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         if (noteHistorique.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
@@ -2030,7 +2038,7 @@ public class SelectedTerme implements Serializable {
      */
     public void editNoteEdit() {
 
-        int idUser = user.getUser().getId();
+        int idUser = user.getUser().getIdUser();
         if (noteEditoriale.isEmpty()) {
             deleteThisNoteOfConcept("note");
             return;
@@ -2073,7 +2081,7 @@ public class SelectedTerme implements Serializable {
      * @param status
      */
     public void delSyno(String value, String status) {
-        new TermHelper().deleteNonPreferedTerm(connect.getPoolConnexion(), idT, idlangue, value, idTheso, status, user.getUser().getId());
+        new TermHelper().deleteNonPreferedTerm(connect.getPoolConnexion(), idT, idlangue, value, idTheso, status, user.getUser().getIdUser());
         majSyno();
         vue.setAddTSyno(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", value + " " + langueBean.getMsg("sTerme.info6")));
@@ -2085,7 +2093,7 @@ public class SelectedTerme implements Serializable {
      * @param lang
      */
     public void delTrad(String lang) {
-        new TermHelper().deleteTraductionOfTerm(connect.getPoolConnexion(), idT, lang, idTheso, user.getUser().getId());
+        new TermHelper().deleteTraductionOfTerm(connect.getPoolConnexion(), idT, lang, idTheso, user.getUser().getIdUser());
         majLangueConcept();
         majNotes();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
@@ -2098,7 +2106,7 @@ public class SelectedTerme implements Serializable {
      * @param id
      */
     public void delAsso(String id) {
-        if (!new RelationsHelper().deleteRelationRT(connect.getPoolConnexion(), idC, idTheso, id, user.getUser().getId())) {
+        if (!new RelationsHelper().deleteRelationRT(connect.getPoolConnexion(), idC, idTheso, id, user.getUser().getIdUser())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.info7")));
             return;
         }
@@ -2134,7 +2142,7 @@ public class SelectedTerme implements Serializable {
                 cpt++;
             }
             if (cpt <= 1) {
-                new ConceptHelper().deleteGroupOfConcept(connect.getPoolConnexion(), idConcept, s, idTheso, user.getUser().getId());
+                new ConceptHelper().deleteGroupOfConcept(connect.getPoolConnexion(), idConcept, s, idTheso, user.getUser().getIdUser());
             }
             cpt = 0;
         }
@@ -2161,7 +2169,7 @@ public class SelectedTerme implements Serializable {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
 
-                /*   if (!new ConceptHelper().deleteConceptFromTable(conn, idC, idTheso, user.getUser().getId())) {
+                /*   if (!new ConceptHelper().deleteConceptFromTable(conn, idC, idTheso, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2173,13 +2181,13 @@ public class SelectedTerme implements Serializable {
                 }
 
                 if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), id, idTheso)) {
-                    if (!new RelationsHelper().setRelationTopConcept(conn, idC, idTheso, id, false, user.getUser().getId())) {
+                    if (!new RelationsHelper().setRelationTopConcept(conn, idC, idTheso, id, false, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
                 } else // on coupe la branche de son BT
-                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2207,12 +2215,12 @@ public class SelectedTerme implements Serializable {
 
                 if (TGisDomaine) {
                     if (!new RelationsHelper().deleteRelationTT(conn, idC,
-                            idTheso, user.getUser().getId())) {
+                            idTheso, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
-                } else if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getId())) {
+                } else if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2306,12 +2314,12 @@ public class SelectedTerme implements Serializable {
             try {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
-                if (!new ConceptHelper().deleteConceptFromTable(conn, id, idTheso, user.getUser().getId())) {
+                if (!new ConceptHelper().deleteConceptFromTable(conn, id, idTheso, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
                 }
-                if (!new RelationsHelper().deleteRelationBT(conn, id, idTheso, idC, user.getUser().getId())) {
+                if (!new RelationsHelper().deleteRelationBT(conn, id, idTheso, idC, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2353,12 +2361,12 @@ public class SelectedTerme implements Serializable {
                 }
 
                 if (type == 1) {
-                    if (!new RelationsHelper().setRelationTopConcept(conn, id, idTheso, idC, false, user.getUser().getId())) {
+                    if (!new RelationsHelper().setRelationTopConcept(conn, id, idTheso, idC, false, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
-                } else if (!new RelationsHelper().deleteRelationBT(conn, id, idTheso, idC, user.getUser().getId())) {
+                } else if (!new RelationsHelper().deleteRelationBT(conn, id, idTheso, idC, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2384,7 +2392,7 @@ public class SelectedTerme implements Serializable {
     public void delImage(String nomImage) {
         new ImagesHelper().deleteImage(connect.getPoolConnexion(), idC, idTheso, nomImage);
         images = new ArrayList<>();
-        images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso, user.getUser().getId());
+        images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info8")));
     }
 
@@ -2395,7 +2403,7 @@ public class SelectedTerme implements Serializable {
      */
     public boolean deprecateConcept() {
         if (!new ConceptHelper().desactiveConcept(connect.getPoolConnexion(),
-                idC, idTheso, user.getUser().getId())) {
+                idC, idTheso, user.getUser().getIdUser())) {
             return false;
         }
         status = "hidden";
@@ -2409,7 +2417,7 @@ public class SelectedTerme implements Serializable {
      */
     public boolean reactivConcept() {
         if (!new ConceptHelper().reactiveConcept(connect.getPoolConnexion(),
-                idC, idTheso, user.getUser().getId())) {
+                idC, idTheso, user.getUser().getIdUser())) {
             return false;
         }
         status = "D";
@@ -2417,7 +2425,7 @@ public class SelectedTerme implements Serializable {
     }
 
     public boolean canBeDel() {
-        return (!status.equals("hidden") && (type != 1) && (user.getUser().getName() != null) && (idC != null) && (user.haveRights(1)));
+        return (!status.equals("hidden") && (type != 1) && (user.getUser().getName() != null) && (idC != null) && (user.getUser().isIsSuperAdmin() || roleOnTheso.isIsAdminOnThisTheso()));
     }
 
     public boolean canBeDelGroup() {
@@ -3006,13 +3014,15 @@ public class SelectedTerme implements Serializable {
         this.nomEdit = nomEdit;
     }
 
-    public CurrentUser getUser() {
+    public CurrentUser2 getUser() {
         return user;
     }
 
-    public void setUser(CurrentUser user) {
+    public void setUser(CurrentUser2 user) {
         this.user = user;
     }
+
+
 
     public String getStatutEdit() {
         return statutEdit;

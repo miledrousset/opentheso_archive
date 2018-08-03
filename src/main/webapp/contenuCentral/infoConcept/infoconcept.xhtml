@@ -10,7 +10,9 @@
 
         <div class="contenuTerme">
             <div id="imageEdition">
-                <h:form id="formEditTInfo" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine != 'Orphan')}">
+                <h:form id="formEditTInfo" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and
+                                                       (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                                       and (selectedTerme.idDomaine != 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                           
@@ -61,7 +63,7 @@
                     </p:menu>
                 </h:form>
                 <!--options pour les orphelins -->
-                <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine == 'Orphan')}">
+                <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine == 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
@@ -81,13 +83,13 @@
                 <span style="font-size: 17px; font-weight: bold;">
                     <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                 </span>
-                <h:panelGroup rendered= "#{(selectedTerme.user.nodePreference.z3950actif) or (selectedTerme.user.nodePreference.bddActive)}">
+                <h:panelGroup rendered= "#{(roleOnTheso.nodePreference.z3950actif) or (roleOnTheso.nodePreference.bddActive)}">
                     
 
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
-                        <h:outputText rendered="#{(selectedTerme.user.nodePreference.bddUseId)}" value="#{langueBean.getMsg('index.notice')}" />   
-                        <h:outputText rendered="#{(!selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti1" value="notices liées &lt;br/&gt;" escape="false" styleClass="textLink" />
-                        <h:outputText rendered="#{(selectedTerme.user.nodePreference.bddUseId)}" id="nbNoti2" value=" #{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textLink" />
+                        <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" value="#{langueBean.getMsg('index.notice')}" />   
+                        <h:outputText rendered="#{(!roleOnTheso.nodePreference.bddUseId)}" id="nbNoti1" value="notices liées &lt;br/&gt;" escape="false" styleClass="textLink" />
+                        <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" id="nbNoti2" value=" #{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textLink" />
                     </a>
 
                 </h:panelGroup>
@@ -141,7 +143,7 @@
 
 
                 <!-- affichage du nombre total des notices de la branche -->
-                <h:panelGroup id="totalNoticesG" rendered="#{user1.nodePreference.z3950actif}">
+                <h:panelGroup id="totalNoticesG" rendered="#{roleOnTheso.nodePreference.z3950actif}">
                     <h:form>
                         <p:commandButton  value="#{selectedTerme.totalNoticesOfBranch}" 
                                           id="ajaxdddn" update=":totalNoticesG" actionListener="#{selectedTerme.getNbNoticesOfBranch()}" styleClass="termInfo" />
@@ -161,10 +163,10 @@
 
                         <span>
                             <h:outputLink rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                          value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall">
+                                          value="#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}" styleClass="linkSmall">
                                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
-                                              value="#{theso.getServerArk()}#{selectedTerme.idArk}" styleClass="linkSmall"/>
-                                <h:graphicImage value = "#{theso.getServerArk()}#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
+                                              value="#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}" styleClass="linkSmall"/>
+                                <h:graphicImage value = "#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
                             </h:outputLink>
                         </span>
 

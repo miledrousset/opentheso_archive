@@ -160,6 +160,7 @@ public class CurrentUser2 implements Serializable {
         listeThesoOfGroup = null;
         FacesContext context = FacesContext.getCurrentInstance();
         String version_Opentheso = context.getExternalContext().getInitParameter("version");
+        versionOfOpentheso = new BaseDeDoneesHelper().getVersionOfOpentheso(connect.getPoolConnexion());
         new BaseDeDoneesHelper().updateVersionOpentheso(connect.getPoolConnexion(), version_Opentheso);
     }
 
@@ -556,6 +557,14 @@ public class CurrentUser2 implements Serializable {
      * @return 
      */
     public boolean addUserRoleOnGroup(int idUser, int idRole, int idGroup) {
+        if(idRole > 1) {
+            if(idGroup == -1 || idGroup == 0) {
+                FacesContext.getCurrentInstance().
+                        addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :",
+                                langueBean.getMsg("profile.needGroupMessage")));
+                return false;
+            }
+        }
         UserHelper2 userHelper = new UserHelper2();
         if(idRole == 1){ // cas de changement en superAdmin
       //      userHelper.setIsSuperAdmin(conn, idUser, vueListSuperAdmin)
@@ -580,6 +589,12 @@ public class CurrentUser2 implements Serializable {
      * @param idGroup
      */
     public void updateUserRoleOnGroup(int idUser, int idRole, int idGroup) {
+        if(idGroup == -1 || idGroup == 0) {
+            FacesContext.getCurrentInstance().
+                    addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :",
+                            langueBean.getMsg("profile.needGroupMessage")));
+            return;
+        }
         UserHelper2 userHelper = new UserHelper2();
         if (!userHelper.updateUserRoleOnGroup(connect.getPoolConnexion(), idUser, idRole, idGroup)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));

@@ -39,7 +39,10 @@ public class rdf4jFileBean implements Serializable {
     private NewTreeBean tree;
     
     @ManagedProperty(value = "#{currentUser}") 
-    private CurrentUser2 currentUser;    
+    private CurrentUser2 currentUser;
+    
+    @ManagedProperty(value = "#{roleOnTheso}")
+    private RoleOnThesoBean roleOnTheso;     
     
     private int typeImport;
     private String selectedIdentifier ="sans";
@@ -56,9 +59,9 @@ public class rdf4jFileBean implements Serializable {
     private boolean BDDinsertEnable = false;
 
     private SKOSXmlDocument sKOSXmlDocument;
-    private String info;
-    private String error;
-    private String warning;
+    private String info = "";
+    private String error = "";
+    private String warning = "";
 
     /**
      *
@@ -97,7 +100,7 @@ public class rdf4jFileBean implements Serializable {
                 } catch (IOException ex) {
                     error = ex.getMessage();
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error = ex.toString();
                 }
                 if(readRdf4j==null) return;
                 progress = 100;
@@ -144,14 +147,20 @@ public class rdf4jFileBean implements Serializable {
     }
 
     private void showError() {
-        if (!info.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", info));
+        if(info != null) {
+            if (!info.isEmpty()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", info));
+            }
         }
-        if (!error.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", error));
+        if(error != null) {
+            if (!error.isEmpty()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", error));
+            }
         }
-        if (!warning.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning :", warning));
+        if(warning != null) {
+            if (!warning.isEmpty()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning :", warning));
+            }
         }
 
     }
@@ -319,7 +328,7 @@ public class rdf4jFileBean implements Serializable {
             importRdf4jHelper.setIdentifierType(selectedIdentifier);
             
             importRdf4jHelper.setPrefixHandle(prefixHandle);
-            importRdf4jHelper.setNodePreference(tree.getSelectedTerme().getUser().nodePreference);
+            importRdf4jHelper.setNodePreference(roleOnTheso.getNodePreference());
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addThesaurus();
@@ -420,7 +429,7 @@ public class rdf4jFileBean implements Serializable {
             idGroup = Integer.parseInt(selectedUserGroup);     
         try {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
-            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, 
+            importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate,
                     currentUser.getUser().getIdUser(),
                     idGroup, 
                     connect.getWorkLanguage());
@@ -596,6 +605,14 @@ public class rdf4jFileBean implements Serializable {
 
     public void setCurrentUser(CurrentUser2 currentUser) {
         this.currentUser = currentUser;
+    }
+
+    public RoleOnThesoBean getRoleOnTheso() {
+        return roleOnTheso;
+    }
+
+    public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
+        this.roleOnTheso = roleOnTheso;
     }
 
 }

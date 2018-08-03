@@ -10,7 +10,9 @@
             <h:outputText value="#{langueBean.getMsg('index.UF')}" /> 
             <div id="imageEdition">
                 <h:form id="formEditTSyno" 
-                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
+                        rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and
+                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                    and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">                                                        
                     <p:commandButton id="dynaButtonTSyno" rendered="#{selectedTerme.type != 1}" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTSyno" my="left top" at="left bottom">  
                         <p:menuitem value="#{langueBean.getMsg('popup.addUSE')}" action="#{selectedTerme.init()}" update=":idTermeSynonymesEditDlg" oncomplete="PF('termeSynonymesEditDlg').show();" style="font-size: 12px;"/>
@@ -28,8 +30,10 @@
                     <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
                 </ui:repeat>
             </h:panelGroup>
-            <h:outputText rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
-            <h:panelGroup  id="synoP" rendered="#{(user1.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+            <h:outputText rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.status != 'hidden')
+                                      and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+            <h:panelGroup  id="synoP" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso)
+                                                  and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                 <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
                     <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>
                 </ui:repeat>
