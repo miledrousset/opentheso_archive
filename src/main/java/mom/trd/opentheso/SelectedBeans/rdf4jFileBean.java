@@ -113,6 +113,7 @@ public class rdf4jFileBean implements Serializable {
                 info = "File correctly loaded";
 
             } catch (Exception e) {
+                System.out.println("erreur :" + e.getMessage());
             } finally {
                 showError();
             }

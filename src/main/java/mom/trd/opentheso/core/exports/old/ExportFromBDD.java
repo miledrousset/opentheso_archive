@@ -355,15 +355,15 @@ public class ExportFromBDD {
         WriteFileSKOS writeFileSKOS = new WriteFileSKOS();
         
         // inititialisation des URI
-        writeFileSKOS.setServerArk(serverArk);
-        writeFileSKOS.setServerAdress(serverAdress);
+        writeFileSKOS.setServerArk(nodePreference.getServeurArk());
+        writeFileSKOS.setServerAdress(nodePreference.getCheminSite());
         writeFileSKOS.setNodePreference(nodePreference);
         
         writeFileSKOS.writeHeader();
         ConceptHelper conceptHelper = new ConceptHelper();
 
         
-        NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
+        NodeConceptExport nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, nodePreference.isUseArk());
         if(nodeConcept == null) return null;
         writeFileSKOS.writeDescriptor(nodeConcept, null);
         writeFileSKOS.endSkos(); 

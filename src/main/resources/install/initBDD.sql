@@ -82,6 +82,7 @@ ALTER SEQUENCE alignement_preferences_id_seq RESTART WITH 1;
 ALTER SEQUENCE gps_preferences_id_seq RESTART WITH 1;
 
 
+
 -- # créarion de l'admin pour la première connexion
 INSERT INTO users (id_user, username, password, active, mail, passtomodify,alertmail, issuperadmin) VALUES
  (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', true, 'admin@domaine.fr', false, false, true);

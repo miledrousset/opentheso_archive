@@ -28,7 +28,7 @@
                 <tr>
                     <td colspan="3" style="text-align: center;">
                         <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{selectedTerme.modifierTraduction()}" 
-                                         update=":lang, :idConceptEditDlg,:accordeonTree,:panContenu" styleClass="styleButton"
+                                         update=":lang, :idConceptEditDlg,:accordeonTree,:panContenu, :messages" styleClass="styleButton"
                                          oncomplete="PF('conceptEditDlg').hide(); PF('editTraductionDlg').hide(); "  />
                     </td>
                     <td colspan="3" style="text-align: center;">

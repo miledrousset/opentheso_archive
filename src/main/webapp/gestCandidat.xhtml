@@ -4,8 +4,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>OpenTheso - Gestionnaire de candidats</title>
         <link rel="icon" href="images/icoTheso.jpg" />
@@ -77,17 +76,19 @@
 
                     <!-- Pour afficher mes candidats -->
                     <h:form id="myCandidat">
-                        <h:panelGrid columns="3" style="margin-bottom:10px; color: green; " cellpadding="5">
+                        <h:panelGrid columns="4" style="margin-bottom:10px; color: green; " cellpadding="5">
                             <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}"/>
                             <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
                                 <p:ajax  listener="#{theso.listeCandidats()}" />
                                 <p:ajax  listener="#{searchCandidat.init()}"  update="myCandidat,:tableCdt,:panelCdt,:gestionCandidat" />
                             </p:selectBooleanCheckbox>
                             <p:outputLabel value="tot = #{searchCandidat.candidats.size()}"/>
-                        </h:panelGrid>                    
+                            <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-plus-16" 
+                                                 actionListener="#{selectedCandidat.initNewProposal()}"
+                                                 update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').show();"
+                                                 title="#{langueBean.getMsg('cdt.btnAddCdt')}"/>
+                        </h:panelGrid>
                     </h:form>
-
-                     
 
 
 
@@ -193,14 +194,7 @@
                     <!-- Panel droit pour les actions et les contributions -->
                     <h:panelGroup id="gestionCandidat">
 
-                        <div style="float: left; margin-left: 30px;">
-                            <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null)}">
-                                <p:commandButton id="cbAjCandidat" styleClass="styleButton_db"  icon="ui-icon-plus-16" 
-                                                 actionListener="#{selectedCandidat.initNewProposal()}"
-                                                 update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').show();"
-                                                 title="#{langueBean.getMsg('cdt.btnAddCdt')}"/><br/>
-                            </h:form>
-                        </div>
+
 
                         <div style="float: right; margin-right: 30px;">
                             <h:form rendered="#{(theso.thesaurus.id_thesaurus != null) and (theso.thesaurus.language != null) and (selectedCandidat.selected.nbProp != 0)

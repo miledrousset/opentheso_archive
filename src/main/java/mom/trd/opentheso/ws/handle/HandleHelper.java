@@ -131,7 +131,7 @@ public class HandleHelper {
                 duplicateId = false;
             }
             if (!handleClient.isHandleExist(
-                    " http://hdl.handle.net/",
+                    " https://hdl.handle.net/",
                     nodePreference.getPrefixIdHandle() + "/" + idHandle)) {
                 duplicateId = false;
             }

@@ -252,7 +252,7 @@ public class ImportRdf4jHelper {
                 int relationProp = relation.getProperty();
                 if (relationProp == SKOSProperty.broader
                         || relationProp == SKOSProperty.broaderGeneric
-                        || relationProp == SKOSProperty.broaderInstantive
+                        || relationProp == SKOSProperty.broaderInstantial
                         || relationProp == SKOSProperty.broaderPartitive) {
                     uriRessourcePere.put(uri, relation.getTargetUri());
                 }
@@ -574,6 +574,7 @@ public class ImportRdf4jHelper {
             acs.term.setId_thesaurus(thesaurus.getId_thesaurus());
             acs.term.setSource(nodeEMList1.getSource());
             acs.term.setStatus(nodeEMList1.getStatus());
+            acs.term.setHidden(nodeEMList1.isHiden());
             acs.termHelper.addNonPreferredTerm(ds, acs.term, idUser);
         }
 
@@ -768,7 +769,7 @@ public class ImportRdf4jHelper {
                 case SKOSProperty.narrowerPartitive:
                     role = "NTP";
                     break;
-                case SKOSProperty.narrowerInstantive:
+                case SKOSProperty.narrowerInstantial:
                     role = "NTI";
                     break;
                 case SKOSProperty.related:
@@ -848,7 +849,7 @@ public class ImportRdf4jHelper {
                 case SKOSProperty.narrowerPartitive:
                     role = "NTP";
                     break;
-                case SKOSProperty.narrowerInstantive:
+                case SKOSProperty.narrowerInstantial:
                     role = "NTI";
                     break;
                 case SKOSProperty.broader:
@@ -857,7 +858,7 @@ public class ImportRdf4jHelper {
                 case SKOSProperty.broaderGeneric:
                     role = "BTG";
                     break;
-                case SKOSProperty.broaderInstantive:
+                case SKOSProperty.broaderInstantial:
                     role = "BTI";
                     break;
                 case SKOSProperty.broaderPartitive:

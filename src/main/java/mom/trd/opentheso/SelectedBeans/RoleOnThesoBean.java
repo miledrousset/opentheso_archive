@@ -144,6 +144,11 @@ public class RoleOnThesoBean {
             authorizedTheso = userHelper.getThesaurusOfUser(connect.getPoolConnexion(), user.getUser().getIdUser());
         }
         addAuthorizedThesoToHM();
+        
+        // permet de définir le role de l'utilisateur sur le group
+        if(authorizedTheso.isEmpty())
+            setUserRoleGroup(); 
+        
 //        setUserRoleOnThisTheso();
     }
     // on ajoute les titres + id, sinon l'identifiant du thésauurus
@@ -234,6 +239,21 @@ public class RoleOnThesoBean {
         if(nodeUserRoleGroup.getIdRole() == 4) 
             setIsContributorOnThisTheso(true);        
     }  
+    
+    /**
+     * permet de récuperer le role de l'utilisateur sur le group 
+     * applelé en cas où le group n'a aucun thésaurus pour que l'utilisateur 
+     * puisse créer des thésaurus et gérer les utilisateur pour le group 
+     * il faut être Admin
+     */
+    private void setUserRoleGroup() {
+        UserHelper2 userHelper = new UserHelper2();
+        ArrayList<NodeUserRoleGroup> nodeUserRoleGroups  = userHelper.getUserRoleGroup(connect.getPoolConnexion(), user.getUser().getIdUser());
+        for (NodeUserRoleGroup nodeUserRoleGroup1 : nodeUserRoleGroups) {
+            if(nodeUserRoleGroup1.isIsAdmin())
+                setIsAdminOnThisTheso(true);
+        }
+    }
     
     private void initRoles(){
         setIsSuperAdmin(false);        

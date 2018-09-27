@@ -7,7 +7,7 @@
     </context-param>
     <context-param>
         <param-name>version</param-name>
-        <param-value>4.3.8</param-value>
+        <param-value>4.3.9</param-value>
     </context-param>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
@@ -45,9 +45,7 @@
     <error-page>
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/errorPages/timeOut.xhtml</location>
-    </error-page>
-
-    
+    </error-page>  
 <!--   
     <error-page>
         <exception-type>java.lang.NullPointerException</exception-type>

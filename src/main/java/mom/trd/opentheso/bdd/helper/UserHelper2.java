@@ -306,9 +306,11 @@ public class UserHelper2 {
      * permet de retourner la liste des thésaurus pour un groupe pour un affichage IHM
      * @param ds
      * @param idGroup
+     * @param idLang
      * @return 
      */
-    public Map <String, String> getThesaurusLabelsOfGroup(HikariDataSource ds, int idGroup) {
+    public Map <String, String> getThesaurusLabelsOfGroup(HikariDataSource ds, int idGroup,
+            String idLang) {
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
@@ -326,7 +328,8 @@ public class UserHelper2 {
                                     "  thesaurus_label" +
                                     " WHERE " +
                                     "  user_group_thesaurus.id_thesaurus = thesaurus_label.id_thesaurus AND" +
-                                    "  user_group_thesaurus.id_group = " + idGroup;
+                                    "  user_group_thesaurus.id_group = " + idGroup +
+                                    " and thesaurus_label.lang = '" + idLang + "'";
                     resultSet = stmt.executeQuery(query);
                     listThesos = new HashMap<>();
                     while(resultSet.next()) {

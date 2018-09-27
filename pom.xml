@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.3.8</version>
+    <version>4.3.9</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -14,7 +14,7 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+   
     <dependencies>
         
         <dependency>
@@ -98,22 +98,14 @@
             <version>3.0</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.19.4</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml</groupId>
-            <artifactId>webservices-api</artifactId>
-            <version>2.0</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>SPARQL-JAVA</groupId>
             <artifactId>SPARQL-JAVA</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -135,7 +127,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
-            <version>1.1.2</version>
+            <version>1.0.4</version>
         </dependency>
                     
                 <dependency>
@@ -282,11 +274,6 @@
             <artifactId>primefaces</artifactId>  
             <version>6.2</version>  
         </dependency>
-        <dependency>
-            <groupId>org.primefaces.extensions</groupId>
-            <artifactId>primefaces-extensions</artifactId>
-            <version>6.2.6</version>
-        </dependency>        
         
        <!-- Attention, il faut aussi tester la version 2.5.1 qui ne passe pas sur le serveur Debian avec java 1.7.0_85 -->
         <dependency>
@@ -309,12 +296,7 @@
             <artifactId>jaxrs-ri</artifactId>
             <version>2.26</version>
         </dependency>
-        
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.11.3</version>
-        </dependency>        
+
         
         
         <!-- Pour l'envoie de Mail> 
@@ -346,12 +328,18 @@
             <version>1.4</version>
         </dependency>
         
-        
-<dependency>
-    <groupId>org.openrdf.sesame</groupId>
-    <artifactId>sesame-queryparser-sparql</artifactId>
-    <version>4.1.2</version>
-</dependency>        
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.19.4</version>
+            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.ws.rs</groupId>
+                    <artifactId>jsr311-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>        
        
     </dependencies>
 

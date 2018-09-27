@@ -221,7 +221,10 @@ public class ExportRdf4jHelper {
 
             }
             if (isInselectedLanguages) {
-                sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.altLabel);
+                if(nodeEM.isHiden())
+                    sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.hiddenLabel);
+                else
+                    sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.altLabel);
             }
         }
         ArrayList<NodeNote> nodeNotes = nodeConcept.getNodeNoteConcept();
@@ -566,7 +569,7 @@ public class ExportRdf4jHelper {
                     prop = SKOSProperty.narrowerPartitive;
                     break;
                 case "NTI":
-                    prop = SKOSProperty.narrowerInstantive;
+                    prop = SKOSProperty.narrowerInstantial;
                     break;
                 default:
                     prop = SKOSProperty.narrower;
@@ -584,7 +587,7 @@ public class ExportRdf4jHelper {
                     prop = SKOSProperty.broaderPartitive;
                     break;
                 case "BTI":
-                    prop = SKOSProperty.broaderInstantive;
+                    prop = SKOSProperty.broaderInstantial;
                     break;
                 default:
                     prop = SKOSProperty.broader;
@@ -708,7 +711,7 @@ public class ExportRdf4jHelper {
         // URI de type Handle
         if (nodeConceptExport.getConcept().getIdHandle() != null) {
             if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
-                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
+                uri = "https://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
                 return uri;
             }
         }        
@@ -740,7 +743,7 @@ public class ExportRdf4jHelper {
         // URI de type Handle
         if (nodeUri.getIdHandle() != null) {
             if (!nodeUri.getIdHandle().trim().isEmpty()) {
-                uri = "http://hdl.handle.net/" + nodeUri.getIdHandle();
+                uri = "https://hdl.handle.net/" + nodeUri.getIdHandle();
                 return uri;
             }
         } 

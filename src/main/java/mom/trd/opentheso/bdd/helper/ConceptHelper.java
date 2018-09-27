@@ -589,6 +589,7 @@ public class ConceptHelper {
                             nodeMetaData)) {
                         conn.rollback();
                         conn.close();
+                        message = message + "La création Ark a échouée";
                         Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
                         return null;
                     }

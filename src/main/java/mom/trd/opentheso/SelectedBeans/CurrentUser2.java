@@ -324,7 +324,8 @@ public class CurrentUser2 implements Serializable {
         if (user.isIsSuperAdmin()) {// l'utilisateur est superAdmin
             //      return selectAllUsers();
         }
-        listeThesoOfGroup = userHelper.getThesaurusLabelsOfGroup(connect.getPoolConnexion(), idGroup);
+        listeThesoOfGroup = userHelper.getThesaurusLabelsOfGroup(connect.getPoolConnexion(), idGroup,
+                connect.getWorkLanguage());
         listeUser = null;
         setUserRoleOnThisGroup();
     }

@@ -247,10 +247,18 @@ public class WriteRdf4j {
         for (SKOSLabel label : resource.getLabelsList()) {
             prop = label.getProperty();
             Literal literal = vf.createLiteral(label.getLabel(), label.getLanguage());
-            if (prop == SKOSProperty.prefLabel) {
-                builder.add(SKOS.PREF_LABEL, literal);
-            } else if (prop == SKOSProperty.altLabel) {
-                builder.add(SKOS.ALT_LABEL, literal);
+            switch (prop) {
+                case SKOSProperty.prefLabel:
+                    builder.add(SKOS.PREF_LABEL, literal);
+                    break;
+                case SKOSProperty.altLabel:
+                    builder.add(SKOS.ALT_LABEL, literal);
+                    break;
+                case SKOSProperty.hiddenLabel:
+                    builder.add(SKOS.HIDDEN_LABEL, literal);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -301,34 +309,34 @@ public class WriteRdf4j {
                     builder.add(SKOS.BROADER, uri);
                     break;
                 case SKOSProperty.broaderGeneric:
-                    builder.add("skos:broaderGeneric", uri);
+                    builder.add("iso-thes:broaderGeneric", uri);
                     break;
-                case SKOSProperty.broaderInstantive:
-                    builder.add("skos:broaderInstantive", uri);
+                case SKOSProperty.broaderInstantial:
+                    builder.add("iso-thes:broaderInstantial", uri);
                     break;
                 case SKOSProperty.broaderPartitive:
-                    builder.add("skos:broaderPartitive", uri);
+                    builder.add("iso-thes:broaderPartitive", uri);
                     break;
                 case SKOSProperty.narrower:
                     builder.add(SKOS.NARROWER, uri);
                     break;
                 case SKOSProperty.narrowerGeneric:
-                    builder.add("skos:narrowerGeneric", uri);
+                    builder.add("iso-thes:narrowerGeneric", uri);
                     break;
-                case SKOSProperty.narrowerInstantive:
-                    builder.add("skos:narrowerInstantive", uri);
+                case SKOSProperty.narrowerInstantial:
+                    builder.add("iso-thes:narrowerInstantial", uri);
                     break;
                 case SKOSProperty.narrowerPartitive:
-                    builder.add("skos:narrowerPartitive", uri);
+                    builder.add("iso-thes:narrowerPartitive", uri);
                     break;
                 case SKOSProperty.related:
                     builder.add(SKOS.RELATED, uri);
                     break;
                 case SKOSProperty.relatedHasPart:
-                    builder.add("skos:relatedHasPart", uri);
+                    builder.add("iso-thes:relatedHasPart", uri);
                     break;
                 case SKOSProperty.relatedPartOf:
-                    builder.add("skos:relatedPartOf", uri);
+                    builder.add("iso-thes:relatedPartOf", uri);
                     break;
                 case SKOSProperty.hasTopConcept:
                     builder.add(SKOS.HAS_TOP_CONCEPT, uri);

@@ -8,10 +8,15 @@
     <!-- Gestion de la note -->
     <p:dialog id="idTermeAssocieEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeAssocieEditDlg" modal="true" resizable="false">
         <fieldset>
+            <legend><h:outputText value="#{langueBean.getMsg('related.relation')}" /></legend>
             <h:form>
                 <p:messages showDetail="true">
                     <p:autoUpdate />
                 </p:messages>  <br/>
+
+                <h:outputText value="#{newtreeBean.selectedTerme.nom}" />
+                <br/><br/>
+                
                 <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
                 <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
                                 scrollHeight="300"

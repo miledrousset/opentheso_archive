@@ -576,7 +576,7 @@ public class SKOSResource {
                 String key;
                 if (relation.getProperty() == SKOSProperty.narrower 
                         || relation.getProperty() == SKOSProperty.narrowerGeneric
-                        || relation.getProperty() == SKOSProperty.narrowerInstantive
+                        || relation.getProperty() == SKOSProperty.narrowerInstantial
                         || relation.getProperty() == SKOSProperty.narrowerPartitive) {
                     key = getIdFromUri(resource.getUri());
                     ArrayList<String> child = idToChildId.get(key);

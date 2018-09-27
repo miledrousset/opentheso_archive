@@ -61,6 +61,8 @@ public class SelectedThesaurus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String testNameTheso;
+    
     private Thesaurus thesaurus;
     private Thesaurus editTheso;
     private NodeGroup nodeCG;
@@ -158,7 +160,6 @@ public class SelectedThesaurus implements Serializable {
     public void preRenderView() {
         // if the URL is for Concept
         if (idCurl != null && idTurl != null) {
-
             idLurl = Locale.getDefault().toString().substring(0, 2);
             ArrayList<Languages_iso639> temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), idTurl);
             if (temp.isEmpty()) {
@@ -1121,6 +1122,7 @@ public class SelectedThesaurus implements Serializable {
         // idTheso est le nouveau thésaurus qu'on a 
         if(roleOnTheso.getAuthorizedTheso().isEmpty()) {
             thesaurus.setId_thesaurus(null);
+            roleOnTheso.setIdTheso(null);
             return;
         }
         if(!roleOnTheso.getAuthorizedTheso().contains(thesaurus.getId_thesaurus())) { // le thésaurus actuel n'est pas dans la liste des thesos de l'utilisateur
@@ -1593,6 +1595,8 @@ public class SelectedThesaurus implements Serializable {
      * @return
      */
     public String getMetaData() {
+        if(nodePreference == null) return "";
+        
         if (this.tree.getSelectedTerme() != null) {
             if (this.tree.getSelectedTerme().getIdC() != null) {
                 if (this.tree.getSelectedTerme().getIdTheso() != null) {
@@ -2166,6 +2170,14 @@ public class SelectedThesaurus implements Serializable {
 
     public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
         this.roleOnTheso = roleOnTheso;
+    }
+
+    public String getTestNameTheso() {
+        return testNameTheso;
+    }
+
+    public void setTestNameTheso(String testNameTheso) {
+        this.testNameTheso = testNameTheso;
     }
 
  

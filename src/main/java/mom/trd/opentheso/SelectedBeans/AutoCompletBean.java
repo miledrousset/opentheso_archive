@@ -400,14 +400,26 @@ public class AutoCompletBean implements Serializable {
         } 
         
         RelationsHelper relationsHelper = new RelationsHelper();
-        if (!relationsHelper.addRelationNT(connect.getPoolConnexion(), 
-                terme.getIdC(),
-                terme.getIdTheso(),
-                terme.getSelectedTermComp().getIdConcept(),
-                terme.getUser().getUser().getIdUser())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-            return;
-        }
+        
+        try {
+            Connection conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            
+            if (!relationsHelper.addRelationNT(conn, 
+                    terme.getIdC(),
+                    terme.getIdTheso(),
+                    terme.getSelectedTermComp().getIdConcept(),
+                    terme.getUser().getUser().getIdUser())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+                conn.rollback();
+                conn.close();
+                return;
+            }
+            conn.commit();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }        
         
         tree.reInit();
         tree.reExpand();
@@ -419,11 +431,27 @@ public class AutoCompletBean implements Serializable {
     
     private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
         RelationsHelper relationsHelper = new RelationsHelper();
+        if(idConcept1.equalsIgnoreCase(idConcept2)) return false;
+        
+        // relations RT et NT en même temps interdites
         if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true) 
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
             return false;
-        else
-            return true;
+        }
+        
+        // relations BT et NT en même temps interdites
+        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }
+        
+        // relation entre frères est interdite 
+        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }        
+        
+        return true;
     }
     
     private boolean isAddRelationRTValid(String idConcept1, String idConcept2) {

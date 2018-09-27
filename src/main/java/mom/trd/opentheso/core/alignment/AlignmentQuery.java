@@ -5,7 +5,6 @@
  */
 package mom.trd.opentheso.core.alignment;
 
-import java.util.ArrayList;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import javax.xml.parsers.*;
 import org.xml.sax.InputSource;
@@ -33,22 +32,23 @@ import skos.SKOSXmlDocument;
 
 
 
+
 import com.bordercloud.sparql.Endpoint;
 import com.bordercloud.sparql.EndpointException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.net.ssl.HttpsURLConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
- * @author Carole
+ * @author Miled Rousset
  */
 public class AlignmentQuery {
 
     private ArrayList<NodeAlignment> listeAlign;
 
-    
-    
-    
 
     ////////////////////////////////////////
     ////////////////////////////////////////
@@ -57,6 +57,89 @@ public class AlignmentQuery {
     //////                     /////////////
     ////////////////////////////////////////
     ////////////////////////////////////////
+    
+    /**
+     * Cette fonction permet de récupérer les alignements présents sur Wikipedia
+     * pour un concept passé en paramètre
+     *
+     * @param idC
+     * @param idTheso
+     * @param lexicalValue
+     * @param lang
+     * @param requete
+     * @param source
+     * @return
+     */
+    public ArrayList<NodeAlignment> queryGemet(String idC, String idTheso,
+            String lexicalValue, String lang,
+            String requete, String source) {
+        listeAlign = new ArrayList<>();
+        
+        lexicalValue = lexicalValue.replaceAll(" ", "%20");
+        requete = requete.replace("##lang##", lang);
+        requete = requete.replace("##value##", lexicalValue);
+            try {
+            URL url = new URL(requete);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            String output;
+            String records = "";
+            while ((output = br.readLine()) != null) {
+                records += output;
+            }
+            byte[] bytes = records.getBytes();
+            records = new String(bytes, Charset.forName("UTF-8"));
+            conn.disconnect();
+           
+            try {
+                String title = "";
+                String uri = "";
+                JSONArray jArray = new JSONArray(records);
+
+                for (int i = 0; i < jArray.length(); i++) {
+                    JSONObject jb = jArray.getJSONObject(i);
+                    title = jb.getJSONObject("preferredLabel").getString("string");
+                    uri = jb.getString("uri");
+
+                    NodeAlignment na = new NodeAlignment();
+                    //si le titre est équivalent, on le place en premier
+                    if(lexicalValue.trim().equalsIgnoreCase(title.trim())) {
+                        na.setConcept_target(title);
+                        na.setDef_target("");
+                        na.setInternal_id_concept(idC);
+                        na.setInternal_id_thesaurus(idTheso);
+                        na.setThesaurus_target(source);
+                        na.setUri_target(uri);
+                        listeAlign.add(0, na);
+                    }
+                    else {
+                      na.setConcept_target(title);
+                        na.setDef_target("");
+                        na.setInternal_id_concept(idC);
+                        na.setInternal_id_thesaurus(idTheso);
+                        na.setThesaurus_target(source);
+                        na.setUri_target(uri);
+                        listeAlign.add(na);
+                    }                    
+                    
+                }
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+
+        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+        }
+        return listeAlign;
+    }    
     
     /**
      * Cette fonction permet de récupérer les alignements présents sur Wikipedia
@@ -158,6 +241,8 @@ public class AlignmentQuery {
         }
         return listeAlign;
     }
+    
+    
     
    /**
      * Cette fonction permet de récupérer les alignements présents sur Opentheso
@@ -274,6 +359,71 @@ public class AlignmentQuery {
     ////////////////////////////////////////   
     
 
+    /**
+     * Aligenement du thésaurus vers la source Wikidata en Sparql et en retour du Json
+     * @param idC
+     * @param idTheso
+     * @param lexicalValue
+     * @param lang
+     * @param requete
+     * @param source
+     * @return 
+     */
+    public ArrayList<NodeAlignment> queryWikidata(String idC, String idTheso,
+            String lexicalValue, String lang, 
+            String requete, String source) {
+        listeAlign = new ArrayList<>();
+        try {
+            Endpoint sp = new Endpoint("https://query.wikidata.org/sparql", false);
+
+    /*       String querySelect = "SELECT ?item ?itemLabel ?itemDescription WHERE {" +
+                                    "  ?item rdfs:label \"fibula\"@en." +
+                                    "  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }" +
+                                    "}";*/
+
+            requete = requete.replaceAll("##value##", lexicalValue);
+            requete = requete.replaceAll("##lang##", lang);
+            HashMap<String, HashMap> rs = sp.query(requete);
+
+            ArrayList<HashMap<String, Object>> rows_queryWikidata = (ArrayList) rs.get("result").get("rows");
+            for (HashMap<String, Object> hashMap : rows_queryWikidata) {
+                NodeAlignment na = new NodeAlignment();
+                na.setInternal_id_concept(idC);
+                na.setInternal_id_thesaurus(idTheso);
+                
+                // label ou Nom
+                if(hashMap.get("itemLabel") != null)
+                    na.setConcept_target(hashMap.get("itemLabel").toString());
+                else
+                    continue;
+                
+                // description
+                if(hashMap.get("itemDescription") != null)
+                    na.setDef_target(hashMap.get("itemDescription").toString());
+                else 
+                    na.setDef_target("");
+                
+                na.setThesaurus_target(source);
+                                
+                // URI
+                if(hashMap.get("item") != null)
+                    na.setUri_target(hashMap.get("item").toString());
+                else 
+                    continue;
+                
+                listeAlign.add(na);
+                
+              /*  System.out.println("URI : " + hashMap.get("item"));
+                System.out.println("URI : " + hashMap.get("itemLabel"));
+                System.out.println("URI : " + hashMap.get("itemDescription"));*/
+            }
+        } catch (EndpointException eex) {
+            System.out.println(eex);
+            eex.printStackTrace();
+        }
+        return listeAlign;
+    }     
+    
     /**
      * cette fonction permet de récuperer les alignements de la BNF 
      * requête de type Sparql
@@ -414,61 +564,7 @@ public class AlignmentQuery {
         */
 
     
-    /////// à faire pour wikiData 
-    public ArrayList<NodeAlignment> queryWikidata(String idC, String idTheso,
-            String lexicalValue, String lang, 
-            String requete, String source) {
-        listeAlign = new ArrayList<>();
-        try {
-            Endpoint sp = new Endpoint("https://query.wikidata.org/sparql", false);
-
-    /*        String querySelect = "SELECT ?item ?itemLabel ?itemDescription WHERE {" +
-                                    "  ?item rdfs:label \"fibula\"@en." +
-                                    "  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }" +
-                                    "}";*/
-
-            requete = requete.replaceAll("##value##", lexicalValue);
-            requete = requete.replaceAll("##lang##", lang);
-            HashMap<String, HashMap> rs = sp.query(requete);
-
-            ArrayList<HashMap<String, Object>> rows_queryWikidata = (ArrayList) rs.get("result").get("rows");
-            for (HashMap<String, Object> hashMap : rows_queryWikidata) {
-                NodeAlignment na = new NodeAlignment();
-                na.setInternal_id_concept(idC);
-                na.setInternal_id_thesaurus(idTheso);
-                
-                // label ou Nom
-                if(hashMap.get("itemLabel") != null)
-                    na.setConcept_target(hashMap.get("itemLabel").toString());
-                else
-                    continue;
-                
-                // description
-                if(hashMap.get("itemDescription") != null)
-                    na.setDef_target(hashMap.get("itemDescription").toString());
-                else 
-                    na.setDef_target("");
-                
-                na.setThesaurus_target(source);
-                                
-                // URI
-                if(hashMap.get("item") != null)
-                    na.setUri_target(hashMap.get("item").toString());
-                else 
-                    continue;
-                
-                listeAlign.add(na);
-                
-              /*  System.out.println("URI : " + hashMap.get("item"));
-                System.out.println("URI : " + hashMap.get("itemLabel"));
-                System.out.println("URI : " + hashMap.get("itemDescription"));*/
-            }
-        } catch (EndpointException eex) {
-            System.out.println(eex);
-            eex.printStackTrace();
-        }
-        return listeAlign;
-    }   
+  
     
 
     
@@ -516,91 +612,6 @@ public class AlignmentQuery {
         qexec.close();
         return listeAlign;
     }
-
-    /**
-     * Cette fonction permet de récupérer les alignements présents sur Gemet
-     * pour un concept passé en paramètre
-     *
-     * @param idC
-     * @param idTheso
-     * @param lexicalValue
-     * @param lang
-     * @return
-     */
-    private ArrayList<NodeAlignment> queryGemet(String idC, String idTheso, String lexicalValue, String lang) {
-        listeAlign = new ArrayList<>();
-        if (lexicalValue.contains(" ")) {
-            lexicalValue = lexicalValue.substring(0, lexicalValue.indexOf(" "));
-        }
-        String sparqlQueryString1 = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-                + "SELECT * WHERE {"
-                + "       ?uri skos:prefLabel ?pl ."
-                + "       FILTER(regex(?pl,\"" + lexicalValue + "*\"))"
-                + "       FILTER ( (lang(?pl)=\"" + lang + "\") )"
-                + "   }";
-        
-        /*
-        
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-                SELECT * WHERE {
-                 ?uri skos:prefLabel ?pl .
-                      FILTER(regex(?pl,"Enseignement"))
-                      FILTER ( (lang(?pl)="fr") )
-
-                  }
-        */
-        
-        //System.out.println(sparqlQueryString1);
-
-        /*String endpointURL = "http://cr.eionet.europa.eu/sparql";
-         SPARQLRepository crEndpoint = new SPARQLRepository(endpointURL);
-         RepositoryConnection conn = null;
-         try {
-         crEndpoint.initialize();
-         conn = crEndpoint.getConnection();
-         TupleQuery q = conn.prepareTupleQuery(QueryLanguage.SPARQL, sparqlQueryString1);
-         TupleQueryResult bindings = q.evaluate();
-         while (bindings.hasNext()) {
-         BindingSet b = bindings.next();
-         NodeAlignment na = new NodeAlignment();
-         na.setInternal_id_concept(idC);
-         na.setInternal_id_thesaurus(idTheso);
-         na.setConcept_target(b.getBinding("pl").getValue().stringValue());
-         na.setDef_target(b.getBinding("def").getValue().stringValue());
-         na.setThesaurus_target("Gemet");
-         na.setUri_target(b.getBinding("uri").getValue().stringValue());
-         listeAlign.add(na);
-         }
-         } catch (Exception e) {
-         e.printStackTrace();
-         } finally {
-         try {
-         conn.close();
-         } catch (RepositoryException e) {
-         e.printStackTrace();
-         }
-         }*/
-        Query query = QueryFactory.create(sparqlQueryString1);
-        QueryExecution qexec = QueryExecutionFactory.sparqlService("http://cr.eionet.europa.eu/sparql", query);
-
-        ResultSet results = qexec.execSelect();
-        while (results.hasNext()) {
-            QuerySolution qs = results.next();
-            NodeAlignment na = new NodeAlignment();
-            na.setInternal_id_concept(idC);
-            na.setInternal_id_thesaurus(idTheso);
-            na.setConcept_target(qs.get("pl").toString());
-            na.setDef_target(qs.get("def").toString());
-            na.setThesaurus_target("Gemet");
-            na.setUri_target(qs.get("uri").toString());
-            listeAlign.add(na);
-        }
-
-        qexec.close();
-        return listeAlign;
-    }
-
  
 
     public ArrayList<NodeAlignment> getListeAlign() {

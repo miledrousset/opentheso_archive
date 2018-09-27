@@ -1569,12 +1569,12 @@ ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.role_i
 -- Data for Name: alignement_source; Type: TABLE DATA; Schema: public; Owner: opentheso
 --
 
-INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Geoname', 'http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=opentheso', 'REST', 'xml', 4, NULL, 'test de geonames', true);
+INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Geoname', 'http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=opentheso', 'REST', 'xml', 1, NULL, 'test de geonames', true);
 INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Pactols', 'http://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1', 'REST', 'skos', 2, NULL, '', false);
 INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('wikidata', 'SELECT ?item ?itemLabel ?itemDescription WHERE {
             ?item rdfs:label "##value##"@##lang##.
             SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],##lang##". }
-}', 'SPARQL', 'json', 9, 9, 'alignement avec le thésaurus de wikidata', false);
+}', 'SPARQL', 'json', 3, 9, 'alignement avec le thésaurus de wikidata', false);
 INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('bnf_instrumentMusique', 'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xml: <http://www.w3.org/XML/1998/namespace>
 SELECT ?instrument ?prop ?value where {
@@ -1582,7 +1582,9 @@ SELECT ?instrument ?prop ?value where {
   ?instrument ?prop ?value.
   FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, ##value##,"i") ) 
     filter(lang(?value) =##lang##)
-} LIMIT 20', 'SPARQL', 'skos', 3, NULL, '', false);
+} LIMIT 20', 'SPARQL', 'skos', 4, NULL, '', false);
+
+INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Gemet', 'http://www.eionet.europa.eu/gemet/getConceptsMatchingKeyword?keyword=##value##&search_mode=3&thesaurus_uri=http://www.eionet.europa.eu/gemet/concept/&language=##lang##', 'REST', 'json', 5, NULL, 'source Gemet', false);
 
 
 --

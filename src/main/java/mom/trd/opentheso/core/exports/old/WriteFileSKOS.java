@@ -419,7 +419,7 @@ public class WriteFileSKOS {
         // URI de type Handle
         if (nodeConceptExport.getConcept().getIdHandle() != null) {
             if (!nodeConceptExport.getConcept().getIdHandle().trim().isEmpty()) {
-                uri = "http://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
+                uri = "https://hdl.handle.net/" + nodeConceptExport.getConcept().getIdHandle();
                 return uri;
             }
         }        

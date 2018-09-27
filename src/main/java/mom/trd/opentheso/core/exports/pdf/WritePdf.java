@@ -453,7 +453,7 @@ public class WritePdf {
                 case SKOSProperty.narrowerGeneric:
                     codeRelation = "NTG";
                     break;
-                case SKOSProperty.narrowerInstantive:
+                case SKOSProperty.narrowerInstantial:
                     codeRelation = "NTI";
                     break;
                 case SKOSProperty.narrowerPartitive:
@@ -462,7 +462,7 @@ public class WritePdf {
                 case SKOSProperty.broaderGeneric:
                     codeRelation = "BTG";
                     break;
-                case SKOSProperty.broaderInstantive:
+                case SKOSProperty.broaderInstantial:
                     codeRelation = "BTI";
                     break;
                 case SKOSProperty.broaderPartitive:

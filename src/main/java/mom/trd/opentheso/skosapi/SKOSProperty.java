@@ -22,10 +22,10 @@ public interface SKOSProperty {
     public static final int memberOf = 11;
     public static final int mainConceptOf = 12;
     public static final int broaderGeneric =13;
-    public static final int broaderInstantive=14;
+    public static final int broaderInstantial=14;
     public static final int broaderPartitive=15;
     public static final int narrowerGeneric=16;
-    public static final int narrowerInstantive=17;
+    public static final int narrowerInstantial=17;
     public static final int narrowerPartitive=18;
     public static final int relatedHasPart=19;
     public static final int relatedPartOf=-1;
@@ -48,7 +48,7 @@ public interface SKOSProperty {
     //Labelling Properties
     public static final int prefLabel = 40;
     public static final int altLabel = 41;
-    public static final int hiddenLabel = 42;
+    public static final int hiddenLabel=42;
 
     //Dates
     public static final int created = 50;

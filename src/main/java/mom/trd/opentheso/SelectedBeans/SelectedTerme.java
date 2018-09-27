@@ -105,19 +105,12 @@ public class SelectedTerme implements Serializable {
     private TreeNode root;
     private MyTreeNode selectedNode;
     private NodeAutoCompletion selectedTermComp;
-    private boolean allLangue = false;
+
 
     private ArrayList<Entry<String, String>> arrayFacette;
 
     private ArrayList<Entry<String, String>> langues = new ArrayList<>();
-    private String note;
-    private String definition;
-    private String noteApplication;
-    private String noteHistorique;
-    private String noteEditoriale;
 
-    private ArrayList<NodeNote> nodeNoteTermList;
-    private ArrayList<NodeNote> nodeNoteConceptList;
 
     private String idT;
     private String idC;
@@ -170,7 +163,7 @@ public class SelectedTerme implements Serializable {
     private NodeSearch nodeSe;
     private NodePermute nodePe;
 
-    public String icon = "+";
+
 
     public String messageAlig = "";
 
@@ -207,6 +200,9 @@ public class SelectedTerme implements Serializable {
     
     @ManagedProperty(value = "#{roleOnTheso}")
     private RoleOnThesoBean roleOnTheso;
+    
+    @ManagedProperty(value = "#{note}")
+    private Note note;    
 
 
     /**
@@ -262,11 +258,7 @@ public class SelectedTerme implements Serializable {
         langues = new ArrayList<>();
         images = new ArrayList<>();
         align = new ArrayList<>();
-        note = "";
-        definition = "";
-        noteApplication = "";
-        noteHistorique = "";
-        noteEditoriale = "";
+
         idT = "";
         idC = null;
         status = "";
@@ -346,7 +338,7 @@ public class SelectedTerme implements Serializable {
             majGroupTGen();
             majLangueGroup();
             majTSpeGroup();
-            majNotes();
+            note.majNotes(idC, idT, idTheso, idlangue);
 
         } else {
             Concept concept = conceptHelper.getThisConcept(connect.getPoolConnexion(), idC, idTheso);
@@ -374,7 +366,7 @@ public class SelectedTerme implements Serializable {
             contributor = t.getContributor();
 
             images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso);
-            majNotes();
+            note.majNotes(idC, idT, idTheso, idlangue);
             majLangueConcept();
             majSyno();
             updateGps();
@@ -633,66 +625,7 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    private void initNotes() {
-        noteEditoriale = "";
-        definition = "";
-        noteHistorique = "";
-        noteApplication = "";
-        note = "";
-    }
 
-    private void majNotes() {
-        // NodeNote contient la note avec le type de note, il faut filtrer pour trouver la bonne note
-        // For Concept : customnote ; scopeNote ; historyNote
-        // For Term : definition; editorialNote; historyNote; 
-        initNotes();
-        nodeNoteTermList = new NoteHelper().getListNotesTerm(connect.getPoolConnexion(), idT, idTheso, idlangue);
-        for (NodeNote nodeNoteList1 : nodeNoteTermList) {
-            if (nodeNoteList1 != null) {
-                // cas d'une noteEditoriale
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("editorialNote")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        noteEditoriale = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-                // cas de definitionNote
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("definition")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        definition = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-                // cas de HistoryNote
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("historyNote")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        noteHistorique = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-            }
-        }
-        nodeNoteConceptList = new NoteHelper().getListNotesConcept(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        for (NodeNote nodeNoteList1 : nodeNoteConceptList) {
-            if (nodeNoteList1 != null) {
-                // cas de Note d'application
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("scopeNote")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        noteApplication = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-                // cas de HistoryNote
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("historyNote")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        noteHistorique = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-                // cas de Note
-                if (nodeNoteList1.getNotetypecode().equalsIgnoreCase("note")) {
-                    if (nodeNoteList1.getLexicalvalue() != null) {
-                        note = nodeNoteList1.getLexicalvalue();
-                    }
-                }
-            }
-        }
-    }
 
     public void majLangueConcept() {
         langues = new ArrayList<>();
@@ -953,6 +886,7 @@ public class SelectedTerme implements Serializable {
             }
           //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
             concept.getUserName();
+           // selecedTerm.setIdConcept(concept.getIdConcept());
             ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
@@ -1644,6 +1578,13 @@ public class SelectedTerme implements Serializable {
                         listAlignValues = alignmentQuery.queryWikipedia(idConcept, idTheso, lexicalValue.trim(),
                                 idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
                     }
+                    // action json (Gemet)
+                    if ("json".equals(alignementSource1.getAlignement_format())) {
+                        //ici il faut appeler le filtre pour Gemet
+                        listAlignValues = alignmentQuery.queryGemet(idConcept, idTheso, lexicalValue.trim(),
+                                idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
+                    }                    
+                    
                 }
                 if ("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete())) {
                     // action SKOS (BNF)
@@ -1843,42 +1784,7 @@ public class SelectedTerme implements Serializable {
         return true;
     }
 
-    /**
-     * Crée ou modifie la définition du terme courant
-     */
-    public void editDef() {
-        int idUser = user.getUser().getIdUser();
-        if (definition.isEmpty()) {
-            deleteThisNoteOfConcept("note");
-            return;
-        }
-        if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "definition")) {
-            new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, definition, "definition", idUser);
-        } else {
-            new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, definition, "definition", idUser);
-        }
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info3")));
-    }
 
-    /**
-     * Cette fontion permet de modifié l'information du note
-     *
-     */
-    public void editNote() {
-        int idUser = user.getUser().getIdUser();
-        if (note.isEmpty()) {
-            deleteThisNoteOfConcept("note");
-            return;
-        }
-        if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, "note")) {
-            new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
-        } else {
-            new NoteHelper().addConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, note, "note", idUser);
-        }
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
-    }
 
     /**
      * Cette fontion permet d'avoir l'information que se besoin du term qu'on va
@@ -1934,8 +1840,16 @@ public class SelectedTerme implements Serializable {
         term.setId_term(idT);
         term.setId_thesaurus(idTheso);
         term.setLang(langEnTraduction);
-
-        if (!new TermHelper().updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
+        TermHelper termHelper = new TermHelper();
+        
+        if (termHelper.isTermExist(connect.getPoolConnexion(),
+                term.getLexical_value(),
+                term.getId_thesaurus(), term.getLang())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
+            return;
+        }
+        
+        if (!termHelper.updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
             //erreur
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
@@ -1973,84 +1887,7 @@ public class SelectedTerme implements Serializable {
         majLangueGroup();
     }       
 
-    /**
-     * Cette fonction permet de supprimer une note suivant son type
-     *
-     * @param noteTypeCode
-     */
-    public void deleteThisNoteOfConcept(String noteTypeCode) {
-        int idUser = user.getUser().getIdUser();
-        new NoteHelper().deletethisNoteOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, noteTypeCode);
 
-        majNotes();
-
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info13")));
-    }
-
-    /**
-     * Cette fonction permet de supprimer une note suivant son type
-     *
-     * @param noteTypeCode
-     */
-    public void deleteThisNoteOfTerm(String noteTypeCode) {
-        int idUser =user.getUser().getIdUser();
-        new NoteHelper().deleteThisNoteOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, noteTypeCode);
-
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info13")));
-    }
-
-    public void editNoteApp() {
-        int idUser = user.getUser().getIdUser();
-        if (noteApplication.isEmpty()) {
-            deleteThisNoteOfConcept("note");
-            return;
-        }
-        if (new NoteHelper().isNoteExistOfConcept(connect.getPoolConnexion(), idC, idTheso, idlangue, "scopeNote")) {
-            new NoteHelper().updateConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, noteApplication, "scopeNote", idUser);
-        } else {
-            new NoteHelper().addConceptNote(connect.getPoolConnexion(), idC, idlangue, idTheso, noteApplication, "scopeNote", idUser);
-        }
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
-    }
-
-    /**
-     * Crée ou modifie la note historique du terme courant
-     */
-    public void editNoteHisto() {
-        int idUser = user.getUser().getIdUser();
-        if (noteHistorique.isEmpty()) {
-            deleteThisNoteOfConcept("note");
-            return;
-        }
-        if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "historyNote")) {
-            new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteHistorique, "historyNote", idUser);
-        } else {
-            new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteHistorique, "historyNote", idUser);
-        }
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info12")));
-    }
-
-    /**
-     * Crée ou modifie la note éditoriale du terme courant
-     */
-    public void editNoteEdit() {
-
-        int idUser = user.getUser().getIdUser();
-        if (noteEditoriale.isEmpty()) {
-            deleteThisNoteOfConcept("note");
-            return;
-        }
-        if (new NoteHelper().isNoteExistOfTerm(connect.getPoolConnexion(), idT, idTheso, idlangue, "editorialNote")) {
-            new NoteHelper().updateTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteEditoriale, "editorialNote", idUser);
-        } else {
-            new NoteHelper().addTermNote(connect.getPoolConnexion(), idT, idlangue, idTheso, noteEditoriale, "editorialNote", idUser);
-        }
-        majNotes();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info5")));
-    }
 
     public void insertInFacet() {
         new FacetHelper().addConceptToFacet(connect.getPoolConnexion(), Integer.parseInt(valueEdit), idTheso, idC);
@@ -2095,7 +1932,7 @@ public class SelectedTerme implements Serializable {
     public void delTrad(String lang) {
         new TermHelper().deleteTraductionOfTerm(connect.getPoolConnexion(), idT, lang, idTheso, user.getUser().getIdUser());
         majLangueConcept();
-        majNotes();
+        note.majNotes(idC, idT, idTheso, idlangue);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
     }
 
@@ -2485,22 +2322,6 @@ public class SelectedTerme implements Serializable {
         return true;
     }
 
-    /**
-     * Permet de voir les nouvelles notes et changer l'icon pour pouvoir voir
-     * touts les notes dans les autres langues;
-     */
-    public void valide() {
-        if (allLangue == true) {
-            allLangue = false;
-            majNotes();
-            icon = "+";
-        } else {
-            allLangue = true;
-
-            majNotes2();
-            icon = "-";
-        }
-    }
 
     /**
      * Renvoie le type du concept générique
@@ -2754,18 +2575,7 @@ public class SelectedTerme implements Serializable {
         return types;
     }
 
-    public void majNotes2() {
-        // NodeNote contient la note avec le type de note, il faut filtrer pour trouver la bonne note
-        // For Concept : customnote ; scopeNote ; historyNote
-        // For Term : definition; editorialNote; historyNote;
-        if (allLangue) {
-            initNotes();
-            nodeNoteTermList = new NoteHelper().getListNotesTerm2(connect.getPoolConnexion(), idT, idTheso);
-            nodeNoteConceptList = new NoteHelper().getListNotesConcept2(connect.getPoolConnexion(), idC, idTheso);
-        } else {
-            majNotes();
-        }
-    }
+
 
     /**
      * Retourne tous les types d'alignements présents
@@ -2964,46 +2774,6 @@ public class SelectedTerme implements Serializable {
 
     public void setIdTopConcept(String idTopConcept) {
         this.idTopConcept = idTopConcept;
-    }
-
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    public String getNoteApplication() {
-        return noteApplication;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public void setNoteApplication(String noteApplication) {
-        this.noteApplication = noteApplication;
-    }
-
-    public String getNoteHistorique() {
-        return noteHistorique;
-    }
-
-    public void setNoteHistorique(String noteHistorique) {
-        this.noteHistorique = noteHistorique;
-    }
-
-    public String getNoteEditoriale() {
-        return noteEditoriale;
-    }
-
-    public void setNoteEditoriale(String noteEditoriale) {
-        this.noteEditoriale = noteEditoriale;
     }
 
     public String getNomEdit() {
@@ -3352,37 +3122,7 @@ public class SelectedTerme implements Serializable {
         this.listnotes = listnotes;
     }
 
-    public ArrayList<NodeNote> getNodeNoteTermList() {
-        return nodeNoteTermList;
-    }
 
-    public void setNodeNoteTermList(ArrayList<NodeNote> nodeNoteTermList) {
-        this.nodeNoteTermList = nodeNoteTermList;
-    }
-
-    public ArrayList<NodeNote> getNodeNoteConceptList() {
-        return nodeNoteConceptList;
-    }
-
-    public void setNodeNoteConceptList(ArrayList<NodeNote> nodeNoteConceptList) {
-        this.nodeNoteConceptList = nodeNoteConceptList;
-    }
-
-    public boolean isAllLangue() {
-        return allLangue;
-    }
-
-    public void setAllLangue(boolean allLangue) {
-        this.allLangue = allLangue;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
 
     public ArrayList<AlignementSource> getAlignementSources() {
         return alignementSources;
@@ -3515,6 +3255,14 @@ public class SelectedTerme implements Serializable {
 
     public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
         this.roleOnTheso = roleOnTheso;
+    }
+
+    public Note getNote() {
+        return note;
+    }
+
+    public void setNote(Note note) {
+        this.note = note;
     }
     
 

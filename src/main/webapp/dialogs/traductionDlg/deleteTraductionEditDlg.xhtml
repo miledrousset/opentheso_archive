@@ -19,7 +19,7 @@
                     <td>
                         <h:form>
                             <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-supp" 
-                                             actionListener="#{selectedTerme.delTrad(itemTrad.key)}" update=":contenuDroite3" oncomplete="PF('deleteTraductionEditDlg').hide();">
+                                             actionListener="#{selectedTerme.delTrad(itemTrad.key)}" update=":contenuDroite3, :messages" oncomplete="PF('deleteTraductionEditDlg').hide();">
                                 <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid6')}" icon="ui-icon-alert" />  
                             </p:commandButton>  
 

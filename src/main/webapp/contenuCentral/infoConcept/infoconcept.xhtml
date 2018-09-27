@@ -1,3 +1,6 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -95,7 +98,7 @@
                 </h:panelGroup>
                 <h:outputText id="idC" value="id : "/>
                 <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/>
-                <h:outputText  rendered="#{selectedTerme.selectedNode.isSubGroup or selectedTerme.selectedNode.isGroup}" value="      Numéro : " />
+                <h:outputText  rendered="#{selectedTerme.selectedNode.isSubGroup or selectedTerme.selectedNode.isGroup}" value=" &nbsp; Numéro: " />
                 <h:outputText styleClass="textInfo" value=" #{selectedTerme.selectedNode.numerotation}" /> <br/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" id="idArk" value="ark: "/>
                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '') }" value ="#{selectedTerme.idArk}&lt;br/&gt;" escape="false" styleClass="textInfo"/>

@@ -432,7 +432,11 @@ CREATE TABLE alignement_source
                   ?instrument ?prop ?value.
                   FILTER( (regex(?prop,skos:prefLabel) || regex(?prop,skos:altLabel))  && regex(?value, ##value##,"i") ) 
                     filter(lang(?value) =##lang##)
-                } LIMIT 20'', ''SPARQL'', ''skos'', 1, ''Musique BNF'', false);';
+                } LIMIT 20'', ''SPARQL'', ''skos'', 1, ''Musique BNF'', false);
+                INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES (''Gemet'',
+                    ''http://www.eionet.europa.eu/gemet/getConceptsMatchingKeyword?keyword=##value##&search_mode=3&thesaurus_uri=http://www.eionet.europa.eu/gemet/concept/&language=##lang##'',
+                    ''REST'', ''json'', 1, ''source Gemet'', false);
+';
 
     END IF;
 END;

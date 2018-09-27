@@ -146,14 +146,29 @@
 
         
         
-        
-
-
+       
 
         <!-- liste des thésaurus autorisée pour l'export ou l'édition -->
         <center>
             <div id="generalEdition" style="height: 600px;">
                <div id="listeTheso" style="height: 580px;">
+    
+                   <!-- partie pour l'action de la création de thesaurus et import --> 
+                    <h:form>
+                        <p:commandButton  id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{editionBean.init()}" 
+                                          action="#{theso.setVueCreat(true)}" 
+                                          update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
+
+                        <p:commandButton  id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
+                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
+                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importDlg').show();" 
+                                        style="font-size: 12px;"/> 
+                            <p:menuitem title="Bug en cours de correction !!!" disabled="true" value="#{langueBean.getMsg('edit.importcsv')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importCSVDlg').show();" 
+                                        style="font-size: 12px;"/> 
+                        </p:menu>
+                    </h:form>
+                   <br/>
+                   
                     <h:panelGroup id="panTable" >
                         <p:dataTable id="tableTheso" value="#{roleOnTheso.listTheso}" var="listTheso" style="font-size: small" >
                             <p:column id="column1" width="100" style="text-align: left;">
@@ -542,33 +557,7 @@
 
 
 
-                <!-- partie pour l'action de la création de thesaurus --> 
-                <div style="clear: both"></div>
-                <div style="float: left;">
-                    <h:form>
-                        <p:commandButton  id="cbCreerTheso" value="#{langueBean.getMsg('edit.addTheso')}" actionListener="#{editionBean.init()}" 
-                                          action="#{theso.setVueCreat(true)}" 
-                                          update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
-                    </h:form>
-                </div>
-                
-                
-                
-                
-                
-                <!-- partie pour l'import SKOS et CSV --> 
-                <div style="float: left; margin-left: 40px;">
-                    <h:form>
-                        <p:commandButton  id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importDlg').show();" 
-                                        style="font-size: 12px;"/> 
-                            <p:menuitem title="Bug en cours de correction !!!" disabled="true" value="#{langueBean.getMsg('edit.importcsv')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importCSVDlg').show();" 
-                                        style="font-size: 12px;"/> 
-                        </p:menu>
-                    </h:form>
-
-                </div>
+            
                 <br/><br/>
             </div><br/>
             <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->

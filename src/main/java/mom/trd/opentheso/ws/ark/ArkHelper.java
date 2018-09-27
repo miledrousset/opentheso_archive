@@ -46,7 +46,7 @@ public class ArkHelper {
         ArkClientRest arkClientRest = new ArkClientRest();
 
         Properties propertiesArk = new Properties();
-        propertiesArk.setProperty("serverHost", "http://ark.mom.fr/Arkeo");//nodePreference.getServeurArk());
+        propertiesArk.setProperty("serverHost", "https://ark.mom.fr/Arkeo");//nodePreference.getServeurArk());
         propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
         propertiesArk.setProperty("user", nodePreference.getUserArk());
         propertiesArk.setProperty("password", nodePreference.getPassArk());

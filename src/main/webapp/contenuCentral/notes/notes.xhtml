@@ -1,16 +1,13 @@
 <!DOCTYPE html [
     <!ENTITY nbsp "&#160;"> 
-]>
-<ui:composition
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:p="http://primefaces.org/ui">
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
 
-
-    
-    <h:panelGroup> 
         <div id="divGenerale">
             <div class="titreNote">
                 <h:form id="allNotes">
@@ -19,30 +16,49 @@
                             <td style="text-align: right">
                             </td>
                             <td>
-                                <p:commandLink  value = "#{selectedTerme.icon}" title="#{langueBean.getMsg('index.viewAllNotes')}" 
-                                                styleClass="linkSmall" actionListener="#{selectedTerme.valide()}" update=":note, :allNotes"/>  
+
+                                <p:commandLink  value = "#{note.icon}" title="#{langueBean.getMsg('index.viewAllNotes')}" 
+                                                styleClass="linkSmall" 
+                                                actionListener="#{note.valide(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}" update=":note, :allNotes"/>  
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                     
-                           
+
                             </td> 
-                            
-                                     <!-- pour pouvoir utiliser &nbsp; , on besoin les 4 priere lignes -->
+
+                            <!-- pour pouvoir utiliser &nbsp; , on besoin les 4 priere lignes -->
                             <td style="text-align: left">
                                 <h:outputText value="#{langueBean.getMsg('index.note')}" />
                             </td>                                                        
                             <div id="imageEdition">
-                               <h:form id="formEditNote" 
-                                       rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and 
-                                                   (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
-                                                   and (selectedTerme.idDomaine != 'Orphan')}">
-                                   <p:commandButton id="dynaButtonNote" rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" styleClass="cbEdit" icon="ui-icon-edit-16"/>
-                                   <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
-                                       <p:menuitem value="#{langueBean.getMsg('index.note5')}"  oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
-                                       <p:menuitem value="#{langueBean.getMsg('index.note1')}"  oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
-                                       <p:menuitem value="#{langueBean.getMsg('index.note2')}"  oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
-                                       <p:menuitem value="#{langueBean.getMsg('index.note3')}"  oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
-                                       <p:menuitem value="#{langueBean.getMsg('index.note4')}"  oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
-                                   </p:menu>
-                               </h:form>
+                                    <p:commandButton id="dynaButtonNote" rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and
+                                                    (currentUser.user.name != null) and (selectedTerme.idC != null) and 
+                                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                                    and (selectedTerme.idDomaine != 'Orphan')}"
+                                                     styleClass="cbEdit" icon="ui-icon-edit-16">
+                                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
+                                            <p:menuitem value="#{langueBean.getMsg('index.note5')}" 
+                                                        action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
+                                                        update=":idNoteEditDlg"
+                                                        oncomplete="PF('noteEditDlg').show();" style="font-size: 12px;"/>
+                                            <p:menuitem value="#{langueBean.getMsg('index.note1')}" 
+                                                        action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
+                                                        update=":idDefinitionEditDlg"
+                                                        oncomplete="PF('definitionEditDlg').show();" style="font-size: 12px;"/>
+                                            <p:menuitem value="#{langueBean.getMsg('index.note2')}" 
+                                                        action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
+                                                        update=":idNotedApplicationEditDlg"                                                        
+                                                        oncomplete="PF('notedApplicationEditDlg').show();" style="font-size: 12px;"/>
+                                            <p:menuitem value="#{langueBean.getMsg('index.note3')}" 
+                                                        action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
+                                                        update=":idNoteHistoriqueEditDlg"                                                        
+                                                        oncomplete="PF('noteHistoriqueEditDlg').show();" style="font-size: 12px;"/>
+                                            <p:menuitem value="#{langueBean.getMsg('index.note4')}"
+                                                        action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
+                                                        update=":idNoteEditorialeEditDlg"                                                        
+                                                        oncomplete="PF ('noteEditorialeEditDlg').show()" style="font-size: 12px;"/>
+
+                                        </p:menu>
+                                    </p:commandButton>
+
                             </div>
                         </tr>
                     </table>
@@ -54,18 +70,17 @@
                 <!-- &lt;br/&gt; pour afficher <br/> -->
                 <div id="clean" />
                 <h:panelGroup id="note"  >
-                    <ui:repeat value="#{selectedTerme.nodeNoteTermList}" var="nodeNoteTermListVar">
+                    <ui:repeat value="#{note.nodeNoteTermList}" var="nodeNoteTermListVar">
                         <h:outputText value="#{nodeNoteTermListVar.notetypecode}:" />
                         <h:outputText value = " #{nodeNoteTermListVar.lexicalvalue} (#{nodeNoteTermListVar.lang}) " style="color: olivedrab"/>
-                            <br/>
+                        <br/>
                     </ui:repeat>
-                    <ui:repeat value="#{selectedTerme.nodeNoteConceptList}" var="nodeNoteConceptListVar">
+                    <ui:repeat value="#{note.nodeNoteConceptList}" var="nodeNoteConceptListVar">
                         <h:outputText value="#{nodeNoteConceptListVar.notetypecode}:"/>
                         <h:outputText value =" #{nodeNoteConceptListVar.lexicalvalue} (#{nodeNoteConceptListVar.lang}) " style="color: olivedrab"/>
                         <br/>
                     </ui:repeat>    
-               </h:panelGroup>
-        </div>
+                </h:panelGroup>
+            </div>
         </div>     
-    </h:panelGroup>
-</ui:composition>
+    </ui:composition>

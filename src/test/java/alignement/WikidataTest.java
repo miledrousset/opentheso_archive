@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package alignement.wikidata;
+package alignement;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -12,8 +12,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.bordercloud.sparql.Endpoint;
-import com.bordercloud.sparql.EndpointException;
+//import com.bordercloud.sparql.Endpoint;
+//import com.bordercloud.sparql.EndpointException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -51,8 +51,8 @@ public class WikidataTest {
 //        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],fr". }.
 //      }
     
-    @Test
-    public void searchValue() {
+   // @Test
+ /*   public void searchValue() {
         try {
             Endpoint sp = new Endpoint("https://query.wikidata.org/sparql", false);
 
@@ -78,7 +78,7 @@ public class WikidataTest {
             System.out.println(eex);
             eex.printStackTrace();
         }
-    }
+    }*/
 
 /*    public void printResult(HashMap rs , int size) {
 

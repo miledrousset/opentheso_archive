@@ -16,10 +16,14 @@
                         <h:outputLink rendered="#{(currentUser.user != null)}" onclick="#{currentUser.reGetUser()}" value="profiles.xhtml">
                         <h:outputText value="#{langueBean.getMsg('menu.div5')}" /></h:outputLink>&nbsp;                        
                         <h:outputLink rendered="#{(currentUser.user != null) and
+                                                  (roleOnTheso.idTheso != null) and
                                                   (roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso || roleOnTheso.isContributorOnThisTheso || currentUser.user.isSuperAdmin)}"
                                       onclick="#{searchCandidat.init()}" value="gestCandidat.xhtml">
+                            
                         <h:outputText value="#{langueBean.getMsg('menu.div2')}" /></h:outputLink>&nbsp;
-                        <h:outputLink rendered="#{(currentUser.user != null) and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
+                        <h:outputLink rendered="#{(currentUser.user != null) and
+                                                  (roleOnTheso.idTheso != null) and
+                                                  (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
                                       onclick="#{conf.clearSelect()}" value="conf.xhtml">
                         <h:outputText value="#{langueBean.getMsg('menu.div3')}" /></h:outputLink>&nbsp;     
                             
@@ -27,7 +31,9 @@
                         <h:outputLink rendered="#{(currentUser.user != null) and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
                                       onclick="#{roleOnTheso.showListTheso()} #{editionBean.init()}" class="edit" value="edition.xhtml">
                         <h:outputText value="#{langueBean.getMsg('menu.div4')}" /></h:outputLink>&nbsp;
-                        <h:outputLink rendered="#{(currentUser.user != null) and (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}" value="statistic.xhtml">
+                        <h:outputLink rendered="#{(currentUser.user != null) and
+                                                  (roleOnTheso.idTheso != null) and
+                                                  (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}" value="statistic.xhtml">
                         <h:outputText value="Statistiques" /></h:outputLink>
                     </div>   
                 </div>

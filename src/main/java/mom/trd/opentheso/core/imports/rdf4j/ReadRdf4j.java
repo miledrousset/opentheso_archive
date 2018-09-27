@@ -202,26 +202,32 @@ public class ReadRdf4j {
      * @return false si on a lus une balise de Documentation true sinon
      */
     private boolean readDocumentation(ReadStruct readStruct) {
+        String lang = "fr"; 
+        // si aucune langue n'est précisée, on applique la langue par défaut
+        if(readStruct.literal.getLanguage().isPresent()) {
+            lang = readStruct.literal.getLanguage().get();
+        }        
+        
         if (readStruct.property.getLocalName().equals("definition")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.definition);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.definition);
             return false;
         } else if (readStruct.property.getLocalName().equals("scopeNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.scopeNote);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.scopeNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("example")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.example);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.example);
             return false;
         } else if (readStruct.property.getLocalName().equals("historyNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.historyNote);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.historyNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("editorialNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.editorialNote);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.editorialNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("changeNote")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.changeNote);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.changeNote);
             return false;
         } else if (readStruct.property.getLocalName().equals("note")) {
-            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), readStruct.literal.getLanguage().get(), SKOSProperty.note);
+            readStruct.resource.addDocumentation(readStruct.literal.getLabel(), lang, SKOSProperty.note);
             return false;
         } else {
             return true;
@@ -243,8 +249,8 @@ public class ReadRdf4j {
         } else if (readStruct.property.getLocalName().equals("broaderGeneric")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderGeneric);
             return false;
-        } else if (readStruct.property.getLocalName().equals("broaderInstantive")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderInstantive);
+        } else if (readStruct.property.getLocalName().equals("broaderInstantial")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderInstantial);
             return false;
         } else if (readStruct.property.getLocalName().equals("broaderPartitive")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.broaderPartitive);
@@ -255,8 +261,8 @@ public class ReadRdf4j {
         } else if (readStruct.property.getLocalName().equals("narrowerGeneric")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerGeneric);
             return false;
-        } else if (readStruct.property.getLocalName().equals("narrowerInstantive")) {
-            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerInstantive);
+        } else if (readStruct.property.getLocalName().equals("narrowerInstantial")) {
+            readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerInstantial);
             return false;
         } else if (readStruct.property.getLocalName().equals("narrowerPartitive")) {
             readStruct.resource.addRelation(readStruct.value.toString(), SKOSProperty.narrowerPartitive);

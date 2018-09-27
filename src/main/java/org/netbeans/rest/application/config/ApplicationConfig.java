@@ -6,13 +6,16 @@
 package org.netbeans.rest.application.config;
 
 import java.util.Set;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import org.glassfish.jersey.server.wadl.internal.WadlResource;
+
 
 /**
  *
  * @author miled.rousset
  */
-@javax.ws.rs.ApplicationPath("webresources")
+@ApplicationPath("webresources")
 public class ApplicationConfig extends Application {
 
     @Override
@@ -32,6 +35,7 @@ public class ApplicationConfig extends Application {
         resources.add(mom.trd.opentheso.ws.rest.NewRestJson.class);
         resources.add(mom.trd.opentheso.ws.rest.NewRestSkos.class);
         resources.add(mom.trd.opentheso.ws.rest.Rest.class);
+        resources.add(mom.trd.opentheso.ws.rest.theso.class);
         resources.add(org.glassfish.jersey.server.wadl.internal.WadlResource.class);
     }
     

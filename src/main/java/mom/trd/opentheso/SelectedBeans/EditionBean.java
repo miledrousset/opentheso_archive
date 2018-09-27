@@ -262,16 +262,13 @@ public class EditionBean implements Serializable {
      */
     public boolean supprimerTheso(String idTheso1) {
         PreferencesHelper preferencesHelper = new PreferencesHelper();
-        NodePreference nodePreference = preferencesHelper.getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
-        if(nodePreference == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("info") + " :", "manque préférences !! "));
-            return false;
+        NodePreference nodePreference = preferencesHelper.getThesaurusPreferences(connect.getPoolConnexion(), idTheso1);
+        if(nodePreference != null) {
+            // suppression des Identifiants Handle
+            ConceptHelper conceptHelper = new ConceptHelper();
+            conceptHelper.setNodePreference(nodePreference);
+            conceptHelper.deleteAllIdHandle(connect.getPoolConnexion(), idTheso1);
         }
-        
-        // suppression des Identifiants Handle
-        ConceptHelper conceptHelper = new ConceptHelper();
-        conceptHelper.setNodePreference(nodePreference);
-        conceptHelper.deleteAllIdHandle(connect.getPoolConnexion(), idTheso1);        
         
         
         // suppression du thesaurus du group/projet
