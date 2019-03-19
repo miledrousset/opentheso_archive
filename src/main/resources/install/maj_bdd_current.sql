@@ -7,18 +7,71 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.3.8
--- date : 31/07/2018
+-- version=4.4.4
+-- date : 15/03/2019
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
-SET ROLE = opentheso;
+
+
+--- fonctions à appliquer en premier et à part depuis la version 4.4.1
+ SET ROLE = opentheso;
+ CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+CREATE OR REPLACE FUNCTION f_unaccent(text)
+  RETURNS text AS
+$func$
+SELECT public.unaccent('public.unaccent', $1)
+$func$  LANGUAGE sql IMMUTABLE;
+
+--- fin des fonctions à appliquer en premier et à part
 
 
 
 
 
+DROP TABLE public.note_type;
+CREATE TABLE public.note_type
+(
+  code text NOT NULL,
+  isterm boolean NOT NULL,
+  isconcept boolean NOT NULL,
+  label_fr character varying,
+  label_en character varying,
+  CONSTRAINT pk_note_type PRIMARY KEY (code),
+  CONSTRAINT chk_not_false_values CHECK (NOT (isterm = false AND isconcept = false))
+)
+WITH (
+  OIDS=FALSE
+);
 
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('note', false, true, 'Note', 'Note');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('historyNote', true, true, 'Note historique', 'History note');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('scopeNote', false, true, 'Note de portée', 'Scope note');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('example', true, false, 'Exemple', 'Example');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('editorialNote', true, false, 'Note éditoriale', 'Editorial note');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('definition', true, false, 'Définition', 'Definition');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('customNote', false, true, 'Custom note', 'Custom note');
+INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('changeNote', true, false, 'Note de changement', 'Change note');
+
+
+--alter table alignement drop constraint alignement_internal_id_concept_internal_id_thesaurus_id_ali_key;
+--alter table alignement drop constraint alignement_internal_id_concept_internal_id_thesaurus_id_alignem;
+--alter TABLE ONLY alignement add CONSTRAINT alignement_internal_id_concept_internal_id_thesaurus_uri_ta_key
+-- UNIQUE (internal_id_concept, internal_id_thesaurus, uri_target);
+
+--select internal_id_concept, internal_id_thesaurus, uri_target, count(*) from alignement 
+-- group by internal_id_concept, internal_id_thesaurus, uri_target having count(*)>1
+
+
+-- pour récupérer les concepts qui ont plusieurs domaines 
+-- select idconcept from concept_group_concept where idthesaurus = '1' 
+-- group by idconcept having count(idconcept) >1;
+
+-- pour trouver les branches polyhiérarchiques 
+-- select id_concept1 from hierarchical_relationship where role = 'BT' 
+--  group by id_concept1 having count(id_concept1) > 2;
 
 -- 
 -- ajout des nouvelles fonctions
@@ -274,9 +327,11 @@ INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id)
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('ia ', 'ina', 'Interlingua (International Auxiliary Language Association)', 'interlingua', 184);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('nn ', 'nno', 'Norwegian Nynorsk; Nynorsk, Norwegian', 'norvégien nynorsk', 185);
 INSERT INTO languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('gr ', 'grc', 'Greek, Ancient (to 1453)', 'grec ancien (jusqu''à 1453)', 186);
+INSERT INTO public.languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('iso', 'iso', 'norme ISO 233-2 (1993)', 'norme ISO 233-2 (1993)', 187);
+INSERT INTO public.languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('ala', 'ala', 'ALA-LC Romanization Table (American Library Association-Library of Congress)', 'ALA-LC)', 188);
+INSERT INTO public.languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('mul', 'mul', 'multiple langages', 'multiple langages', 189);
 
-
-SELECT pg_catalog.setval('languages_id_seq', 186, false);
+SELECT pg_catalog.setval('languages_id_seq', 189, false);
 
 
 
@@ -379,7 +434,7 @@ $$ LANGUAGE plpgsql;
 --Permet de creé la fonction si elle n'existe pas (auth_method)
 --
 
-  CREATE OR REPLACE FUNCTION addtype_auth_method() RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION addtype_auth_method() RETURNS VOID AS $$
 BEGIN
     IF not exists(SELECT e.enumlabel from pg_type t, pg_enum e
 		 where t.oid = e.enumtypid and t.typname = 'auth_method') then 
@@ -393,6 +448,56 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+
+--
+--Permet de creé la fonction si elle n'existe pas (relations_nt)
+--  
+
+CREATE OR REPLACE FUNCTION addtype_relations_nt() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'nt_type') THEN
+		 execute 				
+			'CREATE TABLE public.nt_type (
+                                id integer NOT NULL,
+                                relation character varying,
+                                description_fr character varying,
+                                description_en character varying
+                            );
+                        ALTER TABLE ONLY public.nt_type ADD CONSTRAINT nt_type_pkey PRIMARY KEY (id);
+                        ALTER TABLE ONLY public.nt_type ADD CONSTRAINT nt_type_relation_key UNIQUE (relation);
+                        INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES (1, ''NT'', ''Term spécifique'', ''Narrower term'');
+                        INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES (2, ''NTG'', ''Term spécifique (generic)'', ''Narrower term (generic)'');
+                        INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES (3, ''NTP'', ''Term spécifique (partitive)'', ''Narrower term (partitive)'');
+                        INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES (4, ''NTI'', ''Term spécifique (instantial)'', ''Narrower term (instantial)'');';
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql; 
+
+--
+--Permet de creé la fonction si elle n'existe pas (relations_bt)
+--  
+CREATE OR REPLACE FUNCTION addtype_relations_bt() RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (SELECT table_name FROM information_schema.tables WHERE table_name = 'bt_type') THEN
+		 execute 				
+			'CREATE TABLE public.bt_type (
+                                id integer NOT NULL,
+                                relation character varying,
+                                description_fr character varying,
+                                description_en character varying
+                            );
+                        ALTER TABLE ONLY public.bt_type ADD CONSTRAINT bt_type_pkey PRIMARY KEY (id);
+                        ALTER TABLE ONLY public.bt_type ADD CONSTRAINT bt_type_relation_key UNIQUE (relation);
+                        INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES (1, ''BT'', ''Terme générique'', ''Broader term'');
+                        INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES (2, ''BTG'', ''Terme générique (generic)'', ''Broader term (generic)'');
+                        INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES (3, ''BTP'', ''Terme générique (partitive)'', ''Broader term (partitive)'');
+                        INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES (4, ''BTI'', ''Terme générique (instance)'', ''Broader term (instance)'');';
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql; 
 
   
 --
@@ -420,11 +525,9 @@ CREATE TABLE alignement_source
 );
 
                 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES 
-                    (''wikipedia'', ''https://##lang##.wikipedia.org/w/api.php?action=query&list=search&srwhat=text&format=xml&srsearch=##value##&srnamespace=0"'', ''REST'', ''xml'', 1, ''wikipedia'', false);
-                INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES 
-                    (''Geoname'', ''http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=opentheso'', ''REST'', ''xml'', 1, ''test de geonames'', true);
+                    (''GeoNames'', ''http://api.geonames.org/search?q=##value##&maxRows=10&style=FULL&lang=##lang##&username=opentheso'', ''REST'', ''xml'', 1, ''test de geonames'', true);
                 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
-                    (''Pactols'', ''http://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1'', ''REST'', ''skos'', 1, ''test PACTOLS'', false);
+                    (''Pactols'', ''https://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1'', ''REST'', ''skos'', 1, ''test PACTOLS'', false);
                 INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES (''bnf'', ''PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX xml: <http://www.w3.org/XML/1998/namespace>
                 SELECT ?instrument ?prop ?value where {
@@ -436,6 +539,10 @@ CREATE TABLE alignement_source
                 INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES (''Gemet'',
                     ''http://www.eionet.europa.eu/gemet/getConceptsMatchingKeyword?keyword=##value##&search_mode=3&thesaurus_uri=http://www.eionet.europa.eu/gemet/concept/&language=##lang##'',
                     ''REST'', ''json'', 1, ''source Gemet'', false);
+                INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES (''Wikidata'', ''SELECT ?item ?itemLabel ?itemDescription WHERE {
+                            ?item rdfs:label "##value##"@##lang##.
+                            SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],##lang##". }
+                }'', ''SPARQL'', ''json'', 3, 9, ''alignement avec le thésaurus de Wikidata'', false);
 ';
 
     END IF;
@@ -1191,6 +1298,10 @@ begin
   end;
   $$LANGUAGE plpgsql;
 
+
+
+--- déprécié depuis la version 4.7 (inutile)
+
 --
 -- permet de changer les id des alignements s'ils sont à 0;
 --
@@ -1666,7 +1777,48 @@ begin
 end
 $$language plpgsql;
 
+----------------------------------------------------------------------------
+-- mises à jour
+--
+-- mise a jour de la table alignement (ajout d'une nouvelle contrainte)
+--
+create or replace function addConstraintTo_alignement() returns void as $$
+begin
+    IF EXISTS(SELECT * FROM information_schema.constraint_table_usage where constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_id_alignem') THEN
+        execute 'ALTER TABLE alignement DROP CONSTRAINT alignement_internal_id_concept_internal_id_thesaurus_id_alignem;';
+    END IF;
+    IF EXISTS(SELECT * FROM information_schema.constraint_table_usage where constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_id_ali_key') THEN
+        execute 'ALTER TABLE alignement DROP CONSTRAINT alignement_internal_id_concept_internal_id_thesaurus_id_ali_key;';
+    END IF;
+    
+   
+    IF NOT EXISTS(SELECT * FROM information_schema.constraint_table_usage where constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_uri_ta_key') THEN
+        execute 'alter TABLE ONLY alignement add CONSTRAINT alignement_internal_id_concept_internal_id_thesaurus_uri_ta_key
+	UNIQUE (internal_id_concept, internal_id_thesaurus, uri_target);';
+    END IF;
+end
+$$language plpgsql;
 
+
+----------------------------------------------------------------------------
+-- mises à jour
+--
+-- mise a jour des indexes pour augmenter les performances
+--
+
+
+
+
+
+
+
+CREATE INDEX IF NOT EXISTS  term_lexical_value_unaccent ON term USING GIN (f_unaccent(lower(lexical_value)) gin_trgm_ops);
+
+CREATE INDEX IF NOT EXISTS  term_lexical_value_npt_unaccent ON non_preferred_term USING GIN (f_unaccent(lower(lexical_value)) gin_trgm_ops);
+
+CREATE INDEX IF NOT EXISTS  note_lexical_value_unaccent ON note USING GIN (f_unaccent(lower(lexicalvalue)) gin_trgm_ops);
+
+CREATE INDEX IF NOT EXISTS  concept_notation_unaccent ON concept USING GIN (f_unaccent(lower(notation)) gin_trgm_ops);
 
 
 
@@ -1737,6 +1889,8 @@ SELECT addtype_Alignement_type_rqt();
 SELECT add_primary_keyalignement();
 
 
+SELECT addtype_relations_nt();
+SELECT addtype_relations_bt();
 SELECT addtype_auth_method();
 SELECT create_table_aligenementSources();
 SELECT updateColumn_alignement_source();
@@ -1750,12 +1904,13 @@ SELECT ajoutercolumn_alignement();
 
 
 UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
-SELECT id_alignements();
+--SELECT id_alignements();
+SELECT addConstraintTo_alignement();
 --SELECT changeconstraintalignement();
 
 SELECT delete_constraint_term_changer_concept_historique();
 
-SELECT drop_constraint_alignement_source();
+--SELECT drop_constraint_alignement_source();
 SELECT create_table_alignement_type();
 SELECT ajoutercolumn_preferences();
 
@@ -1965,6 +2120,56 @@ create or replace function update_table_users() returns void as $$
 $$language plpgsql;
 
 
+----------------------------------------------------------------------------
+-- mise à jour de la table préférences pour le lien permanent vers le thésaurus DNS
+-- ajout de la colonne preferredname 
+
+create or replace function update_table_preferences_preferredName() returns void as $$
+    declare
+	line RECORD;
+	begin 
+            IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='preferences' AND column_name='preferredname' ) THEN
+                execute 'Alter TABLE preferences ADD COLUMN preferredname character varying;
+                        Alter TABLE ONLY preferences add CONSTRAINT preferences_preferredname_key UNIQUE (preferredname);';
+            end if;
+	end;
+$$language plpgsql;
+
+
+----------------------------------------------------------------------------
+-- mise à jour de la table images pour la gestion des URI externes 
+
+create or replace function update_table_imagesUri() returns void as $$
+    declare
+	line RECORD;
+	begin 
+            IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='images' AND column_name='external_uri' ) THEN
+                execute 'Alter TABLE images ADD COLUMN external_uri character varying NOT NULL DEFAULT ''''::character varying;
+                        Alter TABLE ONLY images drop CONSTRAINT images_pkey;';
+
+            end if;
+	end;
+$$language plpgsql;
+
+
+create or replace function create_table_external_images() returns void as $$
+    begin 
+        IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='external_images') THEN
+            execute 'CREATE TABLE external_images
+                    (
+                      id_concept character varying NOT NULL,
+                      id_thesaurus character varying NOT NULL,
+                      image_name character varying NOT NULL,
+                      image_copyright character varying NOT NULL,
+                      id_user integer,
+                      external_uri character varying NOT NULL DEFAULT ''''::character varying,
+                      CONSTRAINT external_images_pkey PRIMARY KEY (id_concept, id_thesaurus, external_uri)
+                    );';
+
+        end if;
+    end;
+$$language plpgsql;
+
 
 -- execution des fonctions 
 SELECT alter_table_concept_group_addColumn_id_handle();
@@ -1974,6 +2179,9 @@ SELECT create_table_user_role_only_on();
 SELECT user_group_thesaurus();
 SELECT ajouter_sequence('user_group_label__id_seq');
 SELECT user_group_label();
+SELECT update_table_preferences_preferredName();
+SELECT update_table_imagesUri();
+SELECT create_table_external_images();
 
 -- suppression des fonctions 
 select delete_fonction('alter_table_concept_group_addColumn_id_handle','');
@@ -1982,6 +2190,9 @@ select delete_fonction('create_table_user_role_group','');
 select delete_fonction('create_table_user_role_only_on','');
 select delete_fonction('user_group_thesaurus','');
 select delete_fonction('user_group_label','');
+select delete_fonction('update_table_preferences_preferredName','');
+select delete_fonction('update_table_imagesUri', '');
+select delete_fonction('create_table_external_images','');
 
 
 
@@ -2031,6 +2242,8 @@ SELECT delete_fonction ('delete_sequence','TEXT');
 --SELECT delete_fonction ('createuser_role','');
 SELECT delete_fonction ('create_table_aligenementsources','');
 SELECT delete_fonction ('ajouter_sequence','TEXT');
+SELECT delete_fonction ('addtype_relations_nt','');
+SELECT delete_fonction ('addtype_relations_bt','');
 SELECT delete_fonction ('addtype_auth_method','');
 SELECT delete_fonction ('addtype_alignement_type_rqt','');
 SELECT delete_fonction ('addtype_alignement_format','');
@@ -2042,10 +2255,11 @@ SELECT delete_fonction ('ajoutercolumn_alignement','');
 SELECT delete_fonction ('create_table_alignement_type','');
 SELECT delete_fonction ('create_table_note_type','');
 SELECT delete_fonction ('adjouteconstraint_alignement_source','');
-SELECT delete_fonction ('drop_constraint_alignement_source','');
+--SELECT delete_fonction ('drop_constraint_alignement_source','');
 --SELECT delete_fonction ('changeconstraintalignement','');
 SELECT delete_fonction ('add_primary_keyalignement','');
-SELECT delete_fonction ('id_alignements','');
+--SELECT delete_fonction ('id_alignements','');
+SELECT delete_fonction ('addConstraintTo_alignement', '');
 SELECT delete_fonction ('add_primary_keyalignement_source','');
 SELECT delete_fonction ('updatesequencesalignement_source','');
 SELECT delete_fonction ('delete_constraint_term_changer_concept_historique','');
