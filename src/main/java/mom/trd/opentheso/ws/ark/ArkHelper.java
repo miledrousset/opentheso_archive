@@ -20,18 +20,40 @@ public class ArkHelper {
     
     private String idArk;
     private String idHandle;
+    private ArkClientRest arkClientRest;
     
     public ArkHelper(NodePreference nodePreference) {
         this.nodePreference = nodePreference;
     }
     
+    public boolean login() {
+        //initialisation des valeurs 
+        arkClientRest = new ArkClientRest();
+
+        Properties propertiesArk = new Properties();
+        propertiesArk.setProperty("serverHost", "https://ark.mom.fr/Arkeo");//nodePreference.getServeurArk());
+        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
+        propertiesArk.setProperty("user", nodePreference.getUserArk());
+        propertiesArk.setProperty("password", nodePreference.getPassArk());
+        arkClientRest.setPropertiesArk(propertiesArk);        
+        return arkClientRest.login();
+    }
+    
+    public boolean isArkExsitOnServer(String idArk) {
+        return  arkClientRest.isArkExist(idArk);
+    }
+    
     /**
-     * Permet de créer un identifiant ARK et un identifiant Handle (serveur MOM)
+     * Permet de créer d'ajouter un identifiant ARK sur le serveur 
+     * en pamaramètre l'Id Ark qu'on souhaite créer + identifiant Handle (serveur MOM)
+     * @param idArkProvided
      * @param privateUri
      * @param nodeMetaData
      * @return
      */
-    public boolean addIdArk(String privateUri,
+    public boolean addArkWithProvidedId(
+            String idArkProvided,
+            String privateUri,
             NodeMetaData nodeMetaData) {
         if (nodePreference == null) {
             return false;
@@ -39,25 +61,13 @@ public class ArkHelper {
         if (!nodePreference.isUseArk()) {
             return false;
         }
-        idArk = null;
+
         idHandle = null;
         
-        //initialisation des valeurs 
-        ArkClientRest arkClientRest = new ArkClientRest();
 
-        Properties propertiesArk = new Properties();
-        propertiesArk.setProperty("serverHost", "https://ark.mom.fr/Arkeo");//nodePreference.getServeurArk());
-        propertiesArk.setProperty("idNaan", nodePreference.getIdNaan());
-        propertiesArk.setProperty("user", nodePreference.getUserArk());
-        propertiesArk.setProperty("password", nodePreference.getPassArk());
-        arkClientRest.setPropertiesArk(propertiesArk);
-        
-       
-        //préparation de l'objet Json
-        String loginResp = arkClientRest.login();
-        if(loginResp == null) return false;
         
         NodeJson nodeJson = new NodeJson();
+        nodeJson.setArk(idArkProvided);
         nodeJson.setUrlTarget(nodePreference.getCheminSite() + privateUri); //"?idc=" + idConcept + "&idt=" + idThesaurus);
         nodeJson.setTitle(nodeMetaData.getTitle());
         nodeJson.setCreator(nodeMetaData.getCreator());
@@ -81,7 +91,97 @@ public class ArkHelper {
             return false;
         }
         return true;
+    }    
+    
+    /**
+     * Permet de créer un identifiant ARK et un identifiant Handle (serveur MOM)
+     * @param privateUri
+     * @param nodeMetaData
+     * @return
+     */
+    public boolean addArk(String privateUri,
+            NodeMetaData nodeMetaData) {
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+        idArk = null;
+        idHandle = null;
+        
+
+        
+        NodeJson nodeJson = new NodeJson();
+        nodeJson.setUrlTarget(nodePreference.getCheminSite() + privateUri); //"?idc=" + idConcept + "&idt=" + idThesaurus);
+        nodeJson.setTitle(nodeMetaData.getTitle());
+        nodeJson.setCreator(nodeMetaData.getCreator());
+        nodeJson.setDcElements(nodeMetaData.getDcElementsList()); // n'est pas encore exploité
+        nodeJson.setType(nodePreference.getPrefixArk());  //pcrt : p= pactols, crt=code DCMI pour collection
+        nodeJson.setLanguage(nodePreference.getSourceLang());
+        nodeJson.setNaan(nodePreference.getIdNaan());
+        nodeJson.setHandle_prefix("20.500.11859");
+       
+        // création de l'identifiant Ark et Handle 
+        String jsonDatas = nodeJson.getJsonString();
+        if(jsonDatas == null) return false;
+        if(!arkClientRest.addArk(jsonDatas)) return false;
+
+        idArk = arkClientRest.getIdArk();
+        idHandle = arkClientRest.getIdHandle();
+        if (idArk == null) {
+            message = "La connexion Ark a échouée";
+            return false;
+        }
+        if (idHandle == null) {
+            message = "La connexion Handle a échouée";
+            return false;
+        }
+        return true;
     }
+    
+    /**
+     * Permet de mettre à jour un objet ARK suivant l'Id Ark (serveur MOM)
+     * @param idArk
+     * @param privateUri
+     * @param nodeMetaData
+     * @return
+     */
+    public boolean updateArk(
+            String idArk,
+            String privateUri,
+            NodeMetaData nodeMetaData) {
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+        idHandle = null;
+     
+        NodeJson nodeJson = new NodeJson();
+        nodeJson.setUrlTarget(nodePreference.getCheminSite() + privateUri); //"?idc=" + idConcept + "&idt=" + idThesaurus);
+        nodeJson.setArk(idArk);
+        nodeJson.setTitle(nodeMetaData.getTitle());
+        nodeJson.setCreator(nodeMetaData.getCreator());
+        nodeJson.setDcElements(nodeMetaData.getDcElementsList()); // n'est pas encore exploité
+        nodeJson.setType(nodePreference.getPrefixArk());  //pcrt : p= pactols, crt=code DCMI pour collection
+        nodeJson.setLanguage(nodePreference.getSourceLang());
+        nodeJson.setNaan(nodePreference.getIdNaan());
+        nodeJson.setHandle_prefix("20.500.11859");
+       
+//        if(!arkClientRest.login()) return false;
+        // création de l'identifiant Ark et Handle 
+        if(!arkClientRest.updateArk(nodeJson.getJsonString())) return false;
+
+        idHandle = arkClientRest.getIdHandle();
+
+        if (idHandle == null) {
+            message = "La connexion Handle a échouée";
+            return false;
+        }
+        return true;
+    }    
     
     public String getMessage() {
         return message;

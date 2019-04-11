@@ -16,6 +16,7 @@ public class NodeImage {
     private String idThesaurus;
     private String imageName;
     private String copyRight;
+    private String uri;
     
     public NodeImage() {
     }
@@ -50,6 +51,14 @@ public class NodeImage {
 
     public void setCopyRight(String copyRight) {
         this.copyRight = copyRight;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
  

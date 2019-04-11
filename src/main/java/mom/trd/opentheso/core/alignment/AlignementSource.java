@@ -11,6 +11,10 @@ package mom.trd.opentheso.core.alignment;
  */
 public class AlignementSource {
     private String source;
+    
+    // pour définir le mode de filtrage ex : Opentheso, Wikidata, Gemet ....
+    private String filter;    
+        
     private String requete;
     private String typeRequete;
     private String alignement_format;
@@ -22,6 +26,7 @@ public class AlignementSource {
     public void init_alignementSource()
     {
         source="";
+        filter = "";
         requete="";
         alignement_format="";
         typeRequete="";
@@ -74,6 +79,14 @@ public class AlignementSource {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
   
 }

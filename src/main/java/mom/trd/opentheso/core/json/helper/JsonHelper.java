@@ -9,18 +9,39 @@ import java.io.InputStream;
 import java.io.StringReader;
 import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonException;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
 
 /**
  *
  * @author miled.rousset
  */
-public class ReadJson {
-
-    public ReadJson() {
+public class JsonHelper {
+    
+    private JsonArrayBuilder jab;
+    
+    
+    public JsonHelper() {
+        jab = Json.createArrayBuilder();
     }
+    
+    public void addJsonData(String uri, String value) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("uri", uri);
+        builder.add("label", value);
+        jab.add(builder);
+        
+    }
+
+    public JsonArray getBuilder() {
+        if(jab != null)
+            return jab.build();
+        else
+            return null;
+    }
+    
     
     /**
      * permet de lire un fichier Json d'après une inputStream
@@ -47,5 +68,5 @@ public class ReadJson {
 
         reader.close();
         return jsonObject;
-    }
+    }    
 }

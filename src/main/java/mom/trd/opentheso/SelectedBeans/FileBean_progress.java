@@ -531,7 +531,7 @@ public class FileBean_progress implements Serializable {
                     Logger.getLogger(FileBean.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                selectedTerme.setImages(new ImagesHelper().getImage(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso()));
+                selectedTerme.setImages(new ImagesHelper().getImages(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso()));
 
                 vue.setAddImage(false);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("file.info1.1") + " " + source + langueBean.getMsg("file.info1.2") + "."));

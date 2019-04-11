@@ -8,12 +8,14 @@ package mom.trd.opentheso.timeJob;
 import java.util.ArrayList;
 import java.util.Date;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
+import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 
 /**
  *
  * @author jm.prudham
  */
 public class LineCdt {
+
     private String id_thesaurus;
     private String title_thesaurus;
     private String Id_concept;
@@ -24,10 +26,10 @@ public class LineCdt {
     private String admin_message;
     private String note;
     private ArrayList<NodeProposition> nodeProposition;
-    
-    
+    private ArrayList<NodeTermTraduction> nodeTermTraductions;
+
     public LineCdt() {
-    
+
     }
 
     public void setId_thesaurus(String id_thesaurus) {
@@ -74,40 +76,52 @@ public class LineCdt {
         this.nodeProposition = nodeProposition;
     }
 
+    public ArrayList<NodeTermTraduction> getNodeTermTraductions() {
+        return nodeTermTraductions;
+    }
 
-    
-    
-    public String getMessage(){
+    public void setNodeTermTraductions(ArrayList<NodeTermTraduction> nodeTermTraductions) {
+        this.nodeTermTraductions = nodeTermTraductions;
+    }
+
+    public String getMessage() {
         // #MR
         StringBuilder message = new StringBuilder();
         String status1;
-        switch(status){
-            case("a"):
-                status1="en attente";
+        switch (status) {
+            case ("a"):
+                status1 = "en attente";
                 break;
-            case("r"):
-                status1="refusé";
-                break;                        
-            case("v"):
-                status1="validé";
-                break;                     
-            case("i"):
-                status1="inséré";
-                break;                         
+            case ("r"):
+                status1 = "refusé";
+                break;
+            case ("v"):
+                status1 = "validé";
+                break;
+            case ("i"):
+                status1 = "inséré";
+                break;
             default:
-                status1="inconnu";
-                break;                 
-        }         
-        
+                status1 = "inconnu";
+                break;
+        }
+
         message.append("<table style=\"width: 715px; height: 321px;\" border=\"0\">");
-        message.append("<tbody>"); 
-        message.append("<tr>");
-        message.append("<td><i> Candidat :");
-        message.append("</i></td>");
-        message.append("<td><b>");
-        message.append(valeur_lexical);
-        message.append("</b></td>");
-        message.append("</tr>");
+        message.append("<tbody>");
+        
+        // la liste des candidats avec les traductions
+        for (NodeTermTraduction nodeTermTraduction : nodeTermTraductions) {
+            message.append("<tr>");
+            message.append("<td><i> Candidat :");
+            message.append("</i></td>");
+            message.append("<td><b>");
+            message.append(nodeTermTraduction.getLexicalValue());
+            message.append("@");
+            message.append(nodeTermTraduction.getLang());
+            message.append("</b></td>");
+            message.append("</tr>");            
+        }
+        
         message.append("<tr>");
         message.append("<td><i>id :");
         message.append("</i></td>");
@@ -139,7 +153,7 @@ public class LineCdt {
         message.append("<tr>");
         message.append("<td><i>proposé par :");
         message.append("</i>");
-        
+
         // données concernant les propositions faites par les utilisateurs
         for (NodeProposition nodeProposition1 : nodeProposition) {
             message.append("<tr>");
@@ -147,28 +161,30 @@ public class LineCdt {
             message.append(nodeProposition1.getUser());
             message.append("</b></td>");
             message.append("</tr>");
-            
+
             message.append("<tr>");
             message.append("<td><b>");
             message.append(nodeProposition1.getNote());
             message.append("</b></td>");
             message.append("</tr>");
-            
+
             message.append("<tr>");
             message.append("<td><b>");
-            message.append(nodeProposition1.getLabelConceptParent());
+            if (nodeProposition1.getLabelConceptParent() != null) {
+                message.append(nodeProposition1.getLabelConceptParent());
+            }
             message.append("</b></td>");
-            message.append("</tr>");             
+            message.append("</tr>");
         }
         message.append("</td>");
-       /* 
+        /* 
         if(note != null && !note.isEmpty()) {
             message.append("<td><b>");
             message.append(note);
             message.append("</b></td>");
             message.append("</tr>");
         }*/
-        if(admin_message != null && !admin_message.isEmpty()) {
+        if (admin_message != null && !admin_message.isEmpty()) {
             message.append("<tr>");
             message.append("<td><i>Message de l'admin :");
             message.append("</i></td>");
@@ -189,7 +205,7 @@ public class LineCdt {
         message.append("<hr color=\"blue\"> ");
         message.append("<br>");
         return message.toString();
-        
+
         // ancien formatage 
         /*
         String ret="<table><legend>information sur le candidat</legend>";
@@ -214,10 +230,7 @@ public class LineCdt {
         ret+="<tr><td colspan='2'>Note</td> <td clospan='2' >"+admin_message+"</td></tr>";
         ret+="</table>";    
         return ret;
-        */    
+         */
     }
-    
-    
-    
-    
+
 }

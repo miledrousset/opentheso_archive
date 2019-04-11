@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
@@ -322,7 +323,7 @@ public class ExportTabulateHelper {
 
             // alignment
             first = true;
-            for (NodeAlignment nodeAlignment : nodeConceptExport.getNodeAlignmentsList()) {
+            for (NodeAlignmentSmall nodeAlignment : nodeConceptExport.getNodeAlignmentsList()) {
                 if (!first) {
                     tabulateBuff.append("##");
                 }

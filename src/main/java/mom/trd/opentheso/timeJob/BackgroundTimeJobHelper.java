@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.SelectedBeans.Connexion;
-import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -159,7 +159,7 @@ public class BackgroundTimeJobHelper {
             HikariDataSource poolConnexion) {
         
         ArrayList<String> ret=new CandidateHelper().getListOfCdtDuringPeriod(idTheso, d1,d2, poolConnexion);
-        ArrayList<String> destinataires=new UserHelper().getMailAdmin(poolConnexion, idTheso); 
+        ArrayList<String> destinataires=new UserHelper2().getAdminMail(poolConnexion, idTheso); 
         ArrayList<String> dest=reduce(destinataires);
         MessageCdt mess=new MessageCdt(ret, dest);
         return mess;
@@ -183,8 +183,8 @@ public class BackgroundTimeJobHelper {
      MessageCdt selectMessageValidedInsertedCdt(String idTheso, Date d1,Date d2,
              HikariDataSource poolConnexion) {
        
-        ArrayList<String> destinataires=new UserHelper().getMailAdmin(poolConnexion, idTheso);
-        destinataires.addAll(new UserHelper().getMailUserForCandidat(poolConnexion, idTheso, d1, d2));
+        ArrayList<String> destinataires=new UserHelper2().getAdminMail(poolConnexion, idTheso);
+        destinataires.addAll(new UserHelper2().getMailUserForCandidat(poolConnexion, idTheso, d1, d2));
         ArrayList<String> ret=new CandidateHelper().getInsertedValidedRefusedCdtDuringPeriod(poolConnexion, d1, d2, idTheso);
         MessageCdt mess=new MessageCdt(ret,reduce(destinataires));
         return mess;

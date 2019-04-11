@@ -19,7 +19,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTerm;
@@ -71,14 +71,14 @@ public class WriteSkosBDD {
             Connection conn = ds.getConnection();
             conn.setAutoCommit(false);
 
-            UserHelper userHelper = new UserHelper();
-            int idRole = userHelper.getRoleOfUser(ds, idUser);
+            UserHelper2 userHelper = new UserHelper2();
+            int idRole = userHelper.getUserRoleOnThisGroup(ds, idUser, 1).getIdRole();
 
-            if(!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
+         /*   if(!userHelper.addRole(conn, idUser, idRole, idThesaurus, "")) {
                 conn.rollback();
                 conn.close();
                 return;                    
-            }
+            }*/
             conn.commit();
             conn.close();
         } catch (SQLException ex) {

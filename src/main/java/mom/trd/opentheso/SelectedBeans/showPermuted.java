@@ -52,7 +52,6 @@ public class showPermuted implements Serializable {
     {
         Thesaurus datatheso= new Thesaurus();
         
-        Connexion conn = new Connexion();
         String id_theso =datatheso.getId_thesaurus();
         String langue = datatheso.getLanguage();
         statTheso = new ArrayList<>();

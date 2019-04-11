@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.SelectedBeans.SelectedThesaurus;
 import mom.trd.opentheso.SelectedBeans.Connexion;
@@ -19,7 +20,7 @@ import mom.trd.opentheso.SelectedBeans.Connexion;
  * @author jm.prudham
  */
 @ManagedBean(name= "preferencesAlertBean",eager=true)
-@SessionScoped 
+@ViewScoped 
 public class PreferencesAlertBean {
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;

@@ -23,6 +23,8 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeNT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
+import mom.trd.opentheso.bdd.helper.nodes.NodeRelation;
+import mom.trd.opentheso.bdd.helper.nodes.NodeTypeRelation;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +40,318 @@ public class RelationsHelper {
     public RelationsHelper() {
     }
    
+ //// restructuration de la classe Relations le 23/11/2018 //////    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Nouvelles fontions #MR//////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////        
+    
+    /**
+     * Cette fonction permet d'ajouter une relation unique qui est en paramètre
+     * Fonction utilisée pour le controle de cohérence
+     *
+     * @param ds
+     * @param idConcept1
+     * @param idThesaurus
+     * @param relation
+     * @param idConcept2
+     * @return boolean
+     */
+    public boolean addOneRelation(HikariDataSource ds,
+            String idConcept1, String idThesaurus,
+            String relation,
+            String idConcept2) {
+
+        Statement stmt;
+        boolean status = false;
+
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into hierarchical_relationship"
+                            + "(id_concept1, id_thesaurus, role, id_concept2)"
+                            + " values ("
+                            + "'" + idConcept1 + "'"
+                            + ",'" + idThesaurus + "'"
+                            + ",'" + relation + "'"
+                            + ",'" + idConcept2 + "')";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            //  if (sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding relation : " + idConcept1 + " -> " + relation + " -> " + idConcept2, sqle);
+            }
+        }
+        return status;
+    }
+    
+        
+    /**
+     * Cette fonction permet de récupérer la liste des relations d'un concept 
+     * en partant du concept1 (côté gauche) sans avoir les relations reciproques
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet class Concept
+     * #MR
+     */
+    public ArrayList<NodeRelation> getLeftRelationsOfConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeRelation> nodeRelations = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept1, role, id_concept2 "
+                        + " from hierarchical_relationship "
+                        + " where id_thesaurus = '"+ idThesaurus + "'"
+                        + " and id_concept1 = '" + idConcept + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeRelation nodeRelation = new NodeRelation();
+                        nodeRelation.setIdConcept1(resultSet.getString("id_concept1"));
+                        nodeRelation.setRelation(resultSet.getString("role"));
+                        nodeRelation.setIdConcept2(resultSet.getString("id_concept2")); 
+                        nodeRelations.add(nodeRelation);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All left relations of concept : " + idConcept, sqle);
+        }
+        return nodeRelations;
+    }        
+        
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id concepts avec
+     * les relations BT, NT, RT
+     * les identifiants pérennes (Ark, Handle)
+     * sert à l'export des données
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet class Concept
+     * #MR
+     */
+    public ArrayList<NodeHieraRelation> getAllRelationsOfConcept(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeHieraRelation> nodeListIdOfConcept = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept2, role, id_ark, id_handle "
+                        + " from hierarchical_relationship as hr"
+                        + " left join concept as con on id_concept = id_concept2"
+                        + " and hr.id_thesaurus = con.id_thesaurus"
+                        + " where hr.id_thesaurus = '"+ idThesaurus + "'"
+                        + " and id_concept1 = '" + idConcept + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeHieraRelation nodeHieraRelation = new NodeHieraRelation();
+                        NodeUri nodeUri = new NodeUri();
+                        if ((resultSet.getString("id_ark") == null) || (resultSet.getString("id_ark") .trim().isEmpty())) {
+                            nodeUri.setIdArk("");
+                        } else {
+                            nodeUri.setIdArk(resultSet.getString("id_ark"));
+                        }
+                        if ((resultSet.getString("id_handle") == null) || (resultSet.getString("id_handle") .trim().isEmpty())) {
+                            nodeUri.setIdHandle("");
+                        } else {
+                            nodeUri.setIdHandle(resultSet.getString("id_handle"));
+                        }
+                        nodeUri.setIdConcept(resultSet.getString("id_concept2"));
+                        
+                        nodeHieraRelation.setRole(resultSet.getString("role"));
+                        nodeHieraRelation.setUri(nodeUri);
+                        nodeListIdOfConcept.add(nodeHieraRelation);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Liste ID of BT Concept with ark and handle : " + idConcept, sqle);
+        }
+        return nodeListIdOfConcept;
+    }    
+    
+    
+    
+    
+    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ //////// fin des nouvelles fontions ////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////       
+    
+    
+    
+    
+    /**
+     * permet de changer la relation entre deux concepts 
+     * concept1 = concept de départ
+     * concept2 = concept d'arriver
+     * directRelation = la relation à mettre en place exp NT, NTI ...
+     * inverseRelation = la relation reciproque qu'il faut ajouter exp : BT, BTI ...
+     * @param conn
+     * @param idConcept1
+     * @param idConcept2
+     * @param idTheso
+     * @param directRelation
+     * @param inverseRelation
+     * @return 
+     */
+    public boolean updateRelationNT(Connection conn,
+            String idConcept1, String idConcept2, String idTheso,
+            String directRelation, String inverseRelation) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+            stmt = conn.createStatement();
+            try {
+                String query = "update hierarchical_relationship"
+                        + " set role = '" + directRelation + "'"
+                        + " where id_concept1 = '" +idConcept1+ "'"
+                        + " and id_thesaurus = '" + idTheso + "'"
+                        + " and id_concept2 ='" + idConcept2 + "'";
+
+                stmt.executeUpdate(query);
+                query = "update hierarchical_relationship"
+                        + " set role = '" + inverseRelation + "'"
+                        + " where id_concept1 = '" +idConcept2+ "'"
+                        + " and id_thesaurus = '" + idTheso + "'"
+                        + " and id_concept2 ='" + idConcept1 + "'";
+
+                stmt.executeUpdate(query);                
+                status = true;
+            } finally {
+                stmt.close();
+            }
+        } catch (SQLException sqle) {
+            log.error("Error while updating hierarchical relation of Concept : " + idConcept1, sqle);
+        }
+        return status;        
+    }
+    
+    
+    /**
+     * permet de retourner les types de relations possibles en spécifique 
+     * @param ds
+     * @return 
+     */
+    public ArrayList<NodeTypeRelation> getTypesRelationsNT(HikariDataSource ds) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeTypeRelation> typesRelationsNT = null;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select relation, description_fr, description_en"
+                            + " from nt_type";
+                    resultSet = stmt.executeQuery(query);
+                    typesRelationsNT = new ArrayList<>();
+                    while (resultSet.next()) {
+                        NodeTypeRelation nodeTypeRelation = new NodeTypeRelation();
+                        nodeTypeRelation.setRelationType(resultSet.getString("relation"));
+                        nodeTypeRelation.setDescription_fr(resultSet.getString("description_fr"));
+                        nodeTypeRelation.setDescription_en(resultSet.getString("description_en"));
+                        typesRelationsNT.add(nodeTypeRelation);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+                log.error("Error while getting type Of relations NT ", sqle);
+        }
+        return typesRelationsNT;
+    }
+    
+    /**
+     * permet de retourner les types de relations possibles en générique  
+     * @param ds
+     * @return 
+     */
+    public ArrayList<NodeTypeRelation> getTypesRelationsBT(HikariDataSource ds) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeTypeRelation> typesRelationsBT = null;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select relation, description_fr, description_en"
+                            + " from bt_type";
+                    resultSet = stmt.executeQuery(query);
+                    typesRelationsBT = new ArrayList<>();
+                    while (resultSet.next()) {
+                        NodeTypeRelation nodeTypeRelation = new NodeTypeRelation();
+                        nodeTypeRelation.setRelationType(resultSet.getString("relation"));
+                        nodeTypeRelation.setDescription_fr(resultSet.getString("description_fr"));
+                        nodeTypeRelation.setDescription_en(resultSet.getString("description_en"));
+                        typesRelationsBT.add(nodeTypeRelation);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+                log.error("Error while getting type Of relations BT ", sqle);
+        }
+        return typesRelationsBT;
+    }    
+    
     /**
      * Cette fonction permet d'ajouter une relation à la table
      * hierarchicalRelationship
@@ -2035,6 +2349,48 @@ public class RelationsHelper {
         }
         return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si le Concept a une relation BT (terme générique) 
+     * 
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public boolean isConceptHaveRelationBT(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept1 from hierarchical_relationship"
+                            + " where id_thesaurus = '" + idThesaurus + "'"
+                            + " and id_concept1 = '" + idConcept + "'"
+                            + " and role LIKE 'BT%'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    existe = resultSet.next();
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if relation BT exist of Concept : " + idConcept, sqle);
+        }
+        return existe;
+    }    
     
     /**
      * Cette fonction permet de savoir si le Concept1 a une relation NT avec le concept2 

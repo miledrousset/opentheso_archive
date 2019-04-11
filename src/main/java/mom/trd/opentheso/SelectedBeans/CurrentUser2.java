@@ -15,7 +15,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupThesaurus;
@@ -484,11 +483,6 @@ public class CurrentUser2 implements Serializable {
             } else
                 idGroupTemp = -1;
         }
-        if((idGroupTemp == -1) && (roleAdded != 1) ) {
-            // création d'un utilisateur sans groupe
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
-            return false;
-        }
         if(roleAdded == 1) isSuperAdmin = true;
 
         if(!userHelper.addUser(connect.getPoolConnexion(),
@@ -502,7 +496,8 @@ public class CurrentUser2 implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
             return false;                
         }
-        if(!isSuperAdmin) {
+        /// si idGroupTemp = -1 : création d'utilisateur sans groupe
+        if(!isSuperAdmin && idGroupTemp != -1) {
             // on ajoute l'utilisateur au groupe séléctionné par l'utilisateur
             if(!userHelper.addUserRoleOnGroup(connect.getPoolConnexion(), idUser, roleAdded, idGroupTemp)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
@@ -612,7 +607,7 @@ public class CurrentUser2 implements Serializable {
      */
     public boolean updateAlertMail() {
         try {
-            UserHelper userHelper = new UserHelper();
+            UserHelper2 userHelper = new UserHelper2();
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
             if (!userHelper.setAlertMailForUser(
@@ -642,10 +637,10 @@ public class CurrentUser2 implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error2")));
         } else if (!pwdAdded2.equals(pwdAdded3)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error3")));
-        } else if (!new UserHelper().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdAdded1))) {
+        } else if (!new UserHelper2().isUserExist(connect.getPoolConnexion(), user.getName(), MD5Password.getEncodedPassword(pwdAdded1))) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error4")));
         } else {
-            new UserHelper().updatePwd(connect.getPoolConnexion(), user.getIdUser(), MD5Password.getEncodedPassword(pwdAdded2));
+            new UserHelper2().updatePwd(connect.getPoolConnexion(), user.getIdUser(), MD5Password.getEncodedPassword(pwdAdded2));
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
         }
         pwdAdded1 = "";
@@ -661,10 +656,10 @@ public class CurrentUser2 implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
         } else if (!mailAdded.contains("@") || mailAdded.lastIndexOf(".") < mailAdded.indexOf("@")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error7")));
-        } else if (new UserHelper().isUserMailExist(connect.getPoolConnexion(), mailAdded)) {
+        } else if (new UserHelper2().isUserMailExist(connect.getPoolConnexion(), mailAdded)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error8")));
         } else {
-            new UserHelper().updateMail(connect.getPoolConnexion(), user.getIdUser(), mailAdded);
+            new UserHelper2().updateMail(connect.getPoolConnexion(), user.getIdUser(), mailAdded);
             user.setMail(mailAdded);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
         }
@@ -677,10 +672,10 @@ public class CurrentUser2 implements Serializable {
     public void updatePseudo() {
         if (pseudoEdit == null || pseudoEdit.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error6")));
-        } else if (new UserHelper().isPseudoExist(connect.getPoolConnexion(), pseudoEdit)) {
+        } else if (new UserHelper2().isPseudoExist(connect.getPoolConnexion(), pseudoEdit)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("user.error5")));
         } else {
-            new UserHelper().updatePseudo(connect.getPoolConnexion(), user.getIdUser(), pseudoEdit);
+            new UserHelper2().updatePseudo(connect.getPoolConnexion(), user.getIdUser(), pseudoEdit);
             user.setName(pseudoEdit);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info5")));
         }
@@ -689,15 +684,15 @@ public class CurrentUser2 implements Serializable {
     }    
     
     /**
-     * permet de mettre à jour un utilisateur
+     * permet de mettre les préférences d'un utilisateur (alertes, activé ..
      */
     public void updateUser() {
         UserHelper2 userHelper = new UserHelper2();
-        boolean isSuperAdmin = false;
+    //   boolean isSuperAdmin = false;
         try {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-            if (roleAdded == 1) {
+    /*        if (roleAdded == 1) {
                 isSuperAdmin = true;
                 // on supprime les roles sur les groupes
                 if (!userHelper.deleteRolesOfUser(conn, userEdit.getIdUser())) {
@@ -706,13 +701,11 @@ public class CurrentUser2 implements Serializable {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                     return;
                 }
-            }
+            }*/
             if (!userHelper.updateUser(conn,
                     userEdit.getIdUser(),
-                    roleAdded,
                     userEdit.isIsActive(),
-                    userEdit.isIsAlertMail(),
-                    isSuperAdmin)) {
+                    userEdit.isIsAlertMail())) {
                 conn.rollback();
                 conn.close();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
@@ -1125,7 +1118,9 @@ public class CurrentUser2 implements Serializable {
         UserHelper2 userHelper = new UserHelper2();
         if(selectedGroup != null) 
             if(!selectedGroup.isEmpty())
-                selectedGroupName = userHelper.getGroupName(connect.getPoolConnexion(), Integer.parseInt(selectedGroup));        
+                selectedGroupName = userHelper.getGroupName(connect.getPoolConnexion(), Integer.parseInt(selectedGroup));
+            else
+                selectedGroupName = selectedGroup;
         return selectedGroupName;
     }
 

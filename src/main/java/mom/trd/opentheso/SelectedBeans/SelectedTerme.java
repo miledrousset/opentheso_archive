@@ -56,8 +56,8 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
@@ -101,7 +101,8 @@ public class SelectedTerme implements Serializable {
     private ArrayList<NodeImage> images = new ArrayList<>();
     private ArrayList<NodeAlignment> align = new ArrayList<>();
     private ArrayList<NodeNote> listnotes = new ArrayList<>();
-
+    private ArrayList<NodeNT> listNT = new ArrayList<>();
+    
     private TreeNode root;
     private MyTreeNode selectedNode;
     private NodeAutoCompletion selectedTermComp;
@@ -111,6 +112,11 @@ public class SelectedTerme implements Serializable {
 
     private ArrayList<Entry<String, String>> langues = new ArrayList<>();
 
+    
+    //// à supprimer, Test pour OpenEdition
+    private String idConceptTemp;
+    //// à supprimer, Test pour OpenEdition   
+    
 
     private String idT;
     private String idC;
@@ -359,13 +365,13 @@ public class SelectedTerme implements Serializable {
             nom = t.getLexical_value();
             nomEdit = nom;
             idT = t.getId_term();
-            dateC = dateFormat.format(t.getCreated());
-            dateM = dateFormat.format(t.getModified());
+            dateC = dateFormat.format(concept.getCreated());
+            dateM = dateFormat.format(concept.getModified());
 
             creator = t.getCreator();
             contributor = t.getContributor();
 
-            images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso);
+            images = new ImagesHelper().getImages(connect.getPoolConnexion(), idC, idTheso);
             note.majNotes(idC, idT, idTheso, idlangue);
             majLangueConcept();
             majSyno();
@@ -669,13 +675,13 @@ public class SelectedTerme implements Serializable {
     }
 
     private void majTSpeConcept() {
-        termesSpecifique = new ArrayList<>();
-        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        writeTermesSpecifique(tempNT);
+        termesSpecifique.clear();// = new ArrayList<>();
+        listNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        writeTermesSpecifique();
     }
 
-    private void writeTermesSpecifique(ArrayList<NodeNT> tempNT) {
-        for (NodeNT nnt : tempNT) {
+    private void writeTermesSpecifique() {
+        for (NodeNT nnt : listNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             if (nnt.getStatus().equals("hidden")) {
                 if(nnt.getTitle().isEmpty())
@@ -694,8 +700,8 @@ public class SelectedTerme implements Serializable {
 
     public void majTSpeConceptOrder() {
         termesSpecifique = new ArrayList<>();
-        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNTOrderByDate(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        writeTermesSpecifique(tempNT);
+        listNT = new RelationsHelper().getListNTOrderByDate(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        writeTermesSpecifique();
     }
 
     private void majTGen() {
@@ -748,7 +754,7 @@ public class SelectedTerme implements Serializable {
         }
     }
 
-    public void majSearch() {
+    public void majSearch(NewTreeBean nTree) {
         if (nodeSe.isTopConcept()) {
             type = 2;
         } else {
@@ -756,6 +762,8 @@ public class SelectedTerme implements Serializable {
         }
         MyTreeNode mtn = new MyTreeNode(type, nodeSe.getIdConcept(), nodeSe.getIdThesaurus(),
                 nodeSe.getIdLang(), nodeSe.getIdGroup(), nodeSe.getTypeGroup(), null, null, nodeSe.getLexical_value(), null);
+        
+        nTree.setSelectedNode(mtn);
         majTerme(mtn);
     }
 
@@ -821,14 +829,23 @@ public class SelectedTerme implements Serializable {
      */
     /**
      * Crée un nouveau terme spécifique au terme sélectionné
+     * avec la relation qui les lie (NT, NTG, NTI, NTP)
+     * 
+     * Si idConcept = null c'est à dire, création avec nouvel identifiant
+     * Si idConcept est défini, c'est à dire, on garde l'identifiant
      *
      * @param selecedTerm
+     * @param relationType
+     * @param idConcept
      * @return true or false
      */
-    public boolean creerTermeSpe(MyTreeNode selecedTerm) {
+    public boolean creerTermeSpe(MyTreeNode selecedTerm, String relationType,
+            String idConcept, String notation) {
         ConceptHelper instance = new ConceptHelper();
         if(roleOnTheso.getNodePreference() == null) return false;
         instance.setNodePreference(roleOnTheso.getNodePreference());
+        
+        String idConceptRetour = null;
         
         
         // 1 = domaine/Group, 2 = TT (top Term), 3 = Concept/term  
@@ -838,7 +855,9 @@ public class SelectedTerme implements Serializable {
             concept.setIdGroup(selecedTerm.getIdConcept());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
-            concept.setNotation("");
+            concept.setNotation(notation);
+            
+            concept.setIdConcept(idConcept);
 
             Term terme = new Term();
             terme.setId_thesaurus(idTheso);
@@ -846,8 +865,8 @@ public class SelectedTerme implements Serializable {
             terme.setLexical_value(valueEdit);
             terme.setSource("");
             terme.setStatus("");
-
-            if (instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getIdUser()) == null) {
+            idConceptRetour = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getIdUser());
+            if (idConceptRetour == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
@@ -868,7 +887,9 @@ public class SelectedTerme implements Serializable {
             concept.setIdGroup(selecedTerm.getIdCurrentGroup());
             concept.setIdThesaurus(idTheso);
             concept.setStatus("D");
-            concept.setNotation("");
+            concept.setNotation(notation);
+            
+            concept.setIdConcept(idConcept);            
 
             Term terme = new Term();
             terme.setId_thesaurus(idTheso);
@@ -879,22 +900,25 @@ public class SelectedTerme implements Serializable {
 
             //String idTC = idTopConcept;
             String idP = idC;
-
-            if (instance.addConcept(connect.getPoolConnexion(), idP, concept, terme, user.getUser().getIdUser()) == null) {
+            idConceptRetour = instance.addConcept(connect.getPoolConnexion(), idP, relationType, concept, terme, user.getUser().getIdUser());
+            
+            if (idConceptRetour == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
             }
           //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
             concept.getUserName();
            // selecedTerm.setIdConcept(concept.getIdConcept());
-            ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
-            termesSpecifique = new ArrayList<>();
-            HashMap<String, String> tempMap = new HashMap<>();
-            for (NodeNT nnt : tempNT) {
-                tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
-            }
-            termesSpecifique.addAll(tempMap.entrySet());
+            majTSpeConcept();
+//           ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+//            termesSpecifique = new ArrayList<>();
+//            HashMap<String, String> tempMap = new HashMap<>();
+//            for (NodeNT nnt : tempNT) {
+//                tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
+//            }
+//            termesSpecifique.addAll(tempMap.entrySet());
         }
+        idConceptTemp = idConceptRetour;
         vue.setAddTSpe(false);
         valueEdit = "";
         return true;
@@ -935,13 +959,14 @@ public class SelectedTerme implements Serializable {
         }
     //    instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
         concept.getUserName();
-        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        termesSpecifique = new ArrayList<>();
-        HashMap<String, String> tempMap = new HashMap<>();
-        for (NodeNT nnt : tempNT) {
-            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
-        }
-        termesSpecifique.addAll(tempMap.entrySet());
+        majTSpeConcept();
+//        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+//        termesSpecifique = new ArrayList<>();
+//        HashMap<String, String> tempMap = new HashMap<>();
+//        for (NodeNT nnt : tempNT) {
+//            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
+//        }
+//        termesSpecifique.addAll(tempMap.entrySet());
 
         vue.setAddTSpe(false);
         valueEdit = "";
@@ -1005,6 +1030,8 @@ public class SelectedTerme implements Serializable {
 
                 }
             }
+            ConceptHelper conceptHelper = new ConceptHelper();
+            conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
             valueEdit = "";
             nomEdit = "";
             vue.setAddTSyno(0);
@@ -1127,8 +1154,7 @@ public class SelectedTerme implements Serializable {
         if (totalNoticesOfBranch.isEmpty()) {
             if (roleOnTheso.getNodePreference().isZ3950actif()) {
                 ConceptHelper conceptHelper = new ConceptHelper();
-                ArrayList<String> lisIds = new ArrayList();
-                lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso, lisIds);
+                ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso);
 
                 Properties p = new Properties();
                 p.put("CollectionDataSourceClassName", "com.k_int.util.Repository.XMLDataSource");
@@ -1240,8 +1266,7 @@ public class SelectedTerme implements Serializable {
             }
 
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idTheso, lisIds);
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConcept, idTheso);
 
             // on ajoute le nouveau domaine à la branche
             if (!groupHelper.addDomainToBranch(conn, lisIds, idNewGroup, idTheso, user.getUser().getIdUser())) {
@@ -1376,13 +1401,14 @@ public class SelectedTerme implements Serializable {
                 return false;
             }
         }
-        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
-        termesSpecifique = new ArrayList<>();
-        HashMap<String, String> tempMap = new HashMap<>();
-        for (NodeNT nnt : tempNT) {
-            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
-        }
-        termesSpecifique.addAll(tempMap.entrySet());
+        majTSpeConcept();
+//        ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+//        termesSpecifique = new ArrayList<>();
+//        HashMap<String, String> tempMap = new HashMap<>();
+//        for (NodeNT nnt : tempNT) {
+//            tempMap.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
+//        }
+//        termesSpecifique.addAll(tempMap.entrySet());
         vue.setAddTSpe(false);
         return true;
     }
@@ -1480,7 +1506,8 @@ public class SelectedTerme implements Serializable {
                 nom = termHelper.getThisTerm(connect.getPoolConnexion(), idC, idTheso, idlangue).getLexical_value();
             }
             langues.addAll(tempMapL.entrySet());
-
+            ConceptHelper conceptHelper = new ConceptHelper();
+            conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
             // traduction des concepts
         } else if (type == 3 && !tradExist) {
             Term terme = new Term();
@@ -1514,6 +1541,8 @@ public class SelectedTerme implements Serializable {
             if (newTraduction) {
                 nom = termHelper.getThisTerm(connect.getPoolConnexion(), idC, idTheso, idlangue).getLexical_value();
             }
+            ConceptHelper conceptHelper = new ConceptHelper();
+            conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);            
         }
 
         langueEdit = "";
@@ -1539,7 +1568,8 @@ public class SelectedTerme implements Serializable {
             statutEdit = "";
             align = alignmentHelper.getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
             vue.setAddAlign(0);
-            
+            ConceptHelper conceptHelper = new ConceptHelper();
+            conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);            
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info9")));
         }
     }
@@ -1571,6 +1601,10 @@ public class SelectedTerme implements Serializable {
                     if ("skos".equals(alignementSource1.getAlignement_format())) {
                         listAlignValues = alignmentQuery.queryOpentheso(idConcept, idTheso, lexicalValue.trim(),
                                 idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
+                        if(listAlignValues == null) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    langueBean.getMsg("error") + " :", alignmentQuery.getMessage()));
+                        }
                     }
                     // action xml (wikipédia)
                     if ("xml".equals(alignementSource1.getAlignement_format())) {
@@ -1584,7 +1618,6 @@ public class SelectedTerme implements Serializable {
                         listAlignValues = alignmentQuery.queryGemet(idConcept, idTheso, lexicalValue.trim(),
                                 idlangue, alignementSource1.getRequete(), alignementSource1.getSource());
                     }                    
-                    
                 }
                 if ("SPARQL".equalsIgnoreCase(alignementSource1.getTypeRequete())) {
                     // action SKOS (BNF)
@@ -1661,6 +1694,8 @@ public class SelectedTerme implements Serializable {
             }
         }
         align = new AlignmentHelper().getAllAlignmentOfConcept(connect.getPoolConnexion(), idC, idTheso);
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);        
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info11")));
      //   vue.setAddAlign(0);
     }
@@ -1687,6 +1722,8 @@ public class SelectedTerme implements Serializable {
      * par lot l'apelation de la funtion c'est de AlignementParLotBean
      *
      * @param nodeAlignment
+     * @param addDefinition
+     * @param id_term
      * @return
      */
     public boolean ajouterAlignAutoByLot(NodeAlignment nodeAlignment, boolean addDefinition, String id_term) {
@@ -1707,6 +1744,8 @@ public class SelectedTerme implements Serializable {
                 return false;
             }
         }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);        
         messageAlig = alignmentHelper.getMessage();
         return true;
     }
@@ -1778,6 +1817,8 @@ public class SelectedTerme implements Serializable {
             termTemp.setSource(String.valueOf(user.getUser().getIdUser()));
             new TermHelper().addTraduction(connect.getPoolConnexion(), termTemp, user.getUser().getIdUser());
         } 
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
         vue.setAddTInfo(0);
         nom = nomEdit;
         nomEdit = "";
@@ -1824,6 +1865,8 @@ public class SelectedTerme implements Serializable {
         if (!new TermHelper().updateTermSynonyme(connect.getPoolConnexion(), oldValue, term, idUser)) {
             //ca va pas
         }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifySyn")));
         majSyno();
     }
@@ -1852,6 +1895,8 @@ public class SelectedTerme implements Serializable {
         if (!termHelper.updateTermTraduction(connect.getPoolConnexion(), term, idUser)) {
             //erreur
         }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);        
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.modifyLang")));
         majLangueConcept();
     }
@@ -1919,6 +1964,8 @@ public class SelectedTerme implements Serializable {
      */
     public void delSyno(String value, String status) {
         new TermHelper().deleteNonPreferedTerm(connect.getPoolConnexion(), idT, idlangue, value, idTheso, status, user.getUser().getIdUser());
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
         majSyno();
         vue.setAddTSyno(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", value + " " + langueBean.getMsg("sTerme.info6")));
@@ -1933,6 +1980,8 @@ public class SelectedTerme implements Serializable {
         new TermHelper().deleteTraductionOfTerm(connect.getPoolConnexion(), idT, lang, idTheso, user.getUser().getIdUser());
         majLangueConcept();
         note.majNotes(idC, idT, idTheso, idlangue);
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info10")));
     }
 
@@ -1948,6 +1997,8 @@ public class SelectedTerme implements Serializable {
             return;
         }
         majTAsso();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);        
         vue.setAddTAsso(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info7")));
     }
@@ -1989,13 +2040,19 @@ public class SelectedTerme implements Serializable {
     /**
      * Supprime la relation hiérarchique qui lie le terme courant à son père
      *
-     * @param id l'identifiant du père
+     * @param idBTtoDelete l'identifiant du père
      * @return true or false
      */
-    public boolean delGene(String id) {
+    public boolean delGene(String idBTtoDelete) {
         // id est l'identifiant du concept à qui on doit supprimer la relation BT
         boolean TGisDomaine = false;
-        if (idDomaine.equals(id)) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        GroupHelper groupHelper = new GroupHelper();
+        OrphanHelper orphanHelper = new OrphanHelper();
+        
+        
+        if (idDomaine.equals(idBTtoDelete)) {
             // cas où le générique est un domaine // donc le concept est un TT
             TGisDomaine = true;
         }
@@ -2011,23 +2068,25 @@ public class SelectedTerme implements Serializable {
                     conn.close();
                     return false;
                 }*/
-                if (!new OrphanHelper().addNewOrphan(conn, idC, idTheso)) {
+                if (!orphanHelper.addNewOrphan(conn, idC, idTheso)) {
                     conn.rollback();
                     conn.close();
                     return false;
                 }
 
-                if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), id, idTheso)) {
-                    if (!new RelationsHelper().setRelationTopConcept(conn, idC, idTheso, id, false, user.getUser().getIdUser())) {
+                if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idBTtoDelete, idTheso)) {
+                    if (!relationsHelper.setRelationTopConcept(conn, idC, idTheso, idBTtoDelete, false, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
-                } else // on coupe la branche de son BT
-                if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getIdUser())) {
-                    conn.rollback();
-                    conn.close();
-                    return false;
+                } else { // on coupe la branche de son BT
+                    
+                    if (!relationsHelper.deleteRelationBT(conn, idC, idTheso, idBTtoDelete, user.getUser().getIdUser())) {
+                        conn.rollback();
+                        conn.close();
+                        return false;
+                    }
                 }
                 conn.commit();
                 conn.close();
@@ -2044,20 +2103,50 @@ public class SelectedTerme implements Serializable {
 
         // deuxième cas où la branche a plusieurs termes générique
         if (termeGenerique.size() > 1) {
-            // si la branche est dans le même domaine, alors on supprime seulement la relation BT
 
             try {
                 Connection conn = connect.getPoolConnexion().getConnection();
-                conn.setAutoCommit(false);
+                conn.setAutoCommit(false);            
+            
+                // si la branche est dans le même domaine, alors on supprime seulement la relation BT
+
+                // on récupère les BT du concept sélectionné
+                ArrayList<String> idBTs = relationsHelper.getListIdBT(connect.getPoolConnexion(), idC, idTheso);
+                //on enlève le BT à supprimer
+                idBTs.remove(idBTtoDelete);
+
+                // on récupère les domaines du concept BT à supprimer
+                ArrayList<String> idGroupsOfConceptBTtoDelete = groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(), idTheso, idBTtoDelete); 
+                ArrayList<String> idGroupsOfBT = new ArrayList<>();
+
+                for (String idBT : idBTs) {
+                    // on récupère les domaines du BT sélectionné
+                    idGroupsOfBT.addAll(groupHelper.getListIdGroupOfConcept(connect.getPoolConnexion(), idTheso, idBT));
+                }
+
+                // on compare les Groupes des autres BT qui restent au groupe de du BT à supprimer
+                for (String idGroupOfConceptBTtoDelete : idGroupsOfConceptBTtoDelete) {
+                    if(!idGroupsOfBT.contains(idGroupOfConceptBTtoDelete)) {
+                        // c'est un groupe à supprimer du BT
+
+                        // on récupère les Ids des concepts à modifier
+                        ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idC, idTheso);  
+                        if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, idGroupOfConceptBTtoDelete, idTheso)) {
+                            conn.rollback();
+                            conn.close();
+                            return false;
+                        }
+                    }
+                }
 
                 if (TGisDomaine) {
-                    if (!new RelationsHelper().deleteRelationTT(conn, idC,
+                    if (!relationsHelper.deleteRelationTT(conn, idC,
                             idTheso, user.getUser().getIdUser())) {
                         conn.rollback();
                         conn.close();
                         return false;
                     }
-                } else if (!new RelationsHelper().deleteRelationBT(conn, idC, idTheso, id, user.getUser().getIdUser())) {
+                } else if (!relationsHelper.deleteRelationBT(conn, idC, idTheso, idBTtoDelete, user.getUser().getIdUser())) {
                     conn.rollback();
                     conn.close();
                     return false;
@@ -2210,14 +2299,14 @@ public class SelectedTerme implements Serializable {
                 }
                 conn.commit();
                 conn.close();
-
-                ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
-                termesSpecifique = new ArrayList<>();
-                HashMap<String, String> tempMap3 = new HashMap<>();
-                for (NodeNT nnt : tempNT) {
-                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
-                }
-                termesSpecifique.addAll(tempMap3.entrySet());
+                majTSpeConcept();
+//                ArrayList<NodeNT> tempNT = new RelationsHelper().getListNT(connect.getPoolConnexion(), idC, idTheso, idlangue);
+//                termesSpecifique = new ArrayList<>();
+//                HashMap<String, String> tempMap3 = new HashMap<>();
+//                for (NodeNT nnt : tempNT) {
+//                    tempMap3.put(nnt.getIdConcept(), nnt.getTitle() + " (" + nnt.getRole() + ")");
+//                }
+//                termesSpecifique.addAll(tempMap3.entrySet());
             } catch (SQLException ex) {
                 Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
@@ -2229,7 +2318,7 @@ public class SelectedTerme implements Serializable {
     public void delImage(String nomImage) {
         new ImagesHelper().deleteImage(connect.getPoolConnexion(), idC, idTheso, nomImage);
         images = new ArrayList<>();
-        images = new ImagesHelper().getImage(connect.getPoolConnexion(), idC, idTheso);
+        images = new ImagesHelper().getImages(connect.getPoolConnexion(), idC, idTheso);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info8")));
     }
 
@@ -2472,24 +2561,23 @@ public class SelectedTerme implements Serializable {
         ConceptHelper conceptHelper = new ConceptHelper();
         Connection conn;
         try {
-            conn = connect.getPoolConnexion().getConnection();
-            if (conceptHelper.isNotationExist(conn, idTheso, notation)) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("index.notationError")));
-                status1 = false;
-                conn.close();
-            }
 
+            if (conceptHelper.isNotationExist(connect.getPoolConnexion(), idTheso, notation)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("index.notationError")));
+                return false;
+            }
+            
+            conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
             if (!conceptHelper.updateNotation(conn, idC, idTheso, notation)) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Notation Error BDD")));
-                status1 = false;
                 conn.rollback();
                 conn.close();
-            } else {
-                status1 = true;
-                conn.commit();
-                conn.close();
+                return false;
             }
+            conn.commit();
+            conn.close();
+            status1 = true;            
         } catch (SQLException ex) {
             Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -3069,12 +3157,12 @@ public class SelectedTerme implements Serializable {
     }
 
     public String getCreatorName() {
-        UserHelper userHelper = new UserHelper();
+        UserHelper2 userHelper = new UserHelper2();
         return userHelper.getNameUser(connect.getPoolConnexion(), creator);
     }
 
     public String getContributorName() {
-        UserHelper userHelper = new UserHelper();
+        UserHelper2 userHelper = new UserHelper2();
         return userHelper.getNameUser(connect.getPoolConnexion(), contributor);
     }
 
@@ -3149,6 +3237,7 @@ public class SelectedTerme implements Serializable {
             if (selectedAlignement.equalsIgnoreCase(alignementSource1.getSource())) {
                 // on trouve le type de filtre à appliquer
                 alignementSource = alignementSource1;
+                return;
             }
         }
     }
@@ -3263,6 +3352,22 @@ public class SelectedTerme implements Serializable {
 
     public void setNote(Note note) {
         this.note = note;
+    }
+
+    public ArrayList<NodeNT> getListNT() {
+        return listNT;
+    }
+
+    public void setListNT(ArrayList<NodeNT> listNT) {
+        this.listNT = listNT;
+    }
+
+    public String getIdConceptTemp() {
+        return idConceptTemp;
+    }
+
+    public void setIdConceptTemp(String idConceptTemp) {
+        this.idConceptTemp = idConceptTemp;
     }
     
 

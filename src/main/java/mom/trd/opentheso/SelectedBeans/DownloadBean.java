@@ -29,7 +29,7 @@ import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.exports.pdf.WritePdf;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
-import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.primefaces.model.ByteArrayContent;
@@ -140,7 +140,7 @@ public class DownloadBean implements Serializable {
 
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         return jsonLd.toString();
@@ -283,6 +283,10 @@ public class DownloadBean implements Serializable {
                 format = RDFFormat.TURTLE;
                 extention = "_turtle.ttl";
                 break;
+            case 3:
+                format = RDFFormat.RDFJSON;
+                extention = "_json.json";
+                break;                
         }
 
         WriteRdf4j writeRdf4j = loadExportHelper(idTheso, selectedLanguages, selectedGroups);
@@ -480,7 +484,7 @@ public class DownloadBean implements Serializable {
         StringBuffer skos_local = exportFromBDD.exportConcept(connect.getPoolConnexion(),
                 idTheso, idC);
 
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         if (jsonLd == null) {
@@ -586,7 +590,7 @@ public class DownloadBean implements Serializable {
 
         StringBuffer skos_local = exportFromBDD.exportBranchOfConcept(connect.getPoolConnexion(), idTheso, idConcept);
 
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
 
@@ -643,7 +647,7 @@ public class DownloadBean implements Serializable {
 
         StringBuffer skos_local = exportFromBDD.exportThisGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
 
@@ -700,7 +704,7 @@ public class DownloadBean implements Serializable {
 
         StringBuffer skos_local = exportFromBDD.exportGroup(connect.getPoolConnexion(), idTheso, idGroup);
 
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos_local);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
 

@@ -45,6 +45,7 @@ public class PreferencesHelper {
                         np = new NodePreference();
                         np.setSourceLang(resultSet.getString("source_lang"));
                         np.setIdentifierType(resultSet.getInt("identifier_type"));
+                        np.setPreferredName(resultSet.getString("preferredname"));                        
                         
                         // Ark
                         np.setUseArk(resultSet.getBoolean("use_ark"));
@@ -89,7 +90,7 @@ public class PreferencesHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return np;
     }
@@ -127,7 +128,7 @@ public class PreferencesHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return workLanguage;        
     }
@@ -159,11 +160,46 @@ public class PreferencesHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }    
    
+    /**
+     * retourne l'id du thésaurus d'après son nom dans les préferances 
+     * @param ds
+     * @param thesoName
+     * @return 
+     */
+    public String getIdThesaurusFromName(HikariDataSource ds, String thesoName){
+        Connection conn;
+        Statement stmt;
+        String idTheso = null;
+        ResultSet resultSet;        
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_thesaurus from preferences "
+                            + " where preferredname ilike '"
+                            + thesoName + "'";
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        idTheso = resultSet.getString("id_thesaurus");
+                    }                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return idTheso;
+    }    
     
     /**
      * Cette fonction permet d'initialiser les préférences d'un thésaurus
@@ -184,10 +220,11 @@ public class PreferencesHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "insert into preferences "
-                            + "(id_thesaurus,source_lang)"
+                            + "(id_thesaurus,source_lang, preferredname)"
                             + " values"
                             + " ('" + idThesaurus + "',"
-                            + "'" + workLanguage + "')";
+                            + "'" + workLanguage + "'," 
+                            + "'" + idThesaurus + "')";
                     stmt.executeUpdate(query);
                 } finally {
                     stmt.close();
@@ -196,7 +233,7 @@ public class PreferencesHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -225,6 +262,7 @@ public class PreferencesHelper {
                          //   + ", nb_alert_cdt='" + np.getNbAlertCdt() + "'"
                          //   + ", alert_cdt='" + np.isAlertCdt() + "'"
                             + ", identifier_type='" + np.getIdentifierType() + "'"
+                            + ", preferredname='" + np.getPreferredName()+ "'"
                             
                             // Ark
                             + ", use_ark='" + np.isUseArk() + "'"
@@ -271,7 +309,7 @@ public class PreferencesHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return status;
@@ -305,7 +343,7 @@ public class PreferencesHelper {
                             + " chemin_site, webservices, use_ark, server_ark," 
                             + " id_naan, prefix_ark, user_ark, pass_ark, use_handle,"
                             + " user_handle, pass_handle, path_key_handle, path_cert_handle,"
-                            + " url_api_handle, prefix_handle, private_prefix_handle)"
+                            + " url_api_handle, prefix_handle, private_prefix_handle, preferredname)"
  
                             + " values('" + idThesaurus + "'"
                             + ",'" + stringPlus.convertString(np.getSourceLang()) + "'"
@@ -343,7 +381,8 @@ public class PreferencesHelper {
                             + ",'" + np.getPathCertHandle() + "'"
                             + ",'" + np.getUrlApiHandle() + "'"
                             + ",'" + np.getPrefixIdHandle() + "'"
-                            + ",'" + np.getPrivatePrefixHandle() + "')";
+                            + ",'" + np.getPrivatePrefixHandle() + "'"
+                            + ",'" + np.getPreferredName() + "')";
                     stmt.executeUpdate(query);
                     status = true;
 
@@ -354,7 +393,7 @@ public class PreferencesHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return status;
@@ -386,6 +425,8 @@ public class PreferencesHelper {
         return nodePreference;
     } 
     
+    
+
     
 
 }

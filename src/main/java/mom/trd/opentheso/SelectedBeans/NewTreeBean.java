@@ -9,14 +9,17 @@ import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -29,6 +32,7 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
@@ -37,10 +41,13 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
+import mom.trd.opentheso.core.imports.csv.CsvHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import mom.trd.opentheso.ws.handle.HandleHelper;
-import org.primefaces.context.RequestContext;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
@@ -72,9 +79,12 @@ public class NewTreeBean implements Serializable {
 
     @ManagedProperty(value = "#{conceptbean}")
     private ConceptBean conceptbean;
-    
+
     @ManagedProperty(value = "#{roleOnTheso}")
-    private RoleOnThesoBean roleOnTheso;    
+    private RoleOnThesoBean roleOnTheso;
+
+    @ManagedProperty(value = "#{externalResources}")
+    private ExternalResources externalResources;
 
     private TreeNode root;
     private TreeNode selectedNode;
@@ -86,6 +96,12 @@ public class NewTreeBean implements Serializable {
     private boolean duplicate = false;
     private boolean forced = false;
     private boolean editPassed = false;
+
+    private boolean isSortByNotation = false;
+    private String iconSort = "ui-icon-sort-16";
+    private String sortTitle = "tree.sortByNotation";
+
+    private ArrayList<CsvHelper.ConceptObject> conceptObjects;
 
     public NewTreeBean() {
         root = (TreeNode) new DefaultTreeNode("Root", null);
@@ -110,27 +126,30 @@ public class NewTreeBean implements Serializable {
      */
     /**
      * attributs pour l'alignement des domaines et des BT
-     * 
+     *
      */
-      
-    public ArrayList<String> groupIds=new ArrayList<>();
-    public ArrayList<String> groupLexicalValues=new ArrayList<>();
-    public String idGroupAlign="";
-    
-    
-    /*************************************************************************/
-    
-    /***atttribut pour l'ajout multiple de NT ****/
+    public ArrayList<String> groupIds = new ArrayList<>();
+    public ArrayList<String> groupLexicalValues = new ArrayList<>();
+    public String idGroupAlign = "";
+
+    /**
+     * **********************************************************************
+     */
+    /**
+     * *atttribut pour l'ajout multiple de NT ***
+     */
     private byte[] multipleNT;
-    
-    /**************************************************************************/
-    /************attribut pour la numérotation des groupes et des sous groupes
-     * 
+
+    /**
+     * ***********************************************************************
      */
-    
+    /**
+     * **********attribut pour la numérotation des groupes et des sous groupes
+     *
+     */
     int nouveauSuffixe;
     String ancienPrefixe;
-    
+
     /**
      *
      * @param idTheso
@@ -210,15 +229,15 @@ public class NewTreeBean implements Serializable {
         //      idThesoSelected = idTheso;
         //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
-        int count=1;//attribut pour la numérotation des groupes
-         ArrayList<MyTreeNode> listeNode=new ArrayList<>();//idem
+        int count = 1;//attribut pour la numérotation des groupes
+        ArrayList<MyTreeNode> listeNode = new ArrayList<>();//idem
         if (connect.getPoolConnexion() == null) {
             System.err.println("Opentheso n'a pas pu se connecter à la base de données");
             return;
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
         Collections.sort(racineNode);
-       
+
         // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
 
@@ -233,8 +252,8 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getConceptGroup().getIdgroup(), root);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-               
-                 new DefaultTreeNode("facette", dynamicTreeNode);
+
+                new DefaultTreeNode("facette", dynamicTreeNode);
             } else {
                 TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdthesaurus(),
@@ -243,41 +262,47 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getLexicalValue(), null);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-                /****code pour la numérotation des groupes ******************/
-                GroupHelper groupHelper= new GroupHelper();
-                 String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(),nodegroup.getConceptGroup().getIdgroup());
-                    
-                    if(suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")){
-                     
-                       suffix=""+count;
-                       count++;
-                       groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup(),suffix);
-                    }
-                ((MyTreeNode)dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
-                ((MyTreeNode)dynamicTreeNode).setData(((MyTreeNode)dynamicTreeNode).getNumerotation()+" "+dynamicTreeNode.getData());
-                /*****fin de code pour la numérotation des groupes **********/
+                /**
+                 * **code pour la numérotation des groupes *****************
+                 */
+                GroupHelper groupHelper = new GroupHelper();
+                String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup());
+
+                if (suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")) {
+
+                    suffix = "" + count;
+                    count++;
+                    groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup(), suffix);
+                }
+                ((MyTreeNode) dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
+                ((MyTreeNode) dynamicTreeNode).setData(((MyTreeNode) dynamicTreeNode).getNumerotation() + " " + dynamicTreeNode.getData());
+                /**
+                 * ***fin de code pour la numérotation des groupes *********
+                 */
                 new DefaultTreeNode("facette", dynamicTreeNode);
-                listeNode.add((MyTreeNode)dynamicTreeNode);
-                
+                listeNode.add((MyTreeNode) dynamicTreeNode);
+
             }
-            
-          
-            
+
         }
-        /***ici on trie la liste des groupes d après le champ data***/
-             Collections.sort(listeNode,new TreeNodeComparator());
-             /*et on l'ajoute au root **/
-            for(MyTreeNode mtn :listeNode){
-                 MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
-                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
-                        mtn.getType(),mtn.getData(),root);
-                tmp.setPrefix(mtn.getPrefix());
-                tmp.setSuffix(mtn.getSuffix());
-              
-                tmp.setIsGroup(true);
-                new DefaultTreeNode(null, tmp);
-            }
-            /***fin ***/
+        /**
+         * *ici on trie la liste des groupes d après le champ data**
+         */
+        Collections.sort(listeNode, new TreeNodeComparator());
+        /*et on l'ajoute au root **/
+        for (MyTreeNode mtn : listeNode) {
+            MyTreeNode tmp = new MyTreeNode(1, mtn.getIdConcept(), mtn.getIdTheso(), mtn.getLangue(),
+                    mtn.getIdConcept(), mtn.getTypeDomaine(), mtn.getIdTopConcept(),
+                    mtn.getType(), mtn.getData(), root);
+            tmp.setPrefix(mtn.getPrefix());
+            tmp.setSuffix(mtn.getSuffix());
+
+            tmp.setIsGroup(true);
+            new DefaultTreeNode(null, tmp);
+        }
+        /**
+         * *fin **
+         */
         if (idTheso != null) {
             loadOrphan(idTheso, langue);
         }
@@ -324,16 +349,24 @@ public class NewTreeBean implements Serializable {
     }
 
     public void majSearch() {
-        selectedTerme.majSearch();
+        selectedTerme.majSearch(this);
         vue.setOnglet(1);
         reInit();
         reExpand();
-
     }
+
     public void majSearch2() {
-        selectedTerme.majSearch();
-        vue.setOnglet(3);
-        
+        selectedTerme.majSearch(this);
+        vue.setOnglet(1);
+    }
+
+    /**
+     * permet de recentrer l'arbre au concept sélectionné
+     */
+    public void reloadTree() {
+        vue.setOnglet(0);
+        reInit();
+        reExpand();
     }
 
     /**
@@ -370,9 +403,11 @@ public class NewTreeBean implements Serializable {
             // id du concept ou group sélectionné qu'il faut déployer
             String idSelectedNode = myTreeNode.getIdConcept();
 
-            if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso())) {
+            // cas d'un Groupe ou sous-Groupe
+            if (myTreeNode.isIsGroup() || myTreeNode.isIsSubGroup()) {
+                //    if (groupHelper.isIdOfGroup(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso())) {
                 // if (myTreeNode.isIsGroup() || myTreeNode.isIsSubGroup()) { //pour détecter les noeuds type Group/collecton/MT/Thèmes ...
-                myTreeNode.setTypeConcept(1);//pour group ?
+                myTreeNode.setIsGroup(true);//TypeConcept(1);//pour group ?
                 //      myTreeNode.setIsGroup(true);
 
                 // on récupère la liste des sous_groupes (s'il y en a)
@@ -385,7 +420,8 @@ public class NewTreeBean implements Serializable {
                 listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
 
             } else {
-                listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(),
+                        idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue(), isSortByNotation);
                 //    myTreeNode.setIsTopConcept(true);
             }
 
@@ -399,15 +435,15 @@ public class NewTreeBean implements Serializable {
             /**
              * Ajout des sous_Groupes (MT, C, G, T ..)
              */
-            int count=0;//attribut pour la numérotation des sous groupes
-            ArrayList<MyTreeNode> listeTreeNode=new ArrayList<>();//attribut pour le trie
+            int count = 0;//attribut pour la numérotation des sous groupes
+            ArrayList<MyTreeNode> listeTreeNode = new ArrayList<>();//attribut pour le trie
             /*la partie de code suivant peut comporter des éléments inutiles**/
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
                 treeNode2 = null;
                 value = nodeConceptTreeGroup.getTitle();
                 if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
-                    
+
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
 
                     treeNode2 = new MyTreeNode(1, nodeConceptTreeGroup.getIdConcept(), ((MyTreeNode) treeNode).getIdTheso(),
@@ -416,60 +452,85 @@ public class NewTreeBean implements Serializable {
                             idTC, icon, value, null);
                     ((MyTreeNode) treeNode2).setIsSubGroup(true);
                     listeTreeNode.add(treeNode2);
-                   
+
                     ((MyTreeNode) treeNode2).setIdParent(myTreeNode.getIdConcept());
-                     /***code poour la numérotation des sous groupes ****/
-                    ((MyTreeNode)treeNode2).setPrefix(myTreeNode.getNumerotation());
-                    String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
-                    count+=5;
+                    /**
+                     * *code poour la numérotation des sous groupes ***
+                     */
+                    ((MyTreeNode) treeNode2).setPrefix(myTreeNode.getNumerotation());
+                    String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
+                    count += 5;
                     //a priori par défaut un getInt renvoit 0 si champ vide (cf groupHelper.getSuffixFromNode)
-                    if(suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")){
-                     
-                       if(10<=count){suffix=""+count;}else {suffix="0"+count;}
-                       
-                       groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept(),suffix);
+                    if (suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")) {
+
+                        if (10 <= count) {
+                            suffix = "" + count;
+                        } else {
+                            suffix = "0" + count;
+                        }
+
+                        groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept(), suffix);
                     }
-                    if(suffix.length()<2)suffix="0"+suffix;
-                    ((MyTreeNode)treeNode2).setSuffix(suffix);
-                    ((MyTreeNode)treeNode2).setData(((MyTreeNode)treeNode2).getNumerotation()+"  "+treeNode2.getData());
-                    /**fin code numérotation des sous groupes*****/
+                    if (suffix.length() < 2) {
+                        suffix = "0" + suffix;
+                    }
+                    ((MyTreeNode) treeNode2).setSuffix(suffix);
+                    ((MyTreeNode) treeNode2).setData(((MyTreeNode) treeNode2).getNumerotation() + "  " + treeNode2.getData());
+                    /**
+                     * fin code numérotation des sous groupes****
+                     */
                     new DefaultTreeNode(null, treeNode2);
                 }
-            /**fin de la partie de code pouvant comporter des éléments inutiles*/
+                /**
+                 * fin de la partie de code pouvant comporter des éléments inutiles
+                 */
             }
-            /**afin de classer les sous groupes avec la numérotation on trie
-            *la liste de treeNode on est obligé de récréer un noeuds MyTreeNode pour
-            * chaque treenode de la liste, pour pouvoir l'accrocher à l'arbre
-            * 
-            *#jm
-             **/
-            
-            Collections.sort(listeTreeNode,new TreeNodeComparator());
-            for(MyTreeNode mtn : listeTreeNode){
-                MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
-                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
-                        mtn.getType(),mtn.getData(),treeNode);
+            /**
+             * afin de classer les sous groupes avec la numérotation on trie la
+             * liste de treeNode on est obligé de récréer un noeuds MyTreeNode
+             * pour chaque treenode de la liste, pour pouvoir l'accrocher à
+             * l'arbre
+             *
+             * #jm
+             *
+             */
+
+            Collections.sort(listeTreeNode, new TreeNodeComparator());
+            for (MyTreeNode mtn : listeTreeNode) {
+                MyTreeNode tmp = new MyTreeNode(1, mtn.getIdConcept(), mtn.getIdTheso(), mtn.getLangue(),
+                        mtn.getIdConcept(), mtn.getTypeDomaine(), mtn.getIdTopConcept(),
+                        mtn.getType(), mtn.getData(), treeNode);
                 tmp.setPrefix(mtn.getPrefix());
                 tmp.setSuffix(mtn.getSuffix());
                 tmp.setIdParent(myTreeNode.getIdConcept());
                 tmp.setIsSubGroup(true);
                 new DefaultTreeNode(null, tmp);
-                
+
             }
-            /***fin du tri et des ajouts des sous groupes dans l'arbre ****/
+            /**
+             * *fin du tri et des ajouts des sous groupes dans l'arbre ***
+             */
             // Ajout dans l'arbre des concepts
             for (NodeConceptTree nodeConceptTree : listeConcept) {
                 isTopTerm = false;
                 treeNode2 = null;
-                if (conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept())
-                        || nodeConceptTree.isHaveChildren()) {
+                if (//conceptHelper.haveChildren(connect.getPoolConnexion(), nodeConceptTree.getIdThesaurus(), nodeConceptTree.getIdConcept()) ||
+                        nodeConceptTree.isHaveChildren()) {
                     icon = "dossier";
 
                     if (nodeConceptTree.isIsTopTerm()) { //Création de topConcepts
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
-                            value = nodeConceptTree.getTitle();
+                            if (isSortByNotation) {
+                                if (nodeConceptTree.getNotation().isEmpty()) {
+                                    value = nodeConceptTree.getTitle();
+                                } else {
+                                    value = nodeConceptTree.getTitle() + " (" + nodeConceptTree.getNotation() + ")";
+                                }
+                            } else {
+                                value = nodeConceptTree.getTitle();
+                            }
                         }
                         idTC = value;
                         isTopTerm = true;
@@ -478,7 +539,15 @@ public class NewTreeBean implements Serializable {
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
-                            value = nodeConceptTree.getTitle();
+                            if (isSortByNotation) {
+                                if (nodeConceptTree.getNotation().isEmpty()) {
+                                    value = nodeConceptTree.getTitle();
+                                } else {
+                                    value = nodeConceptTree.getTitle() + " (" + nodeConceptTree.getNotation() + ")";
+                                }
+                            } else {
+                                value = nodeConceptTree.getTitle();
+                            }
                         }
                     }
                     if (nodeConceptTree.getStatusConcept() != null) {
@@ -508,7 +577,15 @@ public class NewTreeBean implements Serializable {
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
-                            value = nodeConceptTree.getTitle();
+                            if (isSortByNotation) {
+                                if (nodeConceptTree.getNotation().isEmpty()) {
+                                    value = nodeConceptTree.getTitle();
+                                } else {
+                                    value = nodeConceptTree.getTitle() + " (" + nodeConceptTree.getNotation() + ")";
+                                }
+                            } else {
+                                value = nodeConceptTree.getTitle();
+                            }
                         }
                         isTopTerm = true;
 
@@ -518,7 +595,15 @@ public class NewTreeBean implements Serializable {
                         if (nodeConceptTree.getTitle().trim().isEmpty()) {
                             value = nodeConceptTree.getIdConcept();
                         } else {
-                            value = nodeConceptTree.getTitle();
+                            if (isSortByNotation) {
+                                if (nodeConceptTree.getNotation().isEmpty()) {
+                                    value = nodeConceptTree.getTitle();
+                                } else {
+                                    value = nodeConceptTree.getTitle() + " (" + nodeConceptTree.getNotation() + ")";
+                                }
+                            } else {
+                                value = nodeConceptTree.getTitle();
+                            }
                         }
                     }
                     if (nodeConceptTree.getStatusConcept().equals("hidden")) {
@@ -543,6 +628,24 @@ public class NewTreeBean implements Serializable {
     }
 
     /**
+     * permet de raffraichir l'affichage d'un concept dans l'arbre et dans le contenu central.
+     * @param selectedNode 
+     */
+    public void reloadConcept(TreeNode selectedNode){
+
+        selectedTerme.majTerme((MyTreeNode) selectedNode);
+        vue.setOnglet(0);
+        selectedTerme.setTree(0);
+
+        externalResources.loadImages(idThesoSelected, selectedTerme.getIdC());
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("principale");
+        }
+    //    RequestContext.getCurrentInstance().update("principale");        
+    }
+    
+    /**
      *
      * @param event
      */
@@ -553,8 +656,14 @@ public class NewTreeBean implements Serializable {
         //}
         vue.setOnglet(0);
         selectedTerme.setTree(0);
+
+        externalResources.loadImages(idThesoSelected, selectedTerme.getIdC());
         // this.parentOrigine=(MyTreeNode)selectedNode.getParent();
-        RequestContext.getCurrentInstance().update("principale");
+//        PrimeFaces pf = PrimeFaces.current();
+//        if (pf.isAjaxRequest()) {
+//            pf.ajax().update(":principale");
+//        }
+    //    RequestContext.getCurrentInstance().update("principale");
     }
 
     /**
@@ -581,21 +690,24 @@ public class NewTreeBean implements Serializable {
 
     public void changeTerme(String id, int type) {
 
-     
-            
         selectedNode.setSelected(false);
-
         for (TreeNode node : selectedNodes) {
             node.setSelected(false);
         }
-
         String idTC;
-        if (((MyTreeNode)selectedNode).isIsGroup() || ((MyTreeNode)selectedNode).isIsSubGroup()) {//type == 2) { //On vient d'un domaine
+        if (((MyTreeNode) selectedNode).isIsGroup() || ((MyTreeNode) selectedNode).isIsSubGroup()) {//type == 2) { //On vient d'un domaine
             idTC = id;
         } else {
             idTC = selectedTerme.getIdTopConcept();
         }
-                /// ????? à comprendre pourquoi ?????
+
+        if (((MyTreeNode) selectedNode).isIsTopConcept()) {
+            type = 2;
+        } else {
+            type = 3;
+        }
+        /* 
+        /// ????? à comprendre pourquoi ?????
         if (type == 0) {
             boolean temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), id, selectedTerme.getIdTheso()).isTopConcept();
             if (temp) {
@@ -603,31 +715,33 @@ public class NewTreeBean implements Serializable {
             } else {
                 type = 3;
             }
-        }
-
+        }*/
+        externalResources.loadImages(idThesoSelected, id);
         MyTreeNode mTN = new MyTreeNode(type, id, selectedTerme.getIdTheso(),
                 selectedTerme.getIdlangue(), selectedTerme.getIdDomaine(), selectedTerme.getTypeDomaine(), idTC, null, null, null);
         selectedTerme.majTerme(mTN);
-        selectedNode=mTN;
-        reExpand();
-        vue.setOnglet(0);
+        selectedNode = mTN;
+
+        //    reExpand();
+        //    vue.setOnglet(0);
     }
 
     public void reExpand() {
-        TreeChange tc=new TreeChange();
-       
+        TreeChange tc = new TreeChange();
+
         tc.saveExpandedNodes(root);
         this.reInit();
         this.initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
-        ArrayList<String> ids =new ArrayList<>();
-        for(TreeNode tn:tc.getExpandedNodes()){
-            ids.add(((MyTreeNode)tn).getIdConcept());
+        ArrayList<String> ids = new ArrayList<>();
+        for (TreeNode tn : tc.getExpandedNodes()) {
+            ids.add(((MyTreeNode) tn).getIdConcept());
         }
-        ids.addAll(tc.getPathFromSelectedConcept(connect,selectedTerme));
+        ids.addAll(tc.getPathFromSelectedConcept(connect, selectedTerme));
         ids.add(selectedTerme.getIdC());
-        reExpandNodes(root,ids,selectedTerme.getIdC());//code pour forcer le depliment de l'arbre
-    
-       if (selectedNode == null) {
+        reExpandNodes(root, ids, selectedTerme.getIdC());//code pour forcer le depliment de l'arbre
+
+        if (selectedNode == null) {
+            selectedNode = selectedTerme.getSelectedNode();
             //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
         }
         //    selectedNode.setSelected(false);
@@ -640,7 +754,7 @@ public class NewTreeBean implements Serializable {
         ArrayList<ArrayList<String>> paths = new ArrayList<>();
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
         if (paths != null) {
-      //  reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(),tc);
+            //  reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(),tc);
         }
 
     }
@@ -652,10 +766,10 @@ public class NewTreeBean implements Serializable {
      * @param idTheso
      * @param langue
      */
-    private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue,TreeChange tc) {
+    private void reExpandTree(ArrayList<ArrayList<String>> listeId, String idTheso, String langue, TreeChange tc) {
         //  if(selectedNodes.isEmpty()){
-        
-         ArrayList<MyTreeNode> listeNode=new ArrayList<>();//idem
+
+        ArrayList<MyTreeNode> listeNode = new ArrayList<>();//idem
         if (root.getChildCount() == 0) {
             // On recrÃ©e la racine
             List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
@@ -679,42 +793,49 @@ public class NewTreeBean implements Serializable {
                             nodegroup.getConceptGroup().getIdtypecode(), null,
                             type, nodegroup.getLexicalValue(), null);
                     ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-                      /****code pour la numérotation des groupes ******************/
-                GroupHelper groupHelper= new GroupHelper();
-                 String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(),nodegroup.getConceptGroup().getIdgroup());
-                 
-                ((MyTreeNode)dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
-                ((MyTreeNode)dynamicTreeNode).setData(((MyTreeNode)dynamicTreeNode).getNumerotation()+" "+dynamicTreeNode.getData());
-                /*****fin de code pour la numérotation des groupes **********/
-                 listeNode.add((MyTreeNode)dynamicTreeNode);
+                    /**
+                     * **code pour la numérotation des groupes *****************
+                     */
+                    GroupHelper groupHelper = new GroupHelper();
+                    String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup());
+
+                    ((MyTreeNode) dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
+                    ((MyTreeNode) dynamicTreeNode).setData(((MyTreeNode) dynamicTreeNode).getNumerotation() + " " + dynamicTreeNode.getData());
+                    /**
+                     * ***fin de code pour la numérotation des groupes *********
+                     */
+                    listeNode.add((MyTreeNode) dynamicTreeNode);
                 }
-             
-              
+
             }
-               
-                /***ici on trie la liste des groupes d après le champ data***/
-             Collections.sort(listeNode,new TreeNodeComparator());
-             /*et on l'ajoute au root **/
-             ArrayList idToExpand=new ArrayList<>();//on récupère les noeuds qui étaient étendus
-             for(TreeNode tn: tc.getExpandedNodes()){
-                 idToExpand.add(((MyTreeNode)tn).getIdConcept());
-             }
-            for(MyTreeNode mtn :listeNode){
-                 MyTreeNode tmp=new MyTreeNode(1,mtn.getIdConcept(),mtn.getIdTheso(),mtn.getLangue(),
-                mtn.getIdConcept(),mtn.getTypeDomaine(),mtn.getIdTopConcept(),
-                        mtn.getType(),mtn.getData(),root);
+
+            /**
+             * *ici on trie la liste des groupes d après le champ data**
+             */
+            Collections.sort(listeNode, new TreeNodeComparator());
+            /*et on l'ajoute au root **/
+            ArrayList idToExpand = new ArrayList<>();//on récupère les noeuds qui étaient étendus
+            for (TreeNode tn : tc.getExpandedNodes()) {
+                idToExpand.add(((MyTreeNode) tn).getIdConcept());
+            }
+            for (MyTreeNode mtn : listeNode) {
+                MyTreeNode tmp = new MyTreeNode(1, mtn.getIdConcept(), mtn.getIdTheso(), mtn.getLangue(),
+                        mtn.getIdConcept(), mtn.getTypeDomaine(), mtn.getIdTopConcept(),
+                        mtn.getType(), mtn.getData(), root);
                 tmp.setPrefix(mtn.getPrefix());
                 tmp.setSuffix(mtn.getSuffix());
-              
+
                 tmp.setIsGroup(true);
                 new DefaultTreeNode(null, tmp);
-                if(idToExpand.contains(mtn.getIdConcept())){
+                if (idToExpand.contains(mtn.getIdConcept())) {
                     mtn.setExpanded(true);
                     this.onNodeExpand(mtn);
                 }
-                
+
             }
-            /***fin ***/
+            /**
+             * *fin **
+             */
             loadOrphan(idTheso, langue);
             //loadOrphan(idTheso, langue);
             for (TreeNode tn : root.getChildren()) {
@@ -806,7 +927,8 @@ public class NewTreeBean implements Serializable {
                 listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
 
             } else {
-                listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept,
+                        myTreeNode.getIdTheso(), myTreeNode.getLangue(), isSortByNotation);
                 //        myTreeNode.setIsTopConcept(true);
             }
 
@@ -833,15 +955,22 @@ public class NewTreeBean implements Serializable {
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
                     ((MyTreeNode) treeNode).setIdCurrentGroup(nodeConceptTreeGroup.getIdConcept());
                     new DefaultTreeNode("fake", treeNode);
-                    /***code poour la numérotation des sous groupes ****/
-                    ((MyTreeNode)treeNode).setPrefix(((MyTreeNode)node).getNumerotation());
-                    String suffix=groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
-                    if(suffix.length()<2)suffix="0"+suffix;
-                    ((MyTreeNode)treeNode).setSuffix(suffix);
-                    ((MyTreeNode)treeNode).setData(((MyTreeNode)treeNode).getNumerotation()+"  "+treeNode.getData());
-                    /**fin code numérotation des sous groupes*****/
-                    if(listeId.contains(((MyTreeNode)treeNode).getIdConcept()))
-                            ((MyTreeNode)treeNode).setExpanded(true);
+                    /**
+                     * *code poour la numérotation des sous groupes ***
+                     */
+                    ((MyTreeNode) treeNode).setPrefix(((MyTreeNode) node).getNumerotation());
+                    String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
+                    if (suffix.length() < 2) {
+                        suffix = "0" + suffix;
+                    }
+                    ((MyTreeNode) treeNode).setSuffix(suffix);
+                    ((MyTreeNode) treeNode).setData(((MyTreeNode) treeNode).getNumerotation() + "  " + treeNode.getData());
+                    /**
+                     * fin code numérotation des sous groupes****
+                     */
+                    if (listeId.contains(((MyTreeNode) treeNode).getIdConcept())) {
+                        ((MyTreeNode) treeNode).setExpanded(true);
+                    }
                     if (listeId.get(cpt).equals(((MyTreeNode) treeNode).getIdConcept())) {
                         if (cpt + 1 < listeId.size()) {
                             treeNode.setSelected(false);
@@ -982,8 +1111,6 @@ public class NewTreeBean implements Serializable {
         root = (TreeNode) new DefaultTreeNode("Root", null);
     }
 
-
-
     /**
      * ************************** ACTIONS SELECTEDTERME
      * ***************************
@@ -996,21 +1123,62 @@ public class NewTreeBean implements Serializable {
         try {
             conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
-            if(!new GroupHelper().deleteConceptGroupRollBack(conn,
+            if (!new GroupHelper().deleteConceptGroupRollBack(conn,
                     selectedTerme.getIdC(),
                     selectedTerme.getIdTheso(),
-                    selectedTerme.getUser().getUser().getIdUser())){
+                    selectedTerme.getUser().getUser().getIdUser())) {
                 conn.rollback();
                 conn.close();
-                FacesContext.getCurrentInstance().addMessage(null, 
+                FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
                 return;
             }
             // pour supprimer le Handle si c'est activé
-            if(roleOnTheso.getNodePreference() != null) {
-                if(roleOnTheso.getNodePreference().isUseHandle()) {
+            if (roleOnTheso.getNodePreference() != null) {
+                if (roleOnTheso.getNodePreference().isUseHandle()) {
                     HandleHelper handleHelper = new HandleHelper(roleOnTheso.getNodePreference());
-                    if(!handleHelper.deleteIdHandle(selectedTerme.getIdHandle(), selectedTerme.getIdTheso())) {
+                    if (!handleHelper.deleteIdHandle(selectedTerme.getIdHandle(), selectedTerme.getIdTheso())) {
+                        conn.rollback();
+                        conn.close();
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
+                        return;
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info7")));
+        reInit();
+        initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
+        selectedTerme.reInitTerme();
+    }
+
+    /**
+     * Supprime le groupe sélectionné
+     */
+    public void delSubGroup() {
+        Connection conn;
+        try {
+            conn = connect.getPoolConnexion().getConnection();
+            conn.setAutoCommit(false);
+            if (!new GroupHelper().deleteConceptGroupRollBack(conn,
+                    selectedTerme.getIdC(),
+                    selectedTerme.getIdTheso(),
+                    selectedTerme.getUser().getUser().getIdUser())) {
+                conn.rollback();
+                conn.close();
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
+                return;
+            }
+            // pour supprimer le Handle si c'est activé
+            if (roleOnTheso.getNodePreference() != null) {
+                if (roleOnTheso.getNodePreference().isUseHandle()) {
+                    HandleHelper handleHelper = new HandleHelper(roleOnTheso.getNodePreference());
+                    if (!handleHelper.deleteIdHandle(selectedTerme.getIdHandle(), selectedTerme.getIdTheso())) {
                         conn.rollback();
                         conn.close();
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
@@ -1085,44 +1253,48 @@ public class NewTreeBean implements Serializable {
         }
         return false;
     }
-    public void changeGroupType(String type){
-       MyTreeNode myTN=(MyTreeNode)this.selectedNode;
-       if(!myTN.isIsGroup() && !myTN.isIsSubGroup()){
-           //normalement impossible
-           return;
-       }
-       if(myTN.getTypeDomaine().equals(type)){
-           return;
-       }
-       else{
-           myTN.setTypeDomaine(type);
-           GroupHelper gh=new GroupHelper();
-           gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected,myTN.getIdConcept());
-           ConceptHelper ch=new ConceptHelper();
-           this.onNodeExpand(myTN);
-           for(TreeNode sbn: myTN.getChildren()){
-               if(((MyTreeNode)sbn).isIsSubGroup())changeGroupType(type,sbn);
-               
-           }
-       }
-       reInit();
-     this.initTree(idThesoSelected, myTN.getLangue());
 
-      reExpand();
+    public void changeGroupType(String type) {
+        MyTreeNode myTN = (MyTreeNode) this.selectedNode;
+        if (!myTN.isIsGroup() && !myTN.isIsSubGroup()) {
+            //normalement impossible
+            return;
+        }
+        if (myTN.getTypeDomaine().equals(type)) {
+            return;
+        } else {
+            myTN.setTypeDomaine(type);
+            GroupHelper gh = new GroupHelper();
+            gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected, myTN.getIdConcept());
+            ConceptHelper ch = new ConceptHelper();
+            this.onNodeExpand(myTN);
+            for (TreeNode sbn : myTN.getChildren()) {
+                if (((MyTreeNode) sbn).isIsSubGroup()) {
+                    changeGroupType(type, sbn);
+                }
+
+            }
+        }
+        reInit();
+        this.initTree(idThesoSelected, myTN.getLangue());
+
+        reExpand();
 
     }
-     public void changeGroupType(String type, TreeNode sbn ){
-       
-         
-        ((MyTreeNode)sbn).setTypeDomaine(type);
-        GroupHelper gh=new GroupHelper();
-        gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected,((MyTreeNode)sbn).getIdConcept());
+
+    public void changeGroupType(String type, TreeNode sbn) {
+
+        ((MyTreeNode) sbn).setTypeDomaine(type);
+        GroupHelper gh = new GroupHelper();
+        gh.updateTypeGroup(this.connect.getPoolConnexion(), type, idThesoSelected, ((MyTreeNode) sbn).getIdConcept());
         this.onNodeExpand(sbn);
-           for(TreeNode sn: sbn.getChildren()){
-               if(((MyTreeNode)sn).isIsSubGroup())changeGroupType(type,sn);
-               
-           }
-     }
+        for (TreeNode sn : sbn.getChildren()) {
+            if (((MyTreeNode) sn).isIsSubGroup()) {
+                changeGroupType(type, sn);
+            }
+
+        }
+    }
 
     /**
      * Permet de supprimer un concept seul, il ne faut pas qu'il est des fils,
@@ -1246,6 +1418,10 @@ public class NewTreeBean implements Serializable {
         forced = false;
         duplicate = false;
         editPassed = true;
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("idConceptEditDlg");
+        }
     }
 
     /**
@@ -1280,7 +1456,7 @@ public class NewTreeBean implements Serializable {
      * @return
      */
     public boolean isGroup() {
-        if (selectedNode == null ) {
+        if (selectedNode == null) {
             return false;
         }
         return ((MyTreeNode) selectedNode).isIsGroup();
@@ -1296,8 +1472,8 @@ public class NewTreeBean implements Serializable {
             return false;
         }
         return ((MyTreeNode) selectedNode).isIsTopConcept();
-    }     
-    
+    }
+
     /**
      * permet de savoir si le noeud sélectionné est un sousGroupe
      *
@@ -1474,13 +1650,37 @@ public class NewTreeBean implements Serializable {
      * ***********************************************************************
      */
     /**
-     * Fonction pour récupérer l'éveneme drag drop de l'arbre
+     * Fonction pour récupérer l'évènement drag drop de l'arbre
      *
      * @param event
      */
     public void onDragDrop(TreeDragDropEvent event) {
         MyTreeNode dragNode = (MyTreeNode) event.getDragNode();
         MyTreeNode dropNode = (MyTreeNode) event.getDropNode();
+        executeDragDrop(dragNode, dropNode);
+    }
+
+    /**
+     * Fonction pour exécuter le couper/coller sans passer par le Drag and Drop
+     * de l'arbre.
+     *
+     * @param dragNode
+     * @param dropNode
+     */
+    public void onDragDropByCopy(MyTreeNode dragNode,
+            MyTreeNode dropNode) {
+        if(dragNode.getIdConcept().equalsIgnoreCase(dropNode.getIdConcept())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "copie impossible",  " (même objet !!!)"));
+            return;
+        }
+        executeDragDrop(dragNode, dropNode);
+    }
+
+    private void executeDragDrop(MyTreeNode dragNode,
+            MyTreeNode dropNode) {
+        //       MyTreeNode dragNode = (MyTreeNode) event.getDragNode();
+        //       MyTreeNode dropNode = (MyTreeNode) event.getDropNode();
         idsBT = new ArrayList<>();
         idsBTRemoveNode = new ArrayList<>();
         TreeChange treeChange = new TreeChange();
@@ -1516,12 +1716,12 @@ public class NewTreeBean implements Serializable {
         }
         idsBT.addAll(sibt);
 
-        if ("fichier".equals(event.getDropNode().getType())) {
-            treeChange.changeLeafToDirectory(event.getDragNode(), event.getDropNode());
+        if ("fichier".equals(dropNode.getType())) {
+            treeChange.changeLeafToDirectory(dragNode, dropNode);
         }
 
-        if (!"fichier".equals(event.getDropNode().getType()) && !"dossier".equals(event.getDropNode().getType())) {
-            treeChange.changeToGroupChild(event.getDragNode(), event.getDropNode());
+        if (!"fichier".equals(dropNode.getType()) && !"dossier".equals(dropNode.getType())) {
+            treeChange.changeToGroupChild(dragNode, dropNode);
         }
 
         treeChange.saveExpandedNodes(root);
@@ -1533,21 +1733,22 @@ public class NewTreeBean implements Serializable {
      * du drag drop de la page JSF , permet de préparer le traitement des
      * paramètres et appelle ensuite la fonction qui correspond à l'évenement
      * produit dans le tree
+     *
+     * @param copyAndPaste
      */
-    public void confirmDrop() {
-
-       
+    public void confirmDrop(CopyAndPaste copyAndPaste) {
         if ((droppedNode.isIsSubGroup() || droppedNode.isIsGroup()) && (!draggedNode.isIsSubGroup())) {
             for (StructIdBroaderTerm elem : this.idsBT) {
                 this.idsBTRemoveNode.add(elem.getIdBroaderTerm());
             }
-        }else{
-          this.idsBTRemoveNode.add(parentId);
+        } else {
+            this.idsBTRemoveNode.add(parentId);
         }
         callTreeHandle();
         callreExpande();
         idsBT = new ArrayList<>();
         idsBTRemoveNode = new ArrayList<>();
+        copyAndPaste.initInfo();
     }
 
     /**
@@ -1649,7 +1850,7 @@ public class NewTreeBean implements Serializable {
                     this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println("from subgroup to group other domain");
+        // System.out.println("from subgroup to group other domain");
     }
 
     /**
@@ -1659,13 +1860,13 @@ public class NewTreeBean implements Serializable {
     public void fromSubGoupToSubGroupOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(), 
+            tc.moveSubGroupToSubGroupDomain(connect, draggedNode.getIdConcept(),
                     idBT, draggedNode.getIdCurrentGroup(), draggedNode.getType(),
                     droppedNode.getIdConcept(), idThesoSelected,
                     this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println("from sub grou to subgroup other domain");
+        // System.out.println("from sub grou to subgroup other domain");
     }
 
     /* public void fromSubGroupToConceptOtherDomain(){
@@ -1678,13 +1879,13 @@ public class NewTreeBean implements Serializable {
      * ******************déplacement d'un top term************************* **
      */
     public void fromTTToGroupOtherDomain() {
-       
-            TreeChange tc = new TreeChange();
-            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(), 
-                    draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
-                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-       
-       // System.out.println("from top term to group other domain");
+
+        TreeChange tc = new TreeChange();
+        tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(),
+                draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
+                idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
+
+        // System.out.println("from top term to group other domain");
     }
 
     /**
@@ -1692,11 +1893,11 @@ public class NewTreeBean implements Serializable {
      * autre domaine
      */
     public void fromTTToSubGroupOtherDomain() {
-          TreeChange tc = new TreeChange();
-            tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(),
-                    draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
-                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-       
+        TreeChange tc = new TreeChange();
+        tc.moveTopTermToOtherDomaine(connect, draggedNode.getIdConcept(),
+                draggedNode.getIdCurrentGroup(), droppedNode.getIdCurrentGroup(),
+                idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
+
         //System.out.println("from top term to sub group other domain");
     }
 
@@ -1711,10 +1912,10 @@ public class NewTreeBean implements Serializable {
                     draggedNode.getIdCurrentGroup(), idBT, droppedNode.getIdConcept(),
                     droppedNode.getIdCurrentGroup(), idThesoSelected,
                     this.selectedTerme.getUser().getUser().getIdUser());
-        
+
         }
 
-       // System.out.println("from to top term to top term other domain");
+        // System.out.println("from to top term to top term other domain");
     }
 
     /**
@@ -1727,10 +1928,10 @@ public class NewTreeBean implements Serializable {
             tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,
                     draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
                     idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-          
+
         }
 
-       // System.out.println("from top term to top term domain");
+        // System.out.println("from top term to top term domain");
     }
 
     /**
@@ -1740,12 +1941,12 @@ public class NewTreeBean implements Serializable {
     public void fromTTToConceptDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT, 
-                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), 
+            tc.moveTopTermToConceptSameDomaine(connect, draggedNode.getIdConcept(), idBT,
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
                     idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-           
+
         }
-      //  System.out.println(" from top term to concept  domain");
+        //  System.out.println(" from top term to concept  domain");
     }
 
     /**
@@ -1755,10 +1956,10 @@ public class NewTreeBean implements Serializable {
     public void fromTTToConceptOtherDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-      tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(), idBT,
-              draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),droppedNode.getIdCurrentGroup(),
-              idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-           
+            tc.moveTopTermToConceptOtherDomaine(connect, draggedNode.getIdConcept(), idBT,
+                    draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(), droppedNode.getIdCurrentGroup(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
+
         }
         //System.out.println(" from top term to concept  other domain");
     }
@@ -1781,18 +1982,18 @@ public class NewTreeBean implements Serializable {
                     this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println(" from concept to group other domain");
+        // System.out.println(" from concept to group other domain");
     }
 
     public void fromConceptToGroupDomain() {
-           for (String idBT : idsBTRemoveNode) {
+        for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
             tc.momveConceptToGroupSameDomain(connect, draggedNode.getIdConcept(),
                     idBT, draggedNode.getIdCurrentGroup(), droppedNode.getIdConcept(),
                     idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println(" from concept to group  domain");
+        // System.out.println(" from concept to group  domain");
     }
 
     /**
@@ -1808,7 +2009,7 @@ public class NewTreeBean implements Serializable {
                     this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println(" from concept  to  sub group other domain   domain");
+        // System.out.println(" from concept  to  sub group other domain   domain");
     }
 
     /**
@@ -1824,7 +2025,7 @@ public class NewTreeBean implements Serializable {
                     idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println(" from   concept to sub group domain");
+        // System.out.println(" from   concept to sub group domain");
     }
 
     /**
@@ -1850,11 +2051,16 @@ public class NewTreeBean implements Serializable {
     public void fromConceptToTTDomain() {
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
+            if(!
             tc.moveConceptTermToConceptTermSameDomain(connect,
-                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
-
+                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(),
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser())){
+                
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "action impossible !!! ", ""));
+            }
         }
-       // System.out.println(" from concept m to top term  domain");
+        // System.out.println(" from concept m to top term  domain");
     }
 
     /**
@@ -1865,11 +2071,16 @@ public class NewTreeBean implements Serializable {
 
         for (String idBT : idsBTRemoveNode) {
             TreeChange tc = new TreeChange();
-            tc.moveConceptTermToConceptTermSameDomain(connect,
-                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
+            if(!tc.moveConceptTermToConceptTermSameDomain(connect,
+                    draggedNode.getIdConcept(), idBT, droppedNode.getIdConcept(), 
+                    idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser())){
+                
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "action impossible !!! ", ""));
+            }
 
         }
-       // System.out.println("from concept to concept domain");
+        // System.out.println("from concept to concept domain");
     }
 
     /**
@@ -1885,7 +2096,7 @@ public class NewTreeBean implements Serializable {
                     droppedNode.getIdCurrentGroup(), idThesoSelected, this.selectedTerme.getUser().getUser().getIdUser());
         }
 
-       // System.out.println("from concept to concept other domain");
+        // System.out.println("from concept to concept other domain");
     }
 
     /**
@@ -1923,18 +2134,21 @@ public class NewTreeBean implements Serializable {
             }
         }
     }
-    private void reExpandNodes(TreeNode tn,ArrayList<String> ids,String id ){
-        
-        for(TreeNode child : tn.getChildren()){
-            if(child==null || ((MyTreeNode)child).getIdConcept()==null)continue;
-            if(ids.contains(((MyTreeNode)child).getIdConcept())){
+
+    private void reExpandNodes(TreeNode tn, ArrayList<String> ids, String id) {
+
+        for (TreeNode child : tn.getChildren()) {
+            if (child == null || ((MyTreeNode) child).getIdConcept() == null) {
+                continue;
+            }
+            if (ids.contains(((MyTreeNode) child).getIdConcept())) {
                 child.setExpanded(true);
                 this.onNodeExpand(child);
-                reExpandNodes(child,ids,id);
+                reExpandNodes(child, ids, id);
             }
-            if((((MyTreeNode)child).getIdConcept()).equals(id)){
-               selectedNode=child; 
-               selectedNode.setSelected(true);
+            if ((((MyTreeNode) child).getIdConcept()).equals(id)) {
+                selectedNode = child;
+                selectedNode.setSelected(true);
             }
         }
     }
@@ -1961,150 +2175,267 @@ public class NewTreeBean implements Serializable {
      * ******************************************
      * **********************************************************************
      */
-    
-    /*******fonction de contrôle de l'arbre
-    /***********************************************************************/
-    
-    
     /**
-     * 
-     * @param lang 
+     * *****fonction de contrôle de l'arbre
+    /**********************************************************************
      */
-    public void getGroupAndSubGroup(String lang){
-        this.groupIds=new ArrayList<>();
-        this.groupLexicalValues=new ArrayList<>();
-        ArrayList<NodeGroup> ncg=new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idThesoSelected,lang);
-        for(NodeGroup ng:ncg){
-            
+    /**
+     *
+     * @param lang
+     */
+    public void getGroupAndSubGroup(String lang) {
+        this.groupIds = new ArrayList<>();
+        this.groupLexicalValues = new ArrayList<>();
+        ArrayList<NodeGroup> ncg = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idThesoSelected, lang);
+        for (NodeGroup ng : ncg) {
+
             this.groupIds.add(ng.getConceptGroup().getIdgroup());
-          
-            
-            this.groupLexicalValues.add(  ng.getLexicalValue()+" ("+ng.getConceptGroup().getIdgroup()+")");
+
+            this.groupLexicalValues.add(ng.getLexicalValue() + " (" + ng.getConceptGroup().getIdgroup() + ")");
         }
-        
+
     }
+
     /**
-     * méthode pour vérifier et forcer que les éléments d'un groupe ou d'un 
-     * sous groupe possède bien le nom de ce groupe comme nom de  domaine
-     * sinon on doit l'ajouter 
-     * 
+     * méthode pour vérifier et forcer que les éléments d'un groupe ou d'un sous
+     * groupe possède bien le nom de ce groupe comme nom de domaine sinon on
+     * doit l'ajouter
+     *
      */
-    public void alignDomain(){
-        String idGroup=null;
-       for(String gid :this.groupIds){
-        if(this.idGroupAlign.contains(gid)){
-            idGroup=gid;
-            break;
+    public void alignDomain() {
+        String idGroup = null;
+        for (String gid : this.groupIds) {
+            if (this.idGroupAlign.contains(gid)) {
+                idGroup = gid;
+                break;
+            }
         }
-       }
-        for( TreeNode tn :this.root.getChildren()){
+        for (TreeNode tn : this.root.getChildren()) {
             onNodeExpand(tn);
-            if(((MyTreeNode)tn).getIdCurrentGroup()==null)continue;
-            if(((MyTreeNode)tn).getIdCurrentGroup().equals(idGroup)){
-                    
-                    alignDomainAux(tn,idGroup);
-                  
+            if (((MyTreeNode) tn).getIdCurrentGroup() == null) {
+                continue;
+            }
+            if (((MyTreeNode) tn).getIdCurrentGroup().equals(idGroup)) {
+
+                alignDomainAux(tn, idGroup);
+
             }
         }
-        
+
     }
-    /**************fonction pour aligner les domaines**************************/
-    public void alignDomainAux(TreeNode mtn,String idGroup){
-        
-        for(TreeNode child : mtn.getChildren()){
+
+    /**
+     * ************fonction pour aligner les domaines*************************
+     */
+    public void alignDomainAux(TreeNode mtn, String idGroup) {
+
+        for (TreeNode child : mtn.getChildren()) {
             onNodeExpand(child);
-            if( ((MyTreeNode)child).isIsSubGroup()){
-                alignDomainAux((MyTreeNode)child,((MyTreeNode)child).getIdCurrentGroup());
-            }
-            else if(((MyTreeNode)child).getIdCurrentGroup()!=idGroup ){
-                 //si le groupe du domaine n'est pas le groupe principal:
-                 //on regarde dans les other groupes   
-                if(!((MyTreeNode)child).getOtherGroup().contains(idGroup)){
-                   //si le groupe n'apparait aps dans les other groupe alors on ajoute
-                   //sur le noeud courant et dans la bdd
-                    ArrayList<String>otherGroup=((MyTreeNode)child).getOtherGroup();
-                   otherGroup.add(idGroup);
-                   ((MyTreeNode)child).setOtherGroup(otherGroup);
-                    GroupHelper gh=new GroupHelper();
-                    gh.addConceptGroupConcept(this.connect.getPoolConnexion(), idGroup,((MyTreeNode)child).getIdConcept(), this.idThesoSelected);
-                }    
-                alignDomainAux(child,idGroup);
-            }
-        }
-        
-    }
-    
-  /*fonction pour importer de multiples NT ****/
-    public void addMultipleNT(){
-         InputStream is=null;
-         ArrayList<String> narrowerTerm=new ArrayList<>();
-        try{
-        
-            BufferedReader buff=new BufferedReader(new InputStreamReader(new ByteArrayInputStream(this.multipleNT)));
-            String tmp=null;
-            while((tmp=buff.readLine())!=null){
-                String[] lineNT=tmp.split("\t");
-                for(String nt : lineNT){
-                    if(!nt.trim().equals(""))narrowerTerm.add(nt.trim());
+            if (((MyTreeNode) child).isIsSubGroup()) {
+                alignDomainAux((MyTreeNode) child, ((MyTreeNode) child).getIdCurrentGroup());
+            } else if (((MyTreeNode) child).getIdCurrentGroup() != idGroup) {
+                //si le groupe du domaine n'est pas le groupe principal:
+                //on regarde dans les other groupes   
+                if (!((MyTreeNode) child).getOtherGroup().contains(idGroup)) {
+                    //si le groupe n'apparait aps dans les other groupe alors on ajoute
+                    //sur le noeud courant et dans la bdd
+                    ArrayList<String> otherGroup = ((MyTreeNode) child).getOtherGroup();
+                    otherGroup.add(idGroup);
+                    ((MyTreeNode) child).setOtherGroup(otherGroup);
+                    GroupHelper gh = new GroupHelper();
+                    gh.addConceptGroupConcept(this.connect.getPoolConnexion(), idGroup, ((MyTreeNode) child).getIdConcept(), this.idThesoSelected);
                 }
-                
+                alignDomainAux(child, idGroup);
             }
         }
-        catch(Exception e){
-           System.out.println("Error while reading uploaded file "+e);
-        }
-        finally{
-            try{
-            if(is!=null)is.close();
+
+    }
+
+    /*fonction pour importer de multiples NT, une seule colonne sans Id ****/
+    public void addMultipleNT() {
+        InputStream is = null;
+        ArrayList<String> narrowerTerm = new ArrayList<>();
+        try {
+
+            BufferedReader buff = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(this.multipleNT)));
+            String tmp = null;
+            while ((tmp = buff.readLine()) != null) {
+                String[] lineNT = tmp.split("\t");
+                for (String nt : lineNT) {
+                    if (!nt.trim().equals("")) {
+                        narrowerTerm.add(nt.trim());
+                    }
+                }
+
             }
-            catch(IOException e){
-                System.out.println("error closing inputSteeam in methodd addMultipleNT "+e );
+        } catch (Exception e) {
+            System.out.println("Error while reading uploaded file " + e);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                System.out.println("error closing inputSteeam in methodd addMultipleNT " + e);
             }
         }
-        for(String nt : narrowerTerm){
-            NodeAutoCompletion nac=new NodeAutoCompletion();
+        for (String nt : narrowerTerm) {
+            /*      NodeAutoCompletion nac=new NodeAutoCompletion();
             nac.setTermLexicalValue(nt);
-           this.selectedTerme.setSelectedTermComp(nac);
-          // this.newTSpe();
+            this.selectedTerme.setSelectedTermComp(nac);*/
+            selectedTerme.setValueEdit(nt);
+            selectedTerme.creerTermeSpe((MyTreeNode) getSelectedNode(), "NT", null, "");
         }
     }
-    
-     public void handleFileUpload(FileUploadEvent event){
-         this.multipleNT=event.getFile().getContents();
+
+    /**
+     * Permet d'importer un fichier CSV avec l'identifiant, prefLabels et
+     * altLabels (+ les langues) exp :
+     * id,skos:prefLabel@en,skos:prefLabel@fr,skos:altLabel@fr,skos:altLabel@en
+     * 600,Monday,Lundi,mon,1##1 601,Tuesday,Mardi,tue,2##2
+     * 602,Wednesday,Mercredi,wed,3##3 603,Thursday,Jeudi,thu,4##4
+     * 604,Friday,Vendredi,fri,5##5 605,Saturday,Samedi,sat,6##6
+     * 606,Sunday,Dimanche,sun,7##7
+     *
+     * #MR en cours de construction
+     */
+    public void addMultipleNT2() {
+
+        Term terme = new Term();
+        TermHelper termHelper = new TermHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        String idconcept = null;
+
+        if (conceptObjects == null) {
+            return;
+        }
+        for (CsvHelper.ConceptObject conceptObject : conceptObjects) {
+            /*      NodeAutoCompletion nac=new NodeAutoCompletion();
+            nac.setTermLexicalValue(nt);
+            this.selectedTerme.setSelectedTermComp(nac);*/
+
+            for (CsvHelper.Label prefLabel : conceptObject.getPrefLabels()) {
+                if (prefLabel.getLang().equalsIgnoreCase("fr")) {
+
+                    selectedTerme.setValueEdit(conceptObject.getPrefLabels().get(0).getLabel());
+                    selectedTerme.creerTermeSpe((MyTreeNode) getSelectedNode(), "NT", null, conceptObject.getId());//conceptObject.getId());
+
+                    idconcept = selectedTerme.getIdConceptTemp();
+                    /*
+                    new NoteHelper().addTermNote(connect.getPoolConnexion(),
+                                termHelper.getIdTermOfConcept(connect.getPoolConnexion(),
+                                        idconcept, ((MyTreeNode)getSelectedNode()).getIdTheso()),
+                                "fr",
+                                ((MyTreeNode)getSelectedNode()).getIdTheso(),
+                                "Id_Calenda :" + conceptObject.getOldId()
+                                        + " ## Id_OE :" + conceptObject.getOldId2()
+                                        + " ## Id_old :" + conceptObject.getOldId3(),//"noteHistorique",
+                                "historyNote", 1);
+                     */
+
+                } // ajout des traductions
+                else {
+                    if (idconcept != null) {
+                        terme.setId_thesaurus(((MyTreeNode) getSelectedNode()).getIdTheso());
+                        terme.setLang(prefLabel.getLang());
+                        terme.setLexical_value(prefLabel.getLabel());
+                        terme.setId_term(
+                                termHelper.getIdTermOfConcept(connect.getPoolConnexion(),
+                                        idconcept, ((MyTreeNode) getSelectedNode()).getIdTheso()));
+                        terme.setContributor(1);
+                        terme.setCreator(1);
+                        terme.setSource("");
+                        terme.setStatus("");
+                        /*  if (termHelper.isTermExist(connect.getPoolConnexion(),
+                                terme.getLexical_value(),
+                                terme.getId_thesaurus(), terme.getLang())) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
+                            return;
+                        }*/
+                        if (!conceptHelper.addConceptTraduction(connect.getPoolConnexion(), terme, 1)) {
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Error"));
+                            return;
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        this.multipleNT = event.getFile().getContents();
+
+        if (!readCsvFile(event)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    langueBean.getMsg("error") + " :", "Erreur de lecture du fichier"));
+
+            conceptObjects = null;
+            return;
+        }
+
         FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-     
-     
-    
-    /**fin fonction **/
-   
-     /**fonction pour changer la numérotation d'un sous groupe **************/
-     
-     public void changeNumerotation(){
-         GroupHelper gh= new GroupHelper();
-         gh.saveSuffixFromNode(this.connect.getPoolConnexion(), idThesoSelected, ((MyTreeNode)this.selectedNode).getIdConcept(), ""+this.nouveauSuffixe);
-          reInit();
-     this.initTree(idThesoSelected, ((MyTreeNode)this.selectedNode).getLangue());
 
-     // reExpand();
-         
-     }
-     
-     public void loadNumerotation(boolean group){
-         if(group){
-          this.ancienPrefixe=null;
-          this.nouveauSuffixe=Integer.parseInt(((MyTreeNode)this.selectedNode).getNumerotation());
-         }
-         else{
-         this.nouveauSuffixe=Integer.parseInt(((MyTreeNode)this.selectedNode).getSuffix());
-         this.ancienPrefixe=((MyTreeNode)this.selectedNode).getPrefix();
-         }
-     }
-     
-     /*********************************fin************************************/
-     
-     public Connexion getConnect() {
+    private boolean readCsvFile(FileUploadEvent event) {
+        try {
+            Reader in = new InputStreamReader(event.getFile().getInputstream());
+            CsvHelper csvHelper = new CsvHelper();
+            if (!csvHelper.readFile(in)) {
+                return false;
+            }
+
+            conceptObjects = csvHelper.getConceptObjects();
+            return true;
+        } catch (IOException ex) {
+        }
+        return false;
+    }
+
+    public void setSortNotation() {
+        if (isSortByNotation == true) {
+            isSortByNotation = false;
+            iconSort = "ui-icon-sort-16";
+            sortTitle = "tree.sortByNotation";
+        } else {
+            isSortByNotation = true;
+            iconSort = "ui-icon-sort-16-selected";
+            sortTitle = "tree.sortAlphabetic";
+        }
+        initTree(idThesoSelected, defaultLanguage);
+    }
+
+    /**
+     * fin fonction *
+     */
+    /**
+     * fonction pour changer la numérotation d'un sous groupe *************
+     */
+    public void changeNumerotation() {
+        GroupHelper gh = new GroupHelper();
+        gh.saveSuffixFromNode(this.connect.getPoolConnexion(), idThesoSelected, ((MyTreeNode) this.selectedNode).getIdConcept(), "" + this.nouveauSuffixe);
+        reInit();
+        this.initTree(idThesoSelected, ((MyTreeNode) this.selectedNode).getLangue());
+
+        // reExpand();
+    }
+
+    public void loadNumerotation(boolean group) {
+        if (group) {
+            this.ancienPrefixe = null;
+            this.nouveauSuffixe = Integer.parseInt(((MyTreeNode) this.selectedNode).getNumerotation());
+        } else {
+            this.nouveauSuffixe = Integer.parseInt(((MyTreeNode) this.selectedNode).getSuffix());
+            this.ancienPrefixe = ((MyTreeNode) this.selectedNode).getPrefix();
+        }
+    }
+
+    /**
+     * *******************************fin***********************************
+     */
+    public Connexion getConnect() {
         return connect;
     }
 
@@ -2125,10 +2456,12 @@ public class NewTreeBean implements Serializable {
     }
 
     public void setSelectedNode(TreeNode selectedNode) {
-        if(selectedNode==null || !(selectedNode instanceof MyTreeNode))return;
+        if (selectedNode == null || !(selectedNode instanceof MyTreeNode)) {
+            return;
+        }
         this.selectedNode = selectedNode;
     }
-    
+
     public ArrayList<TreeNode> getSelectedNodes() {
         return selectedNodes;
     }
@@ -2264,7 +2597,9 @@ public class NewTreeBean implements Serializable {
      * @return
      */
     public boolean isHaveChildren() {
-        if(selectedNode == null) return true;
+        if (selectedNode == null) {
+            return true;
+        }
         return !selectedNode.isLeaf();
     }
 
@@ -2275,7 +2610,6 @@ public class NewTreeBean implements Serializable {
     public void setGroupIds(ArrayList<String> groupIds) {
         this.groupIds = groupIds;
     }
-
 
     public String getIdGroupAlign() {
         return idGroupAlign;
@@ -2316,6 +2650,47 @@ public class NewTreeBean implements Serializable {
     public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
         this.roleOnTheso = roleOnTheso;
     }
-    
-  
+
+    public boolean isIsSortByNotation() {
+        return isSortByNotation;
+    }
+
+    public void setIsSortByNotation(boolean isSortByNotation) {
+        this.isSortByNotation = isSortByNotation;
+    }
+
+    public String getIconSort() {
+        return iconSort;
+    }
+
+    public void setIconSort(String iconSort) {
+        this.iconSort = iconSort;
+    }
+
+    public String getSortTitle() {
+        return sortTitle;
+    }
+
+    public void setSortTitle(String sortTitle) {
+        this.sortTitle = sortTitle;
+    }
+
+    public ArrayList<CsvHelper.ConceptObject> getConceptObjects() {
+        return conceptObjects;
+    }
+
+    public void initConceptObjects() {
+        if (this.conceptObjects != null) {
+            this.conceptObjects.clear();
+        }
+    }
+
+    public ExternalResources getExternalResources() {
+        return externalResources;
+    }
+
+    public void setExternalResources(ExternalResources externalResources) {
+        this.externalResources = externalResources;
+    }
+
 }

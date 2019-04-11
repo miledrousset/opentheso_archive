@@ -9,16 +9,25 @@ import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.logging.Level;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import mom.trd.opentheso.bdd.helper.CandidateHelper;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
+import mom.trd.opentheso.skosapi.SKOSDocumentation;
+import mom.trd.opentheso.skosapi.SKOSLabel;
+import mom.trd.opentheso.skosapi.SKOSMatch;
+import mom.trd.opentheso.skosapi.SKOSProperty;
+import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 import org.primefaces.event.FileUploadEvent;
 
@@ -96,13 +105,18 @@ public class rdf4jFileBean implements Serializable {
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
-                    readRdf4j = new ReadRdf4j(is, 0, this);
+                    readRdf4j = new ReadRdf4j(is, 0);
                 } catch (IOException ex) {
                     error = ex.getMessage();
                 } catch (Exception ex) {
                     error = ex.toString();
                 }
-                if(readRdf4j==null) return;
+                if(readRdf4j==null) {
+                    error = "Erreur de format RDF !!!";
+                    showError();
+                    return;
+                }
+                warning = readRdf4j.getMessage();
                 progress = 100;
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
                 total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
@@ -114,6 +128,7 @@ public class rdf4jFileBean implements Serializable {
 
             } catch (Exception e) {
                 System.out.println("erreur :" + e.getMessage());
+                error = error + "\n" + e.toString();
             } finally {
                 showError();
             }
@@ -188,13 +203,13 @@ public class rdf4jFileBean implements Serializable {
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
-                    readRdf4j = new ReadRdf4j(is, 1, this);
+                    readRdf4j = new ReadRdf4j(is, 1);
                 } catch (IOException ex) {
                     error = ex.getMessage();
                 } catch (Exception ex) {
                     error = ex.getMessage();
                 }
-
+                warning = readRdf4j.getMessage();
                 progress = 100;
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
                 total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
@@ -203,6 +218,7 @@ public class rdf4jFileBean implements Serializable {
                 BDDinsertEnable = true;
                 info = "File correctly loaded";
             } catch (Exception e) {
+                error = error + "\n" + e.toString();
             } finally {
                 showError();
             }
@@ -232,14 +248,14 @@ public class rdf4jFileBean implements Serializable {
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
-                    readRdf4j = new ReadRdf4j(is, 3, this);
+                    readRdf4j = new ReadRdf4j(is, 3);
                 } catch (IOException ex) {
                     error = ex.getMessage();
                 } catch (Exception ex) {
                     error = ex.getMessage();
                 }
                 if(readRdf4j == null) return;
-
+                warning = readRdf4j.getMessage();
                 progress = 100;
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
                 total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
@@ -248,6 +264,7 @@ public class rdf4jFileBean implements Serializable {
                 BDDinsertEnable = true;
                 info = "File correctly loaded";
             } catch (Exception e) {
+                error = error + "\n" + e.toString();
             } finally {
                 showError();
             }
@@ -277,12 +294,13 @@ public class rdf4jFileBean implements Serializable {
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
-                    readRdf4j = new ReadRdf4j(is, 2, this);
+                    readRdf4j = new ReadRdf4j(is, 2);
                 } catch (IOException ex) {
                     error = ex.getMessage();
                 } catch (Exception ex) {
                     error = ex.getMessage();
                 }
+                warning = readRdf4j.getMessage();
                 progress = 100;
                 sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
                 total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
@@ -292,6 +310,7 @@ public class rdf4jFileBean implements Serializable {
 
                 info = "File correctly loaded";
             } catch (Exception e) {
+                error = error + "\n" + e.toString();
             } finally {
                 showError();
             }
@@ -299,6 +318,105 @@ public class rdf4jFileBean implements Serializable {
         }
     }
 
+    
+    /**
+     * insrt un thésaurus dans la BDD
+     *
+     * 
+     * #### temporaire ### 
+     * ### permet d'ajouter une liste de candidats d'après un fichier SKOS ####
+     */
+    public void insertCandidatesBDD() {
+        error = "";
+        info = "";
+        warning = "";
+        
+        
+        CandidateHelper candidateHelper = new CandidateHelper();
+        String idParentConcept;
+        String notes;
+        String idArk;        
+        String idConcept = null;
+
+        progress = 0;
+        progress_abs = 0;
+            
+        for (SKOSResource sKOSResource : sKOSXmlDocument.getConceptList()) {
+            
+            for (SKOSLabel sKOSLabel : sKOSResource.getLabelsList()) {
+                idParentConcept = "";
+                if(sKOSLabel.getProperty() == SKOSProperty.prefLabel) {
+                    if(sKOSLabel.getLanguage().equalsIgnoreCase("fr")) {
+                        notes = getNotes(sKOSResource);
+                        idArk = getIdParentConcept(sKOSResource);
+                        if(idArk != null)
+                            idParentConcept = new ConceptHelper().getIdConceptFromArkId(connect.getPoolConnexion(), idArk);
+                        try {
+                            Connection conn = connect.getPoolConnexion().getConnection();
+                            idConcept = candidateHelper.addCandidat_rollBack(conn,
+                                    sKOSLabel.getLabel(),
+                                    sKOSLabel.getLanguage(),
+                                    roleOnTheso.getIdTheso(),
+                                    currentUser.getUser().getIdUser(),
+                                    notes,
+                                    idParentConcept,
+                                    "");
+                            if(idConcept == null) {
+                                conn.rollback();
+                                conn.close();
+                                continue;
+                            }
+                            conn.commit();
+                            conn.close();
+                      
+                        } catch (SQLException ex) {
+                            java.util.logging.Logger.getLogger(rdf4jFileBean.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } else {
+                        if(idConcept != null) {
+                            candidateHelper.addTermCandidatTraduction(
+                                connect.getPoolConnexion(),
+                                idConcept,
+                                sKOSLabel.getLabel(),
+                                sKOSLabel.getLanguage(),
+                                roleOnTheso.getIdTheso(),
+                                currentUser.getUser().getIdUser());
+                        }
+                    }
+                }
+            }
+        }            
+    }    
+    
+    private String getIdParentConcept(SKOSResource sKOSResource) {
+        String idArk;
+        for (SKOSMatch sKOSMatch : sKOSResource.getMatchList()) {
+            if(sKOSMatch.getValue().contains("https://ark.frantiq.fr")) {    
+                if(sKOSMatch.getProperty() == SKOSProperty.broadMatch) {
+                    idArk = sKOSMatch.getValue().substring(sKOSMatch.getValue().indexOf("ark:/")+5);
+                    return idArk;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private String getNotes(SKOSResource sKOSResource) {
+        String notes = "";
+        for (SKOSDocumentation sDocumentation : sKOSResource.getDocumentationsList()) {
+            if(!sDocumentation.getText().isEmpty()) {
+                if(sDocumentation.getProperty() == SKOSProperty.changeNote) {
+                    if(notes.isEmpty())
+                        notes = sDocumentation.getText();
+                    else 
+                        notes = notes + " ####  " + sDocumentation.getText();
+                }
+            }
+        }
+        return notes;
+    }    
+    
+    
     /**
      * insrt un thésaurus dans la BDD
      *
@@ -360,10 +478,10 @@ public class rdf4jFileBean implements Serializable {
 
             info = "Thesaurus correctly insert into data base";
             info = info + "\n" + importRdf4jHelper.getMessage().toString();
-            showError();
+//            showError();
 
         } catch (Exception e) {
-
+            error = error + "\n" + e.toString();
         } finally {
             showError();
         }
@@ -384,13 +502,16 @@ public class rdf4jFileBean implements Serializable {
         else
             idGroup = Integer.parseInt(selectedUserGroup);        
         try {
-
-        } catch (Exception e) {
             ImportRdf4jHelper importRdf4jHelper = new ImportRdf4jHelper();
             importRdf4jHelper.setInfos(connect.getPoolConnexion(), formatDate, 
                     currentUser.getUser().getIdUser(),
                     idGroup, 
                     connect.getWorkLanguage());
+            // pour récupérer les identifiants pérennes type Ark ou Handle
+            importRdf4jHelper.setIdentifierType(selectedIdentifier);
+            
+            importRdf4jHelper.setPrefixHandle(prefixHandle);
+            importRdf4jHelper.setNodePreference(roleOnTheso.getNodePreference());
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addSingleConcept(selectedTerme);
@@ -409,6 +530,8 @@ public class rdf4jFileBean implements Serializable {
             BDDinsertEnable = false;
             uri = null;
             total = 0;
+        } catch (Exception e) {
+            error = error + "\n" + e.toString();
         } finally {
             showError();
         }
@@ -434,6 +557,12 @@ public class rdf4jFileBean implements Serializable {
                     currentUser.getUser().getIdUser(),
                     idGroup, 
                     connect.getWorkLanguage());
+            // pour récupérer les identifiants pérennes type Ark ou Handle
+            importRdf4jHelper.setIdentifierType(selectedIdentifier);
+            
+            importRdf4jHelper.setPrefixHandle(prefixHandle);
+            importRdf4jHelper.setNodePreference(roleOnTheso.getNodePreference());
+            
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
                 importRdf4jHelper.addBranch(selectedTerme);
@@ -454,6 +583,7 @@ public class rdf4jFileBean implements Serializable {
             total = 0;
 
         } catch (Exception e) {
+            error = error + "\n" + e.toString();
         } finally {
             showError();
         }

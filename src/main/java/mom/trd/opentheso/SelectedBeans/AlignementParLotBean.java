@@ -87,7 +87,7 @@ public class AlignementParLotBean {
         ConceptHelper conceptHelper = new ConceptHelper();
         listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
-                connect.getPoolConnexion(), id_concept, id_Theso, listOfChildrenInConcept);
+                connect.getPoolConnexion(), id_concept, id_Theso);
 
         if (listOfChildrenInConcept.isEmpty() || listOfChildrenInConcept.size() == 1) {
             last = true;

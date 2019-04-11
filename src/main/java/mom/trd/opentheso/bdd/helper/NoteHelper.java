@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.NodeType;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import org.apache.commons.logging.Log;
@@ -28,6 +29,122 @@ public class NoteHelper {
     public NoteHelper() {
     }
 
+    //// restructuration de la classe NoteHelper le 29/10/2018 //////    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Nouvelles fontions #MR//////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////  
+    
+    public ArrayList<NoteType> getNotesType(HikariDataSource ds){
+        ArrayList<NoteType> noteTypes = new ArrayList<>();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT code, isterm, isconcept,"
+                            + " label_fr, label_en"
+                            + " FROM note_type";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NoteType noteType = new NoteType();
+                        noteType.setCodeNote(resultSet.getString("code"));
+                        noteType.setIsterm(resultSet.getBoolean("isterm"));
+                        noteType.setIsconcept(resultSet.getBoolean("isconcept"));
+                        noteType.setLabel_fr(resultSet.getString("label_fr"));
+                        noteType.setLabel_en(resultSet.getString("label_en"));
+                        noteTypes.add(noteType);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Notes types ", sqle);
+        }
+        return noteTypes;
+    }
+    
+    
+    public class NoteType {
+        private String CodeNote;
+        private boolean isterm;
+        private boolean isconcept;
+        private String label_fr;
+        private String label_en;
+        
+        public NoteType() {
+        }
+
+        public String getCodeNote() {
+            return CodeNote;
+        }
+
+        public void setCodeNote(String CodeNote) {
+            this.CodeNote = CodeNote;
+        }
+
+        public boolean isIsterm() {
+            return isterm;
+        }
+
+        public void setIsterm(boolean isterm) {
+            this.isterm = isterm;
+        }
+
+        public boolean isIsconcept() {
+            return isconcept;
+        }
+
+        public void setIsconcept(boolean isconcept) {
+            this.isconcept = isconcept;
+        }
+
+        public String getLabel_fr() {
+            return label_fr;
+        }
+
+        public void setLabel_fr(String label_fr) {
+            this.label_fr = label_fr;
+        }
+
+        public String getLabel_en() {
+            return label_en;
+        }
+
+        public void setLabel_en(String label_en) {
+            this.label_en = label_en;
+        }
+        
+        
+    }    
+    
+    
+    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Fin nouvelles fontions #MR///////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////       
+    
+    
+    
+
+    
     /**
      * Cette focntion permet de retourner la liste des notes pour un concept
      * (type CustomNote, ScopeNote, HistoryNote)

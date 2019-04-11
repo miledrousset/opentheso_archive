@@ -26,6 +26,8 @@ public class ExportFromBDD {
     private NodePreference nodePreference;
     
     DownloadBean downloadBean;
+    
+    private int compteur = 0;
 
     public void setServerArk(String serverArk) {
         this.serverArk = serverArk;
@@ -334,13 +336,25 @@ public class ExportFromBDD {
         ArrayList <NodeUri> idOfTopConcept = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, idGroup, idThesaurus);
         writeFileSKOS.writeGroup(nodeGroupLabel, idOfTopConcept, null);
         
+        NodeConceptExport nodeConcept ;
+        ConceptHelper conceptHelper = new ConceptHelper();
+        ArrayList<String> listConcepts = conceptHelper.getListConceptIdOfGroup(ds, idGroup, idThesaurus);
+        for (String idConcept : listConcepts) {
+            nodeConcept = conceptHelper.getConceptForExport(ds, idConcept, idThesaurus, isArkActive);
+            writeFileSKOS.writeDescriptor(nodeConcept, null);
+            System.out.println(++compteur);
+        }
+        
+        
+        /* deprecated #MR
         //écriture des TopConcepts
         for (NodeUri idOfTopConcept1 : idOfTopConcept) {
             exportAllConcepts(ds, idOfTopConcept1.getIdConcept(), idThesaurus, writeFileSKOS);
-        }
+        }*/
         writeFileSKOS.endSkos();
         return writeFileSKOS.getSkosBuff();
     }
+    
 
     /**
      * Fonction permettant d'exporter Un concept
@@ -587,7 +601,7 @@ public class ExportFromBDD {
             return;
         }
         
-        
+
         
         
         

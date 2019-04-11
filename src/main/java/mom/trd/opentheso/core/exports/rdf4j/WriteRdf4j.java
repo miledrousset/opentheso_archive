@@ -7,7 +7,6 @@ package mom.trd.opentheso.core.exports.rdf4j;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.skosapi.SKOSCreator;
 import mom.trd.opentheso.skosapi.SKOSDate;
 import mom.trd.opentheso.skosapi.SKOSDocumentation;
@@ -62,6 +61,7 @@ public class WriteRdf4j {
         builder.setNamespace("dcterms", "http://purl.org/dc/terms/");
         builder.setNamespace("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#");
         builder.setNamespace("iso-thes", "http://purl.org/iso25964/skos-thes#");
+        builder.setNamespace("opentheso", "http://purl.org/umu/uneskos#");
 
     }
 
@@ -356,7 +356,11 @@ public class WriteRdf4j {
                 case SKOSProperty.superGroup:
                     builder.add("iso-thes:superGroup", uri);
                     break;
-
+                    
+                /// unesco properties for Groups or Collections    
+                case SKOSProperty.memberOf:
+                    builder.add("opentheso:memberOf", uri);
+                    break;                    
             }
 
         }

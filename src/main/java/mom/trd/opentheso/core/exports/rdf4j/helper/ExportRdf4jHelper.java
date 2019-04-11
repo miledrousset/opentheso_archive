@@ -16,6 +16,7 @@ import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
@@ -63,7 +64,7 @@ public class ExportRdf4jHelper {
 
     public ExportRdf4jHelper() {
         skosXmlDocument = new SKOSXmlDocument();
-        superGroupHashMap = new HashMap<String, String>();
+        superGroupHashMap = new HashMap();
 
     }
 
@@ -138,6 +139,9 @@ public class ExportRdf4jHelper {
             sKOSResource.addDate(modified, SKOSProperty.modified);
         }
         sKOSResource.addRelation(getUriFromId(idTheso), SKOSProperty.inScheme);
+        for (NodeUri nodeUri : nodeConcept.getNodeListIdsOfConceptGroup()) {
+            sKOSResource.addRelation(getUriGroupFromNodeUri(nodeUri,idTheso), SKOSProperty.memberOf);
+        }           
         sKOSResource.addIdentifier(idConcept, SKOSProperty.identifier);
         
         skosXmlDocument.addconcept(sKOSResource);
@@ -159,7 +163,6 @@ public class ExportRdf4jHelper {
             addFilsConceptRecursif(idThesaurus, idOfConceptChildren, sKOSResource, downloadBean, selectedLanguages);
             //}
         }
-
     }
 
     private void addFilsConceptRecursif(String idThesaurus, String idPere, SKOSResource sKOSResource) {
@@ -250,6 +253,9 @@ public class ExportRdf4jHelper {
         }
 
         sKOSResource.addRelation(getUriFromId(idTheso), SKOSProperty.inScheme);
+        for (NodeUri nodeUri : nodeConcept.getNodeListIdsOfConceptGroup()) {
+            sKOSResource.addRelation(getUriGroupFromNodeUri(nodeUri,idTheso), SKOSProperty.memberOf);
+        }        
         
         sKOSResource.addIdentifier(nodeConcept.getConcept().getIdConcept(), SKOSProperty.identifier);
         
@@ -311,6 +317,10 @@ public class ExportRdf4jHelper {
         }
 
         sKOSResource.addRelation(getUriFromId(idTheso), SKOSProperty.inScheme);
+        for (NodeUri nodeUri : nodeConcept.getNodeListIdsOfConceptGroup()) {
+            sKOSResource.addRelation(getUriGroupFromNodeUri(nodeUri,idTheso), SKOSProperty.memberOf);
+        }
+        
         sKOSResource.addIdentifier(nodeConcept.getConcept().getIdConcept(), SKOSProperty.identifier);
         skosXmlDocument.addconcept(sKOSResource);
 
@@ -329,35 +339,32 @@ public class ExportRdf4jHelper {
 
     }
 
-    /*
-    private void addSelectedGroupRecursif(){
-        
-    }*/
+
     public void addGroup(String idThesaurus, List<NodeLang> selectedLanguages, List<NodeGroup> selectedGroups) {
 
-        rootGroupList = new GroupHelper().getListIdOfRootGroup(ds, idTheso);
-
+        if(idTheso == null || idTheso.isEmpty())
+            idTheso = idThesaurus;
+        
+        GroupHelper groupHelper = new GroupHelper();
+        rootGroupList = groupHelper.getListIdOfRootGroup(ds, idTheso);
+        NodeGroupLabel nodeGroupLabel;
+        
+        
         for (String idGroup : rootGroupList) {
-
-            boolean isInselectedGroups = false;
             for (NodeGroup nodeGroup : selectedGroups) {
                 if (nodeGroup.getConceptGroup().getIdgroup().equals(idGroup)) {
-                    isInselectedGroups = true;
-                    break;
+                   
+                    nodeGroupLabel = groupHelper.getNodeGroupLabel(ds, idGroup, idThesaurus);
+                    
+                    SKOSResource sKOSResource = new SKOSResource(getUriFromGroup(nodeGroupLabel), SKOSProperty.ConceptGroup);                    
+                    sKOSResource.addRelation(getUriFromGroup(nodeGroupLabel), SKOSProperty.microThesaurusOf);
+                    addFilsGroupRcursif(idThesaurus, idGroup, sKOSResource, selectedLanguages);                    
                 }
             }
-            if (!isInselectedGroups) {
-                continue;
-            }
-
-            SKOSResource group = new SKOSResource(getUriFromId(idGroup), SKOSProperty.ConceptGroup);
-            group.addRelation(getUriFromId(idThesaurus), SKOSProperty.microThesaurusOf);
-
-            addFilsGroupRcursif(idThesaurus, idGroup, group, selectedLanguages);
-
         }
-
     }
+    
+    
 
     private void addFilsGroupRcursif(String idThesaurus, String idPere, SKOSResource sKOSResource, List<NodeLang> selectedLanguages) {
 
@@ -384,7 +391,7 @@ public class ExportRdf4jHelper {
         NodeGroupLabel nodeGroupLabel;
         nodeGroupLabel = new GroupHelper().getNodeGroupLabel(ds, idOfGroupChildren, idThesaurus);
 
-        sKOSResource.setUri(getUriFromId(idOfGroupChildren));
+        sKOSResource.setUri(getUriFromGroup(nodeGroupLabel));
         sKOSResource.setProperty(SKOSProperty.ConceptGroup);
 
         for (NodeGroupTraductions traduction : nodeGroupLabel.getNodeGroupTraductionses()) {
@@ -450,10 +457,82 @@ public class ExportRdf4jHelper {
         //liste top concept
         nodeTTs.addAll(nodeUris);
         for (NodeUri topConcept : nodeTTs) {
-            skosXmlDocument.getConceptScheme().addRelation(getUriFromNodeUri(topConcept, idThesaurus), SKOSProperty.hasTopConcept);
+            if(skosXmlDocument.getConceptScheme() != null)
+                skosXmlDocument.getConceptScheme().addRelation(getUriFromNodeUri(topConcept, idThesaurus), SKOSProperty.hasTopConcept);
         }
 
     }
+    
+    /**
+     * permet d'ajouter une branche entière d'un domaine ou microthésaurus
+     * @param idThesaurus
+     * @param idGroup 
+     * #MR
+     */
+    public void addWholeGroup(String idThesaurus, String idGroup) {
+        SKOSResource sKOSResource = new SKOSResource(getUriFromId(idGroup), SKOSProperty.ConceptGroup);
+        sKOSResource.addRelation(getUriFromId(idThesaurus), SKOSProperty.microThesaurusOf);
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        List<NodeLang> languagesOfTheso = thesaurusHelper.getAllUsedLanguagesOfThesaurusNode(ds, idThesaurus);
+        
+        addFilsGroupRcursif(idThesaurus, idGroup, sKOSResource, languagesOfTheso);
+        
+        for (NodeUri nodeTT1 : nodeTTs) {
+            SKOSResource sKOSResource1 = new SKOSResource();
+            sKOSResource1.addRelation(getUriFromId(idTheso), SKOSProperty.topConceptOf);
+            //fils top concept
+            addFilsConceptRecursif(idThesaurus, nodeTT1.getIdConcept(), sKOSResource1);
+        }      
+    }
+    
+    
+    
+    
+    public void addSingleGroup(String idThesaurus, String idGroup) {
+
+        NodeGroupLabel nodeGroupLabel;
+        nodeGroupLabel = new GroupHelper().getNodeGroupLabel(ds, idGroup, idThesaurus);
+        SKOSResource sKOSResource = new SKOSResource();
+        sKOSResource.setUri(getUriFromGroup(nodeGroupLabel));
+        sKOSResource.setProperty(SKOSProperty.ConceptGroup);
+
+        for (NodeGroupTraductions traduction : nodeGroupLabel.getNodeGroupTraductionses()) {
+            sKOSResource.addLabel(traduction.getTitle(), traduction.getIdLang(), SKOSProperty.prefLabel);
+            //dates
+            String created;
+            String modified;
+            created = traduction.getCreated().toString();
+            modified = traduction.getModified().toString();
+            if (created != null) {
+                sKOSResource.addDate(created, SKOSProperty.created);
+            }
+            if (modified != null) {
+                sKOSResource.addDate(modified, SKOSProperty.modified);
+            }
+        }
+        
+        // pour exporter les membres (tous les concepts du group
+    /*    ArrayList<NodeUri> nodeUris = new ConceptHelper().getListIdsOfTopConceptsForExport(ds, idGroup, idThesaurus);
+        for (NodeUri nodeUri : nodeUris) {
+            sKOSResource.addRelation(getUriFromNodeUri(nodeUri, idThesaurus), SKOSProperty.member);
+            addMember(nodeUri.getIdConcept(), idThesaurus, sKOSResource);
+        }*/
+
+        ArrayList<String> childURI = new GroupHelper().getListGroupChildIdOfGroup(ds, idGroup, idThesaurus);
+        HashMap<String, String> superGroupHashMapTemp = new HashMap();
+        for (String id : childURI) {
+            sKOSResource.addRelation(getUriFromId(id), SKOSProperty.subGroup);
+            superGroupHashMapTemp.put(id, idGroup);
+        }
+        String idSuperGroup = superGroupHashMapTemp.get(idGroup);
+
+        if (idSuperGroup != null) {
+            sKOSResource.addRelation(getUriFromId(idSuperGroup), SKOSProperty.superGroup);
+            superGroupHashMapTemp.remove(idGroup);
+        }
+        sKOSResource.addIdentifier(idGroup, SKOSProperty.identifier);
+        skosXmlDocument.addGroup(sKOSResource);
+    }    
 
     public void addThesaurus(String idThesaurus, List<NodeLang> selectedLanguages) {
 
@@ -513,8 +592,8 @@ public class ExportRdf4jHelper {
 
     }
 
-    private void addAlignementGiven(ArrayList<NodeAlignment> nodeAlignments, SKOSResource resource) {
-        for (NodeAlignment alignment : nodeAlignments) {
+    private void addAlignementGiven(ArrayList<NodeAlignmentSmall> nodeAlignments, SKOSResource resource) {
+        for (NodeAlignmentSmall alignment : nodeAlignments) {
 
             int prop = -1;
             switch (alignment.getAlignement_id_type()) {
@@ -716,9 +795,101 @@ public class ExportRdf4jHelper {
             }
         }        
         // si on ne trouve pas ni Handle, ni Ark
-        uri = nodePreference.getCheminSite() + nodeConceptExport.getConcept().getIdConcept();
+    //    uri = nodePreference.getCheminSite() + nodeConceptExport.getConcept().getIdConcept();
+        uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
+                        + "&idt=" + nodeConceptExport.getConcept().getIdThesaurus();
+        
         return uri;
     }
+    
+    
+    /**
+     * Cette fonction permet de retourner l'URI du concept avec identifiant Ark
+     * : si renseigné sinon l'URL du Site
+     *
+     * @param nodeConceptExport
+     * @return
+     */
+    private String getUriFromGroup(NodeGroupLabel nodeGroupLabel) {
+        String uri = "";
+        if (nodeGroupLabel == null) {
+            //      System.out.println("nodeConcept = Null");
+            return uri;
+        }
+        if (nodeGroupLabel.getIdGroup() == null) {
+            //    System.out.println("nodeConcept.getConcept = Null");
+            return uri;
+        }
+        
+        // Choix de l'URI pour l'export : 
+        // Si Handle est actif, on le prend en premier 
+        // sinon,  on vérifie si Ark est actif, 
+        // en dernier, on prend l'URL basique d'Opentheso
+        // 1 seule URI est possible pour l'export par concept
+        
+
+        // URI de type Ark
+        if (nodeGroupLabel.getIdArk() != null) {
+            if (!nodeGroupLabel.getIdArk().trim().isEmpty()) {
+                uri = nodePreference.getServeurArk() + nodeGroupLabel.getIdArk();
+                return uri;
+            }
+        }
+        // URI de type Handle
+        if (nodeGroupLabel.getIdHandle() != null) {
+            if (!nodeGroupLabel.getIdHandle().trim().isEmpty()) {
+                uri = "https://hdl.handle.net/" + nodeGroupLabel.getIdHandle();
+                return uri;
+            }
+        }        
+        // si on ne trouve pas ni Handle, ni Ark
+//        uri = nodePreference.getCheminSite() + nodeGroupLabel.getIdGroup();
+        uri = nodePreference.getCheminSite() + "?idg=" + nodeGroupLabel.getIdGroup()
+                    + "&idt=" + nodeGroupLabel.getIdThesaurus();
+        return uri;
+    }
+    
+    /**
+     * Cette fonction permet de retourner l'URI du concept avec identifiant Ark
+     * : si renseigné sinon l'URL du Site
+     *
+     * @param nodeConceptExport
+     * @return
+     */
+    private String getUriGroupFromNodeUri(NodeUri nodeUri, String idTheso) {
+        String uri = "";
+        if (nodeUri == null) {
+            //      System.out.println("nodeConcept = Null");
+            return uri;
+        }
+        
+        // Choix de l'URI pour l'export : 
+        // Si Handle est actif, on le prend en premier 
+        // sinon,  on vérifie si Ark est actif, 
+        // en dernier, on prend l'URL basique d'Opentheso
+        // 1 seule URI est possible pour l'export par concept
+        
+        // URI de type Ark
+        if (nodeUri.getIdArk() != null) {
+            if (!nodeUri.getIdArk().trim().isEmpty()) {
+                uri = nodePreference.getServeurArk() + nodeUri.getIdArk();
+                return uri;
+            }
+        }         
+        // URI de type Handle
+        if (nodeUri.getIdHandle() != null) {
+            if (!nodeUri.getIdHandle().trim().isEmpty()) {
+                uri = "https://hdl.handle.net/" + nodeUri.getIdHandle();
+                return uri;
+            }
+        } 
+
+        // si on ne trouve pas ni Handle, ni Ark
+    //    uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
+        uri = nodePreference.getCheminSite() + "?idg=" + nodeUri.getIdConcept()
+                        + "&idt=" + idTheso;        
+        return uri;
+    }   
     
     /**
      * Cette fonction permet de retourner l'URI du concept avec identifiant Ark
@@ -740,6 +911,13 @@ public class ExportRdf4jHelper {
         // en dernier, on prend l'URL basique d'Opentheso
         // 1 seule URI est possible pour l'export par concept
         
+        // URI de type Ark
+        if (nodeUri.getIdArk() != null) {
+            if (!nodeUri.getIdArk().trim().isEmpty()) {
+                uri = nodePreference.getServeurArk() + nodeUri.getIdArk();
+                return uri;
+            }
+        }         
         // URI de type Handle
         if (nodeUri.getIdHandle() != null) {
             if (!nodeUri.getIdHandle().trim().isEmpty()) {
@@ -747,15 +925,12 @@ public class ExportRdf4jHelper {
                 return uri;
             }
         } 
-        // URI de type Ark
-        if (nodeUri.getIdArk() != null) {
-            if (!nodeUri.getIdArk().trim().isEmpty()) {
-                uri = nodePreference.getServeurArk() + nodeUri.getIdArk();
-                return uri;
-            }
-        } 
+
         // si on ne trouve pas ni Handle, ni Ark
-        uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
+    //    uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
+        uri = nodePreference.getCheminSite() + "?idc=" + nodeUri.getIdConcept()
+                        + "&idt=" + idTheso;   
+                        //+ "&amp;idt=" + idTheso;    
         return uri;
     }       
 

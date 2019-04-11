@@ -22,7 +22,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.ForgetPasswordHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
@@ -652,7 +652,8 @@ public class Candidat implements Serializable {
     //    if (niveauEdit == null || niveauEdit.trim().equals("")) { // Top concept
      //       idc = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, serverAdress, arkActive, theUser.getUser().getId());
       //  } else { // concept
-            idc = instance.addConcept(connect.getPoolConnexion(), niveauEdit, concept,
+            idc = instance.addConcept(connect.getPoolConnexion(),
+                    niveauEdit, "NT", concept,
                     terme, currentUser.getUser().getIdUser());
        // }
         // permet d'ajouter les domaines au nouveau concept
@@ -778,7 +779,7 @@ public class Candidat implements Serializable {
     }
 
     public boolean needchangerpass() throws SQLException {
-        UserHelper user = new UserHelper();
+        UserHelper2 user = new UserHelper2();
         if (user.isneededpass(connect.getPoolConnexion(), currentUser.getUser().getIdUser())) {
             return true;
         }

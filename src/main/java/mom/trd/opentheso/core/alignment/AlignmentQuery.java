@@ -48,6 +48,7 @@ import org.json.JSONObject;
 public class AlignmentQuery {
 
     private ArrayList<NodeAlignment> listeAlign;
+    private String message = "";
 
 
     ////////////////////////////////////////
@@ -283,7 +284,8 @@ public class AlignmentQuery {
             conn.setRequestProperty("Accept", "application/xml");
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                message = conn.getResponseMessage();// throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                return null;
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -372,7 +374,7 @@ public class AlignmentQuery {
     public ArrayList<NodeAlignment> queryWikidata(String idC, String idTheso,
             String lexicalValue, String lang, 
             String requete, String source) {
-        listeAlign = new ArrayList<>();
+
         try {
             Endpoint sp = new Endpoint("https://query.wikidata.org/sparql", false);
 
@@ -380,10 +382,12 @@ public class AlignmentQuery {
                                     "  ?item rdfs:label \"fibula\"@en." +
                                     "  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }" +
                                     "}";*/
-
             requete = requete.replaceAll("##value##", lexicalValue);
             requete = requete.replaceAll("##lang##", lang);
             HashMap<String, HashMap> rs = sp.query(requete);
+
+            if(rs == null) return null;
+            listeAlign = new ArrayList<>();
 
             ArrayList<HashMap<String, Object>> rows_queryWikidata = (ArrayList) rs.get("result").get("rows");
             for (HashMap<String, Object> hashMap : rows_queryWikidata) {
@@ -418,8 +422,12 @@ public class AlignmentQuery {
                 System.out.println("URI : " + hashMap.get("itemDescription"));*/
             }
         } catch (EndpointException eex) {
-            System.out.println(eex);
-            eex.printStackTrace();
+            message = eex.toString();
+            return null;
+        }
+        catch (Exception e) {
+            message = "pas de connexion internet !!";
+            return null;
         }
         return listeAlign;
     }     
@@ -621,4 +629,14 @@ public class AlignmentQuery {
     public void setListeAlign(ArrayList<NodeAlignment> listeAlign) {
         this.listeAlign = listeAlign;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    
+    
 }

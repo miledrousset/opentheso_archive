@@ -9,6 +9,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -20,9 +22,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import mom.trd.opentheso.SelectedBeans.Connexion;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 
 /**
  * REST Web Service
@@ -30,6 +35,7 @@ import javax.ws.rs.core.Response;
  * @author miled.rousset
  */
 @Path("theso")
+
 public class theso {
 
     private HikariDataSource ds;
@@ -90,16 +96,6 @@ public class theso {
         return poolConnexion1;
     }
 
-    /**
-     * Permet de lire les préférences d'un thésaurus pour savoir si le
-     * webservices est activé ou non
-     *
-     * @param idTheso
-     */
-    private boolean getStatusOfWebservices(String idTheso) {
-        return true;
-    }
-
 /////////////////////////////////////////////////////    
 ///////////////////////////////////////////////////// 
     /*
@@ -109,22 +105,40 @@ public class theso {
 ///////////////////////////////////////////////////// 
 /////////////////////////////////////////////////////    
     /**
-     * Cette fonction renvoie un concept par son id et par l'id du thésaurus
+     * Cette fonction permet de se diriger vers le bon thésaurus 
+     * en passant par son nom VIA REST  
+     * ceci permet de gérer les noms de domaines et filtrer les thésaurus dans un parc important 
      *
      * @param name
-     * @return
+     * @param uriInfo
      */
     @Path("{theso}")
     @GET
     @Produces("application/xml;charset=UTF-8")
-    public Response getConcept(@PathParam("theso") String name) {
-/*        if (!getStatusOfWebservices(idTheso)) {
-            ds.close();
-            return Response.status(Status.SERVICE_UNAVAILABLE).entity("test").type(MediaType.TEXT_PLAIN).build();
-        }*/
+    public Response getConcept(@PathParam("theso") String name, @Context UriInfo uriInfo) {
 
-        ds.close();
-        return Response.ok("thesaurus = " + name).header("Access-Control-Allow-Origin", "*").build();
+            PreferencesHelper preferencesHelper = new PreferencesHelper();
+            String idTheso = preferencesHelper.getIdThesaurusFromName(ds, name);
+            
+            /*       String idLang = preferencesHelper.getWorkLanguageOfTheso(ds, idTheso);
+            if(idLang == null){
+            ds.close();
+            return null;
+            }*/
+            ds.close();
+
+            String path = uriInfo.getBaseUriBuilder().toString().replaceAll("/webresources/", "/");
+            if(idTheso != null) {
+                path = path + "?idt=" + idTheso;
+            }
+
+            try {
+                URI uri = new URI(path);//uriInfo.getBaseUriBuilder().path("bar").build();
+                return Response.temporaryRedirect(uri).build();
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(theso.class.getName()).log(Level.SEVERE, null, ex);
+            }            
+            return null;
     }
     
 }

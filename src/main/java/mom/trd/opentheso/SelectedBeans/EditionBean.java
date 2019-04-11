@@ -130,6 +130,7 @@ public class EditionBean implements Serializable {
                 arkActive = nodePreference.isUseArk();
                 urlSite = nodePreference.getCheminSite();
                 workLanguage = nodePreference.getSourceLang();
+                nodePreference.setPreferredName(editTheso.getTitle().trim());
             }
 
             try {

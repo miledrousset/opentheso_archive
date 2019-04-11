@@ -20,6 +20,7 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeMessageAdmin;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeProposition;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
+import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.timeJob.LineCdt;
 import org.apache.commons.logging.Log;
@@ -148,8 +149,9 @@ public class CandidateHelper {
     
 
     /**
-     * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
-     * libellé
+     * Cette fonction permet d'ajouter un candidat complet avec relations 
+     * sans les traductions
+     * 
      *
      * @param conn
      * @param lexical_value
@@ -171,93 +173,36 @@ public class CandidateHelper {
             conn.setAutoCommit(false);
 
             CandidateHelper candidateHelper = new CandidateHelper();
-            // controle si le term existe avant de rajouter un concept
+            // controle si le term existe avant de rajouter un candidat
             if (candidateHelper.isCandidatExist_rollBack(conn, lexical_value, idThesaurus, idLang)) {
-                conn.rollback();
-                conn.close();
                 return null;
             }
 
             String idConceptCandidat = addConceptCandidat_rollback(conn, idThesaurus);
             if (idConceptCandidat == null) {
-                conn.rollback();
-                conn.close();
                 return null;
             }
 
             String idTermCandidat = candidateHelper.addTermCandidat_RollBack(conn, lexical_value, idLang, idThesaurus, contributor);
             if (idTermCandidat == null) {
-                conn.rollback();
-                conn.close();
                 return null;
             }
 
             if (!addRelationConceptTermCandidat_RollBack(conn, idConceptCandidat,
                     idTermCandidat, idThesaurus)) {
-                conn.rollback();
-                conn.close();
                 return null;
             }
 
             if (!candidateHelper.addPropositionCandidat_RollBack(conn,
                     idConceptCandidat, contributor, idThesaurus,
                     note, idParentConcept, idGroup)) {
-                conn.rollback();
-                conn.close();
                 return null;
             }
-
             return idConceptCandidat;
         } catch (SQLException ex) {
             Logger.getLogger(CandidateHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
-    }
-
-    /**
-     * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
-     * libellé
-     *
-     * @param ds
-     * @param lexical_value
-     * @param idLang
-     * @param idThesaurus
-     * @param contributor
-     * @param note
-     * @param idParentConcept
-     * @param idGroup
-     * @return null si le term existe ou si erreur, sinon le numero de Concept
-     */
-    public String addCandidat(HikariDataSource ds,
-            String lexical_value,
-            String idLang, String idThesaurus,
-            int contributor, String note,
-            String idParentConcept, String idGroup) {
-
-        CandidateHelper candidateHelper = new CandidateHelper();
-        // controle si le term existe avant de rajouter un concept
-        if (candidateHelper.isCandidatExist(ds, lexical_value, idThesaurus, idLang)) {
-            return null;
-        }
-
-        String idConceptCandidat = addConceptCandidat(ds, idThesaurus);
-        if (idConceptCandidat == null) {
-            return null;
-        }
-
-        String idTermCandidat = candidateHelper.addTermCandidat(ds, lexical_value, idLang, idThesaurus, contributor);
-        if (idTermCandidat == null) {
-            return null;
-        }
-
-        if (!addRelationConceptTermCandidat(ds, idConceptCandidat,
-                idTermCandidat, idThesaurus)) {
-            return null;
-        }
-
-        candidateHelper.addPropositionCandidat(ds, idConceptCandidat, contributor, idThesaurus, note, idParentConcept, idGroup);
-
-        return idConceptCandidat;
     }
 
     /**
@@ -1490,6 +1435,59 @@ public class CandidateHelper {
     }
 
     /**
+     * Permet de retourner toutes les tradcutions pour un candidat au format NodeTermTraduction 
+     * 
+     *
+     * @param ds le pool de connexion
+     * @param idCandidat
+     * @param idThesaurus
+     * @return Objet Class ArrayList nodeTraductionCandidat
+     */
+    public ArrayList<NodeTermTraduction> getAllTraductionOfCandidat(HikariDataSource ds,
+            String idCandidat, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeTermTraduction> nodeTermTraductions = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select lexical_value, lang from term_candidat, concept_term_candidat" +
+                                " where " +
+                                " concept_term_candidat.id_term = term_candidat.id_term AND" +
+                                " concept_term_candidat.id_thesaurus = term_candidat.id_thesaurus AND" +
+                                " term_candidat.id_thesaurus = '" + idThesaurus + "' AND " +
+                                " concept_term_candidat.id_concept = '" + idCandidat + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeTermTraduction nodeTermTraduction = new NodeTermTraduction();
+                        nodeTermTraduction.setLang(resultSet.getString("lang"));
+                        nodeTermTraduction.setLexicalValue(resultSet.getString("lexical_value"));
+                        nodeTermTraductions.add(nodeTermTraduction);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Traductions of Candidat : " + idCandidat, sqle);
+        }
+        return nodeTermTraductions;
+
+    }    
+    
+    
+    /**
      * Permet de retourner une ArrayList de nodeTraductionCandidat par thésaurus
      *
      * @param ds le pool de connexion
@@ -2371,27 +2369,19 @@ public class CandidateHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT \n" +
-                    "  concept_candidat.id_concept,\n" +
-                    "  concept_candidat.id_thesaurus, \n" +
-                    "  term_candidat.lexical_value, \n" +
-                    "  concept_candidat.created, \n" +
-                    "  concept_candidat.modified, \n" +
-                    "  concept_candidat.admin_message, \n" +
-                    "  concept_candidat.status\n" +
-                    "\n" +
-                    "FROM \n" +
-                    "  concept_term_candidat, \n" +
-                    "  concept_candidat, \n" +
-                    "  term_candidat\n" +
-                    "WHERE \n" +
-                    "  concept_term_candidat.id_concept = concept_candidat.id_concept AND\n" +
-                    "  concept_term_candidat.id_thesaurus = concept_candidat.id_thesaurus AND\n" +
-                    "  term_candidat.id_term = concept_term_candidat.id_term AND\n" +
-                    "  term_candidat.id_thesaurus = concept_term_candidat.id_thesaurus AND\n" +
-                    "  concept_candidat.id_thesaurus = '" + idTheso + "' AND \n" +
-                    "  concept_candidat.status = 'a' AND (\n" +
-                    "  concept_candidat.created BETWEEN '" + d11 + "' AND '" + d21 + "' OR \n" +
+                    String query = "SELECT " +
+                    "  concept_candidat.id_concept," +
+                    "  concept_candidat.id_thesaurus," +
+                    "  concept_candidat.created," +
+                    "  concept_candidat.modified," +
+                    "  concept_candidat.admin_message," +
+                    "  concept_candidat.status" +
+                    " FROM " +
+                    "  concept_candidat" +
+                    " WHERE " +
+                    "  concept_candidat.id_thesaurus = '" + idTheso + "' AND " +
+                    "  concept_candidat.status = 'a' AND (" +
+                    "  concept_candidat.created BETWEEN '" + d11 + "' AND '" + d21 + "' OR" +
                     "  concept_candidat.modified BETWEEN '"+ d11 + "' AND '" + d21 + "');";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -2400,7 +2390,6 @@ public class CandidateHelper {
                         lCdt.setId_thesaurus(resultSet.getString("id_thesaurus"));
                         lCdt.setTitle_thesaurus("");
                         lCdt.setId_concept(resultSet.getString("id_concept"));
-                        lCdt.setValeur_lexical(resultSet.getString("lexical_value"));
                         lCdt.setCreated(resultSet.getDate("created"));
                         lCdt.setModified(resultSet.getDate("modified"));
                         lCdt.setAdmin_message(resultSet.getString("admin_message"));
@@ -2409,6 +2398,8 @@ public class CandidateHelper {
                                 getAllPropositionsOfCandidat(poolConnexion,
                                         resultSet.getString("id_concept"),
                                         idTheso));
+                        lCdt.setNodeTermTraductions(getAllTraductionOfCandidat(poolConnexion,
+                                resultSet.getString("id_concept"), idTheso));
                         listCdt.add(lCdt.getMessage());
                     }
 

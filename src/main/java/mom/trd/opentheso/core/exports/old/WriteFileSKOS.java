@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
@@ -312,7 +313,7 @@ public class WriteFileSKOS {
             }
         }
 
-        for (NodeAlignment alignment : nodeConceptExport.getNodeAlignmentsList()) {
+        for (NodeAlignmentSmall alignment : nodeConceptExport.getNodeAlignmentsList()) {
             // alignement exactMatch
             if (alignment.getAlignement_id_type() == 1) {
                 concept.addMapping(prepareUriTohtml(alignment.getUri_target()), SKOSMapping.exactMatch);

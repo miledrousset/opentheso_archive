@@ -4,6 +4,7 @@ package mom.trd.opentheso.bdd.helper.nodes;
 public class NodePreference {
     private String sourceLang;
     private int identifierType;
+    private String preferredName;
     
     // paramètres Ark
     private boolean useArk;
@@ -284,4 +285,14 @@ public class NodePreference {
     public void setWebservices(boolean webservices) {
         this.webservices = webservices;
     }
+
+    public String getPreferredName() {
+        return preferredName;
+    }
+
+    public void setPreferredName(String preferredName) {
+        this.preferredName = preferredName;
+    }
+    
+    
 }

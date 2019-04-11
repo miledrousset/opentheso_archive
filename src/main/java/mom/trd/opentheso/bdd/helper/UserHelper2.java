@@ -2,10 +2,12 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,7 +83,7 @@ public class UserHelper2 {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;         
     }
@@ -119,7 +121,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return idUser;
     }    
@@ -172,7 +174,7 @@ public class UserHelper2 {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUser;
     }
@@ -214,7 +216,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return groupLabel;
     }    
@@ -260,7 +262,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listGroup;
     }
@@ -297,7 +299,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return sortedHashMap;
     }
@@ -342,7 +344,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listThesos;        
     }
@@ -389,7 +391,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserGroupThesauruses;
     }
@@ -444,7 +446,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserGroupThesauruses;
     }
@@ -493,7 +495,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserGroupThesauruses;
     }      
@@ -528,7 +530,7 @@ public class UserHelper2 {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;          
     }    
@@ -573,18 +575,18 @@ public class UserHelper2 {
      * module de modification de l'utilisateur
      * @param conn
      * @param idUser
-     * @param idRole
+//     * @param idRole
      * @param isIsActive
      * @param isIsAlertMail
-     * @param isSuperAdmin
+//     * @param isSuperAdmin
      * @return 
      */
     public boolean updateUser(Connection conn, 
                     int idUser,
-                    int idRole,
+//                    int idRole,
                     boolean isIsActive,
-                    boolean isIsAlertMail,
-                    boolean isSuperAdmin
+                    boolean isIsAlertMail
+//                  , boolean isSuperAdmin
                     ){
         Statement stmt;
         boolean status = false;
@@ -594,14 +596,14 @@ public class UserHelper2 {
                 try {
                     String query = "UPDATE users set alertmail = " + isIsAlertMail +
                             ", active = " + isIsActive + 
-                            ", issuperadmin = " + isSuperAdmin +
+                          //  ", issuperadmin = " + isSuperAdmin +
                             " WHERE id_user = " + idUser;
                     stmt.executeUpdate(query);
-                    if(!isSuperAdmin) {
-                        query = "UPDATE user_role_group set id_role = " + idRole +
-                                " WHERE id_user = " + idUser;
-                        stmt.executeUpdate(query);
-                    }                  
+//                    if(!isSuperAdmin) {
+//                        query = "UPDATE user_role_group set id_role = " + idRole +
+//                                " WHERE id_user = " + idUser;
+//                        stmt.executeUpdate(query);
+//                    }                  
                     status = true;
                 } finally {
                     stmt.close();
@@ -717,7 +719,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserRoles;
     }    
@@ -958,7 +960,7 @@ public class UserHelper2 {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;        
     }
@@ -991,7 +993,7 @@ public class UserHelper2 {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1048,7 +1050,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1110,7 +1112,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserRoleGroups;
     } 
@@ -1148,7 +1150,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return idGroup;        
     }
@@ -1194,7 +1196,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listUser;
     }
@@ -1267,7 +1269,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         return nodeUserRoleGroup;
     }      
@@ -1332,7 +1334,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listUser;
     }
@@ -1396,7 +1398,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserRoleGroup;
     }    
@@ -1443,7 +1445,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserRoleGroup;
     }    
@@ -1548,7 +1550,7 @@ public class UserHelper2 {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserRoleGroup;
     }
@@ -1557,26 +1559,337 @@ public class UserHelper2 {
     
     
     
+    ///////////////////////////
+    /// à vérifier
+    //////////////////////////
     
-    
-    
-    
-    
+    /**
+     *
+     * permet de retourner la liste des admins pour un thésaurus pour leur
+     * envoyer des alertes candidats
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return
+     */
+    public ArrayList<String> getAdminMail(HikariDataSource ds,
+            String idThesaurus) {
+        ArrayList<String> lesMails = new ArrayList<>();
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
 
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT " +
+                            "  users.mail" +
+                            " FROM " +
+                            "  users, " +
+                            "  user_role_group, " +
+                            "  user_group_thesaurus" +
+                            " WHERE " +
+                            "  user_role_group.id_user = users.id_user AND" +
+                            "  user_role_group.id_group = user_group_thesaurus.id_group AND" +
+                            "  user_role_group.id_role = 2 AND " +
+                            "  users.active = true AND " +
+                            "  users.alertmail = true AND" +
+                            "  user_group_thesaurus.id_thesaurus = '" + idThesaurus + "'";
+                    resultSet = stmt.executeQuery(query);
+
+                    while (resultSet.next()) {
+                        lesMails.add(resultSet.getString("mail"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return lesMails;
+    }    
     
+    /**
+     * getMailUserForCandidat
+     * #JM
+     * méthode pour récupérer une arrayList de Mail des utilisateurs qui ont proposé
+     * un candidat et qui a été inséré validé ou refusé, entre deux dates debut et fin
+     * @param ds
+     * @param id_thesaurus
+     * @param debut
+     * @param fin
+     * @return 
+     */
+    public ArrayList<String> getMailUserForCandidat(HikariDataSource ds,String id_thesaurus,Date debut,Date fin){
+       Connection conn;
+       PreparedStatement stmt;
+       ArrayList<String> mail=new ArrayList<>();
+       ResultSet rs;
+       try{
+           conn=ds.getConnection();
+           try{
+               String sql="SELECT mail FROM users INNER JOIN proposition ON proposition.id_user=users.id_user" +
+                            " INNER JOIN  concept_candidat ON proposition.id_concept=concept_candidat.id_concept" +
+                            " INNER JOIN concept_term_candidat ON concept_candidat.id_concept=concept_term_candidat.id_concept" +
+                            " INNER JOIN term_candidat ON concept_term_candidat.id_term=term_candidat.id_term" +
+                            " WHERE concept_candidat.id_thesaurus=?" +
+                            " AND ( concept_candidat.status='i' OR concept_candidat.status='v' OR concept_candidat.status='r')" +
+                            " AND ((concept_candidat.created BETWEEN ? AND ?)" +
+                            " OR (concept_candidat.modified BETWEEN ? AND ?))";
+               stmt=conn.prepareStatement(sql);
+               stmt.setString(1,id_thesaurus);
+                java.sql.Date d=new java.sql.Date(debut.getTime());
+               java.sql.Date f=new java.sql.Date(fin.getTime());
+               stmt.setDate(2,d);
+               stmt.setDate(3,f);
+               stmt.setDate(4,d);
+               stmt.setDate(5,f);
+               try{
+                   rs=stmt.executeQuery();
+                   while(rs.next()){
+                       mail.add(rs.getString("mail"));
+                   }
+               }
+               finally{
+                   stmt.close();
+               }
+           }finally{
+               conn.close();
+               
+           }
+       }
+       catch(SQLException e){
+           Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE,"error while selecting mail from users in getMailUserForCandidat id thesaurus ="+id_thesaurus,e);
+       }
+        return mail;
+    }
     
+    public boolean isUserMailExist(HikariDataSource ds, String mail) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT mail FROM users WHERE mail ilike '" + mail + "'";
+                    resultSet = stmt.executeQuery(query);
+                    resultSet.next();
+                    if (resultSet.getRow() != 0) {
+                        return true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
+    }
     
+    /**
+     * permet de retourner le pseudo de l'utilisateur d'après son Email
+     * @param ds
+     * @param email
+     * @return 
+     */
+    public String getNameUser(HikariDataSource ds, String email) {
+
+        String name = "";
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT username from users "
+                            + " WHERE mail ilike '" + email + "'";
+
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        name = resultSet.getString("username");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return name;
+    }
     
+    public boolean isneededpass(HikariDataSource ds, int id ) 
+    {
+        Statement stmt;
+        boolean need=false;
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Select passtomodify from users where id_user = '"+id+"'";
+                    ResultSet rs = stmt.executeQuery(query);
+                    if(rs.next())
+                    {
+                        need = rs.getBoolean("passtomodify");
+                    }
+                    }finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return need;
+    }    
     
+    /**
+     * Cette fonction permet de récupérer l'Id de l'utilisateur d'après son
+     * Login et son passe
+     *
+     * @param ds
+     * @param login
+     * @param pwd
+     * @return
+     */
+    public boolean isUserExist(HikariDataSource ds, String login, String pwd) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_user FROM users WHERE username ilike '" + login + "' AND password='" + pwd + "'";
+                    resultSet = stmt.executeQuery(query);
+                    //resultSet.first();
+                    //resultSet.next();
+                    if (resultSet.next()) {
+                        existe = true;
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return existe;
+    }    
     
+    public void updatePwd(HikariDataSource ds, int idUser, String newPwd) {
+        Connection conn;
+        Statement stmt;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE users set password = '" + newPwd
+                            + "' WHERE id_user = " + idUser;
+                    stmt.executeUpdate(query);
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
     
+    public void updatePseudo(HikariDataSource ds, int idUser, String pseudo) {
+        Connection conn;
+        Statement stmt;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "UPDATE users set username = '" + pseudo
+                            + "' WHERE id_user = " + idUser;
+                    stmt.executeUpdate(query);
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
     
+    public String getNameUser(HikariDataSource ds, int iden) {
+
+        String name = "";
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT username from users "
+                            + " WHERE id_user =" + iden;
+
+                    resultSet = stmt.executeQuery(query);
+                    if (resultSet.next()) {
+                        name = resultSet.getString("username");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return name;
+    }    
     
-    
-    
-    
-    
-    
+    ///////////////////////////
+    /// fin à vérifier
+    //////////////////////////    
     
     
 
@@ -1787,7 +2100,7 @@ public class UserHelper2 {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         ArrayList<Map.Entry<String, String>> listeRoles = new ArrayList<>(map.entrySet());
         return listeRoles;

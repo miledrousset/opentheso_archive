@@ -5,23 +5,15 @@
  */
 package mom.trd.opentheso.ws.rest;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -29,9 +21,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
-import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import skos.SKOSXmlDocument;
 
 import javax.ws.rs.core.Response;
@@ -48,6 +39,7 @@ import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
+
 /**
  * REST Web Service
  *
@@ -56,7 +48,6 @@ import org.eclipse.rdf4j.rio.Rio;
 @Path("rest")
 public class Rest {
 
-    private HikariDataSource ds;
     private NodePreference nodePreference;
 
     /**
@@ -65,55 +56,12 @@ public class Rest {
      *
      */
     public Rest() {
-        Properties properties = new Properties();
-        try {
-            InputStream inputStream = Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("hikari.properties");
-            if (inputStream != null) {
-                properties.load(inputStream);
-                //   if(properties.getProperty("webservices").equalsIgnoreCase("false"))
-                //      return;
-                this.ds = openConnexionPool(properties);
-            }
-        } catch (IOException ex) {
-            System.err.println(ex.toString());
-        }
     }
-
-    private HikariDataSource openConnexionPool(Properties properties) {
-        HikariConfig config = new HikariConfig();
-        config.setMinimumIdle(Integer.parseInt(properties.getProperty("minimumIdle")));
-        config.setMaximumPoolSize(Integer.parseInt(properties.getProperty("setMaximumPoolSize")));
-        config.setAutoCommit(true);
-        config.setIdleTimeout(Integer.parseInt(properties.getProperty("idleTimeout")));
-        config.setConnectionTimeout(Integer.parseInt(properties.getProperty("connectionTimeout")));
-        config.setConnectionTestQuery(properties.getProperty("connectionTestQuery"));
-        config.setDataSourceClassName(properties.getProperty("dataSourceClassName"));
-
-        config.addDataSourceProperty("user", properties.getProperty("dataSource.user"));
-        config.addDataSourceProperty("password", properties.getProperty("dataSource.password"));
-        config.addDataSourceProperty("databaseName", properties.getProperty("dataSource.databaseName"));
-        config.addDataSourceProperty("serverName", properties.getProperty("dataSource.serverName"));
-        config.addDataSourceProperty("portNumber", properties.getProperty("dataSource.serverPort"));
-
-        HikariDataSource poolConnexion1 = new HikariDataSource(config);
-        try {
-            Connection conn = poolConnexion1.getConnection();
-            if (conn == null) {
-                return null;
-            }
-            conn.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_FATAL, ex.getClass().getName(), ex.getMessage());
-            FacesContext.getCurrentInstance().addMessage(null, message);
-            poolConnexion1.close();
-            return null;
-        }
-
-        return poolConnexion1;
-    }
+    
+    private HikariDataSource connect() {
+        ConnexionRest connexionRest = new ConnexionRest();
+        return connexionRest.getConnexion();
+    }    
 
     /**
      * Permet de lire les préférences d'un thésaurus pour savoir si le
@@ -121,7 +69,7 @@ public class Rest {
      *
      * @param idTheso
      */
-    private boolean getStatusOfWebservices(String idTheso) {
+    private boolean getStatusOfWebservices(HikariDataSource ds , String idTheso) {
         return new PreferencesHelper().isWebservicesOn(ds, idTheso);
     }
 
@@ -145,11 +93,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getConcept(@PathParam("id") String idConcept,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = conceptToSkos(idConcept, idTheso);
+        StringBuffer skos = conceptToSkos(ds, idConcept, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -161,6 +110,33 @@ public class Rest {
         ds.close();
         return Response.ok(skos.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
+    
+    
+    ///////////// test
+    @Path("/skos/{idtheso}/{idconcept}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public Response getConceptTest(@PathParam("idconcept") String idConcept,
+            @PathParam("idtheso") String idTheso) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        StringBuffer skos = conceptToSkos(ds, idConcept, idTheso);
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptySkos()).header("Access-Control-Allow-Origin", "*").build();
+        }        
+        ds.close();
+        return Response.ok(skos.toString()).header("Access-Control-Allow-Origin", "*").build();
+    }   
+    
+    ///test
 
     /**
      * Cette fonction renvoie un concept par son id et par l'id du thésaurus
@@ -174,11 +150,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getConceptClone(@PathParam("idc") String idConcept,
             @PathParam("idt") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = conceptToSkos(idConcept, idTheso);
+        StringBuffer skos = conceptToSkos(ds, idConcept, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -202,11 +179,13 @@ public class Rest {
     @GET
     @Produces("application/xml;charset=UTF-8")
     public Response getAllGroups(@PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
+        StringBuffer skos = groupsOfThesaurusToSkos(ds, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -231,11 +210,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getGroup(@PathParam("idg") String idGroup,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = groupToSkos(idGroup, idTheso);
+        StringBuffer skos = groupToSkos(ds, idGroup, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -255,8 +235,9 @@ public class Rest {
             @PathParam("value") String value,
             @PathParam("lang") String idLang,
             @PathParam("th") String idTheso) {
+        HikariDataSource ds = connect();        
 
-        if (!getStatusOfWebservices(idTheso)) {
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -272,7 +253,7 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -284,6 +265,43 @@ public class Rest {
         ds.close();
         return Response.ok(skos.toString()).header("Access-Control-Allow-Origin", "*").build();
     }
+    
+    @Path("/skos/concept/value={value}&th={th}")
+    @GET
+    @Produces("application/xml;charset=UTF-8")
+    public Response getConceptByValue(
+            @PathParam("value") String value,
+            @PathParam("th") String idTheso) {
+        HikariDataSource ds = connect();        
+
+        if (!getStatusOfWebservices(ds, idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, "");
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptySkos()).header("Access-Control-Allow-Origin", "*").build();
+        }        
+        ds.close();
+        return Response.ok(skos.toString()).header("Access-Control-Allow-Origin", "*").build();
+    }    
 
     /**
      * Permet de rechercher les concepts par valeur
@@ -303,8 +321,8 @@ public class Rest {
             @PathParam("lang") String idLang,
             @PathParam("idg") String idGroup,
             @PathParam("th") String idTheso) {
-
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -321,7 +339,7 @@ public class Rest {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        StringBuffer skos = ConceptByValueToSkos(value,
+        StringBuffer skos = ConceptByValueToSkos(ds, value,
                 idLang,
                 idGroup,
                 idTheso);
@@ -349,18 +367,19 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getConceptSkosArk(@PathParam("naan") String naan,
             @PathParam("ark") String ark) {
+        HikariDataSource ds = connect();        
 
         String idTheso = new ConceptHelper().getIdThesaurusFromArkId(ds, naan + "/" + ark);
         if (idTheso == null) {
             ds.close();
             return Response.noContent().build();
         }
-        if (!getStatusOfWebservices(idTheso)) {
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
 
-        StringBuffer skos = conceptToSkosFromArk(naan + "/" + ark, idTheso);
+        StringBuffer skos = conceptToSkosFromArk(ds, naan + "/" + ark, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -386,11 +405,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getConceptsOfGroup(@PathParam("idg") String idGroup,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
+        StringBuffer skos = conceptsOfGroupToSkos(ds, idGroup, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -416,11 +436,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getBrancheOfConcepts(@PathParam("idc") String idConcept,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
+        StringBuffer skos = brancheOfConceptsToSkos(ds, idConcept, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -446,11 +467,12 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getBrancheOfConcepts2(@PathParam("id") String idConcept,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
+        StringBuffer skos = brancheOfConceptsToSkos(ds, idConcept, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -478,13 +500,13 @@ public class Rest {
     public Response getBrancheOfConcepts(@PathParam("id") String idConcept,
             @PathParam("th") String idTheso,
             @PathParam("way") String way) {
-
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
         if (way.equalsIgnoreCase("top")) {
-            StringBuffer skos = brancheOfConceptsToSkosTop(idConcept, idTheso);
+            StringBuffer skos = brancheOfConceptsToSkosTop(ds, idConcept, idTheso);
             if (skos == null) {
                 ds.close();
                 return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -497,7 +519,7 @@ public class Rest {
             return Response.ok(skos.toString()).header("Access-Control-Allow-Origin", "*").build();
         }
         if (way.equalsIgnoreCase("down")) {
-            StringBuffer skos = brancheOfConceptsToSkos(idConcept, idTheso);
+            StringBuffer skos = brancheOfConceptsToSkos(ds, idConcept, idTheso);
             if (skos == null) {
                 ds.close();
                 return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -526,12 +548,12 @@ public class Rest {
     public Response getBrancheOfConceptsFromDate(
             @PathParam("th") String idTheso,
             @PathParam("date") String date) {
-
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = brancheOfConceptsToSkosFromDate(idTheso, date);
+        StringBuffer skos = brancheOfConceptsToSkosFromDate(ds, idTheso, date);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -559,18 +581,18 @@ public class Rest {
     @Produces("application/xml;charset=UTF-8")
     public Response getBranchOfConceptSkosArk(@PathParam("naan") String naan,
             @PathParam("ark") String ark) {
-
+        HikariDataSource ds = connect();
         String idTheso = new ConceptHelper().getIdThesaurusFromArkId(ds, naan + "/" + ark);
         if (idTheso == null) {
             ds.close();
             return Response.noContent().build();
         }
-        if (!getStatusOfWebservices(idTheso)) {
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
 
-        StringBuffer skos = conceptToSkosFromArk(naan + "/" + ark, idTheso);
+        StringBuffer skos = conceptToSkosFromArk(ds, naan + "/" + ark, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -736,11 +758,12 @@ public class Rest {
     @Produces("application/json;charset=UTF-8")
     public Response getConceptJson(@PathParam("id") String idConcept,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = conceptToSkos(idConcept, idTheso);
+        StringBuffer skos = conceptToSkos(ds, idConcept, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -749,7 +772,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }        
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
 
@@ -772,18 +795,18 @@ public class Rest {
     @Produces("application/json;charset=UTF-8")
     public Response getConceptJsonArk(@PathParam("naan") String naan,
             @PathParam("ark") String ark) {
-
+        HikariDataSource ds = connect();
         String idTheso = new ConceptHelper().getIdThesaurusFromArkId(ds, naan + "/" + ark);
         if (idTheso == null) {
             ds.close();
             return Response.noContent().build();
         }
-        if (!getStatusOfWebservices(idTheso)) {
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
 
-        StringBuffer skos = conceptToSkosFromArk(naan + "/" + ark, idTheso);
+        StringBuffer skos = conceptToSkosFromArk(ds, naan + "/" + ark, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -792,7 +815,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }          
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
 
@@ -819,7 +842,8 @@ public class Rest {
             @PathParam("value") String value,
             @PathParam("lang") String idLang,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -834,7 +858,7 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -843,13 +867,61 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }          
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         ds.close();
         return Response.ok(jsonLd.toString()).header("Access-Control-Allow-Origin", "*").build();
         //return jsonLd.toString();
     }
+    
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus)
+     *
+     * @param value
+     * @param idTheso
+     * @return
+     */
+    @Path("/jsonld/concept/value={value}&th={th}")
+    @GET
+    //@Produces("text/plain")
+    //@Produces("application/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response getConceptJsonByValue(
+            @PathParam("value") String value,
+            @PathParam("th") String idTheso) {
+        HikariDataSource ds = connect();        
+        if (!getStatusOfWebservices(ds, idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, "");
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
+        }          
+        JsonldHelper jsonHelper = new JsonldHelper();
+        SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
+        StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
+        ds.close();
+        return Response.ok(jsonLd.toString()).header("Access-Control-Allow-Origin", "*").build();
+        //return jsonLd.toString();
+    }    
     
     /**
      * Permet de retourner les Concepts par value (en précisant un thésaurus et
@@ -869,7 +941,8 @@ public class Rest {
             @PathParam("value") String value,
             @PathParam("lang") String idLang,
             @PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();         
+        if (!getStatusOfWebservices(ds,idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -884,7 +957,7 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -893,11 +966,86 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }
-        String json = getJsonDatas(value, idLang, idTheso);
+        String json = getJsonDatas(ds, value, idLang, idTheso);
         ds.close();
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();
         //return jsonLd.toString();
     }    
+    
+    /**
+     * Permet de retourner les Concepts par value (en précisant un thésaurus et
+     * une langue)
+     *
+     * @param uri
+     * @return
+     */
+    @Path("/test")
+    @GET
+    //@Produces("text/plain")
+    //@Produces("application/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response searchTest(@Context UriInfo uri) {
+        String value = "";
+        String idLang = "";
+        String idTheso = "";
+        HikariDataSource ds = connect();         
+//        @GET()
+//        @Path("param")
+//        public String param(@Context UriInfo uri) {
+//            String result = "";
+//            result += "path: " + uri.getPath();
+//            for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+//                for (String value : e.getValue()) {
+//                    result += " ";
+//                    result += e.getKey() + "=" + value;
+//                }
+//            }
+//            return result;
+//        }        
+        if (!getStatusOfWebservices(ds, idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+            for (String valeur : e.getValue()) {
+                if(e.getKey().equalsIgnoreCase("lang")) 
+                    idLang = valeur;
+                if(e.getKey().equalsIgnoreCase("value")) 
+                    value = valeur;
+                if(e.getKey().equalsIgnoreCase("th")) 
+                    idTheso = valeur;                 
+            }
+        }
+        if(idLang.isEmpty() || value.isEmpty() || idTheso.isEmpty()) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageBadRequest()).type(MediaType.APPLICATION_JSON).build();            
+        }
+        
+
+        // transforme le codage de la valeur de l'UTF-8
+        try {
+            value = URLDecoder.decode(value, "UTF-8");
+//            System.out.println(URLDecoder.decode("%C3%A9", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "UTF-8"));
+//            System.out.println(URLDecoder.decode("%E9glise", "ISO-8859-1"));
+//            System.out.println(URLDecoder.decode("%E9glise", "US-ASCII"));
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
+        if (skos == null) {
+            ds.close();
+            return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        if (skos.length() == 0) {
+            ds.close();
+            return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        String json = getJsonDatas(ds, value, idLang, idTheso);
+        ds.close();
+        return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();        
+    }        
     
     /**
      * Permet de retourner les Concepts par value (en précisant un thésaurus et
@@ -914,8 +1062,8 @@ public class Rest {
     public Response searchJson(@Context UriInfo uri) {
         String value = "";
         String idLang = "";
-        String idTheso = "0";
-        
+        String idTheso = "";
+        HikariDataSource ds = connect();         
 //        @GET()
 //        @Path("param")
 //        public String param(@Context UriInfo uri) {
@@ -929,7 +1077,10 @@ public class Rest {
 //            }
 //            return result;
 //        }        
-        
+        if (!getStatusOfWebservices(ds, idTheso)) {
+            ds.close();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+        }        
         for (Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
             for (String valeur : e.getValue()) {
                 if(e.getKey().equalsIgnoreCase("lang")) 
@@ -940,12 +1091,12 @@ public class Rest {
                     idTheso = valeur;                 
             }
         }
-        
-        
-        if (!getStatusOfWebservices(idTheso)) {
+        if(idLang.isEmpty() || value.isEmpty() || idTheso.isEmpty()) {
             ds.close();
-            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
+            return Response.status(Status.BAD_REQUEST).entity(messageBadRequest()).type(MediaType.APPLICATION_JSON).build();            
         }
+        
+
         // transforme le codage de la valeur de l'UTF-8
         try {
             value = URLDecoder.decode(value, "UTF-8");
@@ -957,7 +1108,7 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        StringBuffer skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -966,7 +1117,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }
-        String json = getJsonDatas(value, idLang, idTheso);
+        String json = getJsonDatas(ds, value, idLang, idTheso);
         ds.close();
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();        
     }    
@@ -987,7 +1138,8 @@ public class Rest {
         String value = "";
         String idLang = "";
         String idTheso = "0";
-        
+        String idGroup = null;
+        HikariDataSource ds = connect();  
 //        @GET()
 //        @Path("param")
 //        public String param(@Context UriInfo uri) {
@@ -1009,12 +1161,14 @@ public class Rest {
                 if(e.getKey().equalsIgnoreCase("value")) 
                     value = valeur;
                 if(e.getKey().equalsIgnoreCase("th")) 
-                    idTheso = valeur;                 
+                    idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("group")) 
+                    idGroup = valeur;                   
             }
         }
         
         
-        if (!getStatusOfWebservices(idTheso)) {
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -1029,7 +1183,12 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value, idTheso, idLang);
+        StringBuffer skos;
+        if(idGroup == null) {
+            skos = ConceptByValueToSkos(ds, value, idTheso, idLang);
+        } else {
+            skos = ConceptByValueToSkos(ds, value, idLang, idGroup, idTheso);
+        }
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -1038,7 +1197,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }
-        String json = getJsonLdDatas(value, idLang, idTheso);
+        String json = getJsonLdDatas(ds, value, idLang, idTheso);
         ds.close();
         return Response.ok(json).header("Access-Control-Allow-Origin", "*").build();        
     }    
@@ -1061,8 +1220,8 @@ public class Rest {
             @PathParam("lang") String idLang,
             @PathParam("idg") String idGroup,
             @PathParam("th") String idTheso) {
-
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
@@ -1077,7 +1236,7 @@ public class Rest {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(Rest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        StringBuffer skos = ConceptByValueToSkos(value,
+        StringBuffer skos = ConceptByValueToSkos(ds, value,
                 idLang,
                 idGroup,
                 idTheso);
@@ -1089,7 +1248,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }          
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         ds.close();
@@ -1109,12 +1268,12 @@ public class Rest {
     @Produces("application/json;charset=UTF-8")
     public Response getConceptsJsonOfGroup(@PathParam("idg") String idGroup,
             @PathParam("th") String idTheso) {
-
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = conceptsOfGroupToSkos(idGroup, idTheso);
+        StringBuffer skos = conceptsOfGroupToSkos(ds, idGroup, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -1123,7 +1282,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }          
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLd(sKOSXmlDocument);
         ds.close();
@@ -1141,11 +1300,12 @@ public class Rest {
     @GET
     @Produces("application/json;charset=UTF-8")
     public Response getAllGroupsJson(@PathParam("th") String idTheso) {
-        if (!getStatusOfWebservices(idTheso)) {
+        HikariDataSource ds = connect();
+        if (!getStatusOfWebservices(ds, idTheso)) {
             ds.close();
             return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageJson()).type(MediaType.APPLICATION_JSON).build();
         }
-        StringBuffer skos = groupsOfThesaurusToSkos(idTheso);
+        StringBuffer skos = groupsOfThesaurusToSkos(ds, idTheso);
         if (skos == null) {
             ds.close();
             return Response.ok(messageErreur()).header("Access-Control-Allow-Origin", "*").build();
@@ -1154,7 +1314,7 @@ public class Rest {
             ds.close();
             return Response.ok(messageEmptyJson()).header("Access-Control-Allow-Origin", "*").build();
         }          
-        JsonHelper jsonHelper = new JsonHelper();
+        JsonldHelper jsonHelper = new JsonldHelper();
         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
         StringBuffer jsonLd = jsonHelper.getJsonLdForConceptScheme(sKOSXmlDocument);
         ds.close();
@@ -1180,9 +1340,11 @@ public class Rest {
      * @param idTheso
      * @return 
      */
-    private String getJsonDatas(String value,
+    private String getJsonDatas(
+            HikariDataSource ds,
+            String value,
             String idLang, String idTheso){
-        ArrayList <String> listId = getListId(value, idLang, idTheso);
+        ArrayList <String> listId = getListId(ds, value, idLang, idTheso);
         
         NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if(nodePreference != null){
@@ -1204,9 +1366,11 @@ public class Rest {
         return messageEmptyJson();
     }
     
-    private String getJsonLdDatas(String value,
+    private String getJsonLdDatas(
+            HikariDataSource ds,
+            String value,
             String idLang, String idTheso){
-        ArrayList <String> listId = getListId(value, idLang, idTheso);
+        ArrayList <String> listId = getListId(ds, value, idLang, idTheso);
         
         NodePreference nodePreference1 =  new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
         if(nodePreference != null){
@@ -1235,9 +1399,10 @@ public class Rest {
     
     
     private ArrayList<String> getListId( 
+            HikariDataSource ds,
             String value, String idLang, String idTheso) {
         ArrayList <String> listId = new ArrayList<>();
-        ArrayList<NodeSearch> listRes = new SearchHelper().searchTerm(ds, value, idLang, idTheso, "", 1, false);
+        ArrayList<NodeSearch> listRes = new SearchHelper().searchTermNew(ds, value, idLang, idTheso, "", 1, false);
         for (NodeSearch listRe : listRes) {
             listId.add(listRe.getIdConcept());
         }
@@ -1252,7 +1417,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer conceptToSkos(String idConcept, String idTheso) {
+    private StringBuffer conceptToSkos(
+            HikariDataSource ds,
+            String idConcept, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1285,7 +1452,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer conceptToSkosFromArk(String arkId, String idTheso) {
+    private StringBuffer conceptToSkosFromArk(
+            HikariDataSource ds,
+            String arkId, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1313,7 +1482,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer groupToSkos(String idGroup, String idTheso) {
+    private StringBuffer groupToSkos(
+            HikariDataSource ds,
+            String idGroup, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1337,7 +1508,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer conceptsOfGroupToSkos(String idGroup, String idTheso) {
+    private StringBuffer conceptsOfGroupToSkos(
+            HikariDataSource ds,
+            String idGroup, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1363,7 +1536,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer brancheOfConceptsToSkos(String idConcept, String idTheso) {
+    private StringBuffer brancheOfConceptsToSkos(
+            HikariDataSource ds,
+            String idConcept, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1389,7 +1564,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer brancheOfConceptsToSkosTop(String idConcept, String idTheso) {
+    private StringBuffer brancheOfConceptsToSkosTop(
+            HikariDataSource ds,
+            String idConcept, String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1421,7 +1598,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer groupsOfThesaurusToSkos(String idTheso) {
+    private StringBuffer groupsOfThesaurusToSkos(
+            HikariDataSource ds,
+            String idTheso) {
 
         if (ds == null) {
             return null;
@@ -1447,7 +1626,9 @@ public class Rest {
      * @param lang
      * @return
      */
-    private StringBuffer ConceptByValueToSkos(String value, String idTheso, String lang) {
+    private StringBuffer ConceptByValueToSkos(
+            HikariDataSource ds,
+            String value, String idTheso, String lang) {
 
         if (ds == null) {
             return null;
@@ -1477,7 +1658,9 @@ public class Rest {
      * @param idThesaurus
      * @return
      */
-    private StringBuffer ConceptByValueToSkos(String value,
+    private StringBuffer ConceptByValueToSkos(
+            HikariDataSource ds,
+            String value,
             String lang,
             String idGroup,
             String idTheso) {
@@ -1511,7 +1694,9 @@ public class Rest {
      * @param idThesaurus
      * @return skos
      */
-    private StringBuffer brancheOfConceptsToSkosFromDate(String idTheso, String date) {
+    private StringBuffer brancheOfConceptsToSkosFromDate(
+            HikariDataSource ds, 
+            String idTheso, String date) {
 
         if (ds == null) {
             return null;
@@ -1569,6 +1754,17 @@ public class Rest {
         return message;
     }
 
+    private String messageBadRequest() {
+        String message = "{\n"
+                + "\n"
+                + "    \"résultat_fr\":\"reformuler votre requête !!\",\n"
+                + "    \"result_en\":\" bad request !!\"\n"
+                + "\n"
+                + "}";
+
+        return message;
+    }
+            
     private String messageNoData() {
         String message = "{\n"
                 + "\n"

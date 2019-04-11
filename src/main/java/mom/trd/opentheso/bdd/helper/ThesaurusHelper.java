@@ -275,7 +275,7 @@ public class ThesaurusHelper {
      * @param idTheso
      * @return
      */
-    public boolean reorganizingTheso(Connection conn, String idTheso) {
+    public boolean cleaningTheso(Connection conn, String idTheso) {
         Statement stmt;
         boolean status = false;
 
@@ -825,6 +825,52 @@ public class ThesaurusHelper {
 
     /**
      * Retourne la liste des traductions d'un thesaurus sous forme de ArrayList
+     * avec le code iso de la langue
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return
+     */
+    public ArrayList<String> getIsoLanguagesOfThesaurus(HikariDataSource ds, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idLang = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT languages_iso639.iso639_1" +
+                                " FROM " +
+                                " thesaurus_label," +
+                                " languages_iso639" +
+                                " WHERE" +
+                                " thesaurus_label.lang = languages_iso639.iso639_1 AND" +
+                                " thesaurus_label.id_thesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        idLang.add(resultSet.getString("iso639_1").trim());
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Language of thesaurus : " + idThesaurus, sqle);
+        }
+        return idLang;
+    }    
+    
+    /**
+     * Retourne la liste des traductions d'un thesaurus sous forme de ArrayList
      * d'Objet Languages_iso639
      *
      * @param ds
@@ -938,7 +984,8 @@ public class ThesaurusHelper {
     /**
      * Cette fonction permet de retourner toutes les langues utilisées par les
      * Concepts d'un thésaurus !!! seulement les code iso des langues
-     *
+     * sert essentiellement à l'import
+     * 
      * @param ds
      * @param idThesaurus
      * @return Objet class NodeConceptTree

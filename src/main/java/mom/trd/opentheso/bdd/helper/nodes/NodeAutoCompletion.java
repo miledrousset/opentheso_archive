@@ -5,7 +5,8 @@ import java.io.Serializable;
 public class NodeAutoCompletion implements Serializable {
     
     private String idConcept = "";
-    private String termLexicalValue = "";
+    private String prefLabel = "";
+    private String altLabel = "";    
     private String groupLexicalValue = "";
     private String definition = "";
     private String idGroup = "";
@@ -13,6 +14,10 @@ public class NodeAutoCompletion implements Serializable {
     
     // Url pour l'imagette
     private String url;
+    
+    private String idArk;
+    private String idHandle;
+    
 
     public NodeAutoCompletion() {
     }
@@ -25,12 +30,12 @@ public class NodeAutoCompletion implements Serializable {
         this.idConcept = idConcept;
     }
 
-    public String getTermLexicalValue() {
-        return termLexicalValue;
+    public String getPrefLabel() {
+        return prefLabel;
     }
 
-    public void setTermLexicalValue(String termLexicalValue) {
-        this.termLexicalValue = termLexicalValue;
+    public void setPrefLabel(String prefLabel) {
+        this.prefLabel = prefLabel;
     }
 
     public String getGroupLexicalValue() {
@@ -73,11 +78,35 @@ public class NodeAutoCompletion implements Serializable {
         this.isAltLabel = isAltLabel;
     }
 
+    public String getIdArk() {
+        return idArk;
+    }
+
+    public void setIdArk(String idArk) {
+        this.idArk = idArk;
+    }
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
+    }
+
+    public String getAltLabel() {
+        return altLabel;
+    }
+
+    public void setAltLabel(String altLabel) {
+        this.altLabel = altLabel;
+    }
+
     
     
     @Override
     public String toString() {
-        return termLexicalValue;
+        return prefLabel;
     }
 
 

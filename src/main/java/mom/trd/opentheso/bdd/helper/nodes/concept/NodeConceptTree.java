@@ -14,6 +14,7 @@ public class NodeConceptTree implements Comparable {
 
 	private String title;
 	private String idConcept;
+        private String notation = "";
         private String idThesaurus;
         private String idLang;
         private String statusConcept;
@@ -119,5 +120,14 @@ public class NodeConceptTree implements Comparable {
         this.isGroup = isGroup;
     }
 
+    public String getNotation() {
+        return notation;
+    }
+
+    public void setNotation(String notation) {
+        this.notation = notation;
+    }
+
+    
 
 }

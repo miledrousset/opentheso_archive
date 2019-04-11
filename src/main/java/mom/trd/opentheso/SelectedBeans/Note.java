@@ -28,6 +28,13 @@ public class Note implements Serializable {
     private CurrentUser2 user;    
     
     
+    ////// new ///
+    private String selectedLang;
+    private ArrayList<NoteHelper.NoteType> noteTypes;
+    private String selectedTypeNote;
+    
+    ///// fin ////
+    
     private String note;
     private String definition;
     private String noteApplication;
@@ -37,6 +44,10 @@ public class Note implements Serializable {
     private ArrayList<NodeNote> nodeNoteTermList;
     private ArrayList<NodeNote> nodeNoteConceptList;    
     private boolean allLangue = false;
+    
+    private ArrayList<NodeNote> filteredNotes;
+
+    private boolean haveChange = false;
     
     public String icon = "+";    
         
@@ -52,6 +63,55 @@ public class Note implements Serializable {
         note = "";
     }
 
+    //// restructuration de la classe User le 05/04/2018 //////    
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Nouvelles fontions #MR//////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////  
+    
+    public void startInit(){
+        noteTypes = new NoteHelper().getNotesType(connect.getPoolConnexion());
+    }
+    
+    public void test (){
+        String test = "fdsf";
+    }
+    
+    
+    public void editNote(int idNote){
+        
+    }
+    
+    public void delThisNote(int idNote){
+        
+    }
+    
+    public void haveChange(int idNote){
+        haveChange = true;
+    }
+    
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////// Fin nouvelles fontions #MR///////////////////////
+ ////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////      
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     private void initNotes(String idC, String idT, String idTheso, String idLang) {
         // NodeNote contient la note avec le type de note, il faut filtrer pour trouver la bonne note
         // For Concept : customnote ; scopeNote ; historyNote
@@ -103,10 +163,15 @@ public class Note implements Serializable {
                 }
             }
         }
+        filteredNotes = nodeNoteTermList;
     }
     
         /**
      * Crée ou modifie la définition du terme courant
+     * @param idC
+     * @param idT
+     * @param idTheso
+     * @param idLang
      */
     public void editDef(String idC, String idT, String idTheso, String idLang) {
         int idUser = user.getUser().getIdUser();
@@ -124,8 +189,12 @@ public class Note implements Serializable {
     }
 
     /**
-     * Cette fontion permet de modifié l'information du note
+     * Cette fontion permet de modifié l'information de la note
      *
+     * @param idC
+     * @param idT
+     * @param idTheso
+     * @param idLang
      */
     public void editNote(String idC, String idT, String idTheso, String idLang) {
         int idUser = user.getUser().getIdUser();
@@ -238,6 +307,10 @@ public class Note implements Serializable {
     /**
      * Permet de voir les nouvelles notes et changer l'icon pour pouvoir voir
      * touts les notes dans les autres langues;
+     * @param idC
+     * @param idT
+     * @param idTheso
+     * @param idLang
      */
     public void valide(String idC, String idT, String idTheso, String idLang) {
         if (allLangue == true) {
@@ -349,5 +422,42 @@ public class Note implements Serializable {
         this.user = user;
     }
     
+    
+    //// new ////
+
+    public String getSelectedLang() {
+        return selectedLang;
+    }
+
+    public void setSelectedLang(String selectedLang) {
+        this.selectedLang = selectedLang;
+    }
+    public ArrayList<NoteHelper.NoteType> getNoteTypes() {
+        return noteTypes;
+    }
+
+    public void setNoteTypes(ArrayList<NoteHelper.NoteType> noteTypes) {
+        this.noteTypes = noteTypes;
+    }    
+
+    public String getSelectedTypeNote() {
+        return selectedTypeNote;
+    }
+
+    public void setSelectedTypeNote(String selectedTypeNote) {
+        this.selectedTypeNote = selectedTypeNote;
+    }
+    
+    
+    //// fin /////
+
+    public ArrayList<NodeNote> getFilteredNotes() {
+        return filteredNotes;
+    }
+
+    public void setFilteredNotes(ArrayList<NodeNote> filteredNotes) {
+        this.filteredNotes = filteredNotes;
+    }
+
     
 }

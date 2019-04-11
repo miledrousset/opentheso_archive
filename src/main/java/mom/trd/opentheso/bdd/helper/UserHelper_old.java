@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
 
-public class UserHelper {
+public class UserHelper_old {
 
-    public UserHelper() {
+    public UserHelper_old() {
 
     }
 
@@ -54,7 +54,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return existe;
     }
@@ -79,7 +79,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -109,7 +109,7 @@ public class UserHelper {
                // conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -137,7 +137,7 @@ public class UserHelper {
                     String query = "SELECT id_user FROM users WHERE username ilike '" + login + "' AND password='" + pwd + "' and active=true";
                     resultSet = stmt.executeQuery(query);
                     //resultSet.first();
-                    //resultSet.next();
+                    //resultSet.next();updatePwd
                     if (resultSet.next()) {
                         existe = true;
                     }
@@ -149,7 +149,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return existe;
     }
@@ -184,7 +184,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if (count == 1) {
@@ -217,7 +217,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -246,7 +246,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -272,7 +272,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -332,7 +332,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return nu;
@@ -387,7 +387,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return nu;
@@ -428,7 +428,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return idRole;
@@ -461,7 +461,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return name;
@@ -500,7 +500,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return name;
@@ -552,7 +552,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return nu;
@@ -600,7 +600,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return lesMails;
@@ -644,7 +644,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return lesMails;
@@ -705,7 +705,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return listUser;
@@ -752,7 +752,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return idThesausus;
@@ -810,7 +810,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return listUser;
@@ -864,7 +864,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return listUser;
@@ -890,7 +890,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
  
@@ -915,7 +915,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -946,7 +946,7 @@ public class UserHelper {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -980,7 +980,7 @@ public class UserHelper {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1015,7 +1015,7 @@ public class UserHelper {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1048,7 +1048,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1074,7 +1074,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1150,7 +1150,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -1193,7 +1193,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -1234,7 +1234,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -1277,7 +1277,7 @@ public class UserHelper {
                 conn.close();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1314,7 +1314,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         ArrayList<Entry<String, String>> listeRoles = new ArrayList<>(map.entrySet());
         return listeRoles;
@@ -1361,7 +1361,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         ArrayList<Entry<String, String>> listeRoles = new ArrayList<>(map.entrySet());
         return listeRoles;
@@ -1403,7 +1403,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1438,7 +1438,7 @@ public class UserHelper {
             } finally {
             }
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return idUser;
     }
@@ -1480,7 +1480,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }
@@ -1512,7 +1512,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return status;
     }    
@@ -1540,7 +1540,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return needchange;
     }
@@ -1567,7 +1567,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return need;
     }
@@ -1602,7 +1602,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return active;
     }
@@ -1626,7 +1626,7 @@ public class UserHelper {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
         return update;
     }
@@ -1680,7 +1680,7 @@ public class UserHelper {
            }
        }
        catch(SQLException e){
-           Logger.getLogger(UserHelper.class.getName()).log(Level.SEVERE,"error while selecting mail from users in getMailUserForCandidat id thesaurus ="+id_thesaurus,e);
+           Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE,"error while selecting mail from users in getMailUserForCandidat id thesaurus ="+id_thesaurus,e);
        }
         return mail;
     }

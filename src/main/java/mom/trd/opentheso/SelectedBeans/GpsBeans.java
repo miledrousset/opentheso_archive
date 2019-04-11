@@ -1,10 +1,8 @@
 package mom.trd.opentheso.SelectedBeans;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,11 +20,9 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.LanguageHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
-import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.core.alignment.AlignementPreferences;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import mom.trd.opentheso.core.alignment.GpsPreferences;
@@ -421,9 +417,8 @@ public class GpsBeans {
         id_theso = id_Theso;
         id_langue = id_lang;
         ConceptHelper conceptHelper = new ConceptHelper();
-        listOfChildrenInConcept = new ArrayList<>();
         listOfChildrenInConcept = conceptHelper.getIdsOfBranch(
-                connect.getPoolConnexion(), id_concept, id_Theso, listOfChildrenInConcept);
+                connect.getPoolConnexion(), id_concept, id_Theso);
 
         if (listOfChildrenInConcept.isEmpty() || listOfChildrenInConcept.size() == 1) {
             last = true;

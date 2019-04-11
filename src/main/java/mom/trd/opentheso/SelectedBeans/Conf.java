@@ -35,6 +35,7 @@ public class Conf implements Serializable {
         addPrefAdmin("3",langueBean.getMsg("copyright.addCopyrightTo"));
         addPrefAdmin("4",langueBean.getMsg("admin.regenerateArk"));//"Générer les identifiants Ark");
         addPrefAdmin("5",langueBean.getMsg("admin.regenerateHandle"));//"Générer les identifiants Ark");
+        addPrefAdmin("6","Passez tous les identifiants alphnumériques en numériques");        
        
         nodePrefsSuperAdmins = new ArrayList<>();
         addPrefSuperAdmin("1",langueBean.getMsg("conf.sparql"));

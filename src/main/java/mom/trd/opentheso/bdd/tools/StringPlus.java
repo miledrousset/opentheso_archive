@@ -1,11 +1,25 @@
 package mom.trd.opentheso.bdd.tools;
 
+import java.text.Normalizer;
+
 public class StringPlus {
 
     public StringPlus() {
 
     }
-
+    
+    /**
+     * Permet de supprimer les accents d'un String
+     * @param s
+     * @return 
+     */
+    public String unaccentLowerString(String s) 
+    {
+        s = Normalizer.normalize(s, Normalizer.Form.NFD);
+        s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return s.toLowerCase();
+    }
+    
     /**
      * Cette fonction permet de caster les cotes pour les faire passer par le
      * jdbc pour échanger avec les bases de données PostgreSQL exp : l'équipe ->

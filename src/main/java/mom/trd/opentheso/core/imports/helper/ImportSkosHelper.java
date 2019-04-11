@@ -36,7 +36,7 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
+import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
@@ -299,14 +299,14 @@ public class ImportSkosHelper {
             }
             thesaurus.setId_thesaurus(idTheso);
 
-            UserHelper userHelper = new UserHelper();
-            int idRole = userHelper.getRoleOfUser(ds, idUser);
+            UserHelper2 userHelper = new UserHelper2();
+            int idRole = userHelper.getUserRoleOnThisGroup(ds, idUser, 1).getIdRole();//getRoleOfUser(ds, idUser);
 
-            if(!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
+      /*      if(!userHelper.addRole(conn, idUser, idRole, idTheso, "")) {
                 conn.rollback();
                 conn.close();
                 return false;                    
-            }
+            }*/
             conn.commit();
             conn.close();
             return true;

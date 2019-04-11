@@ -127,10 +127,11 @@ public class TreeChange {
      * @param targetNodeIdConcept
      * @param idTheasurus
      * @param idUser 
+     * @return  
      */
-    public void moveConceptTermToConceptTermSameDomain(Connexion connect,String originNodeIdConcept,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
+    public boolean moveConceptTermToConceptTermSameDomain(Connexion connect,String originNodeIdConcept,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
         ConceptHelper conceptHelper=new ConceptHelper();
-        conceptHelper.moveBranch(connect.getPoolConnexion(),originNodeIdConcept,BToriginNode,targetNodeIdConcept,idTheasurus,idUser);
+        return conceptHelper.moveBranch(connect.getPoolConnexion(),originNodeIdConcept,BToriginNode,targetNodeIdConcept,idTheasurus,idUser);
     }
     /**
      * moveConceptTermToConceptTermOtherDomain
@@ -168,8 +169,7 @@ public class TreeChange {
             }
             
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus, lisIds);  
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idTheasurus);  
             if(listeIdGroupBT.size()==1){
                 
                 if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, originNodeIdGroup, idTheasurus)) {
@@ -240,8 +240,7 @@ public class TreeChange {
             }
 
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus, lisIds);
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus);
             
             if(listeIdGroupBT.size()==1){
             // on supprime l'ancien Groupe de la branche 
@@ -375,8 +374,7 @@ public class TreeChange {
              GroupHelper groupHelper=new GroupHelper();
              ConceptHelper conceptHelper=new ConceptHelper();
                 // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus, lisIds);
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), originNodeIdConcept, idThesaurus);
             try {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
@@ -458,8 +456,7 @@ public class TreeChange {
             ConceptHelper conceptHelper=new ConceptHelper();
             RelationsHelper relationHelper=new RelationsHelper();
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConceptOrigin, idThesoSelected, lisIds);  
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), idConceptOrigin, idThesoSelected);  
         
                 if (!groupHelper.deleteAllDomainOfBranch(conn, lisIds, idOriginGroup, idThesoSelected)) {
                     conn.rollback();

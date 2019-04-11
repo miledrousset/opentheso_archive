@@ -3,6 +3,7 @@ package mom.trd.opentheso.core.exports.old;
 import java.util.ArrayList;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUri;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptExport;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroupLabel;
@@ -255,7 +256,7 @@ public class WriteFileSKOS_Frantiq {
             }
         }
         
-        for (NodeAlignment alignment : nodeConceptExport.getNodeAlignmentsList()) {
+        for (NodeAlignmentSmall alignment : nodeConceptExport.getNodeAlignmentsList()) {
             // alignement exactMatch
             if(alignment.getAlignement_id_type() == 1) {
                 concept.addMapping(alignment.getUri_target().trim(), SKOSMapping.exactMatch);

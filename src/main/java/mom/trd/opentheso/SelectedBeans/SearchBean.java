@@ -19,8 +19,8 @@ public class SearchBean implements Serializable {
     private String entry;
     private int typeValueSearch;
     private String idGroup;
-    private int typeSearch = 1;
-    private int startByOrContain = 1;
+    private int typeSearch = 1; // 1= alpha, 2=permuté
+    private int startByOrContain = 2;
     private boolean withNote = false;
     private boolean onlyNote = false;
     private boolean onlyNotation = false;    
@@ -33,13 +33,40 @@ public class SearchBean implements Serializable {
     private String rechercheDeconn;
     //private ArrayList<Concept> resultatDeconn;
     
+    // pour afficher ou masquer le TootTipText du graphe
+    private boolean graphOn = false;
+    
+    private NodeSearch selectedNode;
+    
     @ManagedProperty(value = "#{theso}")
     private SelectedThesaurus theso;
     
     @ManagedProperty(value = "#{poolConnexion}")
     private Connexion connect;
+
+    public boolean isGraphOn() {
+        return graphOn;
+    }
+
+    public void setGraphOn(boolean graphOn) {
+        this.graphOn = graphOn;
+    }
     
+    public void activateGraphOn() {
+        this.graphOn = true;
+    }
     
+    public void desactivateGraphOn() {
+        this.graphOn = false;
+    }
+
+    public NodeSearch getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(NodeSearch selectedNode) {
+        this.selectedNode = selectedNode;
+    }
     
     /**
      * méthode pour la recherceh qui ne passe pas par l'arbre
@@ -85,7 +112,7 @@ public class SearchBean implements Serializable {
                         );
                     }
                     else {
-                        result1 = new SearchHelper().searchTerm(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
+                        result1 = new SearchHelper().searchTermNew(connect.getPoolConnexion(), entry, langue.trim(), theso.getThesaurus().getId_thesaurus(), idGroup,
                                 startByOrContain, withNote);                        
                     }
                 }
@@ -135,6 +162,7 @@ public class SearchBean implements Serializable {
         if(connect.getPoolConnexion() != null) {
             paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), idC, theso.getThesaurus().getId_thesaurus(), first, paths);
         }
+    //    graphOn = false;
         return paths;
     }
     

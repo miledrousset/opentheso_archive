@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -21,11 +22,12 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
+import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import org.primefaces.PrimeFaces;
-import org.primefaces.context.RequestContext;
+
 import org.primefaces.event.SelectEvent;
 
 @ManagedBean(name = "autoComp", eager = true)
@@ -94,10 +96,18 @@ public class AutoCompletBean implements Serializable {
     
     public List<NodeAutoCompletion> completTerm(String value) {
         selectedAtt = new NodeAutoCompletion();
+        SearchHelper searchHelper = new SearchHelper();
         List<NodeAutoCompletion> liste = new ArrayList<>();
         if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
-            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
-                    theso.getThesaurus().getLanguage(), value);
+            /*
+            liste = new SearchHelper().getAutoCompletionIndex(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);*/
+                
+            liste = searchHelper.searchTermNewForAutocompletion(connect.getPoolConnexion(),
+                        value,
+                        theso.getThesaurus().getLanguage(),
+                        theso.getThesaurus().getId_thesaurus(),
+                        "");         
         }
         return liste;
     }
@@ -266,7 +276,11 @@ public class AutoCompletBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
             return false;
         }
-
+        // vérification si la relation est cohérente (BT et RT à la fois ?)  
+        if(!isAddRelationBTValid(terme.getIdC(), selectedAtt.getIdConcept())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorNTRT")));
+            return false;        
+        } 
         
         // addTermeGene(idNT, idBT)
         if (!terme.addTermeGene(terme.getIdC(), selectedAtt.getIdConcept())) {
@@ -276,7 +290,7 @@ public class AutoCompletBean implements Serializable {
 
         tree.reInit();
         tree.reExpand();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getTermLexicalValue() + " " + langueBean.getMsg("autoComp.info1")));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getPrefLabel() + " " + langueBean.getMsg("autoComp.info1")));
         selectedAtt = new NodeAutoCompletion();
         return true;
     }
@@ -314,70 +328,14 @@ public class AutoCompletBean implements Serializable {
         
         tree.reInit();
         tree.reExpand();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getTermLexicalValue() + " " + langueBean.getMsg("autoComp.info1")));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getPrefLabel() + " " + langueBean.getMsg("autoComp.info1")));
         selectedAtt = new NodeAutoCompletion();
         return true;
     }    
 
-    /**
-     * Permet de créer un nouveau concept en vérifiant sa validité
-     */
-    public void newTSpe() {
-        createValid = false;
-        terme.setValueEdit(terme.getSelectedTermComp().getTermLexicalValue());
-        if (terme.getValueEdit().trim().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
-            return;
-        }
 
-        String valueEdit = terme.getValueEdit().trim();
-
-        // vérification si c'est le même nom, on fait rien
-        if (valueEdit.equalsIgnoreCase(terme.getNom())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
-            return;
-        }
-
-        // vérification si le term à ajouter existe déjà 
-        if (terme.isTermExist(valueEdit) != null) {
-            duplicate = true;
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error6")));
-            return;
-        }
-
-        if (!terme.creerTermeSpe(((MyTreeNode) tree.getSelectedNode()))) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-            return;
-        } else {
-            tree.reInit();
-            tree.reExpand();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", valueEdit + " " + langueBean.getMsg("tree.info1")));
-        }
-        terme.setSelectedTermComp(new NodeAutoCompletion());
-        createValid = true;
-        PrimeFaces pf = PrimeFaces.current();
-        if (pf.isAjaxRequest()) {
-            pf.ajax().update("idNtEditDlg");
-        }
-//        RequestContext.getCurrentInstance().update("idNtEditDlg");
-    }
     
-    /**
-     * permet de créer un concept en doublon, après avoir eu la validation de l'utilisateur
-     */
-    public void newTSDupplicated() {
-        if (!terme.creerTermeSpe(((MyTreeNode) tree.getSelectedNode()))) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-            return;
-        } else {
-            tree.reInit();
-            tree.reExpand();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", terme.getSelectedTermComp().getTermLexicalValue() + " " + langueBean.getMsg("tree.info1")));
-        }
-        terme.setSelectedTermComp(new NodeAutoCompletion());
-        createValid = true;
-        duplicate = false;
-    }
+
             
     
     /**
@@ -429,6 +387,31 @@ public class AutoCompletBean implements Serializable {
         createValid = true;
     }
     
+    private boolean isAddRelationBTValid(String idConcept1, String idConcept2) {
+        RelationsHelper relationsHelper = new RelationsHelper();
+        if(idConcept1.equalsIgnoreCase(idConcept2)) return false;
+        
+        // relations RT et BT en même temps interdites
+        if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }
+        
+        // relations BT et NT en même temps interdites
+        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
+                idConcept2, idConcept1, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }
+        
+        // relation entre frères est interdite 
+        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }        
+        
+        return true;
+    }    
+    
     private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
         RelationsHelper relationsHelper = new RelationsHelper();
         if(idConcept1.equalsIgnoreCase(idConcept2)) return false;
@@ -459,14 +442,19 @@ public class AutoCompletBean implements Serializable {
         if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
                 idConcept1, idConcept2, tree.getIdThesoSelected()) == true) 
             return false;
-        else
-            return true;
+        
+        // relation entre frères est interdite 
+        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
+                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
+            return false;
+        }         
+        return true;
     }    
     
 
     public void newSpecialTSpe() {
         createValid = false;
-        terme.setValueEdit(terme.getSelectedTermComp().getTermLexicalValue());
+        terme.setValueEdit(terme.getSelectedTermComp().getPrefLabel());
         if (terme.getValueEdit().trim().equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("tree.error1")));
             return;
@@ -721,8 +709,7 @@ public class AutoCompletBean implements Serializable {
             }
 
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -792,8 +779,7 @@ public class AutoCompletBean implements Serializable {
             }
             
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);            
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());            
 
             // on supprime l'ancien Groupe de la branche 
             ArrayList<String> domsOld = conceptHelper.getListGroupIdOfConcept(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
@@ -865,8 +851,7 @@ public class AutoCompletBean implements Serializable {
             }
             
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);  
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());  
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -944,8 +929,7 @@ public class AutoCompletBean implements Serializable {
             }
             
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);  
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());  
             
             
             // on supprime l'ancien Groupe de la branche 
@@ -1029,8 +1013,7 @@ public class AutoCompletBean implements Serializable {
             }
 
             // on récupère les Ids des concepts à modifier 
-            ArrayList<String> lisIds = new  ArrayList<>();
-            lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso(), lisIds);
+            ArrayList<String> lisIds = conceptHelper.getIdsOfBranch(connect.getPoolConnexion(), terme.getIdC(), terme.getIdTheso());
             
             
             // on supprime l'ancien Groupe de la branche 

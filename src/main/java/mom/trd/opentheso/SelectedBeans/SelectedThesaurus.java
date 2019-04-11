@@ -38,7 +38,6 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.ToolsHelper;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.VerificationInternet;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFacet;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
@@ -47,11 +46,12 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
-import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import skos.SKOSXmlDocument;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
+import mom.trd.opentheso.ws.ark.ArkClientRest;
 import org.primefaces.model.StreamedContent;
 
 @ManagedBean(name = "theso", eager = true)
@@ -148,11 +148,86 @@ public class SelectedThesaurus implements Serializable {
     @ManagedProperty(value = "#{roleOnTheso}")
     private RoleOnThesoBean roleOnTheso;
 
+    @ManagedProperty(value = "#{externalResources}")
+    private ExternalResources externalResources;    
     /**
      * ************************************ INITIALISATION
      * *************************************
      */
 
+
+    /**
+     * cette fonction permet de charger le thésaurus suiavnt son Nom 
+     * c'est le Nom du thésaurus par defaut ou le nom qu'on a défini dans le fichier de conf. 
+     * @param idTheso
+     * @param idLang
+     */
+    public void loadThesaurusFromName(String idTheso, String idLang){
+       // if the URL is only for thésaurus 
+        if (idTheso == null) return;
+        if(idLang == null) return;
+                        
+                ArrayList<Languages_iso639> temp = new LanguageHelper().getLanguagesOfThesaurus(connect.getPoolConnexion(), idTurl);
+                if (temp.isEmpty()) {
+                    idCurl = null;
+                    idGurl = null;
+                    idTurl = null;
+                    return;
+                } else {
+                    boolean lExist = false;
+                    for (Languages_iso639 l : temp) {
+                        if (l.getId_iso639_1().trim().equals(idLurl)) {
+                            lExist = true;
+                        }
+                    }
+                    if (!lExist) {
+                        idLurl = temp.get(0).getId_iso639_1().trim();
+                    }
+                }
+                /*   if (new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(), idGurl, idTurl, idLurl) == null) {
+                    idCurl = null;
+                    idGurl = null;
+                    idTurl = null;
+                    return;
+                }*/
+                tree.getSelectedTerme().reInitTerme();
+
+                // Initialisation du thésaurus et de l'arbre
+                thesaurus.setId_thesaurus(idTurl);
+                thesaurus.setLanguage(idLurl);
+
+                tree.getSelectedTerme().reInitTerme();
+                tree.reInit();
+                tree.initTree(null, null);
+                ThesaurusHelper th = new ThesaurusHelper();
+
+                thesaurus = th.getThisThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+                tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+
+                languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+                roleOnTheso.initUserNodePref(idTurl);
+                // Initialisation du terme séléctionné et de l'arbre
+                //     NodeGroup nodeGroup = new GroupHelper().getThisConceptGroup(connect.getPoolConnexion(),idGurl, idTurl, idLurl);
+                /*
+                Concept c = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idCurl, idTurl);
+                if (c.isTopConcept()) {
+                    type = 2;
+                } else {
+                    type = 3;
+                }*/
+                tree.getSelectedTerme().setIdTheso(idTurl);
+                tree.getSelectedTerme().setIdlangue(idLurl);
+
+                //   MyTreeNode mTN = new MyTreeNode(type, idGurl, idTurl, idLurl, idGurl, "", null, null, null);
+                //   tree.getSelectedTerme().majTerme(mTN);
+                //    tree.reExpand();
+                idCurl = null;
+                idGurl = null;
+                idTurl = null;
+                idLurl = null;
+        
+    }
+    
 
     /**
      * récupère la variable URL et affiche le terme qu'elle désigne
@@ -402,7 +477,8 @@ public class SelectedThesaurus implements Serializable {
             Connection conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
 
-            if (!thesaurusHelper.reorganizingTheso(conn, thesaurus.getId_thesaurus())) {
+            // nettoyage des null et d'espaces
+            if (!thesaurusHelper.cleaningTheso(conn, thesaurus.getId_thesaurus())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                 conn.rollback();
                 conn.close();
@@ -412,18 +488,32 @@ public class SelectedThesaurus implements Serializable {
             conn.close();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing")));
 
-            regenerateOrphan();
+            // complète le thésaurus par les relations qui manquent NT ou BT
+            reorganizingTheso();
             
             // permet de supprimer les BT pour un TopTerm, c'est incohérent
             removeBTofTopTerm();
             
             // permet de supprimer les relations en boucle (100 -> BT -> 100) ou  (100 -> NT -> 100)ou (100 -> RT -> 100)
             removeLoopRelations();
+            
+            // permet de supprimer les groupes qui sont orphelins (si un concept appartient à 2 groupes, mais le deuxième groupe
+            // ne contient pas ce concept), c'est une erreur de cohérence.
+            
+       //     removeGroupOrphan();
+            
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(SelectedThesaurus.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+    
+    private void removeGroupOrphan() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return;
+        }
+   //     new ToolsHelper().removeGroupOrphan(connect.getPoolConnexion(), thesaurus.getId_thesaurus());        
     }
     
     private void removeBTofTopTerm(){
@@ -531,13 +621,18 @@ public class SelectedThesaurus implements Serializable {
                 if (idConcepts == null || idConcepts.isEmpty()) {
                     throw new Exception("No concept in this thesaurus");
                 }
-                regenArkIdConcept(idTheso, idConcepts);
+//                idConcepts.clear();
+//                idConcepts.add("236999");
+        //        idConcepts.add("236999");
+        //        idConcepts.add("237003");
+                conceptHelper.setNodePreference(nodePreference);
+                conceptHelper.generateArkId(connect.getPoolConnexion(), idTheso, idConcepts);
             } catch (Exception ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
-                throw new Exception("Error while regen id concept ");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error during generation id:", ex.getMessage()));
+                throw new Exception("Error during generation idArk for Concept : ");
             }
             maj();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regen id finished"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "The generation of identifiers is complete"));
 
         } catch (SQLException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "SQL Error :", ex.getMessage()));
@@ -558,7 +653,7 @@ public class SelectedThesaurus implements Serializable {
         }        
         try {
             ArrayList<String> idGroup = null;
-
+            
             //group
             /*  try {
                 if(!regenArkIdGroup(conn, idTheso)) {
@@ -574,9 +669,8 @@ public class SelectedThesaurus implements Serializable {
                 ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurusWithoutArk(connect.getPoolConnexion(), idTheso);
                 if (idConcepts == null || idConcepts.isEmpty()) {
                     throw new Exception("No concept in this thesaurus");
-                }
-
-                regenArkIdConcept(idTheso, idConcepts);
+                } else
+                    conceptHelper.generateArkId(connect.getPoolConnexion(), idTheso, idConcepts);
             } catch (Exception ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
                 throw new Exception("Error while regen id concept ");
@@ -723,25 +817,23 @@ public class SelectedThesaurus implements Serializable {
     }
     
     /**
-     * Cette fonction regenère tous les idArk des concepts du théso
+     * permet de transformer les identifiants non numériques en numériques
      */
-    private boolean regenArkIdConcept(String idTheso, ArrayList<String> idConcepts) throws Exception {
-        //récup les concepts
+    public void reGenerateAllNonNumericId() {
         ConceptHelper conceptHelper = new ConceptHelper();
-        if(roleOnTheso.getNodePreference() == null) return false;
-        conceptHelper.setNodePreference(roleOnTheso.getNodePreference());        
 
-        /*Vérification et génération des nouveaux id Ark*/
-        for (String idConcept : idConcepts) {
-            if (!conceptHelper.regenerateArkId(connect.getPoolConnexion(),
-                    idConcept,
-                    thesaurus.getLanguage(), idTheso)) {
-
-                throw new Exception("BDD error");
-            }
+        ArrayList<String> listIdConcept = conceptHelper.getAllNonNumericId(connect.getPoolConnexion(), thesaurus.getId_thesaurus());
+        for (String idConcept : listIdConcept) {
+            if (conceptHelper.setIdConceptToNumeric(connect.getPoolConnexion(),
+                     thesaurus.getId_thesaurus(), idConcept)) {
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate id for concept"));
+                return;
+            }     
         }
-        return true;
-    }    
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate id finished, total = " +listIdConcept.size()));
+    }
 
     public void reGenerateConceptId(String idConcept) {
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -762,11 +854,13 @@ public class SelectedThesaurus implements Serializable {
      * @param idConcept 
      */
     public void reGenerateConceptArkId(String idConcept) {
+        ConceptHelper conceptHelper = new ConceptHelper();
         if(nodePreference.isUseArk()) {
+            conceptHelper.setNodePreference(nodePreference);
             try {
                 ArrayList<String> idConcepts = new ArrayList<>();
                 idConcepts.add(idConcept);
-                if(!regenArkIdConcept(thesaurus.getId_thesaurus(), idConcepts)) {
+                if(!conceptHelper.generateArkId(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), idConcepts)) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for concept"));
                 } else
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
@@ -775,7 +869,27 @@ public class SelectedThesaurus implements Serializable {
             }
         }
         
-    }    
+    }
+    
+    /**
+     * fonction qui permet de regénéerer l'identifiant ARK d'un Group 
+     * Ajout s'il n'exite pas
+     * Mis à jour s'il n'est plus valide
+     * 
+     * @param idGroup
+     */
+    public void reGenerateGroupArkId(String idGroup) {
+        GroupHelper groupHelper = new GroupHelper();
+        
+        if(nodePreference.isUseArk()) {
+            groupHelper.setNodePreference(nodePreference);
+            if(!groupHelper.addIdArkGroup(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), idGroup, "")) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ", "while regenerate Ark_id for Group"));
+            } else
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info :", "Regenerate Ark_id finished"));
+        }
+        
+    }     
 
     /**
      * Cette fonction remplace tout les id des groupes du théso
@@ -934,7 +1048,7 @@ public class SelectedThesaurus implements Serializable {
     //    arrayTheso = new ArrayList<>(th.getListThesaurus(connect.getPoolConnexion(), langueSource).entrySet());
     //    tree.getSelectedTerme().getUser().updateAuthorizedTheso();
         vue.setCreat(false);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
     }
 
 
@@ -1144,6 +1258,7 @@ public class SelectedThesaurus implements Serializable {
     public void maj() {
        
         tree.getSelectedTerme().reInitTerme();
+        externalResources.init();
         tree.reInit();
         tree.initTree(null, null);
         statBean.reInit();
@@ -1351,12 +1466,73 @@ public class SelectedThesaurus implements Serializable {
      *
      * @return
      */
+    public boolean reorganizingTheso() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+        if (!new ToolsHelper().reorganizingTheso(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            return false;
+        }
+        return true;
+    }    
+    
+    /**
+     * Cette fonction permet de regénérer les Orphelins
+     *
+     * @return
+     */
+    public boolean completeReciprocalRelation() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+        if (!new ToolsHelper().completeReciprocalRelation(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            return false;
+        }
+        return true;
+    }       
+    
+    /**
+     * Cette fonction permet de regénérer les Orphelins
+     *
+     * @return
+     */
+    public boolean completeLackGroup() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+        if (!new ToolsHelper().completeLackGroup(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            return false;
+        }
+        return true;
+    }    
+    
+    
+    /**
+     * Cette fonction permet de regénérer les Orphelins
+     *
+     * @return
+     */
     public boolean regenerateOrphan() {
         if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
             return false;
         }
-
         if (!new ToolsHelper().orphanDetect(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            vue.setRegenerateOrphan(0);
+            return false;
+        }
+        return true;
+    }
+    /**
+     * permet de réorganiser les orphelins
+     * @return 
+     */
+    public boolean orphanReplace() {
+    // replacement des orphelins qui ne les sont plus puis les attacher aux concepts.
+        if (!new ToolsHelper().orphanReplace(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
             vue.setRegenerateOrphan(0);
             return false;
@@ -1512,17 +1688,15 @@ public class SelectedThesaurus implements Serializable {
                     currentUser.getUser().getIdUser());
             if(idGroup == null) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(langueBean.getMsg("error") + " :", titleGroup + " " + langueBean.getMsg("group.errorCreate")));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", titleGroup + " " + langueBean.getMsg("group.errorCreate")));
+                return null;
             }
             nodeCG = new NodeGroup();
             vue.setSelectedActionDom(PropertiesNames.noActionDom);
-
             tree.reInit();
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", titleGroup + " " + langueBean.getMsg("theso.info1.2")));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", titleGroup + " " + langueBean.getMsg("theso.info1.2")));
         }
-
         return idGroup;
     }
 
@@ -1611,7 +1785,7 @@ public class SelectedThesaurus implements Serializable {
                                 this.tree.getSelectedTerme().getIdTheso(),
                                 this.tree.getSelectedTerme().getIdC());
 
-                        JsonHelper jsonHelper = new JsonHelper();
+                        JsonldHelper jsonHelper = new JsonldHelper();
                         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                         StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
                         if (jsonLd != null) {
@@ -1634,7 +1808,7 @@ public class SelectedThesaurus implements Serializable {
                             return "";
                         }
 
-                        JsonHelper jsonHelper = new JsonHelper();
+                        JsonldHelper jsonHelper = new JsonldHelper();
                         SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                         if (sKOSXmlDocument == null) {
                             return "";
@@ -1661,7 +1835,7 @@ public class SelectedThesaurus implements Serializable {
                         connect.getPoolConnexion(),
                         thesaurus.getId_thesaurus());
 
-                JsonHelper jsonHelper = new JsonHelper();
+                JsonldHelper jsonHelper = new JsonldHelper();
                 SKOSXmlDocument sKOSXmlDocument = jsonHelper.readSkosDocument(skos);
                 StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrgForConceptScheme(sKOSXmlDocument);
                 if (jsonLd == null) {
@@ -2178,6 +2352,14 @@ public class SelectedThesaurus implements Serializable {
 
     public void setTestNameTheso(String testNameTheso) {
         this.testNameTheso = testNameTheso;
+    }
+
+    public ExternalResources getExternalResources() {
+        return externalResources;
+    }
+
+    public void setExternalResources(ExternalResources externalResources) {
+        this.externalResources = externalResources;
     }
 
  

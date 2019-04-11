@@ -31,8 +31,7 @@ public class OrphanHelper {
                 stmt = conn.createStatement();
                 try {
                     String query = "SELECT id_concept FROM concept_orphan WHERE"
-                            + " id_thesaurus = '" + idThesaurus + "'"
-                            + " limit 100";
+                            + " id_thesaurus = '" + idThesaurus + "'";
 
                     resultSet = stmt.executeQuery(query);
                     while(resultSet.next()){
@@ -53,6 +52,48 @@ public class OrphanHelper {
         
         return listIdConcept;
     }
+    
+    /**
+     * Permet d'ajouter à concept à la liste des orphelins
+     * @param ds
+     * @param idConcept 
+     * @param idThesaurus 
+     * @return  true or false
+     */
+    public boolean addNewOrphan(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Statement stmt;
+        boolean status = false;
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "Insert into concept_orphan "
+                            + "(id_concept, id_thesaurus)"
+                            + " values ("
+                            + "'" + idConcept + "'"
+                            + ",'" + idThesaurus + "')";
+
+                    stmt.executeUpdate(query);
+                    status = true;
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding Orphan concept : " + idConcept, sqle);
+            } else
+                status = true;
+        }
+        return status;
+    }
+
     
     /**
      * 

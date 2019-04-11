@@ -70,7 +70,7 @@ public class ForgetPasswordHelper {
         if (email == null) {
             return false;
         }
-        UserHelper userHelper = new UserHelper();
+        UserHelper2 userHelper = new UserHelper2();
         if (userHelper.isUserMailExist(ds, mail)) {
             ToolsHelper toolsHelper = new ToolsHelper();
             nouvelleSansMD5 = toolsHelper.getNewId(10);

@@ -19,6 +19,9 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  *
@@ -30,6 +33,9 @@ public class ReadRdf4j {
 
     private static Model model;
     private SKOSXmlDocument sKOSXmlDocument;
+    private String message = "";
+    
+    Logger logger = LoggerFactory.getLogger(ReadRdf4j.class);
  
     /**
      * constucteur
@@ -39,10 +45,9 @@ public class ReadRdf4j {
      *
      * @param is
      * @param type 0 pour skos 1 pour jsonld 2 pour turtle
-     * @param fileBean
      * @throws java.io.IOException
      */
-    public ReadRdf4j(InputStream is, int type, rdf4jFileBean fileBean) throws IOException {
+    public ReadRdf4j(InputStream is, int type) throws IOException {
         sKOSXmlDocument = new SKOSXmlDocument();
         switch (type) {
             case 0:
@@ -58,8 +63,10 @@ public class ReadRdf4j {
                 laodJsonModel(is);
                 break;                
         }
-        readModel(fileBean);
+        readModel();
     }
+    
+    
 
     /**
      * Cette fonction permet de charger un fichier RDF puis le parcourir avec
@@ -105,7 +112,7 @@ public class ReadRdf4j {
      * Permet de lire un fichier RDF précédament charger avec la fonction
      * laodModel() les données sont stoqué dans la variable thesaurus
      */
-    private void readModel(rdf4jFileBean fileBean) {
+    private void readModel() {
 
         ReadStruct readStruct = new ReadStruct();
         readStruct.resource = null;
@@ -154,11 +161,14 @@ public class ReadRdf4j {
                 } else if (prop == SKOSProperty.Concept) {
                     sKOSXmlDocument.addconcept(readStruct.resource);
                 }else {
+                        logger.info("This is how you configure Java Logging with SLF4J");
         //            System.out.println("Erreur de type : " + prop);
                 }
 
             } //Labelling Properties
             else if (readLabellingProperties(readStruct)) {
+                if(readStruct.resource == null)
+                    readStruct.resource = new SKOSResource();
                 //Dates
                 if (readDate(readStruct)) {
                     //Semantic Relationships
@@ -191,7 +201,7 @@ public class ReadRdf4j {
             for (String b : nonReco) {
                 balises += "    " + b + "\n";
             }
-            fileBean.setWarning("Not readed RDF tag\n" + balises);
+            message = message + "Not readed RDF tag\n" + balises;//fileBean.setWarning("Not readed RDF tag\n" + balises);
         }
     }
 
@@ -203,6 +213,7 @@ public class ReadRdf4j {
      */
     private boolean readDocumentation(ReadStruct readStruct) {
         String lang = "fr"; 
+        if(readStruct.literal == null) return true;
         // si aucune langue n'est précisée, on applique la langue par défaut
         if(readStruct.literal.getLanguage().isPresent()) {
             lang = readStruct.literal.getLanguage().get();
@@ -473,5 +484,8 @@ public class ReadRdf4j {
         return sKOSXmlDocument;
     }
 
-    
+    public String getMessage() {
+        return message;
+    }
+   
 }

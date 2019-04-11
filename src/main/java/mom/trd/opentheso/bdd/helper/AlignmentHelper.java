@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.core.alignment.AlignementPreferences;
 import mom.trd.opentheso.core.alignment.AlignementSource;
@@ -426,6 +427,57 @@ public class AlignmentHelper {
      * @param idConcept
      * @param idThesaurus
      * @return Objet class
+     * #MR
+     */
+    public ArrayList<NodeAlignmentSmall> getAllAlignmentOfConceptNew(HikariDataSource ds,
+            String idConcept, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<NodeAlignmentSmall> nodeAlignmentList = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT uri_target, alignement_id_type"
+                            + " FROM alignement"
+                            + " where internal_id_concept = '" + idConcept + "'"
+                            + " and internal_id_thesaurus ='" + idThesaurus + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        NodeAlignmentSmall nodeAlignmentSmall = new NodeAlignmentSmall();
+                        nodeAlignmentSmall.setUri_target(resultSet.getString("uri_target").trim());
+                        nodeAlignmentSmall.setAlignement_id_type(resultSet.getInt("alignement_id_type"));
+                        nodeAlignmentList.add(nodeAlignmentSmall);
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All list of alignment of Concept  : " + idConcept, sqle);
+        }
+        return nodeAlignmentList;
+    }    
+    
+    /**
+     * Cette fonction permet de retourner la liste des alignements pour un
+     * concept
+     *
+     * @param ds
+     * @param idConcept
+     * @param idThesaurus
+     * @return Objet class
      */
     public ArrayList<NodeAlignment> getAllAlignmentOfConcept(HikariDataSource ds,
             String idConcept, String idThesaurus) {
@@ -508,8 +560,6 @@ public class AlignmentHelper {
                                 String.valueOf(resultSet.getInt("id")),
                                 resultSet.getString("label_skos"));
                     }
-                    resultSet.close();
-
                 } finally {
                     stmt.close();
                 }

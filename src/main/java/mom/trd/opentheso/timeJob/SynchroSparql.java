@@ -37,7 +37,8 @@ public class SynchroSparql implements Runnable {
     public void  run(){
     System.out.println("dans le run saprtql");
     String url=sparqlStruct.getAdresseServeur().replaceAll("http","jdbc:virtuoso").trim()+":1111";
-    VirtGraph graph=new VirtGraph(sparqlStruct.getGraph(),url,sparqlStruct.getNom_d_utilisateur(),sparqlStruct.getMot_de_passe());
+    VirtGraph graph=new VirtGraph(sparqlStruct.getGraph(),url,sparqlStruct.getNom_d_utilisateur(),
+            sparqlStruct.getMot_de_passe());
 
     String str = "CLEAR GRAPH <"+sparqlStruct.getGraph()+">";
     VirtuosoUpdateRequest vur = VirtuosoUpdateFactory.create(str, graph);

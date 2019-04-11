@@ -14,9 +14,9 @@ import skos.SKOSXmlDocument;
  *
  * @author miled.rousset
  */
-public class JsonHelper {
+public class JsonldHelper {
 
-    public JsonHelper() {
+    public JsonldHelper() {
     }
    
     public SKOSXmlDocument readSkosDocument(StringBuffer skosStringBuffer){
@@ -26,7 +26,7 @@ public class JsonHelper {
             sKOSXmlDocument = readFileSKOS.readStringBuffer(skosStringBuffer);
             return sKOSXmlDocument;
         } catch (Exception ex) {
-            Logger.getLogger(JsonHelper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JsonldHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
