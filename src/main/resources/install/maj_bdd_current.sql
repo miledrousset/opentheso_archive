@@ -7,7 +7,7 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.4.4
+-- version=4.4.5
 -- date : 15/03/2019
 --
 -- n'oubliez pas de définir le role suivant votre installation 
@@ -26,7 +26,6 @@ SELECT public.unaccent('public.unaccent', $1)
 $func$  LANGUAGE sql IMMUTABLE;
 
 --- fin des fonctions à appliquer en premier et à part
-
 
 
 
@@ -100,6 +99,13 @@ INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUE
 --WHERE 
 --  hierarchical_relationship.id_concept2 NOT IN (select concept.id_concept from concept where id_thesaurus = '167')
 --  and hierarchical_relationship.id_thesaurus = '167';
+
+
+-- pour remettre tous les concepts dans un group en particulier 
+-- insert into concept_group_concept (idgroup,idthesaurus,idconcept) 
+-- select 'G2854', id_thesaurus, id_concept from concept where id_thesaurus = '43' 
+
+
 
 
 --- rechargement et optimisation des langues iso_latin1
