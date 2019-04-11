@@ -17,6 +17,7 @@ import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
+import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
@@ -111,11 +112,18 @@ public class ExportJsonTest {
         }
         ds.close();
     }
+    
+    @Test 
+    public void jsonAllThesoInJson() {
+        
+    }
+    
+    
      
     @Test
     public void exportConceptIntoJson() {
-        String idThesaurus = "TH_1";
-        String idGroup = "2";
+        String idThesaurus = "1";
+        String idGroup = "C374";
         String idLang = "fr";
         
         NodeConcept nodeConcept;
@@ -135,7 +143,7 @@ public class ExportJsonTest {
         System.out.println(jsonArrayBuilder.build().toString());
     }
     
-     private void addJsonData(NodeConcept nodeConcept) {
+    private void addJsonData(NodeConcept nodeConcept) {
         JsonObjectBuilder builder = Json.createObjectBuilder();        
 
         // les infos principales
@@ -173,12 +181,13 @@ public class ExportJsonTest {
         // pour le tableau des notes 
         JsonArrayBuilder jsonArrayBuilderNotes = Json.createArrayBuilder();
         JsonObjectBuilder notes = Json.createObjectBuilder();
-        for (NodeEM nodeEM : nodeConcept.getNodeEM()) {
-            notes.add("language", nodeEM.getLang());
-            notes.add("value", nodeEM.getLexical_value());
+        for (NodeNote nodeNote : nodeConcept.getNodeNotesTerm()) {
+            notes.add("language", nodeNote.getLang());
+            notes.add("value", nodeNote.getLexicalvalue());
+            notes.add("noteType", nodeNote.getNotetypecode());
             jsonArrayBuilderNotes.add(notes.build());
         }
-        builder.add("definition", jsonArrayBuilderNotes.build()); 
+        builder.add("note", jsonArrayBuilderNotes.build()); 
         jsonArrayBuilder.add(builder.build());
     }    
 }

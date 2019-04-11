@@ -81,7 +81,7 @@ public class TestRecursive {
            
            
            
-           lisIds = conceptHelper.getIdsOfBranch(hd, "8364", "TH_1", lisIds);
+           lisIds = conceptHelper.getIdsOfBranch(hd, "8364", "TH_1");
            
            if(lisIds.isEmpty()) return;
            int total = totalOfNotices(lisIds);

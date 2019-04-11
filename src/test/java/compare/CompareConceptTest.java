@@ -11,14 +11,18 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
+import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.TestGetSiteMap;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeBT;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
@@ -29,6 +33,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  *
@@ -60,7 +65,7 @@ public class CompareConceptTest {
      */
     @org.junit.Test
 
-    public void testExportAllDatas() {
+    public void testCompareCSVToTheso() {
         ConnexionTest connexionTest = new ConnexionTest();
         HikariDataSource conn = connexionTest.getConnexionPool();
         
@@ -78,7 +83,7 @@ public class CompareConceptTest {
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-        String path = "/Users/Miled/Desktop/inist.csv";
+        String path = "/Users/Miled/Desktop/Marion LAME/arsol2.csv";
        
        
         FileInputStream file = readFile(path);         
@@ -86,10 +91,12 @@ public class CompareConceptTest {
         String line;
         String lineTmp;
         String[] lineOrigine;
+        String conceptOrigine;
+
         
         boolean first = true;
         
-        stringBuilder.append("Numéro BDD\tnom d'origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
+        stringBuilder.append("ID origine\tnom origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
         
         BufferedReader bf = new BufferedReader(new InputStreamReader(file));
         try {
@@ -97,9 +104,9 @@ public class CompareConceptTest {
                 lineOrigine = line.split("\t");
                 if(lineOrigine.length < 2) continue;
                 
-                lineTmp = removeStopWords(lineOrigine[1]);
+                lineTmp = stringPlus.unaccentLowerString(lineOrigine[1]);
                 
-                nodeSearchs = searchHelper.searchTerm(conn, lineTmp, idLang, idTheso, idGroup, 2, false);
+                nodeSearchs = searchHelper.searchTermNew(conn, lineTmp, idLang, idTheso, idGroup, 2, false);
                 
                 stringBuilder.append(lineOrigine[0]);
                 stringBuilder.append("\t");
@@ -174,7 +181,54 @@ public class CompareConceptTest {
       
         conn.close();
     }
- 
+    
+    @Test
+    public void testIsTopTerm() {
+        ConnexionTest connexionTest = new ConnexionTest();
+        HikariDataSource conn = connexionTest.getConnexionPool();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        boolean isTopConcept = conceptHelper.isTopConcept(conn, "1421", "TH_1");
+        conn.close();
+    }
+            
+    
+    @Test
+    public void testSearchGIN(){
+        ConnexionTest connexionTest = new ConnexionTest();
+        HikariDataSource conn = connexionTest.getConnexionPool();
+        
+        
+        String idTheso = "2";
+        String idLang = "fr";
+        String idGroup = "5";
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        StringPlus stringPlus = new StringPlus();
+        
+        NodeConcept nodeConcept;
+        SearchHelper searchHelper = new SearchHelper();
+        ArrayList<NodeSearch> nodeSearchs;        
+        
+      //  nodeSearchs = searchHelper.searchTermNew(conn, "saint", idLang, idTheso, idGroup, 1, true);
+        
+        TermHelper termHelper = new TermHelper();
+        List<NodeAutoCompletion> nodeAutoCompletionList = termHelper.getAutoCompletionTerm(conn, idTheso, idLang, "saint");
+      
+  
+  
+        String test = "écolÉôïçèù";
+        test = test.toLowerCase();
+        test = stringPlus.unaccentLowerString(test);
+        
+        test = "مزهرية";
+        test = stringPlus.unaccentLowerString(test);
+        
+        test = test.toUpperCase();
+        test = test.toLowerCase();
+        conn.close();
+    }
+
+    
     private String removeStopWords(String line){
         String[] words = line.split(" ");
         StringBuilder stringBuilder = new StringBuilder();

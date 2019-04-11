@@ -10,6 +10,7 @@ import connexion.ConnexionTest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.tools.FileUtilities;
@@ -220,6 +221,8 @@ public class VerifyArkIdTest {
         String idLang = "fr";
         String urlSite = "http://test.frantiq.fr/";        
         
+        ArrayList<String> idConcepts = new ArrayList<>();
+        idConcepts.add(idConcept);
         ConnexionTest connexionTest = new ConnexionTest();
         HikariDataSource ds = connexionTest.getConnexionPool();
         if (ds == null) {
@@ -227,7 +230,7 @@ public class VerifyArkIdTest {
         }
         ConceptHelper conceptHelper = new ConceptHelper();
         
-        conceptHelper.regenerateArkId(ds, idConcept, idLang, idTheso);
+        conceptHelper.generateArkId(ds,idTheso, idConcepts);
         ds.close();
     }
     

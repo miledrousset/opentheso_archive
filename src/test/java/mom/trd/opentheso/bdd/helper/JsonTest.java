@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
-import mom.trd.opentheso.core.jsonld.helper.JsonHelper;
+import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -136,7 +136,7 @@ public class JsonTest {
             
             sKOSXmlDocument = readFileSKOS.readStringBuffer(skos);
             
-            JsonHelper jsonHelper = new JsonHelper();
+            JsonldHelper jsonHelper = new JsonldHelper();
         //    StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrg(sKOSXmlDocument);
         
             StringBuffer jsonLd = jsonHelper.getJsonLdForSchemaOrgForConceptScheme(sKOSXmlDocument);

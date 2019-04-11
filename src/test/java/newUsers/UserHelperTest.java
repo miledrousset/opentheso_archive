@@ -9,7 +9,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import connexion.ConnexionTest;
 import java.util.ArrayList;
 import java.util.Map;
-import mom.trd.opentheso.bdd.helper.UserHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;

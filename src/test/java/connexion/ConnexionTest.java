@@ -27,11 +27,17 @@ public class ConnexionTest {
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
         // Zoomathia
+//        config.addDataSourceProperty("user", "pactols");
+//        config.addDataSourceProperty("password", "pactols");
+//        config.addDataSourceProperty("databaseName", "pactols");
+//        config.addDataSourceProperty("portNumber", "5439");
+//        config.addDataSourceProperty("serverName", "localhost");
+        
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "OT438");
-        config.addDataSourceProperty("portNumber", "5436");
-        config.addDataSourceProperty("serverName", "localhost");
+        config.addDataSourceProperty("databaseName", "opentheso4");
+        config.addDataSourceProperty("portNumber", "5433");
+        config.addDataSourceProperty("serverName", "opentheso3.mom.fr");        
 
         /*      config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");

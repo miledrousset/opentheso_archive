@@ -7,7 +7,10 @@ package mom.trd.opentheso.bdd.helper;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,10 +73,10 @@ public class QueriesPostgresTest {
 //dataSource.password=opentheso
 //dataSource.databaseName=zoo
         
-        config.addDataSourceProperty("portNumber", "5433");
+        config.addDataSourceProperty("portNumber", "5436");
         config.addDataSourceProperty("user", "opentheso");
         config.addDataSourceProperty("password", "opentheso");
-        config.addDataSourceProperty("databaseName", "4.2.2");
+        config.addDataSourceProperty("databaseName", "openthesonew");
 
         config.addDataSourceProperty("serverName", "localhost");
         //config.addDataSourceProperty("serverName", "opentheso.mom.fr");
@@ -1190,6 +1193,81 @@ public class QueriesPostgresTest {
         
         conn.close();*/
     }
+    
+    
+    /**
+     * Test of Opentheso WebServices.
+     */
+    @org.junit.Test
+
+    public void testGetConceptSequence() {
+        
+        HikariDataSource ds = openConnexionPool();
+        Connection conn;
+        String idConcept = null;
+        String query;
+        Statement stmt;
+        ResultSet resultSet;
+        String idTheso = "1";
+
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                query = "select nextval('concept__id_seq') from concept__id_seq";
+                stmt.executeQuery(query);
+                resultSet = stmt.getResultSet();
+                if (resultSet.next()) {
+                    int idNumerique = resultSet.getInt(1);
+                    idNumerique++;
+                    idConcept = "" + (idNumerique);
+                    // si le nouveau Id existe, on l'incrémente
+                    while (isIdExiste(conn, idConcept, idTheso)) {
+                        idConcept = "" + (++idNumerique);
+                    }
+                }
+
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ds.close();
+    }    
+    
+    private boolean isIdExiste(Connection conn,
+            String idConcept, String idThesaurus) {
+
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept
+                            + "' and id_thesaurus = '" + idThesaurus
+                            + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            System.err.println("Error while asking if id exist : " + sqle);
+        }
+        return existe;
+    }    
     
     /**
      * Test of récupération des orphelin dans le thésaurus pour les ranger dans la table des orphelins
