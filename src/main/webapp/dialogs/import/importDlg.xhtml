@@ -103,7 +103,7 @@
                 <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml|json|ttl)$/"
                               cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{rdf4jFileBean.chargeFile}" process="@form"
                               onstart="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
-                              update="@form" oncomplete="PrimeFaces.monitorDownload(stop_import)" disabled="#{!rdf4jFileBean.uploadEnable}"/>
+                              update="@form, :messages" oncomplete="PrimeFaces.monitorDownload(stop_import)" disabled="#{!rdf4jFileBean.uploadEnable}"/>
         
                 <h:outputText value="uri : #{rdf4jFileBean.uri}" />
                 <br/> 
@@ -113,7 +113,7 @@
                                  actionListener="#{rdf4jFileBean.insertBDD(editionBean.selectedUserGroup)}" 
                                  onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
                                  oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
-                                 update=":idImportDlg,:panSkos,:tableTheso"
+                                 update=":idImportDlg,:panSkos,:tableTheso, :messages"
                                  style="color: green"
                                  />
                 <br/>

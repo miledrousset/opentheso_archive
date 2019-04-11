@@ -5,43 +5,68 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idNtListImportDlg"  header="#{langueBean.getMsg('index.NT')}" widgetVar="ntListImportDlg" modal="true" resizable="false" >
+    <p:dialog id="idNtListImportDlg"  header="#{langueBean.getMsg('index.NT')}" widgetVar="ntListImportDlg" modal="true" resizable="true" >
         <!-- Importation d'une liste de termes venant d'un fichier tabulé-->
-        <h:form >
-                    <p:messages showDetail="true">
-                        <p:autoUpdate />
-                    </p:messages>  
-            <fieldset>
-                <legend><h:outputText value="#{langueBean.getMsg('nt.multiple.legend')} #{newtreeBean.selectedTerme.nom}" /></legend>
-                <h:outputText value="#{langueBean.getMsg('nt.multiple.text')}"  />
-                <h:form>
-                    <table>
-                        <tr>
-                            <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
-                        </tr>                          
-                        <tr>
-                            <td><h:outputText value="fichier" /> : </td>
-                            <td>
-                                <p:fileUpload  fileUploadListener="#{newtreeBean.handleFileUpload}" mode="advanced" skinSimple="true" />
-                            </td>
+        <fieldset>
+            <legend><h:outputText value="#{langueBean.getMsg('nt.multiple.legend')}" />
+                <h:outputText value=": #{selectedTerme.nom}" style="text-align: center; color: darkred; font-size: 13px;" />
+            </legend>
 
-                            
-                        </tr>
-                     
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                       
-                                <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{newtreeBean.addMultipleNT()}" 
-                                                     update=":idNtListImportDlg,:accordeonTree,:panContenu" styleClass="styleButton"
-                                                     oncomplete="PF('ntListImportDlg').hide();">
-                                    </p:commandButton>  
-                       
+            <p:panelGrid>
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="1">id</p:column>
+                        <p:column colspan="1">skos:prefLabel@fr</p:column>
+                        <p:column colspan="1">skos:prefLabel@en</p:column>
+                        <p:column colspan="1">skos:prefLabel@es</p:column>                             
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>100</p:column>
+                    <p:column>France</p:column>
+                    <p:column>France_en</p:column>
+                    <p:column>France_es</p:column>
+                </p:row>
+                <p:row>
+                    <p:column>101</p:column>
+                    <p:column>Lyon</p:column>
+                    <p:column>Lyon_en</p:column>
+                    <p:column>Lyon_es</p:column>
+                </p:row>                    
+            </p:panelGrid>
 
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-            </fieldset>
-        </h:form>
+
+            <br/>
+            <p:outputPanel deferred="true">
+                <p>
+                    Les termes doivent être séparés par des virgules dans le fichier à uploader ou une valeur par ligne.<br/>
+                    la première colonne "Id" n'est pas oblogatoire sauf si vous souhaitez récupérer votre ancien identifiant.
+                </p>
+            </p:outputPanel>
+
+            <h:panelGroup id="tot">
+                <td><h:outputText style="color: darkred; font-weight: bold" value="total: #{newtreeBean.conceptObjects.size()}"/> </td>
+            </h:panelGroup>
+            <!--  <h:outputText value="{langueBean.getMsg('nt.multiple.text')}" style="max-width: 40px;" /> -->
+            <h:form id="uploadCsv">
+                <table>
+                    <tr>
+                        <td><h:outputText value="fichier" /> : </td>
+                        <td>
+                            <p:fileUpload  fileUploadListener="#{newtreeBean.handleFileUpload}" mode="advanced" skinSimple="true" update=":tot" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{newtreeBean.addMultipleNT2()}" 
+                                             update=":idNtListImportDlg,:accordeonTree,:panContenu,:messages" styleClass="styleButton"
+                                             oncomplete="PF('ntListImportDlg').hide();">
+                            </p:commandButton>  
+                        </td>
+                    </tr>
+                </table>
+            </h:form>
+        </fieldset>
     </p:dialog>
 </ui:composition>

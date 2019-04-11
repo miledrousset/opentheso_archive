@@ -21,7 +21,7 @@
                         <p:commandButton id="cbRegenerateConceptID" styleClass="cbSupp" icon="ui-icon-valider" 
                                          actionListener="#{theso.reGenerateConceptArkId(selectedTerme.idC)}"  
                                          oncomplete="PF('reGenerateConceptArkIdDlg').hide()"
-                                         update=":contenuDroite1, :idDeleteImageDlg" >
+                                         update=":contenuDroite1, :idDeleteImageDlg, :messages">
                         </p:commandButton>
 
                     <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update="idReGenerateConceptArkIdDlg" oncomplete="PF('reGenerateConceptArkIdDlg').hide();"  immediate="true"/>

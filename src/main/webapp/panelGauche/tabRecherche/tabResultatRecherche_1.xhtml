@@ -1,0 +1,65 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui">
+    <h:panelGroup id="resultSearch" style="height: 100px">
+            <h:form id="tableSearch1" rendered="#{search.typeSearch == 1}">
+                <p:dataTable var="ts" value="#{search.result1}" selectionMode="single" selection="#{selectedTerme.nodeSe}" 
+                             rowKey="#{ts.idConcept}" scrollable="true" scrollHeight="700"
+                             emptyMessage="#{langueBean.getMsg('index.noResultSearch')}" styleClass="styleTab" >
+                    <p:ajax event="rowSelect" listener="#{newtreeBean.majSearch2()}" 
+                            update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
+                        
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch1')}">
+                        <h:outputText rendered="#{ts.preferredLabel == true}" value="#{ts.lexical_value}" />
+                        <h:panelGroup rendered="#{ts.preferredLabel == false}" >
+                            <h:outputText value="#{ts.lexical_value}" style="font-style: italic" />
+                        </h:panelGroup>
+                    </p:column>
+                    <p:column headerText="#{langueBean.getMsg('index.tabSearch2')}" width="60" >
+                        <h:outputText value="#{ts.groupLabel}" />
+                    </p:column>
+                    <p:column width="10" style="padding-left: 1px;" >
+                        
+                        
+                        <p:commandButton update=":treeOP" oncomplete="PF('treeOP').show('#{component.clientId}')" icon="pi pi-search" title="View">
+                            <f:setPropertyActionListener value="#{nodeSearch}" target="#{search.selectedNode}" />
+                       </p:commandButton>                     
+                        
+                     
+                    </p:column>                   
+
+                </p:dataTable>
+                
+                <p:overlayPanel widgetVar="treeOP" showEffect="fade" hideEffect="fade" dismissable="false" showCloseIcon="true">
+                    <p:outputPanel id="treeDetail" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty search.selectedNode}" columnClasses="label,value">
+                            <f:facet name="header">
+                                <p:graphicImage name="/images/iconeTree.png"/> 
+                            </f:facet>
+
+                            <h:outputText value="Id:" />
+
+
+                            <h:outputText value="Year" />
+
+
+                            <h:outputText value="Color:" />
+
+
+                            <h:outputText value="Price" />
+
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:overlayPanel>
+
+
+
+                
+            </h:form>
+
+        </h:panelGroup>
+</ui:composition>

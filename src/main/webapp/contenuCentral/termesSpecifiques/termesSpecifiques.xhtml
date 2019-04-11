@@ -16,11 +16,26 @@
                                    and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                      <p:commandButton id="trierTS" styleClass="cbEdit" icon="ui-icon-edit-16"/>                                                        
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="trierTS" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" update=":idNtEditDlg" action="#{autoComp.init()}" oncomplete="PF('ntEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('panel.addRelationNT')}" update=":idAddRelationNTDlg" oncomplete="PF('addRelationNTDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="Terme spécifique spécial" update=":idNtEditDlg" oncomplete="PF('specialntEditDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem value="#{langueBean.getMsg('nt.multiple')}" update=":idNtEditDlg" oncomplete="PF('ntListImportDlg').show();" style="font-size:12px;" />
-                            <p:menuitem value="#{langueBean.getMsg('sTerme.TrieTS')}" actionListener="#{selectedTerme.majTSpeConceptOrder()}" update=":speci" style="font-size: 12px;"/>
+                            <p:menuitem value="#{langueBean.getMsg('popup.addTS')}" 
+                                        title="#{langueBean.getMsg('NT.newConcept')} #{selectedTerme.nom}"
+                                        update=":idAddNewNTDlg" action="#{autoComp.init()}" oncomplete="PF('addNewNTDlg').show();" style="font-size: 12px;"/>
+                            
+                            <p:menuitem value="#{langueBean.getMsg('NT.editRelations')}"
+                                        title="#{langueBean.getMsg('NT.editRelations')} #{langueBean.getMsg('NT.editRelationFor')} #{selectedTerme.nom}"
+                                        update=":idEditRelationNTDlg" 
+                                        actionListener="#{narrowerTerm.initNT(selectedTerme.listNT)}" 
+                                        oncomplete="PF('editRelationNTDlg').show();" style="font-size: 12px;"/> 
+                            
+                            <p:separator/>
+                            <p:menuitem rendered="#{(!selectedTerme.selectedNode.isGroup) and (!selectedTerme.selectedNode.isSubGroup)}" value="#{langueBean.getMsg('panel.addRelationNT')}"
+                                        title="#{langueBean.getMsg('NT.addRelationConcept')}"
+                                        update=":idAddRelationNTDlg" oncomplete="PF('addRelationNTDlg').show();" style="font-size: 12px;"/>
+                            <p:separator/>
+                            
+                            <p:menuitem value="#{langueBean.getMsg('nt.multiple')}" update=":idNtListImportDlg" actionListener="#{newtreeBean.initConceptObjects()}"
+                                        oncomplete="PF('ntListImportDlg').show();" style="font-size:12px;" />
+                            <p:separator/>                            
+                            <p:menuitem value="#{langueBean.getMsg('sTerme.TrieTS')}" actionListener="#{selectedTerme.majTSpeConceptOrder()}" update=":speci,:formEditTSpe" style="font-size: 12px;"/>
                             
                         </p:menu>  
                 </h:form>
@@ -32,11 +47,12 @@
                     <h:form>
                         <p:commandButton styleClass="termClick" rendered="#{item1.value != ''}" value="#{item1.value}" escape="false"
                                          actionListener="#{newtreeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
-                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" oncomplete="srollToSelected()"/>
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
+                                         :externalResources,:idImageGaleriaDlg"/>
                         <p:commandButton styleClass="termClick" rendered="#{item1.value == ''}" value="#{item1.key}" escape="false"
                                          actionListener="#{newtreeBean.changeTerme(item1.key, selectedTerme.getTypeInf())}" 
-                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" oncomplete="srollToSelected()" />
-
+                                         update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
+                                         :externalResources,:idImageGaleriaDlg" />
                     </h:form>
                 </ui:repeat>
             </h:panelGroup>

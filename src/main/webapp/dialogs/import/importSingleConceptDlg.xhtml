@@ -9,17 +9,7 @@
         xmlns:p="http://primefaces.org/ui">
 
         <p:dialog id="idImportSingleConceptDlg"  header="#{langueBean.getMsg('edit.import')}" styleClass="styleText2" widgetVar="importSingleConceptDlg" modal="true" resizable="false"  >
-
-                
-
-
-
-
             <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
-
-                    <p:messages showDetail="true">
-                        <p:autoUpdate />
-                    </p:messages>  
                 <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> <p:graphicImage id="question" value="images/iconeQuestion.png" /> :
                 <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
                 <h:inputText value="#{rdf4jFileBean.formatDate}" />
@@ -30,7 +20,57 @@
                     <f:selectItem itemLabel="Json-ld" itemValue="1" />
                     <f:selectItem itemLabel="Turtle" itemValue="2" />
                 </p:selectOneMenu>
-                <br/><br/>
+                <br/>
+                
+                <p:panelGrid styleClass="ui-noborder">
+                    <f:facet name="header" >
+                        <h:outputText value="Récupération de l'identifiant pérenne (ARK ou Handle)" />
+                    </f:facet>
+                    <p:row>
+                        <p:selectOneRadio id="customRadio" value="#{rdf4jFileBean.selectedIdentifier}" layout="custom">
+                            <f:selectItem itemLabel="Sans" itemValue="sans" />
+                            <f:selectItem itemLabel="Ark" itemValue="ark" />
+                            <f:selectItem itemLabel="Handle" itemValue="handle" />
+                        </p:selectOneRadio>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:radioButton id="opt1" for="customRadio" itemIndex="0" />
+                        </p:column>
+                        <p:column>
+                        <h:outputLabel for="opt1" value="Sans" />
+                        </p:column>
+                        <p:column>
+                        <p:outputLabel value="" />
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                        <p:radioButton id="opt2" for="customRadio" itemIndex="1" />
+                        </p:column>
+                        <p:column>
+                        <h:outputLabel for="opt2" value="Ark" />
+                        </p:column>
+                        <p:column>
+                        <p:outputLabel value="" />
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                        <p:radioButton id="opt3" for="customRadio" itemIndex="2" />
+                        </p:column>
+                        <p:column>
+                        <h:outputLabel for="opt3" value="Handle -> Préfixe :" />
+                        </p:column>
+                        <p:column>
+                        <p:inputText value="#{rdf4jFileBean.prefixHandle}"/>
+                        </p:column>
+                    </p:row>    
+                </p:panelGrid>
+                
+                <br/>                
+                <br/>
                 <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml)$/"
                               cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{rdf4jFileBean.chargeFile}" process="@form"
                               onstart="PrimeFaces.monitorDownload(start_import_concept);PF('pbAjax').start();" 

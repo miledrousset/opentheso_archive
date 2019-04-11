@@ -112,7 +112,11 @@
                                 <f:selectItem itemDisabled="true" itemLabel="#{langueBean.getMsg('index.searchOption2')}" itemValue="2" />
                             </p:selectOneRadio><br/>
                         </tr>
-
+                        <tr>
+                            <p:commandButton icon="ui-icon-valider" actionListener="#{search.research()}" id="idSearchcommandButton" 
+                                             update=":accordeonTree,:panChoixTheso,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
+                                             styleClass="cbEdit"  rendered="true"/>
+                        </tr>
                     </table>
                 </p:tab>
             </p:accordionPanel> 

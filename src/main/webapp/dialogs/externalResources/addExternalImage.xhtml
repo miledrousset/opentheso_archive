@@ -1,0 +1,27 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddExternalImage"  header="#{langueBean.getMsg('index.picture')}" widgetVar="addExternalImage" modal="true" resizable="false" >
+        <!-- Ajout des images d'après une URI -->
+        <h:panelGroup id="addImageByUri" style="background: transparent; box-shadow: none;">
+                <h:form style="text-align: left;">
+                    <br/>
+                    <h:outputText value="Uri   :" /> <h:inputText value="#{externalResources.inputUri}" /><br/>
+                    <h:outputText value="Label :" /> <h:inputText value="#{externalResources.inputLable}" /><br/><br/> 
+                    
+                    
+                    <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-ok" 
+                                     actionListener="#{externalResources.addExternalImage(
+                                                       selectedTerme.idTheso, selectedTerme.idC, currentUser.user.idUser)}"
+                                             update=":contenuDroite1, :idAddExternalImage, :externalResources" > 
+                    </p:commandButton> 
+                    
+                </h:form>
+                <br/>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>

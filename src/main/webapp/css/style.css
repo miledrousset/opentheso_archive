@@ -448,6 +448,27 @@ input[type="button"], input[type="submit"]{
 /***********************************Nouvelles icones / iconsDB icondb***********************************/
 /* custom color #69B019   #284309 */
 
+.ui-icon-import-16 {
+    background: url("../images/import.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+
+}
+
+.ui-icon-tree-16 {
+    background: url("../images/iconeTree.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-tree2-24 {
+    background: url("../images/tree.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;       
+}
+
 .ui-icon-html-24 {
     background: url("../images/html-24.png") no-repeat !important;
     background: none;
@@ -476,6 +497,26 @@ input[type="button"], input[type="submit"]{
     background: url("../images/ok-16.png") no-repeat !important;
     background: none;
     border-radius: 0px;
+}
+
+.ui-icon-cancel-16 {
+    background: url("../images/cancel-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-align-16 {
+    background: url("../images/align-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-ok-24 {
+    background: url("../images/ok-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;    
 
 }
 
@@ -683,6 +724,22 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
     height: 24px;
     width: 24px;
+}
+.ui-icon-sort-16 {
+    background: url("../images/sort-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+.ui-icon-sort-16-selected {
+    background: url("../images/sort-16-selected.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+}
+
+.ui-icon-permalink-16 {
+    background: url("../images/permalink-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
 }
 
 
@@ -1286,6 +1343,19 @@ input[type="button"], input[type="submit"]{
     border-radius: 5px;
 }
 
+.fieldNotes {
+    float: left; 
+    width: 450px;
+    height: 450px;
+    border-radius: 5px;
+}
+
+.fielEditRelationNT {
+    float: left; 
+    width: 300px;
+    border-radius: 5px;
+}
+
 .fieldMyAccount {
     float: left; 
     /*width: 320px; */
@@ -1309,7 +1379,7 @@ input[type="button"], input[type="submit"]{
 .fieldReorga {
     float: right; 
     width: 400px !important; 
-    height: 220px !important; 
+    height: 400px !important; 
     text-align: center;
     border-radius: 5px;
 }

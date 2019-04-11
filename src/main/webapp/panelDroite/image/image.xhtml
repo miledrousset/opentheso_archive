@@ -11,7 +11,7 @@
                 <h:outputText value="#{langueBean.getMsg('index.picture')}" /> 
                 <div id="imageEdition">
                     <h:form id="formeEditImage" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null)
-                                                            and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)
+                                                            and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso || roleOnTheso.isContributorOnThisTheso)
                                                             and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
 
                         <p:commandButton id="imageMenu" rendered="#{selectedTerme.type != 1}" 
@@ -28,7 +28,7 @@
                 <div id="clean" />
             </div>
             <div>
-                <p:imageSwitch style="margin-left: auto; margin-right: auto;" effect="fade" widgetVar="switcher" id="manuelSwitcher" slideshowAuto="true" >
+                <p:imageSwitch style="margin-left: auto; margin-right: auto;" effect="fade" widgetVar="switcher"  slideshowAuto="true" >
 
                     <ui:repeat value="#{selectedTerme.images}" var="image" id="manuelSwitcherImages">
                         <h:form>

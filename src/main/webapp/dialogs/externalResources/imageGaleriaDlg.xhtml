@@ -1,0 +1,16 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets" 
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idImageGaleriaDlg"  header="#{langueBean.getMsg('index.picture')}" widgetVar="imageGaleriaDlg" 
+              modal="true" resizable="true" >
+        <!-- Gestion de la note -->
+
+        <p:galleria  rendered="#{externalResources.images.size() != 0}" id="galleria1" value="#{externalResources.images}"
+                        var="image" panelWidth="500" panelHeight="313" showCaption="false"  >
+                <!--<p:graphicImage  style="display: block; margin: auto;position: relative;"/>-->
+                <p:graphicImage style="max-height: 100%; max-width: 100%" value="#{image}" title="#{image}" cache="false"/>
+            </p:galleria>    
+    </p:dialog>
+</ui:composition>

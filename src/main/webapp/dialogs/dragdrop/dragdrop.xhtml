@@ -37,9 +37,9 @@
                 <h:outputText  style="font-size: 15px;font-weight:bold"  value="#{newtreeBean.droppedNode.idCurrentGroup}" />  
 
             </p:panelGrid>
-            <h:outputText rendered="#{!newtreeBean.renderValid()}" style="text-align:center" value="vous ne pouvez pas confirmer cette action désolé.... "/>
+            <h:outputText rendered="#{!newtreeBean.renderValid()}" style="text-align:center" value="vous ne pouvez pas confirmer cette action .... "/>
             <p:commandButton  rendered="#{newtreeBean.renderValid()}" value=" "  styleClass="ui-confirmdialog-yes" icon="ui-icon-check"   >
-                <p:ajax listener="#{newtreeBean.confirmDrop()}" update="accordeonTree:form:tree,:confirmDialogDrag" />
+                <p:ajax listener="#{newtreeBean.confirmDrop(copyAndPaste)}" update="accordeonTree:form:tree,:confirmDialogDrag, :messages" />
             </p:commandButton>
             <p:commandButton value="" actionListener="#{newtreeBean.infirmDrop()}" type="" styleClass="ui-confirmdialog-no" update="accordeonTree:form:tree,:confirmDialogDrag" icon="ui-icon-close">
             </p:commandButton>

@@ -22,15 +22,15 @@
                         <td>
                             <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTermFromThisGroup}" var="t1"
                                             scrollHeight="300"
-                                            itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
+                                            itemLabel="#{t1.prefLabel}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
                                 <f:facet name="itemtip">
-                                    <h:panelGrid columns="2" cellpadding="5" width="200" >
+                                    <h:panelGrid columns="2" cellpadding="5" >
                                         <f:facet name="header" rendered="#{(t1.url) != null}">
                                             <h:outputText value="ID : " />
                                             <h:outputText value="#{t1.idConcept}" />
                                         </f:facet>
 
-                                        <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
+                                        <h:outputText value="#{langueBean.getMsg('autoComp1')} : "  />
                                         <h:outputText value="#{t1.groupLexicalValue}" />
 
                                         <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
@@ -43,13 +43,10 @@
                     
                     <tr>
                         <td colspan="2" style="text-align: center;">
-                            <h:form>
-                                <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGene()}"
-                                                 update=":idAddTgDlg,:panContenu,:accordeonTree" styleClass="styleButton"
-                                                 oncomplete="PF('addTgDlg').hide();">
-                                </p:commandButton>  
-                            </h:form>
-
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGene()}"
+                                             update=":idAddTgDlg,:panContenu,:accordeonTree, :messages" styleClass="styleButton"
+                                             oncomplete="PF('addTgDlg').hide();">
+                            </p:commandButton>  
                         </td>
                     </tr>
                 </table>

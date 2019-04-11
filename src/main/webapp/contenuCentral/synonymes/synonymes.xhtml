@@ -24,15 +24,21 @@
             </div>
         </div>
         <div class="contenuSynonyme">
-            <!--<h:outputText value="#{langueBean.getMsg('index.UF1')}" />  : <br/>-->
+            <!--<h:outputText value="{langueBean.getMsg('index.UF1')}" />  : <br/>-->
             <h:panelGroup  id="synoE">
                 <ui:repeat value="#{selectedTerme.termesSynonymesE}" var="item3">
                     <h:outputText value="#{item3}" styleClass="nomSynonyme" /><br/>
                 </ui:repeat>
             </h:panelGroup>
-            <h:outputText rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.status != 'hidden')
-                                      and (selectedTerme.idDomaine != 'Orphan')}" value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
-            <h:panelGroup  id="synoP" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso)
+            <h:outputText rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null)
+                                      and (roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso || currentUser.user.isSuperAdmin)
+                                      and (selectedTerme.status != 'hidden')
+                                      and (selectedTerme.idDomaine != 'Orphan')
+                                      and (selectedTerme.termesSynonymesP.size() != 0)}"
+                          value="#{langueBean.getMsg('index.UF2')}:" styleClass="nomSynonymeCache"/>  <br/>
+            
+            <h:panelGroup  id="synoP" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null)
+                                                  and (roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso || currentUser.user.isSuperAdmin)
                                                   and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
                 <ui:repeat value="#{selectedTerme.termesSynonymesP}" var="item4">
                     <h:outputText value="#{item4}" styleClass="nomSynonyme" /><br/>

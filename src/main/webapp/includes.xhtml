@@ -11,7 +11,7 @@
     
     <ui:include src="popUpIndex.xhtml" />
     <ui:include src="historique.xhtml" />
-    <ui:include src="conceptPopUp.xhtml" />
+    <ui:include src="deleteBranchOrphan.xhtml" />
     <ui:include src="dialogs/conceptEditDlg.xhtml" />
     <ui:include src="dialogs/notationEditDlg.xhtml" />
     <ui:include src="dialogs/conceptDeleteDlg.xhtml" />     
@@ -19,7 +19,8 @@
     <ui:include src="dialogs/conceptFusionDlg.xhtml" />
     <ui:include src="dialogs/conceptFusionValidationDlg.xhtml" />
     <ui:include src="dialogs/reGenerateConceptIdDlg.xhtml" />   
-    <ui:include src="dialogs/reGenerateConceptArkIdDlg.xhtml" />    
+    <ui:include src="dialogs/reGenerateConceptArkIdDlg.xhtml" />
+    <ui:include src="dialogs/reGenerateGroupArkIdDlg.xhtml" />     
 
     
     <ui:include src="dialogs/branch/sameGroup/conceptMoveBranchDlg.xhtml" />
@@ -37,9 +38,10 @@
     <ui:include src="dialogs/orphan/moveBranchFromOrphanDlg.xhtml" />
     <ui:include src="dialogs/orphan/moveBranchFromOrphanToGroupDlg.xhtml" />
     <ui:include src="dialogs/orphan/regenerateOrphanDlg.xhtml" />
-    <ui:include src="dialogs/nt/ntEditDlg.xhtml" />
-    <ui:include src="dialogs/nt/addRelationNTDlg.xhtml" />    
-    <ui:include src="dialogs/nt/specialntEditDlg.xhtml" />
+    <ui:include src="dialogs/nt/addNewNTDlg.xhtml" />
+    <ui:include src="dialogs/nt/addRelationNTDlg.xhtml" />   
+    <ui:include src="dialogs/nt/editRelationNTDlg.xhtml" />
+    <ui:include src="dialogs/nt/editRelationNT_suiteDlg.xhtml" />      
     <ui:include src="dialogs/nt/ntListImportDlg.xhtml" />
     <ui:include src="dialogs/bt/addTgDlg.xhtml" />
     <ui:include src="dialogs/bt/addTgOtherGroupDlg.xhtml" />            
@@ -49,13 +51,21 @@
     <ui:include src="dialogs/group/renameGroupDlg.xhtml" />
     <ui:include src="dialogs/group/modifTypeGroupDlg.xhtml" />
     <ui:include src="dialogs/group/groupNumerotationDlg.xhtml" />
-    <ui:include src="dialogs/group/alignGroupDlg.xhtml" />    
+  
 
-    <ui:include src="dialogs/notes/noteEditDlg.xhtml" />
+    
+    <ui:include src="dialogs/notes/noteEditDlg.xhtml"/>
     <ui:include src="dialogs/notes/definitionEditDlg.xhtml" />
     <ui:include src="dialogs/notes/notedApplicationEditDlg.xhtml" />
     <ui:include src="dialogs/notes/noteHistoriqueEditDlg.xhtml" />
     <ui:include src="dialogs/notes/noteEditorialeEditDlg.xhtml" />
+    
+    
+    <ui:include src="dialogs/notes/new/newNote.xhtml"/>
+    <ui:include src="dialogs/notes/new/editNotes.xhtml"/>
+    <ui:include src="dialogs/notes/new/editThisNote.xhtml"/>    
+    
+    
 
     <ui:include src="dialogs/termeAssocies/termeAssocieEditDlg.xhtml"/>
     <ui:include src="dialogs/termeAssocies/termeAssocieSpecialEditDlg.xhtml"/>
@@ -75,6 +85,11 @@
     <ui:include src="dialogs/Alignement/ajouterParLot_suiteEditDlg.xhtml"/>
     <ui:include src="dialogs/Alignement/ajouterParLotEditDlg.xhtml"/>
     <ui:include src="dialogs/Alignement/finalizeDlg.xhtml"/>
+    
+    <!-- nouvelle interface d'alignement -->
+    <ui:include src="dialogs/Alignement/auto/addAlignment.xhtml"/>    
+    <ui:include src="dialogs/Alignement/auto/addAlignmentByStep.xhtml"/>     
+    
 
     <ui:include src="dialogs/gps/finalizeGPSDlg.xhtml"/>
 
@@ -93,6 +108,10 @@
     <ui:include src="dialogs/facette/addToFacetteDlg.xhtml" />            
     <ui:include src="dialogs/image/imageDlg.xhtml" />
     <ui:include src="dialogs/image/deleteImageDlg.xhtml" />
+    <ui:include src="dialogs/externalResources/imageGaleriaDlg.xhtml" />  
+    <ui:include src="dialogs/externalResources/addExternalImage.xhtml" /> 
+    <ui:include src="dialogs/externalResources/deleteExternalImages.xhtml" /> 
+    
 
 
     <ui:include src="dialogs/user/oublieMPEditDlg.xhtml"/>
@@ -104,6 +123,8 @@
     <ui:include src="dialogs/gps/gpsParLot_suiteEditDlg.xhtml"/>
     
     <ui:include src="admin/reorganizing.xhtml"/>
+    <ui:include src="dialogs/copyAndPaste/copyAndPastebetweenTheso.xhtml"/>
+    
     
 
 </ui:composition>

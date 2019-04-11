@@ -29,7 +29,7 @@
                 </p:panelGrid>
                 <p:panelGrid columns="2"  styleClass="ui-noborder" rendered="#{!newtreeBean.editPassed}"> 
                     <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{newtreeBean.editNomT()}" 
-                                     update=":accordeonTree,:panContenu,:confirm" styleClass="styleButton" />
+                                     update=":accordeonTree,:panContenu,:confirm, :messages" styleClass="styleButton" />
 
                     <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>
 
@@ -42,7 +42,7 @@
                     </p:panelGrid>
                     <p:panelGrid columns="2" styleClass="ui-noborder"> 
                         <p:commandButton id="cbEditForced" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{newtreeBean.renameWithoutControl()}" 
-                                         update=":idConceptEditDlg,:accordeonTree,:panContenu,:confirm" styleClass="styleButton" oncomplete="PF('conceptEditDlg').hide();" >
+                                         update=":idConceptEditDlg,:accordeonTree,:panContenu,:confirm, , :messages" styleClass="styleButton" oncomplete="PF('conceptEditDlg').hide();" >
                         </p:commandButton>
                         <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>                        
                     </p:panelGrid> 

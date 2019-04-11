@@ -1,0 +1,86 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddNewNTDlg"  header="#{langueBean.getMsg('index.NT')}" widgetVar="addNewNTDlg" modal="true" resizable="false" >
+        <!-- Cas de la modification du nom du terme -->
+        <h:panelGroup id="confirmAddConcept">        
+        <h:form >
+            <h:panelGroup id="confirm1" rendered="#{!narrowerTerm.duplicate}">  
+                    <p:messages showDetail="true">
+                        <p:autoUpdate />
+                    </p:messages>  
+
+                <fieldset>
+                    <legend><h:outputText value="#{langueBean.getMsg('popup.addNewTerm')}"/></legend>
+
+                    <p:panelGrid styleClass="ui-noborder">
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center; color: darkred; font-size: 13px;">
+                                <h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" />
+                            </p:column>
+                        </p:row>                      
+                        <p:row>
+                            <p:column colspan="1">
+                                <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
+                            </p:column>
+                            <p:column colspan="1">
+                                <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="concept"
+                                                forceSelection="false" active="true"  queryDelay="1000" scrollHeight="300" 
+                                                itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverterLexical">
+                                    <p:column>
+                                        <h:outputText value="#{concept.idConcept}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{concept.prefLabel}" />
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{concept.groupLexicalValue}" />
+                                    </p:column>
+                                </p:autoComplete>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="1">
+                                <h:outputText  value="#{langueBean.getMsg('NT.relation')}" title="#{langueBean.getMsg('NT.relationType')}" />
+                            </p:column>
+                            <p:column colspan="1">
+                                <p:selectOneMenu id="selectRelation" value="#{narrowerTerm.relationType}"  style="width:135px;">
+                                    <f:selectItems value="#{narrowerTerm.typesRelationsNT}" var="typesNT"
+                                                   itemLabel="#{typesNT.description_fr}" itemValue="#{typesNT.relationType}"/>
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center;">
+                                <p:commandButton id="cbAjConcept" 
+                                                 icon="ui-icon-ok-24" styleClass="styleButton_db"
+                                                 title="#{langueBean.getMsg('cdt.btnValid')}"
+                                                 action="#{narrowerTerm.newTSpe(selectedTerme.idTheso)}" 
+                                                 update=":accordeonTree,:panContenu,:confirmAddConcept, :messages">
+                                </p:commandButton>
+                            </p:column>
+                        </p:row>                        
+                    </p:panelGrid>
+                </fieldset>
+            </h:panelGroup>
+
+            <h:panelGroup id="confirm2" rendered="#{narrowerTerm.duplicate}">
+                <p:panelGrid columns="1" styleClass="ui-noborder"> 
+                    <h:outputText value="#{langueBean.getMsg('autoComp.dupplicate')}" />
+                </p:panelGrid>
+                <p:panelGrid columns="2" styleClass="ui-noborder"> 
+                    <p:commandButton id="cbEditForced" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{narrowerTerm.newTSDupplicated()}" 
+                                     update=":idAddNewNTDlg,:accordeonTree,:panContenu, :messages" styleClass="styleButton" oncomplete="PF('addNewNTDlg').hide();" >
+                    </p:commandButton>
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" action="#{narrowerTerm.init()}" update=":idAddNewNTDlg" oncomplete="PF('addNewNTDlg').show();"  immediate="true"/>                        
+                </p:panelGrid> 
+            </h:panelGroup>
+          
+        </h:form>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>

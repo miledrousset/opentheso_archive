@@ -14,7 +14,8 @@
                          selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="false" droppable="false" widgetVar="treeWidgetVar">
                     <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
-                    <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport"   >
+                    <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
+                            :panExport,:externalResources,:idImageGaleriaDlg"   >
                     </p:ajax>
                     <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag" />                       
                     <p:treeNode ariaLabel="#{node}" type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
@@ -74,14 +75,16 @@
                 </p:tree>  
                 <p:tree  id="tree" rendered="#{currentUser.user != null
                                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}"
-                         styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"  style="font-size:13px;    white-space: nowrap;" 
-                         selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" widgetVar="treeWidgetVar">
+                         styleClass="styleTree" value="#{newtreeBean.root}" var="node" dynamic="true" cache="true"
+                         style="font-size:13px;    white-space: nowrap;" 
+                         selectionMode="single"  selection="#{newtreeBean.selectedNode}" animate="true" draggable="true" droppable="true" 
+                         widgetVar="treeWidgetVar">
                     <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
 
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag">                       
                     </p:ajax>
-                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport" 
+                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport,:accordeonTree,:externalResources,:idImageGaleriaDlg" 
                             listener="#{newtreeBean.onNodeSelect}"/>
                     <p:treeNode type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close"  >  

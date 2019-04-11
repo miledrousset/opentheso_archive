@@ -13,48 +13,84 @@
 
         <div class="contenuTerme">
             <div id="imageEdition">
+                                   
                 <h:form id="formEditTInfo" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and
                                                        (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
                                                        and (selectedTerme.idDomaine != 'Orphan')}">
+
+                    
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" update=":idGpsEditDlg"/>
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
-                          
-                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" action="#{newtreeBean.init()}" value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                       
+                        <p:menuitem rendered="#{selectedTerme.status == 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}" 
+                                    action="#{newtreeBean.reactivConcept()}" value="#{langueBean.getMsg('index.btnReacCpt')}"
+                                    update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" style="font-size: 12px;"/>                        
                         
-                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"  value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and !newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"
+                                    action="#{newtreeBean.init()}" value="#{langueBean.getMsg('edit.rename')}" update=":idConceptEditDlg"
+                                    oncomplete="PF('conceptEditDlg').show();" style="font-size: 12px;"/>
+                        
+                        <p:menuitem rendered="#{selectedTerme.status != 'hidden' and newtreeBean.isGroup() or newtreeBean.isSubGroup() }"
+                                    value="#{langueBean.getMsg('edit.rename')}" update=":idRenameGroupDlg" oncomplete="PF('renameGroupDlg').show();" style="font-size: 12px;"/>
                         
                         <p:menuitem rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and !newtreeBean.isHaveChildren()}"
                                     value="#{langueBean.getMsg('edit.delete')}" update=":idConceptDeleteDlg" oncomplete="PF('conceptDeleteDlg').show();" style="font-size: 12px;"/>                        
                         
-                        <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
+                        
+                        
+                        <p:separator/>
+                        <p:menuitem rendered="#{selectedTerme.idDomaine != 'Orphan'}"
+                                    value="Couper/déplacer" title="déplacer le concept ou la branche" 
+                                    update=":messages" actionListener="#{copyAndPaste.copy(newtreeBean.selectedNode, selectedTerme.nom)}" style="font-size: 12px;"/>                           
+                        
+                        <p:menuitem rendered="#{copyAndPaste.isCopyOn and selectedTerme.idDomaine != 'Orphan'}" value="Coller ici: #{copyAndPaste.conceptValueToCopy}" 
+                                    title="coller ici la branche qui a été copié"
+
+                                    action="#{newtreeBean.onDragDropByCopy(copyAndPaste.draggedNode, newtreeBean.selectedNode)}"
+                                    oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag, :messages"
+                                    style="font-size: 12px;"/>    
+                        <p:separator/>                        
+                        
+                        
+                        
+                        
+                        <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" 
+                                    oncomplete="PF('notationEditDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('index.histo')}" onclick="PF('dlgHisto').show();" style="font-size: 12px;"/>
 
 
-                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}" onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
-                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.depreciateCpt')}"
+                                    onclick="PF('conceptDeprecateDlg').show();" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.type != 1 and selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('index.fusion')}" 
+                                    onclick="PF('conceptFusionDlg').show();" style="font-size: 12px;"/>
                         <p:menuitem rendered="#{selectedTerme.type != 1 }" value="#{langueBean.getMsg('concept.setId')}" onclick="PF('reGenerateConceptIdDlg').show();" style="font-size: 12px;"/>
                         
                         <p:menuitem rendered="#{selectedTerme.type != 1 }" value="#{langueBean.getMsg('concept.setIdArk')}" onclick="PF('reGenerateConceptArkIdDlg').show();" style="font-size: 12px;"/>
+                        
 
-                        <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-                        <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" update=":panContenu,:accordeonTree" style="font-size: 12px;" />
-                        <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" style="font-size: 12px;" update=":idModifTypeGroupDlg"/>
-                        <p:menuitem rendered="#{newtreeBean.isSubGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" value="#{langueBean.getMsg('numerotation.header')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"  update=":idGroupNumerotationDlg, :accordeonTree" />
-                        <p:menuitem rendered="#{newtreeBean.isGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" value="#{langueBean.getMsg('numerotation.header2')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"  update=":idGroupNumerotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" 
+                                    value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" 
+                                    update=":panContenu,:accordeonTree" style="font-size: 12px;" />
+                        <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" 
+                                    value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" 
+                                    update=":panContenu,:accordeonTree" style="font-size: 12px;" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" 
+                                    oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" 
+                                    style="font-size: 12px;" update=":idModifTypeGroupDlg"/>
+                        <p:menuitem rendered="#{newtreeBean.isSubGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" 
+                                    value="#{langueBean.getMsg('numerotation.header')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"
+                                    update=":idGroupNumerotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" 
+                                    value="#{langueBean.getMsg('numerotation.header2')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;" 
+                                    update=":idGroupNumerotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup() or newtreeBean.isSubGroup()}"
+                                     value="#{langueBean.getMsg('concept.setIdArk')}" onclick="PF('reGenerateGroupArkIdDlg').show();" style="font-size: 12px;"/>
                         
-                        <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.thisGroup')}" styleClass="cbSeparateMenu">
-                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idConceptMoveBranchDlg" oncomplete="PF('conceptMoveBranchDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.selectedNode.isTopConcept)}" value="#{langueBean.getMsg('panel.moveBrancheFromGroup')}" update=":idConceptMoveBranchFromGroupDlg" oncomplete="PF('conceptMoveBranchFromGroupDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(!selectedTerme.selectedNode.isTopConcept) and (!selectedTerme.selectedNode.isGroup)and (!selectedTerme.selectedNode.isSubGroup)}" value="#{langueBean.getMsg('panel.moveBrancheToGroup')}" update=":idConceptMoveBranchToGroupDlg" oncomplete="PF('conceptMoveBranchToGroupDlg').show();" style="font-size: 12px;"/>
-                        </p:submenu>
+
                         
                         
                         
-                        <p:submenu rendered="#{(selectedTerme.type != 1) }" label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
-                            <p:menuitem rendered="#{(selectedTerme.type == 3) and (selectedTerme.termeGenerique.size() > 0) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroup')}" update=":idMoveBranchToConceptOtherGroupDlg" oncomplete="PF('moveBranchToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.selectedNode.isTopConcept) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupFromGroup')}" update=":idMoveBranchFromTopTermToConceptOtherGroupDlg" oncomplete="PF('moveBranchFromTopTermToConceptOtherGroupDlg').show();" style="font-size: 12px;"/>
-                            <p:menuitem rendered="#{(selectedTerme.type != 1) }" value="#{langueBean.getMsg('panel.moveBrancheOtherGroupToGroup')}" update=":idMoveBranchToGroupOfOtherGroupDlg" oncomplete="PF('moveBranchToGroupOfOtherGroupDlg').show();" style="font-size: 12px;"/>
-                        </p:submenu>
+
 
                         
                         
@@ -65,12 +101,21 @@
 
                     </p:menu>
                 </h:form>
+                <h:form id="reloadTree" rendered="#{(selectedTerme.idC != null)}">
+                    <p:commandButton id="reloadTree" styleClass="cbEdit" icon="ui-icon-tree2-24" actionListener="#{newtreeBean.reloadTree()}" 
+                            title="Se replacer dans l'arbre" update=":accordeonTree,:panContenu" oncomplete="srollToSelected()"/>
+                </h:form>                 
                 <!--options pour les orphelins -->
-                <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and (roleOnTheso.isAdminOnThisTheso) and (selectedTerme.idDomaine == 'Orphan')}">
+                <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and
+                                                       (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                                       and (selectedTerme.idDomaine == 'Orphan')}">
                     <p:commandButton id="cbEditThesoTInfo" styleClass="cbEdit" icon="ui-icon-edit-16" />
                     <p:menu style="background: #CEF0C4" overlay="true" trigger="cbEditThesoTInfo" my="left top" at="left bottom">
                         <p:menuitem rendered="#{selectedTerme.status != 'hidden'}" value="#{langueBean.getMsg('btnEdit')}" actionListener="#{vue.setAddTInfo(1)}" update=":panPopUp" style="font-size: 12px;"/>
-                        <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}" actionListener="#{conceptbean.setDeleteBranchOrphan(1)}" update=":conceptPopUp,:accordeonTree" style="font-size: 12px;"/>
+                        <p:menuitem rendered="#{selectedTerme.idDomaine == 'Orphan'}" value="#{langueBean.getMsg('index.delOrphan')}"
+                                    
+                                    update=":idDeleteBranchOrphan" oncomplete="PF('deleteBranchOrphan').show();"
+                                     style="font-size: 12px;"/>
 
                         <p:menuitem rendered="#{(selectedTerme.type == 3) }" value="#{langueBean.getMsg('panel.moveBranche')}" update=":idMoveBranchFromOrphanDlg" oncomplete="PF('moveBranchFromOrphanDlg').show();" style="font-size: 12px;"/>
 
@@ -170,12 +215,20 @@
                                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
                                               value="#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}" styleClass="linkSmall"/>
                                 <h:graphicImage value = "#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
+                                <br/>
+                            </h:outputLink>
+                        </span>
+                        <span>
+                            <h:outputLink rendered="#{(selectedTerme.idHandle != null) and (selectedTerme.idHandle != '')}"
+                                          value="https://hdl.handle.net/#{selectedTerme.idHandle}" styleClass="linkSmall">
+                                <h:outputText rendered="#{(selectedTerme.idHandle != null) and (selectedTerme.idHandle != '')}"
+                                              value="https://hdl.handle.net/#{selectedTerme.idHandle}" styleClass="linkSmall"/>
                             </h:outputLink>
                         </span>
 
-
                         <!-- cas où l'Id Ark est vide, alors on affiche l'URL interne -->
-                        <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"
+                        <h:outputLink rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')
+                                                  and (selectedTerme.idHandle == '')}"
                                       value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.getLienTerme()}" target="blanc" styleClass="linkSmall">
                             <span>
                                 <h:outputText rendered="#{(selectedTerme.idArk == '') and (selectedTerme.idC != null) and (selectedTerme.idC != '')}"

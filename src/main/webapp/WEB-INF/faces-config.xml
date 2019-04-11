@@ -109,6 +109,5 @@
         <filter-name>PrimeFaces FileUpload Filter</filter-name>
         <servler-name>Faces Servlet</servler-name>
     </filter-mapping>
-
 </faces-config>
 

@@ -59,6 +59,7 @@
             <ui:include src="dialogs/candidat/editCandidatDlg.xhtml"/> 
             <ui:include src="dialogs/candidat/validateCandidatDlg.xhtml"/>
             <ui:include src="dialogs/candidat/insertCandidatDlg.xhtml"/>
+            <ui:include src="dialogs/candidat/importCandidateDlg.xhtml"/>            
             
 
         </div>
@@ -76,7 +77,7 @@
 
                     <!-- Pour afficher mes candidats -->
                     <h:form id="myCandidat">
-                        <h:panelGrid columns="4" style="margin-bottom:10px; color: green; " cellpadding="5">
+                        <h:panelGrid columns="5" style="margin-bottom:10px; color: green; " cellpadding="5">
                             <h:outputText value="#{langueBean.getMsg('cdt.TCdt')}"/>
                             <p:selectBooleanCheckbox value="#{theso.mesCandidats}" >
                                 <p:ajax  listener="#{theso.listeCandidats()}" />
@@ -87,6 +88,11 @@
                                                  actionListener="#{selectedCandidat.initNewProposal()}"
                                                  update=":idAddCandidateDlg" oncomplete="PF('addCandidateDlg').show();"
                                                  title="#{langueBean.getMsg('cdt.btnAddCdt')}"/>
+                            
+                            <p:commandButton rendered="#{(roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
+                                             id="cbImportCandidat" styleClass="styleButton_db"  icon="ui-icon-import-16" 
+                                                 update=":idImportCandidateDlg" oncomplete="PF('importCandidateDlg').show();"
+                                                 title="Importer une liste de candidats au format SKOS"/>                            
                         </h:panelGrid>
                     </h:form>
 

@@ -10,7 +10,7 @@
 
         <div id="divGenerale">
             <div class="titreNote">
-                <h:form id="allNotes">
+                <h:form id="editNotes">
                     <table>
                         <tr>
                             <td style="text-align: right">
@@ -19,7 +19,7 @@
 
                                 <p:commandLink  value = "#{note.icon}" title="#{langueBean.getMsg('index.viewAllNotes')}" 
                                                 styleClass="linkSmall" 
-                                                actionListener="#{note.valide(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}" update=":note, :allNotes"/>  
+                                                actionListener="#{note.valide(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}" update=":editNotes,:note"/>  
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                     
 
                             </td> 
@@ -31,10 +31,23 @@
                             <div id="imageEdition">
                                     <p:commandButton id="dynaButtonNote" rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and
                                                     (currentUser.user.name != null) and (selectedTerme.idC != null) and 
-                                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)
+                                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso || roleOnTheso.isContributorOnThisTheso)
                                                     and (selectedTerme.idDomaine != 'Orphan')}"
                                                      styleClass="cbEdit" icon="ui-icon-edit-16">
                                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonNote" my="left top" at="left bottom">
+                                            
+                                       
+                                            <p:menuitem value="new Note" disabled="true"
+                                                        action="#{note.startInit()}"
+                                                        update=":idNewNoteDlg"
+                                                        oncomplete="PF('newNoteDlg').show();" style="font-size: 12px;"/>                                            
+                                            
+                                            <p:menuitem value="edit Note" disabled="true"
+                                                        action="#{note.startInit()}"
+                                                        update=":idEditNotes"
+                                                        oncomplete="PF('editNotes').show();" style="font-size: 12px;"/>                                              
+                                            
+                                            
                                             <p:menuitem value="#{langueBean.getMsg('index.note5')}" 
                                                         action="#{note.majNotes(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
                                                         update=":idNoteEditDlg"
@@ -65,6 +78,13 @@
                 </h:form>
             </div>
 
+            <!--
+                                                        <p:menuitem value="Ajouter une note" 
+                                                        action="{note.startInit()}"
+                                                        update=":idNewNoteDlg"
+                                                        oncomplete="PF('newNoteDlg').show();" style="font-size: 12px;"/> 
+            -->
+            
             <!-- affichage des notes de la langue en cours -->
             <div class="contenuNote">
                 <!-- &lt;br/&gt; pour afficher <br/> -->

@@ -1,0 +1,65 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <p:dialog id="idEditNotes"  header="#{langueBean.getMsg('index.note5')}" widgetVar="editNotes" modal="true" resizable="true" >
+            <!-- Gestion de la note -->
+            <h:form>
+                <h:selectOneMenu value="#{note.selectedTypeNote}"  style="font-family:'Palatino linotype',Times,serif;">
+                    <f:selectItems value="#{note.noteTypes}" var="noteType" itemLabel="#{noteType.label_fr}" itemValue="#{noteType.codeNote}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu value="#{note.selectedLang}" style="font-family:'Palatino linotype',Times,serif;">
+                    <f:selectItems value="#{theso.languesTheso}"/>
+                </h:selectOneMenu><br/>
+
+                <h:panelGroup id="listUsers" rendered="#{currentUser.user.isSuperAdmin or  roleOnTheso.isAdminOnThisTheso}"> 
+                    <fieldset class="fieldNotes">
+                        <legend><h:outputText value="notes" /></legend>
+
+                        <p:dataTable id="tabNotes" 
+                                     value="#{note.filteredNotes}" var="filteredNote" scrollable="true"  resizableColumns="true" scrollHeight="450" 
+                                     style="font-family:'Palatino linotype',Times,serif;">
+
+                            <p:column colspan="4">
+                                    <h:outputText  value="#{filteredNote.lexicalvalue}" />
+                            </p:column>
+
+                            <p:column width="10">
+
+                                <h:form>
+                                    <p:commandButton id="cbEditUser" styleClass="cbSupp"
+                                                     title="#{langueBean.getMsg('conf.popup1Title')}" icon="ui-icon-edit-16" 
+                                                     actionListener="#{note.editNote(filteredNote.id_note)}" update=":idEditThisNote" oncomplete="PF('editThisNote').show();"/>
+                                </h:form>
+                                    
+                            </p:column>
+
+                            <p:column width="10" >
+                                <h:form>
+                                    <p:commandButton id="cbSuppTheso"  styleClass="cbSupp"
+                                                     title="#{langueBean.getMsg('profile.deleteUser')}"
+                                                     icon="ui-icon-delete-16" actionListener="#{note.delThisNote(filteredNote.id_note)}" update=":idEditThisNote, :messages" >
+                                        <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('conf.valid1')}" icon="ui-icon-alert" />  
+                                    </p:commandButton>  
+
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                        <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                        <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                                    </p:confirmDialog> 
+                                </h:form>
+                            </p:column>
+                        </p:dataTable>            
+
+
+                    </fieldset>
+                </h:panelGroup>  
+
+            </h:form>        
+        </p:dialog>
+    </ui:composition>

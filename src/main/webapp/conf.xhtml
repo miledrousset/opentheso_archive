@@ -13,10 +13,10 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" media="screen" />
     </h:head>
     <h:body>
-         <style >
+        <style >
             div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:nth-child(4){
-               border: 3px  solid #956620;
-               box-shadow:0px 0px 5px #BD6060;
+                border: 3px  solid #956620;
+                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
 
@@ -25,122 +25,129 @@
             Depuis cette page, les administrateurs peuvent gérer les péférences du logiciel et des thésaurus.
             <br/><br/>
         </p:dialog>  
-       
+
         <div id="menuHead">
             <div id="menuHeadTop">
-            <ui:include src="logo.xhtml" />
-            <h:panelGroup rendered="#{currentUser.user != null}">
-                <div id="disconnect">
-                    <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
-                </div>
-            </h:panelGroup>            
+                <ui:include src="logo.xhtml" />
+                <h:panelGroup rendered="#{currentUser.user != null}">
+                    <div id="disconnect">
+                        <h:outputText value="#{langueBean.getMsg('menu.account1')} : #{currentUser.user.name}"/>
+                    </div>
+                </h:panelGroup>            
                 <!--<ui:include src="account.xhtml" />-->
-            <ui:include src="menuThesaurus.xhtml" />
-            <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
+                <ui:include src="menuThesaurus.xhtml" />
+                <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
             </div>
         </div>
 
         <h:panelGroup id="confAll">
 
-        <!-- gestion des actions pour les admins par thésaurus (accessible aux admins et au SuperAdmins) -->
-        <div id="principaleConf">
+            <!-- gestion des actions pour les admins par thésaurus (accessible aux admins et au SuperAdmins) -->
+            <div id="principaleConf">
 
-            <h:panelGroup rendered="#{roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin}">
-                <fieldset class="fieldUser">
-                    <h:form id="formPrefAdmin">
-                    <p:dataTable id="tabPrefsAdmin" rendered="#{roleOnTheso.idTheso != null}"
-                                 value="#{conf.nodePrefsAdmins}" var="prefsAdmin" scrollable="true" resizableColumns="true" scrollHeight="260" style="font-family:'Palatino linotype',Times,serif;">
-                        <f:facet name="header">
-                        </f:facet> 
-                        <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (admin)" >
-                            <h:outputText value="#{prefsAdmin.pref}"/>
-                        </p:column>
-                        
+                <h:panelGroup rendered="#{roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin}">
+                    <fieldset class="fieldUser">
+                        <h:form id="formPrefAdmin">
+                            <p:dataTable id="tabPrefsAdmin" rendered="#{roleOnTheso.idTheso != null}"
+                                         value="#{conf.nodePrefsAdmins}" var="prefsAdmin" scrollable="true" resizableColumns="true" scrollHeight="260" style="font-family:'Palatino linotype',Times,serif;">
+                                <f:facet name="header">
+                                </f:facet> 
+                                <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (admin)" >
+                                    <h:outputText value="#{prefsAdmin.pref}"/>
+                                </p:column>
 
-                        <p:column width="20" >
-                            <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
-                                              title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
-                                <f:setPropertyActionListener value="#{prefsAdmin}" target="#{conf.selectedPrefAdmin}" />
-                            </p:commandButton>
-                        </p:column>
-                    </p:dataTable>
-                    </h:form>
-                    <!-- actions superAdmin -->
-                    <h:form id="formPrefSuperAdmin" rendered="#{currentUser.user.isSuperAdmin}">
-                        <p:dataTable id="tabPrefsSuperAdmin" 
-                                     value="#{conf.nodePrefsSuperAdmins}" var="prefsSuperAdmin" scrollable="true" resizableColumns="true" scrollHeight="100" style="font-family:'Palatino linotype',Times,serif;">
-                            <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (superAdmin)" style="color: #BD6060" >
-                                <h:outputText value="#{prefsSuperAdmin.pref}"/>
-                            </p:column>                       
-                            <p:column width="20" >
-                                <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
-                                         title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
-                                    <f:setPropertyActionListener value="#{prefsSuperAdmin}" target="#{conf.selectedPrefSuperAdmin}" />
-                                </p:commandButton>
-                            </p:column>
-                        </p:dataTable>
-                   </h:form>                    
-                </fieldset>
-            </h:panelGroup>
-            
-            <!-- vue Admins -->
-            
-            <!-- vue preférences générales -->
-            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '1'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/preference.xhtml" />
-                </fieldset>
-            </h:panelGroup>
-            <!-- vue regénérer des nouveaux identifiants -->            
-            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '2'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/regenerateAllConceptId.xhtml" />
-                </fieldset>
-            </h:panelGroup>            
 
-            
-            <!-- vue ajout de copyright -->            
-            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '3'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/copyrightEdit.xhtml" />
-                </fieldset>                
-            </h:panelGroup>
-            
-            <!-- vue ARK -->            
-            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '4'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/regenerateArkId.xhtml" />
-                </fieldset>                
-            </h:panelGroup>
-            
-            <!-- vue Handle -->            
-            <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '5'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/regenerateHandleId.xhtml" />
-                </fieldset>                
-            </h:panelGroup>             
-            
-            
-            <!-- vue SuperAdmins -->
-            
-            <!-- vue sparql -->            
-            <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '1'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/sparqlPreference.xhtml" />
-                </fieldset>                
-            </h:panelGroup>
-            
-            <!-- vue BDD -->            
-            <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '2'}" >
-                <fieldset class="fieldUser">
-                    <ui:include src="admin/prefs/miseAJourBDD.xhtml" />
-                </fieldset>                
-            </h:panelGroup>               
-            
-            
-            
+                                <p:column width="20" >
+                                    <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                                      title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
+                                        <f:setPropertyActionListener value="#{prefsAdmin}" target="#{conf.selectedPrefAdmin}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                        <!-- actions superAdmin -->
+                        <h:form id="formPrefSuperAdmin" rendered="#{currentUser.user.isSuperAdmin}">
+                            <p:dataTable id="tabPrefsSuperAdmin" 
+                                         value="#{conf.nodePrefsSuperAdmins}" var="prefsSuperAdmin" scrollable="true" resizableColumns="true" scrollHeight="100" style="font-family:'Palatino linotype',Times,serif;">
+                                <p:column headerText="#{langueBean.getMsg('conf.modifPref')}: #{theso.thesaurus.title} (superAdmin)" style="color: #BD6060" >
+                                    <h:outputText value="#{prefsSuperAdmin.pref}"/>
+                                </p:column>                       
+                                <p:column width="20" >
+                                    <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                                      title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" update=":confAll"  actionListener="#{conf.clearSelect()}">
+                                        <f:setPropertyActionListener value="#{prefsSuperAdmin}" target="#{conf.selectedPrefSuperAdmin}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>                    
+                    </fieldset>
+                </h:panelGroup>
 
-        </div>
+                <!-- vue Admins -->
+
+                <!-- vue preférences générales -->
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '1'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/preference.xhtml" />
+                    </fieldset>
+                </h:panelGroup>
+                <!-- vue regénérer des nouveaux identifiants -->            
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '2'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/regenerateAllConceptId.xhtml" />
+                    </fieldset>
+                </h:panelGroup>            
+
+
+                <!-- vue ajout de copyright -->            
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '3'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/copyrightEdit.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>
+
+                <!-- vue ARK -->            
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '4'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/regenerateArkId.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>
+
+                <!-- vue Handle -->            
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '5'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/regenerateHandleId.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>       
+                
+                <!-- vue Id alphanumeric To Numeric -->            
+                <h:panelGroup rendered="#{conf.selectedPrefAdmin.id == '6'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/alphanumericToNumeric.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>                  
+
+
+                <!-- vue SuperAdmins -->
+
+                <!-- vue sparql -->            
+                <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '1'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/sparqlPreference.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>
+
+                <!-- vue BDD -->            
+                <h:panelGroup rendered="#{conf.selectedPrefSuperAdmin.id == '2'}" >
+                    <fieldset class="fieldUser">
+                        <ui:include src="admin/prefs/miseAJourBDD.xhtml" />
+                    </fieldset>                
+                </h:panelGroup>               
+
+
+
+
+            </div>
         </h:panelGroup>
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">

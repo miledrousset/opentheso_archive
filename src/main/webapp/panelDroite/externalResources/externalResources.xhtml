@@ -1,0 +1,44 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+    <div id="image2">
+        <h:panelGroup id="externalResources">
+            <div id="titreSplinter">
+                <h:outputText value="#{langueBean.getMsg('externalResources.images')}" /> 
+                <div id="imageEdition">
+                    <h:form id="editImages" rendered="#{(currentUser.user.name != null) and (selectedTerme.idC != null)
+                                                            and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso || roleOnTheso.isContributorOnThisTheso)
+                                                            and (selectedTerme.status != 'hidden') and (selectedTerme.idDomaine != 'Orphan')}">
+
+                        <p:commandButton id="externalImages1"  rendered="#{!newtreeBean.group and !newtreeBean.subGroup}" 
+                                         styleClass="cbEdit" icon="ui-icon-edit-16" >
+                            <p:menu style="background: #CEF0C4" overlay="true" trigger="externalImages1" my="left top" at="left bottom">
+                                <p:menuitem value="#{langueBean.getMsg('externalResources.addImage')}"  update=":idAddExternalImage" oncomplete="PF('addExternalImage').show();" style="font-size: 12px;"/>
+                                <p:menuitem value="#{langueBean.getMsg('externalResources.deleteImage')}" update=":idDeleteExternalImages" oncomplete="PF('deleteExternalImages').show();" style="font-size: 12px;" />
+                            </p:menu>
+                        </p:commandButton>   
+                    </h:form>
+                </div>
+                <div id="clean" />
+            </div>
+            <!-- div that will manage the online loaded images -->
+            <div id="imagesSwitcher2">
+                
+                <!-- image switcher to show and switch between the terme images loaded from the bean -->
+                <p:imageSwitch  style="margin-left: auto; margin-right: auto;" id="manuelSwitcher2" effect="shuffle">
+                    <ui:repeat  value="#{externalResources.images}" var="image" id="manuelSwitcherImages2">
+                        <p:graphicImage title="#{image}"                                         
+                                        value="#{image}" onclick="PF('imageGaleriaDlg').show()"
+                                        style="cursor: pointer;"
+                                        
+                                        width="200px" >
+                        </p:graphicImage>                       
+                    </ui:repeat>
+                </p:imageSwitch>              
+            </div>
+        </h:panelGroup>
+    </div>
+</ui:composition>

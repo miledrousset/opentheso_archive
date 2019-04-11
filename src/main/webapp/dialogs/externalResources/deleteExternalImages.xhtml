@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idDeleteExternalImages"  header="#{langueBean.getMsg('image.delete')}" widgetVar="deleteExternalImages" modal="true" resizable="false" >
+        <!-- effacer l'URI de l'image -->
+        
+        <table id="deleteImageUri">
+            <tr>
+                <th><h:outputText value="images" /></th>
+                <th></th>
+            </tr>
+            <ui:repeat value="#{externalResources.nodeImages}" var="nodeImage">
+                <tr>
+                    <td><h:outputText value="#{nodeImage.imageName}: #{nodeImage.uri}"  /></td>
+                    <td>
+                        <h:form>
+                            <p:commandButton id="cbSuppTradCpt" styleClass="cbSupp" icon="ui-icon-supp" 
+                                             actionListener="#{externalResources.deleteExternalImage(selectedTerme.idTheso, selectedTerme.idC, nodeImage.uri)}"  update=":contenuDroite1, :idDeleteExternalImages,:externalResources" >
+                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid6')}" icon="ui-icon-alert" />  
+                            </p:commandButton>  
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
+                            </p:confirmDialog> 
+                        </h:form>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+    </p:dialog>
+</ui:composition>

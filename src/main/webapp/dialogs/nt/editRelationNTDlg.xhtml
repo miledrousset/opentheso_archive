@@ -1,0 +1,43 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idEditRelationNTDlg"  header="#{langueBean.getMsg('NT.editRelations')}" widgetVar="editRelationNTDlg" modal="true" resizable="true" >
+        <h:panelGroup id="editRelation" rendered="#{roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin}">
+            <fieldset class="fielEditRelationNT">
+                <legend><h:outputText value="#{langueBean.getMsg('NT.editRelationFor')} #{newtreeBean.selectedTerme.nom}" /></legend>                
+                <h:form id="formEditRelations">
+                <p:dataTable id="tabEditRealtions" rendered="#{roleOnTheso.idTheso != null}"
+                             value="#{narrowerTerm.listNT}" var="termesNT" scrollable="true"
+                             resizableColumns="true" scrollHeight="260" style="font-family:'Palatino linotype',Times,serif;">
+                    <f:facet name="header">
+
+                    </f:facet> 
+                    <p:column width="20" headerText="id" >
+                        <h:outputText value="#{termesNT.idConcept}" title="id"/>
+                    </p:column>
+                    <p:column width="60" headerText="#{langueBean.getMsg('popup.terms')}" >
+                        <h:outputText value="#{termesNT.title}" title="#{langueBean.getMsg('popup.terms')}"/>
+                    </p:column>                    
+                    <p:column width="10" headerText="#{langueBean.getMsg('edit.attTheso6')}" >
+                        <h:outputText value="#{termesNT.role}" title="#{langueBean.getMsg('edit.attTheso6')}"/>
+                    </p:column>
+
+                    <p:column width="10" >
+                        <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                          title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" 
+                                          update=":idEditRelationNT_suiteDlg,:accordeonTree,:panContenu, :messages"
+                                          oncomplete="PF('editRelationNT_suiteDlg').show();">
+                            <f:setPropertyActionListener value="#{termesNT}" target="#{narrowerTerm.selectedNodeNT}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                </h:form>
+                 
+            </fieldset>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>

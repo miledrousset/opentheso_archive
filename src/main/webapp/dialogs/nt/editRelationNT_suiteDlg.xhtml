@@ -1,0 +1,44 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idEditRelationNT_suiteDlg"  header="#{langueBean.getMsg('NT.editRelations')}" widgetVar="editRelationNT_suiteDlg" modal="true" resizable="false" >
+        <h:form>
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('NT.editRelation')}" /></legend>
+                    <table>
+                        <tr>
+                            <td style="alignment-baseline: middle; color: green; font-style: oblique " >
+                                <h:outputText id="valueTerme1" escape="false" value="#{selectedTerme.nom} -> " />
+                                <h:outputText style="color: red" id="valueTerme2" escape="false" value="#{narrowerTerm.selectedNodeNT.role}" />
+                                <h:outputText id="valueTerme3" escape="false" value=" -> #{narrowerTerm.selectedNodeNT.title}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                <p:outputLabel for="selectRelation" value="#{langueBean.getMsg('NT.newRelation')}" />
+                                <p:selectOneMenu id="selectRelation" value="#{narrowerTerm.relationType}" >
+                                    <f:selectItems value="#{narrowerTerm.typesRelationsNT}" var="typesNT"
+                                                   itemLabel="#{typesNT.description_fr}" itemValue="#{typesNT.relationType}"/>
+                                </p:selectOneMenu>
+                            </td>
+                            <td>
+                                <p:commandButton id="cbAjTSpe" 
+                                                 icon="ui-icon-ok-16" styleClass="styleButton_db"
+                                                 title="#{langueBean.getMsg('cdt.btnValid')}"
+                                                 action="#{narrowerTerm.updateNewRelation(selectedTerme.idC, selectedTerme.idTheso)}" 
+                                                 update=":idEditRelationNT_suiteDlg,:editRelation, :messages" 
+                                                 oncomplete="PF('editRelationNT_suiteDlg').hide();">
+                                </p:commandButton>
+
+                            </td>
+                        </tr>
+                    </table>
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

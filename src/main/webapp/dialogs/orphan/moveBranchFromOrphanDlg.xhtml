@@ -31,7 +31,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.to')}" /> : </td>
                             <td>
                                 <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
+                                                itemLabel="#{t1.prefLabel}" itemValue="#{t1}" converter="fromMTconverter" forceSelection="true">
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" width="200" >
                                             <f:facet name="header" rendered="#{(t1.url) != null}">

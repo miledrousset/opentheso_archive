@@ -1,0 +1,53 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idCopyAndPastebetweenTheso"  header="#{langueBean.getMsg('tools.copyBranch')}" styleClass="styleText2" showEffect="fade" hideEffect="fade"  widgetVar="copyAndPastebetweenTheso">
+        <h:form>  
+            <span class="copyPaste">
+                <h:outputText style="font-size: 15px;font-weight:bold;color:#586400"
+                    rendered="#{(!newtreeBean.isGroup()) and (!newtreeBean.isSubGroup())}"
+                              value="#{langueBean.getMsg('tools.copyBranch')} : #{copyAndPastebetweenTheso.conceptValueToCopy}"/>
+                
+                <h:outputText style="font-size: 15px;font-weight:bold;color:#586400"
+                    rendered="#{(newtreeBean.isGroup()) or (newtreeBean.isSubGroup())}" 
+                              value="#{langueBean.getMsg('tools.copyGroup')} : #{copyAndPastebetweenTheso.conceptValueToCopy}"/>
+                <br/>
+                <h:outputText value="Coller la branche qui a été copié d'un autre thésaurus" />     
+            </span>
+
+            <br/>
+            <br/>
+            <h3 style="margin-top:0px">Récupérer les identifiants pérennes : </h3>
+            <p:panelGrid columns="1"  class="dragDropTable">
+                <p:selectOneMenu id="basic" value="#{copyAndPastebetweenTheso.identifierType}">
+                    <f:selectItem itemLabel="Non" itemValue="sans" />
+                    <f:selectItem itemLabel="Ark" itemValue="ark" />
+                    <f:selectItem itemLabel="Handle" itemValue="handle" />
+                </p:selectOneMenu>
+            </p:panelGrid>
+
+            <p:commandButton  rendered= "#{(!copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
+                                                        and (selectedTerme.idC != null)}"
+                    title="Coller la branche qui a été copié d'un autre thésaurus"
+                    update=":accordeonTree,:messages"
+                    icon="ui-icon-valider" styleClass="styleButton"
+                    action="#{copyAndPastebetweenTheso.paste(selectedTerme.idTheso, selectedTerme.idC, selectedTerme, roleOnTheso, newtreeBean)}"
+                    oncomplete="PF('copyAndPastebetweenTheso').hide();"
+                    />
+            
+            <p:commandButton  rendered ="#{(copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)}"
+                    title="Coller le Groupe qui a été copié d'un autre thésaurus"
+                    update=":accordeonTree,:messages"
+                    icon="ui-icon-valider" styleClass="styleButton"
+                    action="#{copyAndPastebetweenTheso.pasteGroup(roleOnTheso.idTheso, roleOnTheso, newtreeBean, theso)}"
+                    oncomplete="PF('copyAndPastebetweenTheso').hide();"
+                    />            
+        </h:form>          
+    </p:dialog>  
+</ui:composition>

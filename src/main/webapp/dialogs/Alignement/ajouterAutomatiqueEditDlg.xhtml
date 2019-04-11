@@ -19,7 +19,7 @@
                 </h:panelGrid>
                 <p:commandButton id="cbAjAlignAuto" value="#{langueBean.getMsg('conf.btnValid')}" 
                                  action="#{selectedTerme.creerAlignAuto(selectedTerme.idC, selectedTerme.nom)}"
-                                 update=":idAjouterAutomatique_suiteEditDlg"
+                                 update=":idAjouterAutomatique_suiteEditDlg, :messages"
                                  styleClass="styleButton" oncomplete="PF('ajouterAutomatiqueEditDlg').hide();PF('ajouterAutomatique_suiteEditDlg').show();"/>
                 
                 <p:commandButton id="AlignementManager_cancel" title="#{langueBean.getMsg('btnBack')}" 

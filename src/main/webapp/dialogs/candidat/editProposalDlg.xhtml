@@ -20,7 +20,7 @@
                             <td><h:outputText value="#{langueBean.getMsg('cdt.nvx')}" /> : </td>
                             <td>
                                 <p:autoComplete value="#{selectedCandidat.selectedNvx}" completeMethod="#{autoComp.completNvxCandidat}" var="tep" forceSelection="true"
-                                                itemLabel="#{tep.termLexicalValue}" itemValue="#{tep}" converter="termConverter" styleClass="styleAutoCompCdt">
+                                                itemLabel="#{tep.prefLabel}" itemValue="#{tep}" converter="termConverter" styleClass="styleAutoCompCdt">
                                     <f:facet name="itemtip">
                                         <h:panelGrid columns="2" cellpadding="5" width="200" >
                                             <f:facet name="header" rendered="#{(tep.url) != null}">

@@ -7,13 +7,21 @@
     </context-param>
     <context-param>
         <param-name>version</param-name>
-        <param-value>4.3.9</param-value>
+        <param-value>4.4.5</param-value>
     </context-param>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+<!--    
+    <servlet>
+        <servlet-name>ConnexionRest</servlet-name>
+        <servlet-class>mom.trd.opentheso.ws.rest.ConnexionRest</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>    
+    -->
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
@@ -28,7 +36,7 @@
     </filter-mapping>
     <session-config>
         <session-timeout>
-            30
+            60
         </session-timeout>
     </session-config>
     <welcome-file-list>

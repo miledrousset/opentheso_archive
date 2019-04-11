@@ -19,7 +19,7 @@
                                     <td><h:outputText value="#{langueBean.getMsg('popup.parent')}" /> : </td>
                                     <td>
                                         <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t4"
-                                                        itemLabel="#{t4.termLexicalValue}" itemValue="#{t4}" converter="termConverter" forceSelection="true">
+                                                        itemLabel="#{t4.prefLabel}" itemValue="#{t4}" converter="termConverter" forceSelection="true">
                                         <f:facet name="itemtip">
                                             <h:panelGrid columns="2" cellpadding="5" width="200" >
                                                 <f:facet name="header" rendered="#{(t4.url) != null}">

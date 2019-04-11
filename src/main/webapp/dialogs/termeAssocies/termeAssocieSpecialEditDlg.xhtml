@@ -15,7 +15,7 @@
                 <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
                 <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
                                 scrollHeight="300"
-                                itemLabel="#{t3.termLexicalValue}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
+                                itemLabel="#{t3.prefLabel}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
                     <f:facet name="itemtip">
                         <h:panelGrid columns="2" cellpadding="5" width="200" >
                             <f:facet name="header" rendered="#{(t3.url) != null}">

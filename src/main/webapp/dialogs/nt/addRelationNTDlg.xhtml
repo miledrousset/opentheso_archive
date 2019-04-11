@@ -13,7 +13,6 @@
                     </p:messages>  
             <fieldset>
                 <legend><h:outputText value="#{langueBean.getMsg('panel.addRelationNT')}" /></legend>
-                <h:form>
                     <table>
                       
                         <tr>
@@ -21,15 +20,15 @@
                             <td>
                                 <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationNT}" var="concept"
                                                 forceSelection="true" active="true"  queryDelay="1000" scrollHeight="300"
-                                                itemLabel="#{concept.termLexicalValue}" itemValue="#{concept}" converter="termConverter">
+                                                itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
                                     <p:column style="width:10%">
                                         <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}" style="color: green; font-style: italic"/>
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
                                     </p:column>
 
                                     <p:column style="width:60%">
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.termLexicalValue}" style="color: green; font-style: italic" />
-                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.termLexicalValue}" />
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}" style="color: green; font-style: italic" />
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.prefLabel}" />
                                     </p:column>
                                     <p:column>
                                         <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}" style="color: green; font-style: italic"/>
@@ -40,17 +39,13 @@
                         </tr>
                         <tr>
                             <td colspan="2" style="text-align: center;">
-                                <h:form>
-                                    <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newRelationNT()}" 
-                                                     update=":idAddRelationNTDlg,:accordeonTree,:panContenu, :messages" styleClass="styleButton"
-                                                     oncomplete="PF('addRelationNTDlg').hide();">
-                                    </p:commandButton>  
-                           </h:form>    
-
+                                <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newRelationNT()}" 
+                                                 update=":idAddRelationNTDlg,:accordeonTree,:panContenu, :messages" styleClass="styleButton"
+                                                 oncomplete="PF('addRelationNTDlg').hide();">
+                                </p:commandButton>  
                             </td>
                         </tr>
                     </table>
-                </h:form>
             </fieldset>
         </h:form>
     </p:dialog>

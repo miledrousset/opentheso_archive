@@ -20,7 +20,7 @@
                     <td><h:outputText value="#{langueBean.getMsg('popup.delCptReor')}" /> : </td>
                     <td>
                         <p:autoComplete id="fusionConcept" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="tFusion"
-                                        itemLabel="#{tFusion.termLexicalValue}" itemValue="#{tFusion}" converter="termConverter" forceSelection="true">
+                                        itemLabel="#{tFusion.prefLabel}" itemValue="#{tFusion}" converter="termConverter" forceSelection="true">
                             <f:facet name="itemtip">
                                 <h:panelGrid columns="2" cellpadding="5" width="200" >
                                     <f:facet name="header" rendered="#{(tFusion.url) != null}">

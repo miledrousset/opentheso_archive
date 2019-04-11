@@ -15,17 +15,38 @@
                     <tr>
                         <td>
                             <h:form >
-                                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="t1"
-                                                minQueryLength="2" itemLabel="#{t1.termLexicalValue}" itemValue="#{t1}" converter="termConverter"
-                                                a:placeholder="#{langueBean.getMsg('indexSearch')}" >
+                                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="values"
+                                                minQueryLength="1" itemLabel="#{values.prefLabel}" itemValue="#{values}" converter="termConverter"
+                                                scrollHeight="600"
+                                                a:placeholder="#{langueBean.getMsg('indexSearch')}"  style="font-size: 12px;">
+                                    <p:column rendered="#{values.isAltLabel}" style="font-size: 12px;">
+                                        <h:outputText title="#{values.idConcept}" value="#{values.altLabel}"
+                                                      style="font-style: italic; color: darkred" />
+                                        <h:outputText title="#{values.idConcept}" value=" -> #{values.prefLabel}" style="font-weight: bold;" />                                        
+                                    </p:column>
+
+                                    <p:column rendered="#{!values.isAltLabel}" style="font-size: 12px;">
+                                        <h:outputText title="#{values.idConcept}" value="#{values.prefLabel}" />
+                                    </p:column>
 
                                     <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" oncomplete="srollToSelected()"  
                                             update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
                                             />
                                 </p:autoComplete>
-                            </h:form></td>
+                            </h:form>
+                        </td>
+                        <td>
+                            <h:form>
+                            &nbsp;
+                            <p:commandButton id="sort" styleClass="cbEdit" icon="#{newtreeBean.iconSort}" title="#{langueBean.getMsg(newtreeBean.sortTitle)}" 
+                                             actionListener="#{newtreeBean.setSortNotation}" update=":accordeonTree"/>
+                            &nbsp;&nbsp;
+                            </h:form>
+                        </td>
+                        
                         <!-- gestion des domaines ou groupes --> 
                         <td align="left">
+                            
                             <h:form id="formAjDom" rendered="#{(currentUser.user != null) and (theso.getThisTheso() != null)
                                                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}">
                                 <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="#{langueBean.getMsg('cdt.MT')}"/>
@@ -36,18 +57,65 @@
                                 </p:menu>
                             </h:form>
                         </td>
-                        <!-- boite à outils admins-->
+                        <!-- boite à outils admins -->
                         <td align="right">
                             <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                 <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
                                 <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
                                     <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
                                     <p:separator />                                    
-                                    <p:menuitem style="background: #CEF0C4"  value="#{langueBean.getMsg('conf.alignGroup')}" action="#{newtreeBean.getGroupAndSubGroup(theso.thesaurus.language)}"   styleClass="styleButton" update=":idAlignGroupDlg" oncomplete="PF('alignGroupDlg').show();" />
+                                    
+                                    
+                                    
+                                    
 
+                                    
+                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (!newtreeBean.isGroup()) and (!newtreeBean.isSubGroup())
+                                                        and (selectedTerme.idC != null)}"
+                                        style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyBranch')}" 
+                                                title="!!! attention !!! Copie d'un thésaurus à un autre uniquement"
+                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
+                                                action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
+                                                          selectedTerme.idC,selectedTerme.nom, true, false)}"/>  
+                                    
+                                    
+                                
+                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (newtreeBean.isGroup() or newtreeBean.isSubGroup())}"
+                                        style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyGroup')}" 
+                                                title="!!! attention !!! Copie du groupe d'un thésaurus à un autre uniquement"
+                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
+                                                action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
+                                                          selectedTerme.idC, selectedTerme.nom ,false, true)}"/>
+
+
+                                    
+                                    
+                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
+                                                        and (selectedTerme.idC != null)}"
+                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteBranch')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
+                                                title="Coller la branche qui a été copié d'un autre thésaurus"
+                                                styleClass="styleButton" 
+                                                update=":idCopyAndPastebetweenTheso" 
+                                                oncomplete="PF('copyAndPastebetweenTheso').show();"/>  
+                                    
+                                    <p:menuitem rendered ="#{(copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)}"
+                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteGroup')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
+                                                title="Coller le Groupe qui a été copié d'un autre thésaurus"
+                                                styleClass="styleButton"
+                                                update=":idCopyAndPastebetweenTheso" 
+                                                oncomplete="PF('copyAndPastebetweenTheso').show();"/>                                    
+                                    
+                                    <p:menuitem rendered ="#{copyAndPastebetweenTheso.isCopyOn}"
+                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.cancelCopy')}" 
+                                                title=" Annuler l'action de copie"
+                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
+                                                action="#{copyAndPastebetweenTheso.initInfo()}"/>                                    
                                 </p:menu>
                             </h:form>
-                        </td>                
+                        </td>
+                       
                     </tr>
                 </table>
 

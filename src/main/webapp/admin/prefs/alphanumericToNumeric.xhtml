@@ -1,0 +1,35 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <!--    <p:dialog id="idRegenerateHandleId"  header="{langueBean.getMsg('admin.regenerateHandle')}" widgetVar="regenerateHandleId"
+                  modal="true" resizable="true" width="350" height="200" >-->
+    <div >
+
+        <h:panelGroup id="idAlphanumericToNumeric" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
+            <h:form id="formAlphanumericToNumeric">
+                <fieldset class="fieldReorga">
+                    <legend><h:outputText value="#{langueBean.getMsg('admin.regenerateHandle')}" /></legend>
+                    <h:outputText value="#{langueBean.getMsg('admin.regenerateHandle.help')}" />
+                </fieldset>
+                <center>
+                    <p:commandButton title="transformer les Id alphanumérique en numérique"
+                                     value="transformer les Id alphanumérique en numérique"
+                                     actionListener="#{theso.reGenerateAllNonNumericId()}"   
+                                     update=":idAlphanumericToNumeric, :messages" styleClass="styleButton">
+                        <p:confirm header="Confirmation" message="!!! Attention !!!! cette opération peut prendre beaucoup de temps !" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                    <br/><br/>                  
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </center>
+            </h:form>
+        </h:panelGroup>
+    </div>
+
+</ui:composition>

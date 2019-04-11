@@ -97,20 +97,6 @@
                         <p:fileDownload  value="#{downloadBean.groupToJsonLd(selectedTerme.idDomaine, selectedTerme.idTheso)}" />
                     </p:commandButton>
                 </h:form>
-
-
-
-                
-                <h:form rendered="#{selectedTerme.status == 'hidden' and (currentUser.user != null) and 
-                                    (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin || roleOnTheso.isManagerOnThisTheso)}"
-                        style="float: left;" >
-                    <p:commandButton value="#{langueBean.getMsg('index.btnReacCpt')}" actionListener="#{newtreeBean.reactivConcept()}"
-                                     update=":accordeonTree,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" 
-                                     styleClass="styleButtonValid" >
-                    </p:commandButton>
-                    <br/><br/>
-                </h:form>
-
                
             </div>
             </h:panelGroup>

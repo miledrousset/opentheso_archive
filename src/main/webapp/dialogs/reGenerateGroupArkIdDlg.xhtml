@@ -1,0 +1,30 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idReGenerateGroupArkIdDlg" header="#{langueBean.getMsg('concept.setIdArk')}" widgetVar="reGenerateGroupArkIdDlg" modal="true" resizable="false" >
+        
+        <!-- Cas de la désactivation du concept Deprecated -->
+        <h:form>
+
+            <h:outputText escape="false" value="#{langueBean.getMsg('concept.setIdArk')}" /><br/><br/>
+
+                    
+                   <h:outputText value="Si l'indentifiant Ark n'existe pas, il sera créér"/><br/> 
+                    <h:outputText value="Si l'identifiant Ark est faux, il sera renouveler et mis à jour" /> <br/> 
+                   <h:outputText value="Si l'identifiant Ark est OK, rien ne change" /> 
+                    
+<br/><br/>
+                        <p:commandButton id="cbRegenerateConceptID" styleClass="cbSupp" icon="ui-icon-valider" 
+                                         actionListener="#{theso.reGenerateGroupArkId(selectedTerme.idC)}"  
+                                         oncomplete="PF('reGenerateGroupArkIdDlg').hide()"
+                                         update=":contenuDroite1, :idDeleteImageDlg, :messages">
+                        </p:commandButton>
+
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update="idReGenerateGroupArkIdDlg" oncomplete="PF('reGenerateGroupArkIdDlg').hide();"  immediate="true"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>
