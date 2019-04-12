@@ -456,6 +456,7 @@ public class Rest_new {
         String idLang = "";
         String idTheso = null;
         String format = null;
+        String group = "";
         
         String filter = null;
         
@@ -469,6 +470,8 @@ public class Rest_new {
                     value = valeur;
                 if(e.getKey().equalsIgnoreCase("theso")) 
                     idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("group")) 
+                    group = valeur;                
                 if(e.getKey().equalsIgnoreCase("format")) 
                     format = valeur;
             }
@@ -497,7 +500,7 @@ public class Rest_new {
             case "rdf":
             {
                 format = "application/rdf+xml";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
@@ -505,21 +508,21 @@ public class Rest_new {
             }
             case "jsonld":
                 format = "application/ld+json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                     
             case "turtle":
                 format = "text/turtle";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();                 
             case "json":
                 format = "application/json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
@@ -544,6 +547,7 @@ public class Rest_new {
         String value = null;
         String idLang = "";
         String idTheso = null;
+        String group = "";
         String format = null;
         String filter = null;
         
@@ -557,6 +561,8 @@ public class Rest_new {
                     value = valeur;
                 if(e.getKey().equalsIgnoreCase("theso")) 
                     idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("group")) 
+                    group = valeur;                
                 if(e.getKey().equalsIgnoreCase("format")) 
                     format = valeur;
             }
@@ -584,7 +590,7 @@ public class Rest_new {
             case "rdf":
             {
                 format = "application/rdf+xml";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
@@ -592,21 +598,21 @@ public class Rest_new {
             }
             case "jsonld":
                 format = "application/ld+json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                     
             case "turtle":
                 format = "text/turtle";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();                 
             case "json":
                 format = "application/json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
@@ -630,6 +636,7 @@ public class Rest_new {
         String value = null;
         String idLang = "";
         String idTheso = null;
+        String group = "";
         String format = null;
         String filter = null;        
         String datas;        
@@ -642,6 +649,8 @@ public class Rest_new {
                     value = valeur;
                 if(e.getKey().equalsIgnoreCase("theso")) 
                     idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("group")) 
+                    group = valeur;                
                 if(e.getKey().equalsIgnoreCase("format")) 
                     format = valeur;
             }
@@ -667,7 +676,7 @@ public class Rest_new {
             case "rdf":
             {
                 format = "application/rdf+xml";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
@@ -675,21 +684,21 @@ public class Rest_new {
             }
             case "jsonld":
                 format = "application/ld+json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                     
             case "turtle":
                 format = "text/turtle";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();                 
             case "json":
                 format = "application/json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
@@ -713,7 +722,7 @@ public class Rest_new {
         String value = null;
         String idLang = "";
         String idTheso = null;
-
+        String group = "";
         String format = null;
         String filter = null;        
         String datas;        
@@ -726,6 +735,8 @@ public class Rest_new {
                     value = valeur;
                 if(e.getKey().equalsIgnoreCase("theso")) 
                     idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("group")) 
+                    group = valeur;                
                 if(e.getKey().equalsIgnoreCase("format")) 
                     format = valeur;
             }
@@ -753,7 +764,7 @@ public class Rest_new {
             case "rdf":
             {
                 format = "application/rdf+xml";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
@@ -761,21 +772,21 @@ public class Rest_new {
             }
             case "jsonld":
                 format = "application/ld+json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                     
             case "turtle":
                 format = "text/turtle";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
                 }
                 return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();                 
             case "json":
                 format = "application/json";
-                datas = getDatas(idTheso, idLang, value, format, filter);
+                datas = getDatas(idTheso, idLang, group, value, format, filter);
                 if(datas == null) {
                     return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
                 }
@@ -784,8 +795,10 @@ public class Rest_new {
         return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();      
     }
 
-    private String getDatas(String idTheso, String idLang,
-            String value, String format, String filter){
+    private String getDatas(
+            String idTheso, String idLang, String group, 
+            String value,
+            String format, String filter){
         HikariDataSource ds = connect();
         if(ds == null) 
             return null;
@@ -802,7 +815,7 @@ public class Rest_new {
         }
                 
         datas = restRDFHelper.findConcepts(ds,
-                idTheso, idLang, value, format);
+                idTheso, idLang, group, value, format);
         ds.close();
         if(datas == null) {
             return null;

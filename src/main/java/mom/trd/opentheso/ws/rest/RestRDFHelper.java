@@ -104,17 +104,18 @@ public class RestRDFHelper {
      * @param ds
      * @param idTheso
      * @param lang
+     * @param group
      * @param format 
      * @param value 
      * @return  
      */
     public String findConcepts(HikariDataSource ds,
-            String idTheso, String lang,
+            String idTheso, String lang, String group,
             String value, String format) {
 
         RDFFormat rDFFormat = getRDFFormat(format);
         WriteRdf4j writeRdf4j = findConcepts__(ds,
-                 value, idTheso, lang);
+                 value, idTheso, lang, group);
         if(writeRdf4j == null) return null;
 
         ByteArrayOutputStream out;
@@ -129,11 +130,12 @@ public class RestRDFHelper {
      * @param value
      * @param idTheso
      * @param lang
+     * @param group
      * @return 
      */
     private WriteRdf4j findConcepts__(
             HikariDataSource ds,
-            String value, String idTheso, String lang) {
+            String value, String idTheso, String lang, String group) {
 
         if(value == null || idTheso == null) {
             return null;
@@ -151,13 +153,13 @@ public class RestRDFHelper {
 
         ArrayList<String> idConcepts = new ArrayList<>();
                 
-        ArrayList<String> idConcepts1 = searchHelper.searchExactTermNew(ds, value, lang, idTheso, "");
+        ArrayList<String> idConcepts1 = searchHelper.searchExactTermNew(ds, value, lang, idTheso, group);
         
         if(idConcepts1 != null) {
             idConcepts.addAll(idConcepts1);
         }
         
-        ArrayList<String> idConcepts2 = searchHelper.searchTermNew(ds, value, lang, idTheso, "");
+        ArrayList<String> idConcepts2 = searchHelper.searchTermNew(ds, value, lang, idTheso, group);
         if(idConcepts2 != null) {
             idConcepts.addAll(idConcepts2);
         }
