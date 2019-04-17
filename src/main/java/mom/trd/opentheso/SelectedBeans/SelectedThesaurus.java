@@ -1478,7 +1478,7 @@ public class SelectedThesaurus implements Serializable {
     }    
     
     /**
-     * Cette fonction permet de regénérer les Orphelins
+     * Cette fonction permet de compléter les relations reciproques pour reconstituer les branches correctement
      *
      * @return
      */
@@ -1494,7 +1494,7 @@ public class SelectedThesaurus implements Serializable {
     }       
     
     /**
-     * Cette fonction permet de regénérer les Orphelins
+     * Cette fonction permet de regénérer les relations de groupes qui manquent
      *
      * @return
      */
