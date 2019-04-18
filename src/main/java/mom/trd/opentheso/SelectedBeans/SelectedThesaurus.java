@@ -29,6 +29,7 @@ import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.CopyrightHelper;
+import mom.trd.opentheso.bdd.helper.ExternalImagesHelper;
 import mom.trd.opentheso.bdd.helper.FacetHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
@@ -953,6 +954,7 @@ public class SelectedThesaurus implements Serializable {
         NoteHelper noteHelper = new NoteHelper();
         GpsHelper gpsHelper = new GpsHelper();
         ImagesHelper imagesHelper = new ImagesHelper();
+        ExternalImagesHelper externalImagesHelper = new ExternalImagesHelper();
         AlignmentHelper alignmentHelper = new AlignmentHelper();
         for (int i = 0; i < idConcepts.size(); i++) {
             String id = idConcepts.get(i);
@@ -977,6 +979,8 @@ public class SelectedThesaurus implements Serializable {
             noteHelper.setIdConceptNoteHisto(conn, idTheso, id, newId);
             //table images 
             imagesHelper.setIdConceptImage(conn, idTheso, id, newId);
+            // table external images
+            externalImagesHelper.setIdConceptExternalImage(conn, idTheso, id, newId);
             //table concept_fusion
             conceptHelper.setIdConceptFusion(conn, idTheso, id, newId);
             //table preferred_term 

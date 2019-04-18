@@ -2,12 +2,13 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.0
--- Dumped by pg_dump version 11.0
+-- Dumped from database version 11.2
+-- Dumped by pg_dump version 11.2
 
--- Started on 2019-01-09 13:43:08 CET
+-- Started on 2019-04-18 09:23:59 CEST
 
--- version=4.4.2
+
+-- version=4.4.6
 
 SET role = opentheso;
 
@@ -18,18 +19,19 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
+
 --
 -- TOC entry 2 (class 3079 OID 33871)
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: 
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- TOC entry 3936 (class 0 OID 0)
+-- TOC entry 3947 (class 0 OID 0)
 -- Dependencies: 2
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -37,24 +39,24 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 --
 -- TOC entry 3 (class 3079 OID 33848)
--- Name: unaccent; Type: EXTENSION; Schema: -; Owner: 
+-- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
 
 
 --
--- TOC entry 3937 (class 0 OID 0)
+-- TOC entry 3948 (class 0 OID 0)
 -- Dependencies: 3
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
 
 
 --
--- TOC entry 715 (class 1247 OID 16389)
--- Name: alignement_format; Type: TYPE; Schema: public; Owner: opentheso
+-- TOC entry 717 (class 1247 OID 16389)
+-- Name: alignement_format; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.alignement_format AS ENUM (
@@ -64,11 +66,9 @@ CREATE TYPE public.alignement_format AS ENUM (
 );
 
 
-ALTER TYPE public.alignement_format OWNER TO opentheso;
-
 --
--- TOC entry 718 (class 1247 OID 16396)
--- Name: alignement_type_rqt; Type: TYPE; Schema: public; Owner: opentheso
+-- TOC entry 720 (class 1247 OID 16396)
+-- Name: alignement_type_rqt; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.alignement_type_rqt AS ENUM (
@@ -77,11 +77,9 @@ CREATE TYPE public.alignement_type_rqt AS ENUM (
 );
 
 
-ALTER TYPE public.alignement_type_rqt OWNER TO opentheso;
-
 --
--- TOC entry 721 (class 1247 OID 16402)
--- Name: auth_method; Type: TYPE; Schema: public; Owner: opentheso
+-- TOC entry 723 (class 1247 OID 16402)
+-- Name: auth_method; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.auth_method AS ENUM (
@@ -92,11 +90,9 @@ CREATE TYPE public.auth_method AS ENUM (
 );
 
 
-ALTER TYPE public.auth_method OWNER TO opentheso;
-
 --
--- TOC entry 325 (class 1255 OID 16411)
--- Name: addconstraintto_alignement(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 332 (class 1255 OID 16411)
+-- Name: addconstraintto_alignement(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.addconstraintto_alignement() RETURNS void
@@ -119,11 +115,9 @@ end
 $$;
 
 
-ALTER FUNCTION public.addconstraintto_alignement() OWNER TO opentheso;
-
 --
--- TOC entry 326 (class 1255 OID 16412)
--- Name: alter_table_concept_group_addcolumn_id_handle(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 334 (class 1255 OID 16412)
+-- Name: alter_table_concept_group_addcolumn_id_handle(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.alter_table_concept_group_addcolumn_id_handle() RETURNS void
@@ -137,11 +131,9 @@ end;
 $$;
 
 
-ALTER FUNCTION public.alter_table_concept_group_addcolumn_id_handle() OWNER TO opentheso;
-
 --
--- TOC entry 327 (class 1255 OID 16413)
--- Name: changeconstraintalignement(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 330 (class 1255 OID 16413)
+-- Name: changeconstraintalignement(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.changeconstraintalignement() RETURNS void
@@ -189,11 +181,9 @@ begin
   $$;
 
 
-ALTER FUNCTION public.changeconstraintalignement() OWNER TO opentheso;
-
 --
--- TOC entry 328 (class 1255 OID 16414)
--- Name: drop_constraint_alignement_source(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 329 (class 1255 OID 16414)
+-- Name: drop_constraint_alignement_source(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.drop_constraint_alignement_source() RETURNS void
@@ -210,11 +200,9 @@ begin
   $$;
 
 
-ALTER FUNCTION public.drop_constraint_alignement_source() OWNER TO opentheso;
-
 --
--- TOC entry 334 (class 1255 OID 33957)
--- Name: f_unaccent(text); Type: FUNCTION; Schema: public; Owner: postgres
+-- TOC entry 328 (class 1255 OID 33957)
+-- Name: f_unaccent(text); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.f_unaccent(text) RETURNS text
@@ -224,11 +212,9 @@ SELECT public.unaccent('public.unaccent', $1)
 $_$;
 
 
-ALTER FUNCTION public.f_unaccent(text) OWNER TO postgres;
-
 --
 -- TOC entry 331 (class 1255 OID 16415)
--- Name: id_alignements(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- Name: id_alignements(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.id_alignements() RETURNS void
@@ -277,11 +263,9 @@ declare
 	$$;
 
 
-ALTER FUNCTION public.id_alignements() OWNER TO opentheso;
-
 --
--- TOC entry 332 (class 1255 OID 16416)
--- Name: unaccent_string(text); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 333 (class 1255 OID 42295)
+-- Name: unaccent_string(text); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.unaccent_string(text) RETURNS text
@@ -303,11 +287,29 @@ END;
 $_$;
 
 
-ALTER FUNCTION public.unaccent_string(text) OWNER TO opentheso;
+--
+-- TOC entry 336 (class 1255 OID 40196)
+-- Name: update_table_imagesuri(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_table_imagesuri() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+    declare
+	line RECORD;
+	begin 
+            IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='images' AND column_name='external_uri' ) THEN
+                execute 'Alter TABLE images ADD COLUMN external_uri character varying NOT NULL DEFAULT ''''::character varying;
+                        Alter TABLE ONLY images drop CONSTRAINT images_pkey;';
+
+            end if;
+	end;
+$$;
+
 
 --
--- TOC entry 333 (class 1255 OID 16417)
--- Name: update_table_preferences_preferredname(); Type: FUNCTION; Schema: public; Owner: opentheso
+-- TOC entry 335 (class 1255 OID 16417)
+-- Name: update_table_preferences_preferredname(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.update_table_preferences_preferredname() RETURNS void
@@ -324,11 +326,9 @@ CREATE FUNCTION public.update_table_preferences_preferredname() RETURNS void
 $$;
 
 
-ALTER FUNCTION public.update_table_preferences_preferredname() OWNER TO opentheso;
-
 --
 -- TOC entry 198 (class 1259 OID 16418)
--- Name: alignement_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: alignement_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.alignement_id_seq
@@ -339,15 +339,13 @@ CREATE SEQUENCE public.alignement_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.alignement_id_seq OWNER TO opentheso;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
 -- TOC entry 199 (class 1259 OID 16420)
--- Name: alignement; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: alignement; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.alignement (
@@ -365,11 +363,9 @@ CREATE TABLE public.alignement (
 );
 
 
-ALTER TABLE public.alignement OWNER TO opentheso;
-
 --
 -- TOC entry 200 (class 1259 OID 16429)
--- Name: alignement_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: alignement_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.alignement_preferences_id_seq
@@ -380,11 +376,9 @@ CREATE SEQUENCE public.alignement_preferences_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.alignement_preferences_id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 201 (class 1259 OID 16431)
--- Name: alignement_preferences; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: alignement_preferences; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.alignement_preferences (
@@ -397,11 +391,9 @@ CREATE TABLE public.alignement_preferences (
 );
 
 
-ALTER TABLE public.alignement_preferences OWNER TO opentheso;
-
 --
 -- TOC entry 202 (class 1259 OID 16438)
--- Name: alignement_source__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: alignement_source__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.alignement_source__id_seq
@@ -412,11 +404,9 @@ CREATE SEQUENCE public.alignement_source__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.alignement_source__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 203 (class 1259 OID 16440)
--- Name: alignement_source; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: alignement_source; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.alignement_source (
@@ -431,11 +421,9 @@ CREATE TABLE public.alignement_source (
 );
 
 
-ALTER TABLE public.alignement_source OWNER TO opentheso;
-
 --
 -- TOC entry 204 (class 1259 OID 16448)
--- Name: alignement_type; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: alignement_type; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.alignement_type (
@@ -446,11 +434,9 @@ CREATE TABLE public.alignement_type (
 );
 
 
-ALTER TABLE public.alignement_type OWNER TO opentheso;
-
 --
 -- TOC entry 205 (class 1259 OID 16454)
--- Name: bt_type; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: bt_type; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.bt_type (
@@ -461,11 +447,9 @@ CREATE TABLE public.bt_type (
 );
 
 
-ALTER TABLE public.bt_type OWNER TO opentheso;
-
 --
 -- TOC entry 206 (class 1259 OID 16460)
--- Name: compound_equivalence; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: compound_equivalence; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.compound_equivalence (
@@ -474,11 +458,9 @@ CREATE TABLE public.compound_equivalence (
 );
 
 
-ALTER TABLE public.compound_equivalence OWNER TO opentheso;
-
 --
 -- TOC entry 207 (class 1259 OID 16466)
--- Name: concept__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept__id_seq
@@ -489,11 +471,9 @@ CREATE SEQUENCE public.concept__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 208 (class 1259 OID 16468)
--- Name: concept; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept (
@@ -511,11 +491,9 @@ CREATE TABLE public.concept (
 );
 
 
-ALTER TABLE public.concept OWNER TO opentheso;
-
 --
 -- TOC entry 209 (class 1259 OID 16481)
--- Name: concept_candidat__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_candidat__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_candidat__id_seq
@@ -526,11 +504,9 @@ CREATE SEQUENCE public.concept_candidat__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_candidat__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 210 (class 1259 OID 16483)
--- Name: concept_candidat; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_candidat; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_candidat (
@@ -545,11 +521,9 @@ CREATE TABLE public.concept_candidat (
 );
 
 
-ALTER TABLE public.concept_candidat OWNER TO opentheso;
-
 --
 -- TOC entry 211 (class 1259 OID 16493)
--- Name: concept_fusion; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_fusion; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_fusion (
@@ -561,11 +535,9 @@ CREATE TABLE public.concept_fusion (
 );
 
 
-ALTER TABLE public.concept_fusion OWNER TO opentheso;
-
 --
 -- TOC entry 212 (class 1259 OID 16500)
--- Name: concept_group__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_group__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_group__id_seq
@@ -576,11 +548,9 @@ CREATE SEQUENCE public.concept_group__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_group__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 213 (class 1259 OID 16502)
--- Name: concept_group; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group (
@@ -595,11 +565,9 @@ CREATE TABLE public.concept_group (
 );
 
 
-ALTER TABLE public.concept_group OWNER TO opentheso;
-
 --
 -- TOC entry 214 (class 1259 OID 16511)
--- Name: concept_group_concept; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group_concept; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group_concept (
@@ -609,11 +577,9 @@ CREATE TABLE public.concept_group_concept (
 );
 
 
-ALTER TABLE public.concept_group_concept OWNER TO opentheso;
-
 --
 -- TOC entry 215 (class 1259 OID 16517)
--- Name: concept_group_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_group_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_group_historique__id_seq
@@ -624,11 +590,9 @@ CREATE SEQUENCE public.concept_group_historique__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_group_historique__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 216 (class 1259 OID 16519)
--- Name: concept_group_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group_historique (
@@ -645,11 +609,9 @@ CREATE TABLE public.concept_group_historique (
 );
 
 
-ALTER TABLE public.concept_group_historique OWNER TO opentheso;
-
 --
 -- TOC entry 217 (class 1259 OID 16527)
--- Name: concept_group_label_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_group_label_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_group_label_id_seq
@@ -660,11 +622,9 @@ CREATE SEQUENCE public.concept_group_label_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_group_label_id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 218 (class 1259 OID 16529)
--- Name: concept_group_label; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group_label; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group_label (
@@ -678,11 +638,9 @@ CREATE TABLE public.concept_group_label (
 );
 
 
-ALTER TABLE public.concept_group_label OWNER TO opentheso;
-
 --
 -- TOC entry 219 (class 1259 OID 16538)
--- Name: concept_group_label_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_group_label_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_group_label_historique__id_seq
@@ -693,11 +651,9 @@ CREATE SEQUENCE public.concept_group_label_historique__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_group_label_historique__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 220 (class 1259 OID 16540)
--- Name: concept_group_label_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group_label_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group_label_historique (
@@ -711,11 +667,9 @@ CREATE TABLE public.concept_group_label_historique (
 );
 
 
-ALTER TABLE public.concept_group_label_historique OWNER TO opentheso;
-
 --
 -- TOC entry 221 (class 1259 OID 16548)
--- Name: concept_group_type; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_group_type; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_group_type (
@@ -725,11 +679,9 @@ CREATE TABLE public.concept_group_type (
 );
 
 
-ALTER TABLE public.concept_group_type OWNER TO opentheso;
-
 --
 -- TOC entry 222 (class 1259 OID 16554)
--- Name: concept_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: concept_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.concept_historique__id_seq
@@ -740,11 +692,9 @@ CREATE SEQUENCE public.concept_historique__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.concept_historique__id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 223 (class 1259 OID 16556)
--- Name: concept_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_historique (
@@ -761,11 +711,9 @@ CREATE TABLE public.concept_historique (
 );
 
 
-ALTER TABLE public.concept_historique OWNER TO opentheso;
-
 --
 -- TOC entry 224 (class 1259 OID 16565)
--- Name: concept_orphan; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_orphan; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_orphan (
@@ -774,11 +722,9 @@ CREATE TABLE public.concept_orphan (
 );
 
 
-ALTER TABLE public.concept_orphan OWNER TO opentheso;
-
 --
 -- TOC entry 225 (class 1259 OID 16571)
--- Name: concept_term_candidat; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: concept_term_candidat; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.concept_term_candidat (
@@ -788,11 +734,9 @@ CREATE TABLE public.concept_term_candidat (
 );
 
 
-ALTER TABLE public.concept_term_candidat OWNER TO opentheso;
-
 --
 -- TOC entry 226 (class 1259 OID 16577)
--- Name: copyright; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: copyright; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.copyright (
@@ -801,11 +745,9 @@ CREATE TABLE public.copyright (
 );
 
 
-ALTER TABLE public.copyright OWNER TO opentheso;
-
 --
 -- TOC entry 227 (class 1259 OID 16583)
--- Name: custom_concept_attribute; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: custom_concept_attribute; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.custom_concept_attribute (
@@ -816,11 +758,9 @@ CREATE TABLE public.custom_concept_attribute (
 );
 
 
-ALTER TABLE public.custom_concept_attribute OWNER TO opentheso;
-
 --
 -- TOC entry 228 (class 1259 OID 16589)
--- Name: custom_term_attribute; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: custom_term_attribute; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.custom_term_attribute (
@@ -831,11 +771,24 @@ CREATE TABLE public.custom_term_attribute (
 );
 
 
-ALTER TABLE public.custom_term_attribute OWNER TO opentheso;
+--
+-- TOC entry 279 (class 1259 OID 40353)
+-- Name: external_images; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.external_images (
+    id_concept character varying NOT NULL,
+    id_thesaurus character varying NOT NULL,
+    image_name character varying NOT NULL,
+    image_copyright character varying NOT NULL,
+    id_user integer,
+    external_uri character varying DEFAULT ''::character varying NOT NULL
+);
+
 
 --
 -- TOC entry 229 (class 1259 OID 16595)
--- Name: facet_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: facet_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.facet_id_seq
@@ -846,11 +799,9 @@ CREATE SEQUENCE public.facet_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.facet_id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 230 (class 1259 OID 16597)
--- Name: gps; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: gps; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.gps (
@@ -861,11 +812,9 @@ CREATE TABLE public.gps (
 );
 
 
-ALTER TABLE public.gps OWNER TO opentheso;
-
 --
 -- TOC entry 231 (class 1259 OID 16603)
--- Name: gps_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- Name: gps_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.gps_preferences_id_seq
@@ -876,11 +825,9 @@ CREATE SEQUENCE public.gps_preferences_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.gps_preferences_id_seq OWNER TO opentheso;
-
 --
 -- TOC entry 232 (class 1259 OID 16605)
--- Name: gps_preferences; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: gps_preferences; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.gps_preferences (
@@ -894,11 +841,9 @@ CREATE TABLE public.gps_preferences (
 );
 
 
-ALTER TABLE public.gps_preferences OWNER TO opentheso;
-
 --
 -- TOC entry 233 (class 1259 OID 16615)
--- Name: hierarchical_relationship; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: hierarchical_relationship; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.hierarchical_relationship (
@@ -909,11 +854,9 @@ CREATE TABLE public.hierarchical_relationship (
 );
 
 
-ALTER TABLE public.hierarchical_relationship OWNER TO opentheso;
-
 --
 -- TOC entry 234 (class 1259 OID 16621)
--- Name: hierarchical_relationship_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- Name: hierarchical_relationship_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.hierarchical_relationship_historique (
@@ -927,11 +870,9 @@ CREATE TABLE public.hierarchical_relationship_historique (
 );
 
 
-ALTER TABLE public.hierarchical_relationship_historique OWNER TO opentheso;
-
 --
--- TOC entry 235 (class 1259 OID 16628)
--- Name: images; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 278 (class 1259 OID 39947)
+-- Name: images; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.images (
@@ -939,15 +880,14 @@ CREATE TABLE public.images (
     id_thesaurus character varying NOT NULL,
     image_name character varying NOT NULL,
     image_copyright character varying NOT NULL,
-    id_user integer
+    id_user integer,
+    external_uri character varying DEFAULT ''::character varying NOT NULL
 );
 
 
-ALTER TABLE public.images OWNER TO opentheso;
-
 --
--- TOC entry 236 (class 1259 OID 16634)
--- Name: info; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 235 (class 1259 OID 16634)
+-- Name: info; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.info (
@@ -956,11 +896,9 @@ CREATE TABLE public.info (
 );
 
 
-ALTER TABLE public.info OWNER TO opentheso;
-
 --
--- TOC entry 237 (class 1259 OID 16640)
--- Name: languages_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 236 (class 1259 OID 16640)
+-- Name: languages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.languages_id_seq
@@ -971,11 +909,9 @@ CREATE SEQUENCE public.languages_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.languages_id_seq OWNER TO opentheso;
-
 --
--- TOC entry 238 (class 1259 OID 16642)
--- Name: languages_iso639; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 281 (class 1259 OID 42190)
+-- Name: languages_iso639; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.languages_iso639 (
@@ -987,11 +923,9 @@ CREATE TABLE public.languages_iso639 (
 );
 
 
-ALTER TABLE public.languages_iso639 OWNER TO opentheso;
-
 --
--- TOC entry 239 (class 1259 OID 16649)
--- Name: node_label; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 237 (class 1259 OID 16649)
+-- Name: node_label; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.node_label (
@@ -1004,11 +938,9 @@ CREATE TABLE public.node_label (
 );
 
 
-ALTER TABLE public.node_label OWNER TO opentheso;
-
 --
--- TOC entry 240 (class 1259 OID 16657)
--- Name: non_preferred_term; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 238 (class 1259 OID 16657)
+-- Name: non_preferred_term; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.non_preferred_term (
@@ -1024,11 +956,9 @@ CREATE TABLE public.non_preferred_term (
 );
 
 
-ALTER TABLE public.non_preferred_term OWNER TO opentheso;
-
 --
--- TOC entry 241 (class 1259 OID 16666)
--- Name: non_preferred_term_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 239 (class 1259 OID 16666)
+-- Name: non_preferred_term_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.non_preferred_term_historique (
@@ -1045,11 +975,9 @@ CREATE TABLE public.non_preferred_term_historique (
 );
 
 
-ALTER TABLE public.non_preferred_term_historique OWNER TO opentheso;
-
 --
--- TOC entry 242 (class 1259 OID 16674)
--- Name: note__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 240 (class 1259 OID 16674)
+-- Name: note__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.note__id_seq
@@ -1060,11 +988,9 @@ CREATE SEQUENCE public.note__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.note__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 243 (class 1259 OID 16676)
--- Name: note; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 241 (class 1259 OID 16676)
+-- Name: note; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.note (
@@ -1080,11 +1006,9 @@ CREATE TABLE public.note (
 );
 
 
-ALTER TABLE public.note OWNER TO opentheso;
-
 --
--- TOC entry 244 (class 1259 OID 16685)
--- Name: note_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 242 (class 1259 OID 16685)
+-- Name: note_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.note_historique__id_seq
@@ -1095,11 +1019,9 @@ CREATE SEQUENCE public.note_historique__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.note_historique__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 245 (class 1259 OID 16687)
--- Name: note_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 243 (class 1259 OID 16687)
+-- Name: note_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.note_historique (
@@ -1115,11 +1037,9 @@ CREATE TABLE public.note_historique (
 );
 
 
-ALTER TABLE public.note_historique OWNER TO opentheso;
-
 --
--- TOC entry 246 (class 1259 OID 16695)
--- Name: note_type; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 280 (class 1259 OID 42181)
+-- Name: note_type; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.note_type (
@@ -1132,11 +1052,9 @@ CREATE TABLE public.note_type (
 );
 
 
-ALTER TABLE public.note_type OWNER TO opentheso;
-
 --
--- TOC entry 247 (class 1259 OID 16702)
--- Name: nt_type; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 244 (class 1259 OID 16702)
+-- Name: nt_type; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.nt_type (
@@ -1147,11 +1065,9 @@ CREATE TABLE public.nt_type (
 );
 
 
-ALTER TABLE public.nt_type OWNER TO opentheso;
-
 --
--- TOC entry 248 (class 1259 OID 16708)
--- Name: permuted; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 245 (class 1259 OID 16708)
+-- Name: permuted; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.permuted (
@@ -1166,11 +1082,9 @@ CREATE TABLE public.permuted (
 );
 
 
-ALTER TABLE public.permuted OWNER TO opentheso;
-
 --
--- TOC entry 249 (class 1259 OID 16714)
--- Name: pref__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 246 (class 1259 OID 16714)
+-- Name: pref__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.pref__id_seq
@@ -1181,11 +1095,9 @@ CREATE SEQUENCE public.pref__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.pref__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 250 (class 1259 OID 16716)
--- Name: preferences; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 247 (class 1259 OID 16716)
+-- Name: preferences; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.preferences (
@@ -1225,11 +1137,9 @@ CREATE TABLE public.preferences (
 );
 
 
-ALTER TABLE public.preferences OWNER TO opentheso;
-
 --
--- TOC entry 251 (class 1259 OID 16749)
--- Name: preferences_sparql; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 248 (class 1259 OID 16749)
+-- Name: preferences_sparql; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.preferences_sparql (
@@ -1243,11 +1153,9 @@ CREATE TABLE public.preferences_sparql (
 );
 
 
-ALTER TABLE public.preferences_sparql OWNER TO opentheso;
-
 --
--- TOC entry 252 (class 1259 OID 16756)
--- Name: preferred_term; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 249 (class 1259 OID 16756)
+-- Name: preferred_term; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.preferred_term (
@@ -1257,11 +1165,9 @@ CREATE TABLE public.preferred_term (
 );
 
 
-ALTER TABLE public.preferred_term OWNER TO opentheso;
-
 --
--- TOC entry 253 (class 1259 OID 16762)
--- Name: proposition; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 250 (class 1259 OID 16762)
+-- Name: proposition; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.proposition (
@@ -1276,11 +1182,9 @@ CREATE TABLE public.proposition (
 );
 
 
-ALTER TABLE public.proposition OWNER TO opentheso;
-
 --
--- TOC entry 254 (class 1259 OID 16770)
--- Name: relation_group; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 251 (class 1259 OID 16770)
+-- Name: relation_group; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.relation_group (
@@ -1291,11 +1195,9 @@ CREATE TABLE public.relation_group (
 );
 
 
-ALTER TABLE public.relation_group OWNER TO opentheso;
-
 --
--- TOC entry 255 (class 1259 OID 16776)
--- Name: roles; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 252 (class 1259 OID 16776)
+-- Name: roles; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.roles (
@@ -1305,11 +1207,9 @@ CREATE TABLE public.roles (
 );
 
 
-ALTER TABLE public.roles OWNER TO opentheso;
-
 --
--- TOC entry 256 (class 1259 OID 16782)
--- Name: role_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 253 (class 1259 OID 16782)
+-- Name: role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.role_id_seq
@@ -1320,20 +1220,18 @@ CREATE SEQUENCE public.role_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.role_id_seq OWNER TO opentheso;
-
 --
--- TOC entry 3938 (class 0 OID 0)
--- Dependencies: 256
--- Name: role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: opentheso
+-- TOC entry 3949 (class 0 OID 0)
+-- Dependencies: 253
+-- Name: role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.role_id_seq OWNED BY public.roles.id;
 
 
 --
--- TOC entry 257 (class 1259 OID 16784)
--- Name: routine_mail; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 254 (class 1259 OID 16784)
+-- Name: routine_mail; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.routine_mail (
@@ -1346,22 +1244,18 @@ CREATE TABLE public.routine_mail (
 );
 
 
-ALTER TABLE public.routine_mail OWNER TO opentheso;
-
 --
--- TOC entry 258 (class 1259 OID 16791)
--- Name: split_non_preferred_term; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 255 (class 1259 OID 16791)
+-- Name: split_non_preferred_term; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.split_non_preferred_term (
 );
 
 
-ALTER TABLE public.split_non_preferred_term OWNER TO opentheso;
-
 --
--- TOC entry 259 (class 1259 OID 16794)
--- Name: term__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 256 (class 1259 OID 16794)
+-- Name: term__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.term__id_seq
@@ -1372,11 +1266,9 @@ CREATE SEQUENCE public.term__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.term__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 260 (class 1259 OID 16796)
--- Name: term; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 257 (class 1259 OID 16796)
+-- Name: term; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.term (
@@ -1394,11 +1286,9 @@ CREATE TABLE public.term (
 );
 
 
-ALTER TABLE public.term OWNER TO opentheso;
-
 --
--- TOC entry 261 (class 1259 OID 16806)
--- Name: term_candidat__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 258 (class 1259 OID 16806)
+-- Name: term_candidat__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.term_candidat__id_seq
@@ -1409,11 +1299,9 @@ CREATE SEQUENCE public.term_candidat__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.term_candidat__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 262 (class 1259 OID 16808)
--- Name: term_candidat; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 259 (class 1259 OID 16808)
+-- Name: term_candidat; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.term_candidat (
@@ -1428,11 +1316,9 @@ CREATE TABLE public.term_candidat (
 );
 
 
-ALTER TABLE public.term_candidat OWNER TO opentheso;
-
 --
--- TOC entry 263 (class 1259 OID 16817)
--- Name: term_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 260 (class 1259 OID 16817)
+-- Name: term_historique__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.term_historique__id_seq
@@ -1443,11 +1329,9 @@ CREATE SEQUENCE public.term_historique__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.term_historique__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 264 (class 1259 OID 16819)
--- Name: term_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 261 (class 1259 OID 16819)
+-- Name: term_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.term_historique (
@@ -1463,11 +1347,9 @@ CREATE TABLE public.term_historique (
 );
 
 
-ALTER TABLE public.term_historique OWNER TO opentheso;
-
 --
--- TOC entry 265 (class 1259 OID 16828)
--- Name: thesaurus_id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 262 (class 1259 OID 16828)
+-- Name: thesaurus_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.thesaurus_id_seq
@@ -1478,11 +1360,9 @@ CREATE SEQUENCE public.thesaurus_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.thesaurus_id_seq OWNER TO opentheso;
-
 --
--- TOC entry 266 (class 1259 OID 16830)
--- Name: thesaurus; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 263 (class 1259 OID 16830)
+-- Name: thesaurus; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.thesaurus (
@@ -1495,11 +1375,9 @@ CREATE TABLE public.thesaurus (
 );
 
 
-ALTER TABLE public.thesaurus OWNER TO opentheso;
-
 --
--- TOC entry 267 (class 1259 OID 16840)
--- Name: thesaurus_alignement_source; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 264 (class 1259 OID 16840)
+-- Name: thesaurus_alignement_source; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.thesaurus_alignement_source (
@@ -1508,11 +1386,9 @@ CREATE TABLE public.thesaurus_alignement_source (
 );
 
 
-ALTER TABLE public.thesaurus_alignement_source OWNER TO opentheso;
-
 --
--- TOC entry 268 (class 1259 OID 16846)
--- Name: thesaurus_array; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 265 (class 1259 OID 16846)
+-- Name: thesaurus_array; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.thesaurus_array (
@@ -1524,11 +1400,9 @@ CREATE TABLE public.thesaurus_array (
 );
 
 
-ALTER TABLE public.thesaurus_array OWNER TO opentheso;
-
 --
--- TOC entry 269 (class 1259 OID 16854)
--- Name: thesaurus_array_concept; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 266 (class 1259 OID 16854)
+-- Name: thesaurus_array_concept; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.thesaurus_array_concept (
@@ -1539,11 +1413,9 @@ CREATE TABLE public.thesaurus_array_concept (
 );
 
 
-ALTER TABLE public.thesaurus_array_concept OWNER TO opentheso;
-
 --
--- TOC entry 270 (class 1259 OID 16861)
--- Name: thesaurus_label; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 267 (class 1259 OID 16861)
+-- Name: thesaurus_label; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.thesaurus_label (
@@ -1566,11 +1438,9 @@ CREATE TABLE public.thesaurus_label (
 );
 
 
-ALTER TABLE public.thesaurus_label OWNER TO opentheso;
-
 --
--- TOC entry 271 (class 1259 OID 16869)
--- Name: user__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 268 (class 1259 OID 16869)
+-- Name: user__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.user__id_seq
@@ -1581,11 +1451,9 @@ CREATE SEQUENCE public.user__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.user__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 272 (class 1259 OID 16871)
--- Name: user_group_label__id_seq; Type: SEQUENCE; Schema: public; Owner: opentheso
+-- TOC entry 269 (class 1259 OID 16871)
+-- Name: user_group_label__id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.user_group_label__id_seq
@@ -1596,11 +1464,9 @@ CREATE SEQUENCE public.user_group_label__id_seq
     CACHE 1;
 
 
-ALTER TABLE public.user_group_label__id_seq OWNER TO opentheso;
-
 --
--- TOC entry 273 (class 1259 OID 16873)
--- Name: user_group_label; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 270 (class 1259 OID 16873)
+-- Name: user_group_label; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.user_group_label (
@@ -1609,11 +1475,9 @@ CREATE TABLE public.user_group_label (
 );
 
 
-ALTER TABLE public.user_group_label OWNER TO opentheso;
-
 --
--- TOC entry 274 (class 1259 OID 16880)
--- Name: user_group_thesaurus; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 271 (class 1259 OID 16880)
+-- Name: user_group_thesaurus; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.user_group_thesaurus (
@@ -1622,11 +1486,9 @@ CREATE TABLE public.user_group_thesaurus (
 );
 
 
-ALTER TABLE public.user_group_thesaurus OWNER TO opentheso;
-
 --
--- TOC entry 275 (class 1259 OID 16886)
--- Name: user_role_group; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 272 (class 1259 OID 16886)
+-- Name: user_role_group; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.user_role_group (
@@ -1636,11 +1498,9 @@ CREATE TABLE public.user_role_group (
 );
 
 
-ALTER TABLE public.user_role_group OWNER TO opentheso;
-
 --
--- TOC entry 276 (class 1259 OID 16889)
--- Name: user_role_only_on; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 273 (class 1259 OID 16889)
+-- Name: user_role_only_on; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.user_role_only_on (
@@ -1651,11 +1511,9 @@ CREATE TABLE public.user_role_only_on (
 );
 
 
-ALTER TABLE public.user_role_only_on OWNER TO opentheso;
-
 --
--- TOC entry 277 (class 1259 OID 16896)
--- Name: users; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 274 (class 1259 OID 16896)
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -1670,11 +1528,9 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO opentheso;
-
 --
--- TOC entry 278 (class 1259 OID 16907)
--- Name: users2; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 275 (class 1259 OID 16907)
+-- Name: users2; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users2 (
@@ -1688,11 +1544,9 @@ CREATE TABLE public.users2 (
 );
 
 
-ALTER TABLE public.users2 OWNER TO opentheso;
-
 --
--- TOC entry 279 (class 1259 OID 16916)
--- Name: users_historique; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 276 (class 1259 OID 16916)
+-- Name: users_historique; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users_historique (
@@ -1704,11 +1558,9 @@ CREATE TABLE public.users_historique (
 );
 
 
-ALTER TABLE public.users_historique OWNER TO opentheso;
-
 --
--- TOC entry 280 (class 1259 OID 16924)
--- Name: version_history; Type: TABLE; Schema: public; Owner: opentheso
+-- TOC entry 277 (class 1259 OID 16924)
+-- Name: version_history; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.version_history (
@@ -1721,36 +1573,34 @@ CREATE TABLE public.version_history (
 );
 
 
-ALTER TABLE public.version_history OWNER TO opentheso;
-
 --
--- TOC entry 3527 (class 2604 OID 16930)
--- Name: roles id; Type: DEFAULT; Schema: public; Owner: opentheso
+-- TOC entry 3531 (class 2604 OID 42294)
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.role_id_seq'::regclass);
 
 
 --
--- TOC entry 3849 (class 0 OID 16420)
+-- TOC entry 3859 (class 0 OID 16420)
 -- Dependencies: 199
--- Data for Name: alignement; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: alignement; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3851 (class 0 OID 16431)
+-- TOC entry 3861 (class 0 OID 16431)
 -- Dependencies: 201
--- Data for Name: alignement_preferences; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: alignement_preferences; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3853 (class 0 OID 16440)
+-- TOC entry 3863 (class 0 OID 16440)
 -- Dependencies: 203
--- Data for Name: alignement_source; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: alignement_source; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id, id_user, description, gps) VALUES ('Pactols', 'https://pactols.frantiq.fr/opentheso/webresources/rest/skos/concept/value=##value##&lang=##lang##&th=TH_1', 'REST', 'skos', 1, NULL, '', false);
@@ -1774,9 +1624,9 @@ INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_form
 
 
 --
--- TOC entry 3854 (class 0 OID 16448)
+-- TOC entry 3864 (class 0 OID 16448)
 -- Dependencies: 204
--- Data for Name: alignement_type; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: alignement_type; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.alignement_type (id, label, isocode, label_skos) VALUES (1, 'Equivalence exacte', '=EQ', 'exactMatch');
@@ -1787,9 +1637,9 @@ INSERT INTO public.alignement_type (id, label, isocode, label_skos) VALUES (5, '
 
 
 --
--- TOC entry 3855 (class 0 OID 16454)
+-- TOC entry 3865 (class 0 OID 16454)
 -- Dependencies: 205
--- Data for Name: bt_type; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: bt_type; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES (1, 'BT', 'Terme générique', 'Broader term');
@@ -1799,81 +1649,81 @@ INSERT INTO public.bt_type (id, relation, description_fr, description_en) VALUES
 
 
 --
--- TOC entry 3856 (class 0 OID 16460)
+-- TOC entry 3866 (class 0 OID 16460)
 -- Dependencies: 206
--- Data for Name: compound_equivalence; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: compound_equivalence; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3858 (class 0 OID 16468)
+-- TOC entry 3868 (class 0 OID 16468)
 -- Dependencies: 208
--- Data for Name: concept; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3860 (class 0 OID 16483)
+-- TOC entry 3870 (class 0 OID 16483)
 -- Dependencies: 210
--- Data for Name: concept_candidat; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_candidat; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3861 (class 0 OID 16493)
+-- TOC entry 3871 (class 0 OID 16493)
 -- Dependencies: 211
--- Data for Name: concept_fusion; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_fusion; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3863 (class 0 OID 16502)
+-- TOC entry 3873 (class 0 OID 16502)
 -- Dependencies: 213
--- Data for Name: concept_group; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3864 (class 0 OID 16511)
+-- TOC entry 3874 (class 0 OID 16511)
 -- Dependencies: 214
--- Data for Name: concept_group_concept; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group_concept; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3866 (class 0 OID 16519)
+-- TOC entry 3876 (class 0 OID 16519)
 -- Dependencies: 216
--- Data for Name: concept_group_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3868 (class 0 OID 16529)
+-- TOC entry 3878 (class 0 OID 16529)
 -- Dependencies: 218
--- Data for Name: concept_group_label; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group_label; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3870 (class 0 OID 16540)
+-- TOC entry 3880 (class 0 OID 16540)
 -- Dependencies: 220
--- Data for Name: concept_group_label_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group_label_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3871 (class 0 OID 16548)
+-- TOC entry 3881 (class 0 OID 16548)
 -- Dependencies: 221
--- Data for Name: concept_group_type; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_group_type; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.concept_group_type (code, label, skoslabel) VALUES ('MT', 'Microthesaurus', 'MicroThesaurus');
@@ -1883,105 +1733,114 @@ INSERT INTO public.concept_group_type (code, label, skoslabel) VALUES ('T', 'The
 
 
 --
--- TOC entry 3873 (class 0 OID 16556)
+-- TOC entry 3883 (class 0 OID 16556)
 -- Dependencies: 223
--- Data for Name: concept_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3874 (class 0 OID 16565)
+-- TOC entry 3884 (class 0 OID 16565)
 -- Dependencies: 224
--- Data for Name: concept_orphan; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_orphan; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3875 (class 0 OID 16571)
+-- TOC entry 3885 (class 0 OID 16571)
 -- Dependencies: 225
--- Data for Name: concept_term_candidat; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: concept_term_candidat; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3876 (class 0 OID 16577)
+-- TOC entry 3886 (class 0 OID 16577)
 -- Dependencies: 226
--- Data for Name: copyright; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: copyright; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3877 (class 0 OID 16583)
+-- TOC entry 3887 (class 0 OID 16583)
 -- Dependencies: 227
--- Data for Name: custom_concept_attribute; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: custom_concept_attribute; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3878 (class 0 OID 16589)
+-- TOC entry 3888 (class 0 OID 16589)
 -- Dependencies: 228
--- Data for Name: custom_term_attribute; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: custom_term_attribute; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3880 (class 0 OID 16597)
+-- TOC entry 3939 (class 0 OID 40353)
+-- Dependencies: 279
+-- Data for Name: external_images; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3890 (class 0 OID 16597)
 -- Dependencies: 230
--- Data for Name: gps; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: gps; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3882 (class 0 OID 16605)
+-- TOC entry 3892 (class 0 OID 16605)
 -- Dependencies: 232
--- Data for Name: gps_preferences; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: gps_preferences; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3883 (class 0 OID 16615)
+-- TOC entry 3893 (class 0 OID 16615)
 -- Dependencies: 233
--- Data for Name: hierarchical_relationship; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: hierarchical_relationship; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3884 (class 0 OID 16621)
+-- TOC entry 3894 (class 0 OID 16621)
 -- Dependencies: 234
--- Data for Name: hierarchical_relationship_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: hierarchical_relationship_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3885 (class 0 OID 16628)
+-- TOC entry 3938 (class 0 OID 39947)
+-- Dependencies: 278
+-- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3895 (class 0 OID 16634)
 -- Dependencies: 235
--- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: info; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-
-
---
--- TOC entry 3886 (class 0 OID 16634)
--- Dependencies: 236
--- Data for Name: info; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
+INSERT INTO public.info (version_opentheso, version_bdd) VALUES ('0.0.0', 'xyz');
 
 
 --
--- TOC entry 3888 (class 0 OID 16642)
--- Dependencies: 238
--- Data for Name: languages_iso639; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3941 (class 0 OID 42190)
+-- Dependencies: 281
+-- Data for Name: languages_iso639; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.languages_iso639 (iso639_1, iso639_2, english_name, french_name, id) VALUES ('aa ', 'aar', 'Afar', 'afar', 2);
@@ -2195,49 +2054,49 @@ INSERT INTO public.languages_iso639 (iso639_1, iso639_2, english_name, french_na
 
 
 --
--- TOC entry 3889 (class 0 OID 16649)
+-- TOC entry 3897 (class 0 OID 16649)
+-- Dependencies: 237
+-- Data for Name: node_label; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3898 (class 0 OID 16657)
+-- Dependencies: 238
+-- Data for Name: non_preferred_term; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3899 (class 0 OID 16666)
 -- Dependencies: 239
--- Data for Name: node_label; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: non_preferred_term_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3890 (class 0 OID 16657)
--- Dependencies: 240
--- Data for Name: non_preferred_term; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3891 (class 0 OID 16666)
+-- TOC entry 3901 (class 0 OID 16676)
 -- Dependencies: 241
--- Data for Name: non_preferred_term_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: note; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3893 (class 0 OID 16676)
+-- TOC entry 3903 (class 0 OID 16687)
 -- Dependencies: 243
--- Data for Name: note; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: note_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3895 (class 0 OID 16687)
--- Dependencies: 245
--- Data for Name: note_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3896 (class 0 OID 16695)
--- Dependencies: 246
--- Data for Name: note_type; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3940 (class 0 OID 42181)
+-- Dependencies: 280
+-- Data for Name: note_type; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUES ('note', false, true, 'Note', 'Note');
@@ -2251,9 +2110,9 @@ INSERT INTO public.note_type (code, isterm, isconcept, label_fr, label_en) VALUE
 
 
 --
--- TOC entry 3897 (class 0 OID 16702)
--- Dependencies: 247
--- Data for Name: nt_type; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3904 (class 0 OID 16702)
+-- Dependencies: 244
+-- Data for Name: nt_type; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES (1, 'NT', 'Term spécifique', 'Narrower term');
@@ -2263,57 +2122,57 @@ INSERT INTO public.nt_type (id, relation, description_fr, description_en) VALUES
 
 
 --
--- TOC entry 3898 (class 0 OID 16708)
+-- TOC entry 3905 (class 0 OID 16708)
+-- Dependencies: 245
+-- Data for Name: permuted; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3907 (class 0 OID 16716)
+-- Dependencies: 247
+-- Data for Name: preferences; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3908 (class 0 OID 16749)
 -- Dependencies: 248
--- Data for Name: permuted; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: preferences_sparql; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3900 (class 0 OID 16716)
+-- TOC entry 3909 (class 0 OID 16756)
+-- Dependencies: 249
+-- Data for Name: preferred_term; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3910 (class 0 OID 16762)
 -- Dependencies: 250
--- Data for Name: preferences; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: proposition; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3901 (class 0 OID 16749)
+-- TOC entry 3911 (class 0 OID 16770)
 -- Dependencies: 251
--- Data for Name: preferences_sparql; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: relation_group; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3902 (class 0 OID 16756)
+-- TOC entry 3912 (class 0 OID 16776)
 -- Dependencies: 252
--- Data for Name: preferred_term; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3903 (class 0 OID 16762)
--- Dependencies: 253
--- Data for Name: proposition; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3904 (class 0 OID 16770)
--- Dependencies: 254
--- Data for Name: relation_group; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3905 (class 0 OID 16776)
--- Dependencies: 255
--- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.roles (id, name, description) VALUES (1, 'superAdmin', 'Super Administrateur pour tout gérer tout thésaurus et tout utilisateur');
@@ -2323,354 +2182,352 @@ INSERT INTO public.roles (id, name, description) VALUES (4, 'contributor', 'trad
 
 
 --
--- TOC entry 3907 (class 0 OID 16784)
+-- TOC entry 3914 (class 0 OID 16784)
+-- Dependencies: 254
+-- Data for Name: routine_mail; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3915 (class 0 OID 16791)
+-- Dependencies: 255
+-- Data for Name: split_non_preferred_term; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3917 (class 0 OID 16796)
 -- Dependencies: 257
--- Data for Name: routine_mail; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: term; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3908 (class 0 OID 16791)
--- Dependencies: 258
--- Data for Name: split_non_preferred_term; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3919 (class 0 OID 16808)
+-- Dependencies: 259
+-- Data for Name: term_candidat; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3910 (class 0 OID 16796)
--- Dependencies: 260
--- Data for Name: term; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3921 (class 0 OID 16819)
+-- Dependencies: 261
+-- Data for Name: term_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3912 (class 0 OID 16808)
--- Dependencies: 262
--- Data for Name: term_candidat; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3923 (class 0 OID 16830)
+-- Dependencies: 263
+-- Data for Name: thesaurus; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3914 (class 0 OID 16819)
+-- TOC entry 3924 (class 0 OID 16840)
 -- Dependencies: 264
--- Data for Name: term_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: thesaurus_alignement_source; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3916 (class 0 OID 16830)
+-- TOC entry 3925 (class 0 OID 16846)
+-- Dependencies: 265
+-- Data for Name: thesaurus_array; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3926 (class 0 OID 16854)
 -- Dependencies: 266
--- Data for Name: thesaurus; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: thesaurus_array_concept; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3917 (class 0 OID 16840)
+-- TOC entry 3927 (class 0 OID 16861)
 -- Dependencies: 267
--- Data for Name: thesaurus_alignement_source; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: thesaurus_label; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3918 (class 0 OID 16846)
--- Dependencies: 268
--- Data for Name: thesaurus_array; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3919 (class 0 OID 16854)
--- Dependencies: 269
--- Data for Name: thesaurus_array_concept; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3920 (class 0 OID 16861)
+-- TOC entry 3930 (class 0 OID 16873)
 -- Dependencies: 270
--- Data for Name: thesaurus_label; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: user_group_label; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3923 (class 0 OID 16873)
+-- TOC entry 3931 (class 0 OID 16880)
+-- Dependencies: 271
+-- Data for Name: user_group_thesaurus; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3932 (class 0 OID 16886)
+-- Dependencies: 272
+-- Data for Name: user_role_group; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3933 (class 0 OID 16889)
 -- Dependencies: 273
--- Data for Name: user_group_label; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: user_role_only_on; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3924 (class 0 OID 16880)
+-- TOC entry 3934 (class 0 OID 16896)
 -- Dependencies: 274
--- Data for Name: user_group_thesaurus; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3925 (class 0 OID 16886)
--- Dependencies: 275
--- Data for Name: user_role_group; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3926 (class 0 OID 16889)
--- Dependencies: 276
--- Data for Name: user_role_only_on; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-
-
---
--- TOC entry 3927 (class 0 OID 16896)
--- Dependencies: 277
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 INSERT INTO public.users (id_user, username, password, active, mail, passtomodify, alertmail, issuperadmin) VALUES (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', true, 'admin@domaine.fr', false, false, true);
 
 
 --
--- TOC entry 3928 (class 0 OID 16907)
--- Dependencies: 278
--- Data for Name: users2; Type: TABLE DATA; Schema: public; Owner: opentheso
---
-
-INSERT INTO public.users2 (id_user, login, fullname, password, active, mail, authentication) VALUES (8, 'miled', 'Miled Rousset', '', true, 'mie@mile', 'DB');
-INSERT INTO public.users2 (id_user, login, fullname, password, active, mail, authentication) VALUES (9, 'toto', 'toeot', '', true, 'mil@mf', 'LDAP');
-
-
---
--- TOC entry 3929 (class 0 OID 16916)
--- Dependencies: 279
--- Data for Name: users_historique; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3935 (class 0 OID 16907)
+-- Dependencies: 275
+-- Data for Name: users2; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3930 (class 0 OID 16924)
--- Dependencies: 280
--- Data for Name: version_history; Type: TABLE DATA; Schema: public; Owner: opentheso
+-- TOC entry 3936 (class 0 OID 16916)
+-- Dependencies: 276
+-- Data for Name: users_historique; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 
 
 --
--- TOC entry 3939 (class 0 OID 0)
+-- TOC entry 3937 (class 0 OID 16924)
+-- Dependencies: 277
+-- Data for Name: version_history; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- TOC entry 3950 (class 0 OID 0)
 -- Dependencies: 198
--- Name: alignement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: alignement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.alignement_id_seq', 1, false);
 
 
 --
--- TOC entry 3940 (class 0 OID 0)
+-- TOC entry 3951 (class 0 OID 0)
 -- Dependencies: 200
--- Name: alignement_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: alignement_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.alignement_preferences_id_seq', 1, false);
 
 
 --
--- TOC entry 3941 (class 0 OID 0)
+-- TOC entry 3952 (class 0 OID 0)
 -- Dependencies: 202
--- Name: alignement_source__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: alignement_source__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.alignement_source__id_seq', 13, false);
+SELECT pg_catalog.setval('public.alignement_source__id_seq', 7, false);
 
 
 --
--- TOC entry 3942 (class 0 OID 0)
+-- TOC entry 3953 (class 0 OID 0)
 -- Dependencies: 207
--- Name: concept__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept__id_seq', 1, false);
 
 
 --
--- TOC entry 3943 (class 0 OID 0)
+-- TOC entry 3954 (class 0 OID 0)
 -- Dependencies: 209
--- Name: concept_candidat__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_candidat__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_candidat__id_seq', 1, false);
 
 
 --
--- TOC entry 3944 (class 0 OID 0)
+-- TOC entry 3955 (class 0 OID 0)
 -- Dependencies: 212
--- Name: concept_group__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_group__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_group__id_seq', 1, false);
 
 
 --
--- TOC entry 3945 (class 0 OID 0)
+-- TOC entry 3956 (class 0 OID 0)
 -- Dependencies: 215
--- Name: concept_group_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_group_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_group_historique__id_seq', 1, false);
 
 
 --
--- TOC entry 3946 (class 0 OID 0)
+-- TOC entry 3957 (class 0 OID 0)
 -- Dependencies: 219
--- Name: concept_group_label_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_group_label_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_group_label_historique__id_seq', 1, false);
 
 
 --
--- TOC entry 3947 (class 0 OID 0)
+-- TOC entry 3958 (class 0 OID 0)
 -- Dependencies: 217
--- Name: concept_group_label_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_group_label_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_group_label_id_seq', 1, false);
 
 
 --
--- TOC entry 3948 (class 0 OID 0)
+-- TOC entry 3959 (class 0 OID 0)
 -- Dependencies: 222
--- Name: concept_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: concept_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.concept_historique__id_seq', 1, false);
 
 
 --
--- TOC entry 3949 (class 0 OID 0)
+-- TOC entry 3960 (class 0 OID 0)
 -- Dependencies: 229
--- Name: facet_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: facet_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.facet_id_seq', 1, false);
 
 
 --
--- TOC entry 3950 (class 0 OID 0)
+-- TOC entry 3961 (class 0 OID 0)
 -- Dependencies: 231
--- Name: gps_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- Name: gps_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.gps_preferences_id_seq', 1, false);
 
 
 --
--- TOC entry 3951 (class 0 OID 0)
--- Dependencies: 237
--- Name: languages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3962 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: languages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.languages_id_seq', 189, false);
 
 
 --
--- TOC entry 3952 (class 0 OID 0)
--- Dependencies: 242
--- Name: note__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3963 (class 0 OID 0)
+-- Dependencies: 240
+-- Name: note__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.note__id_seq', 1, false);
 
 
 --
--- TOC entry 3953 (class 0 OID 0)
--- Dependencies: 244
--- Name: note_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3964 (class 0 OID 0)
+-- Dependencies: 242
+-- Name: note_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.note_historique__id_seq', 1, false);
 
 
 --
--- TOC entry 3954 (class 0 OID 0)
--- Dependencies: 249
--- Name: pref__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3965 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: pref__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.pref__id_seq', 1, false);
 
 
 --
--- TOC entry 3955 (class 0 OID 0)
--- Dependencies: 256
--- Name: role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3966 (class 0 OID 0)
+-- Dependencies: 253
+-- Name: role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.role_id_seq', 6, true);
 
 
 --
--- TOC entry 3956 (class 0 OID 0)
--- Dependencies: 259
--- Name: term__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3967 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: term__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.term__id_seq', 1, false);
 
 
 --
--- TOC entry 3957 (class 0 OID 0)
--- Dependencies: 261
--- Name: term_candidat__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3968 (class 0 OID 0)
+-- Dependencies: 258
+-- Name: term_candidat__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.term_candidat__id_seq', 1, false);
 
 
 --
--- TOC entry 3958 (class 0 OID 0)
--- Dependencies: 263
--- Name: term_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3969 (class 0 OID 0)
+-- Dependencies: 260
+-- Name: term_historique__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.term_historique__id_seq', 1, false);
 
 
 --
--- TOC entry 3959 (class 0 OID 0)
--- Dependencies: 265
--- Name: thesaurus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3970 (class 0 OID 0)
+-- Dependencies: 262
+-- Name: thesaurus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.thesaurus_id_seq', 1, false);
 
 
 --
--- TOC entry 3960 (class 0 OID 0)
--- Dependencies: 271
--- Name: user__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3971 (class 0 OID 0)
+-- Dependencies: 268
+-- Name: user__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.user__id_seq', 2, false);
 
 
 --
--- TOC entry 3961 (class 0 OID 0)
--- Dependencies: 272
--- Name: user_group_label__id_seq; Type: SEQUENCE SET; Schema: public; Owner: opentheso
+-- TOC entry 3972 (class 0 OID 0)
+-- Dependencies: 269
+-- Name: user_group_label__id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.user_group_label__id_seq', 1, false);
@@ -2678,7 +2535,7 @@ SELECT pg_catalog.setval('public.user_group_label__id_seq', 1, false);
 
 --
 -- TOC entry 3726 (class 2606 OID 16932)
--- Name: version_history VersionHistory_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: version_history VersionHistory_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.version_history
@@ -2686,8 +2543,8 @@ ALTER TABLE ONLY public.version_history
 
 
 --
--- TOC entry 3561 (class 2606 OID 16934)
--- Name: alignement alignement_internal_id_concept_internal_id_thesaurus_uri_ta_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3569 (class 2606 OID 16934)
+-- Name: alignement alignement_internal_id_concept_internal_id_thesaurus_uri_ta_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement
@@ -2695,8 +2552,8 @@ ALTER TABLE ONLY public.alignement
 
 
 --
--- TOC entry 3563 (class 2606 OID 16936)
--- Name: alignement alignement_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3571 (class 2606 OID 16936)
+-- Name: alignement alignement_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement
@@ -2704,8 +2561,8 @@ ALTER TABLE ONLY public.alignement
 
 
 --
--- TOC entry 3565 (class 2606 OID 16938)
--- Name: alignement_preferences alignement_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3573 (class 2606 OID 16938)
+-- Name: alignement_preferences alignement_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement_preferences
@@ -2713,8 +2570,8 @@ ALTER TABLE ONLY public.alignement_preferences
 
 
 --
--- TOC entry 3567 (class 2606 OID 16940)
--- Name: alignement_source alignement_source_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3575 (class 2606 OID 16940)
+-- Name: alignement_source alignement_source_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement_source
@@ -2722,8 +2579,8 @@ ALTER TABLE ONLY public.alignement_source
 
 
 --
--- TOC entry 3569 (class 2606 OID 16942)
--- Name: alignement_source alignement_source_source_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3577 (class 2606 OID 16942)
+-- Name: alignement_source alignement_source_source_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement_source
@@ -2731,8 +2588,8 @@ ALTER TABLE ONLY public.alignement_source
 
 
 --
--- TOC entry 3571 (class 2606 OID 16944)
--- Name: alignement_type alignment_type_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3579 (class 2606 OID 16944)
+-- Name: alignement_type alignment_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.alignement_type
@@ -2740,8 +2597,8 @@ ALTER TABLE ONLY public.alignement_type
 
 
 --
--- TOC entry 3573 (class 2606 OID 16946)
--- Name: bt_type bt_type_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3581 (class 2606 OID 16946)
+-- Name: bt_type bt_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.bt_type
@@ -2749,8 +2606,8 @@ ALTER TABLE ONLY public.bt_type
 
 
 --
--- TOC entry 3575 (class 2606 OID 16948)
--- Name: bt_type bt_type_relation_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3583 (class 2606 OID 16948)
+-- Name: bt_type bt_type_relation_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.bt_type
@@ -2758,8 +2615,8 @@ ALTER TABLE ONLY public.bt_type
 
 
 --
--- TOC entry 3577 (class 2606 OID 16950)
--- Name: compound_equivalence compound_equivalence_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3585 (class 2606 OID 16950)
+-- Name: compound_equivalence compound_equivalence_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.compound_equivalence
@@ -2767,8 +2624,8 @@ ALTER TABLE ONLY public.compound_equivalence
 
 
 --
--- TOC entry 3582 (class 2606 OID 16952)
--- Name: concept_candidat concept_candidat_id_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3590 (class 2606 OID 16952)
+-- Name: concept_candidat concept_candidat_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_candidat
@@ -2776,8 +2633,8 @@ ALTER TABLE ONLY public.concept_candidat
 
 
 --
--- TOC entry 3584 (class 2606 OID 16954)
--- Name: concept_candidat concept_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3592 (class 2606 OID 16954)
+-- Name: concept_candidat concept_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_candidat
@@ -2785,8 +2642,8 @@ ALTER TABLE ONLY public.concept_candidat
 
 
 --
--- TOC entry 3604 (class 2606 OID 16956)
--- Name: concept_historique concept_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3612 (class 2606 OID 42293)
+-- Name: concept_historique concept_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_historique
@@ -2794,8 +2651,8 @@ ALTER TABLE ONLY public.concept_historique
 
 
 --
--- TOC entry 3586 (class 2606 OID 16958)
--- Name: concept_fusion concept_fusion_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3594 (class 2606 OID 16958)
+-- Name: concept_fusion concept_fusion_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_fusion
@@ -2803,8 +2660,8 @@ ALTER TABLE ONLY public.concept_fusion
 
 
 --
--- TOC entry 3590 (class 2606 OID 16960)
--- Name: concept_group_concept concept_group_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3598 (class 2606 OID 16960)
+-- Name: concept_group_concept concept_group_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_concept
@@ -2812,8 +2669,8 @@ ALTER TABLE ONLY public.concept_group_concept
 
 
 --
--- TOC entry 3592 (class 2606 OID 16962)
--- Name: concept_group_historique concept_group_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3600 (class 2606 OID 16962)
+-- Name: concept_group_historique concept_group_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_historique
@@ -2821,8 +2678,8 @@ ALTER TABLE ONLY public.concept_group_historique
 
 
 --
--- TOC entry 3598 (class 2606 OID 16964)
--- Name: concept_group_label_historique concept_group_label_copy_idgrouplabel_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3606 (class 2606 OID 16964)
+-- Name: concept_group_label_historique concept_group_label_copy_idgrouplabel_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_label_historique
@@ -2830,8 +2687,8 @@ ALTER TABLE ONLY public.concept_group_label_historique
 
 
 --
--- TOC entry 3600 (class 2606 OID 16966)
--- Name: concept_group_label_historique concept_group_label_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3608 (class 2606 OID 16966)
+-- Name: concept_group_label_historique concept_group_label_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_label_historique
@@ -2839,8 +2696,8 @@ ALTER TABLE ONLY public.concept_group_label_historique
 
 
 --
--- TOC entry 3594 (class 2606 OID 16968)
--- Name: concept_group_label concept_group_label_idgrouplabel_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3602 (class 2606 OID 16968)
+-- Name: concept_group_label concept_group_label_idgrouplabel_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_label
@@ -2848,8 +2705,8 @@ ALTER TABLE ONLY public.concept_group_label
 
 
 --
--- TOC entry 3596 (class 2606 OID 16970)
--- Name: concept_group_label concept_group_label_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3604 (class 2606 OID 16970)
+-- Name: concept_group_label concept_group_label_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_label
@@ -2857,8 +2714,8 @@ ALTER TABLE ONLY public.concept_group_label
 
 
 --
--- TOC entry 3588 (class 2606 OID 16972)
--- Name: concept_group concept_group_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3596 (class 2606 OID 16972)
+-- Name: concept_group concept_group_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group
@@ -2866,8 +2723,8 @@ ALTER TABLE ONLY public.concept_group
 
 
 --
--- TOC entry 3602 (class 2606 OID 16974)
--- Name: concept_group_type concept_group_type_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3610 (class 2606 OID 16974)
+-- Name: concept_group_type concept_group_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_group_type
@@ -2875,8 +2732,8 @@ ALTER TABLE ONLY public.concept_group_type
 
 
 --
--- TOC entry 3606 (class 2606 OID 16976)
--- Name: concept_orphan concept_orphan_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3614 (class 2606 OID 16976)
+-- Name: concept_orphan concept_orphan_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_orphan
@@ -2884,8 +2741,8 @@ ALTER TABLE ONLY public.concept_orphan
 
 
 --
--- TOC entry 3580 (class 2606 OID 16978)
--- Name: concept concept_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3588 (class 2606 OID 16978)
+-- Name: concept concept_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept
@@ -2893,8 +2750,8 @@ ALTER TABLE ONLY public.concept
 
 
 --
--- TOC entry 3608 (class 2606 OID 16980)
--- Name: concept_term_candidat concept_term_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3616 (class 2606 OID 16980)
+-- Name: concept_term_candidat concept_term_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.concept_term_candidat
@@ -2902,8 +2759,8 @@ ALTER TABLE ONLY public.concept_term_candidat
 
 
 --
--- TOC entry 3610 (class 2606 OID 16982)
--- Name: copyright copyright_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3618 (class 2606 OID 16982)
+-- Name: copyright copyright_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.copyright
@@ -2911,8 +2768,8 @@ ALTER TABLE ONLY public.copyright
 
 
 --
--- TOC entry 3612 (class 2606 OID 16984)
--- Name: custom_concept_attribute custom_concept_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3620 (class 2606 OID 16984)
+-- Name: custom_concept_attribute custom_concept_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.custom_concept_attribute
@@ -2920,8 +2777,8 @@ ALTER TABLE ONLY public.custom_concept_attribute
 
 
 --
--- TOC entry 3614 (class 2606 OID 16986)
--- Name: custom_term_attribute custom_term_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3622 (class 2606 OID 16986)
+-- Name: custom_term_attribute custom_term_attribute_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.custom_term_attribute
@@ -2929,8 +2786,17 @@ ALTER TABLE ONLY public.custom_term_attribute
 
 
 --
--- TOC entry 3616 (class 2606 OID 16988)
--- Name: gps gps_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3730 (class 2606 OID 40361)
+-- Name: external_images external_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_images
+    ADD CONSTRAINT external_images_pkey PRIMARY KEY (id_concept, id_thesaurus, external_uri);
+
+
+--
+-- TOC entry 3624 (class 2606 OID 42266)
+-- Name: gps gps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gps
@@ -2938,8 +2804,8 @@ ALTER TABLE ONLY public.gps
 
 
 --
--- TOC entry 3618 (class 2606 OID 16990)
--- Name: gps_preferences gps_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3626 (class 2606 OID 16990)
+-- Name: gps_preferences gps_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.gps_preferences
@@ -2947,8 +2813,8 @@ ALTER TABLE ONLY public.gps_preferences
 
 
 --
--- TOC entry 3622 (class 2606 OID 16992)
--- Name: hierarchical_relationship_historique hierarchical_relationship_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3630 (class 2606 OID 16992)
+-- Name: hierarchical_relationship_historique hierarchical_relationship_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.hierarchical_relationship_historique
@@ -2956,8 +2822,8 @@ ALTER TABLE ONLY public.hierarchical_relationship_historique
 
 
 --
--- TOC entry 3620 (class 2606 OID 16994)
--- Name: hierarchical_relationship hierarchical_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3628 (class 2606 OID 16994)
+-- Name: hierarchical_relationship hierarchical_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.hierarchical_relationship
@@ -2965,17 +2831,17 @@ ALTER TABLE ONLY public.hierarchical_relationship
 
 
 --
--- TOC entry 3624 (class 2606 OID 16996)
--- Name: images images_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3728 (class 2606 OID 40199)
+-- Name: images images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.images
-    ADD CONSTRAINT images_pkey PRIMARY KEY (id_concept, id_thesaurus, image_name);
+    ADD CONSTRAINT images_pkey PRIMARY KEY (id_concept, id_thesaurus, external_uri);
 
 
 --
--- TOC entry 3626 (class 2606 OID 16998)
--- Name: info info_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3632 (class 2606 OID 16998)
+-- Name: info info_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.info
@@ -2983,8 +2849,8 @@ ALTER TABLE ONLY public.info
 
 
 --
--- TOC entry 3628 (class 2606 OID 17000)
--- Name: languages_iso639 languages_iso639_iso639_1_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3734 (class 2606 OID 42200)
+-- Name: languages_iso639 languages_iso639_iso639_1_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.languages_iso639
@@ -2992,8 +2858,8 @@ ALTER TABLE ONLY public.languages_iso639
 
 
 --
--- TOC entry 3630 (class 2606 OID 17002)
--- Name: languages_iso639 languages_iso639_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3736 (class 2606 OID 42198)
+-- Name: languages_iso639 languages_iso639_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.languages_iso639
@@ -3001,8 +2867,8 @@ ALTER TABLE ONLY public.languages_iso639
 
 
 --
--- TOC entry 3632 (class 2606 OID 17004)
--- Name: node_label node_label_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3634 (class 2606 OID 17004)
+-- Name: node_label node_label_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.node_label
@@ -3010,8 +2876,8 @@ ALTER TABLE ONLY public.node_label
 
 
 --
--- TOC entry 3635 (class 2606 OID 17006)
--- Name: non_preferred_term non_prefered_term_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3637 (class 2606 OID 17006)
+-- Name: non_preferred_term non_prefered_term_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.non_preferred_term
@@ -3019,8 +2885,8 @@ ALTER TABLE ONLY public.non_preferred_term
 
 
 --
--- TOC entry 3638 (class 2606 OID 17008)
--- Name: non_preferred_term_historique non_preferred_term_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3640 (class 2606 OID 17008)
+-- Name: non_preferred_term_historique non_preferred_term_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.non_preferred_term_historique
@@ -3028,8 +2894,8 @@ ALTER TABLE ONLY public.non_preferred_term_historique
 
 
 --
--- TOC entry 3647 (class 2606 OID 17010)
--- Name: note_historique note_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3649 (class 2606 OID 17010)
+-- Name: note_historique note_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.note_historique
@@ -3037,8 +2903,8 @@ ALTER TABLE ONLY public.note_historique
 
 
 --
--- TOC entry 3641 (class 2606 OID 17012)
--- Name: note note_notetypecode_id_thesaurus_id_concept_lang_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3643 (class 2606 OID 42262)
+-- Name: note note_notetypecode_id_thesaurus_id_concept_lang_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.note
@@ -3046,8 +2912,8 @@ ALTER TABLE ONLY public.note
 
 
 --
--- TOC entry 3643 (class 2606 OID 17014)
--- Name: note note_notetypecode_id_thesaurus_id_term_lang_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3645 (class 2606 OID 42264)
+-- Name: note note_notetypecode_id_thesaurus_id_term_lang_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.note
@@ -3055,8 +2921,8 @@ ALTER TABLE ONLY public.note
 
 
 --
--- TOC entry 3645 (class 2606 OID 17016)
--- Name: note note_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3647 (class 2606 OID 17016)
+-- Name: note note_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.note
@@ -3065,7 +2931,7 @@ ALTER TABLE ONLY public.note
 
 --
 -- TOC entry 3651 (class 2606 OID 17018)
--- Name: nt_type nt_type_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: nt_type nt_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.nt_type
@@ -3074,7 +2940,7 @@ ALTER TABLE ONLY public.nt_type
 
 --
 -- TOC entry 3653 (class 2606 OID 17020)
--- Name: nt_type nt_type_relation_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: nt_type nt_type_relation_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.nt_type
@@ -3083,7 +2949,7 @@ ALTER TABLE ONLY public.nt_type
 
 --
 -- TOC entry 3656 (class 2606 OID 17022)
--- Name: permuted permuted_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: permuted permuted_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.permuted
@@ -3091,8 +2957,8 @@ ALTER TABLE ONLY public.permuted
 
 
 --
--- TOC entry 3649 (class 2606 OID 17024)
--- Name: note_type pk_note_type; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3732 (class 2606 OID 42189)
+-- Name: note_type pk_note_type; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.note_type
@@ -3101,7 +2967,7 @@ ALTER TABLE ONLY public.note_type
 
 --
 -- TOC entry 3670 (class 2606 OID 17026)
--- Name: relation_group pk_relation_group; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: relation_group pk_relation_group; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.relation_group
@@ -3110,7 +2976,7 @@ ALTER TABLE ONLY public.relation_group
 
 --
 -- TOC entry 3658 (class 2606 OID 17028)
--- Name: preferences preferences_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: preferences preferences_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.preferences
@@ -3119,7 +2985,7 @@ ALTER TABLE ONLY public.preferences
 
 --
 -- TOC entry 3660 (class 2606 OID 17030)
--- Name: preferences preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: preferences preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.preferences
@@ -3128,7 +2994,7 @@ ALTER TABLE ONLY public.preferences
 
 --
 -- TOC entry 3662 (class 2606 OID 17032)
--- Name: preferences preferences_preferredname_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: preferences preferences_preferredname_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.preferences
@@ -3137,7 +3003,7 @@ ALTER TABLE ONLY public.preferences
 
 --
 -- TOC entry 3664 (class 2606 OID 17034)
--- Name: preferences_sparql preferences_sparql_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: preferences_sparql preferences_sparql_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.preferences_sparql
@@ -3146,7 +3012,7 @@ ALTER TABLE ONLY public.preferences_sparql
 
 --
 -- TOC entry 3666 (class 2606 OID 17036)
--- Name: preferred_term preferred_term_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: preferred_term preferred_term_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.preferred_term
@@ -3155,7 +3021,7 @@ ALTER TABLE ONLY public.preferred_term
 
 --
 -- TOC entry 3668 (class 2606 OID 17038)
--- Name: proposition proposition_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: proposition proposition_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.proposition
@@ -3164,7 +3030,7 @@ ALTER TABLE ONLY public.proposition
 
 --
 -- TOC entry 3672 (class 2606 OID 17040)
--- Name: roles role_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: roles role_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.roles
@@ -3173,7 +3039,7 @@ ALTER TABLE ONLY public.roles
 
 --
 -- TOC entry 3674 (class 2606 OID 17042)
--- Name: routine_mail routine_mail_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: routine_mail routine_mail_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.routine_mail
@@ -3182,7 +3048,7 @@ ALTER TABLE ONLY public.routine_mail
 
 --
 -- TOC entry 3685 (class 2606 OID 17044)
--- Name: term_candidat term_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: term_candidat term_candidat_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.term_candidat
@@ -3190,8 +3056,8 @@ ALTER TABLE ONLY public.term_candidat
 
 
 --
--- TOC entry 3688 (class 2606 OID 17046)
--- Name: term_historique term_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- TOC entry 3688 (class 2606 OID 42291)
+-- Name: term_historique term_copy_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.term_historique
@@ -3200,7 +3066,7 @@ ALTER TABLE ONLY public.term_historique
 
 --
 -- TOC entry 3677 (class 2606 OID 17048)
--- Name: term term_id_term_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: term term_id_term_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.term
@@ -3209,7 +3075,7 @@ ALTER TABLE ONLY public.term
 
 --
 -- TOC entry 3679 (class 2606 OID 17050)
--- Name: term term_id_term_lexical_value_lang_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: term term_id_term_lexical_value_lang_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.term
@@ -3218,7 +3084,7 @@ ALTER TABLE ONLY public.term
 
 --
 -- TOC entry 3682 (class 2606 OID 17052)
--- Name: term term_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: term term_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.term
@@ -3227,7 +3093,7 @@ ALTER TABLE ONLY public.term
 
 --
 -- TOC entry 3692 (class 2606 OID 17054)
--- Name: thesaurus_alignement_source thesaurus_alignement_source_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus_alignement_source thesaurus_alignement_source_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus_alignement_source
@@ -3236,7 +3102,7 @@ ALTER TABLE ONLY public.thesaurus_alignement_source
 
 --
 -- TOC entry 3696 (class 2606 OID 17056)
--- Name: thesaurus_array_concept thesaurus_array_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus_array_concept thesaurus_array_concept_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus_array_concept
@@ -3245,7 +3111,7 @@ ALTER TABLE ONLY public.thesaurus_array_concept
 
 --
 -- TOC entry 3694 (class 2606 OID 17058)
--- Name: thesaurus_array thesaurus_array_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus_array thesaurus_array_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus_array
@@ -3254,7 +3120,7 @@ ALTER TABLE ONLY public.thesaurus_array
 
 --
 -- TOC entry 3698 (class 2606 OID 17060)
--- Name: thesaurus_label thesaurus_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus_label thesaurus_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus_label
@@ -3263,7 +3129,7 @@ ALTER TABLE ONLY public.thesaurus_label
 
 --
 -- TOC entry 3690 (class 2606 OID 17062)
--- Name: thesaurus thesaurus_pkey1; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus thesaurus_pkey1; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus
@@ -3272,7 +3138,7 @@ ALTER TABLE ONLY public.thesaurus
 
 --
 -- TOC entry 3700 (class 2606 OID 17064)
--- Name: thesaurus_label unique_thesau_lang; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: thesaurus_label unique_thesau_lang; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.thesaurus_label
@@ -3281,7 +3147,7 @@ ALTER TABLE ONLY public.thesaurus_label
 
 --
 -- TOC entry 3702 (class 2606 OID 17066)
--- Name: user_group_label user_group-label_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: user_group_label user_group-label_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_group_label
@@ -3290,7 +3156,7 @@ ALTER TABLE ONLY public.user_group_label
 
 --
 -- TOC entry 3704 (class 2606 OID 17068)
--- Name: user_group_thesaurus user_group_thesaurus_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: user_group_thesaurus user_group_thesaurus_id_thesaurus_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_group_thesaurus
@@ -3299,7 +3165,7 @@ ALTER TABLE ONLY public.user_group_thesaurus
 
 --
 -- TOC entry 3706 (class 2606 OID 17070)
--- Name: user_group_thesaurus user_group_thesaurus_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: user_group_thesaurus user_group_thesaurus_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_group_thesaurus
@@ -3308,7 +3174,7 @@ ALTER TABLE ONLY public.user_group_thesaurus
 
 --
 -- TOC entry 3712 (class 2606 OID 17072)
--- Name: users user_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -3317,7 +3183,7 @@ ALTER TABLE ONLY public.users
 
 --
 -- TOC entry 3710 (class 2606 OID 17074)
--- Name: user_role_only_on user_role_only_on_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: user_role_only_on user_role_only_on_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_role_only_on
@@ -3326,7 +3192,7 @@ ALTER TABLE ONLY public.user_role_only_on
 
 --
 -- TOC entry 3708 (class 2606 OID 17076)
--- Name: user_role_group user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: user_role_group user_role_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_role_group
@@ -3335,7 +3201,7 @@ ALTER TABLE ONLY public.user_role_group
 
 --
 -- TOC entry 3724 (class 2606 OID 17078)
--- Name: users_historique users_historique_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users_historique users_historique_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_historique
@@ -3344,7 +3210,7 @@ ALTER TABLE ONLY public.users_historique
 
 --
 -- TOC entry 3718 (class 2606 OID 17080)
--- Name: users2 users_login_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users2 users_login_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users2
@@ -3353,7 +3219,7 @@ ALTER TABLE ONLY public.users2
 
 --
 -- TOC entry 3720 (class 2606 OID 17082)
--- Name: users2 users_mail_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users2 users_mail_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users2
@@ -3362,7 +3228,7 @@ ALTER TABLE ONLY public.users2
 
 --
 -- TOC entry 3714 (class 2606 OID 17084)
--- Name: users users_mail_key1; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users users_mail_key1; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -3371,7 +3237,7 @@ ALTER TABLE ONLY public.users
 
 --
 -- TOC entry 3722 (class 2606 OID 17086)
--- Name: users2 users_pkey; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users2 users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users2
@@ -3380,7 +3246,7 @@ ALTER TABLE ONLY public.users2
 
 --
 -- TOC entry 3716 (class 2606 OID 17088)
--- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: opentheso
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -3388,8 +3254,8 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3578 (class 1259 OID 33967)
--- Name: concept_notation_unaccent; Type: INDEX; Schema: public; Owner: opentheso
+-- TOC entry 3586 (class 1259 OID 33967)
+-- Name: concept_notation_unaccent; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX concept_notation_unaccent ON public.concept USING gin (public.f_unaccent(lower((notation)::text)) public.gin_trgm_ops);
@@ -3397,7 +3263,7 @@ CREATE INDEX concept_notation_unaccent ON public.concept USING gin (public.f_una
 
 --
 -- TOC entry 3675 (class 1259 OID 17089)
--- Name: index_lexical_value; Type: INDEX; Schema: public; Owner: opentheso
+-- Name: index_lexical_value; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_lexical_value ON public.term USING btree (lexical_value);
@@ -3405,23 +3271,23 @@ CREATE INDEX index_lexical_value ON public.term USING btree (lexical_value);
 
 --
 -- TOC entry 3686 (class 1259 OID 17090)
--- Name: index_lexical_value_copy; Type: INDEX; Schema: public; Owner: opentheso
+-- Name: index_lexical_value_copy; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_lexical_value_copy ON public.term_historique USING btree (lexical_value);
 
 
 --
--- TOC entry 3633 (class 1259 OID 33838)
--- Name: index_lexical_value_npt; Type: INDEX; Schema: public; Owner: opentheso
+-- TOC entry 3635 (class 1259 OID 33838)
+-- Name: index_lexical_value_npt; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_lexical_value_npt ON public.non_preferred_term USING btree (lexical_value);
 
 
 --
--- TOC entry 3639 (class 1259 OID 33966)
--- Name: note_lexical_value_unaccent; Type: INDEX; Schema: public; Owner: opentheso
+-- TOC entry 3641 (class 1259 OID 33966)
+-- Name: note_lexical_value_unaccent; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX note_lexical_value_unaccent ON public.note USING gin (public.f_unaccent(lower((lexicalvalue)::text)) public.gin_trgm_ops);
@@ -3429,15 +3295,15 @@ CREATE INDEX note_lexical_value_unaccent ON public.note USING gin (public.f_unac
 
 --
 -- TOC entry 3654 (class 1259 OID 17091)
--- Name: permuted_lexical_value_idx; Type: INDEX; Schema: public; Owner: opentheso
+-- Name: permuted_lexical_value_idx; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX permuted_lexical_value_idx ON public.permuted USING btree (lexical_value);
 
 
 --
--- TOC entry 3636 (class 1259 OID 33965)
--- Name: term_lexical_value_npt_unaccent; Type: INDEX; Schema: public; Owner: opentheso
+-- TOC entry 3638 (class 1259 OID 33965)
+-- Name: term_lexical_value_npt_unaccent; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX term_lexical_value_npt_unaccent ON public.non_preferred_term USING gin (public.f_unaccent(lower((lexical_value)::text)) public.gin_trgm_ops);
@@ -3445,7 +3311,7 @@ CREATE INDEX term_lexical_value_npt_unaccent ON public.non_preferred_term USING 
 
 --
 -- TOC entry 3680 (class 1259 OID 33964)
--- Name: term_lexical_value_unaccent; Type: INDEX; Schema: public; Owner: opentheso
+-- Name: term_lexical_value_unaccent; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX term_lexical_value_unaccent ON public.term USING gin (public.f_unaccent(lower((lexical_value)::text)) public.gin_trgm_ops);
@@ -3453,15 +3319,16 @@ CREATE INDEX term_lexical_value_unaccent ON public.term USING gin (public.f_unac
 
 --
 -- TOC entry 3683 (class 1259 OID 33952)
--- Name: terms_values_gin; Type: INDEX; Schema: public; Owner: opentheso
+-- Name: terms_values_gin; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX terms_values_gin ON public.term USING gin (lexical_value public.gin_trgm_ops);
 
 
--- Completed on 2019-01-09 13:43:09 CET
+-- Completed on 2019-04-18 09:24:00 CEST
 
 --
 -- PostgreSQL database dump complete
 --
+
 
