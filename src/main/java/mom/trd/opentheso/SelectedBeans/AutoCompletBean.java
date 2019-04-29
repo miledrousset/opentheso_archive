@@ -20,12 +20,14 @@ import javax.swing.event.ChangeEvent;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
+import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
+import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import org.primefaces.PrimeFaces;
 
 import org.primefaces.event.SelectEvent;
@@ -94,6 +96,23 @@ public class AutoCompletBean implements Serializable {
         editPassed = false;
     }    
     
+    public List<NodeAutoCompletion> completTermFullText(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        SearchHelper searchHelper = new SearchHelper();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            /*
+            liste = new SearchHelper().getAutoCompletionIndex(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);*/
+                
+            liste = searchHelper.searchFullText(connect.getPoolConnexion(),
+                        value,
+                        theso.getThesaurus().getLanguage(),
+                        theso.getThesaurus().getId_thesaurus());         
+        }
+        return liste;
+    }
+    
     public List<NodeAutoCompletion> completTerm(String value) {
         selectedAtt = new NodeAutoCompletion();
         SearchHelper searchHelper = new SearchHelper();
@@ -106,11 +125,56 @@ public class AutoCompletBean implements Serializable {
             liste = searchHelper.searchTermNewForAutocompletion(connect.getPoolConnexion(),
                         value,
                         theso.getThesaurus().getLanguage(),
-                        theso.getThesaurus().getId_thesaurus(),
-                        "");         
+                        theso.getThesaurus().getId_thesaurus(), "");         
         }
         return liste;
+    }  
+    
+    /**
+     * permet de retourner les infos en temps réel pour un concept 
+     * pour afficher les groupes et les définitions
+     * @param idConcept
+     * @return 
+     */
+    public String getInfosConcepts(String idConcept) {
+        String idLang = theso.getThesaurus().getLanguage();
+        String idTheso = theso.getThesaurus().getId_thesaurus();
+        String infos = "";
+        GroupHelper groupHelper = new GroupHelper();
+        NoteHelper noteHelper = new NoteHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
+        ArrayList<String> idGroups = conceptHelper.getListGroupIdOfConcept(
+                connect.getPoolConnexion(), idConcept, idTheso);
+        for (String idGroup : idGroups) {
+            infos = infos + " / " + groupHelper.getLexicalValueOfGroup(
+                    connect.getPoolConnexion(), idGroup, idTheso, idLang);         
+        }
+        TermHelper termHelper = new TermHelper();
+        String idTerm = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), idConcept, idTheso);
+               
+        ArrayList<NodeNote> nodeNotes = noteHelper.getListNotesTerm(connect.getPoolConnexion(), idTerm, idTheso, idLang);
+        for (NodeNote nodeNote : nodeNotes) {
+            infos = infos + " \n" + nodeNote.getLexicalvalue();
+        }
+        return infos;
     }
+    
+    public List<NodeAutoCompletion> completExactTerm(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        SearchHelper searchHelper = new SearchHelper();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            /*
+            liste = new SearchHelper().getAutoCompletionIndex(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);*/
+                
+            liste = searchHelper.searchExactTermNewForAutocompletion(connect.getPoolConnexion(),
+                        value,
+                        theso.getThesaurus().getLanguage(),
+                        theso.getThesaurus().getId_thesaurus(), "");         
+        }
+        return liste;
+    }     
 
     /**
      * Fonction qui permet de retrouver les concepts dans un même Group en

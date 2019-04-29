@@ -39,6 +39,125 @@ public class SearchHelper {
 //////////////////////////////////////////////////////////
     
     /**
+     * Cette fonction permet de faire une recherche par valeur sur les termes
+     * Préférés et les synonymes (la recherche porte sur les termes contenus dans une chaine)
+     * en utilisant la méthode  PostgreSQL Trigram Index, 
+     * le résultat est proche d'une recherche avec ElasticSearch
+     * 
+     * Elle retourne la liste des termes + identifiants 
+     *
+     * @param ds
+     * @param value
+     * @param idLang
+     * @param idThesaurus
+     * @return
+     */
+    public ArrayList<NodeAutoCompletion> searchFullText(HikariDataSource ds,
+            String value, String idLang, String idThesaurus) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        StringPlus stringPlus = new StringPlus();
+        
+        ArrayList<NodeAutoCompletion> nodeAutoCompletions = null;
+        value = stringPlus.convertString(value);
+        value = stringPlus.unaccentLowerString(value);
+        
+        String preparedValuePT = " and f_unaccent(lower(term.lexical_value)) % '" + value + "'";
+        String preparedValueNPT = " and f_unaccent(lower(non_preferred_term.lexical_value)) % '" + value + "'";        
+        
+        String query;
+        String lang;
+        String langSynonyme;
+       
+        // préparation de la requête en focntion du choix (toutes les langues ou langue donnée) 
+        if(idLang.isEmpty()) {
+            lang = "";
+            langSynonyme = "";
+        }
+        else {
+            lang = " and term.lang ='" + idLang + "'";
+            langSynonyme = " and non_preferred_term.lang ='" + idLang + "'";
+        }
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    nodeAutoCompletions = new ArrayList<>();
+                    query = "SELECT preferred_term.id_concept, term.lexical_value "
+                            + " FROM term, preferred_term WHERE "
+                            + " preferred_term.id_term = term.id_term AND"
+                            + " preferred_term.id_thesaurus = term.id_thesaurus"
+                            + preparedValuePT
+                            + " and term.id_thesaurus = '" + idThesaurus + "'"
+                            + lang
+                            + " order by term.lexical_value <-> '" + value + "'";
+
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                        nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                        nodeAutoCompletion.setPrefLabel(resultSet.getString("lexical_value"));
+                        nodeAutoCompletion.setIsAltLabel(false);
+                        if(value.trim().equalsIgnoreCase(resultSet.getString("lexical_value"))) {
+                            nodeAutoCompletions.add(0,nodeAutoCompletion);
+                        } else {
+                            nodeAutoCompletions.add(nodeAutoCompletion);
+                        }                        
+                    }      
+                    /**
+                     * recherche de Synonymes
+                     */
+                    query =  "SELECT preferred_term.id_concept," +
+                            " non_preferred_term.lexical_value as npt," +
+                            " term.lexical_value as pt" +
+                            " FROM"
+                            + " non_preferred_term, term, preferred_term WHERE" +
+                            
+                            "  preferred_term.id_term = term.id_term AND" +
+                            "  preferred_term.id_thesaurus = term.id_thesaurus AND" +
+                            "   preferred_term.id_term = non_preferred_term.id_term AND" +
+                            "   term.lang = non_preferred_term.lang AND" +
+                            "   preferred_term.id_thesaurus = non_preferred_term.id_thesaurus" 
+
+                            + preparedValueNPT
+                            + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
+                            + langSynonyme
+                            + " order by non_preferred_term.lexical_value <-> '" + value + "'"; 
+
+                    resultSet = stmt.executeQuery(query);
+
+                    while (resultSet.next()) {
+                        NodeAutoCompletion nodeAutoCompletion = new NodeAutoCompletion();
+                        nodeAutoCompletion.setIdConcept(resultSet.getString("id_concept"));
+                        nodeAutoCompletion.setAltLabel(resultSet.getString("npt"));
+                        nodeAutoCompletion.setPrefLabel(resultSet.getString("pt"));                        
+                        nodeAutoCompletion.setIsAltLabel(true);                        
+                        if(value.trim().equalsIgnoreCase(resultSet.getString("npt"))) {
+                            if(nodeAutoCompletions.get(0).getPrefLabel().equalsIgnoreCase(value.trim()))
+                                nodeAutoCompletions.add(1,nodeAutoCompletion);
+                            else
+                                nodeAutoCompletions.add(0,nodeAutoCompletion);
+                        } else {
+                            nodeAutoCompletions.add(nodeAutoCompletion);
+                        }
+                    }                    
+                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SearchHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeAutoCompletions;
+    }        
+    
+    
+    /**
      * Cette fonction permet de faire une recherche par value sur les termes
      * Préférés et les synonymes (la recherche porte sur les termes exactes)
      * 
@@ -200,10 +319,13 @@ public class SearchHelper {
         String preparedValueNPT = " and f_unaccent(lower(non_preferred_term.lexical_value)) % '" + value + "'";        
 //        String values [] = value.trim().split(" ");
         
+        String preRequestPT;
+        String preRequestNPT;        
+
         String query;
         String lang;
         String langSynonyme;
-        String group;
+//        String group;
 
 /*        String multivaluesTerm = "";
         String multivaluesSynonyme = "";
@@ -233,10 +355,66 @@ public class SearchHelper {
         
         // cas du choix d'un group
         if(idGroup.isEmpty()) {
-            group = "";
+        //    group = "";
+            preRequestPT = "SELECT\n" +
+                        "  preferred_term.id_concept, \n" +
+                        "  term.lexical_value,\n" +
+                        "  concept.id_handle, \n" +
+                        "  concept.id_ark\n" +
+                        "  FROM term, preferred_term, concept\n" +
+                        "   where\n" +
+                        "  \n" +
+                        "  preferred_term.id_term = term.id_term AND\n" +
+                        "  preferred_term.id_thesaurus = term.id_thesaurus AND\n" +
+                        "  concept.id_concept = preferred_term.id_concept AND\n" +
+                        "  concept.id_thesaurus = preferred_term.id_thesaurus";
+            
+            preRequestNPT = "SELECT preferred_term.id_concept," +
+                            " non_preferred_term.lexical_value as npt," +
+                            " term.lexical_value as pt," +
+                            " concept.id_ark, concept.id_handle FROM"
+                            + " non_preferred_term, term, preferred_term, concept WHERE" +
+                    
+                            "  preferred_term.id_term = term.id_term AND" +
+                            "  preferred_term.id_thesaurus = term.id_thesaurus AND" +
+                            "   preferred_term.id_term = non_preferred_term.id_term AND" +
+                            "   term.lang = non_preferred_term.lang AND" +
+                            "   preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND" +
+                            "   preferred_term.id_thesaurus = concept.id_thesaurus AND" +
+                            "   preferred_term.id_concept = concept.id_concept" ;           
         }
         else {
-            group = " and idgroup = '" + idGroup + "'";
+            preRequestPT = "SELECT\n" +
+                        "  preferred_term.id_concept, \n" +
+                        "  term.lexical_value,\n" +
+                        "  concept.id_handle, \n" +
+                        "  concept.id_ark\n" +
+                        "  FROM term, preferred_term, concept\n" +
+                        "   where\n" +
+                        "  \n" +
+                        "  preferred_term.id_term = term.id_term AND\n" +
+                        "  preferred_term.id_thesaurus = term.id_thesaurus AND\n" +
+                        "  concept.id_concept = preferred_term.id_concept AND\n" +
+                        "  concept.id_thesaurus = preferred_term.id_thesaurus" +
+                        " and idgroup = '" + idGroup + "'";
+            
+            preRequestNPT = "SELECT preferred_term.id_concept," +
+                            " non_preferred_term.lexical_value as npt," +
+                            " term.lexical_value as pt," +
+                            " concept.id_concept, concept.id_ark, concept.id_handle FROM"
+                            + " non_preferred_term, term, preferred_term,concept_group_concept, concept WHERE" +
+                            " concept.id_concept = concept_group_concept.idconcept AND" +
+                            "  preferred_term.id_term = term.id_term AND" +
+                            "  preferred_term.id_thesaurus = term.id_thesaurus AND" +
+                            "  concept.id_thesaurus = concept_group_concept.idthesaurus AND" +
+                            "   preferred_term.id_term = non_preferred_term.id_term AND" +
+                            "   term.lang = non_preferred_term.lang AND" +
+                            "   preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND" +
+                            "   preferred_term.id_thesaurus = concept.id_thesaurus AND" +
+                            "   preferred_term.id_concept = concept.id_concept" + 
+                            " and idgroup = '" + idGroup + "'";
+            
+            //group = " and idgroup = '" + idGroup + "'";
         }
         
         
@@ -246,7 +424,7 @@ public class SearchHelper {
                 stmt = conn.createStatement();
                 try {
                     nodeAutoCompletions = new ArrayList<>();
-                    query = "SELECT preferred_term.id_concept, term.lexical_value, "
+                    query = /*"SELECT preferred_term.id_concept, term.lexical_value, "
                             + " concept.id_concept, concept.id_ark, concept.id_handle"
                             + " FROM term, preferred_term, concept,concept_group_concept WHERE "
                             + "concept_group_concept.idthesaurus  = term.id_thesaurus AND "
@@ -254,12 +432,13 @@ public class SearchHelper {
                             + " concept.id_concept = preferred_term.id_concept AND"
                             + " concept.id_thesaurus = preferred_term.id_thesaurus AND"
                             + " preferred_term.id_term = term.id_term AND"
-                            + " preferred_term.id_thesaurus = term.id_thesaurus"
+                            + " preferred_term.id_thesaurus = term.id_thesaurus"*/
+                            preRequestPT
                             + preparedValuePT
                             + " and term.id_thesaurus = '" + idThesaurus + "'"
                             + lang
-                            + group
-                            + " order by term.lexical_value <> '" + value + "'";
+                        //    + group
+                            + " order by term.lexical_value <-> '" + value + "'";
 
                     
 
@@ -303,7 +482,8 @@ public class SearchHelper {
                      */
                     
                     
-                    query =  "SELECT preferred_term.id_concept," +
+                    query = preRequestNPT
+                            /*"SELECT preferred_term.id_concept," +
                             " non_preferred_term.lexical_value as npt," +
                             " term.lexical_value as pt," +
                             " concept.id_concept, concept.id_ark, concept.id_handle FROM"
@@ -316,13 +496,13 @@ public class SearchHelper {
                             "   term.lang = non_preferred_term.lang AND" +
                             "   preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND" +
                             "   preferred_term.id_thesaurus = concept.id_thesaurus AND" +
-                            "   preferred_term.id_concept = concept.id_concept"
+                            "   preferred_term.id_concept = concept.id_concept"*/
 
                             + preparedValueNPT
                             + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
                             + langSynonyme
-                            + group
-                            + " order by non_preferred_term.lexical_value <> '" + value + "'"; 
+                        //    + group
+                            + " order by non_preferred_term.lexical_value <-> '" + value + "'"; 
                     
                     /// deprécated by Miled, remplacé par la requête ci-dessus qui gère le lien entre les altLabels et les prefLabels 
                    /* query = "SELECT preferred_term.id_concept, non_preferred_term.lexical_value, "

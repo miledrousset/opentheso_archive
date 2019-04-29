@@ -15,7 +15,7 @@
                     <tr>
                         <td>
                             <h:form >
-                                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="values"
+                                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTermFullText}" var="values"
                                                 minQueryLength="1" itemLabel="#{values.prefLabel}" itemValue="#{values}" converter="termConverter"
                                                 scrollHeight="600"
                                                 a:placeholder="#{langueBean.getMsg('indexSearch')}"  style="font-size: 12px;">

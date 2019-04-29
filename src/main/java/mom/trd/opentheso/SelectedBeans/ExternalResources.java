@@ -47,6 +47,7 @@ public class ExternalResources implements Serializable {
         images.clear();
         ExternalImagesHelper imagesHelper = new ExternalImagesHelper();
         nodeImages = imagesHelper.getExternalImages(connect.getPoolConnexion(), idConcept, idTheso);
+        if(nodeImages == null) return; 
         for (NodeImage nodeImage : nodeImages) {
             images.add(nodeImage.getUri());
         }

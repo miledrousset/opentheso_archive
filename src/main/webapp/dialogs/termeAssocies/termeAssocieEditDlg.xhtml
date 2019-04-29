@@ -18,24 +18,22 @@
                 <br/><br/>
                 
                 <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
-                <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.completTerm}" var="t3"
-                                scrollHeight="300"
-                                itemLabel="#{t3.prefLabel}" itemValue="#{t3}" converter="termConverter" forceSelection="true">
-                    <f:facet name="itemtip">
-                        <h:panelGrid columns="2" cellpadding="5" width="200" >
-                            <f:facet name="header" rendered="#{(t3.url) != null}">
-                                <h:outputText value="ID : " />
-                                <h:outputText value="#{t3.idConcept}" />
-                            </f:facet>
+                    <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="values"
+                                    forceSelection="false" active="true"  scrollHeight="300" 
+                                    itemLabel="#{values.prefLabel}" itemValue="#{values}" converter="termConverterLexical">
+                        <p:column rendered="#{values.isAltLabel}" style="font-size: 12px;">
+                            <h:outputText title="#{values.idConcept}" value="#{values.altLabel}"
+                                          style="font-style: italic; color: darkred" />
+                            <h:outputText title="#{values.idConcept}" value=" -> #{values.prefLabel}" style="font-weight: bold;" />                                        
+                        </p:column>
 
-                            <h:outputText value="#{langueBean.getMsg('autoComp1')} : " />
-                            <h:outputText value="#{t3.groupLexicalValue}" />
-
-                            <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                            <h:outputText value="#{t3.definition}" />
-                        </h:panelGrid>
-                    </f:facet>
-                </p:autoComplete>
+                        <p:column rendered="#{!values.isAltLabel}" style="font-size: 12px;">
+                            <h:outputText title="#{values.idConcept}" value="#{values.prefLabel}" />
+                        </p:column>
+                        <p:column style="font-size: 12px;">
+                            <h:outputText value="#{values.groupLexicalValue}" />
+                        </p:column>
+                    </p:autoComplete>
                 <br/><br/>
                 <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newTAsso()}" 
                                  update=":panContenu, :messages" styleClass="styleButton" oncomplete="PF('termeAssocieEditDlg').hide();"/> 
