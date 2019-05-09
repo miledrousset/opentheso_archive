@@ -1384,6 +1384,17 @@ input[type="button"], input[type="submit"]{
     border-radius: 5px;
 }
 
+/**********************************Autocomplete***********************************/
+
+
+.panelTest .ui-autocomplete-items .ui-state-highlight {
+    background-color: lightgrey;
+    
+}
+
+    
+
+/**********************************Fin autocomplete***********************************/
 
 
 

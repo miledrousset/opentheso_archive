@@ -34,7 +34,7 @@
 
             
             Le thésaurus <b> <h:outputText value="#{theso.thisTheso.title}" /> </b> est accessible par webservices en : 
-            <h:outputLink value="#{theso.cheminSite}webresources/application.wadl"> 
+            <h:outputLink value="#{theso.cheminSite}api/application.wadl"> 
                 <h:outputText value="REST" />
             </h:outputLink>
             <br/><br/>
@@ -52,114 +52,6 @@
 
 
 
-            
-            <h:panelGroup rendered="#{ (selectedTerme.idC == null)}">
-                <h:outputText value="!!!! Pour voir un exemple de fonctionnement du websevrices, il faut d'abord sélectionner un Concept dans le thésaurus !!!!"
-                              style="color: red" />
-            
-            </h:panelGroup>
-            
-            <h:panelGroup rendered="#{ (selectedTerme.idC != null)  and (selectedTerme.idC.trim() != '')}">
-            
-                <h4> JsonLd :</h4>
-
-                Recherche par identifiant du concept :
-                <br/>
-                <h:outputLink value="#{theso.cheminSite}webresources/rest/jsonld/concept/id=#{selectedTerme.idC}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/jsonld/concept/id=#{selectedTerme.idC}&amp;th=#{selectedTerme.idTheso}" />
-                </h:outputLink>            
-                <br/>
-
-                Recherche par identifiant Ark :
-                <br/>
-                <h:outputLink
-                    rendered="#{(selectedTerme.idArk != '') }" value="#{theso.cheminSite}webresources/rest/jsonld/ark:/#{selectedTerme.idArk}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/jsonld/ark:/#{selectedTerme.idArk}" />
-                </h:outputLink>             
-
-                <br/>
-                Recherche par la valeur d'un concept :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/jsonld/concept/value=#{selectedTerme.urlEncodeUtf_8(selectedTerme.nom)}&amp;lang=#{selectedTerme.idlangue}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/jsonld/concept/value=#{selectedTerme.nom}&amp;lang=#{selectedTerme.idlangue}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink> 
-                <br/><br/>
-
-
-                Recherche par valeur et par groupe ou domaine :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/jsonld/concept/value=#{selectedTerme.urlEncodeUtf_8(selectedTerme.nom)}&amp;lang=#{selectedTerme.idlangue}&amp;idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/jsonld/concept/value=#{selectedTerme.nom}&amp;lang=#{selectedTerme.idlangue}&amp;idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>
-
-                <br/><br/>
-
-                Récupération de tous les domaines d'un thésaurus :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/jsonld/concept/th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/jsonld/concept/th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>                
-
-
-                <h4>SKOS :</h4> 
-
-                Recherche par identifiant du Group ou Domaine :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/skos/concept/idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/concept/idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>            
-                <br/><br/>
-
-                Recherche par identifiant du concept :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/skos/concept/id=#{selectedTerme.idC}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/concept/id=#{selectedTerme.idC}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>              
-                <br/><br/>
-
-                Recherche par identifiant Ark :
-                <br/>
-                <h:outputLink
-                    rendered="#{(selectedTerme.idArk != '') }" value="#{theso.cheminSite}webresources/rest/skos/ark:/#{selectedTerme.idArk}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/ark:/#{selectedTerme.idArk}" />
-                </h:outputLink> 
-                <br/><br/>
-
-
-                Recherche par valeur :
-                <br/>
-                <h:outputLink
-                    value="#{theso.cheminSite}webresources/rest/skos/concept/value=#{selectedTerme.urlEncodeUtf_8(selectedTerme.nom)}&amp;lang=#{selectedTerme.idlangue}&amp;th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/concept/value=#{selectedTerme.nom}&amp;lang=#{selectedTerme.idlangue}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>             
-                <br/><br/>
-
-                Recherche par valeur et par groupe ou domaine :
-                <br/>
-                <h:outputLink 
-                    value="#{theso.cheminSite}webresources/rest/skos/concept/value=#{selectedTerme.urlEncodeUtf_8(selectedTerme.nom)}&amp;lang=#{selectedTerme.idlangue}&amp;idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}" > 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/concept/value=#{selectedTerme.nom}&amp;lang=#{selectedTerme.idlangue}&amp;idg=#{selectedTerme.idDomaine}&amp;th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>
-                <br/><br/>
-
-                Récupération de tous les domaines d'un thésaurus :
-                <br/>
-                <h:outputLink 
-                    value="#{theso.cheminSite}webresources/rest/skos/concept/th=#{selectedTerme.idTheso}"> 
-                    <h:outputText value="#{theso.cheminSite}webresources/rest/skos/concept/th=#{selectedTerme.idTheso}"/>
-                </h:outputLink>            
-            
-            </h:panelGroup>
-            
-
-
-            <br/><br/>
-            <br/><br/>
         </div>
 
     </h:body>

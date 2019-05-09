@@ -17,7 +17,7 @@
                     <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
                             :panExport,:externalResources,:idImageGaleriaDlg"   >
                     </p:ajax>
-                    <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag" />                       
+                      
                     <p:treeNode ariaLabel="#{node}" type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close"  >  
                         <h:outputText  value="#{node}"  />  

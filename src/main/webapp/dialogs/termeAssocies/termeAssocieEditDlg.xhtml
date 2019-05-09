@@ -7,37 +7,44 @@
 
     <!-- Gestion de la note -->
     <p:dialog id="idTermeAssocieEditDlg"  header="#{langueBean.getMsg('index.RT')}" widgetVar="termeAssocieEditDlg" modal="true" resizable="false">
-        <fieldset>
-            <legend><h:outputText value="#{langueBean.getMsg('related.relation')}" /></legend>
-            <h:form>
+        <h:form>        
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('related.relation')}" /></legend>
+
                 <p:messages showDetail="true">
                     <p:autoUpdate />
                 </p:messages>  <br/>
 
                 <h:outputText value="#{newtreeBean.selectedTerme.nom}" />
                 <br/><br/>
-                
+
                 <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
-                    <p:autoComplete id="lVTSpe" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTerm}" var="values"
-                                    forceSelection="false" active="true"  scrollHeight="300" 
-                                    itemLabel="#{values.prefLabel}" itemValue="#{values}" converter="termConverterLexical">
-                        <p:column rendered="#{values.isAltLabel}" style="font-size: 12px;">
-                            <h:outputText title="#{values.idConcept}" value="#{values.altLabel}"
-                                          style="font-style: italic; color: darkred" />
-                            <h:outputText title="#{values.idConcept}" value=" -> #{values.prefLabel}" style="font-weight: bold;" />                                        
+
+                
+                
+                    <p:autoComplete id="addRelationNT" value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getAutoCompletForRelationNT}" var="concept"
+                                    forceSelection="true" active="true"   scrollHeight="300"
+                                    itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
+                        <p:column style="width:10%">
+                            <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}"  />
+                            <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
                         </p:column>
 
-                        <p:column rendered="#{!values.isAltLabel}" style="font-size: 12px;">
-                            <h:outputText title="#{values.idConcept}" value="#{values.prefLabel}" />
+                        <p:column style="width:60%">
+                            <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}"  style="font-style: italic; color: palegreen" />
+                            <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.prefLabel}" />
                         </p:column>
-                        <p:column style="font-size: 12px;">
-                            <h:outputText value="#{values.groupLexicalValue}" />
+                        <p:column>
+                            <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}"  />
+                            <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.groupLexicalValue}" />
                         </p:column>
-                    </p:autoComplete>
+                    </p:autoComplete>                
+                
                 <br/><br/>
                 <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.newTAsso()}" 
                                  update=":panContenu, :messages" styleClass="styleButton" oncomplete="PF('termeAssocieEditDlg').hide();"/> 
-            </h:form>
-        </fieldset>
+
+            </fieldset>
+        </h:form>        
     </p:dialog>
 </ui:composition>

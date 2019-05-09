@@ -19,19 +19,19 @@
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
                                 <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationNT}" var="concept"
-                                                forceSelection="true" active="true"  queryDelay="1000" scrollHeight="300"
+                                                forceSelection="true" active="true"   scrollHeight="300"
                                                 itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
                                     <p:column style="width:10%">
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}" style="color: green; font-style: italic"/>
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}"  />
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
                                     </p:column>
 
                                     <p:column style="width:60%">
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}" style="color: green; font-style: italic" />
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}"  style="font-style: italic; color: palegreen" />
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.prefLabel}" />
                                     </p:column>
                                     <p:column>
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}" style="color: green; font-style: italic"/>
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}"  />
                                         <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.groupLexicalValue}" />
                                     </p:column>
                                 </p:autoComplete>

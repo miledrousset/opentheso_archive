@@ -94,7 +94,11 @@ public class AutoCompletBean implements Serializable {
         duplicate = false;
         forced = false;
         editPassed = false;
-    }    
+    }
+    
+    public void initVariables(){
+        selectedAtt = null;
+    }
     
     public List<NodeAutoCompletion> completTermFullText(String value) {
         selectedAtt = new NodeAutoCompletion();

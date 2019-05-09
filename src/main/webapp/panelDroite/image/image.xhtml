@@ -17,9 +17,6 @@
                         <p:commandButton id="imageMenu" rendered="#{selectedTerme.type != 1}" 
                                          styleClass="cbEdit" icon="ui-icon-edit-16" >
                             <p:menu style="background: #CEF0C4" overlay="true" trigger="imageMenu" my="left top" at="left bottom">
-
-                                <p:menuitem value="#{langueBean.getMsg('image.add')}"  update=":panPopUp" oncomplete="PF('imageDlg').show();" style="font-size: 12px;"/>
-
                                 <p:menuitem value="#{langueBean.getMsg('image.delete')}" update=":idDeleteImageDlg" oncomplete="PF('deleteImageDlg').show();" style="font-size: 12px;" />
                             </p:menu>
                         </p:commandButton>   
