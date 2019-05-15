@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import mom.trd.opentheso.core.imports.csv.CsvHelper;
+import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.After;
@@ -77,10 +77,10 @@ public class ImportCsv {
     
     @Test
     public void readFileTest() throws FileNotFoundException {
-        CsvHelper csvHelper = new CsvHelper();
+        CsvReadHelper csvHelper = new CsvReadHelper();
         String path = "/Users/Miled/Desktop/listNT.csv";
       //  csvHelper.readFile(path);
-        ArrayList<CsvHelper.ConceptObject> conceptObjects = csvHelper.getConceptObjects();
+        ArrayList<CsvReadHelper.ConceptObject> conceptObjects = csvHelper.getConceptObjects();
         int i = 0;
     }    
 

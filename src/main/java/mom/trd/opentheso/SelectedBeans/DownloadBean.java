@@ -28,7 +28,7 @@ import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD_Frantiq;
 import mom.trd.opentheso.core.exports.pdf.WritePdf;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
-import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
+import mom.trd.opentheso.core.exports.rdf4j.ExportRdf4jHelper;
 import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;

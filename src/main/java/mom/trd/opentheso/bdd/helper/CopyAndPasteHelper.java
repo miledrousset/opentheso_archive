@@ -14,7 +14,7 @@ import mom.trd.opentheso.SelectedBeans.SelectedTerme;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
-import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
+import mom.trd.opentheso.core.exports.rdf4j.ExportRdf4jHelper;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 import org.eclipse.rdf4j.rio.RDFFormat;

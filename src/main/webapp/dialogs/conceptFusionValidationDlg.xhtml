@@ -31,10 +31,10 @@
                                 <tr>
                                     <td><h:outputText value="#{itemFuRT.title} (#{itemFuRT.idConcept})" /></td>
                                     <td>
-                                        <h:form>
+
                                             <p:commandButton id="cbSuppRTFuTheso" styleClass="cbSupp" icon="ui-icon-supp"  update=":idConceptFusionValidationDlg"
                                                              oncomplete="PF('conceptFusionValidationDlg').show();" actionListener="#{selectedTerme.delRTFusion(itemFuRT)}" />
-                                        </h:form>
+
                                     </td>
                                 </tr>
                             </ui:repeat>
@@ -57,11 +57,11 @@
                                     <td><h:outputText value="#{itemDelFuAlign.uri_target}" /></td>
                                     <td><h:outputText value="#{itemDelFuAlign.concept_target}" /></td>
                                     <td>
-                                        <h:form>
+
                                             <p:commandButton id="cbSuppFiAlign" styleClass="cbSupp" icon="ui-icon-supp" 
                                                              actionListener="#{selectedTerme.delFuAlign(itemDelFuAlign)}" update=":idConceptFusionValidationDlg"
                                                              oncomplete="PF('conceptFusionValidationDlg').show();"/>
-                                        </h:form>
+
                                     </td>
                                 </tr>
                             </ui:repeat>
@@ -70,12 +70,12 @@
                 </tr>
                 <tr>
                     <td colspan="1" style="text-align: center;">
-                        <h:form>
+
                             <p:commandButton id="cbCptFu" title="#{langueBean.getMsg('btnOk')}" icon="ui-icon-valider"
                                               actionListener="#{newtreeBean.fusionConcept()}"
                                               update=":idConceptFusionValidationDlg,:accordeonTree,:panContenu," styleClass="styleButton"                                               
                                               oncomplete="PF('conceptFusionValidationDlg').hide();"/>
-                        </h:form>
+
                     </td>
                     <td colspan="1" style="text-align: center;">
                         <p:commandButton title="Cancel" icon="ui-icon-retour" actionListener="#{newtreeBean.initConceptFusion()}" 

@@ -41,10 +41,12 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
-import mom.trd.opentheso.core.imports.csv.CsvHelper;
+import mom.trd.opentheso.core.imports.csv.CsvImportHelper;
+import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import mom.trd.opentheso.ws.handle.HandleHelper;
+import mom.trd.opentheso.ws.rest.theso;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.primefaces.PrimeFaces;
@@ -101,7 +103,7 @@ public class NewTreeBean implements Serializable {
     private String iconSort = "ui-icon-sort-16";
     private String sortTitle = "tree.sortByNotation";
 
-    private ArrayList<CsvHelper.ConceptObject> conceptObjects;
+    private ArrayList<CsvReadHelper.ConceptObject> conceptObjects;
 
     public NewTreeBean() {
         root = (TreeNode) new DefaultTreeNode("Root", null);
@@ -2252,6 +2254,7 @@ public class NewTreeBean implements Serializable {
     }
 
     /*fonction pour importer de multiples NT, une seule colonne sans Id ****/
+    // deprecated by Miled
     public void addMultipleNT() {
         InputStream is = null;
         ArrayList<String> narrowerTerm = new ArrayList<>();
@@ -2300,68 +2303,27 @@ public class NewTreeBean implements Serializable {
      * #MR en cours de construction
      */
     public void addMultipleNT2() {
-
-        Term terme = new Term();
-        TermHelper termHelper = new TermHelper();
-        ConceptHelper conceptHelper = new ConceptHelper();
-        String idconcept = null;
-
         if (conceptObjects == null) {
+            FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "No values"));
             return;
         }
-        for (CsvHelper.ConceptObject conceptObject : conceptObjects) {
-            /*      NodeAutoCompletion nac=new NodeAutoCompletion();
-            nac.setTermLexicalValue(nt);
-            this.selectedTerme.setSelectedTermComp(nac);*/
+        
+        CsvImportHelper csvImportHelper = new CsvImportHelper(roleOnTheso.getNodePreference());
 
-            for (CsvHelper.Label prefLabel : conceptObject.getPrefLabels()) {
-                if (prefLabel.getLang().equalsIgnoreCase("fr")) {
-
-                    selectedTerme.setValueEdit(conceptObject.getPrefLabels().get(0).getLabel());
-                    selectedTerme.creerTermeSpe((MyTreeNode) getSelectedNode(), "NT", null, conceptObject.getId());//conceptObject.getId());
-
-                    idconcept = selectedTerme.getIdConceptTemp();
-                    /*
-                    new NoteHelper().addTermNote(connect.getPoolConnexion(),
-                                termHelper.getIdTermOfConcept(connect.getPoolConnexion(),
-                                        idconcept, ((MyTreeNode)getSelectedNode()).getIdTheso()),
-                                "fr",
-                                ((MyTreeNode)getSelectedNode()).getIdTheso(),
-                                "Id_Calenda :" + conceptObject.getOldId()
-                                        + " ## Id_OE :" + conceptObject.getOldId2()
-                                        + " ## Id_old :" + conceptObject.getOldId3(),//"noteHistorique",
-                                "historyNote", 1);
-                     */
-
-                } // ajout des traductions
-                else {
-                    if (idconcept != null) {
-                        terme.setId_thesaurus(((MyTreeNode) getSelectedNode()).getIdTheso());
-                        terme.setLang(prefLabel.getLang());
-                        terme.setLexical_value(prefLabel.getLabel());
-                        terme.setId_term(
-                                termHelper.getIdTermOfConcept(connect.getPoolConnexion(),
-                                        idconcept, ((MyTreeNode) getSelectedNode()).getIdTheso()));
-                        terme.setContributor(1);
-                        terme.setCreator(1);
-                        terme.setSource("");
-                        terme.setStatus("");
-                        /*  if (termHelper.isTermExist(connect.getPoolConnexion(),
-                                terme.getLexical_value(),
-                                terme.getId_thesaurus(), terme.getLang())) {
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error4")));
-                            return;
-                        }*/
-                        if (!conceptHelper.addConceptTraduction(connect.getPoolConnexion(), terme, 1)) {
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Error"));
-                            return;
-                        }
-                    }
-
-                }
-            }
-
+        // ajout des concepts
+        String idPere = selectedTerme.getIdC();
+        if( ((MyTreeNode) selectedNode).isIsGroup() || ((MyTreeNode) selectedNode).isIsSubGroup()){
+            idPere = null;
+        }        
+        for (CsvReadHelper.ConceptObject conceptObject : conceptObjects) {
+            csvImportHelper.addSingleConcept(connect.getPoolConnexion(),
+                    idThesoSelected, idPere, selectedTerme.getIdDomaine(),
+                    selectedTerme.getUser().getUser().getIdUser(), conceptObject);
         }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "infos:", csvImportHelper.getMessage()));
+        reloadTree();
     }
 
     public void handleFileUpload(FileUploadEvent event) {
@@ -2381,9 +2343,14 @@ public class NewTreeBean implements Serializable {
 
     private boolean readCsvFile(FileUploadEvent event) {
         try {
-            Reader in = new InputStreamReader(event.getFile().getInputstream());
-            CsvHelper csvHelper = new CsvHelper();
-            if (!csvHelper.readFile(in)) {
+            Reader in1 = new InputStreamReader(event.getFile().getInputstream());
+            CsvReadHelper csvHelper = new CsvReadHelper();
+            if(! csvHelper.setLangs(in1)){
+                return false;
+            }
+            
+            Reader in2 = new InputStreamReader(event.getFile().getInputstream());            
+            if (!csvHelper.readFile(in2)) {
                 return false;
             }
 
@@ -2675,7 +2642,7 @@ public class NewTreeBean implements Serializable {
         this.sortTitle = sortTitle;
     }
 
-    public ArrayList<CsvHelper.ConceptObject> getConceptObjects() {
+    public ArrayList<CsvReadHelper.ConceptObject> getConceptObjects() {
         return conceptObjects;
     }
 

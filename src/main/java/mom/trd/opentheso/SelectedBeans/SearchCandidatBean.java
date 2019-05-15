@@ -92,7 +92,7 @@ public class SearchCandidatBean {
         
     }
     public void init(){
-       
+       if(st == null) return;
        this.candidats=st.listeCandidats();
        this.candidatsA=st.listeCdtArchives();
        this.candidatsV=st.listeCdtValid();

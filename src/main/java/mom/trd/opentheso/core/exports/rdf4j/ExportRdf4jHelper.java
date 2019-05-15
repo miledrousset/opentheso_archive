@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mom.trd.opentheso.core.exports.rdf4j.helper;
+package mom.trd.opentheso.core.exports.rdf4j;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;

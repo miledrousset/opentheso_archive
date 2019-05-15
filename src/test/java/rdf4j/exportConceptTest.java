@@ -15,7 +15,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
-import mom.trd.opentheso.core.exports.rdf4j.helper.ExportRdf4jHelper;
+import mom.trd.opentheso.core.exports.rdf4j.ExportRdf4jHelper;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 import org.junit.After;

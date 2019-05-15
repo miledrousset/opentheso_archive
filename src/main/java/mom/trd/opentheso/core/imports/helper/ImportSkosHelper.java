@@ -1700,7 +1700,7 @@ public class ImportSkosHelper {
         ConceptHelper conceptHelper = new ConceptHelper();
         ToolsHelper toolsHelper = new ToolsHelper();
         String id = toolsHelper.getNewId(10);
-        while (conceptHelper.isIdExiste(ds, id, thesaurus.getId_thesaurus())) {
+        while (conceptHelper.isIdExiste(ds, id)) {
             id = toolsHelper.getNewId(10);
         }
         return id;

@@ -581,7 +581,16 @@ public class ConceptHelper {
         }
 
         return idConcept;
-    }    
+    }
+    
+    private String getAlphaNumericId (HikariDataSource ds){
+        ToolsHelper toolsHelper = new ToolsHelper();
+        String id = toolsHelper.getNewId(10);
+        while (isIdExiste(ds, id)) {
+            id = toolsHelper.getNewId(10);
+        }
+        return id;
+    }
     
     /**
      * focntion qui permet de récupérer le Delta des Id concepts créés ou
@@ -723,203 +732,39 @@ public class ConceptHelper {
     }
 
    
-
-    /*
-        public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
-            String idConceptDeTete,
-            String idTheso,
-            ArrayList<String> lisIds, int id_alignement_source, ArrayList<String> tmp) {
-
-        lisIds.add(idConceptDeTete);
-
-        ArrayList<String> listIdsOfConceptChildren
-                = getListChildrenOfConceptNotExist(hd, idConceptDeTete, idTheso,id_alignement_source);
-        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
-            getIdsOfBranchParLot(hd, listIdsOfConceptChildren1,
-                    idTheso, lisIds, id_alignement_source,tmp);
-        }
-        return lisIds;
-    }*/
     /**
-     * ************************************************************
-     * /**************************************************************
-     * Fin des nouvelles fonctions stables auteur Miled Rousset
-     * /**************************************************************
-     * /*************************************************************
-     */
-    /**
-     * Cette fonction permet d'ajouter un Top Concept avec le libellé et les
-     * relations Si l'opération échoue, on rollback les modifications
-     *
-     * @param ds
-     * @param idParent
-     * @param concept
-     * @param term
-     * @param idUser
-     * @return null si le term existe ou si erreur, sinon le numero de Concept
-     */
-    public String addTopConcept(HikariDataSource ds,
-            String idParent,
-            Concept concept, Term term,
-            int idUser) {
-        ArrayList<String> idConcepts = new ArrayList<>();
-        Connection conn = null;
-
-        try {
-            conn = ds.getConnection();
-            conn.setAutoCommit(false);
-
-            TermHelper termHelper = new TermHelper();
-            // controle si le term existe avant de rajouter un concept
-            if (termHelper.isTermExist(ds, term.getLexical_value(),
-                    term.getId_thesaurus(), term.getLang())) {
-                conn.close();
-                return null;
-            }
-
-            concept.setTopConcept(true);
-            String idConcept = addConceptInTable(conn, concept, idUser);
-            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
-
-            if (idConcept == null) {
-                conn.rollback();
-                conn.close();
-                return null;
-            }
-
-            String idTerm = termHelper.addTerm(conn, term, idConcept, idUser);
-            if (idTerm == null) {
-                conn.rollback();
-                conn.close();
-                return null;
-            }
-            term.setId_term(idTerm);
-            
-            if (nodePreference != null) {
-                // création de l'identifiant Handle
-                if (nodePreference.isUseHandle()) {
-                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
-                        conn.rollback();
-                        conn.close();
-                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
-                    }
-                }
-            }
-
-            conn.commit();
-            conn.close();
-            
-            
-            // Si on arrive ici, c'est que tout va bien 
-            // alors c'est le moment de récupérer le code ARK
-            if (nodePreference != null) {
-                if (nodePreference.isUseArk()) {
-                    idConcepts.add(idConcept);
-                    if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
-                        message = message + "La création Ark a échouée";
-                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
-                    }
-                }
-            }            
-            
-            return idConcept;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex1) {
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Cette fonction permet d'ajouter une traduction à un TopConcept
-     *
-     * @param ds
-     * @param term
-     * @param idUser
-     * @return null si le term existe ou si erreur, sinon le numero de Concept
-     */
-    public boolean addTopConceptTraduction(
-            HikariDataSource ds, Term term, int idUser) {
-
-        TermHelper termHelper = new TermHelper();
-        // controle si le term existe avant de rajouter un concept
-        if (termHelper.isTermExist(ds, term.getLexical_value(),
-                term.getId_thesaurus(), term.getLang())) {
-            return false;
-        }
-        Connection conn = null;
-        try {
-            conn = ds.getConnection();
-            conn.setAutoCommit(false);
-            if (!termHelper.addTermTraduction(conn, term, idUser)) {
-                conn.rollback();
-                conn.close();
-                return false;
-            }
-            conn.commit();
-            conn.close();
-
-            // cette fonction permet de remplir la table Permutée
-            termHelper.splitConceptForPermute(ds, term.getId_concept(),
-                    getGroupIdOfConcept(ds, term.getId_concept(), term.getId_thesaurus()),
-                    term.getId_thesaurus(),
-                    term.getLang(),
-                    term.getLexical_value());
-
-            return true;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex1) {
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Cette fonction permet d'ajouter un Concept complet à la base avec le
-     * libellé et les relations Si l'opération échoue, elle envoi un NULL et ne
+     * Cette fonction permet d'ajouter un Concept 
+     * Si l'opération échoue, elle envoi un NULL et ne
      * modifie pas la base de données
      *
      * @param ds
+     * @param idTheso
      * @param idParent
-     * @param relationType
-     * @param concept
-     * @param term
+     * @param idGroup
      * @param idUser
      * @return null si le term existe ou si erreur, sinon le numero de Concept
+     * #MR
      */
-    public String addConcept(HikariDataSource ds,
+  /*  public String addConceptNew(HikariDataSource ds,
+            String idTheso,
             String idParent,
-            String relationType,
-            Concept concept, Term term, int idUser) {
+            String idConcept,
+            String idGroup,
+            int idUser) {
 
         ArrayList<String> idConcepts = new ArrayList<>();
         Connection conn = null;
+        
+        // topTerm
+        boolean topConcept = false;
+        
         try {
             conn = ds.getConnection();
             conn.setAutoCommit(false);
+            if(idParent != null)
+                topConcept = true;
 
-            TermHelper termHelper = new TermHelper();
-            // controle si le term existe avant de rajouter un concept
-            /*if (termHelper.isTermExist(ds, term.getLexical_value(),
-             term.getId_thesaurus(), term.getLang())) {
-             conn.close();
-             return null;
-             }*/
-            concept.setTopConcept(false);
-
-            String idConcept = addConceptInTable(conn, concept, idUser);
+            String idConcept = addConceptInTableNew(ds, idTheso, idConcept, idGroup, idGroup, idTheso, topConcept)conn, concept, idUser);
             new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
             if (idConcept == null) {
                 conn.rollback();
@@ -938,7 +783,7 @@ public class ConceptHelper {
             /**
              * ajouter le lien hiérarchique
              */
-            String inverseRelation = "BT";
+     /*       String inverseRelation = "BT";
             if(relationType == null) 
                 relationType = "NT";
             switch (relationType) {
@@ -1018,7 +863,418 @@ public class ConceptHelper {
             }
         }
         return null;
+    }*/
+    
+    /**
+     * Cette fonction permet d'ajouter un Concept à la table Concept, en
+     * avec RollBack
+     *
+     * @param conn
+     * @param concept
+     * @param idUser
+     * @return
+     * #MR en construction
+     */
+    private String addConceptInTableNew(HikariDataSource ds,
+            String idTheso,
+            String idConcept,
+            String idArk,
+            String status,
+            String notation,
+            boolean isTopConcept) {
+
+        Connection conn;
+        Statement stmt;
+
+        if (notation == null)
+            notation = "";
+        if (status == null)
+            status = "";
+        
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                String query;
+                try {
+                    // Si l'idConcept = null, c'est un nouveau concept sans Id fourni
+                    if(idConcept == null) {
+                        if (nodePreference.getIdentifierType() == 1) { // identifiants types alphanumérique
+                            ToolsHelper toolsHelper = new ToolsHelper();
+                            idConcept = toolsHelper.getNewId(10);
+                            while (isIdExiste(ds, idConcept)) {
+                                idConcept = toolsHelper.getNewId(10);
+                            }
+                        } else {
+                            idConcept = getNumericConceptId(ds);
+                        }
+                    }
+                    query = "Insert into concept "
+                            + "(id_concept, id_thesaurus, id_ark, status, notation, top_concept)"
+                            + " values ("
+                            + "'" + idConcept + "'"
+                            + ",'" + idTheso + "'"
+                            + ",'" + idArk + "'"
+                            + ",'" + status + "'"
+                            + ",'" + notation + "'"
+                            + "," + isTopConcept
+                            + ")";
+
+                    stmt.executeUpdate(query);
+                    /**
+                     * Ajout des informations dans la table Concept
+                     */
+                /*    if (!addConceptHistorique(conn, concept, idUser)) {
+                        stmt.close();
+                        return null;
+                    }*/
+                
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            log.error("Error while adding new Concept : " + sqle);
+            idConcept = null;
+        }
+        return idConcept;
+    }    
+
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non
+     *
+     * @param ds
+     * @param idConcept
+     * @return boolean
+     */
+    public boolean isIdExiste(HikariDataSource ds,
+            String idConcept) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id exist : " + idConcept, sqle);
+        }
+        return existe;
     }
+    
+    /**
+     * Cette fonction permet de savoir si l'ID du concept existe ou non dans un thésaurus en particulier
+     *
+     * @param ds
+     * @param idConcept
+     * @param idTheso
+     * @return boolean
+     */
+    public boolean isIdExiste(HikariDataSource ds,
+            String idConcept, String idTheso) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean existe = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where "
+                            + "id_concept = '" + idConcept + "'"
+                            + " and id_thesaurus = '" + idTheso + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet.next()) {
+                        existe = resultSet.getRow() != 0;
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while asking if id exist : " + idConcept, sqle);
+        }
+        return existe;
+    }      
+    
+    /*
+        public ArrayList<String> getIdsOfBranchParLot(HikariDataSource hd,
+            String idConceptDeTete,
+            String idTheso,
+            ArrayList<String> lisIds, int id_alignement_source, ArrayList<String> tmp) {
+
+        lisIds.add(idConceptDeTete);
+
+        ArrayList<String> listIdsOfConceptChildren
+                = getListChildrenOfConceptNotExist(hd, idConceptDeTete, idTheso,id_alignement_source);
+        for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
+            getIdsOfBranchParLot(hd, listIdsOfConceptChildren1,
+                    idTheso, lisIds, id_alignement_source,tmp);
+        }
+        return lisIds;
+    }*/
+    /**
+     * ************************************************************
+     * /**************************************************************
+     * Fin des nouvelles fonctions stables auteur Miled Rousset
+     * /**************************************************************
+     * /*************************************************************
+     */
+ 
+    
+    
+    // deprecated by Miled
+    /**
+     * Cette fonction permet d'ajouter un Top Concept avec le libellé et les
+     * relations Si l'opération échoue, on rollback les modifications
+     *
+     * @param ds
+     * @param idParent
+     * @param concept
+     * @param term
+     * @param idUser
+     * @return null si le term existe ou si erreur, sinon le numero de Concept
+     */
+   /* public String addTopConcept(HikariDataSource ds,
+            String idParent,
+            Concept concept, Term term,
+            int idUser) {
+        ArrayList<String> idConcepts = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            TermHelper termHelper = new TermHelper();
+            // controle si le term existe avant de rajouter un concept
+            if (termHelper.isTermExist(ds, term.getLexical_value(),
+                    term.getId_thesaurus(), term.getLang())) {
+                conn.close();
+                return null;
+            }
+
+            concept.setTopConcept(true);
+            String idConcept = addConceptInTable(conn, concept, idUser);
+            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
+
+            if (idConcept == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+
+            String idTerm = termHelper.addTerm(conn, term, idConcept, idUser);
+            if (idTerm == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+            term.setId_term(idTerm);
+            
+            if (nodePreference != null) {
+                // création de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
+                    }
+                }
+            }
+
+            conn.commit();
+            conn.close();
+            
+            
+            // Si on arrive ici, c'est que tout va bien 
+            // alors c'est le moment de récupérer le code ARK
+            if (nodePreference != null) {
+                if (nodePreference.isUseArk()) {
+                    idConcepts.add(idConcept);
+                    if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
+                        message = message + "La création Ark a échouée";
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                    }
+                }
+            }            
+            
+            return idConcept;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex1) {
+            }
+        }
+        return null;
+    }*/
+
+    /**
+     * Cette fonction permet d'ajouter un Concept complet à la base avec le
+     * libellé et les relations Si l'opération échoue, elle envoi un NULL et ne
+     * modifie pas la base de données
+     *
+     * @param ds
+     * @param idParent
+     * @param relationType
+     * @param concept
+     * @param term
+     * @param idUser
+     * @return null si le term existe ou si erreur, sinon le numero de Concept
+     * #MR
+     */
+    public String addConcept(HikariDataSource ds,
+            String idParent,
+            String relationType,
+            Concept concept, Term term, int idUser) {
+
+        ArrayList<String> idConcepts = new ArrayList<>();
+        Connection conn = null;
+        try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
+
+            TermHelper termHelper = new TermHelper();
+
+            if(idParent == null)
+                concept.setTopConcept(true);
+
+            String idConcept = addConceptInTable(conn, concept, idUser);
+            new GroupHelper().addConceptGroupConcept(ds, concept.getIdGroup(), concept.getIdConcept(), concept.getIdThesaurus());
+            if (idConcept == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+
+            String idTerm = termHelper.addTerm(conn, term, idConcept, idUser);
+            if (idTerm == null) {
+                conn.rollback();
+                conn.close();
+                return null;
+            }
+            term.setId_term(idTerm);
+           
+            /**
+             * ajouter le lien hiérarchique avec le concept partent sauf si ce n'est pas un TopConcept
+             */
+            if(!concept.isTopConcept()) {
+                String inverseRelation = "BT";
+                if(relationType == null) 
+                    relationType = "NT";
+                switch (relationType) {
+                    case "NT" :
+                        inverseRelation = "BT";
+                        break;
+                    case "NTG":
+                        inverseRelation = "BTG";
+                        break;
+                    case "NTP":
+                        inverseRelation = "BTP";
+                        break;
+                    case "NTI":
+                        inverseRelation = "BTI";
+                        break;
+                }               
+
+                HierarchicalRelationship hierarchicalRelationship = new HierarchicalRelationship();
+                hierarchicalRelationship.setIdConcept1(idParent);
+                hierarchicalRelationship.setIdConcept2(idConcept);
+                hierarchicalRelationship.setIdThesaurus(concept.getIdThesaurus());
+                hierarchicalRelationship.setRole(relationType);
+
+                if (!addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
+                    conn.rollback();
+                    conn.close();
+                    return null;
+                }
+
+                hierarchicalRelationship.setIdConcept1(idConcept);
+                hierarchicalRelationship.setIdConcept2(idParent);
+                hierarchicalRelationship.setIdThesaurus(concept.getIdThesaurus());
+                hierarchicalRelationship.setRole(inverseRelation);
+
+                if (!addLinkHierarchicalRelation(conn, hierarchicalRelationship, idUser)) {
+                    conn.rollback();
+                    conn.close();
+                    return null;
+                }
+            }
+            if (nodePreference != null) {            
+                // création de l'identifiant Handle
+                if (nodePreference.isUseHandle()) {
+                    if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
+                        conn.rollback();
+                        conn.close();
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
+                    }
+                }
+            }
+            if (nodePreference != null) {
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de récupérer le code ARK
+                if (nodePreference.isUseArk()) {
+                    idConcepts.add(idConcept);
+                    if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
+                        conn.rollback();
+                        conn.close();
+                        message = message + "La création Ark a échouée";
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+            return idConcept;
+
+        } catch (SQLException ex) {
+            try {
+                Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex1) {
+            }
+        }
+        return null;
+    }   
+
 
     /**
      * Cette fonction permet d'ajouter un Concept et de choisir le type de
@@ -1933,14 +2189,6 @@ public class ConceptHelper {
 
             conn.commit();
             conn.close();
-
-            // cette fonction permet de remplir la table Permutée
-        /*    termHelper.splitConceptForPermute(ds, term.getId_concept(),
-                    getGroupIdOfConcept(ds, term.getId_concept(), term.getId_thesaurus()),
-                    term.getId_thesaurus(),
-                    term.getLang(),
-                    term.getLexical_value());*/
-
             return true;
 
         } catch (SQLException ex) {
@@ -2203,50 +2451,7 @@ public class ConceptHelper {
     
     
     
-    /**
-     * Cette fonction permet de savoir si l'ID du concept existe ou non dans un thésaurus donné
-     *
-     * @param ds
-     * @param idConcept
-     * @param idThesaurus
-     * @return boolean
-     */
-    public boolean isIdExiste(HikariDataSource ds,
-            String idConcept, String idThesaurus) {
 
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        boolean existe = false;
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "select id_concept from concept where "
-                            + "id_concept = '" + idConcept
-                            + "' and id_thesaurus = '" + idThesaurus
-                            + "'";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    if (resultSet.next()) {
-                        existe = resultSet.getRow() != 0;
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while asking if id exist : " + idConcept, sqle);
-        }
-        return existe;
-    }
 
     /**
      * Cette fonction permet de savoir si l'ID du concept existe ou non
@@ -4271,16 +4476,15 @@ public class ConceptHelper {
 
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
-                        if(resultSet.next()) {
-                            if (resultSet.getString("lexical_value").isEmpty()) {
-                                nodeConceptTree1.setTitle("");
-                            } else {
-                                nodeConceptTree1.setTitle(resultSet.getString("lexical_value"));
-                            }
-                            nodeConceptTree1.setHaveChildren(
-                                    haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
-                            );
+                        resultSet.next();
+                        if (resultSet.getRow() == 0) {
+                            nodeConceptTree1.setTitle("");
+                        } else {
+                            nodeConceptTree1.setTitle(resultSet.getString("lexical_value"));
                         }
+                        nodeConceptTree1.setHaveChildren(
+                                haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
+                        );
                     }
 
                     /// ancienne version supprimée par Miled

@@ -82,10 +82,14 @@
                     <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
 
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
-                    <p:ajax    event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag">                       
+                    <p:ajax  event="dragdrop"  listener="#{newtreeBean.onDragDrop}" oncomplete="PF('confirmDrag').show()" update=":confirmDialogDrag"/>                       
+                    
+
+                    
+                    <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
+                            :panExport,:externalResources,:idImageGaleriaDlg"   >
                     </p:ajax>
-                    <p:ajax event="select" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport,:accordeonTree,:externalResources,:idImageGaleriaDlg" 
-                            listener="#{newtreeBean.onNodeSelect}"/>
+                    
                     <p:treeNode type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
                                 collapsedIcon="ui-icon ui-icon-domaine-close"  >  
                         <h:outputText  value="#{node}"  />  

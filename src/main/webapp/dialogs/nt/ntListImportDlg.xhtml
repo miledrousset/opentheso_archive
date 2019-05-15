@@ -18,20 +18,23 @@
                         <p:column colspan="1">id</p:column>
                         <p:column colspan="1">skos:prefLabel@fr</p:column>
                         <p:column colspan="1">skos:prefLabel@en</p:column>
-                        <p:column colspan="1">skos:prefLabel@es</p:column>                             
+                        <p:column colspan="1">skos:altLabel@fr</p:column>
+                        <p:column colspan="1">skos:definition@fr</p:column>                         
                     </p:row>
                 </f:facet>
                 <p:row>
                     <p:column>100</p:column>
                     <p:column>France</p:column>
                     <p:column>France_en</p:column>
-                    <p:column>France_es</p:column>
+                    <p:column>l'Hexagone</p:column>
+                    <p:column>Pays de la liberté</p:column>
                 </p:row>
                 <p:row>
                     <p:column>101</p:column>
                     <p:column>Lyon</p:column>
                     <p:column>Lyon_en</p:column>
-                    <p:column>Lyon_es</p:column>
+                    <p:column>Lugdunum</p:column>
+                    <p:column>Ville de la gastronomie</p:column>                    
                 </p:row>                    
             </p:panelGrid>
 
@@ -40,7 +43,8 @@
             <p:outputPanel deferred="true">
                 <p>
                     Les termes doivent être séparés par des virgules dans le fichier à uploader ou une valeur par ligne.<br/>
-                    la première colonne "Id" n'est pas oblogatoire sauf si vous souhaitez récupérer votre ancien identifiant.
+                    la première colonne "Id" n'est pas oblogatoire sauf si vous souhaitez récupérer votre ancien identifiant.<br/>
+                    Pour les champs qui autorisent les valeurs multiples, il faut les séparer par (##) ex : (deux##2).
                 </p>
             </p:outputPanel>
 
@@ -59,9 +63,10 @@
 
                     <tr>
                         <td colspan="2" style="text-align: center;">
-                            <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{newtreeBean.addMultipleNT2()}" 
+                            <p:commandButton id="cbAjTSpe" value="#{langueBean.getMsg('btnAdd')}"
+                                             actionListener="#{newtreeBean.addMultipleNT2()}" 
                                              update=":idNtListImportDlg,:accordeonTree,:panContenu,:messages" styleClass="styleButton"
-                                             oncomplete="PF('ntListImportDlg').hide();">
+                                             oncomplete="PF('ntListImportDlg').hide();srollToSelected()">
                             </p:commandButton>  
                         </td>
                     </tr>

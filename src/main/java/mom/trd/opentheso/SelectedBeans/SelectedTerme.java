@@ -837,6 +837,7 @@ public class SelectedTerme implements Serializable {
      * @param selecedTerm
      * @param relationType
      * @param idConcept
+     * @param notation
      * @return true or false
      */
     public boolean creerTermeSpe(MyTreeNode selecedTerm, String relationType,
@@ -865,7 +866,8 @@ public class SelectedTerme implements Serializable {
             terme.setLexical_value(valueEdit);
             terme.setSource("");
             terme.setStatus("");
-            idConceptRetour = instance.addTopConcept(connect.getPoolConnexion(), idTheso, concept, terme, user.getUser().getIdUser());
+            concept.setTopConcept(true);
+            idConceptRetour = instance.addConcept(connect.getPoolConnexion(), null, null, concept, terme, user.getUser().getIdUser());
             if (idConceptRetour == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
                 return false;
@@ -1491,7 +1493,7 @@ public class SelectedTerme implements Serializable {
                 return;
             }
 
-            if (!ch.addTopConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getIdUser())) {
+            if (!ch.addConceptTraduction(connect.getPoolConnexion(), terme, user.getUser().getIdUser())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("Error")));
                 return;
             }
