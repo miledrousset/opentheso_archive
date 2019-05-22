@@ -93,6 +93,33 @@ public class ArkHelper {
         return true;
     }    
     
+    
+    public boolean getArkFromArkeo(String ark){
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+        idArk = null;
+        idHandle = null;
+        
+        if(!arkClientRest.getArk(ark)) return false;
+
+        idArk = arkClientRest.getIdArk();
+        idHandle = arkClientRest.getIdHandle();
+        if (idArk == null) {
+            message = "Erreur Ark !!";
+            return false;
+        }
+        if (idHandle == null) {
+            message = "Erreur Handle !!";
+            return false;
+        }
+        return true;        
+    }
+    
+    
     /**
      * Permet de créer un identifiant ARK et un identifiant Handle (serveur MOM)
      * @param privateUri

@@ -80,13 +80,13 @@ public final class ArkClientRest {
      */
     public boolean isArkExist(String ark) {
         client = Client.create();
-        String idArk = ark.substring(ark.indexOf("/")+1);
+        String idArk1 = ark.substring(ark.indexOf("/")+1);
         String naan = ark.substring(0, ark.indexOf("/"));
         WebResource webResource = client.resource(propertiesArk.getProperty("serverHost") +
                         "/rest/ark/naan=" + 
                         naan + 
                         "&id=" +
-                        idArk);
+                        idArk1);
         ClientResponse response = webResource.accept("application/json")
                 .get(ClientResponse.class);
         if (response.getStatus() != 200) {
@@ -107,14 +107,14 @@ public final class ArkClientRest {
      */
     public boolean getArk(String ark) {
         client = Client.create();
-        String idArk = ark.substring(ark.indexOf("/")+1);
+        String idArk1 = ark.substring(ark.indexOf("/")+1);
         String naan = ark.substring(0, ark.indexOf("/"));
-        if(idArk == null || naan == null) return false;
+        if(idArk1 == null || naan == null) return false;
         WebResource webResource = client.resource(propertiesArk.getProperty("serverHost") +
                         "/rest/ark/naan=" + 
                         naan + 
                         "&id=" +
-                        idArk);
+                        idArk1);
         ClientResponse response = webResource.accept("application/json")
                 .get(ClientResponse.class);
         if (response.getStatus() != 200) {
@@ -122,6 +122,7 @@ public final class ArkClientRest {
             return false;
         }
         jsonArk = response.getEntity(String.class);
+        setForGet();
         return true;
     }     
     
@@ -204,7 +205,7 @@ public final class ArkClientRest {
   
     private boolean setForUpdate(){
         if(jsonArk == null) return false;
-        System.out.println("avant la lecture : " + jsonArk);
+    //    System.out.println("avant la lecture : " + jsonArk);
         JsonReader reader = Json.createReader(new StringReader(jsonArk));
         JsonObject jsonObject = reader.readObject();
         reader.close();
@@ -219,6 +220,24 @@ public final class ArkClientRest {
         message = "Erreur lors de la lecture du Json";
         return false;
     }
+    
+    private boolean setForGet(){
+        if(jsonArk == null) return false;
+    //    System.out.println("avant la lecture : " + jsonArk);
+        JsonReader reader = Json.createReader(new StringReader(jsonArk));
+        JsonObject jsonObject = reader.readObject();
+        reader.close();
+
+        if(jsonObject.getJsonString("status").getString().equalsIgnoreCase("ok")) {
+            idArk = jsonObject.getJsonObject("result").getString("ark");
+            idHandle = jsonObject.getJsonObject("result").getString("handle");
+            Uri = jsonObject.getJsonObject("result").getString("urlTarget");
+            loginJson.put("token", jsonObject.getJsonString("token"));
+            return true;
+        }
+        message = "Erreur lors de la lecture du Json";
+        return false;
+    }    
 
     private boolean setIdArkHandle(){
         if(jsonArk == null) return false;

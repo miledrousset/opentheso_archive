@@ -621,13 +621,14 @@ public class SelectedThesaurus implements Serializable {
                 ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurus(connect.getPoolConnexion(), idTheso);
                 if (idConcepts == null || idConcepts.isEmpty()) {
                     throw new Exception("No concept in this thesaurus");
+                } else {
+    //                idConcepts.clear();
+    //                idConcepts.add("236999");
+            //        idConcepts.add("236999");
+            //        idConcepts.add("237003");
+                    conceptHelper.setNodePreference(nodePreference);
+                    conceptHelper.generateArkId(connect.getPoolConnexion(), idTheso, idConcepts);
                 }
-//                idConcepts.clear();
-//                idConcepts.add("236999");
-        //        idConcepts.add("236999");
-        //        idConcepts.add("237003");
-                conceptHelper.setNodePreference(nodePreference);
-                conceptHelper.generateArkId(connect.getPoolConnexion(), idTheso, idConcepts);
             } catch (Exception ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error during generation id:", ex.getMessage()));
                 throw new Exception("Error during generation idArk for Concept : ");
@@ -670,8 +671,10 @@ public class SelectedThesaurus implements Serializable {
                 ArrayList<String> idConcepts = conceptHelper.getAllIdConceptOfThesaurusWithoutArk(connect.getPoolConnexion(), idTheso);
                 if (idConcepts == null || idConcepts.isEmpty()) {
                     throw new Exception("No concept in this thesaurus");
-                } else
+                } else {
+                    conceptHelper.setNodePreference(nodePreference);
                     conceptHelper.generateArkId(connect.getPoolConnexion(), idTheso, idConcepts);
+                }
             } catch (Exception ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error while regen id concept:", ex.getMessage()));
                 throw new Exception("Error while regen id concept ");
@@ -684,6 +687,8 @@ public class SelectedThesaurus implements Serializable {
         } catch (Exception ex) {
         }
     }
+    
+
     
     /**
      * Permet de générere les identifiants Handle manquants

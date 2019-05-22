@@ -568,7 +568,7 @@ public class ToolsHelper {
     }
 
     public String getNewId(int length) {
-        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        String chars = "abcdefghijklmnopqrstuvwxyz1234567890";
         StringBuilder pass = new StringBuilder();
         for (int x = 0; x < length; x++) {
             int i = (int) Math.floor(Math.random() * (chars.length() - 1));
