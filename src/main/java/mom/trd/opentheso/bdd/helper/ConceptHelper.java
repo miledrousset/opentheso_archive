@@ -3546,7 +3546,6 @@ public class ConceptHelper {
                 try {
                     String query = "select id_concept, id_ark from concept where "
                             + "id_thesaurus = '" + idThesaurus + "'"
-                            + " and id > 3063"
                             + " and (id_ark != null or id_ark != '')";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -6400,3 +6399,4 @@ public class ConceptHelper {
     }
 
 }
+
