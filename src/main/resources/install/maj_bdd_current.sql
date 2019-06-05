@@ -7,8 +7,8 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.4.5
--- date : 15/03/2019
+-- version=4.4.8
+-- date : 04/06/2019
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -2158,6 +2158,30 @@ create or replace function update_table_imagesUri() returns void as $$
 $$language plpgsql;
 
 
+----------------------------------------------------------------------------
+-- mise à jour de la table alignement source pour la gestion des nouvelles sources IdRef et Wikidata 
+
+create or replace function update_table_alignement_source() returns void as $$
+    declare
+	begin 
+            execute 'delete from alignement_source where source = ''idRefSubject'';
+                     delete from alignement_source where source = ''idRefNames'';
+                     delete from alignement_source where source = ''wikidata'';
+                    INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
+                    (''idRefSubject'', ''https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=subjectheading_t:(##value##)%20AND%20recordtype_z:r'', ''REST'', ''json'', 1, ''alignement avec les Sujets de IdRef ABES'', false);
+
+                    INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
+                    (''idRefNames'', ''https://www.idref.fr/Sru/Solr?wt=json&q=nom_t:(##nom##)%20AND%20prenom_t:(##prenom##)%20AND%20recordtype_z:a&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'', ''REST'', ''json'', 1, ''alignement avec les Noms de IdRef ABES'', false);
+                    
+                    INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
+                    (''wikidata'', ''SELECT ?item ?itemLabel ?itemDescription WHERE {
+                    ?item rdfs:label "##value##"@##lang##.
+                    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],##lang##". }
+                    }'', ''SPARQL'', ''json'', 1, ''alignement avec le thésaurus de wikidata'', false);
+                    ';
+	end;
+$$language plpgsql;
+
 create or replace function create_table_external_images() returns void as $$
     begin 
         IF NOT EXISTS (SELECT * FROM information_schema.tables WHERE table_name='external_images') THEN
@@ -2188,6 +2212,8 @@ SELECT user_group_label();
 SELECT update_table_preferences_preferredName();
 SELECT update_table_imagesUri();
 SELECT create_table_external_images();
+
+SELECT update_table_alignement_source();
 
 -- suppression des fonctions 
 select delete_fonction('alter_table_concept_group_addColumn_id_handle','');
@@ -2280,7 +2306,7 @@ SELECT delete_fonction('create_table_concept_group_concept','');
 SELECT delete_fonction('update_table_preferences_handle','');
 SELECT delete_fonction('update_table_concept_handle','');
 SELECT delete_fonction('update_table_users_alert','');
-
+SELECT delete_fonction('update_table_alignement_source','');
 
 
 --

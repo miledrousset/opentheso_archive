@@ -72,8 +72,12 @@ public class ExternalImagesHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while adding external image of Concept : " + idConcept, sqle);
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding Image of concept : " + idConcept, sqle);
+                //System.out.println(sqle.toString());
+                return false;
+            } else
+                return true;
         }
         return status;
     }      

@@ -22,15 +22,14 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
-import mom.trd.opentheso.bdd.helper.nodes.NodeIdValue;
+import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeImage;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.alignment.AlignementSource;
-import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.core.alignment.SelectedResource;
-import mom.trd.opentheso.core.alignment.helper.CurlHelper;
-import mom.trd.opentheso.helper.wikidata.WikidataHelper;
+import mom.trd.opentheso.core.alignment.helper.IdRefHelper;
+import mom.trd.opentheso.core.alignment.helper.WikidataHelper;
 
 /**
  *
@@ -50,6 +49,10 @@ public class Alignment {
     private NodeAlignment selectedNodeAlignment;     
     private ArrayList<Map.Entry<String, String>> alignmentTypes;
     private int selectedAlignementType;
+    
+    private String nom;
+    private String prenom;
+    private boolean isNameAlignment = false; // pour afficher les nom et prénom
     
     private ArrayList<String> thesaurusUsedLanguageWithoutCurrentLang;
     private ArrayList<String> thesaurusUsedLanguage;
@@ -71,9 +74,12 @@ public class Alignment {
     private ArrayList<NodeImage> nodeImages; 
     
     
-    private ArrayList<SelectedResource>  traductionsWikidata;
-    private ArrayList<SelectedResource> descriptionsWikidata;
-    private ArrayList<SelectedResource> imagesWikidata;
+    // résultat des alignements
+    private ArrayList<SelectedResource>  traductionsOfAlignment;
+    private ArrayList<SelectedResource> descriptionsOfAlignment;
+    private ArrayList<SelectedResource> imagesOfAlignment;
+    private ArrayList<NodeAlignmentSmall> nodeAlignmentSmall;
+    
     
     private boolean isSelectedAllLang = true;
     private boolean isSelectedAllDef = true;    
@@ -109,11 +115,11 @@ public class Alignment {
             idsAndValues = null;
             return;
         }
-        if(counter > allIdsOfBranch.size()) return;
+        if(counter >= allIdsOfBranch.size()) return;
         idsToGet.clear();
         int counterTemp = counter;
         
-        for (int i = counterTemp; i < 10; i++) {
+        for (int i = counterTemp; i < counterTemp+10; i++) {
             if(counter >= allIdsOfBranch.size()) {
                 counter = allIdsOfBranch.size();
                 break;
@@ -134,11 +140,13 @@ public class Alignment {
             idsAndValues = null;
             return;
         }
-        if(counter < 0) return;
+        if(counter -10 <= 0) return;
         idsToGet.clear();
-        int counterTemp = counter;
+        int counterTempFirst = counter - 20;
+        int counterTempLast = counter - 10;
+        if(counterTempFirst <0) counterTempFirst = 0;
         
-        for (int i = counterTemp; i < 10; i--) {
+        for (int i = counterTempFirst; i < counterTempLast; i++) {
             if(counter < 0) {
                 counter = 0;
                 break;
@@ -148,6 +156,32 @@ public class Alignment {
         }
         getIdsAndValues(idLang, idTheso);        
     }
+    
+    /**
+     * retourne à la première position
+     * @param idLang
+     * @param idTheso
+     */    
+    public void restart(String idLang, String idTheso) {
+        if(allIdsOfBranch == null) {
+            idsAndValues = null;
+            return;
+        }
+        counter = 0;
+        if(counter >= allIdsOfBranch.size()) return;
+        idsToGet.clear();
+        int counterTemp = counter;
+        
+        for (int i = counterTemp; i < counterTemp+10; i++) {
+            if(counter >= allIdsOfBranch.size()) {
+                counter = allIdsOfBranch.size();
+                break;
+            }
+            idsToGet.add(allIdsOfBranch.get(i));
+            counter++;
+        }
+        getIdsAndValues(idLang, idTheso);     
+    }    
     
     /**
      * remettre le compteur à zéro
@@ -169,10 +203,26 @@ public class Alignment {
         selectConceptForAlignment();
     }
     
+    // quand on sélectionne un concept, on récupére sa valeur du vecteur
     public void selectConceptForAlignment() {
         conceptValueForAlignment = idsAndValues.get(idConceptSelectedForAlignment);
         cancelAlignment();
         resetValuesAlignement();
+        prepareValuesForIdRef();
+    }
+    
+    private void prepareValuesForIdRef(){
+        if(isNameAlignment) { // alignement de type Autorités
+            /// récupération du nom et prénom
+            if(conceptValueForAlignment.isEmpty()) return;
+            String valuesTemp[] = conceptValueForAlignment.split(",");
+            if(valuesTemp.length == 1)
+                nom = valuesTemp[0];
+            if(valuesTemp.length > 1){
+                nom = valuesTemp[0];
+                prenom = valuesTemp[1];
+            }
+        }
     }
     
     private void resetValuesAlignement(){
@@ -180,19 +230,22 @@ public class Alignment {
             listAlignValues.clear();
     }
     
-    
     /////// fin  gestion de la pagination pour le traitement par lot ///////    
     
+
+
+
+
     
     
     public void selectDeselectTrad() {
         if(isSelectedAllLang) {
-            for (SelectedResource selectedResource : traductionsWikidata) {
+            for (SelectedResource selectedResource : traductionsOfAlignment) {
                 selectedResource.setSelected(true);
             }
             isSelectedAllLang = true;
         } else {
-            for (SelectedResource selectedResource : traductionsWikidata) {
+            for (SelectedResource selectedResource : traductionsOfAlignment) {
                 selectedResource.setSelected(false);
             }
             isSelectedAllLang = false;
@@ -201,12 +254,12 @@ public class Alignment {
     
     public void selectDeselectDef() {
         if(isSelectedAllDef) {
-            for (SelectedResource selectedResource : descriptionsWikidata) {
+            for (SelectedResource selectedResource : descriptionsOfAlignment) {
                 selectedResource.setSelected(true);
             }
             isSelectedAllDef = true;
         } else {
-            for (SelectedResource selectedResource : descriptionsWikidata) {
+            for (SelectedResource selectedResource : descriptionsOfAlignment) {
                 selectedResource.setSelected(false);
             }
             isSelectedAllDef = false;
@@ -215,18 +268,21 @@ public class Alignment {
     
     public void selectDeselectImages() {
         if(isSelectedAllImages) {
-            for (SelectedResource selectedResource : imagesWikidata) {
+            for (SelectedResource selectedResource : imagesOfAlignment) {
                 selectedResource.setSelected(true);
             }
             isSelectedAllImages = true;
         } else {
-            for (SelectedResource selectedResource : imagesWikidata) {
+            for (SelectedResource selectedResource : imagesOfAlignment) {
                 selectedResource.setSelected(false);
             }
             isSelectedAllImages = false;
         }
     }     
 
+    
+    /// au lancement du module d'alignement, on initialise les variables.
+    
     /**
      * permet d'initialiser le tableau des concepts à aligner 
      * @param idTheso
@@ -270,9 +326,10 @@ public class Alignment {
         selectedOptions.add("langues");
         selectedOptions.add("images");  
         selectedOptions.add("notes");
-        traductionsWikidata = new ArrayList<>();
-        descriptionsWikidata = new ArrayList<>();
-        imagesWikidata = new ArrayList<>();
+        traductionsOfAlignment = new ArrayList<>();
+        descriptionsOfAlignment = new ArrayList<>();
+        imagesOfAlignment = new ArrayList<>();
+        nodeAlignmentSmall = new ArrayList<>();
 
         isSelectedAllLang = true;
         reset();
@@ -281,16 +338,19 @@ public class Alignment {
     }
 
     private void reset(){
-        if(traductionsWikidata != null)
-            traductionsWikidata.clear();
-        if(descriptionsWikidata != null)
-            descriptionsWikidata.clear();
-        if(imagesWikidata != null)
-            imagesWikidata.clear();
+        if(traductionsOfAlignment != null)
+            traductionsOfAlignment.clear();
+        if(descriptionsOfAlignment != null)
+            descriptionsOfAlignment.clear();
+        if(imagesOfAlignment != null)
+            imagesOfAlignment.clear();
         if(listAlignValues != null)
             listAlignValues.clear();
         if(nodeTermTraductions != null)
             nodeTermTraductions.clear();
+        if(nodeAlignmentSmall != null)
+            nodeAlignmentSmall.clear();
+        
         if(nodeNotes != null)
             nodeNotes.clear();
         if(nodeImages != null)
@@ -301,13 +361,17 @@ public class Alignment {
     }
     
     private void resetVariables(){
-        if(traductionsWikidata != null)
-            traductionsWikidata.clear();
-        if(descriptionsWikidata != null)
-            descriptionsWikidata.clear();
-        if(imagesWikidata != null)
-            imagesWikidata.clear();
+        if(traductionsOfAlignment != null)
+            traductionsOfAlignment.clear();
+        if(descriptionsOfAlignment != null)
+            descriptionsOfAlignment.clear();
+        if(imagesOfAlignment != null)
+            imagesOfAlignment.clear();
+        if(nodeAlignmentSmall != null)
+            nodeAlignmentSmall.clear();        
         isSelectedAllLang = true;
+        nom = "";
+        prenom = "";
 
     }  
     
@@ -315,6 +379,13 @@ public class Alignment {
         alignementResult = null;
         error = false;
     }
+    
+
+    
+  
+    
+    
+    /// récupération des infos sur le concept local qui est en cours d'alignement
     
     /**
      * permet de récupérer les traductions d'un concept en local
@@ -328,111 +399,6 @@ public class Alignment {
         nodeTermTraductions = 
                 termHelper.getAllTraductionsOfConcept(connect.getPoolConnexion(),
                 idConcept, idTheso);
-    }
-    
-    /**
-     * permet de charger dans l'objet 'traductionsWikidata' toutes les traductions 
-     * qui n'existent pas en local
-     * si la traduction en local est identique à celle récupérée, on l'ignore
-     * si la traduction en local est différente, on l'ajoute à l'objet pour correction 
-     * @param idConcept
-     * @param idTheso 
-     */
-    private void setObjectTraductions(ArrayList<SelectedResource>  traductionsWikidataTemp){
-        boolean added;
-        
-        // la liste des traductions de Wikidata
-        for (SelectedResource selectedResource : traductionsWikidataTemp) {
-            added = false;
-            // la liste des traductions existantes
-            for (NodeTermTraduction nodeTermTraduction : nodeTermTraductions) {
-                // cas où la langue récupérée existe déjà en local
-                if(selectedResource.getIdLang().equalsIgnoreCase(nodeTermTraduction.getLang())){
-                    // on compare le texte si équivalent, on l'ignore
-                    if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeTermTraduction.getLexicalValue().trim())){
-                        selectedResource.setLocalValue(nodeTermTraduction.getLexicalValue());
-                        traductionsWikidata.add(selectedResource);
-                        added = true;
-                        break;
-                    } else {
-                        added = true;
-                        break;
-                    }
-                }
-            }
-            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
-            if(!added) {
-                traductionsWikidata.add(selectedResource);
-            }
-        }
-    }
-    
-    /**
-     * permet de charger dans l'objet 'descriptionsWikidata' toutes les définitions 
-     * qui n'existent pas en local
-     * si la définition en local est identique à celle récupérée, on l'ignore
-     * si la définition en local est différente, on l'ajoute à l'objet pour correction 
-     * @param idConcept
-     * @param idTheso 
-     */
-    private void setObjectDefinitions(ArrayList<SelectedResource>  descriptionsWikidataTemp){
-        boolean added;
-        
-        // la liste des traductions de Wikidata
-        for (SelectedResource selectedResource : descriptionsWikidataTemp) {
-            added = false;
-            // la liste des traductions existantes
-            for (NodeNote nodeNote : nodeNotes) {
-                // on compare le texte si équivalent, on l'ignore
-                if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeNote.getLexicalvalue().trim())){
-                    selectedResource.setLocalValue(nodeNote.getLexicalvalue());
-                    descriptionsWikidata.add(selectedResource);
-                    added = true;
-                    break;
-                } else {
-                    added = true;
-                    break;
-                }
-            }
-            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
-            if(!added) {
-                descriptionsWikidata.add(selectedResource);
-            }
-        }
-    }      
-    
-    /**
-     * permet de charger dans l'objet 'imagesWikidata' toutes les images 
-     * qui n'existent pas en local
-     * si l'image en local est identique à celle récupérée, on l'ignore
-     * si l'image en local est différente, on l'ajoute à l'objet pour correction 
-     * @param idConcept
-     * @param idTheso 
-     */
-    private void setObjectImages(ArrayList<SelectedResource>  imagesWikidataTemp){
-        boolean added;
-        
-        // la liste des traductions de Wikidata
-        for (SelectedResource selectedResource : imagesWikidataTemp) {
-            added = false;
-            // la liste des traductions existantes
-            for (NodeImage nodeImage : nodeImages) {
-                // on compare l'URI est équivalente, on l'ignore
-                if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeImage.getUri().trim())){
-                    selectedResource.setLocalValue(nodeImage.getUri());
-                    imagesWikidata.add(selectedResource);
-                    added = true;
-                    break;
-                } else {
-                    added = true;
-                    break;
-                }
-            }
-            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
-            if(!added) {
-                imagesWikidata.add(selectedResource);
-            }
-        }
     }    
     
     /**
@@ -464,10 +430,34 @@ public class Alignment {
         ExternalImagesHelper imagesHelper = new ExternalImagesHelper();
         nodeImages = imagesHelper.getExternalImages(connect.getPoolConnexion(),
                         idConcept, idTheso);
-    }    
+    }
+    
+    /**
+     * permet de récuprer les alignements du concept
+     * pour permettre de vérifier les alignements existants
+     * @param idConcept
+     * @param idTheso 
+     */
+    private void getAlignmentOfConcept(
+            String idTheso, 
+            String idConcept){
+        AlignmentHelper alignmentHelper = new  AlignmentHelper();
+        nodeAlignmentSmall = alignmentHelper.getAllAlignmentOfConceptNew(
+                connect.getPoolConnexion(),
+                idConcept, idTheso);
+    }
     
     
-    public void prepareAlignment(
+    
+    /**
+     * lance la recherche des alignements pour le concept sélectionné
+     * avec la source sélectionnée
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang 
+     */
+    public void searchAlignments(
             String idTheso,
             String idConcept,
             String lexicalValue,
@@ -479,7 +469,7 @@ public class Alignment {
                 break;
             }
         }
-        // si l'alignement est de type Wikidata
+        // si l'alignement est de type Wikidata, on récupère la liste des concepts pour préparer le choix de l'utilisateur
         if(selectedAlignementSource.getSource().equalsIgnoreCase("wikidata")) {
             getAlignmentWikidata(
                     selectedAlignementSource,
@@ -488,9 +478,37 @@ public class Alignment {
                     lexicalValue,
                     idLang);
         }
+        
+        // ici  IdRef pour les sujets
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("idrefSubject")) {
+            getAlignmentIdRefSubject(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }
+        
+        // ici  IdRef pour les noms
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("idrefNames")) {
+            getAlignmentIdRefNames(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    idLang);
+        }          
+        
+        
+        
+        // ici pour un alignement de type Opentheso
+        
+        
+        
     }
+    
     /**
      * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
      *
      * @param alignementSource
      * @param idTheso
@@ -508,45 +526,25 @@ public class Alignment {
         
         if (alignementSource == null) {
             listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
             return;
         }
-        AlignmentQuery alignmentQuery = new AlignmentQuery();
-        listAlignValues = new ArrayList<>();
+        WikidataHelper wikidataHelper = new WikidataHelper();
         
         // action JSON (HashMap (Wikidata)
         //ici il faut appeler le filtre de Wikidata 
-        listAlignValues = alignmentQuery.queryWikidata(idConcept, idTheso, lexicalValue.trim(),
+        listAlignValues = wikidataHelper.queryWikidata(idConcept, idTheso, lexicalValue.trim(),
                     idLang, alignementSource.getRequete(),
                     alignementSource.getSource());
         if(listAlignValues == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", alignmentQuery.getMessage()));
-        }
-    }    
-
-    
-    
-    
-    /**
-     * récupération des options de Wikidata
-     * @param selectedNodeAlignment
-     * @param idTheso
-     * @param idConcept
-     */
-    public void getOptions(NodeAlignment selectedNodeAlignment,
-            String idTheso, String idConcept){
-        alignmentInProgress = true;
-        resetAlignmentResult();
-        // si l'alignement est de type Wikidata
-        this.selectedNodeAlignment = selectedNodeAlignment;
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("wikidata")) {
-            resetVariables();
-            getOptionsWikidata(selectedNodeAlignment,
-                    idTheso, idConcept);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", wikidataHelper.getMessages()));
         }
     }
+    
+    
     /**
-     * Cette fonction permet de récupérer les options de Wikidata 
-     * Images, alignements, traductions....
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
      *
      * @param alignementSource
      * @param idTheso
@@ -554,44 +552,235 @@ public class Alignment {
      * @param lexicalValue
      * @param idLang
      */
-    private void getOptionsWikidata(
-            NodeAlignment selectedNodeAlignment,
-            String idTheso, String idConcept) {
-        if (selectedNodeAlignment == null) {
+    private void getAlignmentIdRefSubject(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
             listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
             return;
         }
-        WikidataHelper wikidataHelper = new WikidataHelper();
-        ArrayList<SelectedResource> resourceWikidataTemp;
-        CurlHelper curlHelper = new CurlHelper();
-        curlHelper.setHeader1("Accept");
-        curlHelper.setHeader2("application/json");
+        IdRefHelper idRefHelper = new IdRefHelper();
         
-        String uri = selectedNodeAlignment.getUri_target();//."https://www.wikidata.org/entity/Q178401";//"https://www.wikidata.org/entity/Q178401";//Q7748";Q324926
-        String datas = curlHelper.getDatasFromUri(uri);
-        String entity = uri.substring(uri.lastIndexOf("/") + 1);
+        // action JSON (HashMap (Wikidata)
+        //ici il faut appeler le filtre de Wikidata 
+        listAlignValues = idRefHelper.queryIdRefSubject(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
+        }
+    } 
 
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentIdRefNames(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String idLang
+            ) {
         
-        for (String selectedOption : selectedOptions) {
-            switch (selectedOption) {
-                case "langues":
-                    resourceWikidataTemp = wikidataHelper.getTraductions(datas, entity, thesaurusUsedLanguageWithoutCurrentLang);
-                    getTraductionsOfConcept(idTheso, idConcept);
-                    setObjectTraductions(resourceWikidataTemp);
-                    break;
-                case "notes":
-                    resourceWikidataTemp = wikidataHelper.getDescriptions(datas, entity, thesaurusUsedLanguage);
-                    getDefinitionsOfConcept(idTheso, idConcept);
-                    setObjectDefinitions(resourceWikidataTemp);
-                    break;
-                case "images":
-                    resourceWikidataTemp = wikidataHelper.getImages(datas, entity);
-                    getExternalImagesOfConcept(idTheso, idConcept);
-                    setObjectImages(resourceWikidataTemp);
-                    break;                    
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        IdRefHelper idRefHelper = new IdRefHelper();
+        
+        // action JSON (HashMap (Wikidata)
+        //ici il faut appeler le filtre de Wikidata 
+        listAlignValues = idRefHelper.queryIdRefNames(idConcept, idTheso, nom, prenom,
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
+        }
+    } 
+
+    /**
+     * initialisation des valeurs du concept local pour comparaison avec le concept à aligner
+     * @param idTheso
+     * @param idConcept 
+     */
+    private void getValuesOfLocalConcept(String idTheso, String idConcept) {
+        getTraductionsOfConcept(idTheso, idConcept);
+        getDefinitionsOfConcept(idTheso, idConcept);
+        getExternalImagesOfConcept(idTheso, idConcept);
+        getAlignmentOfConcept(idTheso, idConcept);
+    }
+    
+    
+    /**
+     * L'utilisateur a cliqué sur un concept à aligner, ici on récupère les détails du concept de la source
+     * et les détails des options (images, définitions, traductions en plus de l'URL d'alignement
+     * récupération des options
+     * @param selectedNodeAlignment
+     * @param idTheso
+     * @param idConcept
+     */
+    public void getUriAndOptions(NodeAlignment selectedNodeAlignment,
+            String idTheso, String idConcept){
+        alignmentInProgress = true;
+        resetAlignmentResult();
+        
+        // initialisation des valeurs du concept local pour comparaison avec le concept à aligner
+        getValuesOfLocalConcept(idTheso, idConcept);
+        
+        /**
+         * ici on filtre les données par rapport à la source d'alignement 
+         * on prépare les objets pour recevoir les informations suivant
+         * les options sélectionnées : traductions, notes, images
+         */
+        
+        
+        
+        
+        // si l'alignement est de type Wikidata
+        this.selectedNodeAlignment = selectedNodeAlignment;
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("wikidata")) {
+            WikidataHelper wikidataHelper = new WikidataHelper();
+            resetVariables();
+            
+            wikidataHelper.setOptionsFromWikidata(selectedNodeAlignment,
+                    selectedOptions,
+                    thesaurusUsedLanguageWithoutCurrentLang,
+                    thesaurusUsedLanguage);
+            setObjectTraductions(wikidataHelper.getResourceWikidataTraductions());
+            setObjectDefinitions(wikidataHelper.getResourceWikidataDefinitions());
+            setObjectImages(wikidataHelper.getResourceWikidataImages());
+        }
+        
+        // si l'alignement est de type IdRef
+
+
+        // si l'alignement est de type Opentheso
+        
+        
+        
+    }
+ 
+    /**
+     * permet de charger dans l'objet 'traductionsOfAlignment' toutes les traductions 
+     * qui n'existent pas en local
+     * si la traduction en local est identique à celle récupérée, on l'ignore
+     * si la traduction en local est différente, on l'ajoute à l'objet pour correction 
+     * @param idConcept
+     * @param idTheso 
+     */
+    private void setObjectTraductions(ArrayList<SelectedResource>  traductionsoOfAlignmentTemp){
+        boolean added;
+        
+        // la liste des traductions de Wikidata
+        for (SelectedResource selectedResource : traductionsoOfAlignmentTemp) {
+            added = false;
+            // la liste des traductions existantes
+            for (NodeTermTraduction nodeTermTraduction : nodeTermTraductions) {
+                // cas où la langue récupérée existe déjà en local
+                if(selectedResource.getIdLang().equalsIgnoreCase(nodeTermTraduction.getLang())){
+                    // on compare le texte si équivalent, on l'ignore
+                    if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeTermTraduction.getLexicalValue().trim())){
+                        selectedResource.setLocalValue(nodeTermTraduction.getLexicalValue());
+                        traductionsOfAlignment.add(selectedResource);
+                        added = true;
+                        break;
+                    } else {
+                        added = true;
+                        break;
+                    }
+                }
+            }
+            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
+            if(!added) {
+                traductionsOfAlignment.add(selectedResource);
             }
         }
-    }    
+    }
+    
+    /**
+     * permet de charger dans l'objet 'descriptionsWikidata' toutes les définitions 
+     * qui n'existent pas en local
+     * si la définition en local est identique à celle récupérée, on l'ignore
+     * si la définition en local est différente, on l'ajoute à l'objet pour correction 
+     * @param idConcept
+     * @param idTheso 
+     */
+    private void setObjectDefinitions(ArrayList<SelectedResource>  descriptionsOfAlignmentTemp){
+        boolean added;
+        
+        // la liste des traductions de Wikidata
+        for (SelectedResource selectedResource : descriptionsOfAlignmentTemp) {
+            added = false;
+            // la liste des traductions existantes
+            for (NodeNote nodeNote : nodeNotes) {
+                // on compare le texte si équivalent, on l'ignore
+                if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeNote.getLexicalvalue().trim())){
+                    selectedResource.setLocalValue(nodeNote.getLexicalvalue());
+                    descriptionsOfAlignment.add(selectedResource);
+                    added = true;
+                    break;
+                } else {
+                    added = true;
+                    break;
+                }
+            }
+            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
+            if(!added) {
+                descriptionsOfAlignment.add(selectedResource);
+            }
+        }
+    }      
+    
+    /**
+     * permet de charger dans l'objet 'imagesWikidata' toutes les images 
+     * qui n'existent pas en local
+     * si l'image en local est identique à celle récupérée, on l'ignore
+     * si l'image en local est différente, on l'ajoute à l'objet pour correction 
+     * @param idConcept
+     * @param idTheso 
+     */
+    private void setObjectImages(ArrayList<SelectedResource>  imagesOfAlignmentTemp){
+        boolean added;
+        
+        // la liste des traductions de Wikidata
+        for (SelectedResource selectedResource : imagesOfAlignmentTemp) {
+            added = false;
+            // la liste des traductions existantes
+            for (NodeImage nodeImage : nodeImages) {
+                // on compare l'URI est équivalente, on l'ignore
+                if(!selectedResource.getGettedValue().trim().equalsIgnoreCase(nodeImage.getUri().trim())){
+                    selectedResource.setLocalValue(nodeImage.getUri());
+                    imagesOfAlignment.add(selectedResource);
+                    added = true;
+                    break;
+                } else {
+                    added = true;
+                    break;
+                }
+            }
+            // si on a déjà ajouté la traduction, on l'ignore, sinon, on l'ajoute
+            if(!added) {
+                imagesOfAlignment.add(selectedResource);
+            }
+        }
+    }  
+
+
+
+    
     
     /**
      * permet d'ajouter l'alignement et les options choisis (traductions, définitions et images)
@@ -657,7 +846,7 @@ public class Alignment {
             error = true;
             return false;
         }
-        alignementResult = "Traductions ajoutées ##";
+        alignementResult = "Alignement ajouté ##";
         return true;
     }
     
@@ -667,7 +856,7 @@ public class Alignment {
         String idTerm = termHelper.getIdTermOfConcept(connect.getPoolConnexion(), idConcept, idTheso);
         if(idTerm == null) return false;
         
-        for (SelectedResource selectedResource : traductionsWikidata) {
+        for (SelectedResource selectedResource : traductionsOfAlignment) {
             if(selectedResource.isSelected()) {
                 term.setId_thesaurus(idTheso);
                 term.setLang(selectedResource.getIdLang());
@@ -704,7 +893,7 @@ public class Alignment {
         if(idTerm == null) return false;
         
         // ajout de la note avec prefix de la source (wikidata)
-        for (SelectedResource selectedResource : descriptionsWikidata) {
+        for (SelectedResource selectedResource : descriptionsOfAlignment) {
             if(selectedResource.isSelected()) {
                 if(!noteHelper.addTermNote(connect.getPoolConnexion(),
                         idTerm, selectedResource.getIdLang(),
@@ -723,7 +912,7 @@ public class Alignment {
     
     private boolean addImages__(String idTheso, String idConcept, int idUser){
         ExternalImagesHelper imagesHelper = new ExternalImagesHelper();
-        for (SelectedResource selectedResource : imagesWikidata) {
+        for (SelectedResource selectedResource : imagesOfAlignment) {
             if(selectedResource.isSelected()) {
                 if(!imagesHelper.addExternalImage(connect.getPoolConnexion(),
                         idConcept, idTheso,
@@ -787,10 +976,20 @@ public class Alignment {
         return selectedAlignement;
     }
 
+    public void actionChoix(){
+        if(selectedAlignement == null) return;
+        if(selectedAlignement.equalsIgnoreCase("idRefNames")){
+            isNameAlignment = true;
+            prepareValuesForIdRef();
+        }
+        else 
+            isNameAlignment = false;
+    }
+    
     public void setSelectedAlignement(String selectedAlignement) {
         this.selectedAlignement = selectedAlignement;
     }
-
+    
     public AlignementSource getSelectedAlignementSource() {
         return selectedAlignementSource;
     }
@@ -815,21 +1014,31 @@ public class Alignment {
         this.selectedAlignementType = selectedAlignementType;
     }
 
-    public ArrayList<SelectedResource> getTraductionsWikidata() {
-        return traductionsWikidata;
+    public ArrayList<SelectedResource> getTraductionsOfAlignment() {
+        return traductionsOfAlignment;
     }
 
-    public void setTraductionsWikidata(ArrayList<SelectedResource> traductionsWikidata) {
-        this.traductionsWikidata = traductionsWikidata;
+    public void setTraductionsOfAlignment(ArrayList<SelectedResource> traductionsOfAlignment) {
+        this.traductionsOfAlignment = traductionsOfAlignment;
     }
 
-    public ArrayList<SelectedResource> getDescriptionsWikidata() {
-        return descriptionsWikidata;
+    public ArrayList<SelectedResource> getDescriptionsOfAlignment() {
+        return descriptionsOfAlignment;
     }
 
-    public void setDescriptionsWikidata(ArrayList<SelectedResource> descriptionsWikidata) {
-        this.descriptionsWikidata = descriptionsWikidata;
+    public void setDescriptionsOfAlignment(ArrayList<SelectedResource> descriptionsOfAlignment) {
+        this.descriptionsOfAlignment = descriptionsOfAlignment;
     }
+
+    public ArrayList<NodeAlignmentSmall> getNodeAlignmentSmall() {
+        return nodeAlignmentSmall;
+    }
+
+    public void setNodeAlignmentSmall(ArrayList<NodeAlignmentSmall> nodeAlignmentSmall) {
+        this.nodeAlignmentSmall = nodeAlignmentSmall;
+    }
+    
+    
 
     public boolean isIsSelectedAllLang() {
         return isSelectedAllLang;
@@ -847,12 +1056,12 @@ public class Alignment {
         this.isSelectedAllDef = isSelectedAllDef;
     }
 
-    public ArrayList<SelectedResource> getImagesWikidata() {
-        return imagesWikidata;
+    public ArrayList<SelectedResource> getImagesOfAlignment() {
+        return imagesOfAlignment;
     }
 
-    public void setImagesWikidata(ArrayList<SelectedResource> imagesWikidata) {
-        this.imagesWikidata = imagesWikidata;
+    public void setImagesOfAlignment(ArrayList<SelectedResource> imagesOfAlignment) {
+        this.imagesOfAlignment = imagesOfAlignment;
     }
 
     public boolean isIsSelectedAllImages() {
@@ -914,4 +1123,31 @@ public class Alignment {
     public void setConceptValueForAlignment(String conceptValueForAlignment) {
         this.conceptValueForAlignment = conceptValueForAlignment;
     }
+
+    public boolean isIsNameAlignment() {
+        return isNameAlignment;
+    }
+
+    public void setIsNameAlignment(boolean isNameAlignment) {
+        this.isNameAlignment = isNameAlignment;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+    
+    
+    
 }

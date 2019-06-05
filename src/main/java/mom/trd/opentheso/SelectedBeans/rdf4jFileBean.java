@@ -69,7 +69,7 @@ public class rdf4jFileBean implements Serializable {
 
     private SKOSXmlDocument sKOSXmlDocument;
     private String info = "";
-    private String error = "";
+    private StringBuffer error = new StringBuffer();
     private String warning = "";
 
     /**
@@ -77,7 +77,7 @@ public class rdf4jFileBean implements Serializable {
      */
     public void init() {
         info = "";
-        error = "";
+        error = new StringBuffer();
         warning = "";
         uri = "";
         formatDate = "yyyy-MM-dd";
@@ -99,20 +99,25 @@ public class rdf4jFileBean implements Serializable {
                 try {
                     is = event.getFile().getInputstream();
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
                     readRdf4j = new ReadRdf4j(is, 0);
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.toString();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.toString());
                 }
                 if(readRdf4j==null) {
-                    error = "Erreur de format RDF !!!";
+                    error.append(System.getProperty("line.separator"));
+                    error.append("Erreur de format RDF !!!");
                     showError();
                     return;
                 }
@@ -128,7 +133,8 @@ public class rdf4jFileBean implements Serializable {
 
             } catch (Exception e) {
                 System.out.println("erreur :" + e.getMessage());
-                error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
             } finally {
                 showError();
             }
@@ -144,7 +150,7 @@ public class rdf4jFileBean implements Serializable {
      * @param event
      */
     public void chargeFile(FileUploadEvent event) {
-        error = "";
+        error = new StringBuffer();
         info = "";
         warning = "";
         switch (typeImport) {
@@ -169,8 +175,8 @@ public class rdf4jFileBean implements Serializable {
             }
         }
         if(error != null) {
-            if (!error.isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", error));
+            if (error.length() != 0) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :", error.toString()));
             }
         }
         if(warning != null) {
@@ -197,17 +203,21 @@ public class rdf4jFileBean implements Serializable {
                 try {
                     is = event.getFile().getInputstream();
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
                     readRdf4j = new ReadRdf4j(is, 1);
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                   error.append(System.getProperty("line.separator"));
+                   error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 warning = readRdf4j.getMessage();
                 progress = 100;
@@ -218,7 +228,8 @@ public class rdf4jFileBean implements Serializable {
                 BDDinsertEnable = true;
                 info = "File correctly loaded";
             } catch (Exception e) {
-                error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
             } finally {
                 showError();
             }
@@ -242,17 +253,21 @@ public class rdf4jFileBean implements Serializable {
                 try {
                     is = event.getFile().getInputstream();
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
                     readRdf4j = new ReadRdf4j(is, 3);
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 if(readRdf4j == null) return;
                 warning = readRdf4j.getMessage();
@@ -264,7 +279,8 @@ public class rdf4jFileBean implements Serializable {
                 BDDinsertEnable = true;
                 info = "File correctly loaded";
             } catch (Exception e) {
-                error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
             } finally {
                 showError();
             }
@@ -288,17 +304,21 @@ public class rdf4jFileBean implements Serializable {
                 try {
                     is = event.getFile().getInputstream();
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 ReadRdf4j readRdf4j = null;
                 try {
                     readRdf4j = new ReadRdf4j(is, 2);
                 } catch (IOException ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
                 }
                 warning = readRdf4j.getMessage();
                 progress = 100;
@@ -310,7 +330,8 @@ public class rdf4jFileBean implements Serializable {
 
                 info = "File correctly loaded";
             } catch (Exception e) {
-                error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
             } finally {
                 showError();
             }
@@ -327,7 +348,7 @@ public class rdf4jFileBean implements Serializable {
      * ### permet d'ajouter une liste de candidats d'après un fichier SKOS ####
      */
     public void insertCandidatesBDD() {
-        error = "";
+        error = new StringBuffer();
         info = "";
         warning = "";
         
@@ -423,7 +444,7 @@ public class rdf4jFileBean implements Serializable {
      * @param selectedUserGroup
      */
     public void insertBDD(String selectedUserGroup) {
-        error = "";
+        error = new StringBuffer();
         info = "";
         warning = "";
 
@@ -452,9 +473,11 @@ public class rdf4jFileBean implements Serializable {
             try {
                 importRdf4jHelper.addThesaurus();
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             }
             progress_abs++;
             progress = progress_abs / total * 100;
@@ -462,11 +485,14 @@ public class rdf4jFileBean implements Serializable {
             try {
                 importRdf4jHelper.addConcepts(this);
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (ParseException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             }
             
             //new UserHelper().addRole(connect.getPoolConnexion().getConnection(), idUser,idRole, ImportRdf4jHelper.getIdFromUri(uri) , "");
@@ -481,7 +507,8 @@ public class rdf4jFileBean implements Serializable {
 //            showError();
 
         } catch (Exception e) {
-            error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
         } finally {
             showError();
         }
@@ -516,11 +543,14 @@ public class rdf4jFileBean implements Serializable {
             try {
                 importRdf4jHelper.addSingleConcept(selectedTerme);
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (ParseException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             }
             tree.reInit();
             tree.reExpand();
@@ -531,7 +561,8 @@ public class rdf4jFileBean implements Serializable {
             uri = null;
             total = 0;
         } catch (Exception e) {
-            error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
         } finally {
             showError();
         }
@@ -567,11 +598,14 @@ public class rdf4jFileBean implements Serializable {
             try {
                 importRdf4jHelper.addBranch(selectedTerme);
             } catch (ParseException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (SQLException ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             } catch (Exception ex) {
-                error = ex.getMessage();
+                error.append(System.getProperty("line.separator"));
+                error.append(ex.getMessage());
             }
             tree.reInit();
             tree.reExpand();
@@ -583,7 +617,8 @@ public class rdf4jFileBean implements Serializable {
             total = 0;
 
         } catch (Exception e) {
-            error = error + "\n" + e.toString();
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
         } finally {
             showError();
         }
@@ -695,10 +730,10 @@ public class rdf4jFileBean implements Serializable {
     }
 
     public String getError() {
-        return error;
+        return error.toString();
     }
 
-    public void setError(String error) {
+    public void setError(StringBuffer error) {
         this.error = error;
     }
 

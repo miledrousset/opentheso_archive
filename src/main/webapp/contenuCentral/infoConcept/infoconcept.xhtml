@@ -123,9 +123,6 @@
                     </p:menu>
                 </h:form>
             </div>
-            <script type="application/ld+json">
-                <h:outputText value="#{theso.getMetaData()}" />
-            </script>
 
             <h:panelGroup rendered="#{(selectedTerme.idC != null)}" >
                 <span style="font-size: 17px; font-weight: bold;">
@@ -214,7 +211,7 @@
                                           value="#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}" styleClass="linkSmall">
                                 <h:outputText rendered="#{(selectedTerme.idArk != null) and (selectedTerme.idArk != '')}"
                                               value="#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}" styleClass="linkSmall"/>
-                                <h:graphicImage value = "#{roleOnTheso.nodePreference.serveurArk}#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
+                                <h:graphicImage value = "https://ark.mom.fr/ark:/#{selectedTerme.idArk}/qrcode" width="50" height="50"/>
                                 <br/>
                             </h:outputLink>
                         </span>

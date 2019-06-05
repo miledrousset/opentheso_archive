@@ -7,6 +7,16 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
+        <h:panelGroup id="generalTitle" >
+            <title>
+                <h:outputText rendered="#{selectedTerme.nom != ''}" value="#{selectedTerme.nom}"/>
+                <h:outputText rendered="#{selectedTerme.nom == null or selectedTerme.nom == ''}" value="Opentheso"/>
+                <script type="application/ld+json">
+                    <h:outputText value="#{theso.getMetaData()}" />
+                </script>
+            </title>
+        </h:panelGroup>
+
         <ui:include src="link_et_script.xhtml"/> <!-- cette archive est dans la racine Web Pages -->
         <style type ="text/css">
             <!--
@@ -20,8 +30,8 @@
     <h:body>
         <style>
             div#menuHead span#buttonMenuPanel div#panelMenu div#panelMenu_content div#onglets div#listeMenu a:first-child{
-               border: 3px  solid #956620;
-               box-shadow:0px 0px 5px #BD6060;
+                border: 3px  solid #956620;
+                box-shadow:0px 0px 5px #BD6060;
             }
         </style>
 
@@ -37,14 +47,14 @@
         <div id="menuHead">
             <div id="menuHeadTop">
                 <ui:include src="logo.xhtml" />
-            <!--    <ui:include src="connection.xhtml" />-->
+                <!--    <ui:include src="connection.xhtml" />-->
                 <ui:include src="connection2.xhtml" />                
                 <ui:include src="panChoixThesoetLangue.xhtml"/>  <!-- cette archive est dans la racine Web Pages -->
                 <ui:include src="menuAll.xhtml" />  <!-- cette archive est dans la racine Web Pages -->
             </div>
-           <ui:include src="menuThesaurus.xhtml" />
+            <ui:include src="menuThesaurus.xhtml" />
         </div>
-        
+
         <div id="center" style="border-top-width: 0px;border-top-style: solid;padding-top: 10px;">
 
             <ui:include src="includes.xhtml"/>  <!-- cette archive d'include est dans la racine -->
@@ -80,6 +90,5 @@
                 </f:facet>
             </p:ajaxStatus>
         </ui:insert>
-    
     </h:body>
 </html>

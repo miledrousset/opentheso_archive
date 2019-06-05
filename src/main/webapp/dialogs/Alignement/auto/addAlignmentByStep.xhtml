@@ -9,15 +9,35 @@
         xmlns:p="http://primefaces.org/ui">
 
         <!-- nouvelle interface pour l'alignement automatique -->
-        <p:dialog id="idAddAlignmentByStep"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="addAlignmentByStep" modal="true" resizable="true" >
+        <p:dialog id="idAddAlignmentByStep"  header="#{langueBean.getMsg('index.alignBtn2')}" widgetVar="addAlignmentByStep" modal="true" resizable="false" >
             <h:panelGroup id="alignementChoiceStep" rendered="#{(alignment.idsAndValues !=null) and (alignment.idsAndValues.size() != 0)}" >
 
                 <!-- panel général avant découpage de la page  -->
-                <p:layout style="min-width:1050px;min-height:545px; max-width:1050px; max-height:850px" >
+                <p:layout style="min-width:1070px;min-height:580px; max-width:1070px; max-height:850px" >
                     
                     <h:form>
+                       
+                        
+                        
+                        
                         <!-- liste des concepts à aligner  -->
                         <p:layoutUnit position="west" resizable="true" size="200"  style="font-size: 12px">
+                            
+                             <!-- Navigation dans le lot des concepts à aligner  -->
+     
+                             <p:commandButton value="pre" id="previous"  action="#{alignment.previousTen(theso.thesaurus.language, theso.thesaurus.id_thesaurus)}" 
+                                              styleClass="styleButton_db" style="margin-left:10px;"
+                                              update=":alignementChoiceStep"/>
+
+                             <p:commandButton value="set" id="reset" action="#{alignment.restart(theso.thesaurus.language, theso.thesaurus.id_thesaurus)}"
+                                              styleClass="styleButton_db" style="margin-left:10px;"
+                                              update=":alignementChoiceStep"/>
+
+                            <p:commandButton value="next" id="next" action="#{alignment.nextTen(theso.thesaurus.language, theso.thesaurus.id_thesaurus)}"
+                                             styleClass="styleButton_db" style="margin-left:10px;"
+                                             update=":alignementChoiceStep"/>
+                             
+                            
                             <p:selectOneListbox id="basic" value="#{alignment.idConceptSelectedForAlignment}" style="width: 185px; height: 530px;" 
                                                 scrollHeight="530" >
                                 <f:selectItems value="#{alignment.idsAndValues.entrySet()}" var="term2"
@@ -33,26 +53,39 @@
 
 
                     <p:layoutUnit position="center" resizable="true" size="850"  style="font-size: 12px">
-
+                       
                         <!-- première ligne de haut ! choix de la source avec les options -->
                         <h:panelGroup id="searchStep" rendered="#{!alignment.alignmentInProgress}"> 
                             <h:form>
-                                <div align="center">
+                                <div align="left">
                                     <p:panelGrid styleClass="ui-noborder" >
-                                        <p:row >
-                                            <p:column style="font-size: 12px">
+                                        <p:row>
+                                            <p:column rendered="#{!alignment.isNameAlignment}" style="font-size: 12px">
                                                 <h:outputText value = "Aligner:"/>
                                             </p:column>                            
-                                            <p:column style="font-weight: bold; font-size: 12px; color: darkgreen ">
+                                            <p:column  rendered="#{!alignment.isNameAlignment}" style="font-weight: bold; font-size: 12px; color: darkgreen ">
                                                 <h:inputText value="#{alignment.conceptValueForAlignment}" style="color: darkgreen; background: oldlace"/>
-                                            </p:column>                               
+                                            </p:column>
+                                            
+                                            
+                                            
+                                            <p:column rendered="#{alignment.isNameAlignment}" style="font-weight: bold; font-size: 12px; color: darkgreen;">
+                                                <p:inputText title="Nom" placeholder="Nom" value="#{alignment.nom}" 
+                                                             style="color: darkgreen; background: oldlace; width: 100px"/>
+                                            </p:column>
+                                            <p:column rendered="#{alignment.isNameAlignment}"  style="font-weight: bold; font-size: 12px; color: darkgreen ">
+                                                <p:inputText title="Prenom" placeholder="Prenom" value="#{alignment.prenom}" 
+                                                             style="color: darkgreen; background: oldlace; width: 70px;"/>
+                                            </p:column>                                             
+                                            
 
                                             <p:column style="font-size: 12px">
                                                 <h:outputText value = "avec" />
                                             </p:column>
                                             <p:column style="font-size: 12px">
-                                                <p:selectOneMenu id="console" value="#{alignment.selectedAlignement}" style="width:125px">
+                                                <p:selectOneMenu id="console" value="#{alignment.selectedAlignement}" style="width:100px" >
                                                     <f:selectItems value="#{alignment.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>                                
+                                                    <p:ajax event="change" listener="#{alignment.actionChoix()}"  update=":searchStep"/>
                                                 </p:selectOneMenu>
                                             </p:column>
 
@@ -68,7 +101,7 @@
                                             </p:column>
                                             <p:column style="font-weight: bold; font-size: 12px">
                                                 <p:commandButton id="cbAjAlignAuto" icon="ui-icon-align-16" title="Chercher les alignements" 
-                                                                 action="#{alignment.prepareAlignment(
+                                                                 action="#{alignment.searchAlignments(
                                                                            theso.thesaurus.id_thesaurus,
                                                                            alignment.idConceptSelectedForAlignment,
                                                                            alignment.conceptValueForAlignment,
@@ -86,12 +119,12 @@
 
                         <!--  -->
                         <h:form id="formResultatStep">   
-                            <p:layout style="min-width:800px;min-height:500px; max-width:850px; max-height:850px" >
+                            <p:layout style="min-width:800px;min-height:530px; max-width:850px; max-height:850px" >
 
                                 <!-- panel de gauche resultats des alignements trouvés -->
-                                <p:layoutUnit position="west" resizable="true" size="350"  style="font-size: 12px">
+                                <p:layoutUnit position="west" resizable="true" size="360"  style="font-size: 12px">
                                     <ui:repeat rendered="#{alignment.listAlignValues != null}" value="#{alignment.listAlignValues}" var='nodeAlign'>
-                                        <p:layout style="min-width:340px;min-height:60px; max-width:350px; max-height:70px" >
+                                        <p:layout style="min-width:350px;min-height:60px; max-width:350px; max-height:70px" >
                                             <p:layoutUnit position="west" resizable="false" size="300"  style="font-size: 12px">
                                                 <p:row>
                                                     <p:column style="font-size: 12px">
@@ -115,13 +148,13 @@
                                                     </p:column>
                                                 </p:row>
                                             </p:layoutUnit>
-                                            <p:layoutUnit position="center" resizable="false" size="40"  style="font-size: 12px; border: none">
+                                            <p:layoutUnit position="center" resizable="false" size="30"  style="font-size: 12px; border: none">
                                                 <p:row style="border: none">
                                                     <br/>
                                                     <p:column style="font-size: 12px; border: none">
                                                         <p:commandButton id="select" icon="ui-icon-exp" styleClass="styleButton_db" style="border: none"
                                                                          title="selectionner cet alignement" 
-                                                                         action="#{alignment.getOptions(nodeAlign,selectedTerme.idTheso, selectedTerme.idC)}"
+                                                                         action="#{alignment.getUriAndOptions(nodeAlign,selectedTerme.idTheso, selectedTerme.idC)}"
                                                                          update=":formResultatStep, :alignementChoiceStep">
                                                         </p:commandButton>
                                                     </p:column>
@@ -153,7 +186,7 @@
                                         <fieldset style="height: 30px" >
                                             <legend><h:outputText value="Choix d'alignement" /></legend>
 
-                                            <h:outputText value="#{selectedTerme.nom} "  style="color: darkred"/>
+                                            <h:outputText value="#{alignment.conceptValueForAlignment} "  style="color: darkred"/>
                                             <h:selectOneMenu value="#{alignment.selectedAlignementType}" styleClass="listes" style="width: 150px;">
                                                 <f:selectItems value="#{alignment.alignmentTypes}" var="type" itemLabel="#{type.value}" itemValue="#{type.key}" />
                                             </h:selectOneMenu>
@@ -162,9 +195,15 @@
 
                                             <p:commandButton id="align" icon="ui-icon-ok-16" styleClass="styleButton_db" style="border: none"
                                                              title="Valider l'alignement" 
-                                                             action="#{alignment.addAlignment(selectedTerme.idTheso,
+                                                             actionListener="#{alignment.addAlignment(selectedTerme.idTheso,
                                                                        alignment.idConceptSelectedForAlignment, currentUser.user.idUser)}"
-                                                             update=":formResultatStep, :alignementChoiceStep">
+                                                             
+                                                             action="#{newtreeBean.reloadConcept(newtreeBean.selectedNode)}"
+
+                                                                 
+                                                             update=":formResultatStep, :alignementChoiceStep,                                                                                                                    
+                                                             :alignementChoice,:panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,:panExport,
+                                                             :accordeonTree,:externalResources,:idImageGaleriaDlg,:idAddAlignment, :messages" >
                                             </p:commandButton>
 
                                             <p:commandButton id="cancel" icon="ui-icon-cancel-16" styleClass="styleButton_db" style="border: none"
@@ -177,15 +216,16 @@
 
 
                                     <h:panelGroup id="listOptions" > 
-                                        <h:panelGroup id="choiceTraductions" rendered="#{(alignment.traductionsWikidata != null) and (alignment.traductionsWikidata.size() != 0)}">
+                                        <h:panelGroup id="choiceTraductions" rendered="#{(alignment.traductionsOfAlignment != null) and (alignment.traductionsOfAlignment.size() != 0)}">
                                             <fieldset style="height: 150px" >
                                                 <legend><h:outputText value="traductions" /></legend>
 
                                                 <p:selectBooleanCheckbox value="#{alignment.isSelectedAllLang}" title="Select/deselect all" style="float:right">
                                                     <p:ajax update=":formResultatStep:listOptions" listener="#{alignment.selectDeselectTrad()}" />
                                                 </p:selectBooleanCheckbox>
-                                                <p:dataTable id="tabTraductions" widgetVar="trad"
-                                                             value="#{alignment.traductionsWikidata}" var="traductions"
+                                                <p:dataTable id="tabTraductions" 
+                                                             value="#{alignment.traductionsOfAlignment}"
+                                                             var="traductions"
                                                              scrollable="true" resizableColumns="true" scrollHeight="110" 
                                                              style="font-family:'Palatino linotype',Times,serif;">
                                                     <p:column width="10" headerText="iso">
@@ -207,14 +247,14 @@
                                         </h:panelGroup>
 
 
-                                        <h:panelGroup id="choiceDescriptions" rendered="#{(alignment.descriptionsWikidata != null) and (alignment.descriptionsWikidata.size() != 0)}">
+                                        <h:panelGroup id="choiceDescriptions" rendered="#{(alignment.descriptionsOfAlignment != null) and (alignment.descriptionsOfAlignment.size() != 0)}">
                                             <fieldset style="height: 150px">
                                                 <legend><h:outputText value="Définitions" /></legend>
                                                 <p:selectBooleanCheckbox value="#{alignment.isSelectedAllDef}" title="Select/deselect all" style="float:right">
                                                     <p:ajax update=":formResultatStep:listOptions" listener="#{alignment.selectDeselectDef()}" />
                                                 </p:selectBooleanCheckbox>                            
                                                 <p:dataTable id="tabNotes" 
-                                                             value="#{alignment.descriptionsWikidata}" var="descriptions" scrollable="true"
+                                                             value="#{alignment.descriptionsOfAlignment}" var="descriptions" scrollable="true"
                                                              resizableColumns="true" scrollHeight="110" 
                                                              style="font-family:'Palatino linotype',Times,serif;">
 
@@ -233,14 +273,14 @@
                                         </h:panelGroup>
 
 
-                                        <h:panelGroup id="choiceImages" rendered="#{(alignment.imagesWikidata != null) and (alignment.imagesWikidata.size() != 0)}">                            
+                                        <h:panelGroup id="choiceImages" rendered="#{(alignment.imagesOfAlignment != null) and (alignment.imagesOfAlignment.size() != 0)}">                            
                                             <fieldset style="height: 150px">
                                                 <legend><h:outputText value="Images" /></legend>
                                                 <p:selectBooleanCheckbox value="#{alignment.isSelectedAllImages}" title="Select/deselect all" style="float:right">
                                                     <p:ajax update=":formResultatStep:listOptions" listener="#{alignment.selectDeselectImages()}" />
                                                 </p:selectBooleanCheckbox>                            
                                                 <p:dataTable id="tabImages" 
-                                                             value="#{alignment.imagesWikidata}" var="images" scrollable="true"
+                                                             value="#{alignment.imagesOfAlignment}" var="images" scrollable="true"
                                                              resizableColumns="true" scrollHeight="110" 
                                                              style="font-family:'Palatino linotype',Times,serif;">
 
@@ -265,7 +305,15 @@
 
 
                                 <p:layoutUnit position="south" resizable="true" size="50" style="font-size: 12px" >
-                                    <h:outputText value="Resultat :  "/>
+                                    <h:outputText value="Infos :  "/>
+                                    <p:repeat value="#{alignment.nodeAlignmentSmall}" var="nodeAlignment">
+                                            <f:facet name="header">
+                                                Alignements existants
+                                            </f:facet>
+                                            #{nodeAlignment.uri_target}, #{nodeAlignment.alignement_id_type}
+                                    </p:repeat>
+                                    
+                                    <h:outputText rendered="#{alignment.error}" value="#{alignment.alignementResult}" style="color: darkred" />
                                     <h:outputText rendered="#{alignment.error}" value="#{alignment.alignementResult}" style="color: darkred" />
                                     <h:outputText rendered="#{(!alignment.error) and  (alignment.alignementResult != null)}" value="#{alignment.alignementResult}" style="color: green" />
 

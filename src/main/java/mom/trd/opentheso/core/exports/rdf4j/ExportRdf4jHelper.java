@@ -382,7 +382,6 @@ public class ExportRdf4jHelper {
             addFilsGroupRcursif(idThesaurus, idOfGroupChildren, sKOSResource, selectedLanguages);
             //}
         }
-
     }
 
     private void writeGroupInfo(SKOSResource sKOSResource,
@@ -450,6 +449,12 @@ public class ExportRdf4jHelper {
         if (idSuperGroup != null) {
             sKOSResource.addRelation(getUriFromId(idSuperGroup), SKOSProperty.superGroup);
             superGroupHashMap.remove(idOfGroupChildren);
+        }
+        
+        // ajout de la notation
+        if (nodeGroupLabel.getNotation() != null && !nodeGroupLabel.getNotation().equals("null")) {
+            if(!nodeGroupLabel.getNotation().isEmpty())
+                sKOSResource.addNotation(nodeGroupLabel.getNotation());
         }
 
         skosXmlDocument.addGroup(sKOSResource);
@@ -796,8 +801,10 @@ public class ExportRdf4jHelper {
         }        
         // si on ne trouve pas ni Handle, ni Ark
     //    uri = nodePreference.getCheminSite() + nodeConceptExport.getConcept().getIdConcept();
-        uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
-                        + "&idt=" + nodeConceptExport.getConcept().getIdThesaurus();
+//        uri = nodePreference.getCheminSite() + "?idc=" + nodeConceptExport.getConcept().getIdConcept()
+//                        + "&idt=" + nodeConceptExport.getConcept().getIdThesaurus();
+        uri = nodePreference.getCheminSite() + nodeConceptExport.getConcept().getIdConcept();
+
         
         return uri;
     }
@@ -844,8 +851,10 @@ public class ExportRdf4jHelper {
         }        
         // si on ne trouve pas ni Handle, ni Ark
 //        uri = nodePreference.getCheminSite() + nodeGroupLabel.getIdGroup();
-        uri = nodePreference.getCheminSite() + "?idg=" + nodeGroupLabel.getIdGroup()
-                    + "&idt=" + nodeGroupLabel.getIdThesaurus();
+//        uri = nodePreference.getCheminSite() + "?idg=" + nodeGroupLabel.getIdGroup()
+//                    + "&idt=" + nodeGroupLabel.getIdThesaurus();
+
+        uri = nodePreference.getCheminSite() + nodeGroupLabel.getIdGroup();
         return uri;
     }
     
@@ -886,8 +895,10 @@ public class ExportRdf4jHelper {
 
         // si on ne trouve pas ni Handle, ni Ark
     //    uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
-        uri = nodePreference.getCheminSite() + "?idg=" + nodeUri.getIdConcept()
-                        + "&idt=" + idTheso;        
+//        uri = nodePreference.getCheminSite() + "?idg=" + nodeUri.getIdConcept()
+//                        + "&idt=" + idTheso;
+        uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
+        
         return uri;
     }   
     
@@ -928,9 +939,11 @@ public class ExportRdf4jHelper {
 
         // si on ne trouve pas ni Handle, ni Ark
     //    uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();
-        uri = nodePreference.getCheminSite() + "?idc=" + nodeUri.getIdConcept()
-                        + "&idt=" + idTheso;   
-                        //+ "&amp;idt=" + idTheso;    
+//        uri = nodePreference.getCheminSite() + "?idc=" + nodeUri.getIdConcept()
+//                        + "&idt=" + idTheso;   
+//                        //+ "&amp;idt=" + idTheso;
+                        
+        uri = nodePreference.getCheminSite() + nodeUri.getIdConcept();                         
         return uri;
     }       
 

@@ -1722,7 +1722,7 @@ public class GroupHelper {
         nodeGroupLabel.setIdThesaurus(idThesaurus);
         nodeGroupLabel.setIdArk(getIdArkOfGroup(ds, idConceptGroup, idThesaurus));
         nodeGroupLabel.setIdHandle(getIdHandleOfGroup(ds, idConceptGroup, idThesaurus));
-
+        nodeGroupLabel.setNotation(getNotationOfGroup(ds, idConceptGroup, idThesaurus));
         nodeGroupLabel.setNodeGroupTraductionses(getAllGroupTraduction(ds, idConceptGroup, idThesaurus));
 
         return nodeGroupLabel;
@@ -2413,7 +2413,49 @@ public class GroupHelper {
             log.error("Error while getting id_handle of Group : " + idGroup, sqle);
         }
         return ark;
-    }    
+    }
+    
+    /**
+     * Cette fonction permet de récupérer la notation d'un groupe
+     *
+     * @param ds
+     * @param idGroup
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public String getNotationOfGroup(HikariDataSource ds, String idGroup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String notation = "";
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select notation from concept_group where"
+                            + " idthesaurus = '" + idThesaurus + "'"
+                            + " and idgroup = '" + idGroup + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    if (resultSet.next()) {
+                        notation = resultSet.getString("notation");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting notation of Group : " + idGroup, sqle);
+        }
+        return notation;
+    }     
     
     /**
      * Cette fonction permet de récupérer l'identifiant Ark sinon renvoie un une

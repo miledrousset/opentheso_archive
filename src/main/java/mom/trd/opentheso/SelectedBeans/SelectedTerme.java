@@ -333,7 +333,7 @@ public class SelectedTerme implements Serializable {
             nom = ncg.getLexicalValue();
             idArk = ncg.getConceptGroup().getIdARk();
             idHandle = ncg.getConceptGroup().getIdHandle();
-
+            notation = ncg.getConceptGroup().getNotation();
             nomEdit = nom;
             idT = "";
             if (ncg.getCreated() != null && ncg.getModified() != null) {
@@ -842,9 +842,9 @@ public class SelectedTerme implements Serializable {
      */
     public boolean creerTermeSpe(MyTreeNode selecedTerm, String relationType,
             String idConcept, String notation) {
-        ConceptHelper instance = new ConceptHelper();
+        ConceptHelper conceptHelper = new ConceptHelper();
         if(roleOnTheso.getNodePreference() == null) return false;
-        instance.setNodePreference(roleOnTheso.getNodePreference());
+        conceptHelper.setNodePreference(roleOnTheso.getNodePreference());
         
         String idConceptRetour = null;
         
@@ -867,9 +867,9 @@ public class SelectedTerme implements Serializable {
             terme.setSource("");
             terme.setStatus("");
             concept.setTopConcept(true);
-            idConceptRetour = instance.addConcept(connect.getPoolConnexion(), null, null, concept, terme, user.getUser().getIdUser());
+            idConceptRetour = conceptHelper.addConcept(connect.getPoolConnexion(), null, null, concept, terme, user.getUser().getIdUser());
             if (idConceptRetour == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", conceptHelper.getMessage()));
                 return false;
             }
           //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
@@ -902,10 +902,10 @@ public class SelectedTerme implements Serializable {
 
             //String idTC = idTopConcept;
             String idP = idC;
-            idConceptRetour = instance.addConcept(connect.getPoolConnexion(), idP, relationType, concept, terme, user.getUser().getIdUser());
+            idConceptRetour = conceptHelper.addConcept(connect.getPoolConnexion(), idP, relationType, concept, terme, user.getUser().getIdUser());
             
             if (idConceptRetour == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", instance.getMessage()));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", conceptHelper.getMessage()));
                 return false;
             }
           //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
@@ -920,6 +920,8 @@ public class SelectedTerme implements Serializable {
 //            }
 //            termesSpecifique.addAll(tempMap.entrySet());
         }
+        if(!conceptHelper.getMessage().isEmpty())
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", conceptHelper.getMessage()));
         idConceptTemp = idConceptRetour;
         vue.setAddTSpe(false);
         valueEdit = "";

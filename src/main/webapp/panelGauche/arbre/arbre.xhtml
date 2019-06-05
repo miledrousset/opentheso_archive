@@ -15,7 +15,7 @@
                     <p:ajax event="collapse" listener="#{newtreeBean.onNodeCollapse}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <p:ajax event="expand" listener="#{newtreeBean.onNodeExpand}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3" />
                     <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
-                            :panExport,:externalResources,:idImageGaleriaDlg"   >
+                            :panExport,:externalResources,:idImageGaleriaDlg,:generalTitle"   >
                     </p:ajax>
                       
                     <p:treeNode ariaLabel="#{node}" type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 
@@ -87,7 +87,7 @@
 
                     
                     <p:ajax event="select" listener="#{newtreeBean.onNodeSelect}" update=":panContenu,:contenuDroite1,:contenuDroite2,:contenuDroite3,
-                            :panExport,:externalResources,:idImageGaleriaDlg"   >
+                            :panExport,:externalResources,:idImageGaleriaDlg,:generalTitle"   >
                     </p:ajax>
                     
                     <p:treeNode type="default" rendered="false" expandedIcon="ui-icon ui-icon-domaine-open" 

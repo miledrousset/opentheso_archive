@@ -28,14 +28,14 @@
             <div id="imagesSwitcher2">
                 
                 <!-- image switcher to show and switch between the terme images loaded from the bean -->
-                <p:imageSwitch  style="margin-left: auto; margin-right: auto;" id="manuelSwitcher2" effect="shuffle">
+                <p:imageSwitch  style="margin-left: auto; margin-right: auto;" id="manuelSwitcher2" effect="shuffle" >
                     <ui:repeat  value="#{externalResources.images}" var="image" id="manuelSwitcherImages2">
                         <p:graphicImage title="#{image}"                                         
                                         value="#{image}" onclick="PF('imageGaleriaDlg').show()"
                                         style="cursor: pointer;"
-                                        
                                         width="200px" >
-                        </p:graphicImage>                       
+                            
+                        </p:graphicImage>  
                     </ui:repeat>
                 </p:imageSwitch>              
             </div>

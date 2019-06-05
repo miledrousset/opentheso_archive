@@ -9,7 +9,6 @@ import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,7 +18,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -32,7 +30,6 @@ import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
-import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
@@ -46,9 +43,6 @@ import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import mom.trd.opentheso.ws.handle.HandleHelper;
-import mom.trd.opentheso.ws.rest.theso;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
@@ -642,7 +636,7 @@ public class NewTreeBean implements Serializable {
         externalResources.loadImages(idThesoSelected, selectedTerme.getIdC());
         PrimeFaces pf = PrimeFaces.current();
         if (pf.isAjaxRequest()) {
-            pf.ajax().update("principale");
+            pf.ajax().update("panContenu");
         }
     //    RequestContext.getCurrentInstance().update("principale");        
     }
@@ -660,6 +654,7 @@ public class NewTreeBean implements Serializable {
         selectedTerme.setTree(0);
 
         externalResources.loadImages(idThesoSelected, selectedTerme.getIdC());
+
         // this.parentOrigine=(MyTreeNode)selectedNode.getParent();
 //        PrimeFaces pf = PrimeFaces.current();
 //        if (pf.isAjaxRequest()) {

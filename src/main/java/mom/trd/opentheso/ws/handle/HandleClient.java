@@ -417,9 +417,9 @@ public class HandleClient {
     public boolean isHandleExist(
             String urlHandle, String idHandle) {
         try {
-            urlHandle = urlHandle.replace("https://","http://");
+            urlHandle = urlHandle.replace("http://","https://");
             URL url = new URL(urlHandle + idHandle);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setUseCaches(false);

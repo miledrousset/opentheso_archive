@@ -786,8 +786,14 @@ public class NoteHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding Note of Term : " + idTerm, sqle);
+                //System.out.println(sqle.toString());
+                return false;
+            } else
+                return true;
             // Log exception
-            log.error("Error while adding Note of Term : " + idTerm, sqle);
+            
         }
         addTermNoteHistorique(ds, idTerm, idLang, idThesaurus, note, noteTypeCode, idUser);
         return status;

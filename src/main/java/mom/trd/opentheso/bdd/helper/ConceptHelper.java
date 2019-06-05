@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.context.FacesContext;
+import javax.faces.context.SessionMap;
 import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
@@ -583,11 +585,20 @@ public class ConceptHelper {
         return idConcept;
     }
     
+    private String getAlphaNumericId (Connection conn){
+        ToolsHelper toolsHelper = new ToolsHelper();
+        String id = toolsHelper.getNewId(15);
+        while (isIdExiste(conn, id)) {
+            id = toolsHelper.getNewId(15);
+        }
+        return id;
+    }    
+    
     private String getAlphaNumericId (HikariDataSource ds){
         ToolsHelper toolsHelper = new ToolsHelper();
-        String id = toolsHelper.getNewId(10);
+        String id = toolsHelper.getNewId(15);
         while (isIdExiste(ds, id)) {
-            id = toolsHelper.getNewId(10);
+            id = toolsHelper.getNewId(15);
         }
         return id;
     }
@@ -669,12 +680,13 @@ public class ConceptHelper {
             
             nodeMetaData = getNodeMetaData(ds, idConcept,
                     nodePreference.getSourceLang(), idTheso);
-            
+            if(nodeMetaData == null) return false;
             concept = getThisConcept(ds, idConcept, idTheso);
             if(concept == null) return false;
             
             privateUri = "?idc=" + idConcept + "&idt=" + idTheso;
             
+            /// cas où on n'a pas d'idArk dans le concept, il faut alors le créer sur Arkeo
             if (concept.getIdArk() == null || concept.getIdArk().isEmpty()) {
                 // création d'un identifiant Ark + (Handle avec le serveur Ark de la MOM)
                 if(!arkHelper.addArk(privateUri, nodeMetaData)) {
@@ -682,31 +694,106 @@ public class ConceptHelper {
                     return false;
                 }
                 if(!updateArkIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdArk())) return false;
-                return updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle());                
-            }
-            
-            // ark existe dans Opentheso, on vérifie si Ark est présent sur le serveur Ark 
-            if(arkHelper.isArkExsitOnServer(concept.getIdArk())) {
-                // ark existe sur le serveur, alors on applique une mise à jour
-                // pour l'URL et les métadonnées
-                if(!arkHelper.updateArk(concept.getIdArk(), privateUri, nodeMetaData)) {
-                    message = arkHelper.getMessage();
-                    return false;
-                }
-                return updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle()); 
+                if(!updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle())) return false;                
             } else {
-                // création d'un identifiant Ark avec en paramètre l'ID Ark existant sur Opentheso
-                // + (création de l'ID Handle avec le serveur Ark de la MOM)
-                if(!arkHelper.addArkWithProvidedId(concept.getIdArk(),privateUri, nodeMetaData)) {
-                    message = arkHelper.getMessage();
-                    return false;
+                // ark existe dans Opentheso, on vérifie si Ark est présent sur le serveur Ark 
+                if(arkHelper.isArkExistOnServer(concept.getIdArk())) {
+                    // ark existe sur le serveur, alors on applique une mise à jour
+                    // pour l'URL et les métadonnées
+                    if(!arkHelper.updateArk(concept.getIdArk(), privateUri, nodeMetaData)) {
+                        message = arkHelper.getMessage();
+                        return false;
+                    }
+                    if(! updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle())) return false;
+                } else {
+                    // création d'un identifiant Ark avec en paramètre l'ID Ark existant sur Opentheso
+                    // + (création de l'ID Handle avec le serveur Ark de la MOM)
+                    if(!arkHelper.addArkWithProvidedId(concept.getIdArk(),privateUri, nodeMetaData)) {
+                        message = arkHelper.getMessage();
+                        return false;
+                    }
+                    if(!updateArkIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdArk())) return false;
+                    if(!updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle())) return false;  
                 }
-                if(!updateArkIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdArk())) return false;
-                return updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle());  
             }
         }
         return true;
     }
+    
+    /**
+     * Permet de :
+     * - Vérifier si l'identifiant Ark existe sur le serveur Arkéo
+     * - S'il existe, on le met à jour pour l'URL
+     * - s'il n'existe pas, on le créé
+     * 
+     * à utiliser avec précaution pour maintenance
+     *
+     * #MR
+     * @param ds
+     * @param idTheso
+     * @param idConcept
+     * @param idArk
+     * @return 
+     */
+    public boolean updateArkId(
+            HikariDataSource ds,
+            String idTheso,
+            String idConcept,
+            String idArk) {
+
+        ArkHelper arkHelper = new ArkHelper(nodePreference);
+        if(!arkHelper.login()) return false;
+        
+        NodeMetaData nodeMetaData;
+        Concept concept;
+        String privateUri;
+        
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }        
+        
+        if (idArk == null || idArk.isEmpty()) return false;
+        
+        nodeMetaData = getNodeMetaData(ds, idConcept,
+                nodePreference.getSourceLang(), idTheso);
+        if(nodeMetaData == null) return false;
+        concept = getThisConcept(ds, idConcept, idTheso);
+        if(concept == null) return false;
+
+        privateUri = "?idc=" + idConcept + "&idt=" + idTheso;
+
+        
+        if(arkHelper.isArkExistOnServer(idArk)) {
+            // ark existe sur le serveur, alors on applique une mise à jour
+            // pour l'URL et les métadonnées
+            if(!arkHelper.updateArk(idArk, privateUri, nodeMetaData)) {
+                message = arkHelper.getMessage();
+                return false;
+            }
+            if(! updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle())) return false;            
+        } else {
+            // création d'un identifiant Ark avec en paramètre l'ID Ark existant sur Opentheso
+            // + (création de l'ID Handle avec le serveur Ark de la MOM)
+            
+            // on vérifie d'abord si idHandle existe sur handle.net, alors il faut le supprimer avant
+            if(arkHelper.isHandleExistOnServer(idArk.replaceAll("/", "."))) {
+                if(!arkHelper.deleteHandle(idArk.replaceAll("/", "."), privateUri, nodeMetaData)) {
+                    message = arkHelper.getMessage();
+                    return false;
+                }
+            }
+            
+            if(!arkHelper.addArkWithProvidedId(idArk, privateUri, nodeMetaData)) {
+                message = arkHelper.getMessage();
+                return false;
+            }
+            if(!updateHandleIdOfConcept(ds, idConcept, idTheso, arkHelper.getIdHandle())) return false;  
+        }
+        return true;
+    }    
     
     
     /**
@@ -724,6 +811,7 @@ public class ConceptHelper {
             String idConcept, String idLang, String idTheso) {
         NodeConcept nodeConcept;
         nodeConcept = getConcept(ds, idConcept, idTheso, idLang);
+        if(nodeConcept == null) return null;
         NodeMetaData nodeMetaData = new NodeMetaData();
         nodeMetaData.setCreator(nodeConcept.getTerm().getSource());
         nodeMetaData.setTitle(nodeConcept.getTerm().getLexical_value());
@@ -1145,6 +1233,41 @@ public class ConceptHelper {
         return null;
     }*/
 
+    
+    ///// test à supprimer 
+ /*   private void test(HikariDataSource ds){
+        Statement stmt;
+        ArrayList<String> conceptabush = new ArrayList<>();
+        ResultSet resulset;
+        String idConcept = "";
+        try {
+            Connection conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select * from concept"
+                            + " where id_thesaurus ='1'" 
+                            + "' and id_concept = '130'";
+                    resulset = stmt.executeQuery(query);
+                    while (resulset.next()) {
+                        idConcept = resulset.getString("id_concept");
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while deleting Concept : " + idConcept, sqle);
+        }
+    }*/
+    
+    /// fin test à supprimer
+    
+    
+    
     /**
      * Cette fonction permet d'ajouter un Concept complet à la base avec le
      * libellé et les relations Si l'opération échoue, elle envoi un NULL et ne
@@ -1164,6 +1287,20 @@ public class ConceptHelper {
             String relationType,
             Concept concept, Term term, int idUser) {
 
+        
+        
+      
+        //// Test de conservation des inforamtions dans la session //////
+   //     FacesContext context_session = FacesContext.getCurrentInstance();
+    //    (HikariDataSource) SessionMap.get("somekey");
+        
+    //    HikariDataSource ds2 = (HikariDataSource) context_session.getExternalContext().getSessionMap().get("hikariDs");
+    //    test(ds2);
+        //// Fin Test de conservation des inforamtions dans la session //////
+        
+        
+        
+        
         ArrayList<String> idConcepts = new ArrayList<>();
         Connection conn = null;
         try {
@@ -1242,25 +1379,27 @@ public class ConceptHelper {
                     if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
                         conn.rollback();
                         conn.close();
+                        message = message + "La création Handle a échouée";
                         Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Handle a échouée");
                     }
                 }
             }
+            conn.commit();
+            conn.close();
+            
             if (nodePreference != null) {
                 // Si on arrive ici, c'est que tout va bien 
                 // alors c'est le moment de récupérer le code ARK
                 if (nodePreference.isUseArk()) {
                     idConcepts.add(idConcept);
                     if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
-                        conn.rollback();
-                        conn.close();
+                    //    conn.rollback();
+                    //    conn.close();
                         message = message + "La création Ark a échouée";
                         Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
                     }
                 }
-            }
-            conn.commit();
-            conn.close();
+            }            
             return idConcept;
 
         } catch (SQLException ex) {
@@ -1356,17 +1495,6 @@ public class ConceptHelper {
             // Si on arrive ici, c'est que tout va bien 
             // alors c'est le moment de récupérer le code ARK
             if (nodePreference != null) {
-                // Si on arrive ici, c'est que tout va bien 
-                // alors c'est le moment de récupérer le code ARK
-                if (nodePreference.isUseArk()) {
-                    idConcepts.add(idConcept);
-                    if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
-                        conn.rollback();
-                        conn.close();
-                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
-                        return null;
-                    }
-                }
                 // création de l'identifiant Handle
                 if (nodePreference.isUseHandle()) {
                     if (!addIdHandle(conn, idConcept, concept.getIdThesaurus())) {
@@ -1380,6 +1508,20 @@ public class ConceptHelper {
 
             conn.commit();
             conn.close();
+            
+            if (nodePreference != null) {
+                // Si on arrive ici, c'est que tout va bien 
+                // alors c'est le moment de récupérer le code ARK
+                if (nodePreference.isUseArk()) {
+                    idConcepts.add(idConcept);
+                    if (!generateArkId(ds, concept.getIdThesaurus(),idConcepts)){ 
+                    //    conn.rollback();
+                    //    conn.close();
+                        message = message + "La création Ark a échouée";
+                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La création Ark a échouée");
+                    }
+                }
+            }              
             return idConcept;
 
         } catch (SQLException ex) {
@@ -2357,11 +2499,7 @@ public class ConceptHelper {
                 try {
                     if(concept.getIdConcept() == null) {
                         if (nodePreference.getIdentifierType() == 1) { // identifiants types alphanumérique
-                            ToolsHelper toolsHelper = new ToolsHelper();
-                            idConcept = toolsHelper.getNewId(10);
-                            while (isIdExiste(conn, idConcept)) {
-                                idConcept = toolsHelper.getNewId(10);
-                            }
+                            idConcept = getAlphaNumericId(conn);
                             concept.setIdConcept(idConcept);
                         } else {
                             idConcept = getNumericConceptId(conn);
@@ -3309,8 +3447,9 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_handle from concept where id_thesaurus = '"
-                            + idThesaurus + "'";
+                    String query = "select id_handle from concept where"
+                            + " id_thesaurus = '" + idThesaurus + "'"
+                            + " and (id_handle != null or id_handle != '')";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
 
@@ -3334,6 +3473,104 @@ public class ConceptHelper {
         }
         return tabId;
     }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id Ark d'un thésaurus
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public ArrayList<String> getAllIdArkOfThesaurus(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabId = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_ark from concept where "
+                            + "id_thesaurus = '" + idThesaurus + "'"
+                            + " and (id_ark != null or id_ark != '')";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        if (resultSet.getString("id_ark") != null) {
+                            if (!resultSet.getString("id_ark").isEmpty()) {
+                                tabId.add(resultSet.getString("id_ark"));
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdHandle of Thesaurus : " + idThesaurus, sqle);
+        }
+        return tabId;
+    }
+    
+    /**
+     * Cette fonction permet de récupérer la liste des Id Ark d'un thésaurus
+     * sous forme de MAP avec idConcept + idArk
+     *
+     * @param ds
+     * @param idThesaurus
+     * @return ArrayList
+     */
+    public HashMap<String, String> getAllIdArkOfThesaurusMap(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        HashMap<String, String> tabIds = new LinkedHashMap<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept, id_ark from concept where "
+                            + "id_thesaurus = '" + idThesaurus + "'"
+                            + " and id > 3063"
+                            + " and (id_ark != null or id_ark != '')";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        if (resultSet.getString("id_ark") != null) {
+                            if (!resultSet.getString("id_ark").isEmpty()) {
+                                tabIds.put(resultSet.getString("id_concept"), resultSet.getString("id_ark"));
+                            }
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdHandle of Thesaurus : " + idThesaurus, sqle);
+        }
+        return tabIds;
+    }      
 
     /**
      * Cette fonction permet de récupérer la liste des Id concept d'un thésaurus

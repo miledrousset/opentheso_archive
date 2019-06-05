@@ -39,9 +39,57 @@ public class ArkHelper {
         return arkClientRest.login();
     }
     
-    public boolean isArkExsitOnServer(String idArk) {
+    public boolean isArkExistOnServer(String idArk) {
         return  arkClientRest.isArkExist(idArk);
     }
+    
+    
+    public boolean isHandleExistOnServer(String idHandle) {
+        return arkClientRest.isHandleExist(idHandle);
+    }
+    
+    /**
+     * Permet de supprimer un Handle en local et sur handle.net
+     * @param idHandle
+     * @param privateUri
+     * @param nodeMetaData
+     * @return
+     */
+    public boolean deleteHandle(
+            String idHandle,
+            String privateUri,
+            NodeMetaData nodeMetaData) {
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+        
+        NodeJson nodeJson = new NodeJson();
+        nodeJson.setArk("");
+        
+        /// c'est le seul argument qui compte pour la suppression 
+        nodeJson.setHandle(idHandle);
+        
+        
+        nodeJson.setUrlTarget(nodePreference.getCheminSite() + privateUri); //"?idc=" + idConcept + "&idt=" + idThesaurus);
+        nodeJson.setTitle(nodeMetaData.getTitle());
+        nodeJson.setCreator(nodeMetaData.getCreator());
+        nodeJson.setDcElements(nodeMetaData.getDcElementsList()); // n'est pas encore exploité
+        nodeJson.setType(nodePreference.getPrefixArk());  //pcrt : p= pactols, crt=code DCMI pour collection
+        nodeJson.setLanguage(nodePreference.getSourceLang());
+        nodeJson.setNaan(nodePreference.getIdNaan());
+        nodeJson.setHandle_prefix("20.500.11859");
+       
+        // création de l'identifiant Ark et Handle 
+        if(!arkClientRest.deleteHandle(nodeJson.getJsonString())) {
+            message = arkClientRest.getMessage();
+            return false;
+        }
+        message = arkClientRest.getMessage();
+        return true;
+    }        
     
     /**
      * Permet de créer d'ajouter un identifiant ARK sur le serveur 
@@ -92,6 +140,33 @@ public class ArkHelper {
         }
         return true;
     }    
+    
+    
+    public boolean getArkFromArkeo(String ark){
+        if (nodePreference == null) {
+            return false;
+        }
+        if (!nodePreference.isUseArk()) {
+            return false;
+        }
+        idArk = null;
+        idHandle = null;
+        
+        if(!arkClientRest.getArk(ark)) return false;
+
+        idArk = arkClientRest.getIdArk();
+        idHandle = arkClientRest.getIdHandle();
+        if (idArk == null) {
+            message = "Erreur Ark !!";
+            return false;
+        }
+        if (idHandle == null) {
+            message = "Erreur Handle !!";
+            return false;
+        }
+        return true;        
+    }
+    
     
     /**
      * Permet de créer un identifiant ARK et un identifiant Handle (serveur MOM)

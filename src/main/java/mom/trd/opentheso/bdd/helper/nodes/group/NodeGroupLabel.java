@@ -7,6 +7,7 @@ public class NodeGroupLabel {
     private String idGroup;
     private String idArk;
     private String idHandle;
+    private String notation;
     private String idThesaurus;
     
     private ArrayList<NodeGroupTraductions> nodeGroupTraductionses = new ArrayList<>();
@@ -52,6 +53,14 @@ public class NodeGroupLabel {
 
     public void setNodeGroupTraductionses(ArrayList<NodeGroupTraductions> nodeGroupTraductionses) {
         this.nodeGroupTraductionses = nodeGroupTraductionses;
+    }
+
+    public String getNotation() {
+        return notation;
+    }
+
+    public void setNotation(String notation) {
+        this.notation = notation;
     }
 
            

@@ -38,11 +38,11 @@
                             
                             
                             
-                            <p:menuitem disabled="false" value="#{langueBean.getMsg('index.alignBtn2')}_New"
+                            <p:menuitem disabled="true" value="#{langueBean.getMsg('index.alignBtn2')}_New"
                                         actionListener="#{alignment.initAlignmentSources(selectedTerme.idTheso, selectedTerme.idC, theso.thesaurus.language)}" 
                                         update=":idAddAlignment" oncomplete="PF('addAlignment').show();" style="font-size: 12px;"/>                            
                             
-                            <p:menuitem disabled="true" value="#{langueBean.getMsg('index.alignBtn2')}_New_StepByStep"
+                            <p:menuitem disabled="false" value="#{langueBean.getMsg('index.alignBtn2')}_New_StepByStep"
                                         actionListener="#{alignment.initAlignementByStep(theso.thesaurus.id_thesaurus, selectedTerme.idC, theso.thesaurus.language)}"
                                         action="#{alignment.nextTen(theso.thesaurus.language, theso.thesaurus.id_thesaurus)}"
                                         update=":idAddAlignmentByStep" oncomplete="PF('addAlignmentByStep').show();" style="font-size: 12px;"/>                               
@@ -60,7 +60,7 @@
                 </h:form>    
             </div>
         </div>
-        <div class="contenuAlign">
+        <div id="listeAlignment" class="contenuAlign">
             <ui:repeat value="#{selectedTerme.ALignType}" var="allAlign">
                 <h:outputText value="#{allAlign.value} : " /><br/>
                 <ui:repeat value="#{selectedTerme.align}" var="alignVar">

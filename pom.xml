@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.4.7</version>
+    <version>4.4.8</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -421,6 +421,5 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
 

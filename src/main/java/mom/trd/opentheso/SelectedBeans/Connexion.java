@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 //import java.util.logging.Level;
@@ -11,6 +12,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.ExternalContext;
+
 import javax.faces.context.FacesContext;
 
 //import org.slf4j.Logger;
@@ -55,6 +58,17 @@ public class Connexion implements Serializable {
  
     public Connexion() {
         this.poolConnexion = openConnexionPool();
+
+        
+        //// Test de conservation des inforamtions dans la session //////
+   //     FacesContext context = FacesContext.getCurrentInstance();        
+      //  context.getExternalContext().getSessionMap().put("hikariDs", poolConnexion);
+      //  context.getExternalContext().getSessionMap().put("test", "test");
+    //    ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+    //    Map<String, Object> sessionMap = externalContext.getSessionMap();
+    //    sessionMap.put("hikariDs", poolConnexion);
+        
+        //// Fin Test de conservation des inforamtions dans la session //////
     }
 
     public HikariDataSource getPoolConnexion() {
