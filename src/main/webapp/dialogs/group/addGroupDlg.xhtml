@@ -27,9 +27,23 @@
                      
                     </td>
                 </tr>
+                
                 <tr>
                     <td colspan="3" style="text-align: center;">
-                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.addGroup(addGroup.selectedGroupType, addGroup.titleGroup)}" 
+                        <p:outputLabel for="type" title="Permet de trier les groupes" value="Notation: " />
+                        <p:inputText value="#{groupManager.notation}" />
+                     
+                    </td>
+                </tr>                
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}"
+                                         actionListener="#{groupManager.addGroup(theso.thesaurus.id_thesaurus,
+                                                           theso.thesaurus.language,
+                                                           addGroup.selectedGroupType, addGroup.titleGroup,
+                                                           roleOnTheso.nodePreference,
+                                                           currentUser.user.idUser)}" 
+                                         action="#{theso.actionAfterCreateGroup()}"
                                          update=":ajGroup,:accordeonTree, :messages" styleClass="styleButton"
                                          oncomplete="PF('groupAddDlg').hide();"/>
 

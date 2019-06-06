@@ -654,13 +654,21 @@ public class GroupHelper {
     
     
     
+    /**
+     * permet d'ajouter un sous groupe
+     * @param ds
+     * @param fatherNodeID
+     * @param childNodeID
+     * @param idThesaurus 
+     * @return  
+     */
     
-    
-    public void addSubGroup(HikariDataSource ds,
+    public boolean addSubGroup(HikariDataSource ds,
             String fatherNodeID, String childNodeID, String idThesaurus) {
 
         Connection conn;
         Statement stmt;
+        boolean status = false;
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -678,7 +686,7 @@ public class GroupHelper {
                             + ")";
 
                     stmt.executeUpdate(query);
-
+                    status = true;
                 } finally {
                     stmt.close();
                 }
@@ -689,7 +697,7 @@ public class GroupHelper {
             // Log exception
             log.error("Error while adding relation : " + sqle);
         }
-
+        return status;
     }
 
     public void addConceptGroupConcept(HikariDataSource ds,
@@ -780,15 +788,28 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select id_group2 from relation_group where id_thesaurus = '"
+                    /*String query = "select id_group2 from relation_group where id_thesaurus = '"
                             + idThesaurus + "'"
                             + " and id_group1 = '" + idGRoup + "'"
-                            + " and relation='sub'";
+                            + " and relation='sub'";*/
+                    String query = "SELECT " +
+                                    "  concept_group.notation, " +
+                                    "  concept_group.idgroup" +
+                                    " FROM " +
+                                    "  relation_group, " +
+                                    "  concept_group" +
+                                    " WHERE " +
+                                    "  concept_group.idthesaurus = relation_group.id_thesaurus AND" +
+                                    "  concept_group.idgroup = relation_group.id_group2 AND" +
+                                    "  concept_group.idthesaurus = '" + idThesaurus + "' AND " +
+                                    "  relation_group.id_group1 = '" + idGRoup + "' AND " +
+                                    "  relation_group.relation = 'sub'" +
+                                    "  order by notation ASC;";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
                         while (resultSet.next()) {
-                            idGroupParentt.add(resultSet.getString("id_group2"));
+                            idGroupParentt.add(resultSet.getString("idgroup"));
                         }
                     }
 
@@ -2111,7 +2132,10 @@ public class GroupHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "select idgroup from concept_group where idthesaurus = '" + idThesaurus + "' and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')";
+                    String query = "select idgroup, notation from concept_group where idthesaurus = '" 
+                            + idThesaurus +
+                            "' and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')" +
+                            " order by notation ASC";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -2455,6 +2479,45 @@ public class GroupHelper {
             log.error("Error while getting notation of Group : " + idGroup, sqle);
         }
         return notation;
+    }
+    
+    /**
+     * Cette fonction permet de récupérer la notation d'un groupe
+     *
+     * @param ds
+     * @param notation
+     * @param idGroup
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public boolean setNotationOfGroup(HikariDataSource ds, 
+            String notation, String idGroup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        if(notation == null) return false;
+        boolean status = false;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "update concept_group set notation = '" + notation + "'"
+                            + " where idthesaurus = '" + idThesaurus + "'"
+                            + " and idgroup = '" + idGroup + "'";
+                    stmt.executeUpdate(query);
+                    status = true;
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while updating notation of Group : " + idGroup, sqle);
+        }
+        return status;
     }     
     
     /**

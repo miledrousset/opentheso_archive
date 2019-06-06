@@ -51,8 +51,8 @@
                                                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}">
                                 <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="#{langueBean.getMsg('cdt.MT')}"/>
                                 <p:menu style="background: #CEF0C4" overlay="true" trigger="cbAjDom" my="left top" at="left bottom"> 
-                                    <p:menuitem value="#{langueBean.getMsg('add.group')}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
-                                    <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
+                                    <p:menuitem value="#{langueBean.getMsg('add.group')}" actionListener="#{groupManager.init()}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
+                                    <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" actionListener="#{groupManager.init()}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
                                                 update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
                                 </p:menu>
                             </h:form>

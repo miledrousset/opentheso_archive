@@ -18,24 +18,38 @@
             <table>
                 <tr>
                     <td><h:outputText value="#{langueBean.getMsg('add.subGroup')} : " /> <h:outputText value="#{newtreeBean.selectedTerme.nom}" /> </td>
-                    <td>
-                    </td>
                 </tr>   
                 <tr>
-                    <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                     <td>
+                        <h:outputText value="#{langueBean.getMsg('popup.name')}" /> : 
                         <h:inputText id="lVDom" value="#{addSubGroup.titleGroup}"/>
                     </td>
-                </tr>   
+                </tr> 
                 <tr>
-                    <td><h:outputText value="#{langueBean.getMsg('add.groupType')} : " /> <h:outputText value="#{addSubGroup.typeDomainePere}" /> </td>
                     <td>
+                        <h:outputText title="Sert pour le tri des groupes" value="Notation" /> : 
+                        <h:inputText id="notation" value="#{groupManager.notation}"/>
+                    </td>
+                </tr>                 
+                <tr>
+                    <td>
+                        <h:outputText value="#{langueBean.getMsg('add.groupType')} : " />
+                        <h:outputText value="#{addSubGroup.typeDomainePere}" />
                     </td>
                 </tr>   
                 <tr>
                     <td colspan="3" style="text-align: center;">
-                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{theso.addSubGroup(addSubGroup.typeDomainePere, addSubGroup.titleGroup)}" 
-                                         update=":ajGroup,:accordeonTree" styleClass="styleButton"
+                        <p:commandButton id="cbAjSousGroupTheso" value="#{langueBean.getMsg('btnAdd')}"
+                                         actionListener="#{groupManager.addSubGroup(
+                                                           selectedTerme.idC,
+                                                           theso.thesaurus.id_thesaurus,
+                                                           theso.thesaurus.language,
+                                                           addSubGroup.typeDomainePere,
+                                                           addSubGroup.titleGroup,
+                                                           roleOnTheso.nodePreference,
+                                                           currentUser.user.idUser)}" 
+                                         action="#{theso.actionAfterCreateGroup()}"
+                                         update=":ajGroup,:accordeonTree, :messages" styleClass="styleButton"
                                          oncomplete="PF('subGroupAddDlg').hide();"/>
                     </td>
                     <td colspan="3" style="text-align: center;">

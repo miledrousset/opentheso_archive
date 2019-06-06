@@ -77,12 +77,14 @@
                         <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" 
                                     oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" 
                                     style="font-size: 12px;" update=":idModifTypeGroupDlg"/>
-                        <p:menuitem rendered="#{newtreeBean.isSubGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" 
-                                    value="#{langueBean.getMsg('numerotation.header')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;"
-                                    update=":idGroupNumerotationDlg, :accordeonTree" />
-                        <p:menuitem rendered="#{newtreeBean.isGroup()}" actionListener="#{newtreeBean.loadNumerotation(newtreeBean.isGroup())}" 
-                                    value="#{langueBean.getMsg('numerotation.header2')}" oncomplete="PF('groupNumerotationDlg').show()" style="font-size: 12px;" 
-                                    update=":idGroupNumerotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isSubGroup()}" 
+                                    actionListener="#{groupManager.init()}"
+                                    value="#{langueBean.getMsg('numerotation.header')}" oncomplete="PF('groupNotationDlg').show()" style="font-size: 12px;"
+                                    update=":idGroupNotationDlg, :accordeonTree" />
+                        <p:menuitem rendered="#{newtreeBean.isGroup()}"  
+                                    actionListener="#{groupManager.init()}"
+                                    value="#{langueBean.getMsg('numerotation.header2')}" oncomplete="PF('groupNotationDlg').show()" style="font-size: 12px;" 
+                                    update=":idGroupNotationDlg, :accordeonTree" />
                         <p:menuitem rendered="#{newtreeBean.isGroup() or newtreeBean.isSubGroup()}"
                                      value="#{langueBean.getMsg('concept.setIdArk')}" onclick="PF('reGenerateGroupArkIdDlg').show();" style="font-size: 12px;"/>
                         

@@ -1,0 +1,37 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idGroupNotationDlg"  header="#{langueBean.getMsg('numerotation.header2')}" widgetVar="groupNotationDlg" modal="true" resizable="false" >
+        <!-- Ajout d'un domaine/ group -->
+        <h:form >
+            <table>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:outputLabel for="numerotation" value="#{selectedTerme.notation}" /> 
+                        <p:inputText id="numerotation" value="#{groupManager.notation}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton id="cbAjGroupTheso" value="#{langueBean.getMsg('numerotation.header2')}"
+                                         actionListener="#{groupManager.changeNotation(
+                                                           selectedTerme.idC,
+                                                           theso.thesaurus.id_thesaurus)}" 
+                                         action="#{theso.actionAfterCreateGroup()}"
+                                         update=":accordeonTree,:idGroupNotationDlg, :messages" styleClass="styleButton"
+                                         oncomplete="PF('groupNotationDlg').hide();"/>
+
+                    </td>
+                    <td colspan="3" style="text-align: center;">
+                        <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" update=":idGroupNotationDlg" oncomplete="PF('groupNotationDlg').hide();"  immediate="true"/>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+

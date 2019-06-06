@@ -1708,29 +1708,14 @@ public class SelectedThesaurus implements Serializable {
         }
         return idGroup;
     }
-
-    /**
-     * permet d'ajouter un sous groupe avec un type défini, le groupe père doit
-     * exister. Le sous-groupe prend le même type que le père
-     *
-     * @param codeTypeGroupFather
-     * @param titleGroupSubGroup
-     */
-    public void addSubGroup(String codeTypeGroupFather, String titleGroupSubGroup) {
-        // typeDom = "";
-        //si on a bien selectioner un group
-        String idGroup = tree.getSelectedTerme().getIdC();
-        if (new GroupHelper().isIdOfGroup(connect.getPoolConnexion(), idGroup, thesaurus.getId_thesaurus())) {
-            String idSubGroup = addGroup(codeTypeGroupFather, titleGroupSubGroup);
-
-            new GroupHelper().addSubGroup(connect.getPoolConnexion(), idGroup, idSubGroup, thesaurus.getId_thesaurus());
-            tree.reInit();
-            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        }
-
-    }
-
     
+    public void actionAfterCreateGroup(){
+        vue.setSelectedActionDom(PropertiesNames.noActionDom);
+        tree.reInit();
+        tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+    }
+    
+   
     /**
      * Permet de supprimer un groupe
      * déprécé

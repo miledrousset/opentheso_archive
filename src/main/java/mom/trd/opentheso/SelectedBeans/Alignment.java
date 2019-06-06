@@ -480,7 +480,7 @@ public class Alignment {
         }
         
         // ici  IdRef pour les sujets
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("idrefSubject")) {
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefSujets")) {
             getAlignmentIdRefSubject(
                     selectedAlignementSource,
                     idTheso,
@@ -490,13 +490,23 @@ public class Alignment {
         }
         
         // ici  IdRef pour les noms
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("idrefNames")) {
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefPersonnes")) {
+            getAlignmentIdRefPerson(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }         
+        
+        // ici  IdRef pour les noms
+        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefAuteurs")) {
             getAlignmentIdRefNames(
                     selectedAlignementSource,
                     idTheso,
                     idConcept,
                     idLang);
-        }          
+        }
         
         
         
@@ -577,6 +587,41 @@ public class Alignment {
         }
     } 
 
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentIdRefPerson(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        IdRefHelper idRefHelper = new IdRefHelper();
+        
+        // action JSON (HashMap (Wikidata)
+        //ici il faut appeler le filtre de Wikidata 
+        listAlignValues = idRefHelper.queryIdRefPerson(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
+        }
+    }     
+    
     /**
      * Cette fonction permet de récupérer les concepts à aligner de la source
      * juste la liste des concepts avec une note pour distinguer les concepts/
@@ -978,7 +1023,7 @@ public class Alignment {
 
     public void actionChoix(){
         if(selectedAlignement == null) return;
-        if(selectedAlignement.equalsIgnoreCase("idRefNames")){
+        if(selectedAlignement.equalsIgnoreCase("idRefAuteurs")){
             isNameAlignment = true;
             prepareValuesForIdRef();
         }

@@ -36,6 +36,7 @@ public class AddGroup {
 
     
     public void init(){
+        titleGroup = "";
         listGroupType = new GroupHelper().getAllGroupType(connect.getPoolConnexion());
         if(!listGroupType.isEmpty()) 
             selectedGroupType = listGroupType.get(0).getLabel();

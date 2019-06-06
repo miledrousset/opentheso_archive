@@ -20,6 +20,7 @@ public class NodeGroup implements Serializable, Comparable {
     private String id_theso;
     private String original_value;
     private boolean  ispreferredterm;
+    private String notation;
 
     public NodeGroup() {
         conceptGroup = new ConceptGroup();
@@ -124,6 +125,14 @@ public class NodeGroup implements Serializable, Comparable {
 
     public void setIspreferredterm(boolean ispreferredterm) {
         this.ispreferredterm = ispreferredterm;
+    }
+
+    public String getNotation() {
+        return notation;
+    }
+
+    public void setNotation(String notation) {
+        this.notation = notation;
     }
 
 

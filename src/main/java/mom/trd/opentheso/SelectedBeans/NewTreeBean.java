@@ -232,7 +232,7 @@ public class NewTreeBean implements Serializable {
             return;
         }
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
-        Collections.sort(racineNode);
+    //    Collections.sort(racineNode);
 
         // Les premiers noeuds de l'arbre sont de type Groupe (isGroup = true)
         for (NodeGroup nodegroup : racineNode) {
@@ -262,16 +262,19 @@ public class NewTreeBean implements Serializable {
                  * **code pour la numérotation des groupes *****************
                  */
                 GroupHelper groupHelper = new GroupHelper();
-                String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup());
-
+                //String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup());
+                String prefix = groupHelper.getNotationOfGroup(connect.getPoolConnexion(),
+                        nodegroup.getConceptGroup().getIdgroup(),
+                        nodegroup.getConceptGroup().getIdthesaurus());
+                /*
                 if (suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")) {
 
                     suffix = "" + count;
                     count++;
                     groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup(), suffix);
-                }
-                ((MyTreeNode) dynamicTreeNode).setPrefix(suffix);//ici c'est un groupe donc pas de suffix
-                ((MyTreeNode) dynamicTreeNode).setData(((MyTreeNode) dynamicTreeNode).getNumerotation() + " " + dynamicTreeNode.getData());
+                }*/
+                ((MyTreeNode) dynamicTreeNode).setPrefix(prefix);//ici c'est un groupe donc pas de suffix
+                ((MyTreeNode) dynamicTreeNode).setData(prefix + "  " + dynamicTreeNode.getData());//((MyTreeNode) dynamicTreeNode).getNumerotation() + " " + dynamicTreeNode.getData());
                 /**
                  * ***fin de code pour la numérotation des groupes *********
                  */
@@ -284,7 +287,9 @@ public class NewTreeBean implements Serializable {
         /**
          * *ici on trie la liste des groupes d après le champ data**
          */
-        Collections.sort(listeNode, new TreeNodeComparator());
+    //    Collections.sort(listeNode, new TreeNodeComparator());
+    
+        
         /*et on l'ajoute au root **/
         for (MyTreeNode mtn : listeNode) {
             MyTreeNode tmp = new MyTreeNode(1, mtn.getIdConcept(), mtn.getIdTheso(), mtn.getLangue(),
@@ -453,8 +458,14 @@ public class NewTreeBean implements Serializable {
                     /**
                      * *code poour la numérotation des sous groupes ***
                      */
-                    ((MyTreeNode) treeNode2).setPrefix(myTreeNode.getNumerotation());
-                    String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
+                    String prefix = groupHelper.getNotationOfGroup(connect.getPoolConnexion(),
+                        nodeConceptTreeGroup.getIdConcept(),
+                        nodeConceptTreeGroup.getIdThesaurus());
+                    //((MyTreeNode) treeNode2).setPrefix(myTreeNode.getNumerotation());
+                    
+                    ((MyTreeNode) treeNode2).setPrefix(prefix);
+                    
+                    /*String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
                     count += 5;
                     //a priori par défaut un getInt renvoit 0 si champ vide (cf groupHelper.getSuffixFromNode)
                     if (suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")) {
@@ -469,9 +480,10 @@ public class NewTreeBean implements Serializable {
                     }
                     if (suffix.length() < 2) {
                         suffix = "0" + suffix;
-                    }
-                    ((MyTreeNode) treeNode2).setSuffix(suffix);
-                    ((MyTreeNode) treeNode2).setData(((MyTreeNode) treeNode2).getNumerotation() + "  " + treeNode2.getData());
+                    }*/
+                    //((MyTreeNode) treeNode2).setSuffix(suffix);
+                    //((MyTreeNode) treeNode2).setData(((MyTreeNode) treeNode2).getNumerotation() + "  " + treeNode2.getData());
+                    ((MyTreeNode) treeNode2).setData(prefix + "  " + treeNode2.getData());
                     /**
                      * fin code numérotation des sous groupes****
                      */
@@ -491,7 +503,9 @@ public class NewTreeBean implements Serializable {
              *
              */
 
-            Collections.sort(listeTreeNode, new TreeNodeComparator());
+        //    Collections.sort(listeTreeNode, new TreeNodeComparator());
+        
+            
             for (MyTreeNode mtn : listeTreeNode) {
                 MyTreeNode tmp = new MyTreeNode(1, mtn.getIdConcept(), mtn.getIdTheso(), mtn.getLangue(),
                         mtn.getIdConcept(), mtn.getTypeDomaine(), mtn.getIdTopConcept(),
@@ -809,7 +823,9 @@ public class NewTreeBean implements Serializable {
             /**
              * *ici on trie la liste des groupes d après le champ data**
              */
-            Collections.sort(listeNode, new TreeNodeComparator());
+        //    Collections.sort(listeNode, new TreeNodeComparator());
+        
+            
             /*et on l'ajoute au root **/
             ArrayList idToExpand = new ArrayList<>();//on récupère les noeuds qui étaient étendus
             for (TreeNode tn : tc.getExpandedNodes()) {

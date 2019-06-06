@@ -11,9 +11,6 @@
             <title>
                 <h:outputText rendered="#{selectedTerme.nom != ''}" value="#{selectedTerme.nom}"/>
                 <h:outputText rendered="#{selectedTerme.nom == null or selectedTerme.nom == ''}" value="Opentheso"/>
-                <script type="application/ld+json">
-                    <h:outputText value="#{theso.getMetaData()}" />
-                </script>
             </title>
         </h:panelGroup>
 
@@ -80,6 +77,9 @@
             <!-- GESTIONNAIRE FIN -->
             <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         </div>
+        <script type="application/ld+json">
+            <h:outputText value="#{theso.getMetaData()}" />
+        </script>
         <ui:insert name="status">
             <p:ajaxStatus>
                 <f:facet name="start">
