@@ -2169,13 +2169,13 @@ create or replace function update_table_alignement_source() returns void as $$
                      delete from alignement_source where source = ''idRefPersonnes'';
                      delete from alignement_source where source = ''wikidata'';
                     INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
-                    (''idRefSujets'', ''https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=subjectheading_t:(##value##)%20AND%20recordtype_z:r'', ''REST'', ''json'', 1, ''alignement avec les Sujets de IdRef ABES Rameaux'', false);
+                    (''IdRefSujets'', ''https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=subjectheading_t:(##value##)%20AND%20recordtype_z:r'', ''REST'', ''json'', 1, ''alignement avec les Sujets de IdRef ABES Rameaux'', false);
 
                     INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
-                    (''idRefAuteurs'', ''https://www.idref.fr/Sru/Solr?wt=json&q=nom_t:(##nom##)%20AND%20prenom_t:(##prenom##)%20AND%20recordtype_z:a&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'', ''REST'', ''json'', 1, ''alignement avec les Auteurs de IdRef ABES'', false);
+                    (''IdRefAuteurs'', ''https://www.idref.fr/Sru/Solr?wt=json&q=nom_t:(##nom##)%20AND%20prenom_t:(##prenom##)%20AND%20recordtype_z:a&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'', ''REST'', ''json'', 1, ''alignement avec les Auteurs de IdRef ABES'', false);
                     
                     INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
-                    (''idRefPersonnes'', ''https://www.idref.fr/Sru/Solr?wt=json&q=persname_t:(##value##)&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'', ''REST'', ''json'', 1, ''alignement avec les Noms de personnes de IdRef ABES'', false);
+                    (''IdRefPersonnes'', ''https://www.idref.fr/Sru/Solr?wt=json&q=persname_t:(##value##)&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'', ''REST'', ''json'', 1, ''alignement avec les Noms de personnes de IdRef ABES'', false);
 
                     INSERT INTO public.alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps) VALUES
                     (''wikidata'', ''SELECT ?item ?itemLabel ?itemDescription WHERE {

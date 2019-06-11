@@ -85,6 +85,26 @@ public class AutoCompletBean implements Serializable {
         return liste;
     }
     
+    /**
+     * permet de retourner la liste des concepts possibles 
+     * pour ajouter une relation NT
+     * (en ignorant les relations interdites) 
+     * on ignore les concepts de type TT
+     * on ignore les concepts de type RT
+     * @param value
+     * @return 
+     */
+    public List<NodeAutoCompletion> getAutoCompletForRelationRT(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);
+        }
+        return liste;
+    }
+        
+    
     public void init() {
         duplicate = false;
         forced = false;
