@@ -694,8 +694,10 @@ public class GroupHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while adding relation : " + sqle);
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+              log.error("Error while adding relation : " + sqle);
+            }
+
         }
         return status;
     }

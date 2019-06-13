@@ -106,6 +106,7 @@
                 <h:form id="reloadTree" rendered="#{(selectedTerme.idC != null)}">
                     <p:commandButton id="reloadTree" styleClass="cbEdit" icon="ui-icon-tree2-24" actionListener="#{newtreeBean.reloadTree()}" 
                             title="Se replacer dans l'arbre" update=":accordeonTree,:panContenu" oncomplete="srollToSelected()"/>
+
                 </h:form>                 
                 <!--options pour les orphelins -->
                 <h:form id="formEditTInfoOrphan" rendered="#{(currentUser.user != null) and (selectedTerme.idC != null) and

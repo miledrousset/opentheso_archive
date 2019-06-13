@@ -482,6 +482,7 @@ public class rdf4jFileBean implements Serializable {
             progress_abs++;
             progress = progress_abs / total * 100;
             importRdf4jHelper.addGroups(this);
+
             try {
                 importRdf4jHelper.addConcepts(this);
             } catch (SQLException ex) {

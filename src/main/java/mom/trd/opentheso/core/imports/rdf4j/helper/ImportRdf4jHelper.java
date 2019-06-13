@@ -56,7 +56,7 @@ import mom.trd.opentheso.skosapi.SKOSXmlDocument;
 public class ImportRdf4jHelper {
 
     private final ArrayList<String> idTopConcept;
-    private ArrayList<String> idGroups;
+    private ArrayList<String> idGroups; // tous les idGroupes du thésaurus
     private String idGroupDefault;
     private boolean defaultGroupToAdd;
 
@@ -81,6 +81,9 @@ public class ImportRdf4jHelper {
     Thesaurus thesaurus;
 
     HashMap<String, String> memberHashMap = new HashMap<>();
+    HashMap<String, String> groupSubGroup = new HashMap<>(); // pour garder en mémoire les relations de types (member) pour détecter ce qui groupe ou concept 
+    
+    
     ArrayList<String> hasTopConcceptList = new ArrayList<>();
 
     private SKOSXmlDocument skosXmlDocument;
@@ -516,7 +519,10 @@ public class ImportRdf4jHelper {
                     break;
             }
             groupHelper.insertGroup(ds, idGroup, thesaurus.getId_thesaurus(), type, notationValue, "", false, idUser);
-
+            /// permet de grouper tous les id des groupes du thésaurus à importer.
+            idGroups.add(idGroup);
+            
+            
             //sub group
             String idSubGroup;
             //concept group concept
@@ -536,7 +542,8 @@ public class ImportRdf4jHelper {
                         // Récupération de l'Id d'origine sauvegardé à l'import (idArk -> identifier)
                         idSubConcept = getOriginalId(relation.getTargetUri());
                         //     }
-                        groupHelper.addConceptGroupConcept(ds, idGroup, idSubConcept, thesaurus.getId_thesaurus());
+                        groupSubGroup.put(idSubConcept, idGroup);
+                //        groupHelper.addConceptGroupConcept(ds, idGroup, idSubConcept, thesaurus.getId_thesaurus());
                         memberHashMap.put(relation.getTargetUri(), idGroup);
                         break;
                     case SKOSProperty.hasTopConcept:
@@ -559,6 +566,7 @@ public class ImportRdf4jHelper {
                 groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
             }
         }
+        addGroupConceptGroup();
         /*
         groupHelper.insertGroup(ds,
                 idGroupDefault,
@@ -622,6 +630,7 @@ public class ImportRdf4jHelper {
             initAddConceptsStruct(acs, conceptResource);
             addRelation(acs);
 
+
             // envoie du concept à la BDD 
             if (!isConceptEmpty(acs.nodeTermTraductionList)) {
                 if (acs.idGrps.isEmpty()) {
@@ -657,18 +666,65 @@ public class ImportRdf4jHelper {
         RelationsHelper relationsHelper = new RelationsHelper();
 
         for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
-            if (!relationsHelper.insertHierarchicalRelation(ds,
-                    hierarchicalRelationship.getIdConcept1(),
-                    hierarchicalRelationship.getIdThesaurus(),
-                    hierarchicalRelationship.getRole(),
-                    hierarchicalRelationship.getIdConcept2())) {
-                //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
-                message.append(System.getProperty("line.separator"));
-                message.append("Erreur sur la relation = ");
-                message.append(acs.concept.getIdConcept());
-                message.append(" ## ");
-                message.append(hierarchicalRelationship.getRole());
+            
+            switch (hierarchicalRelationship.getRole()) {
+                case "NT":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "BT",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }                    
+                    break;
+                case "BT":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "NT",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }             
+                    break;
             }
+            
+
         }
 
         // For Concept : customnote ; scopeNote ; historyNote
@@ -951,6 +1007,24 @@ public class ImportRdf4jHelper {
 
     }
 
+    /**
+     * permet d'ajouter les relations entre les groupes / sousGroupes
+     * et les groupes / concepts
+     */
+    private void addGroupConceptGroup(){
+        // groupSubGroup : compositon du HashMap = idSubGroup(ou idConcept) -> idGroup 
+        // c'est pour séparer les concepts des groupes
+        GroupHelper groupHelper = new GroupHelper();
+        for (String idSubGroup : groupSubGroup.keySet()) {
+          if(idGroups.contains(idSubGroup)) {
+              // si la relation member est vers un sous groupe, alors on créé une relation groupe/sousGroupe
+              groupHelper.addSubGroup(ds, groupSubGroup.get(idSubGroup), idSubGroup, thesaurus.getId_thesaurus());
+          } else
+              groupHelper.addConceptGroupConcept(ds, groupSubGroup.get(idSubGroup), idSubGroup, thesaurus.getId_thesaurus());
+    //      System.out.println("key: " + i + " value: " + capitalCities.get(i));
+        }
+    }
+    
     private void addRelation(AddConceptsStruct acs) {
         HierarchicalRelationship hierarchicalRelationship;
         int prop;
@@ -1036,7 +1110,6 @@ public class ImportRdf4jHelper {
                 acs.idGrps.add(idPere);
                 memberHashMap.remove(uri);
             }
-
         }
     }
 
