@@ -395,7 +395,9 @@ public class RelationsHelper {
         } catch (SQLException sqle) {
             // To avoid dupplicate Key
             //   System.out.println(sqle.toString());
-            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                status = true;
+            }else {
                 log.error("Error while adding hierarchical relation of Concept : " + idConcept1, sqle);
             }
         }
