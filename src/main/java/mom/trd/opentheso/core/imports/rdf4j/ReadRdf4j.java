@@ -8,7 +8,6 @@ package mom.trd.opentheso.core.imports.rdf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import mom.trd.opentheso.SelectedBeans.rdf4jFileBean;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import org.eclipse.rdf4j.model.IRI;

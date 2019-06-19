@@ -77,7 +77,7 @@ public class ImportCsv {
     
     @Test
     public void readFileTest() throws FileNotFoundException {
-        CsvReadHelper csvHelper = new CsvReadHelper();
+        CsvReadHelper csvHelper = new CsvReadHelper(',');
         String path = "/Users/Miled/Desktop/listNT.csv";
       //  csvHelper.readFile(path);
         ArrayList<CsvReadHelper.ConceptObject> conceptObjects = csvHelper.getConceptObjects();

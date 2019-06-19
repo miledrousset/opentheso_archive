@@ -8,10 +8,13 @@ package mom.trd.opentheso.SelectedBeans;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -21,6 +24,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import mom.trd.opentheso.bdd.helper.CandidateHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
+import mom.trd.opentheso.core.imports.csv.CsvImportHelper;
+import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.imports.rdf4j.helper.ImportRdf4jHelper;
 import mom.trd.opentheso.skosapi.SKOSDocumentation;
@@ -56,6 +61,15 @@ public class rdf4jFileBean implements Serializable {
     private int typeImport;
     private String selectedIdentifier ="sans";
     private String prefixHandle;
+    
+    
+    // import CSV
+    private char delimiterCsv = ',';
+    private int choiceDelimiter = 0;
+    private String thesaurusName;
+    private ArrayList <CsvReadHelper.ConceptObject> conceptObjects;
+    private ArrayList<String> langs;    
+    
     /*
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;    
@@ -85,6 +99,21 @@ public class rdf4jFileBean implements Serializable {
         uploadEnable = true;
         BDDinsertEnable = false;
         selectedIdentifier = "sans";
+        sKOSXmlDocument = null;
+        if(conceptObjects != null)
+            conceptObjects.clear();
+        if(langs != null)
+            langs.clear();
+
+    }
+    
+    public void actionChoice() {
+        if(choiceDelimiter == 0)
+            delimiterCsv = ',';
+        if(choiceDelimiter == 1)
+            delimiterCsv = ';';
+        if(choiceDelimiter == 2)
+            delimiterCsv = '\t';         
     }
 
     public void chargeSkos(FileUploadEvent event) {
@@ -163,7 +192,9 @@ public class rdf4jFileBean implements Serializable {
             case 2:
                 chargeTurtle(event);
                 break;
-
+            case 3:
+                chargeCsv(event);
+                break;
         }
 
     }
@@ -209,9 +240,17 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                ReadRdf4j readRdf4j = null;
+                ReadRdf4j readRdf4j;
                 try {
                     readRdf4j = new ReadRdf4j(is, 1);
+                    warning = readRdf4j.getMessage();
+                    progress = 100;
+                    sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                    total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                    uri = sKOSXmlDocument.getTitle();
+                    uploadEnable = false;
+                    BDDinsertEnable = true;
+                    info = "File correctly loaded";                    
                 } catch (IOException ex) {
                    error.append(System.getProperty("line.separator"));
                    error.append(ex.getMessage());
@@ -219,14 +258,6 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                warning = readRdf4j.getMessage();
-                progress = 100;
-                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-                uri = sKOSXmlDocument.getTitle();
-                uploadEnable = false;
-                BDDinsertEnable = true;
-                info = "File correctly loaded";
             } catch (Exception e) {
                 error.append(System.getProperty("line.separator"));
                 error.append(e.toString());
@@ -259,9 +290,17 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                ReadRdf4j readRdf4j = null;
+                ReadRdf4j readRdf4j;
                 try {
                     readRdf4j = new ReadRdf4j(is, 3);
+                    warning = readRdf4j.getMessage();
+                    progress = 100;
+                    sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                    total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                    uri = sKOSXmlDocument.getTitle();
+                    uploadEnable = false;
+                    BDDinsertEnable = true;
+                    info = "File correctly loaded";                    
                 } catch (IOException ex) {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
@@ -269,15 +308,7 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                if(readRdf4j == null) return;
-                warning = readRdf4j.getMessage();
-                progress = 100;
-                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-                uri = sKOSXmlDocument.getTitle();
-                uploadEnable = false;
-                BDDinsertEnable = true;
-                info = "File correctly loaded";
+
             } catch (Exception e) {
                 error.append(System.getProperty("line.separator"));
                 error.append(e.toString());
@@ -288,6 +319,57 @@ public class rdf4jFileBean implements Serializable {
         }
     }    
 
+    /**
+     *
+     * @param event
+     */
+    public void chargeCsv(FileUploadEvent event) {
+        progress = 0;
+
+        if (!PhaseId.INVOKE_APPLICATION.equals(event.getPhaseId())) {
+            event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            event.queue();
+        } else {
+            try {
+                CsvReadHelper csvReadHelper;
+                try {
+                    csvReadHelper = new CsvReadHelper(delimiterCsv);
+                    Reader reader1 = new InputStreamReader(event.getFile().getInputstream());
+                    if(! csvReadHelper.setLangs(reader1)){
+                        error.append(csvReadHelper.getMessage());
+                    }
+                    Reader reader2 = new InputStreamReader(event.getFile().getInputstream());            
+                    if (!csvReadHelper.readFile(reader2)) {
+                        error.append(csvReadHelper.getMessage());
+                    }                    
+                    
+                    warning = csvReadHelper.getMessage();
+                    progress = 100;
+                    
+                    conceptObjects = csvReadHelper.getConceptObjects();
+                    if(conceptObjects != null) {
+                        langs = csvReadHelper.getLangs();
+                        total = conceptObjects.size();
+                        uri = "";//csvReadHelper.getUri();
+                        uploadEnable = false;
+                        BDDinsertEnable = true;
+                        info = "File correctly loaded";                    
+                    }
+                } catch (Exception ex) {
+                    error.append(System.getProperty("line.separator"));
+                    error.append(ex.getMessage());
+                }
+
+            } catch (Exception e) {
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
+            } finally {
+                showError();
+            }
+
+        }
+    }    
+    
     /**
      *
      * @param event
@@ -310,9 +392,17 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                ReadRdf4j readRdf4j = null;
+                ReadRdf4j readRdf4j;
                 try {
                     readRdf4j = new ReadRdf4j(is, 2);
+                    warning = readRdf4j.getMessage();
+                    progress = 100;
+                    sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
+                    total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
+                    uri = sKOSXmlDocument.getTitle();
+                    uploadEnable = false;
+                    BDDinsertEnable = true;
+                    info = "File correctly loaded";                    
                 } catch (IOException ex) {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
@@ -320,15 +410,6 @@ public class rdf4jFileBean implements Serializable {
                     error.append(System.getProperty("line.separator"));
                     error.append(ex.getMessage());
                 }
-                warning = readRdf4j.getMessage();
-                progress = 100;
-                sKOSXmlDocument = readRdf4j.getsKOSXmlDocument();
-                total = sKOSXmlDocument.getConceptList().size() + sKOSXmlDocument.getGroupList().size() + 1;
-                uri = sKOSXmlDocument.getTitle();
-                uploadEnable = false;
-                BDDinsertEnable = true;
-
-                info = "File correctly loaded";
             } catch (Exception e) {
                 error.append(System.getProperty("line.separator"));
                 error.append(e.toString());
@@ -437,9 +518,71 @@ public class rdf4jFileBean implements Serializable {
         return notes;
     }    
     
+
+
+    /**
+     * insert un thésaurus dans la BDD (CSV)
+     *
+     * @param selectedUserGroup
+     */
+    public void insertCsvBDD(String selectedUserGroup) {
+        if(conceptObjects == null) return;
+        if(conceptObjects.isEmpty()) return;
+        
+        error = new StringBuffer();
+        info = "";
+        warning = "";
+
+        int idGroup; 
+        
+        if(currentUser.getUser().isIsSuperAdmin()) 
+            idGroup = -1;
+        else
+            idGroup = Integer.parseInt(selectedUserGroup);
+        
+        try {
+            progress = 0;
+            progress_abs = 0;
+            CsvImportHelper csvImportHelper = new CsvImportHelper(roleOnTheso.getNodePreference());
+            csvImportHelper.setInfos(
+                    formatDate, 
+                    currentUser.getUser().getIdUser(), idGroup,
+                    connect.getWorkLanguage());
+
+
+            progress_abs++;
+            progress = progress_abs / total * 100;
+
+            if(!csvImportHelper.addTheso(
+                        connect.getPoolConnexion(),
+                        this,
+                        thesaurusName, conceptObjects,
+                        langs)) {
+                error.append(csvImportHelper.getMessage());
+            }
+
+            //new UserHelper().addRole(connect.getPoolConnexion().getConnection(), idUser,idRole, ImportRdf4jHelper.getIdFromUri(uri) , "");
+            
+            uploadEnable = true;
+            BDDinsertEnable = false;
+            uri = null;
+            total = 0;
+
+            info = "Thesaurus correctly insert into data base";
+            info = info + "\n" + csvImportHelper.getMessage().toString();
+//            showError();
+
+        } catch (Exception e) {
+                error.append(System.getProperty("line.separator"));
+                error.append(e.toString());
+        } finally {
+            showError();
+        }
+
+    }        
     
     /**
-     * insrt un thésaurus dans la BDD
+     * insert un thésaurus dans la BDD (Skos)
      *
      * @param selectedUserGroup
      */
@@ -780,6 +923,31 @@ public class rdf4jFileBean implements Serializable {
 
     public void setRoleOnTheso(RoleOnThesoBean roleOnTheso) {
         this.roleOnTheso = roleOnTheso;
+    }
+
+    public char getDelimiterCsv() {
+        return delimiterCsv;
+    }
+
+    public void setDelimiterCsv(char delimiterCsv) {
+        this.delimiterCsv = delimiterCsv;
+    }
+
+
+    public String getThesaurusName() {
+        return thesaurusName;
+    }
+
+    public void setThesaurusName(String thesaurusName) {
+        this.thesaurusName = thesaurusName;
+    }
+
+    public int getChoiceDelimiter() {
+        return choiceDelimiter;
+    }
+
+    public void setChoiceDelimiter(int choiceDelimiter) {
+        this.choiceDelimiter = choiceDelimiter;
     }
 
 }

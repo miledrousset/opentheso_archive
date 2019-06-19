@@ -584,8 +584,8 @@ public class TermHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
-                status = false;
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                status = true;
             }
         }
         return status;

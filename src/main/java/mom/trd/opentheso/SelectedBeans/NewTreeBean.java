@@ -96,6 +96,9 @@ public class NewTreeBean implements Serializable {
     private boolean isSortByNotation = false;
     private String iconSort = "ui-icon-sort-16";
     private String sortTitle = "tree.sortByNotation";
+    
+    private char delimiter = ',';
+    private int choiceDelimiter = 0;
 
     private ArrayList<CsvReadHelper.ConceptObject> conceptObjects;
 
@@ -2337,8 +2340,16 @@ public class NewTreeBean implements Serializable {
         reloadTree();
     }
 
+    public void actionChoice() {
+        if(choiceDelimiter == 0)
+            delimiter = ',';
+        if(choiceDelimiter == 1)
+            delimiter = ';';
+        if(choiceDelimiter == 2)
+            delimiter = '\t';         
+    }
     public void handleFileUpload(FileUploadEvent event) {
-        this.multipleNT = event.getFile().getContents();
+   //     this.multipleNT = event.getFile().getContents();
 
         if (!readCsvFile(event)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -2354,8 +2365,9 @@ public class NewTreeBean implements Serializable {
 
     private boolean readCsvFile(FileUploadEvent event) {
         try {
+            //char delimiter = ',';
             Reader in1 = new InputStreamReader(event.getFile().getInputstream());
-            CsvReadHelper csvHelper = new CsvReadHelper();
+            CsvReadHelper csvHelper = new CsvReadHelper(delimiter);
             if(! csvHelper.setLangs(in1)){
                 return false;
             }
@@ -2670,5 +2682,25 @@ public class NewTreeBean implements Serializable {
     public void setExternalResources(ExternalResources externalResources) {
         this.externalResources = externalResources;
     }
+
+    public char getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(char delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public int getChoiceDelimiter() {
+        return choiceDelimiter;
+    }
+
+    public void setChoiceDelimiter(int choiceDelimiter) {
+        this.choiceDelimiter = choiceDelimiter;
+    }
+
+
+
+
 
 }

@@ -53,6 +53,21 @@
             </h:panelGroup>
             <!--  <h:outputText value="{langueBean.getMsg('nt.multiple.text')}" style="max-width: 40px;" /> -->
             <h:form id="uploadCsv">
+                <p:panelGrid>
+                    <p:row>
+                        <p:column>
+                            <h:outputLabel value="Délimiteur Csv :" />
+                        </p:column>
+                        <p:column >
+                            <p:selectOneMenu id="idDelimiter" value="#{newtreeBean.choiceDelimiter}" style="font-size: smaller">
+                                <f:selectItem itemLabel="," itemValue="0" />
+                                <f:selectItem itemLabel=";" itemValue="1" />
+                                <f:selectItem itemLabel="\t" itemValue="2" />
+                                <p:ajax event="change" listener="#{newtreeBean.actionChoice()}"  />
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>  
                 <table>
                     <tr>
                         <td><h:outputText value="fichier" /> : </td>

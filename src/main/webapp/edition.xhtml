@@ -67,7 +67,9 @@
             <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
             <ui:include src="/dialogs/export/exportAltLabel.xhtml" />
             <ui:include src="/dialogs/import/importDlg.xhtml" />
-            <ui:include src="/dialogs/import/importCSVDlg.xhtml" />            
+            <ui:include src="/dialogs/import/importCSVDlg.xhtml" />
+            <ui:include src="dialogs/help/csvImportHelp.xhtml" />            
+            
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
         <center>
@@ -159,13 +161,9 @@
                                           action="#{theso.setVueCreat(true)}" 
                                           update=":panSkos,:panCsv,:panCreer,:panModif,:panTrad,:panAjTrad" styleClass="styleButton"/>
 
-                        <p:commandButton  id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"/>
-                        <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonImport" my="left top" at="left bottom">
-                            <p:menuitem value="#{langueBean.getMsg('edit.import')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importDlg').show();" 
-                                        style="font-size: 12px;"/> 
-                            <p:menuitem title="Bug en cours de correction !!!" disabled="true" value="#{langueBean.getMsg('edit.importcsv')}"  action="#{rdf4jFileBean.init()}" oncomplete="PF('importCSVDlg').show();" 
-                                        style="font-size: 12px;"/> 
-                        </p:menu>
+                        <p:commandButton  id="dynaButtonImport" value="#{langueBean.getMsg('edit.import')}..."  styleClass="styleButton"
+                                          action="#{rdf4jFileBean.init()}" oncomplete="PF('importDlg').show();"/>
+
                     </h:form>
                    <br/>
                    

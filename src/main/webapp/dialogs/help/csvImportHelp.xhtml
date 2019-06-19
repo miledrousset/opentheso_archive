@@ -1,0 +1,69 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="idCsvImportHelp"  header="#{langueBean.getMsg('edit.importcsv')}" widgetVar="csvImportHelp" modal="true" resizable="false" >
+
+        <fieldset>
+            <legend><h:outputText value="#{langueBean.getMsg('nt.multiple.legend')}" />
+                <h:outputText value=": #{selectedTerme.nom}" style="text-align: center; color: darkred; font-size: 13px;" />
+            </legend>
+
+            <p:panelGrid>
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="1">id</p:column>
+                        <p:column colspan="1">skos:prefLabel@fr</p:column>
+                        <p:column colspan="1">skos:prefLabel@en</p:column>
+                        <p:column colspan="1">skos:altLabel@fr</p:column>
+                        <p:column colspan="1">skos:definition@fr</p:column>                         
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>100</p:column>
+                    <p:column>France</p:column>
+                    <p:column>France_en</p:column>
+                    <p:column>l'Hexagone</p:column>
+                    <p:column>Pays de la liberté</p:column>
+                </p:row>
+                <p:row>
+                    <p:column>101</p:column>
+                    <p:column>Lyon</p:column>
+                    <p:column>Lyon_en</p:column>
+                    <p:column>Lugdunum</p:column>
+                    <p:column>Ville de la gastronomie</p:column>                    
+                </p:row>                    
+            </p:panelGrid>
+
+            <br/>
+            <p:outputPanel deferred="true">
+                <p>
+                    Les termes doivent être séparés par des virgules dans le fichier à uploader ou une valeur par ligne.<br/>
+                    la première colonne "Id" n'est pas oblogatoire sauf si vous souhaitez récupérer votre ancien identifiant.<br/>
+                    Pour les champs qui autorisent les valeurs multiples, il faut les séparer par (##) ex : (deux##2).
+                </p>
+            </p:outputPanel>
+            <br/>
+            <h:form>             
+                <p:commandButton value="Download sample" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                 icon="ui-icon-download-16" styleClass="styleButton_db">
+                    <p:fileDownload value="#{helpfileDownload.downloadCSVSample()}" />
+                </p:commandButton>      
+            </h:form>
+        </fieldset>
+    </p:dialog>
+    <script type="text/javascript">
+            //<![CDATA[
+        function start() {
+            PF('statusDialog').show();
+        }
+
+        function stop() {
+            PF('statusDialog').hide();
+        }
+            //]]>
+    </script>
+</ui:composition>

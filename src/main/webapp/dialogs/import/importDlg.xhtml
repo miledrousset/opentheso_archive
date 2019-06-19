@@ -9,138 +9,181 @@
         xmlns:p="http://primefaces.org/ui">
 
         <p:dialog id="idImportDlg"  header="#{langueBean.getMsg('edit.import')}" styleClass="styleText2" widgetVar="importDlg" modal="true" resizable="false"  >
-            <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
+            <h:panelGroup id="optionsImport">
+                <h:form style="text-align: left; padding: 10px; max-width: 550px; overflow: auto;">
 
-                <p:panelGrid styleClass="ui-noborder">
-                    <p:row>
-                        <p:column >
-                            <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> 
-                            <p:graphicImage id="question" value="images/iconeQuestion.png" />
-                            <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
-                        </p:column>
-                        <p:column >
-                            <h:inputText value="#{rdf4jFileBean.formatDate}" style="font-size: smaller"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                            <p:outputLabel for="idTypeImportSingle" value="#{langueBean.getMsg('export.type')}" />
-                        </p:column>
-                        <p:column >
-                            <p:selectOneMenu id="idTypeImportSingle" value="#{rdf4jFileBean.typeImport}" style="font-size: smaller">
-                                <f:selectItem itemLabel="Skos" itemValue="0" />
-                                <f:selectItem itemLabel="Json-ld" itemValue="1" />
-                                <f:selectItem itemLabel="Turtle" itemValue="2" />
-                            </p:selectOneMenu>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                            <h:outputText rendered="#{!currentUser.user.isSuperAdmin}" value="User Group :" />
-                        </p:column>
-                        <p:column>
-                            <p:selectOneMenu rendered="#{!currentUser.user.isSuperAdmin}" id="idGroupSelected" 
-                                             value="#{editionBean.selectedUserGroup}" style="font-size: smaller">
-                                <f:selectItems value="#{editionBean.userRoleGroups.entrySet()}" var="varSelectedGroup" 
-                                               itemLabel="#{varSelectedGroup.value}" itemValue="#{varSelectedGroup.key}"/>
-                            </p:selectOneMenu>
-                        </p:column>
-                    </p:row>                    
-                </p:panelGrid>
-                
-                
-                <br/>
-                
-                <p:panelGrid styleClass="ui-noborder">
-                    <f:facet name="header" >
-                        <h:outputText value="Récupération de l'identifiant pérenne (ARK ou Handle)" />
-                    </f:facet>
-                    <p:row>
-                        <p:selectOneRadio id="customRadio" value="#{rdf4jFileBean.selectedIdentifier}" layout="custom">
-                            <f:selectItem itemLabel="Sans" itemValue="sans" />
-                            <f:selectItem itemLabel="Ark" itemValue="ark" />
-                            <f:selectItem itemLabel="Handle" itemValue="handle" />
-                        </p:selectOneRadio>
-                    </p:row>
+                    <p:panelGrid styleClass="ui-noborder">
+                        <p:row>
+                            <p:column >
+                                <h:outputText value="#{langueBean.getMsg('edit.formDate')}" /> 
+                                <p:graphicImage id="question" value="images/iconeQuestion.png" />
+                                <p:tooltip id="toolTipFade" for="question" value="#{langueBean.getMsg('edit.dateExemple')}" />
+                            </p:column>
+                            <p:column >
+                                <h:inputText value="#{rdf4jFileBean.formatDate}" style="font-size: smaller"/>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idTypeImportSingle" value="#{langueBean.getMsg('export.type')}" />
+                            </p:column>
+                            <p:column >
+                                <p:selectOneMenu id="idTypeImportSingle" value="#{rdf4jFileBean.typeImport}" style="font-size: smaller">
+                                    <f:selectItem itemLabel="Skos" itemValue="0" />
+                                    <f:selectItem itemLabel="Json-ld" itemValue="1" />
+                                    <f:selectItem itemLabel="Turtle" itemValue="2" />
+                                    <f:selectItem itemLabel="Csv" itemValue="3" />
+                                    <p:ajax event="change" listener="#{rdf4jFileBean.actionChoice()}"  update=":optionsImport"/>
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <h:outputText rendered="#{!currentUser.user.isSuperAdmin}" value="User Group :" />
+                            </p:column>
+                            <p:column>
+                                <p:selectOneMenu rendered="#{!currentUser.user.isSuperAdmin}" id="idGroupSelected" 
+                                                 value="#{editionBean.selectedUserGroup}" style="font-size: smaller">
+                                    <f:selectItems value="#{editionBean.userRoleGroups.entrySet()}" var="varSelectedGroup" 
+                                                   itemLabel="#{varSelectedGroup.value}" itemValue="#{varSelectedGroup.key}"/>
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>                    
+                    </p:panelGrid>
 
-                    <p:row>
-                        <p:column>
-                            <p:radioButton id="opt1" for="customRadio" itemIndex="0" />
-                        </p:column>
-                        <p:column>
-                        <h:outputLabel for="opt1" value="Sans" />
-                        </p:column>
-                        <p:column>
-                        <p:outputLabel value="" />
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                        <p:radioButton id="opt2" for="customRadio" itemIndex="1" />
-                        </p:column>
-                        <p:column>
-                        <h:outputLabel for="opt2" value="Ark" />
-                        </p:column>
-                        <p:column>
-                        <p:outputLabel value="" />
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                        <p:radioButton id="opt3" for="customRadio" itemIndex="2" />
-                        </p:column>
-                        <p:column>
-                        <h:outputLabel for="opt3" value="Handle -> Préfixe :" />
-                        </p:column>
-                        <p:column>
-                        <p:inputText value="#{rdf4jFileBean.prefixHandle}"/>
-                        </p:column>
-                    </p:row>    
-                </p:panelGrid>
-                
-                <br/>
-                
-                <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(skos|rdf|xml|json|ttl)$/"
-                              cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{rdf4jFileBean.chargeFile}" process="@form"
-                              onstart="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
-                              update="@form, :messages" oncomplete="PrimeFaces.monitorDownload(stop_import)" disabled="#{!rdf4jFileBean.uploadEnable}"/>
-        
-                <h:outputText value="uri : #{rdf4jFileBean.uri}" />
-                <br/> 
-                <h:outputText value="#{langueBean.getMsg('import.total')} : #{rdf4jFileBean.total}" />
-                <br/> 
-                <p:commandButton value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
-                                 actionListener="#{rdf4jFileBean.insertBDD(editionBean.selectedUserGroup)}" 
-                                 onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
-                                 oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
-                                 update=":idImportDlg,:panSkos,:tableTheso, :messages"
-                                 style="color: green"
-                                 />
-                <br/>
-                <br/>
-                <p:accordionPanel activeIndex="-1">
-                    <p:tab title="Info" titleStyleClass="infoAcordionPanel" >
-                        <p:scrollPanel mode="native" style="width:400px;height:200px">
-                            <pre><h:outputText value="#{rdf4jFileBean.info}" styleClass="infoAcordionPanel" /></pre>
-                            <hr/>
-                            <pre><h:outputText rendered="#{!rdf4jFileBean.warningIsEmpty()}" value="Warning : #{rdf4jFileBean.warning}" styleClass="warningAcordionPanel" /></pre>
-                        </p:scrollPanel>
-                    </p:tab>
-                    <p:tab title="Error" titleStyleClass="errorAcordionPanel">
-                        <p:scrollPanel mode="native" style="width:400px;height:200px">
-                            <pre><h:outputText value="#{rdf4jFileBean.error}" styleClass="errorAcordionPanel" /></pre>
-                        </p:scrollPanel>
-                    </p:tab>
 
-                </p:accordionPanel> 
+                    <br/>
 
-                <p:dialog modal="true" widgetVar="importWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
-                    <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
+                    <p:panelGrid rendered="#{rdf4jFileBean.typeImport != 3}" styleClass="ui-noborder">
+                        <f:facet name="header" >
+                            <h:outputText value="Récupération de l'identifiant pérenne (ARK ou Handle)" />
+                        </f:facet>
+                        <p:row>
+                            <p:selectOneRadio id="customRadio" value="#{rdf4jFileBean.selectedIdentifier}" layout="custom">
+                                <f:selectItem itemLabel="Sans" itemValue="sans" />
+                                <f:selectItem itemLabel="Ark" itemValue="ark" />
+                                <f:selectItem itemLabel="Handle" itemValue="handle" />
+                            </p:selectOneRadio>
+                        </p:row>
 
-                    <br />
-                    <p:progressBar widgetVar="pbAjax" ajax="true" value="#{rdf4jFileBean.progress}" labelTemplate="{value}%" styleClass="animated" global="false"/>
-                </p:dialog>
-            </h:form>
+                        <p:row>
+                            <p:column>
+                                <p:radioButton id="opt1" for="customRadio" itemIndex="0" />
+                            </p:column>
+                            <p:column>
+                            <h:outputLabel for="opt1" value="Sans" />
+                            </p:column>
+                            <p:column>
+                            <p:outputLabel value="" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                            <p:radioButton id="opt2" for="customRadio" itemIndex="1" />
+                            </p:column>
+                            <p:column>
+                            <h:outputLabel for="opt2" value="Ark" />
+                            </p:column>
+                            <p:column>
+                            <p:outputLabel value="" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                            <p:radioButton id="opt3" for="customRadio" itemIndex="2" />
+                            </p:column>
+                            <p:column>
+                            <h:outputLabel for="opt3" value="Handle -> Préfixe :" />
+                            </p:column>
+                            <p:column>
+                            <p:inputText value="#{rdf4jFileBean.prefixHandle}"/>
+                            </p:column>
+                        </p:row>    
+                    </p:panelGrid>
+
+                    <p:panelGrid rendered="#{rdf4jFileBean.typeImport == 3}" styleClass="ui-noborder">
+                         <p:row>
+                             <p:column>
+                                 <h:outputLabel title="Permet d'importer un fichier en CSV, voir l'aide" value="Import en CSV ....." />
+                             </p:column>
+                            <p:column width="10">
+                                <p:commandButton title="Aide sur le format supporté !!" update=":idCsvImportHelp"  icon="ui-icon-help-20" styleClass="styleButton_db"
+                                             oncomplete="PF('csvImportHelp').show();"/>
+                            </p:column>
+                        </p:row>                            
+                        <p:row>
+                            <p:column>
+                                <h:outputLabel value="Délimiteur Csv :" />
+                            </p:column>
+                            <p:column >
+                                <p:selectOneMenu id="idDelimiter" value="#{rdf4jFileBean.choiceDelimiter}" style="font-size: smaller">
+                                    <f:selectItem itemLabel="," itemValue="0" />
+                                    <f:selectItem itemLabel=";" itemValue="1" />
+                                    <f:selectItem itemLabel="\t" itemValue="2" />
+                                    <p:ajax event="change" listener="#{rdf4jFileBean.actionChoice()}"  />
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <h:outputLabel value="Nom du thésaurus :" />
+                            </p:column>
+                            <p:column>
+                                <p:inputText id="ThesoName" value="#{rdf4jFileBean.thesaurusName}" />
+                            </p:column>
+                        </p:row>                          
+                    </p:panelGrid>                    
+                    <br/>
+
+                    <p:fileUpload label="#{langueBean.getMsg('upOpt1')}" uploadLabel="#{langueBean.getMsg('upOpt2')}" allowTypes="/(\.|\/)(csv|txt)$/"
+                                  cancelLabel="#{langueBean.getMsg('upOpt3')}" fileUploadListener="#{rdf4jFileBean.chargeFile}" process="@form"
+                                  onstart="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
+                                  update="@form, :messages" oncomplete="PrimeFaces.monitorDownload(stop_import)" disabled="#{!rdf4jFileBean.uploadEnable}"/>
+
+                    <h:outputText value="uri : #{rdf4jFileBean.uri}" />
+                    <br/> 
+                    <h:outputText value="#{langueBean.getMsg('import.total')} : #{rdf4jFileBean.total}" />
+                    <br/> 
+                    <p:commandButton rendered="#{rdf4jFileBean.typeImport != 3}" value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
+                                     actionListener="#{rdf4jFileBean.insertBDD(editionBean.selectedUserGroup)}" 
+                                     onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
+                                     oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
+                                     update=":idImportDlg,:panSkos,:tableTheso, :messages"
+                                     style="color: green"
+                                     />
+                    <p:commandButton rendered="#{rdf4jFileBean.typeImport == 3}" value="#{langueBean.getMsg('btnAdd')}" disabled="#{!rdf4jFileBean.BDDinsertEnable}"
+                                     actionListener="#{rdf4jFileBean.insertCsvBDD(editionBean.selectedUserGroup)}" 
+                                     onclick="PrimeFaces.monitorDownload(start_import);PF('pbAjax').start();" 
+                                     oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
+                                     update=":idImportDlg,:panSkos,:tableTheso, :messages"
+                                     style="color: green"
+                                     />                    
+                    <br/>
+                    <br/>
+                    <p:accordionPanel activeIndex="-1">
+                        <p:tab title="Info" titleStyleClass="infoAcordionPanel" >
+                            <p:scrollPanel mode="native" style="width:400px;height:200px">
+                                <pre><h:outputText value="#{rdf4jFileBean.info}" styleClass="infoAcordionPanel" /></pre>
+                                <hr/>
+                                <pre><h:outputText rendered="#{!rdf4jFileBean.warningIsEmpty()}" value="Warning : #{rdf4jFileBean.warning}" styleClass="warningAcordionPanel" /></pre>
+                            </p:scrollPanel>
+                        </p:tab>
+                        <p:tab title="Error" titleStyleClass="errorAcordionPanel">
+                            <p:scrollPanel mode="native" style="width:400px;height:200px">
+                                <pre><h:outputText value="#{rdf4jFileBean.error}" styleClass="errorAcordionPanel" /></pre>
+                            </p:scrollPanel>
+                        </p:tab>
+
+                    </p:accordionPanel> 
+
+                    <p:dialog modal="true" widgetVar="importWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
+                        <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
+
+                        <br />
+                        <p:progressBar widgetVar="pbAjax" ajax="true" value="#{rdf4jFileBean.progress}" labelTemplate="{value}%" styleClass="animated" global="false"/>
+                    </p:dialog>
+                </h:form>
+            </h:panelGroup>
         </p:dialog>
         <script type="text/javascript">
             function start_import() {
