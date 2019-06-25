@@ -103,6 +103,42 @@ public class AutoCompletBean implements Serializable {
         }
         return liste;
     }
+    
+    /**
+     * permet de retourner la liste des concepts possibles 
+     * pour ajouter une relation BT
+     * (en ignorant les relations interdites) 
+     * @param value
+     * @return 
+     */
+    public List<NodeAutoCompletion> getAutoCompletForRelationBT(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new TermHelper().getAutoCompletionTerm(connect.getPoolConnexion(), theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(), value);
+        }
+        return liste;
+    }
+    
+    /**
+     * permet de retourner la liste des groupes / collections  
+     * contenus dans le thésaurus 
+     * @param value
+     * @return 
+     */
+    public List<NodeAutoCompletion> getAutoCompletCollection(String value) {
+        selectedAtt = new NodeAutoCompletion();
+        List<NodeAutoCompletion> liste = new ArrayList<>();
+        if (theso.getThesaurus().getId_thesaurus() != null && theso.getThesaurus().getLanguage() != null) {
+            liste = new GroupHelper().getAutoCompletionGroup(
+                    connect.getPoolConnexion(),
+                    theso.getThesaurus().getId_thesaurus(),
+                    theso.getThesaurus().getLanguage(),
+                    value);
+        }
+        return liste;
+    }
         
     
     public void init() {
@@ -220,7 +256,9 @@ public class AutoCompletBean implements Serializable {
      *
      * @param query
      * @return
+     * Deprecated #MR
      */
+    /*
     public List<NodeAutoCompletion> getListTermFromThisGroup(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
@@ -231,7 +269,7 @@ public class AutoCompletBean implements Serializable {
                     theso.getThesaurus().getLanguage(), terme.getIdDomaine(), query);
         }
         return liste;
-    }
+    }*/
 
     /**
      * Fonction qui permet de retrouver les concepts dans un autre Group en
@@ -239,7 +277,9 @@ public class AutoCompletBean implements Serializable {
      *
      * @param query
      * @return
+     * Deprecated #MR
      */
+    /*
     public List<NodeAutoCompletion> getListTermOfOtherGroup(String query) {
         selectedAtt = new NodeAutoCompletion();
         List<NodeAutoCompletion> liste = new ArrayList<>();
@@ -250,7 +290,7 @@ public class AutoCompletBean implements Serializable {
                     theso.getThesaurus().getLanguage(), terme.getIdDomaine(), query);
         }
         return liste;
-    }
+    }*/
 
     public void onItemSelect(SelectEvent event) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
@@ -377,6 +417,35 @@ public class AutoCompletBean implements Serializable {
         selectedAtt = new NodeAutoCompletion();
         return true;
     }
+    
+    /**
+     * permet d'ajouter le concept à une collection ou groupe
+     * @return 
+     */
+    public boolean addConceptToGroup() {
+
+        // selectedAtt.getIdConcept() est le terme TG à ajouter
+        // terme.getIdC() est le terme séléctionné dans l'arbre
+        // terme.getIdTheso() est l'id du thésaurus
+        if (selectedAtt == null || selectedAtt.getIdGroup().equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return false;
+        }
+       
+        // addConceptToGroup
+        GroupHelper groupHelper = new GroupHelper();
+        if (!groupHelper.addConceptGroupConcept(connect.getPoolConnexion(),
+                selectedAtt.getIdGroup(), terme.getIdC(), terme.getIdTheso())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
+            return false;
+        }
+
+        tree.reInit();
+        tree.reExpand();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getPrefLabel() + " " + langueBean.getMsg("autoComp.info1")));
+        selectedAtt = new NodeAutoCompletion();
+        return true;
+    }    
     
     /**
      * Cette fonction permet d'ajouter une relation TG d'unn autre Group
@@ -1136,48 +1205,18 @@ public class AutoCompletBean implements Serializable {
         }
         return false;
     }    
+    ///// * Fin des fonctions pour le déplacement de branches Auteur : Miled Rousset
 
 
-    /**
-     * *****
-     *
-     * Fin des fonctions pour le déplacement de branches Auteur : Miled Rousset
-     *
-     *****
-     */
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
 
 
     public NodeAutoCompletion getSelectedAtt() {
         return selectedAtt;
     }
+
 
     public void setSelectedAtt(NodeAutoCompletion selectedAtt) {
         this.selectedAtt = selectedAtt;

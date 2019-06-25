@@ -24,7 +24,6 @@ import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
-import mom.trd.opentheso.bdd.helper.ToolsHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
@@ -194,9 +193,12 @@ public class CsvImportHelper {
             return false;
         }
         addLangsToThesaurus(ds, idTheso, thesoName, langs);
-        if (!addGroupDefault(ds, idTheso)) {
+        
+        GroupHelper groupHelper = new GroupHelper();
+        if (!groupHelper.addGroupDefault(ds, langueSource, idTheso)) {
             return false;
         }
+        idDefaultGroup = "orphans";
         for (CsvReadHelper.ConceptObject conceptObject1 : conceptObject) {
             fileBean.setAbs_progress(fileBean.getAbs_progress() + 1);
             fileBean.setProgress(fileBean.getAbs_progress() / fileBean.getTotal() * 100);
@@ -731,43 +733,4 @@ public class CsvImportHelper {
         }
         return true;
     }
-
-    /**
-     * Permet d'ajouter le Groupe par défaut pour les concepts qui sont
-     * orphelins ou sans groupes
-     *
-     * @return
-     */
-    private boolean addGroupDefault(
-            HikariDataSource ds,
-            String idTheso) {
-        GroupHelper groupHelper = new GroupHelper();
-        ToolsHelper toolsHelper = new ToolsHelper();
-        String idGroup = toolsHelper.getNewId(10);
-        while (groupHelper.isIdOfGroup(ds, idGroup, idTheso)) {
-            idGroup = toolsHelper.getNewId(10);
-        }
-
-        groupHelper.insertGroup(ds,
-                idGroup,
-                idTheso,
-                "C",
-                "", //notation
-                "",
-                false,
-                idUser);
-
-        // Création du domaine par défaut 
-        // ajouter les traductions des Groupes
-        ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
-        conceptGroupLabel.setIdgroup(idGroup);
-        conceptGroupLabel.setIdthesaurus(idTheso);
-
-        conceptGroupLabel.setLang(langueSource);
-        conceptGroupLabel.setLexicalvalue("noGroup");
-        groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
-        idDefaultGroup = idGroup;
-        return true;
-    }
-
-}
+ }

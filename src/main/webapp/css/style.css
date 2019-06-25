@@ -567,6 +567,14 @@ input[type="button"], input[type="submit"]{
     width: 24px;  
 }
 
+.ui-change-user-24 {
+    background: url("../images/change-user-24.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;  
+}
+
 .ui-icon-trash-16 {
     background: url("../images/trash-16.png") no-repeat !important;
     background: none;

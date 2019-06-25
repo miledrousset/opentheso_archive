@@ -17,29 +17,28 @@
                     <tr>
                         <td colspan="2" style="text-align: left; color: green; font-style: oblique " ><h:outputText id="valueTerme" escape="false" value="#{selectedTerme.nom}" /></td>
                     </tr>
-                    <tr>
-                        <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
-                        <td>
-                            <p:autoComplete value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getListTermFromThisGroup}" var="t1"
-                                            scrollHeight="300"
-                                            itemLabel="#{t1.prefLabel}" itemValue="#{t1}" converter="termConverter" forceSelection="true">
-                                <f:facet name="itemtip">
-                                    <h:panelGrid columns="2" cellpadding="5" >
-                                        <f:facet name="header" rendered="#{(t1.url) != null}">
-                                            <h:outputText value="ID : " />
-                                            <h:outputText value="#{t1.idConcept}" />
-                                        </f:facet>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
+                            <td>
+                                <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationBT}" var="concept"
+                                                forceSelection="true" active="true"   scrollHeight="300"
+                                                itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
+                                    <p:column style="width:10%">
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}"  />
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
+                                    </p:column>
 
-                                        <h:outputText value="#{langueBean.getMsg('autoComp1')} : "  />
-                                        <h:outputText value="#{t1.groupLexicalValue}" />
-
-                                        <h:outputText value="#{langueBean.getMsg('autoComp2')} : " />
-                                        <h:outputText value="#{t1.definition}" />
-                                    </h:panelGrid>
-                                </f:facet>
-                            </p:autoComplete>
-                        </td>
-                    </tr>
+                                    <p:column style="width:60%">
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}"  style="font-style: italic; color: palegreen" />
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.prefLabel}" />
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}"  />
+                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.groupLexicalValue}" />
+                                    </p:column>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
                     
                     <tr>
                         <td colspan="2" style="text-align: center;">

@@ -140,6 +140,13 @@ public class MyTreeNode extends DefaultTreeNode implements Serializable {
         return prefix;
     }
 
+    public boolean isIsOrphan(){
+        if(idCurrentGroup.equalsIgnoreCase("orphans")){
+            return true;
+        }
+        return false;
+    }
+    
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }

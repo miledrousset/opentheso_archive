@@ -19,11 +19,8 @@
 
                         <p:commandButton id="dynaButtonTGen" styleClass="cbEdit" icon="ui-icon-edit-16"/>
                         <p:menu style="background: #CEF0C4" overlay="true" trigger="dynaButtonTGen" my="left top" at="left bottom">
-                            <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgDlg" oncomplete="PF('addTgDlg').show();" style="font-size: 12px;"/>
+                            <p:menuitem  rendered="#{(!selectedTerme.selectedNode.isTopConcept)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgDlg" oncomplete="PF('addTgDlg').show();" style="font-size: 12px;"/>
                             <p:menuitem value="#{langueBean.getMsg('panel.delTG')}" update=":idDeleteTgDlg" oncomplete="PF('deleteTgDlg').show();" style="font-size: 12px;"/>
-                            <p:submenu label="#{langueBean.getMsg('index.subMenu.otherGroup')}" styleClass="cbSeparateMenu">
-                                <p:menuitem  rendered="#{(selectedTerme.type != 2)}" value="#{langueBean.getMsg('panel.addBT')}" update=":idAddTgOtherGroupDlg" oncomplete="PF('addTgOtherGroupDlg').show();" style="font-size: 12px;"/>
-                            </p:submenu>
                         </p:menu>
                     </h:form>
                 </div>

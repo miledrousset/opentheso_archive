@@ -627,7 +627,7 @@ public class SelectedTerme implements Serializable {
             NodeGroupIdLabel nodeGroupIdLabeltmp = new NodeGroupIdLabel();
             nodeGroupIdLabeltmp.setIdGroup(idGroup);
             nodeGroupIdLabeltmp.setLabel(labelGroup);
-            nodeGroupIdLabel.add(nodeGroupIdLabeltmp);            
+            nodeGroupIdLabel.add(nodeGroupIdLabeltmp);
         }
     }
 
@@ -2006,6 +2006,41 @@ public class SelectedTerme implements Serializable {
         vue.setAddTAsso(0);
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info7")));
     }
+    
+    /**
+     * Supprime le concept de cette collection ou groupe
+     * si le concept n'a plus de groupe, on le passe dans les orphelins.
+     *
+     * @param idGroup
+     */
+    public void removeConceptFromGroup(String idGroup) {
+        GroupHelper groupHelper = new GroupHelper();
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        // récupère tous les idConcept d'une branche
+        ArrayList<String> listIds = conceptHelper.getIdsOfBranch(
+                connect.getPoolConnexion(), idC, idTheso);
+        
+        // création du groupe Orphelin
+        groupHelper.addGroupDefault(connect.getPoolConnexion(), idlangue, idTheso);
+        
+        for (String idConcept : listIds) {
+            if (!groupHelper.deleteRelationConceptGroupConcept(
+                    connect.getPoolConnexion(), idGroup, idConcept, idTheso, user.getUser().getIdUser())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.info7")));
+                return;
+            }
+            // si le concept n'a plus de groupe, on le place dans les orphelins.
+            if(!groupHelper.isConceptHaveGroup(connect.getPoolConnexion(), idConcept, idTheso)) {
+                groupHelper.addConceptGroupConcept(connect.getPoolConnexion(),
+                        "orphans", idConcept, idTheso);
+            }
+        }
+        majGroup();
+        conceptHelper.updateDateOfConcept(connect.getPoolConnexion(), idTheso, idC);
+        vue.setAddTAsso(0);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("sTerme.info7")));
+    }    
 
     /**
      * (ne marche pas encore !!! en cours) cette fonction permet de supprimer un

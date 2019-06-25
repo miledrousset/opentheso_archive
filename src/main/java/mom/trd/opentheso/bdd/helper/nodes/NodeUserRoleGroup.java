@@ -5,8 +5,6 @@
  */
 package mom.trd.opentheso.bdd.helper.nodes;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author miled.rousset

@@ -14,6 +14,11 @@
                             <h:outputText value="droit sur le groupe : " /> 
                             <h:outputText value="#{currentUser.nodeUserRoleOnThisGroupEdit.groupName}" style="color: green" />
                         </p:panelGrid>
+                        
+                        <p:panelGrid columns="2" >
+                            <h:outputText value="#{langueBean.getMsg('NT.editRelationFor')}: " /> 
+                            <h:outputText value="#{currentUser.userEdit.name}" style="color: green" />
+                        </p:panelGrid>                        
                         <br/>
                         <h:selectOneMenu value="#{currentUser.roleAdded}">
                             <f:selectItems value="#{currentUser.authorizedRoles}" var="r" itemLabel="#{r.value}" itemValue="#{r.key}" />
@@ -25,7 +30,7 @@
                     <td style="text-align: left;">
                         <p:commandButton value="#{langueBean.getMsg('btnOk')}" actionListener="#{currentUser.updateUserRoleOnGroup(
                                                   currentUser.userEdit.idUser, currentUser.roleAdded, currentUser.nodeUserRoleOnThisGroupEdit.idGroup)}" 
-                                              update=":tabUser, :messages" styleClass="styleButton" oncomplete="PF('editUserRoleDlg').hide();"/>
+                                              update=":tabUser, :tabMoveUserIntoGroupes, :messages" styleClass="styleButton" oncomplete="PF('editUserRoleDlg').hide();"/>
                     </td>
                     <td style="text-align: center;">
                         <p:commandButton value="Cancel" icon="ui-icon-annuler" styleClass="styleButton"  oncomplete="PF('editUserRoleDlg').hide();"  actionListener="#{currentUser.reInit()}" immediate="true"/>

@@ -27,6 +27,7 @@
         <ui:include src="dialogs/user/moveThesoToAnotherGroupDlg.xhtml"/>         
         <ui:include src="dialogs/user/editUserRoleSuperAdminDlg.xhtml"/>
         <ui:include src="dialogs/user/addUserGroupDlg.xhtml"/>
+        <ui:include src="dialogs/user/addNewRoleOnGroup.xhtml"/>
         
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
@@ -91,7 +92,10 @@
                             &nbsp;
 
                             <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-change-theso-24" styleClass="styleButton_db" action="#{currentUser.getListAllGroupTheso()}"
-                                             title="#{langueBean.getMsg('profile.moveTheso')}" update=":listUsers,:formEditPseudo" />                               
+                                             title="#{langueBean.getMsg('profile.moveTheso')}" update=":listUsers,:formEditPseudo" />
+                            &nbsp;
+                            <p:commandButton  rendered="#{currentUser.user.isSuperAdmin}" icon="ui-change-user-24" styleClass="styleButton_db" action="#{currentUser.getListAllGroupUser()}"
+                                             title="#{langueBean.getMsg('profile.moveUser')}" update=":listUsers,:formEditPseudo" />                               
                             
                         </h:form>
                     </h:panelGroup>
@@ -134,7 +138,7 @@
                             <h:form>
                                 <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditUser" styleClass="cbSupp"
                                                  title="#{langueBean.getMsg('conf.popup1Title')}" icon="ui-icon-edit-16" 
-                                                 actionListener="#{currentUser.selectUser(u.idUser)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
+                                                 actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
                             </h:form>
                         </p:column>
                         
@@ -145,14 +149,14 @@
                             <h:form>
                             <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
                                      title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
+                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
                             </h:form>                            
                         </p:column>
                         <p:column rendered="#{(currentUser.selectedGroup == '')}" width="20" >
                             <h:form>
                             <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
                                      title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser)}" update=":idEditUserRoleWithoutGroupDlg" oncomplete="PF('editUserRoleWithoutGroupDlg').show();"/>
+                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleWithoutGroupDlg" oncomplete="PF('editUserRoleWithoutGroupDlg').show();"/>
                             </h:form>
                         </p:column>  
                         
@@ -165,7 +169,7 @@
                             <h:form>
                             <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbDeleteRole"  styleClass="cbSupp"
                                             title="#{langueBean.getMsg('profile.deleteRole')}"
-                                            icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(u.idUser)}"
+                                            icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}"
                                             action="#{currentUser.delUserRoleOnGroup(currentUser.userEdit.idUser, currentUser.nodeUserRoleOnThisGroupEdit.idGroup)}" update=":tabUser, :messages" >
                                <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
                            </p:commandButton>
@@ -212,14 +216,14 @@
                             <h:form>
                                 <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditUser" styleClass="cbSupp"
                                                  title="#{langueBean.getMsg('conf.popup1Title')}" icon="ui-icon-edit-16" 
-                                                 actionListener="#{currentUser.selectUser(u.idUser)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
+                                                 actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
                             </h:form>
                         </p:column>
                         <p:column width="20" >
                             <h:form>
                             <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
                                      title="#{langueBean.getMsg('profile.modifyRole')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser)}" update=":idEditUserRoleSuperAdminDlg" oncomplete="PF('editUserRoleSuperAdminDlg').show();"/>
+                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleSuperAdminDlg" oncomplete="PF('editUserRoleSuperAdminDlg').show();"/>
                             </h:form>
                         </p:column>
                         
@@ -261,7 +265,50 @@
                             </h:form>
                         </p:column>
                         
-                    </p:dataTable>   
+                    </p:dataTable> 
+                    
+                    <!-- Vue gestion des droits pour les utilisateurs sur les groupes / superAdmin -->
+                    <p:dataTable id="tabMoveUserIntoGroupes" rendered="#{currentUser.vueMoveUserIntoGroupes and currentUser.user.isSuperAdmin and currentUser.listeAllGroupUser != null}"
+                                 value="#{currentUser.listeAllGroupUser}" var="groupUser" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                        <f:facet name="header">
+                            <h:form>   
+                                <h:outputText value="#{langueBean.getMsg('profile.editUserGroup')}" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <p:commandButton icon="ui-icon-plus-16" title="#{langueBean.getMsg('profile.newRole')}" 
+                                                 action="#{currentUser.initAllUsersNotSuperadmin()}" update=":idAddNewRoleOnGroup" oncomplete="PF('addNewRoleOnGroup').show();"
+                                                 styleClass="styleButton_db" style="align-content: flex-end"/>
+                            </h:form>
+                        </f:facet> 
+
+                        <p:column headerText="#{langueBean.getMsg('co.att1')}" >
+                            <h:outputText value="#{groupUser.userName} (#{groupUser.roleName})"/>
+                        </p:column>                        
+                        <p:column headerText="#{langueBean.getMsg('profile.listGroup')}">
+                            <h:outputText rendered="#{groupUser.idGroup != -1}" value="#{groupUser.groupName} (#{groupUser.idGroup})" />
+                            <h:outputText rendered="#{groupUser.idGroup == -1}" value="" />
+                        </p:column>
+
+                        <p:column width="20" >
+                            <h:form>
+                            <p:commandButton rendered="#{(groupUser.idGroup != -1)}" id="cbEditRoles" styleClass="cbSupp"
+                                     title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
+                                     actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
+                            </h:form>  
+                        </p:column>
+                        <p:column width="20">
+                            <h:form>
+                            <p:commandButton id="cbDeleteRole2" rendered="#{(groupUser.idGroup != -1)}" styleClass="cbSupp"
+                                            title="#{langueBean.getMsg('profile.deleteRole')}"
+                                            icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}"
+                                            action="#{currentUser.delUserRoleOnGroup(groupUser.idUser, groupUser.idGroup)}" update=":tabUser,:tabMoveUserIntoGroupes, :messages" >
+                               <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
+                           </p:commandButton>
+                           <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                            </p:confirmDialog> 
+                           </h:form>
+                        </p:column>                           
+                    </p:dataTable>                     
                    
                 </fieldset>
             </h:panelGroup>            

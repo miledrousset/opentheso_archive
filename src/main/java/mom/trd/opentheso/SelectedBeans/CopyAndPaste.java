@@ -44,6 +44,11 @@ public class CopyAndPaste {
         draggedNode = null;
     }
     
+    /**
+     * permet de couper une branche pour la replacer à un autre endroit
+     * @param copiedNodeTemp
+     * @param name 
+     */
     public void copy(MyTreeNode copiedNodeTemp, String name) {
         if(copiedNodeTemp == null) return;
         conceptValueToCopy = name;

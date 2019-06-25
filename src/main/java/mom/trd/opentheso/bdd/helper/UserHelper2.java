@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupThesaurus;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupUser;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRole;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRoleGroup;
 
@@ -349,6 +350,40 @@ public class UserHelper2 {
         return listThesos;        
     }
     
+    /**
+     * permet de retourner la liste de tous les utilisateurs qui ne sont pas SuperAdmin
+     * @param ds
+     * @return 
+     */
+    public Map <String, String> getAllUsersNotSuperadmin(HikariDataSource ds) {
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        Map <String, String> listUsers = null;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT id_user, username FROM users where issuperadmin != true order by username";
+
+                    resultSet = stmt.executeQuery(query);
+                    listUsers = new HashMap<>();
+                    while(resultSet.next()) {
+                        listUsers.put(resultSet.getString("id_user"), resultSet.getString("username"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listUsers;        
+    }    
+    
     
     /**
      * cette fonction permet de retourner la liste des thésaurus pour un utilisateur
@@ -498,7 +533,123 @@ public class UserHelper2 {
             Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
         }
         return nodeUserGroupThesauruses;
-    }      
+    }
+    
+     /**
+     * cette fonction permet de retourner la liste des utilisateurs avec les groupes correspondants
+     * on ignore les superAdmin et les utilisateurs sans groupes.
+     *
+     * @param ds
+     * @param idLangSource
+     * @return
+     * #MR
+     */
+    public ArrayList<NodeUserGroupUser> getAllGroupUser(HikariDataSource ds, String idLangSource) {
+                Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+     
+        ArrayList<NodeUserGroupUser> nodeUserGroupUsers = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT" +
+                            " users.username," +
+                            " users.id_user," +
+                            " roles.name," +
+                            " user_group_label.label_group," +
+                            " user_group_label.id_group," +
+                            " roles.id" +
+                            " FROM" +
+                            " user_role_group," +
+                            " users," +
+                            " user_group_label," +
+                            " roles" +
+                            " WHERE" +
+                            " user_role_group.id_user = users.id_user AND" +
+                            " user_group_label.id_group = user_role_group.id_group AND" +
+                            " roles.id = user_role_group.id_role";
+                    resultSet = stmt.executeQuery(query);
+
+                    while(resultSet.next()) {
+                        NodeUserGroupUser nodeUserGroupUser = new NodeUserGroupUser();
+                        nodeUserGroupUser.setIdUser(resultSet.getString("id_user"));
+                        nodeUserGroupUser.setUserName(resultSet.getString("username"));
+                        nodeUserGroupUser.setIdGroup(resultSet.getInt("id_group"));
+                        nodeUserGroupUser.setGroupName(resultSet.getString("label_group"));
+                        nodeUserGroupUser.setIdRole(resultSet.getInt("id"));
+                        nodeUserGroupUser.setRoleName(resultSet.getString("name"));
+                        nodeUserGroupUsers.add(nodeUserGroupUser);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeUserGroupUsers;
+    }
+    
+    /**
+     * cette fonction permet de retourner la liste des utilisateurs qui n'ont aucun groupe
+     * et qui ne sont pas des superAdmin.
+     *
+     * @param ds
+     * @param idLangSource
+     * @return
+     * #MR
+     */
+    public ArrayList<NodeUserGroupUser> getAllGroupUserWithoutGroup(HikariDataSource ds, String idLangSource) {
+                Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+     
+        ArrayList<NodeUserGroupUser> nodeUserGroupUsers = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT" +
+                        " users.username," +
+                        " users.id_user" +
+                        " FROM" +
+                        " users" +
+                        " WHERE " +
+                        " users.issuperadmin != true" +
+                        " and" +
+                        " users.id_user not in" +
+                        " (select user_role_group.id_user from user_role_group)";
+                    resultSet = stmt.executeQuery(query);
+
+                    while(resultSet.next()) {
+                        NodeUserGroupUser nodeUserGroupUser = new NodeUserGroupUser();
+                        nodeUserGroupUser.setIdUser(resultSet.getString("id_user"));
+                        nodeUserGroupUser.setUserName(resultSet.getString("username"));
+                        nodeUserGroupUser.setIdGroup(-1);
+                        nodeUserGroupUser.setGroupName("");
+                        
+                        nodeUserGroupUsers.add(nodeUserGroupUser);
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nodeUserGroupUsers;
+    }
+    
+
+    
     
     /**
      * permet de créer un groupe ou projet pour regrouper les utilisateurs et les thésaurus
@@ -1207,7 +1358,6 @@ public class UserHelper2 {
      * 
      *
      * @param ds
-     * @param idUser
      * @return
      */
     public NodeUserRoleGroup getUserRoleWithoutGroup(

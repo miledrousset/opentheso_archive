@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idAddConceptToGroup"  header="#{langueBean.getMsg('concept.addToCollection')}" widgetVar="addConceptToGroup" modal="true" resizable="false" >
+        <!-- Ajout du concept à une collection / Groupe  -->
+        <h:form>        
+            <fieldset>
+                <legend><h:outputText value="#{langueBean.getMsg('concept.addToCollection')}" /></legend>
+
+                    <h:outputText value="#{newtreeBean.selectedTerme.nom}" />
+                    <br/><br/>
+                    <h:outputText value="#{langueBean.getMsg('group.group')}" /> : 
+                    <p:autoComplete id="addConceptToColl" value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getAutoCompletCollection}" var="group"
+                                    forceSelection="true" active="true"   scrollHeight="300"
+                                    itemLabel="#{group.groupLexicalValue}" itemValue="#{group}" converter="termConverterGroup">
+                        <p:column style="width:20%"> 
+                            <h:outputText value="#{group.idGroup}"  />
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{group.groupLexicalValue}" />
+                        </p:column>
+                    </p:autoComplete>                
+
+                    <br/><br/>
+                    <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addConceptToGroup()}"
+                                     update=":panContenu,:accordeonTree, :messages" styleClass="styleButton"
+                                     oncomplete="PF('addConceptToGroup').hide();">
+                    </p:commandButton>  
+            </fieldset>
+        </h:form>
+    </p:dialog>
+</ui:composition>

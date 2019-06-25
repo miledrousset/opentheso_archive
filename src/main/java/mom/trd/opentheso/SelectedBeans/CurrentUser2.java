@@ -18,6 +18,7 @@ import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupThesaurus;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupUser;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRole;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRoleGroup;
 import mom.trd.opentheso.bdd.tools.MD5Password;
@@ -38,25 +39,36 @@ public class CurrentUser2 implements Serializable {
     private int idEdit;
     private String pseudoAdded;
     private String mailAdded;
-    private int roleAdded;
+
     private String pwdAdded1 = "";
     private String pwdAdded2 = "";
     private String pwdAdded3 = "";
     private boolean alertmail = false;
 
     private String groupAdded;
+    private int userSelected;
+    private int roleAdded;    
 
     private String selectedGroup;
     private String selectedGroupName;
 
     private Map<String, String> listeGroupsOfUser;
+    
+    private Map<String, String> listeOfUsersWithoutSuperadmin;
+    
     private ArrayList<Entry<String, String>> authorizedRoles;
     
-    private ArrayList<NodeUserRole> listeUser;
+    private ArrayList<NodeUserRole> listeUser; // la liste des utilisateur du groupe
     private ArrayList<NodeUserRole> listeUserSuperAdmin;
     
     private ArrayList <NodeUserGroupThesaurus> listeAllGroupTheso;
+    
+    // pour le superAdmin pour gérer la multi apparetenance des utilisateurs aux groupes
+    private ArrayList <NodeUserGroupUser> listeAllGroupUser;
  
+    
+    
+    
     private NodeUserGroupThesaurus nodeUserGroupThesaurusSelected; // le theso et le group selectionnés pour déplacement à un autre groupe
 
     private Map<String, String> listeThesoOfGroup;
@@ -73,6 +85,7 @@ public class CurrentUser2 implements Serializable {
     private boolean vueListTheso = false;
     private boolean vueListSuperAdmin = false;
     private boolean vueMoveThesoIntoGroupes = false;
+    private boolean vueMoveUserIntoGroupes = false;    
 
     //pref
     private String langSourceEdit;
@@ -201,6 +214,7 @@ public class CurrentUser2 implements Serializable {
         vueListTheso = false;
         vueListSuperAdmin = false;
         vueMoveThesoIntoGroupes = false;
+        vueMoveUserIntoGroupes = false;        
     }
     /**
      * permet de récupérer la liste des utilisateurs suivants les options choisies
@@ -242,7 +256,8 @@ public class CurrentUser2 implements Serializable {
         listSuperAdmin();
         vueListUser = false;
         vueListTheso = false;
-        vueMoveThesoIntoGroupes = false;        
+        vueMoveThesoIntoGroupes = false;  
+        vueMoveUserIntoGroupes = false;         
         vueListSuperAdmin = true;
     }
     private void listSuperAdmin(){
@@ -258,7 +273,8 @@ public class CurrentUser2 implements Serializable {
         listAllGroupTheso();
         vueListUser = false;
         vueListTheso = false;
-        vueMoveThesoIntoGroupes = true;        
+        vueMoveThesoIntoGroupes = true; 
+        vueMoveUserIntoGroupes = false;         
         vueListSuperAdmin = false;
     }
     private void listAllGroupTheso(){
@@ -266,12 +282,37 @@ public class CurrentUser2 implements Serializable {
         listeAllGroupTheso = userHelper.getAllGroupTheso(connect.getPoolConnexion(), connect.getWorkLanguage());
         
         // les thésos sans groupe 
-        ArrayList <NodeUserGroupThesaurus> listeAllGroupTheso_wtihoutGroup;   listeAllGroupTheso_wtihoutGroup = userHelper.getAllThesoWithoutGroup(
+        ArrayList <NodeUserGroupThesaurus> listeAllGroupTheso_wtihoutGroup;
+        listeAllGroupTheso_wtihoutGroup = userHelper.getAllThesoWithoutGroup(
                 connect.getPoolConnexion(), connect.getWorkLanguage());
         if(listeAllGroupTheso_wtihoutGroup != null)
             if(!listeAllGroupTheso_wtihoutGroup.isEmpty())
                 listeAllGroupTheso.addAll(listeAllGroupTheso_wtihoutGroup);
-    }    
+    }
+    
+    /**
+     * permet de retourner la liste des utilisateurs avec les groupes correspondants
+     * on affiche aussi la vue correspondante
+     */
+    public void getListAllGroupUser() {
+        listAllGroupUser();
+        vueListUser = false;
+        vueListTheso = false;
+        vueMoveThesoIntoGroupes = false;      
+        vueListSuperAdmin = false;
+        vueMoveUserIntoGroupes = true;         
+    }
+    private void listAllGroupUser(){
+        UserHelper2 userHelper = new UserHelper2();
+        listeAllGroupUser = userHelper.getAllGroupUser(connect.getPoolConnexion(), connect.getWorkLanguage());
+        
+        // les users sans groupe en ignorant les superAdmin 
+        ArrayList <NodeUserGroupUser> nodeUserGroupUser_wtihoutGroup = userHelper.getAllGroupUserWithoutGroup(
+                connect.getPoolConnexion(), connect.getWorkLanguage());
+        if(nodeUserGroupUser_wtihoutGroup != null)
+            if(!nodeUserGroupUser_wtihoutGroup.isEmpty())
+                listeAllGroupUser.addAll(nodeUserGroupUser_wtihoutGroup);
+    }        
     
 
     /**
@@ -307,7 +348,9 @@ public class CurrentUser2 implements Serializable {
         vueListUser = false;
         vueListTheso = true;
         vueListSuperAdmin = false;
-        vueMoveThesoIntoGroupes = false;        
+        vueMoveThesoIntoGroupes = false;
+        vueMoveUserIntoGroupes = false;           
+        
     }
     
     private void listThesoByGroup(){
@@ -328,6 +371,7 @@ public class CurrentUser2 implements Serializable {
         listeUser = null;
         setUserRoleOnThisGroup();
     }
+    
 
     /**
      * permet de savoir si l'utilisateur est Admin sur ce Groupe / SuperAdmin
@@ -377,6 +421,34 @@ public class CurrentUser2 implements Serializable {
         this.authorizedRoles = userHelper.getAuthorizedRoles(connect.getPoolConnexion(),
                 idRoleFrom);
     }
+    
+    public void initAllUsersNotSuperadmin() {
+        UserHelper2 userHelper = new UserHelper2();
+        listeOfUsersWithoutSuperadmin = userHelper.getAllUsersNotSuperadmin(connect.getPoolConnexion());
+        initAuthorizedRoles();
+    }
+    
+    public void addNewRoleOnGroup(){
+        UserHelper2 userHelper = new UserHelper2();
+        if(groupAdded == null || groupAdded.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    langueBean.getMsg("error") + " :", langueBean.getMsg("Groupe manquant")));
+            return;
+        }
+        int idGroup =  Integer.parseInt(groupAdded);
+        if(!userHelper.addUserRoleOnGroup(
+                connect.getPoolConnexion(),
+                userSelected,
+                roleAdded,
+                idGroup)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
+            return;
+        }
+        listUsersByGroup();
+        listAllGroupUser();        
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("profile.ModifyRoleMessage")));        
+    }
 
     /**
      * permet de récupérer la liste de role/groupe pour un utilisateur
@@ -393,11 +465,12 @@ public class CurrentUser2 implements Serializable {
      * informations nécessaires pour sa modification
      *
      * @param idUser
+     * @param selectedGroup1
      */
-    public void selectUser(int idUser) {
+    public void selectUser(int idUser, String selectedGroup1) {
         UserHelper2 userHelper = new UserHelper2();
         userEdit = userHelper.getUser(connect.getPoolConnexion(), idUser);
-
+        selectedGroup = selectedGroup1;
         if (userEdit.isIsSuperAdmin()) {
             // cas d'un SuperAdmin
             nodeUserRoleSuperAdmin = userHelper.getUserRoleForSuperAdmin(connect.getPoolConnexion());
@@ -599,6 +672,7 @@ public class CurrentUser2 implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("profile.ModifyRoleMessage")));
         nodeUserRoleGroups = userHelper.getUserRoleGroup(connect.getPoolConnexion(), idUser);
         listUsersByGroup();
+        listAllGroupUser();
     }    
     
     /**
@@ -774,7 +848,8 @@ public class CurrentUser2 implements Serializable {
             conn.close();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("profile.deleteRoleMessage")));
             nodeUserRoleGroups = userHelper.getUserRoleGroup(connect.getPoolConnexion(), idUser);
-            listUsersByGroup();            
+            listUsersByGroup();
+            listAllGroupUser();  
         } catch (SQLException ex) {
             Logger.getLogger(CurrentUser2.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1146,6 +1221,38 @@ public class CurrentUser2 implements Serializable {
 
     public void setNodeUserGroupThesaurusSelected(NodeUserGroupThesaurus nodeUserGroupThesaurusSelected) {
         this.nodeUserGroupThesaurusSelected = nodeUserGroupThesaurusSelected;
+    }
+
+    public ArrayList<NodeUserGroupUser> getListeAllGroupUser() {
+        return listeAllGroupUser;
+    }
+
+    public void setListeAllGroupUser(ArrayList<NodeUserGroupUser> listeAllGroupUser) {
+        this.listeAllGroupUser = listeAllGroupUser;
+    }
+
+    public boolean isVueMoveUserIntoGroupes() {
+        return vueMoveUserIntoGroupes;
+    }
+
+    public void setVueMoveUserIntoGroupes(boolean vueMoveUserIntoGroupes) {
+        this.vueMoveUserIntoGroupes = vueMoveUserIntoGroupes;
+    }
+
+    public Map<String, String> getListeOfUsersWithoutSuperadmin() {
+        return listeOfUsersWithoutSuperadmin;
+    }
+
+    public void setListeOfUsersWithoutSuperadmin(Map<String, String> listeOfUsersWithoutSuperadmin) {
+        this.listeOfUsersWithoutSuperadmin = listeOfUsersWithoutSuperadmin;
+    }
+
+    public int getUserSelected() {
+        return userSelected;
+    }
+
+    public void setUserSelected(int userSelected) {
+        this.userSelected = userSelected;
     }
 
 

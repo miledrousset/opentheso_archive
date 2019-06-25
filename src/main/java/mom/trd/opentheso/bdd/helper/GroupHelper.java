@@ -96,6 +96,40 @@ public class GroupHelper {
     
     
     /**
+     * Permet d'ajouter le Groupe par défaut pour les concepts qui sont
+     * orphelins ou sans groupes
+     *
+     * @param ds
+     * @param idLang
+     * @param idTheso
+     * @return
+     */
+    public boolean addGroupDefault(
+            HikariDataSource ds,
+            String idLang,
+            String idTheso) {
+
+        String idGroup = "orphans";
+
+        insertGroup(ds, idGroup, idTheso, "C",
+                "", //notation
+                "",
+                false,
+                1);
+
+        // Création du domaine par défaut 
+        // ajouter les traductions des Groupes
+        ConceptGroupLabel conceptGroupLabel = new ConceptGroupLabel();
+        conceptGroupLabel.setIdgroup(idGroup);
+        conceptGroupLabel.setIdthesaurus(idTheso);
+
+        conceptGroupLabel.setLang(idLang);
+        conceptGroupLabel.setLexicalvalue("Orphelins");
+        addGroupTraduction(ds, conceptGroupLabel, 1);
+        return true;
+    }    
+    
+    /**
      * Cette fonction permet d'ajouter un group (MT, domaine etc..) avec le
      * libellé
      * elle retourne l'identifiant du nouveau groupe ou null
@@ -702,11 +736,20 @@ public class GroupHelper {
         return status;
     }
 
-    public void addConceptGroupConcept(HikariDataSource ds,
+    /**
+     * permet d'ajouter un concept à un groupe ou collection
+     * @param ds
+     * @param groupID
+     * @param conceptID
+     * @param idThesaurus 
+     * @return  
+     */
+    public boolean addConceptGroupConcept(HikariDataSource ds,
             String groupID, String conceptID, String idThesaurus) {
 
         Connection conn;
         Statement stmt;
+        boolean status = false;
         try {
             // Get connection from pool
             conn = ds.getConnection();
@@ -722,7 +765,7 @@ public class GroupHelper {
                             + ")";
 
                     stmt.executeUpdate(query);
-
+                    status = true;
                 } finally {
                     stmt.close();
                 }
@@ -730,10 +773,12 @@ public class GroupHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
-            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+            if (sqle.getSQLState().equalsIgnoreCase("23505"))
+                status = true;
+            else
                 log.error("Error while addConceptGroupConcept : " + sqle);
-            }
         }
+        return status;
     }
 
     /**
@@ -1947,8 +1992,8 @@ public class GroupHelper {
                             + " WHERE "
                             + " concept_group_label.idthesaurus = '" + idThesaurus + "'"
                             + " AND concept_group_label.lang = '" + idLang + "'"
-                            + " AND unaccent_string(concept_group_label.lexicalvalue) ILIKE unaccent_string('" + text + "%')"
-                            + " ORDER BY concept_group_label.lexicalvalue ASC LIMIT 20";
+                            + " AND unaccent_string(concept_group_label.lexicalvalue) ILIKE unaccent_string('%" + text + "%')"
+                            + " ORDER BY concept_group_label.lexicalvalue ASC LIMIT 40";
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();

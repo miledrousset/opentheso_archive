@@ -35,11 +35,19 @@
                         
                         <p:menuitem rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and !newtreeBean.isHaveChildren()}"
                                     value="#{langueBean.getMsg('edit.delete')}" update=":idConceptDeleteDlg" oncomplete="PF('conceptDeleteDlg').show();" style="font-size: 12px;"/>                        
-                        
-                        
-                        
                         <p:separator/>
-                        <p:menuitem rendered="#{selectedTerme.idDomaine != 'Orphan'}"
+                        
+                        <p:menuitem rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup()}"
+                                    value="#{langueBean.getMsg('concept.addToCollection')}"
+                                    action="#{autoComp.initVariables()}" update=":idAddConceptToGroup"
+                                    oncomplete="PF('addConceptToGroup').show();" style="font-size: 12px;"/> 
+                        <p:menuitem rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and (!selectedTerme.selectedNode.isOrphan)}"
+                                    value="#{langueBean.getMsg('concept.removeFromCollection')}"
+                                    update=":idRemoveConceptFromGroup"
+                                    oncomplete="PF('removeConceptFromGroup').show();" style="font-size: 12px;"/>                         
+                        <p:separator/>
+
+                        <p:menuitem rendered="#{(selectedTerme.idDomaine != 'Orphan')}"
                                     value="Couper/déplacer" title="déplacer le concept ou la branche" 
                                     update=":messages" actionListener="#{copyAndPaste.copy(newtreeBean.selectedNode, selectedTerme.nom)}" style="font-size: 12px;"/>                           
                         
