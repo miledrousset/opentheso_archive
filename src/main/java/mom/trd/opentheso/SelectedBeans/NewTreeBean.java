@@ -1133,16 +1133,24 @@ public class NewTreeBean implements Serializable {
      */
     /**
      * Supprime le groupe sélectionné
+     * @param idGroup
+     * @param idTheso
+     * @param idHandle
+     * @param idUser
      */
-    public void delGroup() {
+    public void delGroup(
+            String idGroup,
+            String idTheso,
+            String idHandle,
+            int idUser) {
         Connection conn;
         try {
             conn = connect.getPoolConnexion().getConnection();
             conn.setAutoCommit(false);
             if (!new GroupHelper().deleteConceptGroupRollBack(conn,
-                    selectedTerme.getIdC(),
-                    selectedTerme.getIdTheso(),
-                    selectedTerme.getUser().getUser().getIdUser())) {
+                    idGroup,
+                    idTheso,
+                    idUser)) {
                 conn.rollback();
                 conn.close();
                 FacesContext.getCurrentInstance().addMessage(null,
@@ -1153,7 +1161,7 @@ public class NewTreeBean implements Serializable {
             if (roleOnTheso.getNodePreference() != null) {
                 if (roleOnTheso.getNodePreference().isUseHandle()) {
                     HandleHelper handleHelper = new HandleHelper(roleOnTheso.getNodePreference());
-                    if (!handleHelper.deleteIdHandle(selectedTerme.getIdHandle(), selectedTerme.getIdTheso())) {
+                    if (!handleHelper.deleteIdHandle(idHandle, selectedTerme.getIdTheso())) {
                         conn.rollback();
                         conn.close();
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("error") + " :", langueBean.getMsg("group.errorDelete")));
@@ -1359,7 +1367,7 @@ public class NewTreeBean implements Serializable {
                 = conceptHelper.getListChildrenOfConcept(ds,
                         idConcept, idTheso);
 
-        if (!conceptHelper.deleteConceptForced(ds, idConcept, idTheso, idUser)) {
+        if (!conceptHelper.deleteConceptWithoutControl(ds, idConcept, idTheso, idUser)) {
             return false;
         }
 
@@ -2451,6 +2459,11 @@ public class NewTreeBean implements Serializable {
         }
         this.selectedNode = selectedNode;
     }
+    
+    public MyTreeNode getSelectedMyTreeNode() {
+        return (MyTreeNode)selectedNode;
+    }
+    
 
     public ArrayList<TreeNode> getSelectedNodes() {
         return selectedNodes;

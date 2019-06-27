@@ -247,7 +247,7 @@ public class Rest_new {
     }
     
     /**
-     * pour produire du Json
+     * pour produire du JsonLd
      * @param naan
      * @param arkId
      * @return 
@@ -290,7 +290,7 @@ public class Rest_new {
     }
     
     /**
-     * pour produire du Json
+     * pour produire du JsonLd
      * @param naan
      * @param arkId
      * @return 
@@ -426,8 +426,318 @@ public class Rest_new {
 ///////////////////////////////////////////////////// 
 /////////////////////////////////////////////////////       
 
+    
+    
+    
+    
+/////////////////////////////////////////////////////    
+///////////////////////////////////////////////////// 
+    /*
+     * Recherche par Id du concept
+     */
+///////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////  
 
+    /**
+     *  pour produire du RDF-SKOS
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}")
+    @GET
+    @Produces("application/rdf+xml;charset=UTF-8")
+    public Response getSkosFromIdConcept__(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
 
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/rdf+xml");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_XML).build();
+    } 
+    
+    /**
+     *  pour produire du RDF-SKOS
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}.rdf")
+    @GET
+    @Produces("application/rdf+xml;charset=UTF-8")
+    public Response getSkosFromIdConcept(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/rdf+xml");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_XML).build();
+    }  
+
+    /**
+     *  pour produire du Json
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public Response getJsonFromIdConcept__(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/json");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();
+    }    
+    
+    /**
+     *  pour produire du Json
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}.json")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public Response getJsonFromIdConcept(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/json");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
+     *  pour produire du JsonLd
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}")
+    @GET
+    @Produces("application/ld+json;charset=UTF-8")
+    public Response getJsonLdFromIdConcept__(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/ld+json");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();
+    }    
+    
+    /**
+     *  pour produire du JsonLd
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}.jsonld")
+    @GET
+    @Produces("application/ld+json;charset=UTF-8")
+    public Response getJsonLdFromIdConcept(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "application/ld+json");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();
+    }
+    
+    /**
+     *  pour produire du Turtle
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}")
+    @GET
+    @Produces("text/turtle;charset=UTF-8")
+    public Response getTurtleFromIdConcept__(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "text/turtle");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.TEXT_PLAIN).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();
+    } 
+    
+    /**
+     *  pour produire du Turtle
+     * @param idTheso
+     * @param idConcept
+     * @return 
+     * #MR
+     */
+    @Path("/{idTheso}.{idConcept}.ttl")
+    @GET
+    @Produces("text/turtle;charset=UTF-8")
+    public Response getTurtleFromIdConcept(
+            @PathParam("idTheso") String idTheso,
+            @PathParam("idConcept") String idConcept) {
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        if(idConcept == null) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+        if(idConcept.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.exportConceptFromId(ds,
+                idConcept, idTheso, 
+                "text/turtle");
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.TEXT_PLAIN).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();
+    } 
+/////////////////////////////////////////////////////    
+///////////////////////////////////////////////////// 
+    /*
+     * Fin de la recherche par Id du concept
+     */
+///////////////////////////////////////////////////// 
+////////////////////////////////////////////////////
+            
+            
+            
+            
+            
+            
 
 /////////////////////////////////////////////////////    
 ///////////////////////////////////////////////////// 

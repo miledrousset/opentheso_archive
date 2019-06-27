@@ -28,6 +28,47 @@ import org.eclipse.rdf4j.rio.Rio;
  * @author miled.rousset
  */
 public class RestRDFHelper {
+    
+    /**
+     * Permet de retourner un concept au format défini en passant par l'identifiant du concept
+     * utilisé pour la négociation de contenu
+     * 
+     * @param ds 
+     * @param idConcept 
+     * @param idTheso 
+     * @param format 
+     * @return  
+     */
+    public String exportConceptFromId(HikariDataSource ds, 
+            String idConcept, String idTheso, String format) {
+
+        RDFFormat rDFFormat = getRDFFormat(format);
+        WriteRdf4j writeRdf4j = getConceptFromId(ds, idConcept, idTheso);
+        if(writeRdf4j == null) return null;
+
+        ByteArrayOutputStream out;
+        out = new ByteArrayOutputStream();
+        Rio.write(writeRdf4j.getModel(), out, rDFFormat);
+        return out.toString();
+    }
+    
+    private WriteRdf4j getConceptFromId(HikariDataSource ds,
+            String idConcept, String idTheso) {
+        if(idConcept == null || idTheso == null) {
+            return null;
+        }
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(ds, idTheso);
+        if(nodePreference == null) return null;
+        
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setNodePreference(nodePreference);
+        exportRdf4jHelper.setInfos(ds, "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
+
+        exportRdf4jHelper.addSignleConcept(idTheso, idConcept);
+        WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+        return writeRdf4j;
+    }
+
     /**
      * Permet de retourner un concept au format défini en passant par un identifiant Ark
      * utilisé pour la négociation de contenu

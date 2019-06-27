@@ -1707,23 +1707,31 @@ public class ConceptHelper {
     public boolean deleteConcept(HikariDataSource ds,
             String idConcept, String idThesaurus, int idUser) {
 
-        TermHelper termHelper = new TermHelper();
         RelationsHelper relationsHelper = new RelationsHelper();
-        NoteHelper noteHelper = new NoteHelper();
-        AlignmentHelper alignmentHelper = new AlignmentHelper();
 
         // controle si le Concept a des fils avant de le supprimer
         if (relationsHelper.isRelationNTExist(ds, idConcept, idThesaurus)) {
             return false;
         }
-
+        if(!deleteConcept__(ds, idConcept, idThesaurus, idUser)) 
+            return false;
+        return true;
+    }
+    
+    private boolean deleteConcept__(HikariDataSource ds,
+            String idConcept, String idThesaurus, int idUser){
+        // suppression du term avec les traductions et les synonymes
+        // gestion du Rollback en cas d'erreur
+        
+        TermHelper termHelper = new TermHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        NoteHelper noteHelper = new NoteHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        
         String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
         if (idTerm == null) {
             return false;
-        }
-
-        // suppression du term avec les traductions et les synonymes
-        // gestion du Rollback en cas d'erreur
+        }        
         Connection conn = null;
         try {
             conn = ds.getConnection();
@@ -1816,75 +1824,9 @@ public class ConceptHelper {
      * @param idUser
      * @return boolean
      */
-    public boolean deleteConceptForced(HikariDataSource ds,
-            String idConcept, String idThesaurus, int idUser) {
-
-        TermHelper termHelper = new TermHelper();
-        RelationsHelper relationsHelper = new RelationsHelper();
-
-        String idTerm = new TermHelper().getIdTermOfConcept(ds, idConcept, idThesaurus);
-        if (idTerm == null) {
-            /// c'est à dire que le concept n'a aucune traduction (cas de concept corrompu)
-            //       return false;
-        }
-
-        // suppression du term avec les traductions et les synonymes
-        // gestion du Rollback en cas d'erreur
-        Connection conn = null;
-        try {
-            conn = ds.getConnection();
-            conn.setAutoCommit(false);
-
-            if (!termHelper.deleteTerm(conn, idTerm, idThesaurus, idUser)) {
-                conn.rollback();
-                conn.close();
-                return false;
-            }
-
-            if (!relationsHelper.deleteAllRelationOfConcept(conn, idConcept, idThesaurus, idUser)) {
-                conn.rollback();
-                conn.close();
-                return false;
-            }
-
-            if (!deleteConceptFromTable(conn, idConcept, idThesaurus, idUser)) {
-                conn.rollback();
-                conn.close();
-                return false;
-            }
-            if (nodePreference != null) {
-                // Si on arrive ici, c'est que tout va bien 
-                // alors c'est le moment de supprimer le code ARK
-                if (nodePreference.isUseArk()) {
-                    // suppression de l'identifiant ARK
-                }
-                // suppression de l'identifiant Handle
-                if (nodePreference.isUseHandle()) {
-                    String idHandle = getIdHandleOfConcept(ds, idConcept, idThesaurus);
-                    if (!deleteIdHandle(conn, idConcept, idHandle, idThesaurus)) {
-                        conn.rollback();
-                        conn.close();
-                        Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, "La suppression du Handle a échouée");
-                        return false;
-                    }
-                }
-            }
-            conn.commit();
-            conn.close();
-            return true;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex);
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    conn.close();
-                } catch (SQLException ex1) {
-                    Logger.getLogger(ConceptHelper.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-            }
-            return false;
-        }
+    public boolean deleteConceptWithoutControl(HikariDataSource ds,
+        String idConcept, String idThesaurus, int idUser) {
+        return deleteConcept__(ds, idConcept, idThesaurus, idUser);
     }
 
     

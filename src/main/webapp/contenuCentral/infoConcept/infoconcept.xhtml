@@ -77,10 +77,20 @@
                         
 
                         <p:menuitem rendered="#{newtreeBean.isGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" 
-                                    value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" 
+                                    value="#{langueBean.getMsg('index.delGroup')}" 
+                                    actionListener="#{newtreeBean.delGroup(
+                                                      newtreeBean.selectedMyTreeNode.idCurrentGroup,
+                                                      newtreeBean.selectedMyTreeNode.idTheso,
+                                                      selectedTerme.idHandle,
+                                                      currentUser.user.idUser)}" 
                                     update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isSubGroup() and !newtreeBean.haveSubGroup() and selectedTerme.termesSpecifique.size() == 0}" 
-                                    value="#{langueBean.getMsg('index.delGroup')}" actionListener="#{newtreeBean.delGroup()}" 
+                                    value="#{langueBean.getMsg('index.delGroup')}"
+                                    actionListener="#{newtreeBean.delGroup(
+                                                      newtreeBean.selectedMyTreeNode.idCurrentGroup,
+                                                      newtreeBean.selectedMyTreeNode.idTheso,
+                                                      selectedTerme.idHandle,
+                                                      currentUser.user.idUser)}" 
                                     update=":panContenu,:accordeonTree" style="font-size: 12px;" />
                         <p:menuitem rendered="#{newtreeBean.isGroup()}" value="#{langueBean.getMsg('group.modifType')}" 
                                     oncomplete="PF('modifTypeGroupDlg').show()" actionListener="#{addGroup.init()}" 
@@ -97,7 +107,9 @@
                                      value="#{langueBean.getMsg('concept.setIdArk')}" onclick="PF('reGenerateGroupArkIdDlg').show();" style="font-size: 12px;"/>
                         
 
-                        
+                        <p:submenu rendered="#{newtreeBean.isGroup() or newtreeBean.isSubGroup()}"  label="" styleClass="cbSeparateMenu">
+                            <p:menuitem value="#{langueBean.getMsg('group.deleteAll')}" style="font-size: 12px;" update=":idGroupDelete" oncomplete="PF('groupDelete').show();"/>
+                        </p:submenu>
                         
                         
 

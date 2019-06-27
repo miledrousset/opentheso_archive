@@ -80,7 +80,7 @@ public class CsvReadHelper {
                 // puis on génère un nouvel identifiant
                 try {
                     uri1 = record.get("URI");
-                    conceptObject.setId(getId(uri1));
+                    conceptObject.setIdConcept(getId(uri1));
                 } catch (Exception e) {
                     //System.err.println("");
                 }
@@ -610,8 +610,9 @@ public class CsvReadHelper {
     
     
     public class ConceptObject {
-        private String id;
+        private String idConcept;
         
+        private String idTerm;
         // rdf:type pour distinguer les concepts des collections, groupes ...
         private String type;
                 
@@ -683,13 +684,23 @@ public class CsvReadHelper {
             members = new ArrayList<>();            
         }
 
-        public String getId() {
-            return id;
+        public String getIdConcept() {
+            return idConcept;
         }
 
-        public void setId(String id) {
-            this.id = id;
+        public void setIdConcept(String idConcept) {
+            this.idConcept = idConcept;
         }
+
+        public String getIdTerm() {
+            return idTerm;
+        }
+
+        public void setIdTerm(String idTerm) {
+            this.idTerm = idTerm;
+        }
+
+
 
         public String getType() {
             return type;

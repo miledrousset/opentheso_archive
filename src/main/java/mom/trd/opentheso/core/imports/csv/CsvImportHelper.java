@@ -102,7 +102,7 @@ public class CsvImportHelper {
         concept.setIdThesaurus(idTheso);
         concept.setStatus("");
         concept.setNotation("");
-        concept.setIdConcept(conceptObject.getId());
+        concept.setIdConcept(conceptObject.getIdConcept());
 
         Term term = new Term();
         term.setId_thesaurus(idTheso);
@@ -118,10 +118,12 @@ public class CsvImportHelper {
                 if (idConcept == null) {
                     message = message + "\n" + "erreur dans l'intégration du concept " + prefLabel.getLabel();
                 }
+                conceptObject.setIdConcept(idConcept);
                 idTerm = termHelper.getIdTermOfConcept(ds, idConcept, idTheso);
                 if (idTerm == null) {
                     message = message + "\n" + "erreur dans l'intégration du concept " + prefLabel.getLabel();
                 }
+                conceptObject.setIdTerm(idTerm);
                 first = false;
             } // ajout des traductions
             else {
@@ -141,6 +143,24 @@ public class CsvImportHelper {
             }
         }
 
+        // synonymes et cachés
+        addAltLabels(ds, idTheso, conceptObject);
+
+        // notes
+        addNotes(ds, idTheso, conceptObject);
+
+        // relations
+        addRelations(ds, idTheso, conceptObject);
+        
+        // alignements
+        addAlignments(ds, idTheso, conceptObject);
+        
+        // géolocalisation
+        addGeoLocalisation(ds, idTheso, conceptObject);
+
+        
+        
+/*        
         NoteHelper noteHelper = new NoteHelper();
         // add définition
         if (idConcept != null) {
@@ -168,7 +188,7 @@ public class CsvImportHelper {
                     message = message + "\n" + "erreur dans l'intégration du synonyme : " + altLabel.getLabel();
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -340,7 +360,7 @@ public class CsvImportHelper {
         // récupération des groups ou domaine
         GroupHelper groupHelper = new GroupHelper();
 
-        String idGroup = conceptObject.getId();
+        String idGroup = conceptObject.getIdConcept();
         if (idGroup == null || idGroup.isEmpty()) {
             message = message + "\n" + "Identifiant Groupe manquant";
             return false;
@@ -367,6 +387,8 @@ public class CsvImportHelper {
             String idTheso,
             CsvReadHelper.ConceptObject conceptObject) {
 
+        conceptObject.setIdTerm(conceptObject.getIdConcept());
+        
         if (!addPrefLabel(ds, idTheso, conceptObject)) {
             return false;
         }
@@ -403,7 +425,7 @@ public class CsvImportHelper {
             String idTheso,
             CsvReadHelper.ConceptObject conceptObject) {
 
-        if (conceptObject.getId() == null || conceptObject.getId().isEmpty()) {
+        if (conceptObject.getIdConcept()== null || conceptObject.getIdConcept().isEmpty()) {
             message = message + "\n" + "concept sans identifiant";
             return false;
         }
@@ -425,16 +447,16 @@ public class CsvImportHelper {
         concept.setIdThesaurus(idTheso);
         concept.setStatus("");
         concept.setNotation(conceptObject.getNotation());
-        concept.setIdConcept(conceptObject.getId());
+        concept.setIdConcept(conceptObject.getIdConcept());
 
         // ajout du concept
         if (!conceptHelper.insertConceptInTable(ds, concept, idUser)) {
-            message = message + "\n" + "erreur dans l'intégration du concept " + conceptObject.getId();
+            message = message + "\n" + "erreur dans l'intégration du concept " + conceptObject.getIdConcept();
         }
 
         Term term = new Term();
         term.setId_thesaurus(idTheso);
-        term.setId_term(conceptObject.getId());
+        term.setId_term(conceptObject.getIdConcept());
         term.setContributor(idUser);
         term.setCreator(idUser);
         term.setSource("");
@@ -442,8 +464,8 @@ public class CsvImportHelper {
 
         try {
             // ajout de la relation entre le concept et le terme
-            if (!termHelper.addLinkTerm(ds.getConnection(), term, conceptObject.getId(), idUser)) {
-                message = message + "\n" + "erreur dans l'intégration du concept " + conceptObject.getId();
+            if (!termHelper.addLinkTerm(ds.getConnection(), term, conceptObject.getIdConcept(), idUser)) {
+                message = message + "\n" + "erreur dans l'intégration du concept " + conceptObject.getIdConcept();
                 return false;
             }
         } catch (SQLException ex) {
@@ -457,7 +479,7 @@ public class CsvImportHelper {
             term.setId_thesaurus(idTheso);
             term.setLang(prefLabel.getLang());
             term.setLexical_value(prefLabel.getLabel());
-            term.setId_term(conceptObject.getId());
+            term.setId_term(conceptObject.getIdConcept());
             term.setContributor(idUser);
             term.setCreator(idUser);
             term.setSource("");
@@ -484,7 +506,7 @@ public class CsvImportHelper {
         Term term = new Term();
         TermHelper termHelper = new TermHelper();
         for (CsvReadHelper.Label altLabel : conceptObject.getAltLabels()) {
-            term.setId_term(conceptObject.getId());
+            term.setId_term(conceptObject.getIdTerm());
             term.setId_thesaurus(idTheso);
             term.setLang(altLabel.getLang());
             term.setLexical_value(altLabel.getLabel());
@@ -498,7 +520,7 @@ public class CsvImportHelper {
             }
         }
         for (CsvReadHelper.Label altLabel : conceptObject.getHiddenLabels()) {
-            term.setId_term(conceptObject.getId());
+            term.setId_term(conceptObject.getIdTerm());
             term.setId_thesaurus(idTheso);
             term.setLang(altLabel.getLang());
             term.setLexical_value(altLabel.getLabel());
@@ -528,42 +550,42 @@ public class CsvImportHelper {
             CsvReadHelper.ConceptObject conceptObject) {
         NoteHelper noteHelper = new NoteHelper();
         for (CsvReadHelper.Label note : conceptObject.getDefinitions()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
                     "definition", idUser);
         }
         for (CsvReadHelper.Label note : conceptObject.getChangeNotes()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
                     "changeNote", idUser);
         }
         for (CsvReadHelper.Label note : conceptObject.getEditorialNotes()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
                     "editorialNote", idUser);
         }
         for (CsvReadHelper.Label note : conceptObject.getHistoryNotes()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
                     "historyNote", idUser);
         }
         for (CsvReadHelper.Label note : conceptObject.getScopeNotes()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addConceptNote(ds, conceptObject.getIdConcept(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
                     "scopeNote", idUser);
         }
         for (CsvReadHelper.Label note : conceptObject.getExamples()) {
-            noteHelper.addTermNote(ds, conceptObject.getId(),
+            noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),
                     idTheso,
                     note.getLabel(),
@@ -581,45 +603,45 @@ public class CsvImportHelper {
 
         for (String idConcept2 : conceptObject.getBroaders()) {
             if (!relationsHelper.insertHierarchicalRelation(ds,
-                    conceptObject.getId(),
+                    conceptObject.getIdConcept(),
                     idTheso,
                     "BT",
                     idConcept2)) {
-                message = message + "\n" + "erreur dans de la relation BT: " + conceptObject.getId();
+                message = message + "\n" + "erreur dans de la relation BT: " + conceptObject.getIdConcept();
             }
             // pour créer la relation réciproque si elle n'existe pas
             if (!relationsHelper.insertHierarchicalRelation(ds,
                     idConcept2,
                     idTheso,
                     "NT",
-                    conceptObject.getId())) {
-                message = message + "\n" + "erreur dans de la relation BT: " + conceptObject.getId();
+                    conceptObject.getIdConcept())) {
+                message = message + "\n" + "erreur dans de la relation BT: " + conceptObject.getIdConcept();
             }
         }
         for (String idConcept2 : conceptObject.getNarrowers()) {
             if (!relationsHelper.insertHierarchicalRelation(ds,
-                    conceptObject.getId(),
+                    conceptObject.getIdConcept(),
                     idTheso,
                     "NT",
                     idConcept2)) {
-                message = message + "\n" + "erreur dans de la relation NT: " + conceptObject.getId();
+                message = message + "\n" + "erreur dans de la relation NT: " + conceptObject.getIdConcept();
             }
             // pour créer la relation réciproque si elle n'existe pas
             if (!relationsHelper.insertHierarchicalRelation(ds,
                     idConcept2,
                     idTheso,
                     "BT",
-                    conceptObject.getId())) {
-                message = message + "\n" + "erreur dans de la relation NT: " + conceptObject.getId();
+                    conceptObject.getIdConcept())) {
+                message = message + "\n" + "erreur dans de la relation NT: " + conceptObject.getIdConcept();
             }
         }
         for (String idConcept2 : conceptObject.getRelateds()) {
             if (!relationsHelper.insertHierarchicalRelation(ds,
-                    conceptObject.getId(),
+                    conceptObject.getIdConcept(),
                     idTheso,
                     "RT",
                     idConcept2)) {
-                message = message + "\n" + "erreur dans de la relation RT: " + conceptObject.getId();
+                message = message + "\n" + "erreur dans de la relation RT: " + conceptObject.getIdConcept();
             }
 //            // pour créer la relation réciproque si elle n'existe pas
 //            if (!relationsHelper.insertHierarchicalRelation(ds,
@@ -643,7 +665,7 @@ public class CsvImportHelper {
         nodeAlignment.setId_author(idUser);
         nodeAlignment.setConcept_target("");
         nodeAlignment.setThesaurus_target("");
-        nodeAlignment.setInternal_id_concept(conceptObject.getId());
+        nodeAlignment.setInternal_id_concept(conceptObject.getIdConcept());
         nodeAlignment.setInternal_id_thesaurus(idTheso);
 
 //        exactMatch   = 1;
@@ -655,35 +677,35 @@ public class CsvImportHelper {
             nodeAlignment.setUri_target(uri);
             nodeAlignment.setAlignement_id_type(1);
             if (!alignmentHelper.addNewAlignment(ds, nodeAlignment)) {
-                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getId();
+                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getIdConcept();
             }
         }
         for (String uri : conceptObject.getCloseMatchs()) {
             nodeAlignment.setUri_target(uri);
             nodeAlignment.setAlignement_id_type(2);
             if (!alignmentHelper.addNewAlignment(ds, nodeAlignment)) {
-                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getId();
+                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getIdConcept();
             }
         }
         for (String uri : conceptObject.getBroadMatchs()) {
             nodeAlignment.setUri_target(uri);
             nodeAlignment.setAlignement_id_type(3);
             if (!alignmentHelper.addNewAlignment(ds, nodeAlignment)) {
-                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getId();
+                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getIdConcept();
             }
         }
         for (String uri : conceptObject.getRelatedMatchs()) {
             nodeAlignment.setUri_target(uri);
             nodeAlignment.setAlignement_id_type(4);
             if (!alignmentHelper.addNewAlignment(ds, nodeAlignment)) {
-                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getId();
+                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getIdConcept();
             }
         }
         for (String uri : conceptObject.getNarrowMatchs()) {
             nodeAlignment.setUri_target(uri);
             nodeAlignment.setAlignement_id_type(5);
             if (!alignmentHelper.addNewAlignment(ds, nodeAlignment)) {
-                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getId();
+                message = message + "\n" + "erreur dans l'ajout de l'alignement : " + conceptObject.getIdConcept();
             }
         }
 
@@ -711,7 +733,7 @@ public class CsvImportHelper {
             return true;
         }
         GpsHelper gpsHelper = new GpsHelper();
-        gpsHelper.insertCoordonees(ds, conceptObject.getId(),
+        gpsHelper.insertCoordonees(ds, conceptObject.getIdConcept(),
                 idTheso,
                 latitude, longitude);
         return true;
@@ -725,10 +747,10 @@ public class CsvImportHelper {
         GroupHelper groupHelper = new GroupHelper();
         if (conceptObject.getMembers().isEmpty()) {
             // ajout dans le groupe par defaut (NoGroup)
-            groupHelper.addConceptGroupConcept(ds, idDefaultGroup, conceptObject.getId(), idTheso);
+            groupHelper.addConceptGroupConcept(ds, idDefaultGroup, conceptObject.getIdConcept(), idTheso);
         } else {
             for (String member : conceptObject.getMembers()) {
-                groupHelper.addConceptGroupConcept(ds, member.trim(), conceptObject.getId(), idTheso);
+                groupHelper.addConceptGroupConcept(ds, member.trim(), conceptObject.getIdConcept(), idTheso);
             }
         }
         return true;

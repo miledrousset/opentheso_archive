@@ -114,8 +114,10 @@ public class ExportRdf4jHelper {
         }
         // altLabel
         for (NodeEM nodeEM : nodeConcept.getNodeEM()) {
-
-            sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.altLabel);
+            if(nodeEM.isHiden())
+                sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.hiddenLabel);
+            else
+                sKOSResource.addLabel(nodeEM.getLexical_value(), nodeEM.getLang(), SKOSProperty.altLabel);            
         }
         ArrayList<NodeNote> nodeNotes = nodeConcept.getNodeNoteConcept();
         nodeNotes.addAll(nodeConcept.getNodeNoteTerm());
