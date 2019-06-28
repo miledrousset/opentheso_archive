@@ -58,6 +58,7 @@
                             </h:form>
                         </td>
                         <!-- boite à outils admins -->
+                        
                         <td align="right">
                             <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
                                 <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
