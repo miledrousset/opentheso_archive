@@ -94,7 +94,8 @@ public class RelationsHelper {
 
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding relation : " + idConcept1 + " -> " + relation + " -> " + idConcept2, sqle);
-            }
+            } else
+                status = true;
         }
         return status;
     }
@@ -883,7 +884,8 @@ public class RelationsHelper {
 
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding relation BT of Concept : " + idConceptNT, sqle);
-            }
+            } else
+                status = true;
         }
         return status;
     }
@@ -936,10 +938,10 @@ public class RelationsHelper {
         } catch (SQLException sqle) {
             // Log exception
             //  if (sqle.getMessage().contains("duplicate key value violates unique constraint")) {
-            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding relation NT : " + idConcept + "-> " + idConceptNT, sqle);
+            } else
                 status = true;
-            }
-            log.error("Error while adding relation NT : " + idConcept + "-> " + idConceptNT, sqle);
         }
         return status;
     }    
@@ -991,7 +993,8 @@ public class RelationsHelper {
             // if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding relation historique of Concept : " + idConcept1, sqle);
-            }
+            } else
+                status = true;
         }
         return status;
     }

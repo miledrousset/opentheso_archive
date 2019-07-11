@@ -940,6 +940,81 @@ public class DownloadBean implements Serializable {
         }
         return file;        
     }
+    
+    /**
+     * récupère tous les identifiants Ark, Handle, IdConcept, PrefLable, Note, alignement
+     * @param idTheso
+     * @param codeLang
+     * @param selectedGroups
+     * @return 
+     */
+    public StreamedContent getIdentifiers(String idTheso,
+            String codeLang, List<NodeGroup> selectedGroups) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
+        if(nodePreference == null) return null;
+        
+        ExportThesaurus exportThesaurus = new ExportThesaurus();
+        StringBuilder stringBuilder = exportThesaurus.exportIdentifier(
+                connect.getPoolConnexion(),
+                idTheso, codeLang,
+                selectedGroups, nodePreference);
+        if(stringBuilder == null) return null;
+
+        InputStream stream;
+        try {
+            stream = new ByteArrayInputStream(stringBuilder.toString().getBytes("UTF-8"));
+            file = new DefaultStreamedContent(stream, "text/csv", "Identifiers_" + idTheso +".csv");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return file;        
+    }    
+    
+   /**
+     * récupère tous les alignements au foramt SKOS
+     * @param idTheso
+     * @param selectedGroups
+     * @return 
+     */
+    public StreamedContent getAlignments(String idTheso,
+            List<NodeGroup> selectedGroups) {
+
+        progress_per_100 = 0;
+        progress_abs = 0;
+
+        WriteRdf4j writeRdf4j = loadExportAlignment(selectedGroups, idTheso);
+        ByteArrayOutputStream out;
+        out = new ByteArrayOutputStream();
+        Rio.write(writeRdf4j.getModel(), out, RDFFormat.RDFXML);
+        file = new ByteArrayContent(out.toByteArray(), "application/xml", idTheso + "_alignment" + "_skos.xml");
+        progress_per_100 = 0;
+        progress_abs = 0;
+        return file;        
+        
+        
+    }      
+    private WriteRdf4j loadExportAlignment(List<NodeGroup> selectedGroups, String idTheso) {
+        progress_per_100 = 0;
+        progress_abs = 0;
+        
+        NodePreference nodePreference = new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
+        if (nodePreference == null) {
+            return null;
+        }
+        
+        ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
+        exportRdf4jHelper.setNodePreference(nodePreference);
+        exportRdf4jHelper.setInfos(connect.getPoolConnexion(), "dd-mm-yyyy", false, idTheso, nodePreference.getCheminSite());
+
+        exportRdf4jHelper.getAllAlignment(selectedGroups, idTheso);                
+        WriteRdf4j writeRdf4j = new WriteRdf4j(exportRdf4jHelper.getSkosXmlDocument());
+        return writeRdf4j;        
+    }
+
 
     /**
      * Applelation de la funtion pour realiser l'injection a la BDD; on puex

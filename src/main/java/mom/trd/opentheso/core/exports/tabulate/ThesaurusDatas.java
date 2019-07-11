@@ -78,6 +78,42 @@ public class ThesaurusDatas {
     }
     
     /**
+     * permet d'exporter les identifiants Ark, Handle et identifiant interne
+     * + des options
+     * format d'export :
+     * id, idArk, idHandle, label // options // synonyme, note, alignement 
+     * @param ds
+     * @param idThesaurus
+     * @param idLang
+     * @param selectedGroups
+     * @return 
+     */
+    
+    public boolean exportIdentifiers(HikariDataSource ds, String idThesaurus, 
+            String idLang, List<NodeGroup> selectedGroups) {
+        
+        // récupération du thésaurus 
+        this.nodeThesaurus = new ThesaurusHelper().getNodeThesaurus(ds, idThesaurus);
+        
+        // récupération des groupes
+        ArrayList<String> idGroups = new GroupHelper().getListIdOfGroup(ds, idThesaurus);
+        for (String idGroup : idGroups) {
+            this.nodeGroupLabels.add(new GroupHelper().getNodeGroupLabel(ds, idGroup, idThesaurus));
+    //        System.out.println("idGroup = : " + idGroup);
+        }
+        
+        // récupération des ids des Tops Concepts
+        nodeTTs = new ConceptHelper().getAllListIdsOfTopConcepts(ds, idThesaurus);
+        
+        // récupération de tous les concepts
+        for (NodeTT nodeTT1 : nodeTTs) {
+            new ConceptHelper().exportAllConcepts(ds, nodeTT1.getIdConcept(),
+                    idThesaurus, nodeConceptExports);
+        }
+        return true;
+    }    
+    
+    /**
      * permet de récupérer toutes les données d'un thésaurus
      * puis les chargées dans les variables de la classe
      * en filrant par langue et Groupe

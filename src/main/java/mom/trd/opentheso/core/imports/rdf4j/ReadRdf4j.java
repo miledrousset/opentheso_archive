@@ -122,6 +122,7 @@ public class ReadRdf4j {
         for (Statement st : model) {
 
             readStruct.value = st.getObject();
+
             readStruct.property = st.getPredicate();
             if (readStruct.value instanceof Literal) {
                 readStruct.literal = (Literal) readStruct.value;
@@ -131,6 +132,9 @@ public class ReadRdf4j {
             if (readStruct.property.getLocalName().equals("type")) {
                 int prop = -1;
                 String type = readStruct.value.toString();
+
+              
+                
                 type = type.toUpperCase();
                 if (type.contains("ConceptScheme".toUpperCase())) {
                     prop = SKOSProperty.ConceptScheme;
@@ -151,6 +155,7 @@ public class ReadRdf4j {
                 String uri = st.getSubject().stringValue();
         //        System.out.println("URI = " + uri);
                 
+        
                 readStruct.resource = new SKOSResource(uri, prop);
 
                 if (prop == SKOSProperty.ConceptScheme) {

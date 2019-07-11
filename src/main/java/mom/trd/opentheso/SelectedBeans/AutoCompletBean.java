@@ -380,43 +380,7 @@ public class AutoCompletBean implements Serializable {
         }
     }
 
-    /**
-     * Cette fonction permet d'ajouter une relation TG à un concept Le TG existe
-     * déjà dans le thésaurus, donc c'est une relation à créer
-     *
-     * @return
-     */
-    public boolean addTGene() {
 
-        // selectedAtt.getIdConcept() est le terme TG à ajouter
-        // terme.getIdC() est le terme séléctionné dans l'arbre
-        // terme.getIdTheso() est l'id du thésaurus
-        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
-            return false;
-        }
-        if (selectedAtt.getIdConcept().equals(terme.getIdC())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
-            return false;
-        }
-        // vérification si la relation est cohérente (BT et RT à la fois ?)  
-        if(!isAddRelationBTValid(terme.getIdC(), selectedAtt.getIdConcept())){
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorNTRT")));
-            return false;        
-        } 
-        
-        // addTermeGene(idNT, idBT)
-        if (!terme.addTermeGene(terme.getIdC(), selectedAtt.getIdConcept())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
-            return false;
-        }
-
-        tree.reInit();
-        tree.reExpand();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getPrefLabel() + " " + langueBean.getMsg("autoComp.info1")));
-        selectedAtt = new NodeAutoCompletion();
-        return true;
-    }
     
     /**
      * permet d'ajouter le concept à une collection ou groupe
@@ -446,48 +410,6 @@ public class AutoCompletBean implements Serializable {
         selectedAtt = new NodeAutoCompletion();
         return true;
     }    
-    
-    /**
-     * Cette fonction permet d'ajouter une relation TG d'unn autre Group
-     * Le TG existe déjà dans le thésaurus, donc c'est une relation à créer
-     * en ajoutant en plus le nouveau domaine à la branche
-     *
-     * // Auteur Miled Rousset
-     * 
-     * @return
-     */
-    public boolean addTGeneOtherGroup() {
-
-        // selectedAtt.getIdConcept() est le terme TG à ajouter
-        // terme.getIdC() est le terme séléctionné dans l'arbre
-        // terme.getIdTheso() est l'id du thésaurus
-        
-
-
-        if (selectedAtt == null || selectedAtt.getIdConcept().equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error1")));
-            return false;
-        }
-        if (selectedAtt.getIdConcept().equals(terme.getIdC())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.impossible")));
-            return false;
-        }
-
-        if (!terme.addTermeGeneOtherGroup(terme.getIdC(), terme.getIdDomaine(), selectedAtt.getIdConcept())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("autoComp.error2")));
-            return false;
-        }
-        
-        tree.reInit();
-        tree.reExpand();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedAtt.getPrefLabel() + " " + langueBean.getMsg("autoComp.info1")));
-        selectedAtt = new NodeAutoCompletion();
-        return true;
-    }    
-
-
-    
-
             
     
     /**
@@ -539,30 +461,7 @@ public class AutoCompletBean implements Serializable {
         createValid = true;
     }
     
-    private boolean isAddRelationBTValid(String idConcept1, String idConcept2) {
-        RelationsHelper relationsHelper = new RelationsHelper();
-        if(idConcept1.equalsIgnoreCase(idConcept2)) return false;
-        
-        // relations RT et BT en même temps interdites
-        if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }
-        
-        // relations BT et NT en même temps interdites
-        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
-                idConcept2, idConcept1, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }
-        
-        // relation entre frères est interdite 
-        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }        
-        
-        return true;
-    }    
+  
     
     private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
         RelationsHelper relationsHelper = new RelationsHelper();

@@ -160,9 +160,17 @@ public class RoleOnThesoBean {
         ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
         String title;
         String lang = connect.getWorkLanguage().toLowerCase();
-
+        
+        // ajout de code qui permet de charger une liste de thésaurus avec le nom en utilisant la langue préférée dans les préférences du thésaurus.
+        // pour éviter d'afficher des Id quand on a un mélange des thésaurus avec des langues sources différentes.
+        String preferredIdLangOfTheso; 
+        PreferencesHelper preferencesHelper = new PreferencesHelper();
         for (String idTheso1 : authorizedTheso) {
-            title = thesaurusHelper.getTitleOfThesaurus(connect.getPoolConnexion(), idTheso1, lang);
+            preferredIdLangOfTheso = preferencesHelper.getWorkLanguageOfTheso(connect.getPoolConnexion(), idTheso1);
+            if(preferredIdLangOfTheso == null)
+                preferredIdLangOfTheso = lang;
+            
+            title = thesaurusHelper.getTitleOfThesaurus(connect.getPoolConnexion(), idTheso1, preferredIdLangOfTheso);
             if (title == null) {
                 authorizedThesoHM.put("" + "(" + idTheso1 + ")", idTheso1);
             } else {

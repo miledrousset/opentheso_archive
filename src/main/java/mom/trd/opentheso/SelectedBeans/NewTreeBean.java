@@ -1510,37 +1510,7 @@ public class NewTreeBean implements Serializable {
         return ((MyTreeNode) selectedNode).isIsSubGroup();
     }
 
-    /**
-     * Supprime la relation hiÃ©rarchique qui lie le terme courant au terme dont
-     * l'id est passÃ© en paramÃ¨tre puis met l'arbre Ã  jour. Si type vaut 0,
-     * le terme courant est le fils, si type vaut 1, le terme courant est le
-     * pÃ¨re.
-     *
-     * @param id
-     * @param type
-     */
-    public void suppRel(String id, int type) {
-        if (type == 0) {
-            // type 0 = suppression de la relation gÃ©nÃ©rique 
-            if (!selectedTerme.delGene(id)) {
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-                return;
-            }
 
-        } else {
-            // type 1 = suppression de la relation spÃ©cifique
-            if (!selectedTerme.delSpe(id)) {
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error")));
-                return;
-            }
-        }
-
-        reInit();
-        reExpand();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("tree.info3")));
-    }
 
     public boolean desactivateConcept() {
         if (!selectedTerme.deprecateConcept()) {

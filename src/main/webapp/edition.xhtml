@@ -66,9 +66,13 @@
             <ui:include src="/dialogs/export/exportTxtDlg.xhtml" />                  
             <ui:include src="/dialogs/export/exportPdfDlg.xhtml" />
             <ui:include src="/dialogs/export/exportAltLabel.xhtml" />
+            <ui:include src="dialogs/export/exportIdentifier.xhtml" /> 
+            <ui:include src="dialogs/export/exportAlignment.xhtml" />            
+            
             <ui:include src="/dialogs/import/importDlg.xhtml" />
             <ui:include src="/dialogs/import/importCSVDlg.xhtml" />
-            <ui:include src="dialogs/help/csvImportHelp.xhtml" />            
+            <ui:include src="dialogs/help/csvImportHelp.xhtml" />
+
             
         </div>
         <!-- POP UP SKOS THESO DEBUT -->
@@ -186,6 +190,10 @@
                                                     style="font-size: 12px;"/>
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportAltlabel')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportAltLabel" oncomplete="PF('exportAltLabel').show();"
                                                     style="font-size: 12px;"/>
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportIdentifier')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportIdentifier" oncomplete="PF('exportIdentifier').show();"
+                                                    style="font-size: 12px;"/>
+                                        <p:menuitem disabled="false" value="#{langueBean.getMsg('edit.exportAlignment')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportAlignment" oncomplete="PF('exportAlignment').show();"
+                                                    style="font-size: 12px;"/>                                           
                                     </p:menu>
                                 </h:form>
 

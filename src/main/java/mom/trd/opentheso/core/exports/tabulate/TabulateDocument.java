@@ -17,6 +17,8 @@ public class TabulateDocument {
 
     private String id;
     private String idArk;
+    private String idHandle;
+    private String uri;
     
     // type du concept (MT = domaine ou microthésaurus, DE = descripteur)
     private String type;
@@ -259,6 +261,22 @@ public class TabulateDocument {
 
     public void setModified(Date modified) {
         this.modified = modified;
+    }
+
+    public String getIdHandle() {
+        return idHandle;
+    }
+
+    public void setIdHandle(String idHandle) {
+        this.idHandle = idHandle;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
 }

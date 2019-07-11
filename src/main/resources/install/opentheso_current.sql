@@ -2677,13 +2677,7 @@ ALTER TABLE ONLY public.concept_group_historique
     ADD CONSTRAINT concept_group_copy_pkey PRIMARY KEY (idgroup, idthesaurus, modified, id_user);
 
 
---
--- TOC entry 3606 (class 2606 OID 16964)
--- Name: concept_group_label_historique concept_group_label_copy_idgrouplabel_key; Type: CONSTRAINT; Schema: public; Owner: -
---
 
-ALTER TABLE ONLY public.concept_group_label_historique
-    ADD CONSTRAINT concept_group_label_copy_idgrouplabel_key UNIQUE (id);
 
 
 --

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mom.trd.opentheso.core.exports.altlabel;
+package mom.trd.opentheso.core.exports.helper;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;

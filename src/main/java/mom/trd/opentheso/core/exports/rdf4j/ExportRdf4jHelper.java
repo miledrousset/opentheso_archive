@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.datas.Thesaurus;
+import mom.trd.opentheso.bdd.helper.AlignmentHelper;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
-import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
 import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
@@ -93,7 +93,7 @@ public class ExportRdf4jHelper {
         idTheso = idThesaurus;
         addFilsConceptRecursif(idTheso, idConcept, new SKOSResource());
     }
-
+    
     public void addSignleConcept(String idThesaurus, String idConcept) {
         idTheso = idThesaurus;
         ConceptHelper conceptHelper = new ConceptHelper();
@@ -147,6 +147,36 @@ public class ExportRdf4jHelper {
         sKOSResource.addIdentifier(idConcept, SKOSProperty.identifier);
         
         skosXmlDocument.addconcept(sKOSResource);
+    }    
+
+    /**
+     * Permet de préparer tous les alignements d'un thésaurus pour l'export
+     * @param selectedGroups
+     * @param idThesaurus 
+     */
+    public void getAllAlignment(List<NodeGroup> selectedGroups, String idThesaurus) {
+        idTheso = idThesaurus;
+        
+        ConceptHelper conceptHelper = new ConceptHelper();
+        AlignmentHelper alignmentHelper = new AlignmentHelper();
+        ArrayList<NodeAlignmentSmall> nodeAlignmentSmalls;
+        ArrayList<String> allIds;
+
+        for (NodeGroup selectedGroup : selectedGroups) {
+            allIds = conceptHelper.getAllIdConceptOfThesaurusByGroup(ds, idTheso, selectedGroup.getConceptGroup().getIdgroup());
+            for (String idConcept : allIds) {
+                nodeAlignmentSmalls = alignmentHelper.getAllAlignmentOfConceptNew(ds, idConcept, idThesaurus);
+                if(!nodeAlignmentSmalls.isEmpty()) {
+                    SKOSResource sKOSResource = new SKOSResource();
+                    sKOSResource.setUri(getUriFromId(idConcept));
+                    sKOSResource.setProperty(SKOSProperty.Concept);
+
+                    addAlignementGiven(nodeAlignmentSmalls, sKOSResource);
+                    sKOSResource.addIdentifier(idConcept, SKOSProperty.identifier);
+                    skosXmlDocument.addconcept(sKOSResource);
+                }
+            }
+        }
     }
 
     private void addFilsConceptRecursif(String idThesaurus, String idPere, SKOSResource sKOSResource, DownloadBean downloadBean, List<NodeLang> selectedLanguages) {
@@ -621,11 +651,8 @@ public class ExportRdf4jHelper {
                     prop = SKOSProperty.narrowMatch;
                     break;
             }
-
             resource.addMatch(alignment.getUri_target(), prop);
-
         }
-
     }
 
     private void addRelationGiven(ArrayList<NodeHieraRelation> btList, ArrayList<NodeHieraRelation> ntList,

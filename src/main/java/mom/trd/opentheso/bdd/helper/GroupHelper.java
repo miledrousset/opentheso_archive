@@ -189,13 +189,16 @@ public class GroupHelper {
             }
             
             // ajout dans l'historique 
-            addGroupTraductionHistoriqueRollBack(conn,
+            if(!addGroupTraductionHistoriqueRollBack(conn,
                     idGroup,
                     nodeConceptGroup.getConceptGroup().getIdthesaurus(),
                     nodeConceptGroup.getIdLang(),
                     nodeConceptGroup.getLexicalValue(),
-                    idUser);
-         
+                    idUser)){
+                conn.rollback();
+                conn.close();
+                return null;
+            }
             if (nodePreference != null) {
                 if (nodePreference.isUseArk()) {
                     NodeMetaData nodeMetaData = new NodeMetaData();
@@ -316,7 +319,11 @@ public class GroupHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding traduction to ConceptGroupLabel : " + idGroup, sqle);
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
+                log.error("Error while adding traduction to ConceptGroupLabel : " + idGroup, sqle);
+            } else
+                status = true;
+            
         }
         return status;
     }

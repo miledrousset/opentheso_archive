@@ -8,47 +8,20 @@
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:p="http://primefaces.org/ui">
 
-        <p:dialog id="idExportPdfDlg"  header="#{langueBean.getMsg('edit.export')}" styleClass="styleText2" widgetVar="exportPdfDlg" modal="true" resizable="false"  >
+        <p:dialog id="idExportIdentifier"  header="#{langueBean.getMsg('edit.exportIdentifier')}" styleClass="styleText2" widgetVar="exportIdentifier" modal="true" resizable="false"  >
             <h:form >
                 <h:panelGroup>
-                    <h:outputText value="#{langueBean.getMsg('popup.exp')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
-
+                    <h:outputText value="#{langueBean.getMsg('edit.exportIdentifier')} : " styleClass="styleText2" /> <h:outputText value="#{theso.thesaurus.title}" styleClass="textInfo"/>
                     <div style="align-content: center">
-
-
-                        <h:panelGroup  id="panelExportPDF" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
-
-
-                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                <p:outputLabel for="idTypeExportPdf" value="#{langueBean.getMsg('export.type')} :" />    
-                                <p:selectOneMenu id="idTypeExportPdf" value="#{skosExportBean.exportFormat}">
-                                    <f:selectItem itemLabel="hiérarchique" itemValue="0" />
-                                    <f:selectItem itemLabel="alphabétique" itemValue="1" />
-                                </p:selectOneMenu>
-
-                            </h:panelGrid>
-
+                        <h:panelGroup  id="panelExportIdentifier" rendered="#{currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso}">
+                        <p:outputLabel value="type : CSV" />  
                             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                                 <p:outputLabel for="idLangExport" value="#{langueBean.getMsg('export.langOfTheso')} :" />    
                                 <p:selectOneMenu id="idLangExport" value="#{skosExportBean.singleLanguageCodeSelected}">
                                     <f:selectItems value="#{skosExportBean.getCodesLanguagesOfTheso()}"/>
                                 </p:selectOneMenu>
-
                             </h:panelGrid>
-                            
-                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                                <p:outputLabel for="idLang2Export" value="#{langueBean.getMsg('export.langOfTheso')} 2 :" />    
-                                <p:selectOneMenu id="idLang2Export" value="#{skosExportBean.singleLanguageCodeSelected2}">
-                                    <f:selectItem itemLabel="None" itemValue="" />
-                                    <f:selectItems value="#{skosExportBean.getCodesLanguagesOfTheso()}"/>
-                                </p:selectOneMenu>
-
-                            </h:panelGrid>
-
-
-
-
-
+                            <!-- Liste des domaines -->
                             <fieldset class="fieldDomain" >
                                 <legend><h:outputText value="#{langueBean.getMsg('stat.statTheso1')}" styleClass="textInfoSmall" /></legend>
 
@@ -72,66 +45,39 @@
                                         </p:dataTable>                    
                                     </p:tab>
                                 </p:accordionPanel>
-
                             </fieldset>
                         </h:panelGroup>
-
+  
                         <br/>
-
-                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Pdf, stop_export_Pdf);PF('pbAjax').start();" > 
-
-                            <p:fileDownload value="#{downloadBean.thesoPDF(skosExportBean.idTheso,skosExportBean.selectedLanguages, 
-                                                     skosExportBean.selectedGroups,skosExportBean.singleLanguageCodeSelected,
-                                                     skosExportBean.singleLanguageCodeSelected2,skosExportBean.exportFormat)}" />  
+                        <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" 
+                                         ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Identifier, stop_export_Identifier);PF('pbAjaxIdentifier').start();" 
+                                         update=":idExportIdentifier"> 
+                            <p:fileDownload value="#{downloadBean.getIdentifiers(skosExportBean.idTheso, 
+                                                     skosExportBean.singleLanguageCodeSelected, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>
-
-                        <p:dialog modal="true" widgetVar="exportWait" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
+                        <p:dialog modal="true" widgetVar="exportWaitIdentifier" header="#{langueBean.getMsg('export.wait')}" draggable="false" closable="false" resizable="false">
                             <p:graphicImage id="exportLoadingImage" value="/images/loading.gif" width="50"/>
-
-
-
                             <br />
-                            <p:progressBar widgetVar="pbAjax" ajax="true" value="#{downloadBean.progress_per_100}" labelTemplate="{value}%" styleClass="animated" global="false"/>
-
-
-
-
-
-
+                            <p:progressBar widgetVar="pbAjaxIdentifier" ajax="true" value="#{downloadBean.progress_per_100}" labelTemplate="{value}%" styleClass="animated" global="false"/>
                         </p:dialog>
-
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <p:commandButton id="cbAjAlignAuto2" title="#{langueBean.getMsg('btnBack')}" 
-                                         update="idExportPdfDlg"
-                                         action="PF('exportPdfDlg').hide();"
+                                         update="idExportIdentifier"
+                                         action="PF('exportIdentifier').hide();"
                                          icon="ui-icon-retour"
                                          styleClass="styleButton"  style="align-content: flex-end"/>
                     </div>
                     <br/>
-
-
                 </h:panelGroup>
-
-
             </h:form> 
         </p:dialog>
         <script type="text/javascript">
-            function start_export_Pdf() {
-                PF('exportWait').show();
+            function start_export_Identifier() {
+                PF('exportWaitIdentifier').show();
             }
-
-            function stop_export_Pdf() {
-                PF('exportWait').hide();
-                PF('exportPdfDlg').hide();
-
+            function stop_export_Identifier() {
+                PF('exportWaitIdentifier').hide();
+                PF('exportIdentifier').hide();
             }
         </script> 
-
     </ui:composition>
-
-
-
-
-
-
-

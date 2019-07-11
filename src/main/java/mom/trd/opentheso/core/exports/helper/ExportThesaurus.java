@@ -8,10 +8,11 @@ package mom.trd.opentheso.core.exports.helper;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.ArrayList;
 import java.util.List;
+import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeLang;
+import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
-import mom.trd.opentheso.core.exports.altlabel.WriteAltLabel;
 import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
 
 
@@ -58,6 +59,27 @@ public class ExportThesaurus {
         }
         return writeAltLabel.getAllAltLabels();
     }
+    
+    /**
+     * permetr d'exporter les identifiants pérennes et internes d'un thésaurus par groupe(s) 
+     * @param ds
+     * @param idTheso
+     * @param idLang
+     * @param selectedGroups
+     * @param nodePreference
+     * @return 
+     */
+    public StringBuilder exportIdentifier(HikariDataSource ds, 
+            String idTheso, String idLang, List<NodeGroup> selectedGroups,
+            NodePreference nodePreference) {
+
+        WriteIdentifier writeIdentifier = new WriteIdentifier();
+        writeIdentifier.setHeader();
+        writeIdentifier.AppendConcept(ds, idTheso, idLang, selectedGroups, nodePreference);
+        return writeIdentifier.getAllIdentifiers();
+    }
+    
+          
     
     /**
      * Permet d'exporter tout le thésaurus en filtrant par langue et Groupe

@@ -20,7 +20,10 @@
                         <td>
                             <h:form>
                                 <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:idDeleteTgDlg"
-                                                 actionListener="#{newtreeBean.suppRel(item0.key, 0)}">
+                                                 actionListener="#{broaderTerm.deleteBroader(
+                                                                   newtreeBean.selectedMyTreeNode,
+                                                                   item0.key,
+                                                                   currentUser.user.idUser)}" >
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>  
 
@@ -29,7 +32,7 @@
                                     <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>       
                                 </p:confirmDialog> 
                             </h:form>
-                        </td>
+                        </td> 
                     </tr>
                 </ui:repeat>
             </table>

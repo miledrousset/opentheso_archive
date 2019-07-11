@@ -109,6 +109,7 @@ public class EditionBean implements Serializable {
         boolean arkActive = false;
         String urlSite = "";
         String workLanguage;
+        String idThesoNew = null;
         
         if(!currentUser.getUser().isIsSuperAdmin()){
             if(selectedUserGroup == null || selectedUserGroup.isEmpty()){
@@ -137,20 +138,20 @@ public class EditionBean implements Serializable {
                 Connection conn = connect.getPoolConnexion().getConnection();
                 conn.setAutoCommit(false);
 
-                String idThesaurus = th.addThesaurusRollBack(conn, urlSite, arkActive);
-                if (idThesaurus == null) {
+                idThesoNew = th.addThesaurusRollBack(conn, urlSite, arkActive);
+                if (idThesoNew == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("theso.error1")));
                     conn.rollback();
                     conn.close();
                     return;
                 }
                 if (editTheso.getTitle().isEmpty()) {
-                    editTheso.setTitle("theso_" + idThesaurus);
+                    editTheso.setTitle("theso_" + idThesoNew);
                 }
                 if (editTheso.getLanguage() == null) {
                     editTheso.setLanguage(workLanguage);
                 }
-                editTheso.setId_thesaurus(idThesaurus);
+                editTheso.setId_thesaurus(idThesoNew);
 
                 if (!th.addThesaurusTraductionRollBack(conn, editTheso)) {
                     conn.rollback();
@@ -162,7 +163,7 @@ public class EditionBean implements Serializable {
                 // ajout de role pour le thésaurus à l'utilisateur en cours
                 UserHelper2 userHelper = new UserHelper2();
                 if(!currentUser.getUser().isIsSuperAdmin()) {
-                    if (!userHelper.addThesoToGroup(conn, idThesaurus, Integer.parseInt(selectedUserGroup))) {
+                    if (!userHelper.addThesoToGroup(conn, idThesoNew, Integer.parseInt(selectedUserGroup))) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         conn.rollback();
                         conn.close();
@@ -174,7 +175,7 @@ public class EditionBean implements Serializable {
                 
                 // appliquer les préférences du Domaine au nouveau thésaurus
                 if(nodePreference != null){
-                    if (!new PreferencesHelper().addPreference(connect.getPoolConnexion(), nodePreference, idThesaurus)) {
+                    if (!new PreferencesHelper().addPreference(connect.getPoolConnexion(), nodePreference, idThesoNew)) {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("error.BDD")));
                         return;
                     }
@@ -189,7 +190,7 @@ public class EditionBean implements Serializable {
           //  vue.setCreat(false);
             
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.info1.1") + " " + editTheso.getTitle() + " " + langueBean.getMsg("theso.info1.2")));
-            setVisibility(idTheso, isPrivate);
+            setVisibility(idThesoNew, isPrivate);
             editTheso = new Thesaurus();
         }
         // tree.getSelectedTerme().getUser().getUser().getId();

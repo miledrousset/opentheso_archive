@@ -85,7 +85,9 @@ public class CopyAndPasteBetweenTheso {
         CopyAndPasteHelper copyAndPasteHelper = new CopyAndPasteHelper();
         if(tree.isGroup() || tree.isSubGroup()) {
             // traitement pour insertion sous un domaine.
-            
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    languageBean.getMsg("tools.copyBranch"), "On ne peut pas coller sous un groupe directement, choisissez un concept !!!")); 
+            return;
         } else {
             if(!copyAndPasteHelper.pasteBranchLikeNT(connect.getPoolConnexion(),
                     currentIdTheso, currentIdConcept,

@@ -2405,6 +2405,7 @@ public class ConceptHelper {
                 log.error("Error while adding hierarchicalRelationship RT : "
                         + hierarchicalRelationship.getIdConcept1(), sqle);
             }
+            
         }
 
     }
@@ -2479,7 +2480,7 @@ public class ConceptHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding Concept : " + idConcept, sqle);
             }
             idConcept = null;
@@ -2657,9 +2658,10 @@ public class ConceptHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding Concept : " + concept.getIdConcept(), sqle);
-            }
+            } else
+                status = true;
         }
         return status;
     }
@@ -2952,7 +2954,7 @@ public class ConceptHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding Concept : " + concept.getIdConcept(), sqle);
             }
         }
@@ -3022,9 +3024,10 @@ public class ConceptHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding Concept : " + concept.getIdConcept(), sqle);
-            }
+            } else
+                status = true;
         }
         return status;
     }

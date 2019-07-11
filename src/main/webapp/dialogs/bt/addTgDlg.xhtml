@@ -20,7 +20,7 @@
                         <tr>
                             <td><h:outputText value="#{langueBean.getMsg('popup.name')}" /> : </td>
                             <td>
-                                <p:autoComplete id="addRelationNT" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.getAutoCompletForRelationBT}" var="concept"
+                                <p:autoComplete id="addRelationNT" value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getAutoCompletForRelationBT}" var="concept"
                                                 forceSelection="true" active="true"   scrollHeight="300"
                                                 itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
                                     <p:column style="width:10%">
@@ -42,7 +42,10 @@
                     
                     <tr>
                         <td colspan="2" style="text-align: center;">
-                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{autoComp.addTGene()}"
+                            <p:commandButton id="cbAjTA" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{broaderTerm.addBroader(
+                                                                  autoComp.selectedAtt,
+                                                                  newtreeBean.selectedMyTreeNode,
+                                                                  currentUser.user.idUser)}"
                                              update=":idAddTgDlg,:panContenu,:accordeonTree, :messages" styleClass="styleButton"
                                              oncomplete="PF('addTgDlg').hide();">
                             </p:commandButton>  
