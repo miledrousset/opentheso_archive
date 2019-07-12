@@ -25,6 +25,7 @@ import mom.trd.opentheso.core.exports.tabulate.ThesaurusDatas;
 public class ExportThesaurus {
 
     private ThesaurusDatas thesaurusDatas;
+    private StringBuffer message;
     
     public ExportThesaurus() {
     }
@@ -76,6 +77,7 @@ public class ExportThesaurus {
         WriteIdentifier writeIdentifier = new WriteIdentifier();
         writeIdentifier.setHeader();
         writeIdentifier.AppendConcept(ds, idTheso, idLang, selectedGroups, nodePreference);
+        message = writeIdentifier.getMessage();
         return writeIdentifier.getAllIdentifiers();
     }
     
@@ -102,6 +104,9 @@ public class ExportThesaurus {
         }
         return true;
     }    
-   
+
+    public StringBuffer getMessage() {
+        return message;
+    }
     
 }

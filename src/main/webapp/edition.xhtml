@@ -190,7 +190,7 @@
                                                     style="font-size: 12px;"/>
                                         <p:menuitem value="#{langueBean.getMsg('edit.exportAltlabel')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportAltLabel" oncomplete="PF('exportAltLabel').show();"
                                                     style="font-size: 12px;"/>
-                                        <p:menuitem value="#{langueBean.getMsg('edit.exportIdentifier')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportIdentifier" oncomplete="PF('exportIdentifier').show();"
+                                        <p:menuitem value="#{langueBean.getMsg('edit.exportIdentifier')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportIdentifier, :messages" oncomplete="PF('exportIdentifier').show();"
                                                     style="font-size: 12px;"/>
                                         <p:menuitem disabled="false" value="#{langueBean.getMsg('edit.exportAlignment')}" actionListener="#{skosExportBean.init(listTheso.value, theso.thisTheso.language)}" update=":idExportAlignment" oncomplete="PF('exportAlignment').show();"
                                                     style="font-size: 12px;"/>                                           

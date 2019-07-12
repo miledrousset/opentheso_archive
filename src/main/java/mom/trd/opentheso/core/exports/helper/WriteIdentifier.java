@@ -15,13 +15,9 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignmentSmall;
-import mom.trd.opentheso.bdd.helper.nodes.NodeEM;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
-import mom.trd.opentheso.bdd.helper.nodes.NodeTab2Levels;
-import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConcept;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
-import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 
 /**
  *
@@ -29,10 +25,16 @@ import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
  */
 public class WriteIdentifier {
 
-    StringBuilder stringBuilder;
+    private StringBuilder stringBuilder;
+    private StringBuffer message;
+    private int countTreated;
+    private int totalCount;
 
     public WriteIdentifier() {
         stringBuilder = new StringBuilder();
+        message = new StringBuffer();
+        countTreated = 0;
+        totalCount = 0;
     }
 
     public void setHeader() {
@@ -85,48 +87,64 @@ public class WriteIdentifier {
 
         for (NodeGroup selectedGroup : selectedGroups) {
             listIdConcept = conceptHelper.getAllIdConceptOfThesaurusByGroup(ds, idTheso, selectedGroup.getConceptGroup().getIdgroup());
+            totalCount = totalCount + listIdConcept.size();
+        }
+        for (NodeGroup selectedGroup : selectedGroups) {
+            listIdConcept = conceptHelper.getAllIdConceptOfThesaurusByGroup(ds, idTheso, selectedGroup.getConceptGroup().getIdgroup());
             for (String idConcept : listIdConcept) {
-
                 concept = conceptHelper.getThisConcept(ds, idConcept, idTheso);
                 if (concept == null) {
-                    continue;
-                }
-
-                // Uri
-                stringBuilder.append(getInternalUri(
-                        nodePreference.getCheminSite(), idConcept, idTheso));
-                stringBuilder.append("\t");
-
-                // Identifiants
-                stringBuilder.append(concept.getIdConcept());
-                stringBuilder.append("\t");
-
-                stringBuilder.append(concept.getIdArk());
-                stringBuilder.append("\t");
-
-                stringBuilder.append(concept.getIdHandle());
-                stringBuilder.append("\t");
-
-                // Label
-                term = termHelper.getThisTerm(ds, idConcept, idTheso, idLang);
-                if (term != null) {
-                    stringBuilder.append(term.getLexical_value());
-                    stringBuilder.append("\t");
+                    message.append("concept null :");
+                    message.append(idConcept);
+                    message.append("\n");
                 } else {
-                    stringBuilder.append(" ");
+                    // Uri
+                    stringBuilder.append(getInternalUri(
+                            nodePreference.getCheminSite(), idConcept, idTheso));
                     stringBuilder.append("\t");
-                }
 
-                // Definition
-                idTerme = termHelper.getIdTermOfConcept(ds, idConcept, idTheso);
-                nodeNote = noteHelper.getListNotesTerm(ds, idTerme, idTheso, idLang);
+                    // Identifiants
+                    stringBuilder.append(concept.getIdConcept());
+                    stringBuilder.append("\t");
 
-                if (nodeNote != null) {
-                    for (NodeNote nodeNote1 : nodeNote) {
-                        if (nodeNote1.getLang().equalsIgnoreCase("fr")) {
+                    stringBuilder.append(concept.getIdArk());
+                    stringBuilder.append("\t");
+
+                    stringBuilder.append(concept.getIdHandle());
+                    stringBuilder.append("\t");
+
+                    // Label
+                    term = termHelper.getThisTerm(ds, idConcept, idTheso, idLang);
+                    if (term != null) {
+                        note = term.getLexical_value().replace('\r', ' ');
+                        note = note.replace('\n', ' ');
+                        note = note.replace('\t', ' ');
+                        note = note.replace('\"', ' ');
+                        stringBuilder.append(note);
+                        stringBuilder.append("\t");
+                    } else {
+                        message.append("terme null :");
+                        message.append(idConcept);
+                        message.append("\n");                  
+                        stringBuilder.append(" ");
+                        stringBuilder.append("\t");
+                    }
+
+                    // Definition
+                    idTerme = termHelper.getIdTermOfConcept(ds, idConcept, idTheso);
+                    if(idTerme == null) {
+                        message.append("idTerm null pour le concept :");
+                        message.append(idConcept);
+                        message.append("\n");
+                    }
+                    nodeNote = noteHelper.getListNotesTerm(ds, idTerme, idTheso, idLang);
+                    if (nodeNote != null) {
+                        for (NodeNote nodeNote1 : nodeNote) {
                             if (nodeNote1.getNotetypecode().equalsIgnoreCase("definition")) {
                                 note = nodeNote1.getLexicalvalue().replace('\r', ' ');
                                 note = note.replace('\n', ' ');
+                                note = note.replace('\t', ' ');
+                                note = note.replace('\"', ' ');
                                 if (notePassed) {
                                     stringBuilder.append(" ## ");
                                 }
@@ -136,38 +154,46 @@ public class WriteIdentifier {
                             }
                         }
                     }
-                }
-                if (!passed) {
-                    stringBuilder.append(" ");                    
-                    stringBuilder.append("\t");
-                } else {
-                    stringBuilder.append("\t");
-                } 
-                passed = false;
-                notePassed = false;
-                // alignements
-                nodeAlignments = alignmentHelper.getAllAlignmentOfConceptNew(ds, idConcept, idTheso);
-                if (nodeAlignments != null) {
-                    for (NodeAlignmentSmall nodeAlignment : nodeAlignments) {
-                        if (notePassed) {
-                            stringBuilder.append(" ## ");
+                    if (!passed) {
+                        stringBuilder.append(" ");                    
+                        stringBuilder.append("\t");
+                    } else {
+                        stringBuilder.append("\t");
+                    } 
+                    passed = false;
+                    notePassed = false;
+                    // alignements
+                    nodeAlignments = alignmentHelper.getAllAlignmentOfConceptNew(ds, idConcept, idTheso);
+                    if (nodeAlignments != null) {
+                        for (NodeAlignmentSmall nodeAlignment : nodeAlignments) {
+                            note = nodeAlignment.getUri_target().replace('\r', ' ');
+                            note = note.replace('\n', ' ');
+                            note = note.replace('\t', ' ');
+                            note = note.replace('\"', ' ');
+                            if (notePassed) {
+                                stringBuilder.append(" ## ");
+                            }
+                            stringBuilder.append(note);
+                            passed = true;
+                            notePassed = true;
                         }
-                        stringBuilder.append(nodeAlignment.getUri_target());
-                        passed = true;
-                        notePassed = true;
                     }
+                    if (!passed) {
+                        stringBuilder.append(" ");                    
+                    }
+                    passed = false;
+                    notePassed = false;
+                    stringBuilder.append("\n");
+                    countTreated = countTreated + 1;
                 }
-                if (!passed) {
-                    stringBuilder.append(" ");                    
-                    stringBuilder.append("\t");
-                } else {
-                    stringBuilder.append("\t");
-                }
-                passed = false;
-                notePassed = false;
-                stringBuilder.append("\n");
             }
         }
+        message.append("total général = ");
+        message.append(totalCount);
+        stringBuilder.append("\n");
+        message.append("total traité = ");
+        message.append(countTreated);        
+        System.out.println("message = " + message.toString());
     }
     
 
@@ -179,6 +205,30 @@ public class WriteIdentifier {
 
     public StringBuilder getAllIdentifiers() {
         return stringBuilder;
+    }
+
+    public StringBuffer getMessage() {
+        return message;
+    }
+
+    public void setMessage(StringBuffer message) {
+        this.message = message;
+    }
+
+    public int getCountTreated() {
+        return countTreated;
+    }
+
+    public void setCountTreated(int countTreated) {
+        this.countTreated = countTreated;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
     }
 
 }

@@ -52,7 +52,6 @@ import skos.SKOSXmlDocument;
 import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
-import mom.trd.opentheso.ws.ark.ArkClientRest;
 import org.primefaces.model.StreamedContent;
 
 @ManagedBean(name = "theso", eager = true)

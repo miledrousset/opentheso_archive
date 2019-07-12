@@ -971,6 +971,10 @@ public class DownloadBean implements Serializable {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
         }
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        languageBean.getMsg("info") + " :", exportThesaurus.getMessage().toString()));
+        
         return file;        
     }    
     
