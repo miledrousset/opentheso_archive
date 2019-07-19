@@ -26,18 +26,19 @@ public class ConnexionTest {
         config.setConnectionTestQuery("SELECT 1");
         config.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
 
-        // Zoomathia
-//        config.addDataSourceProperty("user", "pactols");
-//        config.addDataSourceProperty("password", "pactols");
-//        config.addDataSourceProperty("databaseName", "pactols");
-//        config.addDataSourceProperty("portNumber", "5439");
-//        config.addDataSourceProperty("serverName", "localhost");
-        
+        // Pactols2
         config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");
-        config.addDataSourceProperty("databaseName", "pactolsprod");
+        config.addDataSourceProperty("databaseName", "pactols2");
+        config.addDataSourceProperty("portNumber", "5439");
+        config.addDataSourceProperty("serverName", "localhost");
+        
+/*        config.addDataSourceProperty("user", "opentheso");
+        config.addDataSourceProperty("password", "opentheso");
+        config.addDataSourceProperty("databaseName", "testFacettes");
         config.addDataSourceProperty("portNumber", "5439");
         config.addDataSourceProperty("serverName", "localhost");        
+*/
 
         /*      config.addDataSourceProperty("user", "pactols");
         config.addDataSourceProperty("password", "pactols");

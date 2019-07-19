@@ -14,6 +14,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.SelectedBeans.Connexion;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
+import mom.trd.opentheso.bdd.helper.ValidateActionHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import static mom.trd.opentheso.skosapi.SKOSProperty.Collection;
@@ -131,6 +132,13 @@ public class TreeChange {
      */
     public boolean moveConceptTermToConceptTermSameDomain(Connexion connect,String originNodeIdConcept,String BToriginNode,String targetNodeIdConcept,String idTheasurus,int idUser){
         ConceptHelper conceptHelper=new ConceptHelper();
+        ValidateActionHelper vah = new ValidateActionHelper();
+        if(!vah.isMoveConceptToConceptValid(connect.getPoolConnexion(),
+                idTheasurus,
+                targetNodeIdConcept,
+                originNodeIdConcept)) {
+            return false;
+        }
         return conceptHelper.moveBranch(connect.getPoolConnexion(),originNodeIdConcept,BToriginNode,targetNodeIdConcept,idTheasurus,idUser);
     }
     /**

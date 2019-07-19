@@ -7,8 +7,8 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.4.8
--- date : 04/06/2019
+-- version=4.5.1
+-- date : 19/07/2019
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -16,7 +16,10 @@
 
 --- fonctions à appliquer en premier et à part depuis la version 4.4.1
  SET ROLE = opentheso;
- CREATE EXTENSION IF NOT EXISTS unaccent;
+
+
+-- pour créer ces extensions, il faut avoir des privilèves SuperAdmin sur Postgres
+CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE OR REPLACE FUNCTION f_unaccent(text)
@@ -1788,7 +1791,7 @@ $$language plpgsql;
 --
 -- mise a jour de la table alignement (ajout d'une nouvelle contrainte)
 --
-create or replace function addConstraintTo_alignement() returns void as $$
+create or replace function addconstraintto_alignement() returns void as $$
 begin
     IF EXISTS(SELECT * FROM information_schema.constraint_table_usage where constraint_name ='alignement_internal_id_concept_internal_id_thesaurus_id_alignem') THEN
         execute 'ALTER TABLE alignement DROP CONSTRAINT alignement_internal_id_concept_internal_id_thesaurus_id_alignem;';
@@ -1911,7 +1914,7 @@ SELECT ajoutercolumn_alignement();
 
 UPDATE alignement SET id_alignement_source = 0  WHERE id_alignement_source  is null;
 --SELECT id_alignements();
-SELECT addConstraintTo_alignement();
+SELECT addconstraintto_alignement();
 --SELECT changeconstraintalignement();
 
 SELECT delete_constraint_term_changer_concept_historique();
@@ -2044,7 +2047,7 @@ $$language plpgsql;
 
 
 --fonction pour insérrer la colonne id_handle à la table concept_group
-create or replace function alter_table_concept_group_addColumn_id_handle() returns void as $$
+create or replace function alter_table_concept_group_addcolumn_id_handle() returns void as $$
 begin
     IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name='concept_group' AND column_name='id_handle' ) THEN
         execute 'ALTER TABLE concept_group ADD COLUMN id_handle character varying DEFAULT ''''::character varying;';
@@ -2140,7 +2143,7 @@ $$language plpgsql;
 -- mise à jour de la table préférences pour le lien permanent vers le thésaurus DNS
 -- ajout de la colonne preferredname 
 
-create or replace function update_table_preferences_preferredName() returns void as $$
+create or replace function update_table_preferences_preferredname() returns void as $$
     declare
 	line RECORD;
 	begin 
@@ -2155,7 +2158,7 @@ $$language plpgsql;
 ----------------------------------------------------------------------------
 -- mise à jour de la table images pour la gestion des URI externes 
 
-create or replace function update_table_imagesUri() returns void as $$
+create or replace function update_table_imagesuri() returns void as $$
     declare
 	line RECORD;
 	begin 
@@ -2225,28 +2228,28 @@ $$language plpgsql;
 
 -- execution des fonctions 
 SELECT update_table_iconcept_group_label_historique();
-SELECT alter_table_concept_group_addColumn_id_handle();
+SELECT alter_table_concept_group_addcolumn_id_handle();
 SELECT update_table_users();
 SELECT create_table_user_role_group();
 SELECT create_table_user_role_only_on();
 SELECT user_group_thesaurus();
 SELECT ajouter_sequence('user_group_label__id_seq');
 SELECT user_group_label();
-SELECT update_table_preferences_preferredName();
-SELECT update_table_imagesUri();
+SELECT update_table_preferences_preferredname();
+SELECT update_table_imagesuri();
 SELECT create_table_external_images();
 
 SELECT update_table_alignement_source();
 
 -- suppression des fonctions 
-select delete_fonction('alter_table_concept_group_addColumn_id_handle','');
+select delete_fonction('alter_table_concept_group_addcolumn_id_handle','');
 select delete_fonction('update_table_users','');
 select delete_fonction('create_table_user_role_group','');
 select delete_fonction('create_table_user_role_only_on','');
 select delete_fonction('user_group_thesaurus','');
 select delete_fonction('user_group_label','');
-select delete_fonction('update_table_preferences_preferredName','');
-select delete_fonction('update_table_imagesUri', '');
+select delete_fonction('update_table_preferences_preferredname','');
+select delete_fonction('update_table_imagesuri', '');
 select delete_fonction('create_table_external_images','');
 select delete_fonction('update_table_iconcept_group_label_historique','');
 
@@ -2310,11 +2313,11 @@ SELECT delete_fonction ('ajoutercolumn_alignement','');
 SELECT delete_fonction ('create_table_alignement_type','');
 SELECT delete_fonction ('create_table_note_type','');
 SELECT delete_fonction ('adjouteconstraint_alignement_source','');
---SELECT delete_fonction ('drop_constraint_alignement_source','');
---SELECT delete_fonction ('changeconstraintalignement','');
+SELECT delete_fonction ('drop_constraint_alignement_source','');
+SELECT delete_fonction ('changeconstraintalignement','');
 SELECT delete_fonction ('add_primary_keyalignement','');
---SELECT delete_fonction ('id_alignements','');
-SELECT delete_fonction ('addConstraintTo_alignement', '');
+SELECT delete_fonction ('id_alignements','');
+SELECT delete_fonction ('addconstraintto_alignement', '');
 SELECT delete_fonction ('add_primary_keyalignement_source','');
 SELECT delete_fonction ('updatesequencesalignement_source','');
 SELECT delete_fonction ('delete_constraint_term_changer_concept_historique','');

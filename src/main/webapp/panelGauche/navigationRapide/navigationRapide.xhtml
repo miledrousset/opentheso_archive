@@ -65,12 +65,6 @@
                                 <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
                                     <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
                                     <p:separator />                                    
-                                    
-                                    
-                                    
-                                    
-
-                                    
                                     <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (!newtreeBean.isGroup()) and (!newtreeBean.isSubGroup())
                                                         and (selectedTerme.idC != null)}"
                                         style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyBranch')}" 
@@ -78,18 +72,12 @@
                                                 styleClass="styleButton"  update=":accordeonTree,:messages" 
                                                 action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
                                                           selectedTerme.idC,selectedTerme.nom, true, false)}"/>  
-                                    
-                                    
-                                
                                     <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (newtreeBean.isGroup() or newtreeBean.isSubGroup())}"
                                         style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyGroup')}" 
                                                 title="!!! attention !!! Copie du groupe d'un thésaurus à un autre uniquement"
                                                 styleClass="styleButton"  update=":accordeonTree,:messages" 
                                                 action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
                                                           selectedTerme.idC, selectedTerme.nom ,false, true)}"/>
-
-
-                                    
                                     
                                     <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOfGroup) and
                                                         (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
@@ -116,10 +104,8 @@
                                 </p:menu>
                             </h:form>
                         </td>
-                       
                     </tr>
                 </table>
-
             </div>
         </h:panelGroup>
     </ui:composition>

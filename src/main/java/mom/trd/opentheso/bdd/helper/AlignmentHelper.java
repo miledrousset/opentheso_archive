@@ -181,7 +181,12 @@ public class AlignmentHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            log.error("Error while adding external alignement with target : " + uriTarget, sqle);
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                status = true;
+            } else {
+                log.error("Error while adding external alignement with target : " + uriTarget, sqle);
+                return false;
+            }
         }
         return status;
     }
@@ -413,8 +418,12 @@ public class AlignmentHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
+            if (sqle.getSQLState().equalsIgnoreCase("23505")) {
+                status = true;
+            } else {
             // Log exception
-            log.error("Error while updating Alignment : " + idAlignment, sqle);
+                log.error("Error while updating Alignment : " + idAlignment, sqle);
+            }
         }
         return status;
     }

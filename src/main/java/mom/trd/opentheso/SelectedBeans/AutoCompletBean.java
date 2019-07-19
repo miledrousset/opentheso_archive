@@ -21,6 +21,7 @@ import mom.trd.opentheso.bdd.helper.OrphanHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.SearchHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
+import mom.trd.opentheso.bdd.helper.ValidateActionHelper;
 import mom.trd.opentheso.bdd.helper.nodes.MyTreeNode;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
@@ -346,7 +347,14 @@ public class AutoCompletBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorRTNT")));
                 return;                 
             }
-            if(!isAddRelationRTValid(terme.getIdC(),selectedAtt.getIdConcept())) {
+            
+            ValidateActionHelper validateActionHelper = new ValidateActionHelper();
+            
+            if(!validateActionHelper.isAddRelationRTValid(
+                    connect.getPoolConnexion(),
+                    theso.getThesaurus().getId_thesaurus(),
+                    terme.getIdC(),
+                    selectedAtt.getIdConcept())) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorRTNT")));
                 return;    
             }
@@ -425,8 +433,14 @@ public class AutoCompletBean implements Serializable {
             return;
         }        
         
+        ValidateActionHelper validateActionHelper = new ValidateActionHelper();
+        
         // vérification si la relation est cohérente (NT et RT à la fois ?)  
-        if(!isAddRelationNTValid(terme.getIdC(), terme.getSelectedTermComp().getIdConcept())){
+        if(!validateActionHelper.isAddRelationNTValid(
+                connect.getPoolConnexion(),
+                theso.getThesaurus().getId_thesaurus(),
+                terme.getIdC(),
+                terme.getSelectedTermComp().getIdConcept())){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("relation.errorNTRT")));
             return;        
         } 
@@ -463,44 +477,7 @@ public class AutoCompletBean implements Serializable {
     
   
     
-    private boolean isAddRelationNTValid(String idConcept1, String idConcept2) {
-        RelationsHelper relationsHelper = new RelationsHelper();
-        if(idConcept1.equalsIgnoreCase(idConcept2)) return false;
-        
-        // relations RT et NT en même temps interdites
-        if(relationsHelper.isConceptHaveRelationRT(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }
-        
-        // relations BT et NT en même temps interdites
-        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }
-        
-        // relation entre frères est interdite 
-        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }        
-        
-        return true;
-    }
-    
-    private boolean isAddRelationRTValid(String idConcept1, String idConcept2) {
-        RelationsHelper relationsHelper = new RelationsHelper();
-        if(relationsHelper.isConceptHaveRelationNTorBT(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true) 
-            return false;
-        
-        // relation entre frères est interdite 
-        if(relationsHelper.isConceptHaveBrother(connect.getPoolConnexion(),
-                idConcept1, idConcept2, tree.getIdThesoSelected()) == true){ 
-            return false;
-        }         
-        return true;
-    }    
+  
     
 
     public void newSpecialTSpe() {

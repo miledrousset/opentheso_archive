@@ -3627,7 +3627,7 @@ public class ConceptHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT concept.id_concept"
+                    String query = "SELECT DISTINCT concept.id_concept"
                             + " FROM concept, concept_group_concept"
                             + " WHERE"
                             + " concept.id_concept = concept_group_concept.idconcept AND"

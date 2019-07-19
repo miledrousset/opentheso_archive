@@ -666,7 +666,6 @@ public class ImportRdf4jHelper {
         RelationsHelper relationsHelper = new RelationsHelper();
 
         for (HierarchicalRelationship hierarchicalRelationship : acs.hierarchicalRelationships) {
-            
             switch (hierarchicalRelationship.getRole()) {
                 case "NT":
                     if (!relationsHelper.insertHierarchicalRelation(ds,
@@ -722,10 +721,118 @@ public class ImportRdf4jHelper {
                         message.append(hierarchicalRelationship.getRole());
                     }             
                     break;
+                case "RT":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "RT",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }             
+                    break;
+                case "NTP":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "BTP",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }             
+                    break;
+                case "NTG":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "BTG",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }             
+                    break;
+                case "NTI":
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept1(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            hierarchicalRelationship.getRole(),
+                            hierarchicalRelationship.getIdConcept2())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }
+                    // pour créer la relation réciproque si elle n'existe pas
+                    if (!relationsHelper.insertHierarchicalRelation(ds,
+                            hierarchicalRelationship.getIdConcept2(),
+                            hierarchicalRelationship.getIdThesaurus(),
+                            "BTI",
+                            hierarchicalRelationship.getIdConcept1())) {
+                        //System.out.println("Erreur sur la relation = " + acs.concept.getIdConcept() + " ## " + hierarchicalRelationship.getRole());
+                        message.append(System.getProperty("line.separator"));
+                        message.append("Erreur sur la relation = ");
+                        message.append(acs.concept.getIdConcept());
+                        message.append(" ## ");
+                        message.append(hierarchicalRelationship.getRole());
+                    }             
+                    break;                     
             }
-            
-
         }
+        
+    //    addRelationNoBTHiera(acs);        
 
         // For Concept : customnote ; scopeNote ; historyNote
         // For Term : definition; editorialNote; historyNote;

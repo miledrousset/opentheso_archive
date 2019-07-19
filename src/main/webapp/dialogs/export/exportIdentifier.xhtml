@@ -51,7 +51,7 @@
                         <br/>
                         <p:commandButton value="#{langueBean.getMsg('edit.export')}" icon="ui-icon-valider" 
                                          ajax="false" onclick="PrimeFaces.monitorDownload(start_export_Identifier, stop_export_Identifier);PF('pbAjaxIdentifier').start();" 
-                                         update=":idExportIdentifier"> 
+                                         update=":idExportIdentifier,:messages"> 
                             <p:fileDownload value="#{downloadBean.getIdentifiers(skosExportBean.idTheso, 
                                                      skosExportBean.singleLanguageCodeSelected, skosExportBean.selectedGroups)}" />  
                         </p:commandButton>
