@@ -46,7 +46,6 @@
                         
                         <!-- gestion des domaines ou groupes --> 
                         <td align="left">
-                            
                             <h:form id="formAjDom" rendered="#{(currentUser.user != null) and (theso.getThisTheso() != null)
                                                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}">
                                 <p:commandButton id="cbAjDom" styleClass="cbEdit" icon="ui-icon-edit-16" title="#{langueBean.getMsg('cdt.MT')}"/>
@@ -54,53 +53,6 @@
                                     <p:menuitem value="#{langueBean.getMsg('add.group')}" actionListener="#{groupManager.init()}" action="#{addGroup.init()}" update=":idGroupAddDlg, :accordeonTree" oncomplete="PF('groupAddDlg').show();" style="font-size: 12px;"/>
                                     <p:menuitem value="#{langueBean.getMsg('add.subGroup')}" actionListener="#{groupManager.init()}" action="#{addSubGroup.init(newtreeBean.selectedTerme.idDomaine,newtreeBean.selectedTerme.idTheso)}"
                                                 update=":idSubGroupAddDlg" oncomplete="PF('subGroupAddDlg').show();" style="font-size: 12px;"/>
-                                </p:menu>
-                            </h:form>
-                        </td>
-                        <!-- boite à outils admins -->
-                        
-                        <td align="right">
-                            <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
-                                <p:commandButton id="tools" styleClass="cbEdit" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
-                                <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
-                                    <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
-                                    <p:separator />                                    
-                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (!newtreeBean.isGroup()) and (!newtreeBean.isSubGroup())
-                                                        and (selectedTerme.idC != null)}"
-                                        style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyBranch')}" 
-                                                title="!!! attention !!! Copie d'un thésaurus à un autre uniquement"
-                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
-                                                action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
-                                                          selectedTerme.idC,selectedTerme.nom, true, false)}"/>  
-                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (newtreeBean.isGroup() or newtreeBean.isSubGroup())}"
-                                        style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyGroup')}" 
-                                                title="!!! attention !!! Copie du groupe d'un thésaurus à un autre uniquement"
-                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
-                                                action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
-                                                          selectedTerme.idC, selectedTerme.nom ,false, true)}"/>
-                                    
-                                    <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOfGroup) and
-                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
-                                                        and (selectedTerme.idC != null)}"
-                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteBranch')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
-                                                title="Coller la branche qui a été copié d'un autre thésaurus"
-                                                styleClass="styleButton" 
-                                                update=":idCopyAndPastebetweenTheso" 
-                                                oncomplete="PF('copyAndPastebetweenTheso').show();"/>  
-                                    
-                                    <p:menuitem rendered ="#{(copyAndPastebetweenTheso.isCopyOfGroup) and
-                                                        (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)}"
-                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteGroup')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
-                                                title="Coller le Groupe qui a été copié d'un autre thésaurus"
-                                                styleClass="styleButton"
-                                                update=":idCopyAndPastebetweenTheso" 
-                                                oncomplete="PF('copyAndPastebetweenTheso').show();"/>                                    
-                                    
-                                    <p:menuitem rendered ="#{copyAndPastebetweenTheso.isCopyOn}"
-                                                style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.cancelCopy')}" 
-                                                title=" Annuler l'action de copie"
-                                                styleClass="styleButton"  update=":accordeonTree,:messages" 
-                                                action="#{copyAndPastebetweenTheso.initInfo()}"/>                                    
                                 </p:menu>
                             </h:form>
                         </td>

@@ -198,6 +198,14 @@ input[type="button"], input[type="submit"]{
     box-shadow: none;
 }
 
+.cbTool{
+    background: none;
+    height: 24px;
+    width: 50px;
+    border: none;
+    box-shadow: none;
+}
+
 .ui-widget-content .cbEdit{
     background: none;
     height: 20px;
@@ -448,12 +456,21 @@ input[type="button"], input[type="submit"]{
 /***********************************Nouvelles icones / iconsDB icondb***********************************/
 /* custom color #69B019   #284309 */
 
+.ui-icon-tool-box-16 {
+    background: url("../images/tool-box-16.png") no-repeat !important;
+    background: none;
+    border-radius: 0px;
+    height: 24px;
+    width: 24px;     
+}
+
 .ui-icon-import-16 {
     background: url("../images/import.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 
 }
+
 
 .ui-icon-download-24 {
     background: url("../images/download-2-24.png") no-repeat !important;

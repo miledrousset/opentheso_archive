@@ -1,0 +1,57 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+    ]>
+    <ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+
+        <h:panelGroup  id="buttonMenuPanel2">
+                        <h:form id="formTools" rendered="#{currentUser.user.name != null and theso.getThisTheso() != null and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}">
+                            <p:commandButton style="background: #f5f5f5" id="tools" styleClass="cbTool" icon="ui-icon-tool" title="#{langueBean.getMsg('tools.messageTools')}"/>
+                            <p:menu style="background: #CEF0C4" overlay="true" trigger="tools" my="left top" at="left bottom"> 
+                                <p:menuitem style="background: #CEF0C4" value="#{langueBean.getMsg('conf.reorganizing')}"  update=":idReorganizing" oncomplete="PF('reorganizing').show();" styleClass="styleButton"/>
+                                <p:separator />                                    
+                                <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (!newtreeBean.isGroup()) and (!newtreeBean.isSubGroup())
+                                                    and (selectedTerme.idC != null)}"
+                                    style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyBranch')}" 
+                                            title="!!! attention !!! Copie d'un thésaurus à un autre uniquement"
+                                            styleClass="styleButton"  update=":formTools,:messages" 
+                                            action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
+                                                      selectedTerme.idC,selectedTerme.nom, true, false)}"/>  
+                                <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOn) and (newtreeBean.isGroup() or newtreeBean.isSubGroup())}"
+                                    style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.copyGroup')}" 
+                                            title="!!! attention !!! Copie du groupe d'un thésaurus à un autre uniquement"
+                                            styleClass="styleButton"  update=":formTools,:messages" 
+                                            action="#{copyAndPastebetweenTheso.copy(selectedTerme.idTheso,
+                                                      selectedTerme.idC, selectedTerme.nom ,false, true)}"/>
+
+                                <p:menuitem rendered ="#{(!copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                    (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
+                                                    and (selectedTerme.idC != null)}"
+                                            style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteBranch')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
+                                            title="Coller la branche qui a été copié d'un autre thésaurus"
+                                            styleClass="styleButton" 
+                                            update=":idCopyAndPastebetweenTheso" 
+                                            oncomplete="PF('copyAndPastebetweenTheso').show();"/>  
+
+                                <p:menuitem rendered ="#{(copyAndPastebetweenTheso.isCopyOfGroup) and
+                                                    (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)}"
+                                            style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.pasteGroup')} : #{copyAndPastebetweenTheso.conceptValueToCopy}" 
+                                            title="Coller le Groupe qui a été copié d'un autre thésaurus"
+                                            styleClass="styleButton"
+                                            update=":idCopyAndPastebetweenTheso" 
+                                            oncomplete="PF('copyAndPastebetweenTheso').show();"/>                                    
+
+                                <p:menuitem rendered ="#{copyAndPastebetweenTheso.isCopyOn}"
+                                            style="background: #CEF0C4"  value="#{langueBean.getMsg('tools.cancelCopy')}" 
+                                            title=" Annuler l'action de copie"
+                                            styleClass="styleButton"  update=":formTools,:messages" 
+                                            action="#{copyAndPastebetweenTheso.initInfo()}"/>                                    
+                            </p:menu>
+                        </h:form>
+
+        </h:panelGroup>
+    </ui:composition>

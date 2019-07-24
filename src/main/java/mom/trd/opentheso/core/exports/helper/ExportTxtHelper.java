@@ -515,6 +515,7 @@ public class ExportTxtHelper {
         }
         
         first = true;
+        String note;
         // on écrit les notes de type Term
         if (selectedOptions.contains("notes")) {
             if ( (!nodeConcept.getNodeNotesTerm().isEmpty()) || (!nodeConcept.getNodeNotesConcept().isEmpty()) ) {
@@ -523,14 +524,18 @@ public class ExportTxtHelper {
                     if (!first)
                         txtBuff.append("\t");
             //        txtBuff.append("noteT: ");
-                    txtBuff.append(stringPlus.clearNewLine(nodeNote.getLexicalvalue()));
+                    note = stringPlus.clearNewLine(nodeNote.getLexicalvalue());
+                    note = note.replace('\"', ' ');
+                    txtBuff.append(note);
                     first = false;
                 }
                 for (NodeNote nodeNote : nodeConcept.getNodeNotesConcept()) {
                     if (!first)
                         txtBuff.append("\t");
             //        txtBuff.append("noteC: ");
-                    txtBuff.append(stringPlus.clearNewLine(nodeNote.getLexicalvalue()));
+                    note = stringPlus.clearNewLine(nodeNote.getLexicalvalue());
+                    note = note.replace('\"', ' ');            
+                    txtBuff.append(note);
                     first = false;
                 }                 
             }
@@ -539,7 +544,8 @@ public class ExportTxtHelper {
                         (nodeConcept.getNodeNotesConcept().size() + nodeConcept.getNodeNotesTerm().size())
                                 );
             }             
-        }        
+        }
+        
         txtBuff.append("\n");
     }
 

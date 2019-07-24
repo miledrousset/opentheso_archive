@@ -23,7 +23,12 @@
                             <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/>
                             <p:selectBooleanCheckbox value="#{currentUser.userEdit.isAlertMail}" />                          
                         </p:panelGrid>
-                        <br/>
+                         <br/>
+                    </td> 
+                    <td style="text-align: left;">
+                        <p:commandButton rendered="#{(roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}"
+                                        value="init password" 
+                                        styleClass="styleButton" oncomplete="PF('initPassword').show();"/>
                     </td>
                 </tr>
                 <tr>

@@ -94,6 +94,9 @@ public class CurrentUser2 implements Serializable {
     private String versionOfOpentheso;
 
     private boolean isActive = false;
+    
+    private String password5;
+    
 
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
@@ -184,6 +187,17 @@ public class CurrentUser2 implements Serializable {
         roleAdded = -1;
         groupAdded = "";
         initAuthorizedRoles();
+    }
+    
+    public void initPassword() {
+        if(password5 == null) {
+            return;
+        }
+        UserHelper2 userHelper2 = new UserHelper2();
+        if(!userHelper2.updatePwd(connect.getPoolConnexion(), userEdit.getIdUser(), MD5Password.getEncodedPassword(password5))) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("BDD" + " :", "Error"));
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("user.info1")));
     }
     
     public void setLists() {
@@ -1253,6 +1267,14 @@ public class CurrentUser2 implements Serializable {
 
     public void setUserSelected(int userSelected) {
         this.userSelected = userSelected;
+    }
+
+    public String getPassword5() {
+        return password5;
+    }
+
+    public void setPassword5(String password5) {
+        this.password5 = password5;
     }
 
 

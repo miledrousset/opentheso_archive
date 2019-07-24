@@ -10,8 +10,10 @@
         <h:form>
                     <p:messages showDetail="true">
                         <p:autoUpdate />
-                    </p:messages>     
-            <h:inputTextarea value="#{note.noteApplication}" styleClass="areaNote" /><br/>
+                    </p:messages>
+            <p:inputTextarea value="#{note.noteApplication}" rows="20" cols="53" />
+
+            <br/>
                 <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider"
                                  actionListener="#{note.editNoteApp(selectedTerme.idC, selectedTerme.idT, selectedTerme.idTheso, selectedTerme.idlangue)}"
                              update=":panEditNote,:note, :idNotedApplicationEditDlg" styleClass="styleButton" oncomplete="PF('notedApplicationEditDlg').hide();"/>

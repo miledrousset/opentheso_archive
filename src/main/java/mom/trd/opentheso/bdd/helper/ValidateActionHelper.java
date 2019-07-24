@@ -101,10 +101,10 @@ public class ValidateActionHelper {
             return false;
         
         // relation entre frères est interdite 
-        if(relationsHelper.isConceptHaveBrother(ds,
+/*        if(relationsHelper.isConceptHaveBrother(ds,
                 idConcept, idConceptToAdd, idTheso) == true){ 
             return false;
-        }         
+        }*/         
         return true;
     }     
     

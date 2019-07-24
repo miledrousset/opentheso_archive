@@ -1956,19 +1956,20 @@ public class UserHelper2 {
         return existe;
     }    
     
-    public void updatePwd(HikariDataSource ds, int idUser, String newPwd) {
+    public boolean updatePwd(HikariDataSource ds, int idUser, String newPwd) {
         Connection conn;
         Statement stmt;
+        boolean status = false;
         try {
             // Get connection from pool
             conn = ds.getConnection();
-
             try {
                 stmt = conn.createStatement();
                 try {
                     String query = "UPDATE users set password = '" + newPwd
                             + "' WHERE id_user = " + idUser;
                     stmt.executeUpdate(query);
+                    status = true;
                 } finally {
                     stmt.close();
                 }
@@ -1978,6 +1979,7 @@ public class UserHelper2 {
         } catch (SQLException ex) {
             Logger.getLogger(UserHelper_old.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return status;
     }    
     
     public void updatePseudo(HikariDataSource ds, int idUser, String pseudo) {

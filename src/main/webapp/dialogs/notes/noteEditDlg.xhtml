@@ -11,7 +11,9 @@
                     <p:messages showDetail="true">
                         <p:autoUpdate />
                     </p:messages>   
-            <h:inputTextarea value="#{note.note}" styleClass="areaNote" /><br/>
+            <p:inputTextarea value="#{note.note}" rows="20" cols="53" />
+            <!-- <h:inputTextarea value="{note.note}" styleClass="areaNote" /> -->
+            <br/>
             
             <br/>
                 <p:commandButton id="cbEditDef" title="#{langueBean.getMsg('cdt.validCdt')}" icon="ui-icon-valider"

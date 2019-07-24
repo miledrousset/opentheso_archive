@@ -34,7 +34,7 @@
                                                         (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)
                                                         and (selectedTerme.idC != null)}"
                     title="Coller la branche qui a été copié d'un autre thésaurus"
-                    update=":accordeonTree,:messages"
+                    update=":formTools,:messages"
                     icon="ui-icon-valider" styleClass="styleButton"
                     action="#{copyAndPastebetweenTheso.paste(selectedTerme.idTheso, selectedTerme.idC, selectedTerme, roleOnTheso, newtreeBean)}"
                     oncomplete="PF('copyAndPastebetweenTheso').hide();"
@@ -43,7 +43,7 @@
             <p:commandButton  rendered ="#{(copyAndPastebetweenTheso.isCopyOfGroup) and
                                                         (copyAndPastebetweenTheso.isCopyOn) and (selectedTerme.idTheso != copyAndPastebetweenTheso.fromIdTheso)}"
                     title="Coller le Groupe qui a été copié d'un autre thésaurus"
-                    update=":accordeonTree,:messages"
+                    update=":formTools,:messages"
                     icon="ui-icon-valider" styleClass="styleButton"
                     action="#{copyAndPastebetweenTheso.pasteGroup(roleOnTheso.idTheso, roleOnTheso, newtreeBean, theso)}"
                     oncomplete="PF('copyAndPastebetweenTheso').hide();"

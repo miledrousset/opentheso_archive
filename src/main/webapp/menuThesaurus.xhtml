@@ -12,6 +12,7 @@
             <p:panel id="panelMenu"   styleClass="panelNoBorder"> 
                 <div id="onglets">
                     <div id="listeMenu" > 
+
                         <h:outputLink value="index.xhtml"><h:outputText  value="#{langueBean.getMsg('theso')}"/></h:outputLink>&nbsp;
                         <h:outputLink rendered="#{(currentUser.user != null)}" onclick="#{currentUser.reGetUser()}" value="profiles.xhtml">
                         <h:outputText value="#{langueBean.getMsg('menu.div5')}" /></h:outputLink>&nbsp;                        
@@ -35,6 +36,7 @@
                                                   (roleOnTheso.idTheso != null) and
                                                   (roleOnTheso.isAdminOnThisTheso || currentUser.user.isSuperAdmin)}" value="statistic.xhtml">
                         <h:outputText value="Statistiques" /></h:outputLink>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>   
                 </div>
             </p:panel>
