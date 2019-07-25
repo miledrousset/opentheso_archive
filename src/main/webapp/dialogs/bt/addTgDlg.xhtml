@@ -22,19 +22,19 @@
                             <td>
                                 <p:autoComplete id="addRelationNT" value="#{autoComp.selectedAtt}" completeMethod="#{autoComp.getAutoCompletForRelationBT}" var="concept"
                                                 forceSelection="true" active="true"   scrollHeight="300"
-                                                itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter">
-                                    <p:column style="width:10%">
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.idConcept}"  />
-                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.idConcept}"/>
+                                                itemLabel="#{concept.prefLabel}" itemValue="#{concept}" converter="termConverter" style="font-size: 12px;">
+                                    <p:column style="width:60%; font-size: 12px;" rendered="#{concept.isAltLabel}">
+                                        <h:outputText title="#{concept.idConcept}" value="#{concept.altLabel}"
+                                                          style="font-style: italic;" />
+                                        <h:outputText title="#{concept.idConcept}" value=" -> #{concept.prefLabel}" style="color: blue" /> 
                                     </p:column>
-
-                                    <p:column style="width:60%">
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.prefLabel}"  style="font-style: italic; color: palegreen" />
-                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.prefLabel}" />
+                                    
+                                    <p:column style="width:60%; font-size: 12px;" rendered="#{!concept.isAltLabel}">
+                                        <h:outputText title="#{concept.idConcept}" value="#{concept.prefLabel}" />
                                     </p:column>
-                                    <p:column>
-                                        <h:outputText rendered="#{concept.isAltLabel}" value="#{concept.groupLexicalValue}"  />
-                                        <h:outputText rendered="#{!concept.isAltLabel}" value="#{concept.groupLexicalValue}" />
+                                    
+                                    <p:column style="font-size: 12px;">
+                                        <h:outputText value="#{concept.groupLexicalValue}" />
                                     </p:column>
                                 </p:autoComplete>
                             </td>
