@@ -7,8 +7,8 @@
 --
 --  !!!!!!! Attention !!!!!!!!! 
 
--- version=4.5.1
--- date : 19/07/2019
+-- version=4.5.2
+-- date : 25/07/2019
 --
 -- n'oubliez pas de définir le role suivant votre installation 
 --
@@ -18,7 +18,12 @@
  SET ROLE = opentheso;
 
 
+
+
+
+-- !!! Important !!!
 -- pour créer ces extensions, il faut avoir des privilèves SuperAdmin sur Postgres
+--
 CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
@@ -27,8 +32,11 @@ CREATE OR REPLACE FUNCTION f_unaccent(text)
 $func$
 SELECT public.unaccent('public.unaccent', $1)
 $func$  LANGUAGE sql IMMUTABLE;
-
+--
 --- fin des fonctions à appliquer en premier et à part
+
+
+
 
 
 
