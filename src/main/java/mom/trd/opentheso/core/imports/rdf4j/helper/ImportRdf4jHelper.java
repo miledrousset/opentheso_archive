@@ -397,11 +397,15 @@ public class ImportRdf4jHelper {
      * @return
      * @throws java.sql.SQLException
      */
-    public String addThesaurus() throws SQLException {
+    public boolean addThesaurus() throws SQLException {
         thesaurus = new Thesaurus();
 
         SKOSResource conceptScheme = skosXmlDocument.getConceptScheme();
-
+        if(conceptScheme == null) {
+            message.append("Erreur SKOS !!! manque balise conceptSheme");
+            return false;
+        }
+        
         String creator = null;
         String contributor = null;
 
@@ -427,7 +431,8 @@ public class ImportRdf4jHelper {
         if ((idTheso1 = thesaurusHelper.addThesaurusRollBack(conn, "", false)) == null) {
             conn.rollback();
             conn.close();
-            return null;
+            message.append("Erreur lors de la création du thésaurus");            
+            return false;
         }
         // Si le Titre du thésaurus n'est pas detecter, on donne un nom par defaut
         if (skosXmlDocument.getConceptScheme().getLabelsList().isEmpty()) {
@@ -449,7 +454,8 @@ public class ImportRdf4jHelper {
             if (!thesaurusHelper.addThesaurusTraductionRollBack(conn, thesaurus)) {
                 conn.rollback();
                 conn.close();
-                return null;
+                message.append("Erreur lors de la création des traductions du thésaurus"); 
+                return false;
             }
         }
 
@@ -460,7 +466,8 @@ public class ImportRdf4jHelper {
                     idGroupUser)) {
                 conn.rollback();
                 conn.close();
-                return null;
+                message.append("Erreur lors de l'ajout du thésaurus au projet"); 
+                return false;
             }
         }
         conn.commit();
@@ -470,8 +477,7 @@ public class ImportRdf4jHelper {
         for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
             hasTopConcceptList.add(relation.getTargetUri());
         }
-
-        return null;
+        return true;
     }
 
     public void addGroups(rdf4jFileBean fileBean) {

@@ -614,7 +614,11 @@ public class rdf4jFileBean implements Serializable {
             importRdf4jHelper.setNodePreference(roleOnTheso.getNodePreference());
             importRdf4jHelper.setRdf4jThesaurus(sKOSXmlDocument);
             try {
-                importRdf4jHelper.addThesaurus();
+                if(!importRdf4jHelper.addThesaurus()) {
+                    error.append(importRdf4jHelper.getMessage());
+                    showError();
+                    return;
+                }
             } catch (SQLException ex) {
                 error.append(System.getProperty("line.separator"));
                 error.append(ex.getMessage());
