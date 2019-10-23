@@ -124,7 +124,7 @@ public class GroupHelper {
         conceptGroupLabel.setIdthesaurus(idTheso);
 
         conceptGroupLabel.setLang(idLang);
-        conceptGroupLabel.setLexicalvalue("Orphelins");
+        conceptGroupLabel.setLexicalvalue("NoGroup");
         addGroupTraduction(ds, conceptGroupLabel, 1);
         return true;
     }    

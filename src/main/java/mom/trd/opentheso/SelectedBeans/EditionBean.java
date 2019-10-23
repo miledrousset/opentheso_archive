@@ -5,7 +5,6 @@
  */
 package mom.trd.opentheso.SelectedBeans;
 
-import com.google.common.collect.HashBiMap;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;

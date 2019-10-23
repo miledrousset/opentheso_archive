@@ -7,6 +7,23 @@
 
 -- Started on 2019-07-25 13:49:05 CEST
 
+--
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- !!!!!!!!!!!!!!!!! Important !!!!!!!!!!!!!!!!!!!
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- pour créer ces extensions, il faut avoir des privilèves Superuser sur Postgres
+--
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
+COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
+--
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- !!!!!!!!!!!!!!!!! Fin !!!!!!!!!!!!!!!!!!!
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 
 -- version=4.5.2
 
@@ -19,38 +36,6 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- TOC entry 3 (class 3079 OID 55333)
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- TOC entry 3938 (class 0 OID 0)
--- Dependencies: 3
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
--- TOC entry 2 (class 3079 OID 55410)
--- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
-
-
---
--- TOC entry 3939 (class 0 OID 0)
--- Dependencies: 2
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
 
 
 --

@@ -28,7 +28,9 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import mom.trd.opentheso.core.alignment.SelectedResource;
+import mom.trd.opentheso.core.alignment.helper.GettyAATHelper;
 import mom.trd.opentheso.core.alignment.helper.IdRefHelper;
+import mom.trd.opentheso.core.alignment.helper.OpenthesoHelper;
 import mom.trd.opentheso.core.alignment.helper.WikidataHelper;
 
 /**
@@ -470,7 +472,7 @@ public class Alignment {
             }
         }
         // si l'alignement est de type Wikidata, on récupère la liste des concepts pour préparer le choix de l'utilisateur
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("wikidata")) {
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("wikidata")) {
             getAlignmentWikidata(
                     selectedAlignementSource,
                     idTheso,
@@ -480,7 +482,7 @@ public class Alignment {
         }
         
         // ici  IdRef pour les sujets
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefSujets")) {
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefSujets")) {
             getAlignmentIdRefSubject(
                     selectedAlignementSource,
                     idTheso,
@@ -490,7 +492,7 @@ public class Alignment {
         }
         
         // ici  IdRef pour les noms
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefPersonnes")) {
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefPersonnes")) {
             getAlignmentIdRefPerson(
                     selectedAlignementSource,
                     idTheso,
@@ -500,7 +502,7 @@ public class Alignment {
         }         
         
         // ici  IdRef pour les noms
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("idRefAuteurs")) {
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefAuteurs")) {
             getAlignmentIdRefNames(
                     selectedAlignementSource,
                     idTheso,
@@ -508,9 +510,25 @@ public class Alignment {
                     idLang);
         }
         
-        
+        // ici  AAT du Getty
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("Getty_AAT")) {
+            getAlignmentGettyAAT(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }        
         
         // ici pour un alignement de type Opentheso
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("Opentheso")) {
+            getAlignmentOpentheso(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }          
         
         
         
@@ -655,6 +673,79 @@ public class Alignment {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
         }
     } 
+    
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentGettyAAT(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        GettyAATHelper gettyAATHelper = new GettyAATHelper();
+        
+        // action XML
+        //ici il faut appeler le filtre du Getty AAT 
+        listAlignValues = gettyAATHelper.queryAAT(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected",
+                    gettyAATHelper.getMessages()));
+        }
+    }
+    
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentOpentheso(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        OpenthesoHelper openthesoHelper = new OpenthesoHelper();
+        
+        // action XML
+        //ici il faut appeler le filtre du Getty AAT 
+        listAlignValues = openthesoHelper.queryOpentheso(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected",
+                    openthesoHelper.getMessages()));
+        }
+    }     
+    
 
     /**
      * initialisation des valeurs du concept local pour comparaison avec le concept à aligner
@@ -712,6 +803,9 @@ public class Alignment {
         // si l'alignement est de type IdRef
 
 
+        // si l'alignement est de type Getty_AAT
+        
+        
         // si l'alignement est de type Opentheso
         
         

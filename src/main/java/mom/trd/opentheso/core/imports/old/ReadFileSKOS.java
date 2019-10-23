@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 
 import javax.xml.stream.*;
-import org.xml.sax.InputSource;
 
 import skos.SKOSConceptScheme;
 import skos.SKOSProperty;

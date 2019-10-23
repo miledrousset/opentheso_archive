@@ -371,7 +371,7 @@ public class CsvReadHelper {
             values = value.split("##");
             for (String value1 : values) {
                 if(!value1.isEmpty()) {
-                    conceptObject.narrowers.add(getId(value.trim()));
+                    conceptObject.narrowers.add(getId(value1.trim()));
                 }
             }            
         } catch (Exception e) {
@@ -383,7 +383,7 @@ public class CsvReadHelper {
             values = value.split("##");
             for (String value1 : values) {
                 if(!value1.isEmpty()) {
-                    conceptObject.broaders.add(getId(value.trim()));
+                    conceptObject.broaders.add(getId(value1.trim()));
                 }
             }            
         } catch (Exception e) {
@@ -395,7 +395,7 @@ public class CsvReadHelper {
             values = value.split("##");
             for (String value1 : values) {
                 if(!value1.isEmpty()) {
-                    conceptObject.relateds.add(getId(value.trim()));
+                    conceptObject.relateds.add(getId(value1.trim()));
                 }
             }
         } catch (Exception e) {

@@ -156,6 +156,7 @@ public class TermHelper {
     public boolean addLinkTerm(Connection conn,
             Term term, String idConcept, int idUser) {
 
+        boolean status = false;
         Statement stmt;
         try {
             // Get connection from pool
@@ -171,7 +172,7 @@ public class TermHelper {
                             + ",'" + term.getId_thesaurus() + "')";
 
                     stmt.executeUpdate(query);
-
+                    status = true;
                 } finally {
                     stmt.close();
                 }
@@ -180,12 +181,11 @@ public class TermHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            System.out.println(sqle);
-            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
-                return false;
-            }
+          //  System.out.println(sqle);
+            if (sqle.getSQLState().equalsIgnoreCase("23505"))
+                status = true;
         }
-        return true;
+        return status;
     }
 
     /**
@@ -355,9 +355,10 @@ public class TermHelper {
             }
         } catch (SQLException sqle) {
             // Log exception
-            if (!sqle.getMessage().contains("duplicate key value violates unique constraint")) {
+            if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding Term Import : " + idTerm_import, sqle);
-            }
+            } else
+                resultat = true;
         }
         return resultat;
     }
@@ -763,7 +764,7 @@ public class TermHelper {
                             + ", " + term.getContributor()
                             + ", " + term.getCreator() + ")";
 
-                    stmt.execute(query);
+                    stmt.executeUpdate(query);
                     addNewTermHistorique(conn, term, idUser);
                 } finally {
                     stmt.close();

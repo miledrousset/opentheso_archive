@@ -14,6 +14,8 @@ import mom.trd.opentheso.bdd.tools.AsciiUtils;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Connection;
@@ -35,6 +37,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonException;
@@ -1467,6 +1470,25 @@ public class SelectedTerme implements Serializable {
         if (valueEdit == null || valueEdit2 == null || linkEdit == null || /*valueEdit.equals("") || valueEdit2.equals("") ||*/ linkEdit.equals("")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", langueBean.getMsg("sTerme.error5")));
         } else {
+            
+            // validation de l'URL
+            if( !((linkEdit.startsWith("http://", 0)) || (linkEdit.startsWith("https://", 0)))) {
+               if(!linkEdit.startsWith("https://", 0)) {
+                    linkEdit =  "http://" + linkEdit;
+               } else {
+                   linkEdit =  "https://" + linkEdit;
+               }
+            }
+
+            try {
+               new URI(linkEdit);
+            } catch (URISyntaxException e) {
+               FacesMessage msg =
+                  new FacesMessage("URL validation failed","Invalid URL format");
+               msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+               return;
+            }
+            
             alignmentHelper.addNewAlignment(connect.getPoolConnexion(),
                     user.getUser().getIdUser(), valueEdit2.trim(), valueEdit.trim(),
                     linkEdit.trim(), Integer.parseInt(statutEdit), idC, idTheso, 0);

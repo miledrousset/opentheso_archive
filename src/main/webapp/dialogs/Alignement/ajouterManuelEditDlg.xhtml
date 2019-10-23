@@ -27,7 +27,10 @@
                 <tr>
                     <td>URI : </td>
                     <td>
-                        <h:inputText value="#{selectedTerme.linkEdit}"/>
+                        <h:inputText id="urlInput" value="#{selectedTerme.linkEdit}" label="URL" >
+                            <f:validator validatorId="urlValidator" />
+                         </h:inputText>
+                         <h:message for = "urlInput" style = "color:red" />
                     </td>
                 </tr>
                 <tr>
@@ -41,7 +44,8 @@
             </table>
             <br/>
             <p:commandButton id="cbAjAlignManu" value="#{langueBean.getMsg('btnAdd')}" actionListener="#{selectedTerme.creerAlign()}"
-                             update=":panContenu" styleClass="styleButton" oncomplete="PF('ajouterManuelEditDlg').hide();"/>
+                             update=":panContenu, :messages" styleClass="styleButton" oncomplete="PF('ajouterManuelEditDlg').hide();"/>
+           
         </h:form>
     </p:dialog>
 </ui:composition>

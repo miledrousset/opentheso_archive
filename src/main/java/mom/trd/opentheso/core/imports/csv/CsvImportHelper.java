@@ -157,38 +157,6 @@ public class CsvImportHelper {
         
         // géolocalisation
         addGeoLocalisation(ds, idTheso, conceptObject);
-
-        
-        
-/*        
-        NoteHelper noteHelper = new NoteHelper();
-        // add définition
-        if (idConcept != null) {
-            for (CsvReadHelper.Label definition : conceptObject.getDefinitions()) {
-                noteHelper.addTermNote(ds, idTerm,
-                        definition.getLang(),
-                        idTheso,
-                        definition.getLabel(),
-                        "definition", idUser);
-            }
-        }
-        // add altLabel
-        if (idConcept != null) {
-            for (CsvReadHelper.Label altLabel : conceptObject.getAltLabels()) {
-                term.setId_term(idTerm);
-                term.setId_thesaurus(idTheso);
-                term.setLang(altLabel.getLang());
-                term.setLexical_value(altLabel.getLabel());
-                term.setHidden(false);
-                term.setStatus("USE");
-                term.setSource("");
-
-                if (!termHelper.addNonPreferredTerm(ds,
-                        term, idUser)) {
-                    message = message + "\n" + "erreur dans l'intégration du synonyme : " + altLabel.getLabel();
-                }
-            }
-        }*/
     }
 
     /**
@@ -230,17 +198,19 @@ public class CsvImportHelper {
                         return false;
                     }
                     break;
-                case "":
+    /*           case "":
                     // ajout de concept
                     if (!addConcept(ds, idTheso, conceptObject1)) {
                         return false;
                     }
-                    break;
-                default:
+                    break;*/
+                case "skos:collection":
                     // ajout de groupe
                     if (!addGroup(ds, idTheso, conceptObject1)) {
                         return false;
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -461,33 +431,54 @@ public class CsvImportHelper {
         term.setCreator(idUser);
         term.setSource("");
         term.setStatus("");
-
+        Connection conn = null;
         try {
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
             // ajout de la relation entre le concept et le terme
-            if (!termHelper.addLinkTerm(ds.getConnection(), term, conceptObject.getIdConcept(), idUser)) {
+            if (!termHelper.addLinkTerm(conn, term, conceptObject.getIdConcept(), idUser)) {
                 message = message + "\n" + "erreur dans l'intégration du concept " + conceptObject.getIdConcept();
+                conn.rollback();
+                conn.close();
                 return false;
             }
+            conn.commit();
+            // ajout des PrefLabel
+            for (CsvReadHelper.Label prefLabel : conceptObject.getPrefLabels()) {
+                // ajout des traductions
+                term.setId_thesaurus(idTheso);
+                term.setLang(prefLabel.getLang());
+                term.setLexical_value(prefLabel.getLabel());
+                term.setId_term(conceptObject.getIdConcept());
+                term.setContributor(idUser);
+                term.setCreator(idUser);
+                term.setSource("");
+                term.setStatus("");
+                if(!termHelper.addTermTraduction(conn, term, idUser)) {
+                    conn.rollback();
+                    conn.close();
+                    message = message + "\n" + "erreur dans l'intégration du terme " + prefLabel.getLabel();
+                    return false;
+                }
+                conn.commit();
+            /*if (!conceptHelper.addConceptTraduction(ds, term, idUser)) {
+                    message = message + "\n" + "erreur dans l'intégration du terme " + prefLabel.getLabel();
+                }*/
+            }
+            conn.close();
+            
         } catch (SQLException ex) {
             Logger.getLogger(CsvImportHelper.class.getName()).log(Level.SEVERE, null, ex);
+            if(conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex1) {
+                    Logger.getLogger(CsvImportHelper.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            }
             return false;
         }
-
-        // ajout des PrefLabel
-        for (CsvReadHelper.Label prefLabel : conceptObject.getPrefLabels()) {
-            // ajout des traductions
-            term.setId_thesaurus(idTheso);
-            term.setLang(prefLabel.getLang());
-            term.setLexical_value(prefLabel.getLabel());
-            term.setId_term(conceptObject.getIdConcept());
-            term.setContributor(idUser);
-            term.setCreator(idUser);
-            term.setSource("");
-            term.setStatus("");
-            if (!conceptHelper.addConceptTraduction(ds, term, idUser)) {
-                message = message + "\n" + "erreur dans l'intégration du terme " + prefLabel.getLabel();
-            }
-        }
+       
         return true;
     }
 
@@ -644,13 +635,13 @@ public class CsvImportHelper {
                 message = message + "\n" + "erreur dans de la relation RT: " + conceptObject.getIdConcept();
             }
 //            // pour créer la relation réciproque si elle n'existe pas
-//            if (!relationsHelper.insertHierarchicalRelation(ds,
-//                    idConcept2,
-//                    idTheso,
-//                    "RT",
-//                    conceptObject.getId())) {
-//                message = message + "\n" + "erreur dans de la relation RT: " + conceptObject.getId();
-//            }
+            if (!relationsHelper.insertHierarchicalRelation(ds,
+                    idConcept2,
+                    idTheso,
+                    "RT",
+                    conceptObject.getIdConcept())) {
+                message = message + "\n" + "erreur dans de la relation RT: " + conceptObject.getIdConcept();
+            }
         }
         return true;
     }

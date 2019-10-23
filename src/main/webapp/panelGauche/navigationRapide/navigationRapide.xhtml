@@ -29,7 +29,7 @@
                                         <h:outputText title="#{values.idConcept}" value="#{values.prefLabel}" />
                                     </p:column>
 
-                                    <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch()}" oncomplete="srollToSelected()"  
+                                    <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearch(theso.thesaurus.language)}" oncomplete="srollToSelected()"  
                                             update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
                                             />
                                 </p:autoComplete>

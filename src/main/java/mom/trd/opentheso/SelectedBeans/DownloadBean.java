@@ -250,7 +250,11 @@ public class DownloadBean implements Serializable {
         ConceptHelper conceptHelper = new ConceptHelper();
 
         NodePreference nodePreference =  new PreferencesHelper().getThesaurusPreferences(connect.getPoolConnexion(), idTheso);
-        if(nodePreference == null) return null;
+        if(nodePreference == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Info :", "!!! Veuillez ouvrir le thésaurus pour l'initialiser avant export !!!"));
+            return null;
+        }
         
         sizeOfTheso = conceptHelper.getConceptCountOfThesaurus(connect.getPoolConnexion(), idTheso);
         ExportRdf4jHelper exportRdf4jHelper = new ExportRdf4jHelper();
@@ -269,6 +273,7 @@ public class DownloadBean implements Serializable {
 
         RDFFormat format = null;
         String extention = "";
+        file = null;
 
         switch (type) {
             case 0:
@@ -290,10 +295,12 @@ public class DownloadBean implements Serializable {
         }
 
         WriteRdf4j writeRdf4j = loadExportHelper(idTheso, selectedLanguages, selectedGroups);
-        ByteArrayOutputStream out;
-        out = new ByteArrayOutputStream();
-        Rio.write(writeRdf4j.getModel(), out, format);
-        file = new ByteArrayContent(out.toByteArray(), "application/xml", idTheso + " " + extention);
+        if(writeRdf4j != null) {
+            ByteArrayOutputStream out;
+            out = new ByteArrayOutputStream();
+            Rio.write(writeRdf4j.getModel(), out, format);
+            file = new ByteArrayContent(out.toByteArray(), "application/xml", idTheso + " " + extention);
+        }
         progress_per_100 = 0;
         progress_abs = 0;
         return file;

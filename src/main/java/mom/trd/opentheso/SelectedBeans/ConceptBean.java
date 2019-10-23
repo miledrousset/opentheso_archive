@@ -45,7 +45,6 @@ public class ConceptBean implements Serializable{
     /**
      * permet de supprimer le groupe avec ses concepts
      * @param selectedNode
-     * @param selectedTerme
      */
     public void deleteAllTheGroup(MyTreeNode selectedNode){
     //    String idGroup = selectedNode.getIdCurrentGroup();
@@ -67,6 +66,30 @@ public class ConceptBean implements Serializable{
       //  GroupHelper groupHelper = new GroupHelper();
       //  groupHelper.deleteConceptGroupRollBack(connect.getPoolConnexion(), idGroup, idThesaurus, deleteBranchOrphan);
     }
+    
+    /**
+     * permet de supprimer toute la branche avec ses concepts
+     * @param selectedNode
+     */
+    public void deleteBranch(MyTreeNode selectedNode){
+        // trouver tous les concepts du groupe
+        ConceptHelper conceptHelper = new ConceptHelper();
+        ArrayList<String> idConcepts = conceptHelper.getIdsOfBranch(
+                connect.getPoolConnexion(),
+                selectedNode.getIdConcept(),
+                selectedNode.getIdTheso());
+     
+        // supprimer les concepts
+        for (String idConcept : idConcepts) {
+            conceptHelper.deleteConceptWithoutControl(connect.getPoolConnexion(),
+                    idConcept,
+                    selectedNode.getIdTheso(),
+                    1);
+        }
+        // supprimer le groupe (il faut corriger la focntion pour accepter la suppression des Id Handle en meme temps
+      //  GroupHelper groupHelper = new GroupHelper();
+      //  groupHelper.deleteConceptGroupRollBack(connect.getPoolConnexion(), idGroup, idThesaurus, deleteBranchOrphan);
+    }    
 
     public Connexion getConnect() {
         return connect;

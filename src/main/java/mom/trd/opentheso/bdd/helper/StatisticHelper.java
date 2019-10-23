@@ -185,15 +185,21 @@ public class StatisticHelper {
             try {
                 stmt = conn.createStatement();
                 try {
-                   //modification query SQL #JM
-                   String query="SELECT count(non_preferred_term.id_term) FROM non_preferred_term "
-                            + "INNER JOIN (SELECT DISTINCT preferred_term.id_concept,"
-                            + "preferred_term.id_term FROM preferred_term "
-                            + "WHERE preferred_term.id_concept IN "
-                            + "(SELECT DISTINCT idconcept FROM concept_group_concept "
-                            + "WHERE idgroup ='"+idGroup+"'  AND idthesaurus = '"+idThesaurus+"')) "
-                            + "as Tabl ON Tabl.id_term=non_preferred_term.id_term "
-                            + "WHERE non_preferred_term.lang='"+langue+"'";
+                   //modification query SQL #MR
+                    String query = "SELECT " +
+                        "  count(non_preferred_term.id_term)" +
+                        " FROM" +
+                        "  non_preferred_term, " +
+                        "  preferred_term, " +
+                        "  concept_group_concept" +
+                        " WHERE" +
+                        "  preferred_term.id_term = non_preferred_term.id_term AND" +
+                        "  preferred_term.id_thesaurus = non_preferred_term.id_thesaurus AND" +
+                        "  concept_group_concept.idconcept = preferred_term.id_concept AND" +
+                        "  concept_group_concept.idthesaurus = preferred_term.id_thesaurus AND" +
+                        "  non_preferred_term.lang = '" + langue + "' AND " +
+                        "  non_preferred_term.id_thesaurus = '" + idThesaurus + "' AND " +
+                        "  concept_group_concept.idgroup = '" + idGroup + "'";
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
                     if (resultSet != null) {
@@ -266,8 +272,10 @@ public class StatisticHelper {
                 try {
                     String query = "SELECT count(DISTINCT note.id) FROM concept, note WHERE"
                             + " concept.id_concept = note.id_concept"
+                            + " and concept.id_thesaurus = note.id_thesaurus"
                             + " and concept.id_thesaurus = '" + idThesaurus + "'"
-                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '"+ idGroup + "')"
+                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept"
+                            + " WHERE idgroup = '"+ idGroup + "' and idthesaurus = '" + idThesaurus + "')"
                             + " and note.lang = '" + langue + "'";
 
                     stmt.executeQuery(query);

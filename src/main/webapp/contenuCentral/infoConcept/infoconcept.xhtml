@@ -59,7 +59,10 @@
                                     style="font-size: 12px;"/>    
                         <p:separator/>                        
                         
-                        
+                        <p:menuitem  rendered="#{!newtreeBean.isGroup() and !newtreeBean.isSubGroup() and newtreeBean.isHaveChildren()}"
+                                    value="#{langueBean.getMsg('concept.deleteAll')}" style="font-size: 12px;" update=":idConceptDeleteBranch" oncomplete="PF('conceptDeleteBranch').show();"/>
+                      
+                        <p:separator/>
                         
                         
                         <p:menuitem rendered="#{selectedTerme.type != 1}" value="#{langueBean.getMsg('editNotation')}" update=":idNotationEditDlg" 

@@ -2254,15 +2254,14 @@ public class ConceptHelper {
 
         Connection conn = null;
         try {
-            conn = ds.getConnection();
-            conn.setAutoCommit(false);
             TermHelper termHelper = new TermHelper();
             // controle si le term existe avant de rajouter un concept
-            if (termHelper.isTermExist(ds, term.getLexical_value(),
+     /*       if (termHelper.isTermExist(ds, term.getLexical_value(),
                     term.getId_thesaurus(), term.getLang())) {
                 return false;
-            }
-
+            }*/
+            conn = ds.getConnection();
+            conn.setAutoCommit(false);
             if (!termHelper.addTermTraduction(conn, term, idUser)) {
                 conn.rollback();
                 conn.close();

@@ -8,7 +8,6 @@ package mom.trd.opentheso.bdd.helper;
 import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -156,9 +155,9 @@ public class ThesaurusHelper {
                         resultSet = stmt.getResultSet();
                         resultSet.next();
                         int idNumeriqueThesaurus = resultSet.getInt(1);
-                        idThesaurus = "" + ++idNumeriqueThesaurus;
+                        idThesaurus = "th" + ++idNumeriqueThesaurus;
                         while (isThesaurusExiste(conn, idThesaurus)) {
-                            idThesaurus = "" + ++idNumeriqueThesaurus;
+                            idThesaurus = "th" + ++idNumeriqueThesaurus;
                         }
                     }
                     /**

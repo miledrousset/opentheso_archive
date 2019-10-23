@@ -13,7 +13,7 @@ public class AlignementSource {
     private String source;
     
     // pour définir le mode de filtrage ex : Opentheso, Wikidata, Gemet ....
-    private String filter;    
+    private String source_filter;    
         
     private String requete;
     private String typeRequete;
@@ -26,7 +26,7 @@ public class AlignementSource {
     public void init_alignementSource()
     {
         source="";
-        filter = "";
+        source_filter = "";
         requete="";
         alignement_format="";
         typeRequete="";
@@ -81,12 +81,14 @@ public class AlignementSource {
         this.description = description;
     }
 
-    public String getFilter() {
-        return filter;
+    public String getSource_filter() {
+        return source_filter;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
+    public void setSource_filter(String source_filter) {
+        this.source_filter = source_filter;
     }
+
+
   
 }

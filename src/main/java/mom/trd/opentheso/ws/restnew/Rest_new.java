@@ -1355,6 +1355,8 @@ public class Rest_new {
     public Response getAllBrancheOfGroup(@Context UriInfo uri) {
         String idGroup = null;
         String idTheso = null;
+        String format = null;
+        String datas;
 
         for (Map.Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
             for (String valeur : e.getValue()) {
@@ -1362,27 +1364,59 @@ public class Rest_new {
                     idGroup = valeur;
                 if(e.getKey().equalsIgnoreCase("theso")) 
                     idTheso = valeur;
+                if(e.getKey().equalsIgnoreCase("format")) 
+                    format = valeur;
             }
         }
+        
         if(idTheso == null || idGroup == null) {
             return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+        }        
+        if(format == null)
+            format = "rdf";
+        switch (format) {
+            case "rdf":
+            {
+                format = "application/rdf+xml";
+                datas = getAllBrancheOfGroup__(idTheso, idGroup, format);
+                if(datas == null) {
+                    return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+                }
+                return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_XML).build(); 
+            }
+            case "jsonld":
+                format = "application/ld+json";
+                datas = getAllBrancheOfGroup__(idTheso, idGroup, format);
+                if(datas == null) {
+                    return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+                }
+                return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                     
+            case "turtle":
+                format = "text/turtle";
+                datas = getAllBrancheOfGroup__(idTheso, idGroup, format);
+                if(datas == null) {
+                    return Response.status(Status.OK).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
+                }
+                return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.TEXT_PLAIN).build();                 
+            case "json":
+                format = "application/json";
+                 datas = getAllBrancheOfGroup__(idTheso, idGroup, format);
+                if(datas == null) {
+                    return Response.status(Status.OK).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+                }
+                return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();                 
         }
-        String datas = getAllBrancheOfGroup__(idTheso, idGroup);
-
-        if(datas == null) {
-            return Response.status(Status.NO_CONTENT).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();
-        }
-        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_XML).build();     
+        return Response.status(Status.BAD_REQUEST).entity(messageEmptySkos()).type(MediaType.APPLICATION_XML).build();  
     }
 
     private String getAllBrancheOfGroup__(String idtheso,
-            String idGroup){
+            String idGroup, String format){
         HikariDataSource ds = connect();
         String datas;
         if(ds == null) 
             return null;
         RestRDFHelper restRDFHelper = new RestRDFHelper();
-        datas = restRDFHelper.brancheOfGroup(ds, idGroup, idtheso, "application/rdf+xml");
+        datas = restRDFHelper.brancheOfGroup(ds, idGroup, idtheso, format);
 
         ds.close();
         if(datas == null) {

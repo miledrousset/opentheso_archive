@@ -606,7 +606,8 @@ public class AlignmentHelper {
                     String query = "select "
                             + " alignement_source.source, alignement_source.requete,"
                             + " alignement_source.type_rqt, alignement_source.alignement_format,"
-                            + " alignement_source.id from alignement_source, thesaurus_alignement_source"
+                            + " alignement_source.id, alignement_source.description, "
+                            + " alignement_source.source_filter from alignement_source, thesaurus_alignement_source"
                             + " WHERE thesaurus_alignement_source.id_alignement_source = alignement_source.id"
                             + " AND thesaurus_alignement_source.id_thesaurus = '" + id_theso + "'"
                             + " AND gps = false";
@@ -618,6 +619,8 @@ public class AlignmentHelper {
                         alignementSource.setTypeRequete(resultSet.getString("type_rqt"));
                         alignementSource.setAlignement_format(resultSet.getString("alignement_format"));
                         alignementSource.setId(resultSet.getInt("id"));
+                        alignementSource.setDescription(resultSet.getString("description"));
+                        alignementSource.setSource_filter(resultSet.getString("source_filter"));
                         alignementSources.add(alignementSource);
                     }
                     resultSet.close();
@@ -700,6 +703,7 @@ public class AlignmentHelper {
                         alignementSource.setAlignement_format(resultSet.getString("alignement_format"));
                         alignementSource.setId(resultSet.getInt("id"));
                         alignementSource.setDescription((resultSet.getString("description")));
+                        alignementSource.setDescription((resultSet.getString("source_filter")));
                         alignementSources.add(alignementSource);
                     }
                     resultSet.close();

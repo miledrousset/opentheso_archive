@@ -370,7 +370,7 @@ public class RelationsHelper {
             String idConcept1, String idTheso,
             String role, String idConcept2) {
 
-        Connection conn;
+        Connection conn = null;
         Statement stmt;
         boolean status = false;
         try {
@@ -400,6 +400,13 @@ public class RelationsHelper {
                 status = true;
             }else {
                 log.error("Error while adding hierarchical relation of Concept : " + idConcept1, sqle);
+            }
+            if(conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(RelationsHelper.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return status;
@@ -432,7 +439,9 @@ public class RelationsHelper {
             //   System.out.println(sqle.toString());
             if (!sqle.getSQLState().equalsIgnoreCase("23505")) {
                 log.error("Error while adding hierarchical relation of Concept : " + idConcept1, sqle);
-            }
+            } else 
+                status = true;
+            
         }
         return status;
     }    

@@ -6,9 +6,11 @@
 package mom.trd.opentheso.core.alignment.helper;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,28 +23,35 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
+import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.core.alignment.SelectedResource;
+import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
+import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.json.helper.JsonHelper;
+import mom.trd.opentheso.skosapi.SKOSDocumentation;
+import mom.trd.opentheso.skosapi.SKOSLabel;
+import mom.trd.opentheso.skosapi.SKOSProperty;
+import mom.trd.opentheso.skosapi.SKOSResource;
+import mom.trd.opentheso.skosapi.SKOSXmlDocument;
+import org.primefaces.model.DefaultStreamedContent;
 
 /**
  *
  * @author miled.rousset
  */
-public class GettyAATHelper {
+public class OpenthesoHelper {
 
     private StringBuffer messages;
     // private ArrayList<NodeAlignment> listAlignValues;
 
     // les informations récupérées de Wikidata
-    private ArrayList<SelectedResource> resourceAATTraductions;
-    private ArrayList<SelectedResource> resourceAATDefinitions;
-    private ArrayList<SelectedResource> resourceAATImages;
+    private ArrayList<SelectedResource> resourceOpenthesoTraductions;
+    private ArrayList<SelectedResource> resourceOpenthesoDefinitions;
+    private ArrayList<SelectedResource> resourceOpenthesoImages;
 
-    public GettyAATHelper() {
+    public OpenthesoHelper() {
         messages = new StringBuffer();
     }
 
@@ -53,36 +62,40 @@ public class GettyAATHelper {
      * @param idC
      * @param idTheso
      * @param lexicalValue
-     * @param lang
+     * @param idLang
      * @param query
      * @param source
      * @return
      */
-    public ArrayList<NodeAlignment> queryAAT(String idC, String idTheso,
-            String lexicalValue, String lang,
+    public ArrayList<NodeAlignment> queryOpentheso(String idC, String idTheso,
+            String lexicalValue, String idLang,
             String query, String source) {
 
-        if (query.trim().equals("")) {
+        if (query.trim().equals("") ) {
             return null;
         }
         if (lexicalValue.trim().equals("")) {
             return null;
-        }
-
-        ArrayList<NodeAlignment> listeAlign;
-        // construction de la requête de type (webservices Getty)
-
+        }        
+        
+        ArrayList<NodeAlignment> listeAlign = new ArrayList<>();
+        // construction de la requête de type (webservices Opentheso)
+        
         try {
             lexicalValue = URLEncoder.encode(lexicalValue, "UTF-8");
-            query = query.replace("##value##", lexicalValue);
+            lexicalValue = lexicalValue.replaceAll(" ", "%20");
+            query = query.replace("##lang##", idLang);
+            query = query.replace("##value##", lexicalValue);       
             URL url = new URL(query);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/xml");
+            conn.setRequestProperty("Accept", "application/rdf+xml");
 
-            if (conn.getResponseCode() != 200) {
-                messages.append(conn.getResponseMessage());
-                return null;
+            if (conn.getResponseCode() != 200){
+                if (conn.getResponseCode() != 202) {
+                    messages.append(conn.getResponseMessage());
+                    return null;
+                }
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -92,82 +105,71 @@ public class GettyAATHelper {
             while ((output = br.readLine()) != null) {
                 xmlRecord += output;
             }
+//            byte[] bytes = xmlRecord.getBytes();
+//            xmlRecord = new String(bytes, Charset.forName("UTF-8"));
             conn.disconnect();
-
-            listeAlign = getValues(xmlRecord, idC, idTheso, source);
+            
+            listeAlign = getValues(xmlRecord, idC, idLang, idTheso, source);
 
         } catch (MalformedURLException e) {
-            messages.append(e.toString());
-            return null;
         } catch (IOException e) {
-            messages.append(e.toString());
-            return null;
         }
         return listeAlign;
     }
 
     private ArrayList<NodeAlignment> getValues(String xmlDatas,
-            String idC, String idTheso, String source) {
+            String idC, String idLang, String idTheso, String source) {
 
         ArrayList<NodeAlignment> listAlignValues = new ArrayList<>();
-
-        String uri = "http://vocab.getty.edu/page/aat/";
-
+    //    StringBuffer sb = new StringBuffer(xmlDatas);
+        
+        InputStream inputStream;
+        SKOSXmlDocument sxd;
         try {
-            String localName = "";
-            String text;
-            String originalText;
-            String id;
-            //    try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader r = factory.createXMLStreamReader(new StringReader(xmlDatas));
-            NodeAlignment nodeAlignment = new NodeAlignment();
-            while (r.hasNext()) {
-                int event = r.next();
-                if (event == r.START_ELEMENT) {
-                    if (r.hasName()) {
-                        localName = r.getLocalName();
-                    }
-                }
-                if (event == r.CHARACTERS) {
-                    // le term dans la langue source du Getty
-                    if (localName.equalsIgnoreCase("preferred_term")) {
-                        originalText = new String(r.getTextCharacters(), r.getTextStart(), r.getTextLength());
-                        if (!originalText.trim().isEmpty()) {
-                            nodeAlignment.setDef_target(originalText);
-                        }
-                    }
-                    // uri du concept
-                    if (localName.equalsIgnoreCase("subject_id")) {
-                        id = new String(r.getTextCharacters(), r.getTextStart(), r.getTextLength());
-                        if (!id.trim().isEmpty()) {
-                            nodeAlignment.setUri_target(uri + id);
-                        }
-                    }
-                    // le texte recherché avec la langue en cours 
-                    if (localName.equalsIgnoreCase("term")) {
-                        text = new String(r.getTextCharacters(), r.getTextStart(), r.getTextLength());
-                        if (!text.trim().isEmpty()) {
-                            nodeAlignment.setConcept_target(text);
-                        }
-                    }
-                }
-                if (event == r.END_ELEMENT) {
-                    if (r.hasName()) {
-                        localName = r.getLocalName();
-                    }
-                    if (localName.equalsIgnoreCase("subject")) {
-                        nodeAlignment.setInternal_id_concept(idC);
-                        nodeAlignment.setInternal_id_thesaurus(idTheso);
-                        nodeAlignment.setThesaurus_target(source);
-                        listAlignValues.add(nodeAlignment);
-                        nodeAlignment = new NodeAlignment();
-                    }
-                }
-            }
+            inputStream = new ByteArrayInputStream(xmlDatas.getBytes("UTF-8"));
+            ReadRdf4j readRdf4j = new ReadRdf4j(inputStream, 0); /// read XML SKOS
+            sxd = readRdf4j.getsKOSXmlDocument();
 
-        } catch (XMLStreamException ex) {
-            messages.append(ex.toString());
+            for (SKOSResource resource : sxd.getConceptList()) {
+                NodeAlignment na = new NodeAlignment();
+                na.setInternal_id_concept(idC);
+                na.setInternal_id_thesaurus(idTheso);
+                na.setThesaurus_target(source);//"Pactols");
+                na.setUri_target(resource.getUri());
+                for(SKOSLabel label : resource.getLabelsList()) {
+                    switch (label.getProperty()) {
+                        case SKOSProperty.prefLabel:
+                            if(label.getLanguage().equals(idLang)) {
+                                na.setConcept_target(label.getLabel());
+                            }
+                            break;
+                        case SKOSProperty.altLabel:
+                            if(label.getLanguage().equals(idLang)) {
+                                if(na.getConcept_target_alt().isEmpty()) {
+                                    na.setConcept_target_alt(label.getLabel());
+                                } 
+                                else {
+                                    na.setConcept_target_alt(
+                                            na.getConcept_target_alt() + ";" + label.getLabel());                                        
+                                }
+                            }
+                            break;                                
+                        default:
+                            break;
+                    }
+                }
+
+                for(SKOSDocumentation sd : resource.getDocumentationsList()) {
+                    if(sd.getProperty() == SKOSProperty.definition && sd.getLanguage().equals(idLang)) {
+                        na.setDef_target(sd.getText());
+                    }
+                }
+                listAlignValues.add(na);
+            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(DownloadBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {            
+            Logger.getLogger(OpenthesoHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listAlignValues;
     }
@@ -181,7 +183,7 @@ public class GettyAATHelper {
      * @param thesaurusUsedLanguageWithoutCurrentLang
      * @param thesaurusUsedLanguage
      */
-    public void setOptionsFromAAT(
+    public void setOptionsFromOpentheso(
             NodeAlignment selectedNodeAlignment,
             List<String> selectedOptions,
             ArrayList<String> thesaurusUsedLanguageWithoutCurrentLang,
@@ -200,13 +202,13 @@ public class GettyAATHelper {
         for (String selectedOption : selectedOptions) {
             switch (selectedOption) {
                 case "langues":
-                    resourceAATTraductions = getTraductions(datas, entity, thesaurusUsedLanguageWithoutCurrentLang);
+                    resourceOpenthesoTraductions = getTraductions(datas, entity, thesaurusUsedLanguageWithoutCurrentLang);
                     break;
                 case "notes":
-                    resourceAATDefinitions = getDescriptions(datas, entity, thesaurusUsedLanguage);
+                    resourceOpenthesoDefinitions = getDescriptions(datas, entity, thesaurusUsedLanguage);
                     break;
                 case "images":
-                    resourceAATImages = getImages(datas, entity);
+                    resourceOpenthesoImages = getImages(datas, entity);
                     break;
             }
         }
@@ -353,16 +355,18 @@ public class GettyAATHelper {
         return messages.toString();
     }
 
-    public ArrayList<SelectedResource> getResourceAATTraductions() {
-        return resourceAATTraductions;
+    public ArrayList<SelectedResource> getResourceOpenthesoTraductions() {
+        return resourceOpenthesoTraductions;
     }
 
-    public ArrayList<SelectedResource> getResourceAATDefinitions() {
-        return resourceAATDefinitions;
+    public ArrayList<SelectedResource> getResourceOpenthesoDefinitions() {
+        return resourceOpenthesoDefinitions;
     }
 
-    public ArrayList<SelectedResource> getResourceAATImages() {
-        return resourceAATImages;
+    public ArrayList<SelectedResource> getResourceOpenthesoImages() {
+        return resourceOpenthesoImages;
     }
+
+
 
 }

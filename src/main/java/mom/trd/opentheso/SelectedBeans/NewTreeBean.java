@@ -43,6 +43,7 @@ import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import mom.trd.opentheso.ws.handle.HandleHelper;
+import mom.trd.opentheso.ws.rest.theso;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
@@ -335,7 +336,7 @@ public class NewTreeBean implements Serializable {
             Term term = new TermHelper().getThisTerm(connect.getPoolConnexion(), idC, idTheso, langue);
             if (term != null) {
                 value = term.getLexical_value() + " (id_" + idC + ")";
-                Concept temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
+        //        Concept temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
                 MyTreeNode mtn = new MyTreeNode(3, idC, idTheso, langue, "Orphan", null, null, typeNode, value, dynamicTreeNode);
                 if (typeNode.equals("dossier")) {
                     new DefaultTreeNode("fake", mtn);
@@ -439,7 +440,7 @@ public class NewTreeBean implements Serializable {
             /**
              * Ajout des sous_Groupes (MT, C, G, T ..)
              */
-            int count = 0;//attribut pour la numérotation des sous groupes
+
             ArrayList<MyTreeNode> listeTreeNode = new ArrayList<>();//attribut pour le trie
             /*la partie de code suivant peut comporter des éléments inutiles**/
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
@@ -694,9 +695,12 @@ public class NewTreeBean implements Serializable {
     /**
      * Permet de mettre à jour l'arbre et le terme à la sélection d'un index
      * rapide par autocomplétion
+     * @param idLang
      */
-    public void majIndexRapidSearch() {
-        selectedTerme.majIndexRapidSearch(idThesoSelected, defaultLanguage);
+    public void majIndexRapidSearch(String idLang) {
+        if(idLang == null || idLang.isEmpty()) 
+            idLang = defaultLanguage;
+        selectedTerme.majIndexRapidSearch(idThesoSelected, idLang);
         //reInit();
         reExpand();
         vue.setOnglet(0);
@@ -2148,7 +2152,10 @@ public class NewTreeBean implements Serializable {
     }
 
     public boolean renderValid() {
+        
+        
         if (draggedNode != null && droppedNode != null) {
+            if( ((TreeNode) droppedNode).getType().equalsIgnoreCase("orphan") ) return false;
             return draggedNode.isIsGroup() == false && ((draggedNode.isIsSubGroup() && droppedNode.isIsGroup()) || (draggedNode.isIsSubGroup() && droppedNode.isIsSubGroup()) || draggedNode.isIsSubGroup() == false);
         } else {
             return false;
@@ -2309,9 +2316,19 @@ public class NewTreeBean implements Serializable {
             idPere = null;
         }        
         for (CsvReadHelper.ConceptObject conceptObject : conceptObjects) {
-            csvImportHelper.addSingleConcept(connect.getPoolConnexion(),
+            // gestion des hiérarchies pour les listes NT, si le BT est renseigné, alors on intègre le père au concept,
+            // sinon, c'est le père du dossier en cours qui est pris en compte
+            if(conceptObject.getBroaders().isEmpty()) {
+                csvImportHelper.addSingleConcept(connect.getPoolConnexion(),
                     idThesoSelected, idPere, selectedTerme.getIdDomaine(),
                     selectedTerme.getUser().getUser().getIdUser(), conceptObject);
+            } else {
+                for (String idBT : conceptObject.getBroaders()) {
+                    csvImportHelper.addSingleConcept(connect.getPoolConnexion(),
+                        idThesoSelected, idBT, selectedTerme.getIdDomaine(),
+                        selectedTerme.getUser().getUser().getIdUser(), conceptObject);
+                }
+            }
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "infos:", csvImportHelper.getMessage()));

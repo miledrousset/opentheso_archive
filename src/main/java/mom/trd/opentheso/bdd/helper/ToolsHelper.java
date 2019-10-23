@@ -534,6 +534,45 @@ public class ToolsHelper {
         }
         return false;
     }
+    
+    /**
+     * Permet de détecter les concepts TT et les organiser dans la BDD pour pouvoir les afficher 
+     * un TT est un concept qui n'a pas de BT, il faut ajouter dans la table Concept l'information top_concept = true
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+ /*   public boolean detectAndSetTopTerm(HikariDataSource ds,
+            String idThesaurus) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+        ArrayList<String> idConcepts;
+
+        // récupération de tous les Id concepts qui n'ont pas de BT
+        ArrayList<String> idConcepts = conceptHelper.getAllTopTermOfThesaurus(ds, idThesaurus);
+        try {
+            Connection conn = ds.getConnection();
+            conn.setAutoCommit(false);
+            for (String idConcept : tabIdTT) {
+                idBTs = relationsHelper.getListIdBT(ds, idConcept, idThesaurus);
+                for (String idBT : idBTs) {
+                    if (!idBT.isEmpty()) {
+                        if (!relationsHelper.deleteRelationBT(conn, idConcept, idThesaurus, idBT, 1)) {
+                            conn.rollback();
+                            conn.close();
+                            return false;
+                        }
+                    }
+                }
+            }
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ToolsHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }    */
 
     /**
      * Permet de supprimer les relations en boucle qui sont interdites (100 ->

@@ -161,7 +161,13 @@
                                      oncomplete="#{roleOnTheso.showListTheso()}; PrimeFaces.monitorDownload(stop_import);PF('importDlg').hide();" 
                                      update=":idImportDlg,:panSkos,:tableTheso, :messages"
                                      style="color: green"
-                                     />                    
+                                     />
+                    
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton" 
+                                     actionListener="#{rdf4jFileBean.init()}" update=":optionsImport" 
+                                     disabled="#{!rdf4jFileBean.BDDinsertEnable}"
+                                     immediate="true"/>  
+                    
                     <br/>
                     <br/>
                     <p:accordionPanel activeIndex="-1">

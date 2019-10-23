@@ -1,0 +1,36 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idConceptDeleteBranch"  header="#{langueBean.getMsg('concept.deleteAll')}" widgetVar="conceptDeleteBranch" modal="true" resizable="false" >
+        <!-- pour supprimer un groupe avec ses concepts -->
+        <h:panelGroup id="confirmDeleteBranch" >
+            <h:form >
+
+                <p:panelGrid columns="1"  styleClass="ui-noborder" >
+                    <p:row>
+                        <p:column colspan="1"><h:outputText id="messageDelete" value="#{langueBean.getMsg('concept.deleteAll')}:"/></p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="1"><h:outputText id="valueTerme" value="#{selectedTerme.nom}" style="color: red;" /></p:column>
+                    </p:row>
+                </p:panelGrid>
+                <p:panelGrid columns="3"  styleClass="ui-noborder" rendered="#{!newtreeBean.editPassed}"> 
+                    <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('concept.deleteAll')}"
+                                     actionListener="#{conceptbean.deleteBranch(newtreeBean.selectedNode)}" 
+                                     update=":idConceptDeleteBranch,:accordeonTree,:panContenu"  oncomplete="PF('conceptDeleteBranch').hide();" styleClass="styleButton" >
+                        <p:confirm header="Confirmation" message="#{langueBean.getMsg('concept.messageDeleteBranch')}" icon="ui-icon-alert" />
+                    </p:commandButton>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+
+                    <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptDeleteBranch" oncomplete="PF('conceptDeleteBranch').hide();"  immediate="true"/>
+                </p:panelGrid>
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+</ui:composition>
