@@ -25,6 +25,9 @@ public class SKOSResource {
     private SKOSGPSCoordinates GPSCoordinates;
     private ArrayList<SKOSNotation> notationList;
     private ArrayList<SKOSMatch> matchList;
+    
+    // Autopostage the complete path to the concept
+    private ArrayList<String> paths;
 
     /**
      *
@@ -284,6 +287,15 @@ public class SKOSResource {
     public SKOSdc getSdc() {
         return sdc;
     }
+
+    public ArrayList<String> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(ArrayList<String> paths) {
+        this.paths = paths;
+    }
+   
     
     /**
      * Surcharge de la méthode toString() afin de mettre au format xml la

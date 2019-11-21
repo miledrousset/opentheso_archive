@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.5.5</version>
+    <version>4.5.7</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -70,22 +70,28 @@
         </dependency>       
 
       
-        <dependency>
-          <groupId>org.eclipse.rdf4j</groupId>
-          <artifactId>rdf4j-runtime</artifactId>
-          <version>2.5.0</version>
-        </dependency>
+
         <dependency>
             <groupId>skos-api-onejar</groupId>
             <artifactId>skos-api-onejar</artifactId>
             <version>4</version>
         </dependency>
+        
+        
+        <!-- Rdf4j -->
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-model</artifactId>
-            <version>2.5.0</version>
+            <version>3.0.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+          <groupId>org.eclipse.rdf4j</groupId>
+          <artifactId>rdf4j-runtime</artifactId>
+          <version>3.0.1</version>
+        </dependency>
+                
+        
         <dependency>
             <groupId>virtuoso</groupId>
             <artifactId>virtuosos</artifactId>
@@ -291,7 +297,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.3.1</version>
+            <version>3.4.1</version>
             <type>jar</type>
         </dependency>   
 

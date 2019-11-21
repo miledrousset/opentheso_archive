@@ -81,6 +81,7 @@ public class WriteRdf4j {
             writeNotation(concept);
             writeDate(concept);
             writeIdentifier(concept);
+            writePath(concept);
             writeCreator(concept);
             writeDocumentation(concept);
             writeGPS(concept);
@@ -220,6 +221,23 @@ public class WriteRdf4j {
 
     }
     
+    /**
+     * Pour écrire le chemin complet / autopostage
+     * @param resource 
+     */
+    private void writePath(SKOSResource resource) {
+        Literal literal;
+        if(resource.getPaths() != null){
+            if(!resource.getPaths().isEmpty()) {
+                for (String path1 : resource.getPaths()) {
+                    literal = vf.createLiteral(path1.trim(), XMLSchema.STRING);            
+                    builder.add(DCTERMS.DESCRIPTION, literal);
+                }
+            }
+        }
+    }    
+    
+        
     private void writeIdentifier(SKOSResource resource) {
         if (resource.getSdc() != null) {
             builder.add(DCTERMS.IDENTIFIER, resource.getSdc().getIdentifier());

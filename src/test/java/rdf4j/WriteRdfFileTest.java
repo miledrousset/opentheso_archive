@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import javax.xml.datatype.XMLGregorianCalendar;
 import mom.trd.opentheso.core.exports.rdf4j.WriteRdf4j;
 import org.eclipse.rdf4j.model.BNode;
-import org.eclipse.rdf4j.model.Graph;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -228,35 +227,6 @@ public class WriteRdfFileTest {
         Rio.write(model, System.out, RDFFormat.RDFXML);
     }
 
-    @Test
-    public void writeRio(){ 
-    
-        FileOutputStream out = null;
-    try {
-        Graph myGraph = null; // a collection of several RDF statements
-            out = new FileOutputStream("test_unesco2.rdf");
-            try {
-                RDFWriter writer = Rio.createWriter(RDFFormat.RDFXML, out);
-                writer.startRDF();
-                for (Statement st: myGraph) {
-                    writer.handleStatement(st);
-                }
-                writer.endRDF();
-            }
-            catch (RDFHandlerException e) {
-                // oh no, do something!
-            }
-    }
-    catch (FileNotFoundException ex) {
-            Logger.getLogger(WriteRdfFileTest.class.getName()).log(Level.SEVERE, null, ex);
-     // oh no, do something!
-    } finally {
-            try {
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(WriteRdfFileTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
+
     
 }

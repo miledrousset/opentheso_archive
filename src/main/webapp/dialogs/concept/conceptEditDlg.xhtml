@@ -15,7 +15,6 @@
                         <p:autoUpdate />
                     </p:messages>  
 
-
                 <p:panelGrid columns="1"  styleClass="ui-noborder"  rendered="#{!newtreeBean.editPassed}">
                     <p:row>
                         <p:column colspan="1"><h:outputText id="valueTerme" value="#{selectedTerme.nom}" /></p:column>
@@ -30,12 +29,9 @@
                 <p:panelGrid columns="2"  styleClass="ui-noborder" rendered="#{!newtreeBean.editPassed}"> 
                     <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('btnEdit')}" actionListener="#{newtreeBean.editNomT()}" 
                                      update=":accordeonTree,:panContenu,:confirm, :messages" styleClass="styleButton" />
-
                     <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>
-
                 </p:panelGrid>
-                
-                
+               
                 <h:panelGroup id="confirm2" rendered="#{newtreeBean.duplicate}">
                     <p:panelGrid columns="1" styleClass="ui-noborder"> 
                         <h:outputText value="#{langueBean.getMsg('autoComp.dupplicate')}" />
@@ -47,8 +43,6 @@
                         <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idConceptEditDlg" oncomplete="PF('conceptEditDlg').hide();"  immediate="true"/>                        
                     </p:panelGrid> 
                 </h:panelGroup>
- 
-                
             </h:form>
         </h:panelGroup>
     </p:dialog>

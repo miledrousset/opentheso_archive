@@ -21,9 +21,8 @@
                                      styleClass="cbEdit" 
                                      icon="ui-icon-settings-16" >
                          <p:menu  style="background: #CEF0C4" overlay="true" trigger="buttonParamAlign" my="left top" at="left bottom">
-                             <p:menuitem value="#{langueBean.getMsg('alig.gestion')}" update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show();"  style="font-size: 12px;"/>
-                             <p:menuitem 
-                                 value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('associateAlignement').show();" 
+                             <p:menuitem rendered="#{currentUser.user.isSuperAdmin}" value="#{langueBean.getMsg('alig.gestion')}" update=":idEditAlignementSourceEditDlg" oncomplete="PF('editAlignementSourceEditDlg').show();"  style="font-size: 12px;"/>
+                             <p:menuitem value="#{langueBean.getMsg('align.asso')}" oncomplete="PF('associateAlignement').show();" 
                                  action="#{editAlignement.exporterSource()}" update=":idAssociateAlignement"  style="font-size: 12px;"/>
                         </p:menu>
                     </p:commandButton>
@@ -35,12 +34,6 @@
                             <p:menuitem value="#{langueBean.getMsg('index.alignBtn2')}" actionListener="#{selectedTerme.setAlignementSources()}" 
                                         update=":idAjouterAutomatiqueEditDlg" oncomplete="PF('ajouterAutomatiqueEditDlg').show();" style="font-size: 12px;"/>
                             
-                            
-                            
-                            
-                            <p:menuitem disabled="true" value="#{langueBean.getMsg('index.alignBtn2')}_New"
-                                        actionListener="#{alignment.initAlignmentSources(selectedTerme.idTheso, selectedTerme.idC, theso.thesaurus.language)}" 
-                                        update=":idAddAlignment" oncomplete="PF('addAlignment').show();" style="font-size: 12px;"/>                            
                             
                             <p:menuitem disabled="false" value="#{langueBean.getMsg('index.alignBtn2')}_New_StepByStep"
                                         actionListener="#{alignment.initAlignementByStep(theso.thesaurus.id_thesaurus, selectedTerme.idC, theso.thesaurus.language)}"

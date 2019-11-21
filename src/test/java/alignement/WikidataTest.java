@@ -109,7 +109,7 @@ public class WikidataTest {
         curlHelper.setHeader2("application/json");
 
         String uri = "https://www.wikidata.org/entity/Q178401";//"https://www.wikidata.org/entity/Q178401";//Q7748";Q324926
-        String datas = curlHelper.getDatasFromUri(uri);
+        String datas = curlHelper.getDatasFromUriHttps(uri);
         String entity = uri.substring(uri.lastIndexOf("/") + 1);
 
         getTraductions(datas, entity); // OK pour les traductions

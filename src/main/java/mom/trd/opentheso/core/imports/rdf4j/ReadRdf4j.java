@@ -115,7 +115,7 @@ public class ReadRdf4j {
 
         ReadStruct readStruct = new ReadStruct();
         readStruct.resource = null;
-
+        boolean validProperty = false;
         //pour le debug : 
         ArrayList<String> nonReco = new ArrayList();
 
@@ -130,6 +130,7 @@ public class ReadRdf4j {
 
             //Concept or ConceptScheme or Collection or ConceptGroup
             if (readStruct.property.getLocalName().equals("type")) {
+                validProperty = false;
                 int prop = -1;
                 String type = readStruct.value.toString();
 
@@ -139,34 +140,38 @@ public class ReadRdf4j {
                 if (type.contains("ConceptScheme".toUpperCase())) {
                     prop = SKOSProperty.ConceptScheme;
                     sKOSXmlDocument.setTitle(st.getSubject().stringValue());
+                    validProperty = true;
                 } else if (type.contains("ConceptGroup".toUpperCase())) {
                     prop = SKOSProperty.ConceptGroup;
+                    validProperty = true;
 
                 } else if (type.contains("Theme".toUpperCase())) {
                     prop = SKOSProperty.Theme;
+                    validProperty = true;
                 } else if (type.contains("MicroThesaurus".toUpperCase())) {
                     prop = SKOSProperty.MicroThesaurus;
+                    validProperty = true;
                 } else if (type.contains("Collection".toUpperCase())) {
                     prop = SKOSProperty.Collection;
+                    validProperty = true;
                 } else if (type.contains("Concept".toUpperCase())) {
                     prop = SKOSProperty.Concept;
+                    validProperty = true;
                 }
-
-                String uri = st.getSubject().stringValue();
-        //        System.out.println("URI = " + uri);
-                
-        
-                readStruct.resource = new SKOSResource(uri, prop);
-
-                if (prop == SKOSProperty.ConceptScheme) {
-                    sKOSXmlDocument.setConceptScheme(readStruct.resource);
-                } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection || prop == SKOSProperty.Theme || prop == SKOSProperty.MicroThesaurus) {
-                    sKOSXmlDocument.addGroup(readStruct.resource);
-                } else if (prop == SKOSProperty.Concept) {
-                    sKOSXmlDocument.addconcept(readStruct.resource);
-                }else {
-                        logger.info("This is how you configure Java Logging with SLF4J");
-        //            System.out.println("Erreur de type : " + prop);
+                if(validProperty) {
+                    String uri = st.getSubject().stringValue();
+            //        System.out.println("URI = " + uri);
+                    readStruct.resource = new SKOSResource(uri, prop);
+                    if (prop == SKOSProperty.ConceptScheme) {
+                        sKOSXmlDocument.setConceptScheme(readStruct.resource);
+                    } else if (prop == SKOSProperty.ConceptGroup || prop == SKOSProperty.Collection || prop == SKOSProperty.Theme || prop == SKOSProperty.MicroThesaurus) {
+                        sKOSXmlDocument.addGroup(readStruct.resource);
+                    } else if (prop == SKOSProperty.Concept) {
+                        sKOSXmlDocument.addconcept(readStruct.resource);
+                    }else {
+                            logger.info("This is how you configure Java Logging with SLF4J");
+            //            System.out.println("Erreur de type : " + prop);
+                    }
                 }
 
             } //Labelling Properties

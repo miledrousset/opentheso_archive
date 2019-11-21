@@ -15,12 +15,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
-import javax.net.ssl.HttpsURLConnection;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -194,7 +191,7 @@ public class GettyAATHelper {
         curlHelper.setHeader2("application/json");
 
         String uri = selectedNodeAlignment.getUri_target();//."https://www.wikidata.org/entity/Q178401";//"https://www.wikidata.org/entity/Q178401";//Q7748";Q324926
-        String datas = curlHelper.getDatasFromUri(uri);
+        String datas = curlHelper.getDatasFromUriHttps(uri);
         String entity = uri.substring(uri.lastIndexOf("/") + 1);
 
         for (String selectedOption : selectedOptions) {

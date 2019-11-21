@@ -59,7 +59,27 @@
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.completeLackGroup}" 
                                      oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
-                </h:form>                  
+                </h:form>   
+                
+                <h:form id="formDetectNoGroup">
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.reorganizing.detectNoGroup')}" />  </td>
+                        </tr>
+                    </table>
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.detectAndReplaceNoGroup}" 
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                </h:form>                 
+                
+                <h:form id="formCompleteLackTopTerm">
+                    <table>
+                        <tr>
+                            <td><h:outputText value="#{langueBean.getMsg('conf.reorganizing.completeLackTopTerm')}" />  </td>
+                        </tr>
+                    </table>
+                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizingTopTerm}" 
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                </h:form>                
                 
             </fieldset>
         </h:panelGroup>

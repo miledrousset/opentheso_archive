@@ -36,6 +36,153 @@ public class IdRefHelper {
     public IdRefHelper() {
         messages = new StringBuffer();
     }
+  
+    /**
+     * Alignement du thésaurus vers la source IdRef Titre Uniforme en REST et en retour du Json
+     * @param idC
+     * @param idTheso
+     * @param lexicalValue
+     * @param lang
+     * @param query
+     * @param source
+     * @return 
+     */
+    public ArrayList<NodeAlignment> queryIdRefUniformtitle(String idC, String idTheso,
+            String lexicalValue, String lang, 
+            String query, String source) {
+
+        //https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=uniformtitle_t:(la%20belle)%20AND%20recordtype_z:f
+
+        if (query.trim().equals("")) {
+            return null;
+        }
+        if (lexicalValue.trim().equals("")) {
+            return null;
+        }
+        
+        String [] splitValues = lexicalValue.split(" ");
+        
+        String value = "";
+        
+        for (String splitValue : splitValues) {
+            if(value.isEmpty())
+                value = splitValue;
+            else
+                value = value + " AND " + splitValue;
+        }
+    //    value = value.replaceAll(" ", "%20");        
+
+        ArrayList<NodeAlignment> listeAlign;
+        // construction de la requête de type (webservices Opentheso)
+
+        try {
+            value = URLEncoder.encode(value,"UTF-8");            
+            query = query.replace("##value##", value);            
+            URL url = new URL(query);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                messages.append("Failed : HTTP error code : ");
+                messages.append(conn.getResponseCode());
+                return null;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            String output;
+            String records = "";
+            while ((output = br.readLine()) != null) {
+                records += output;
+            }
+
+            conn.disconnect();
+            listeAlign = getValuesSubject(records, idC, idTheso, source);
+
+        } catch (MalformedURLException e) {
+            messages.append(e.toString());
+            return null;
+        } catch (IOException e) {
+            messages.append(e.toString());
+            return null;            
+        }
+        return listeAlign;
+    }                
+            
+    /**
+     * Alignement du thésaurus vers la source IdRef Sujets en REST et en retour du Json
+     * @param idC
+     * @param idTheso
+     * @param lexicalValue
+     * @param lang
+     * @param query
+     * @param source
+     * @return 
+     */
+    public ArrayList<NodeAlignment> queryIdRefLieux(String idC, String idTheso,
+            String lexicalValue, String lang, 
+            String query, String source) {
+
+        // https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=geogname_t:
+        // (saint%20clair%20du%20rhone)%20AND%20recordtype_z:c
+
+        if (query.trim().equals("")) {
+            return null;
+        }
+        if (lexicalValue.trim().equals("")) {
+            return null;
+        }
+        
+        String [] splitValues = lexicalValue.split(" ");
+        
+        String value = "";
+        
+        for (String splitValue : splitValues) {
+            if(value.isEmpty())
+                value = splitValue;
+            else
+                value = value + " AND " + splitValue;
+        }
+    //    value = value.replaceAll(" ", "%20");        
+
+        ArrayList<NodeAlignment> listeAlign;
+        // construction de la requête de type (webservices Opentheso)
+
+        try {
+            value = URLEncoder.encode(value,"UTF-8");            
+            query = query.replace("##value##", value);            
+            URL url = new URL(query);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                messages.append("Failed : HTTP error code : ");
+                messages.append(conn.getResponseCode());
+                return null;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            String output;
+            String records = "";
+            while ((output = br.readLine()) != null) {
+                records += output;
+            }
+
+            conn.disconnect();
+            listeAlign = getValuesSubject(records, idC, idTheso, source);
+
+        } catch (MalformedURLException e) {
+            messages.append(e.toString());
+            return null;
+        } catch (IOException e) {
+            messages.append(e.toString());
+            return null;            
+        }
+        return listeAlign;
+    }     
     
     /**
      * Alignement du thésaurus vers la source IdRef Sujets en REST et en retour du Json

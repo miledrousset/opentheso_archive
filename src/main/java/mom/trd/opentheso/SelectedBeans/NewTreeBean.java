@@ -24,7 +24,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import mom.trd.opentheso.bdd.datas.Concept;
 import mom.trd.opentheso.bdd.datas.HierarchicalRelationship;
 import mom.trd.opentheso.bdd.datas.Term;
 import mom.trd.opentheso.bdd.helper.AlignmentHelper;
@@ -43,7 +42,6 @@ import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
 import mom.trd.opentheso.dragdrop.TreeChange;
 import mom.trd.opentheso.ws.handle.HandleHelper;
-import mom.trd.opentheso.ws.rest.theso;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeCollapseEvent;
@@ -422,7 +420,8 @@ public class NewTreeBean implements Serializable {
                     listeSubGroup = new ArrayList<>();
                 }
                 // pour récupérer les concepts mélangés avec les Sous_Groupes
-                listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(),
+                        idSelectedNode, myTreeNode.getIdTheso(), myTreeNode.getLangue(), isSortByNotation);
 
             } else {
                 listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(),
@@ -705,6 +704,25 @@ public class NewTreeBean implements Serializable {
         reExpand();
         vue.setOnglet(0);
     }
+    
+    /**
+     * Permet de mettre à jour l'arbre et le terme à la sélection d'un index
+     * rapide par autocomplétion
+     * @param idLang
+     */
+    public void majIndexRapidSearchWithoutExpand(String idLang) {
+        if(idLang == null || idLang.isEmpty()) 
+            idLang = defaultLanguage;
+        selectedTerme.majIndexRapidSearch(idThesoSelected, idLang);
+        //reInit();
+    //    reExpand();
+    
+        if (selectedNode == null) {
+            selectedNode = selectedTerme.getSelectedNode();
+            //      selectedNode = new MyTreeNode(0, "", "", "", "", "", "domaine", "", root);
+        }
+        vue.setOnglet(0);
+    }    
 
     public void changeTerme(String id, int type) {
 
@@ -772,7 +790,7 @@ public class NewTreeBean implements Serializable {
         ArrayList<ArrayList<String>> paths = new ArrayList<>();
         paths = new ConceptHelper().getPathOfConcept(connect.getPoolConnexion(), selectedTerme.getIdC(), selectedTerme.getIdTheso(), first, paths);
         if (paths != null) {
-            //  reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(),tc);
+            reExpandTree(paths, selectedTerme.getIdTheso(), selectedTerme.getIdlangue(),tc);
         }
 
     }
@@ -824,7 +842,6 @@ public class NewTreeBean implements Serializable {
                      */
                     listeNode.add((MyTreeNode) dynamicTreeNode);
                 }
-
             }
 
             /**
@@ -944,7 +961,8 @@ public class NewTreeBean implements Serializable {
                 }
 
                 // pour récupérer les concepts mélangés avec les Sous_Groupes
-                listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(), idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue());
+                listeConcept = conceptHelper.getListTopConcepts(connect.getPoolConnexion(),
+                        idConcept, myTreeNode.getIdTheso(), myTreeNode.getLangue(), isSortByNotation);
 
             } else {
                 listeConcept = conceptHelper.getListConcepts(connect.getPoolConnexion(), idConcept,
@@ -975,19 +993,6 @@ public class NewTreeBean implements Serializable {
                     ((MyTreeNode) treeNode).setIsSubGroup(true);
                     ((MyTreeNode) treeNode).setIdCurrentGroup(nodeConceptTreeGroup.getIdConcept());
                     new DefaultTreeNode("fake", treeNode);
-                    /**
-                     * *code poour la numérotation des sous groupes ***
-                     */
-                    ((MyTreeNode) treeNode).setPrefix(((MyTreeNode) node).getNumerotation());
-                    String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept());
-                    if (suffix.length() < 2) {
-                        suffix = "0" + suffix;
-                    }
-                    ((MyTreeNode) treeNode).setSuffix(suffix);
-                    ((MyTreeNode) treeNode).setData(((MyTreeNode) treeNode).getNumerotation() + "  " + treeNode.getData());
-                    /**
-                     * fin code numérotation des sous groupes****
-                     */
                     if (listeId.contains(((MyTreeNode) treeNode).getIdConcept())) {
                         ((MyTreeNode) treeNode).setExpanded(true);
                     }
@@ -1346,6 +1351,9 @@ public class NewTreeBean implements Serializable {
         reInit();
         initTree(selectedTerme.getIdTheso(), selectedTerme.getIdlangue());
         selectedTerme.reInitTerme();
+        
+        if(selectedNode.getParent() == null) return true;
+        
         selectedTerme.setSelectedNode((MyTreeNode) selectedNode.getParent());
         selectedTerme.majTerme((MyTreeNode) selectedNode.getParent());
         selectedNode = (MyTreeNode) selectedNode.getParent();

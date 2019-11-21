@@ -4607,29 +4607,41 @@ public class ConceptHelper {
      * @param idGroup
      * @param idThesaurus
      * @param idLang
+     * @param isSortByNotation
      * @return Objet class NodeConceptTree
      */
     public ArrayList<NodeConceptTree> getListTopConcepts(HikariDataSource ds,
-            String idGroup, String idThesaurus, String idLang) {
+            String idGroup, String idThesaurus, String idLang, boolean isSortByNotation) {
 
         Connection conn;
         Statement stmt;
         ResultSet resultSet;
         ArrayList<NodeConceptTree> nodeConceptTree = null;
-
+        String query;
         try {
             // Get connection from pool
             conn = ds.getConnection();
             try {
                 stmt = conn.createStatement();
                 try {
-                    String query = "SELECT concept.status, concept.id_concept"
-                            + " FROM concept, concept_group_concept WHERE"
-                            + " concept_group_concept.idconcept = concept.id_concept AND"
-                            + " concept_group_concept.idthesaurus = concept.id_thesaurus AND"
-                            + " concept_group_concept.idgroup = '" + idGroup + "' AND"
-                            + " concept.id_thesaurus = '" + idThesaurus + "' AND"
-                            + " concept.top_concept = true";
+                    if(isSortByNotation) {
+                        query = "SELECT concept.notation, concept.status, concept.id_concept"
+                                + " FROM concept, concept_group_concept WHERE"
+                                + " concept_group_concept.idconcept = concept.id_concept AND"
+                                + " concept_group_concept.idthesaurus = concept.id_thesaurus AND"
+                                + " concept_group_concept.idgroup = '" + idGroup + "' AND"
+                                + " concept.id_thesaurus = '" + idThesaurus + "' AND"
+                                + " concept.top_concept = true"
+                                + " ORDER BY concept.notation ASC";
+                    } else {
+                        query = "SELECT concept.status, concept.id_concept"
+                                + " FROM concept, concept_group_concept WHERE"
+                                + " concept_group_concept.idconcept = concept.id_concept AND"
+                                + " concept_group_concept.idthesaurus = concept.id_thesaurus AND"
+                                + " concept_group_concept.idgroup = '" + idGroup + "' AND"
+                                + " concept.id_thesaurus = '" + idThesaurus + "' AND"
+                                + " concept.top_concept = true";                      
+                    }
 
                     stmt.executeQuery(query);
                     resultSet = stmt.getResultSet();
@@ -4637,6 +4649,8 @@ public class ConceptHelper {
                     while (resultSet.next()) {
                         NodeConceptTree nodeConceptTree1 = new NodeConceptTree();
                         nodeConceptTree1.setIdConcept(resultSet.getString("id_concept"));
+                        if(isSortByNotation)
+                            nodeConceptTree1.setNotation(resultSet.getString("notation"));                        
                         nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
                         nodeConceptTree1.setIdThesaurus(idThesaurus);
                         nodeConceptTree1.setIdLang(idLang);
@@ -4665,53 +4679,6 @@ public class ConceptHelper {
                         );
                     }
 
-                    /// ancienne version supprimée par Miled
-                    /*    String query = "select id_concept, status from concept where id_thesaurus = '"
-                            + idThesaurus + "'"
-                            + " and concept.id_concept IN (SELECT idconcept FROM concept_group_concept WHERE idgroup = '" + idGroup + "' AND idthesaurus = '" + idThesaurus + "' )"
-                            + " and top_concept = true";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        nodeConceptTree = new ArrayList<>();
-                        while (resultSet.next()) {
-                            NodeConceptTree nodeConceptTree1 = new NodeConceptTree();
-                            nodeConceptTree1.setIdConcept(resultSet.getString("id_concept"));
-                            nodeConceptTree1.setStatusConcept(resultSet.getString("status"));
-                            nodeConceptTree1.setIdThesaurus(idThesaurus);
-                            nodeConceptTree1.setIdLang(idLang);
-                            nodeConceptTree1.setIsTopTerm(true);
-                            nodeConceptTree.add(nodeConceptTree1);
-                        }
-                    }
-                    for (NodeConceptTree nodeConceptTree1 : nodeConceptTree) {
-
-                        query = "SELECT term.lexical_value FROM preferred_term, term" +
-                                " WHERE preferred_term.id_thesaurus = term.id_thesaurus AND" +
-                                " term.id_term = preferred_term.id_term AND" +
-                                " term.lang = '" + idLang + "' AND" +
-                                " preferred_term.id_concept = '" + nodeConceptTree1.getIdConcept() + "' AND" +
-                                " term.id_thesaurus = '" + idThesaurus + "'";
-                        
-                        stmt.executeQuery(query);
-                        resultSet = stmt.getResultSet();
-                        if (resultSet != null) {
-                            resultSet.next();
-                            if (resultSet.getRow() == 0) {
-                                nodeConceptTree1.setTitle("");
-
-                            } else {
-
-                                nodeConceptTree1.setTitle(resultSet.getString("lexical_value"));
-
-                            }
-                            nodeConceptTree1.setHaveChildren(
-                                    haveChildren(ds, idThesaurus, nodeConceptTree1.getIdConcept())
-                            );
-                        }
-                    
-                    }
-                     */
                 } finally {
                     stmt.close();
                 }
@@ -4722,7 +4689,9 @@ public class ConceptHelper {
             // Log exception
             log.error("Error while getting TopConcept of Group : " + idGroup, sqle);
         }
-        Collections.sort(nodeConceptTree);
+        if(!isSortByNotation){
+            Collections.sort(nodeConceptTree);
+        }
         return nodeConceptTree;
     }
 

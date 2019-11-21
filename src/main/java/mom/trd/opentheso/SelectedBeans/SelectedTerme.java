@@ -593,7 +593,7 @@ public class SelectedTerme implements Serializable {
         termesSpecifique = new ArrayList<>();
         ConceptHelper ch = new ConceptHelper();
         GroupHelper gh = new GroupHelper();
-        ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue);
+        ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue, false);
         for (NodeConceptTree nct : tempNT) {
             HashMap<String, String> tempMap1 = new HashMap<>();
             tempMap1.put(nct.getIdConcept(), nct.getTitle());
@@ -876,15 +876,18 @@ public class SelectedTerme implements Serializable {
                 return false;
             }
           //  instance.insertID_grouptoPermuted(connect.getPoolConnexion(), concept.getIdThesaurus(), concept.getIdConcept());
-            ConceptHelper ch = new ConceptHelper();
 
-            ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue);
+            majTSpeConcept();
+            
+          /*ConceptHelper ch = new ConceptHelper();
+
+            ArrayList<NodeConceptTree> tempNT = ch.getListTopConcepts(connect.getPoolConnexion(), idC, idTheso, idlangue, false);
             termesSpecifique = new ArrayList<>();
             HashMap<String, String> tempMap = new HashMap<>();
             for (NodeConceptTree nct : tempNT) {
                 tempMap.put(nct.getIdConcept(), nct.getTitle());
             }
-            termesSpecifique.addAll(tempMap.entrySet());
+            termesSpecifique.addAll(tempMap.entrySet());*/
 
         } else {
 

@@ -7,7 +7,6 @@ package mom.trd.opentheso.core.alignment.helper;
 
 import com.bordercloud.sparql.Endpoint;
 import com.bordercloud.sparql.EndpointException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,7 +126,7 @@ public class WikidataHelper {
         curlHelper.setHeader2("application/json");
         
         String uri = selectedNodeAlignment.getUri_target();//."https://www.wikidata.org/entity/Q178401";//"https://www.wikidata.org/entity/Q178401";//Q7748";Q324926
-        String datas = curlHelper.getDatasFromUri(uri);
+        String datas = curlHelper.getDatasFromUriHttps(uri);
         String entity = uri.substring(uri.lastIndexOf("/") + 1);
 
         

@@ -25,9 +25,7 @@ import javax.json.JsonValue;
 import javax.net.ssl.HttpsURLConnection;
 import mom.trd.opentheso.SelectedBeans.DownloadBean;
 import mom.trd.opentheso.bdd.helper.nodes.NodeAlignment;
-import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.core.alignment.SelectedResource;
-import mom.trd.opentheso.core.imports.old.ReadFileSKOS;
 import mom.trd.opentheso.core.imports.rdf4j.ReadRdf4j;
 import mom.trd.opentheso.core.json.helper.JsonHelper;
 import mom.trd.opentheso.skosapi.SKOSDocumentation;
@@ -35,7 +33,6 @@ import mom.trd.opentheso.skosapi.SKOSLabel;
 import mom.trd.opentheso.skosapi.SKOSProperty;
 import mom.trd.opentheso.skosapi.SKOSResource;
 import mom.trd.opentheso.skosapi.SKOSXmlDocument;
-import org.primefaces.model.DefaultStreamedContent;
 
 /**
  *
@@ -80,25 +77,39 @@ public class OpenthesoHelper {
         
         ArrayList<NodeAlignment> listeAlign = new ArrayList<>();
         // construction de la requête de type (webservices Opentheso)
-        
+        HttpsURLConnection cons = null;
+        HttpURLConnection con = null;
+        BufferedReader br;
         try {
             lexicalValue = URLEncoder.encode(lexicalValue, "UTF-8");
             lexicalValue = lexicalValue.replaceAll(" ", "%20");
             query = query.replace("##lang##", idLang);
             query = query.replace("##value##", lexicalValue);       
             URL url = new URL(query);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/rdf+xml");
-
-            if (conn.getResponseCode() != 200){
-                if (conn.getResponseCode() != 202) {
-                    messages.append(conn.getResponseMessage());
-                    return null;
+            if(query.startsWith("https://")) {
+                cons = (HttpsURLConnection) url.openConnection();
+                cons.setRequestMethod("GET");
+                cons.setRequestProperty("Accept", "application/rdf+xml");
+                if (cons.getResponseCode() != 200){
+                    if (cons.getResponseCode() != 202) {
+                        messages.append(cons.getResponseMessage());
+                        return null;
+                    }
                 }
+                br = new BufferedReader(new InputStreamReader((cons.getInputStream())));                
             }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            else {
+                con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setRequestProperty("Accept", "application/rdf+xml");
+                if (con.getResponseCode() != 200){
+                    if (con.getResponseCode() != 202) {
+                        messages.append(con.getResponseMessage());
+                        return null;
+                    }
+                }
+                br = new BufferedReader(new InputStreamReader((con.getInputStream())));                  
+            }
 
             String output;
             String xmlRecord = "";
@@ -107,7 +118,10 @@ public class OpenthesoHelper {
             }
 //            byte[] bytes = xmlRecord.getBytes();
 //            xmlRecord = new String(bytes, Charset.forName("UTF-8"));
-            conn.disconnect();
+            if(cons != null)
+                cons.disconnect();
+            if(con != null)
+                con.disconnect();
             
             listeAlign = getValues(xmlRecord, idC, idLang, idTheso, source);
 
@@ -196,7 +210,7 @@ public class OpenthesoHelper {
         curlHelper.setHeader2("application/json");
 
         String uri = selectedNodeAlignment.getUri_target();//."https://www.wikidata.org/entity/Q178401";//"https://www.wikidata.org/entity/Q178401";//Q7748";Q324926
-        String datas = curlHelper.getDatasFromUri(uri);
+        String datas = curlHelper.getDatasFromUriHttps(uri);
         String entity = uri.substring(uri.lastIndexOf("/") + 1);
 
         for (String selectedOption : selectedOptions) {

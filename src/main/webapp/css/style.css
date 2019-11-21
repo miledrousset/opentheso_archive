@@ -452,6 +452,12 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
 }
 
+/***********************************Nouvelle css / primesFaces***********************************/
+    .ui-row-editor .ui-row-editor-pencil {
+        margin-left:8px;
+    }
+
+
 
 /***********************************Nouvelles icones / iconsDB icondb***********************************/
 /* custom color #69B019   #284309 */

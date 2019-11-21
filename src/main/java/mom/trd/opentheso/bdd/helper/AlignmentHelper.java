@@ -610,7 +610,7 @@ public class AlignmentHelper {
                             + " alignement_source.source_filter from alignement_source, thesaurus_alignement_source"
                             + " WHERE thesaurus_alignement_source.id_alignement_source = alignement_source.id"
                             + " AND thesaurus_alignement_source.id_thesaurus = '" + id_theso + "'"
-                            + " AND gps = false";
+                            + " AND gps = false  order by alignement_source.source ASC";
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
                         AlignementSource alignementSource = new AlignementSource();

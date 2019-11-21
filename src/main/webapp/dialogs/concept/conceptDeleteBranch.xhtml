@@ -17,7 +17,7 @@
                         <p:column colspan="1"><h:outputText id="valueTerme" value="#{selectedTerme.nom}" style="color: red;" /></p:column>
                     </p:row>
                 </p:panelGrid>
-                <p:panelGrid columns="3"  styleClass="ui-noborder" rendered="#{!newtreeBean.editPassed}"> 
+                <p:panelGrid columns="3"  styleClass="ui-noborder" > 
                     <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('concept.deleteAll')}"
                                      actionListener="#{conceptbean.deleteBranch(newtreeBean.selectedNode)}" 
                                      update=":idConceptDeleteBranch,:accordeonTree,:panContenu"  oncomplete="PF('conceptDeleteBranch').hide();" styleClass="styleButton" >

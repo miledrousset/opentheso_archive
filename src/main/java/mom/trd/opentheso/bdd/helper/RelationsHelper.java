@@ -49,6 +49,71 @@ public class RelationsHelper {
  ////////////////////////////////////////////////////////////////////        
     
     /**
+     * récupération des TopTerms qui ont au moins une hiérarchie 
+     * fonction pour la correction des cohérences
+     * @param ds
+     * @param idThesaurus
+     * @return Objet class Concept
+     */
+    public ArrayList<String> getListIdOfTopTermForRepair(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> listIds = new ArrayList<>();
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select DISTINCT hierarchical_relationship.id_concept1 from hierarchical_relationship where" +
+                            " hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'" +
+                            " AND" +
+                            " hierarchical_relationship.role like 'NT%'" +
+                            " AND" +
+                            " hierarchical_relationship.id_concept1 not in " +
+                            " (select hierarchical_relationship.id_concept2 from hierarchical_relationship where" +
+                            " hierarchical_relationship.id_thesaurus = '" + idThesaurus + "' and" +
+                            " (hierarchical_relationship.role not like 'BT%'" +
+                            " AND " +
+                            " hierarchical_relationship.role not like 'RT%'))";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listIds.add(resultSet.getString("id_concept1"));
+                    }
+                    query = "select id_concept from concept where concept.id_thesaurus = '" + idThesaurus + "'" +
+                            " and concept.id_concept not in " +
+                            " (" +
+                            " select DISTINCT hierarchical_relationship.id_concept1 from hierarchical_relationship where" +
+                            " hierarchical_relationship.id_thesaurus = '" + idThesaurus + "'" +
+                            " AND" +
+                            " hierarchical_relationship.role not like 'RT%'" +
+                            " )";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    while (resultSet.next()) {
+                        listIds.add(resultSet.getString("id_concept"));
+                    }                    
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All TopTerm for Repair : " + idThesaurus, sqle);
+            listIds.clear();
+        }
+        return listIds;
+    }    
+    
+    
+    /**
      * Cette fonction permet d'ajouter une relation unique qui est en paramètre
      * Fonction utilisée pour le controle de cohérence
      *
@@ -604,8 +669,8 @@ public class RelationsHelper {
     }
 
     /**
-     * Cette fonction permet de rÃ©cupÃ©rer la liste des Ids des termes
-     * gÃ©nÃ©riques d'un concept
+     * Cette fonction permet de récupérer la liste des Ids des termes
+     * génériques d'un concept
      *
      * @param ds
      * @param idConcept

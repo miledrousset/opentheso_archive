@@ -140,7 +140,7 @@ public class AlignmentQuery {
         } catch (IOException e) {
         }
         return listeAlign;
-    }    
+    }
     
     /**
      * Cette fonction permet de récupérer les alignements présents sur Wikipedia
@@ -281,9 +281,9 @@ public class AlignmentQuery {
             URL url = new URL(requete);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/xml");
+            conn.setRequestProperty("Accept", "application/rdf+xml");
 
-            if (conn.getResponseCode() != 200) {
+            if ((conn.getResponseCode() <= 200)|| (conn.getResponseCode() >= 300)) {
                 message = conn.getResponseMessage();// throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
                 return null;
             }

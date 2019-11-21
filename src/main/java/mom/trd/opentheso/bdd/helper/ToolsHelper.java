@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import fr.mom.arkeo.soap.DcElement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -16,7 +15,6 @@ import mom.trd.opentheso.bdd.tools.FileUtilities;
 import mom.trd.opentheso.ws.ark.ArkClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import skos.SKOSProperty;
 
 public class ToolsHelper {
 
@@ -273,6 +271,40 @@ public class ToolsHelper {
         return true;
     }
     
+    
+    /**
+     * Fonction qui permet de détecter les concepts qui n'ont pas de groupes
+     * puis elle les replace dans le domaine (NoGroup)
+     *
+     * @param ds
+     * @param idThesaurus
+     * @param defaultLang
+     * @return
+     */
+    public boolean detectAndReplaceNoGroup(HikariDataSource ds,
+            String idThesaurus, String defaultLang) {
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        GroupHelper groupHelper = new GroupHelper();
+        
+        boolean first = true;
+
+        // ici, on traite les concept qui n'ont aucun groupe 
+        ArrayList<String> tabIdConcept = conceptHelper.getAllIdConceptOfThesaurusWithoutGroup(ds, idThesaurus);
+        for (String idConcept : tabIdConcept) {
+            if(first) {
+                // création du domaine (NoGroup)
+                if(!groupHelper.addGroupDefault(ds, defaultLang, idThesaurus))
+                    return false;
+            }
+            first = false;
+            String idDefaultGroup = "orphans";
+            groupHelper.addConceptGroupConcept(ds, idDefaultGroup, idConcept, idThesaurus); 
+        }
+        return true;
+    }    
+        
+        
     /**
      * Fonction qui permet de compléter les domaines qui manquent pour un Concept
      * Pour pallier au concepts qui n'ont pas de domaine ou groupe
@@ -534,6 +566,27 @@ public class ToolsHelper {
         }
         return false;
     }
+            
+    /**
+     * Permet de detecter les concepts qui n'ont pas de BT,
+     * puis vérifier qu'ils ont l'info de TopTerme
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public boolean reorganizingTopTerm(HikariDataSource ds,
+            String idThesaurus) {
+        ConceptHelper conceptHelper = new ConceptHelper();
+        RelationsHelper relationsHelper = new RelationsHelper();
+
+        // récupération des TopTerms en tenant compte des éventuelles erreurs donc par déduction
+        ArrayList<String> listIds = relationsHelper.getListIdOfTopTermForRepair(ds, idThesaurus);
+        
+        for (String idConcept : listIds) {
+            conceptHelper.setTopConcept(ds, idConcept, idThesaurus);
+        }
+        return true;
+    }            
     
     /**
      * Permet de détecter les concepts TT et les organiser dans la BDD pour pouvoir les afficher 

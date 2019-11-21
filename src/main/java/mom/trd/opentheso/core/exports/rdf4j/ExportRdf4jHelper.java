@@ -146,8 +146,34 @@ public class ExportRdf4jHelper {
         }           
         sKOSResource.addIdentifier(idConcept, SKOSProperty.identifier);
         
+
+        ArrayList<String> first = new ArrayList<>();
+        first.add(idConcept);
+        ArrayList<ArrayList<String>> paths = new ArrayList<>();
+            
+        paths = new ConceptHelper().getPathOfConceptWithoutGroup(ds, idConcept, idThesaurus, first, paths);
+        ArrayList<String> pathFromArray = getPathFromArray(paths);
+        if(!pathFromArray.isEmpty())
+            sKOSResource.setPaths(pathFromArray);
+    //    sKOSResource.setPath("A/B/C/D/"+idConcept);
         skosXmlDocument.addconcept(sKOSResource);
-    }    
+    }
+    
+    private ArrayList<String> getPathFromArray(ArrayList<ArrayList<String>> paths) {
+        String pathFromArray = "";
+        ArrayList<String> allPath = new ArrayList<>();
+        for (ArrayList<String> path : paths) {
+            for (String string1 : path) {
+                if(pathFromArray.isEmpty())
+                    pathFromArray = string1;
+                else
+                    pathFromArray = pathFromArray + "##" + string1;
+            }
+            allPath.add(pathFromArray);
+            pathFromArray = "";
+        }
+        return allPath;
+    }
 
     /**
      * Permet de préparer tous les alignements d'un thésaurus pour l'export
@@ -290,7 +316,9 @@ public class ExportRdf4jHelper {
         }        
         
         sKOSResource.addIdentifier(nodeConcept.getConcept().getIdConcept(), SKOSProperty.identifier);
-        
+    
+    //    sKOSResource.setPath("A/B/C/D/"+nodeConcept.getConcept().getIdConcept());
+    
         downloadBean.setProgress_abs(downloadBean.getProgress_abs() + 1);
         double progress = (downloadBean.getProgress_abs() / downloadBean.getSizeOfTheso()) * 100;
 

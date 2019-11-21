@@ -4,10 +4,10 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui">
 
-    <p:dialog id="idAddUserGroupDlg"  header="#{langueBean.getMsg('profile.addGroupProject')}" widgetVar="addUserGroupDlg" modal="true" resizable="false" style="font-size: 12px;" >
-        <h:form id="confirmAddProject">
+    <p:dialog id="idEditUserGroupDlg"  header="#{langueBean.getMsg('profile.renameGroupProject')}" widgetVar="editUserGroupDlg" modal="true" resizable="false" style="font-size: 12px;" >
+        <h:form id="confirmEditProject">
 
-            <p:remoteCommand rendered="#{currentUser.editPassed}" actionListener="PF('addUserGroupDlg').hide();"/>
+            <p:remoteCommand rendered="#{currentUser.editPassed}" actionListener="PF('editUserGroupDlg').hide();"/>
 
             <p:messages id="localMessage" rendered="#{!currentUser.editPassed}" showDetail="true">
                 <p:autoUpdate />
@@ -16,13 +16,13 @@
             <p:panelGrid columns="2" styleClass="ui-noborder" rendered="#{!currentUser.editPassed}" style="font-size: 12px;"> 
                 <p:row>
                     <p:column > <h:outputText value="#{langueBean.getMsg('edit.tab1Opt1')} : "  /></p:column>
-                    <p:column > <h:inputText value="#{currentUser.groupAdded}" /></p:column>
+                    <p:column > <h:inputText value="#{currentUser.nodeUserGroupEdit.groupName}" /></p:column>
                 </p:row>
             </p:panelGrid>
             <p:panelGrid columns="2"  styleClass="ui-noborder" rendered="#{!currentUser.editPassed}" style="font-size: 12px;"> 
-                <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('profile.addGroupProject')}" actionListener="#{currentUser.addUserGroup()}" 
+                <p:commandButton id="cbEditNomT" icon="ui-icon-valider" title="#{langueBean.getMsg('profile.renameGroupProject')}" actionListener="#{currentUser.renameUserGroup()}" 
                                  update=":manageProjects, :messages, :confirmAddProject, :listUsers" styleClass="styleButton" style="font-size: 12px;"/>
-                <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idAddUserGroupDlg" oncomplete="PF('addUserGroupDlg').hide();"  immediate="true" style="font-size: 12px;"/>
+                <p:commandButton title="Cancel" icon="ui-icon-retour" styleClass="styleButton"  update=":idEditUserGroupDlg" oncomplete="PF('editUserGroupDlg').hide();"  immediate="true" style="font-size: 12px;"/>
             </p:panelGrid>                
         </h:form>
     </p:dialog>

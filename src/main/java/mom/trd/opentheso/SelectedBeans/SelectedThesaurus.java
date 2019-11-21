@@ -157,7 +157,7 @@ public class SelectedThesaurus implements Serializable {
 
 
     /**
-     * cette fonction permet de charger le thésaurus suiavnt son Nom 
+     * cette fonction permet de charger le thésaurus suivant son Nom 
      * c'est le Nom du thésaurus par defaut ou le nom qu'on a défini dans le fichier de conf. 
      * @param idTheso
      * @param idLang
@@ -487,7 +487,10 @@ public class SelectedThesaurus implements Serializable {
             conn.commit();
             conn.close();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", langueBean.getMsg("theso.infoReorganizing")));
-
+            
+            // permet de detecter les concepts TT erronnés : si le concept n'a pas de BT, alors, il est forcement TopTerme
+            reorganizingTopTerm();  
+            
             // complète le thésaurus par les relations qui manquent NT ou BT
             reorganizingTheso();
             
@@ -496,6 +499,8 @@ public class SelectedThesaurus implements Serializable {
             
             // permet de supprimer les relations en boucle (100 -> BT -> 100) ou  (100 -> NT -> 100)ou (100 -> RT -> 100)
             removeLoopRelations();
+            
+          
             
             // permet de supprimer les groupes qui sont orphelins (si un concept appartient à 2 groupes, mais le deuxième groupe
             // ne contient pas ce concept), c'est une erreur de cohérence.
@@ -1469,12 +1474,23 @@ public class SelectedThesaurus implements Serializable {
         return tempT;
     }
 
+    public boolean reorganizingTopTerm() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+        if (!new ToolsHelper().reorganizingTopTerm(connect.getPoolConnexion(), thesaurus.getId_thesaurus())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            return false;
+        }
+        return true;        
+    }
+    
     /**
      * Cette fonction permet de regénérer les Orphelins
      *
      * @return
      */
-    public boolean reorganizingTheso() {
+    private boolean reorganizingTheso() {
         if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
             return false;
         }
@@ -1515,7 +1531,26 @@ public class SelectedThesaurus implements Serializable {
             return false;
         }
         return true;
-    }    
+    }   
+    
+    /**
+     * Cette fonction permet de détecter les concepts qui n'ont pas de groupes
+     * puis les placer dans le domaine (NoGroup)
+     *
+     * @return
+     */
+    public boolean detectAndReplaceNoGroup() {
+        if (thesaurus.getLanguage() == null || thesaurus.getId_thesaurus() == null) {
+            return false;
+        }
+        if (!new ToolsHelper().detectAndReplaceNoGroup(connect.getPoolConnexion(),
+                thesaurus.getId_thesaurus(), connect.getWorkLanguage())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error"), "error"));
+            return false;
+        }
+        return true;
+    }     
+    
     
     
     /**

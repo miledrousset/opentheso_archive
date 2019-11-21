@@ -19,11 +19,11 @@
                         <td><h:outputText value="#{item0.value} (#{item0.key})" /></td>
                         <td>
                             <h:form>
-                                <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree,:idDeleteTgDlg"
+                                <p:commandButton id="cbSuppTradTheso" styleClass="cbSupp" icon="ui-icon-supp" update=":panContenu,:accordeonTree"
                                                  actionListener="#{broaderTerm.deleteBroader(
                                                                    newtreeBean.selectedMyTreeNode,
                                                                    item0.key,
-                                                                   currentUser.user.idUser)}" >
+                                                                   currentUser.user.idUser)}" oncomplete="PF('deleteTgDlg').hide();" >
                                     <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('popup.valid1')}" icon="ui-icon-alert" />  
                                 </p:commandButton>  
 

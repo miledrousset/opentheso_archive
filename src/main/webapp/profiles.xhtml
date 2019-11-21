@@ -28,8 +28,9 @@
         <ui:include src="dialogs/user/moveThesoToAnotherGroupDlg.xhtml"/>         
         <ui:include src="dialogs/user/editUserRoleSuperAdminDlg.xhtml"/>
         <ui:include src="dialogs/user/addUserGroupDlg.xhtml"/>
+        <ui:include src="dialogs/user/editUserGroupDlg.xhtml"/>        
         <ui:include src="dialogs/user/addNewRoleOnGroup.xhtml"/>
-        
+
 
         <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600">
             <h1>Configurations</h1>
@@ -65,10 +66,10 @@
                 <fieldset class="fieldUser">
                     <legend><h:outputText value="#{langueBean.getMsg('conf.field1')}" /></legend>
                     <h:panelGroup>
-                        <h:form>
+                        <h:form id="listProjectNav">
                             <p:outputLabel for="listGroup" value="Projets " />
-                            <p:selectOneMenu id="listGroup" value="#{currentUser.selectedGroup}" autoWidth="false">
-                                <f:selectItem itemLabel="...." itemValue=""/>
+                            <p:selectOneMenu id="listGroup" value="#{currentUser.selectedGroup}" autoWidth="false" style="font-size: 12px;">
+                                <f:selectItem itemLabel="...." itemValue="" />
                                 <f:selectItems value="#{currentUser.listeGroupsOfUser.entrySet()}" var="group" itemLabel="#{group.value}" itemValue="#{group.key}"/>
                                 <p:ajax event="change" listener="#{currentUser.setLists()}" update=":listUsers,:formEditPseudo"/>
                             </p:selectOneMenu>
@@ -79,32 +80,36 @@
                             <p:commandButton icon="ui-icon-theso-24" styleClass="styleButton_db"
                                              title="#{langueBean.getMsg('profile.showTheso')}" action="#{currentUser.getListThesoByGroup()}" 
                                              update=":listUsers,:formEditPseudo" />
-                            
+
 
                             <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-icon-space-24" styleClass="styleButton_db" disabled="true"/>
-                                                       
-                            <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-icon-superadmin-24" styleClass="styleButton_db" title="#{langueBean.getMsg('profile.showSuperAdmin')}" action="#{currentUser.getListSuperAdmin}" 
+
+                            <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-icon-superadmin-24" styleClass="styleButton_db"
+                                             title="#{langueBean.getMsg('profile.showSuperAdmin')}" action="#{currentUser.getListSuperAdmin}" 
                                              update=":listUsers,:formEditPseudo" />   
                             &nbsp;
 
                             <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-icon-new-group-24" styleClass="styleButton_db"
-                                             title="#{langueBean.getMsg('profile.addGroupProject')}" update=":idAddUserGroupDlg" oncomplete="PF('addUserGroupDlg').show();"
-                                              />      
+                                             title="#{langueBean.getMsg('profile.manageGroupProject')}"
+                                             action="#{currentUser.initProjectEdit()}"
+                                             update=":listUsers, :manageProjects, :formEditPseudo"/>
+
                             &nbsp;
 
                             <p:commandButton rendered="#{currentUser.user.isSuperAdmin}" icon="ui-change-theso-24" styleClass="styleButton_db" action="#{currentUser.getListAllGroupTheso()}"
                                              title="#{langueBean.getMsg('profile.moveTheso')}" update=":listUsers,:formEditPseudo" />
                             &nbsp;
                             <p:commandButton  rendered="#{currentUser.user.isSuperAdmin}" icon="ui-change-user-24" styleClass="styleButton_db" action="#{currentUser.getListAllGroupUser()}"
-                                             title="#{langueBean.getMsg('profile.moveUser')}" update=":listUsers,:formEditPseudo" />                               
-                            
+                                              title="#{langueBean.getMsg('profile.moveUser')}" update=":listUsers,:formEditPseudo" />                               
+
                         </h:form>
                     </h:panelGroup>
                     <br/>
-                    
+
                     <!-- Vue liste de thesaurus -->
                     <p:dataTable rendered="#{(currentUser.vueListTheso) and (currentUser.isAdminOnThisGroup()) and (currentUser.listeUser == null) and (currentUser.listeThesoOfGroup != null)}"
-                                 value="#{currentUser.listeThesoOfGroup}" var="listTheso">
+                                 value="#{currentUser.listeThesoOfGroup}" var="listTheso"
+                                 style="font-size: 12px;">
                         <f:facet name="header">
                             <h:outputText value="#{langueBean.getMsg('theso')} (#{currentUser.selectedGroupName})"/>
                         </f:facet>
@@ -118,7 +123,8 @@
 
                     <!-- Vue liste des utilisateurs par groupe -->
                     <p:dataTable id="tabUser" rendered="#{currentUser.vueListUser and currentUser.isAdminOnThisGroup() and currentUser.listeUser != null}"
-                                 value="#{currentUser.listeUser}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                                 value="#{currentUser.listeUser}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450"
+                                 style="font-size: 12px;">
                         <f:facet name="header">
                             <h:form>
                                 <h:outputText value="#{langueBean.getMsg('conf.field1')} (#{currentUser.selectedGroupName})" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -142,42 +148,42 @@
                                                  actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserDlg" oncomplete="PF('editUserDlg').show();"/>
                             </h:form>
                         </p:column>
-                        
-                        
-                        
-                        
+
+
+
+
                         <p:column rendered="#{(currentUser.selectedGroup != '')}" width="20" >
                             <h:form>
-                            <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
-                                     title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
+                                <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
+                                                 actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
                             </h:form>                            
                         </p:column>
                         <p:column rendered="#{(currentUser.selectedGroup == '')}" width="20" >
                             <h:form>
-                            <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
-                                     title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleWithoutGroupDlg" oncomplete="PF('editUserRoleWithoutGroupDlg').show();"/>
+                                <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
+                                                 actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleWithoutGroupDlg" oncomplete="PF('editUserRoleWithoutGroupDlg').show();"/>
                             </h:form>
                         </p:column>  
-                        
-                        
-                        
-                        
-                        
-                        
+
+
+
+
+
+
                         <p:column width="20"  rendered="#{(currentUser.selectedGroup != '')}">
                             <h:form>
-                            <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbDeleteRole"  styleClass="cbSupp"
-                                            title="#{langueBean.getMsg('profile.deleteRole')}"
-                                            icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}"
-                                            action="#{currentUser.delUserRoleOnGroup(currentUser.userEdit.idUser, currentUser.nodeUserRoleOnThisGroupEdit.idGroup)}" update=":tabUser, :messages" >
-                               <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
-                           </p:commandButton>
-                           </h:form>
+                                <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbDeleteRole"  styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.deleteRole')}"
+                                                 icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}"
+                                                 action="#{currentUser.delUserRoleOnGroup(currentUser.userEdit.idUser, currentUser.nodeUserRoleOnThisGroupEdit.idGroup)}" update=":tabUser, :messages" >
+                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
+                                </p:commandButton>
+                            </h:form>
                         </p:column>                         
-                       
-                        
+
+
                         <p:column width="20" >
                             <h:form>
                                 <p:commandButton id="cbSuppTheso"  styleClass="cbSupp"
@@ -193,10 +199,11 @@
                             </h:form>
                         </p:column>
                     </p:dataTable>
-                    
+
                     <!-- Vue liste des superAdmin -->
                     <p:dataTable id="tabListSuperAdmin" rendered="#{currentUser.vueListSuperAdmin and currentUser.user.isSuperAdmin and currentUser.listeUserSuperAdmin != null}"
-                                 value="#{currentUser.listeUserSuperAdmin}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                                 value="#{currentUser.listeUserSuperAdmin}" var="u" scrollable="true" resizableColumns="true" scrollHeight="450" 
+                                 style="font-size: 12px;">
                         <f:facet name="header">
                             <h:form>
                                 <h:outputText value="#{langueBean.getMsg('profile.ListSuperAdmin')}" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -222,12 +229,12 @@
                         </p:column>
                         <p:column width="20" >
                             <h:form>
-                            <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
-                                     title="#{langueBean.getMsg('profile.modifyRole')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleSuperAdminDlg" oncomplete="PF('editUserRoleSuperAdminDlg').show();"/>
+                                <p:commandButton rendered="#{currentUser.user.idUser != u.idUser}" id="cbEditRoles" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.modifyRole')}" icon="ui-icon-access-16" 
+                                                 actionListener="#{currentUser.selectUser(u.idUser, currentUser.selectedGroup)}" update=":idEditUserRoleSuperAdminDlg" oncomplete="PF('editUserRoleSuperAdminDlg').show();"/>
                             </h:form>
                         </p:column>
-                        
+
                         <p:column width="20" >
                             <h:form>
                                 <p:commandButton id="cbSuppTheso"  styleClass="cbSupp"
@@ -244,11 +251,59 @@
                         </p:column>
                     </p:dataTable>                    
 
+
+
+                    <!-- Vue Gestion des Projets ou Groupes / superAdmin -->                    
+                    <h:form id="manageProjects">
+                        <p:dataTable rendered="#{currentUser.vueManageProject and currentUser.user.isSuperAdmin and currentUser.nodeAllProject != null}"
+                                     scrollable="true" resizableColumns="true" scrollHeight="450" value="#{currentUser.nodeAllProject}" var="projects"
+                                     style="font-size: 12px;">
+                              
+                            <f:facet name="header">
+                                    <h:outputText value="#{langueBean.getMsg('profile.addGroupProject')}"/>
+                                    <p:commandButton id="AddProject" icon="ui-icon-plus-16" title="#{langueBean.getMsg('profile.addGroupProject')}" 
+                                                     action="#{currentUser.initProjectEdit()}"
+                                                     update=":idAddUserGroupDlg" oncomplete="PF('addUserGroupDlg').show();"
+                                                     styleClass="styleButton_db" style="margin-left: 5px"/>
+                            </f:facet>
+
+                            <p:column >
+                                <h:outputText value="#{projects.groupName}" />
+
+                            </p:column>
+
+                            <p:column width="20" >
+                                <p:commandButton id="cbEditProject" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.renameGroupProject')}" icon="ui-icon-edit-16" 
+                                                 action="#{currentUser.initProjectRename(projects)}"
+                                                    update=":idEditUserGroupDlg" oncomplete="PF('editUserGroupDlg').show();"/>
+                            </p:column>                            
+
+                            <p:column style="width:35px">
+                                    <p:commandButton  id="cbDeleteProject"  styleClass="cbSupp"
+                                                      title="#{langueBean.getMsg('profile.deleteGroupProject')}" 
+                                                      icon="ui-icon-delete-16" style="font-size: 12px;"
+                                                      action="#{currentUser.deleteProject(projects)}" update=":manageProjects, :listUsers, :messages" >
+                                        <p:confirm header="#{langueBean.getMsg('confirm')}" 
+                                                   message="#{langueBean.getMsg('profile.deleteGroupProject')}: #{projects.groupName} ??" icon="ui-icon-alert" />  
+                                    </p:commandButton>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">  
+                                        <div align="center">
+                                            <p:commandButton value="#{langueBean.getMsg('yes')}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>  
+                                            <p:commandButton value="#{langueBean.getMsg('no')}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>   
+                                        </div>
+                                    </p:confirmDialog>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+
                     <!-- Vue deplacement des thésaurus entre les groupes / superAdmin -->
                     <p:dataTable id="tabMoveThesoIntoGroupes" rendered="#{currentUser.vueMoveThesoIntoGroupes and currentUser.user.isSuperAdmin and currentUser.listeAllGroupTheso != null}"
-                                 value="#{currentUser.listeAllGroupTheso}" var="groupTheso" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                                 value="#{currentUser.listeAllGroupTheso}" var="groupTheso" scrollable="true" resizableColumns="true" scrollHeight="450"
+                                 style="font-size: 12px;">
                         <f:facet name="header">
-                                <h:outputText value="#{langueBean.getMsg('profile.moveTheso')}" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <h:outputText value="#{langueBean.getMsg('profile.moveTheso')}" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </f:facet> 
                         <p:column headerText="#{langueBean.getMsg('profile.ListTheso')}" >
                             <h:outputText value="#{groupTheso.thesaurusName} (#{groupTheso.idThesaurus})"/>
@@ -260,17 +315,18 @@
 
                         <p:column width="20" >
                             <h:form>
-                            <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
-                                     title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" 
-                                     actionListener="#{currentUser.selectThesoGroup(groupTheso)}" update=":idMoveThesoToAnotherGroupDlg" oncomplete="PF('moveThesoToAnotherGroupDlg').show();"/>
+                                <p:commandButton  id="cbEditRoles1" styleClass="cbSupp"
+                                                  title="#{langueBean.getMsg('profile.moveThesoGroup')}" icon="ui-icon-edit-16" 
+                                                  actionListener="#{currentUser.selectThesoGroup(groupTheso)}" update=":idMoveThesoToAnotherGroupDlg" oncomplete="PF('moveThesoToAnotherGroupDlg').show();"/>
                             </h:form>
                         </p:column>
-                        
+
                     </p:dataTable> 
-                    
+
                     <!-- Vue gestion des droits pour les utilisateurs sur les groupes / superAdmin -->
                     <p:dataTable id="tabMoveUserIntoGroupes" rendered="#{currentUser.vueMoveUserIntoGroupes and currentUser.user.isSuperAdmin and currentUser.listeAllGroupUser != null}"
-                                 value="#{currentUser.listeAllGroupUser}" var="groupUser" scrollable="true" resizableColumns="true" scrollHeight="450" style="font-family:'Palatino linotype',Times,serif;">
+                                 value="#{currentUser.listeAllGroupUser}" var="groupUser" scrollable="true" resizableColumns="true" scrollHeight="450"
+                                 style="font-size: 12px;">
                         <f:facet name="header">
                             <h:form>   
                                 <h:outputText value="#{langueBean.getMsg('profile.editUserGroup')}" style="align-content: flex-start"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -290,116 +346,118 @@
 
                         <p:column width="20" >
                             <h:form>
-                            <p:commandButton rendered="#{(groupUser.idGroup != -1)}" id="cbEditRoles" styleClass="cbSupp"
-                                     title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
-                                     actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
+                                <p:commandButton rendered="#{(groupUser.idGroup != -1)}" id="cbEditRoles" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.modifyRoleOnGroup')}" icon="ui-icon-access-16" 
+                                                 actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}" update=":idEditUserRoleDlg" oncomplete="PF('editUserRoleDlg').show();"/>
                             </h:form>  
                         </p:column>
                         <p:column width="20">
                             <h:form>
-                            <p:commandButton id="cbDeleteRole2" rendered="#{(groupUser.idGroup != -1)}" styleClass="cbSupp"
-                                            title="#{langueBean.getMsg('profile.deleteRole')}"
-                                            icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}"
-                                            action="#{currentUser.delUserRoleOnGroup(groupUser.idUser, groupUser.idGroup)}" update=":tabUser,:tabMoveUserIntoGroupes, :messages" >
-                               <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
-                           </p:commandButton>
-                           <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-                                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-                            </p:confirmDialog> 
-                           </h:form>
+                                <p:commandButton id="cbDeleteRole2" rendered="#{(groupUser.idGroup != -1)}" styleClass="cbSupp"
+                                                 title="#{langueBean.getMsg('profile.deleteRole')}"
+                                                 icon="ui-delete-access-16" actionListener="#{currentUser.selectUser(groupUser.idUser, groupUser.idGroup)}"
+                                                 action="#{currentUser.delUserRoleOnGroup(groupUser.idUser, groupUser.idGroup)}" update=":tabUser,:tabMoveUserIntoGroupes, :messages" >
+                                    <p:confirm header="#{langueBean.getMsg('confirm')}" message="#{langueBean.getMsg('profile.deleteRoleConfirm')}" icon="ui-icon-alert" />  
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                </p:confirmDialog> 
+                            </h:form>
                         </p:column>                           
                     </p:dataTable>                     
-                   
+
                 </fieldset>
             </h:panelGroup>            
 
 
             <!-- profile de l'utilisateur en cours -->
-            <fieldset class="fieldMyAccount">
-                <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
-                <h:form id="formEditPseudo">
-                    <table>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{currentUser.user.name}" styleClass="textInfo" />
-                                <h:outputText rendered="#{!currentUser.user.isSuperAdmin}" value="  ->  #{currentUser.nodeUserRoleOnThisGroup.roleName}" styleClass="textInfo" style="color: darkred; font-weight: bold"/>
-                                <h:outputText rendered="#{currentUser.user.isSuperAdmin}" value="  ->  #{currentUser.nodeUserRoleSuperAdmin.roleName}" styleClass="textInfo" style="color: darkred; font-weight: bold"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.editPseudo')}" /> : </td>
-                            <td><h:inputText value="#{currentUser.pseudoEdit}" /></td>
+            <h:panelGroup rendered="#{currentUser.user != null}">
+                <fieldset class="fieldMyAccount">
+                    <legend><h:outputText value="#{langueBean.getMsg('conf.field2')}" /></legend>
+                    <h:form id="formEditPseudo">
+                        <table>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <h:outputText value="#{currentUser.user.name}" styleClass="textInfo" />
+                                    <h:outputText rendered="#{!currentUser.user.isSuperAdmin}" value="  ->  #{currentUser.nodeUserRoleOnThisGroup.roleName}" styleClass="textInfo" style="color: darkred; font-weight: bold"/>
+                                    <h:outputText rendered="#{currentUser.user.isSuperAdmin}" value="  ->  #{currentUser.nodeUserRoleSuperAdmin.roleName}" styleClass="textInfo" style="color: darkred; font-weight: bold"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.editPseudo')}" /> : </td>
+                                <td><h:inputText value="#{currentUser.pseudoEdit}" /></td>
 
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editPseudo')}" actionListener="#{currentUser.updatePseudo}" 
-                                                 update=":formEditPseudo, :tabUser, :messages" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-                <hr/>
-                <h:form id="formEditPwd">
-                    <table>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.currentPwd')}" /> : </td>
-                            <td><h:inputSecret value="#{currentUser.pwdAdded1}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd1')}" /> : </td>
-                            <td><h:inputSecret value="#{currentUser.pwdAdded2}" /></td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newPwd2')}" /> :</td>
-                            <td><h:inputSecret value="#{currentUser.pwdAdded3}" /></td>
+                                <td colspan="2" style="text-align: center;">
+                                    <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editPseudo')}" actionListener="#{currentUser.updatePseudo}" 
+                                                     update=":formEditPseudo, :tabUser, :messages" />
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>
+                    <hr/>
+                    <h:form id="formEditPwd">
+                        <table>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.currentPwd')}" /> : </td>
+                                <td><h:inputSecret value="#{currentUser.pwdAdded1}" /></td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.newPwd1')}" /> : </td>
+                                <td><h:inputSecret value="#{currentUser.pwdAdded2}" /></td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.newPwd2')}" /> :</td>
+                                <td><h:inputSecret value="#{currentUser.pwdAdded3}" /></td>
 
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{currentUser.updatePassword()}" 
-                                                 update=":formEditPwd, :messages" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
+                                <td colspan="2" style="text-align: center;">
+                                    <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnEditPwd')}" actionListener="#{currentUser.updatePassword()}" 
+                                                     update=":formEditPwd, :messages" />
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>
 
-                <hr/>
-                <h:form id="formEditMail">
-                    <table>
-                        <tr>
-                            <td colspan="2" style="text-align: center;">
-                                <h:outputText value="#{currentUser.user.mail}" styleClass="textInfo"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.newMail')}" /> : </td>
-                            <td>
-                                <p:inputText id="email1" value="#{currentUser.mailAdded}" >
-                                    <!--<p:keyFilter regEx="/[a-z0-9_\.\-@]/i"/>-->
-                                    <f:validator validatorId="custom.emailValidator" />
-                                </p:inputText>
-                            </td>
-                            
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editMail')}" actionListener="#{currentUser.updateMail()}" 
-                                                 update=":formEditMail, :messages" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>
-                <hr/>
-                <h:form id="formEditAlertMail">
-                    <table>
-                        <tr>
-                            <td> <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/> : </td>
-                            <td><p:selectBooleanCheckbox value="#{currentUser.alertmail}" /></td>
+                    <hr/>
+                    <h:form id="formEditMail">
+                        <table>
+                            <tr>
+                                <td colspan="2" style="text-align: center;">
+                                    <h:outputText value="#{currentUser.user.mail}" styleClass="textInfo"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{langueBean.getMsg('conf.newMail')}" /> : </td>
+                                <td>
+                                    <p:inputText id="email1" value="#{currentUser.mailAdded}" >
+                                        <!--<p:keyFilter regEx="/[a-z0-9_\.\-@]/i"/>-->
+                                        <f:validator validatorId="custom.emailValidator" />
+                                    </p:inputText>
+                                </td>
 
-                            <td colspan="2" style="text-align: center;">
-                                <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{currentUser.updateAlertMail()}" 
-                                                 update=":formEditMail, :messages" />
-                            </td>
-                        </tr>
-                    </table>
-                </h:form>                
-            </fieldset>
+                                <td colspan="2" style="text-align: center;">
+                                    <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.editMail')}" actionListener="#{currentUser.updateMail()}" 
+                                                     update=":formEditMail, :messages" />
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>
+                    <hr/>
+                    <h:form id="formEditAlertMail">
+                        <table>
+                            <tr>
+                                <td> <h:outputText value="#{langueBean.getMsg('conf.alertMail')} "/> : </td>
+                                <td><p:selectBooleanCheckbox value="#{currentUser.alertmail}" /></td>
+
+                                <td colspan="2" style="text-align: center;">
+                                    <p:commandButton icon="ui-icon-ok-16" styleClass="styleButton_db" title="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{currentUser.updateAlertMail()}" 
+                                                     update=":formEditMail, :messages" />
+                                </td>
+                            </tr>
+                        </table>
+                    </h:form>                
+                </fieldset>
+            </h:panelGroup>
         </div>
         <ui:include src="gestionnaire/gestinnaireFin.xhtml"/> <!-- cette archive est dans Web Pages/gestoinnaire  -->
         <ui:insert name="status">

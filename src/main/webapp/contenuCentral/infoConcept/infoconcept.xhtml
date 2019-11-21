@@ -154,15 +154,22 @@
                 <span style="font-size: 17px; font-weight: bold;">
                     <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                 </span>
-                <h:panelGroup rendered= "#{(roleOnTheso.nodePreference.z3950actif) or (roleOnTheso.nodePreference.bddActive)}">
-                    
 
+                <!-- Uri d'origine du concept -->
+                <span>
+                    <h:outputText value="uri: " />
+                    <h:outputLink value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.idC}" target="_blank" styleClass="linkSmall">
+                        <h:outputText value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.idC}" styleClass="linkSmall"/>
+                    </h:outputLink>
+                </span>                
+                <br/>
+                
+                <h:panelGroup rendered= "#{(roleOnTheso.nodePreference.z3950actif) or (roleOnTheso.nodePreference.bddActive)}">
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
                         <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" value="#{langueBean.getMsg('index.notice')}" />   
                         <h:outputText rendered="#{(!roleOnTheso.nodePreference.bddUseId)}" id="nbNoti1" value="notices liées &lt;br/&gt;" escape="false" styleClass="textLink" />
                         <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" id="nbNoti2" value=" #{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textLink" />
                     </a>
-
                 </h:panelGroup>
                 <h:outputText id="idC" value="id : "/>
                 <h:outputText value ="#{selectedTerme.idC}" styleClass="textInfo"/>

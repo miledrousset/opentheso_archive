@@ -24,6 +24,7 @@ import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GpsHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.NoteHelper;
+import mom.trd.opentheso.bdd.helper.PreferencesHelper;
 import mom.trd.opentheso.bdd.helper.RelationsHelper;
 import mom.trd.opentheso.bdd.helper.TermHelper;
 import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
@@ -477,6 +478,10 @@ public class ImportRdf4jHelper {
         for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
             hasTopConcceptList.add(relation.getTargetUri());
         }
+        PreferencesHelper preferencesHelper = new PreferencesHelper();
+        nodePreference.setCheminSite(skosXmlDocument.getTitle());
+        nodePreference.setPreferredName(idTheso1);
+        preferencesHelper.addPreference(ds, nodePreference, idTheso1);
         return true;
     }
 

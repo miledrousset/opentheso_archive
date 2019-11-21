@@ -17,11 +17,14 @@ import javax.faces.context.FacesContext;
 import mom.trd.opentheso.bdd.helper.BaseDeDoneesHelper;
 import mom.trd.opentheso.bdd.helper.UserHelper2;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUser2;
+import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroup;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupThesaurus;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupUser;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRole;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRoleGroup;
 import mom.trd.opentheso.bdd.tools.MD5Password;
+import org.primefaces.PrimeFaces;
+import org.primefaces.event.RowEditEvent;
 
 @ManagedBean(name = "currentUser", eager = true)
 @SessionScoped
@@ -66,7 +69,8 @@ public class CurrentUser2 implements Serializable {
     // pour le superAdmin pour gérer la multi apparetenance des utilisateurs aux groupes
     private ArrayList <NodeUserGroupUser> listeAllGroupUser;
  
-    
+    // pour récupérer tous les projets pour la gestion
+    private ArrayList <NodeUserGroup> nodeAllProject;
     
     
     private NodeUserGroupThesaurus nodeUserGroupThesaurusSelected; // le theso et le group selectionnés pour déplacement à un autre groupe
@@ -84,8 +88,9 @@ public class CurrentUser2 implements Serializable {
     private boolean vueListUser = false;
     private boolean vueListTheso = false;
     private boolean vueListSuperAdmin = false;
+    private boolean vueManageProject = false;    
     private boolean vueMoveThesoIntoGroupes = false;
-    private boolean vueMoveUserIntoGroupes = false;    
+    private boolean vueMoveUserIntoGroupes = false;
 
     //pref
     private String langSourceEdit;
@@ -97,7 +102,10 @@ public class CurrentUser2 implements Serializable {
     
     private String password5;
     
-
+    private boolean editPassed = false;
+    
+    private NodeUserGroup nodeUserGroupEdit;
+    
     @ManagedProperty(value = "#{langueBean}")
     private LanguageBean langueBean;
 
@@ -189,6 +197,25 @@ public class CurrentUser2 implements Serializable {
         initAuthorizedRoles();
     }
     
+    public void initProjectEdit(){
+        groupAdded = "";
+        editPassed = false;
+        nodeAllProject = null;
+        getAllProject();
+        vueListUser = false;
+        vueListTheso = false;
+        vueListSuperAdmin = false;
+        vueManageProject = true;        
+        vueMoveThesoIntoGroupes = false;
+        vueMoveUserIntoGroupes = false;         
+    }
+    
+    public void initProjectRename(NodeUserGroup nodeUserGroup){
+        nodeUserGroupEdit = nodeUserGroup;
+        initProjectEdit();
+    }    
+        
+    
     public void initPassword() {
         if(password5 == null) {
             return;
@@ -217,6 +244,14 @@ public class CurrentUser2 implements Serializable {
         listeGroupsOfUser = userHelper.getGroupsOfUser(connect.getPoolConnexion(), user.getIdUser());
     }
 
+    public void initVue(){
+        vueListUser = false;
+        vueListTheso = false;
+        vueListSuperAdmin = false;
+        vueManageProject = false;    
+        vueMoveThesoIntoGroupes = false;
+        vueMoveUserIntoGroupes = false;    
+    }
     /**
      * retoure la liste d'utilisateurs par groupe
      *
@@ -227,6 +262,7 @@ public class CurrentUser2 implements Serializable {
         vueListUser = true;
         vueListTheso = false;
         vueListSuperAdmin = false;
+        vueManageProject = false;
         vueMoveThesoIntoGroupes = false;
         vueMoveUserIntoGroupes = false;        
     }
@@ -271,7 +307,8 @@ public class CurrentUser2 implements Serializable {
         vueListUser = false;
         vueListTheso = false;
         vueMoveThesoIntoGroupes = false;  
-        vueMoveUserIntoGroupes = false;         
+        vueMoveUserIntoGroupes = false;
+        vueManageProject = false;
         vueListSuperAdmin = true;
     }
     private void listSuperAdmin(){
@@ -290,6 +327,7 @@ public class CurrentUser2 implements Serializable {
         vueMoveThesoIntoGroupes = true; 
         vueMoveUserIntoGroupes = false;         
         vueListSuperAdmin = false;
+        vueManageProject = false;        
     }
     private void listAllGroupTheso(){
         UserHelper2 userHelper = new UserHelper2();
@@ -314,6 +352,7 @@ public class CurrentUser2 implements Serializable {
         vueListTheso = false;
         vueMoveThesoIntoGroupes = false;      
         vueListSuperAdmin = false;
+        vueManageProject = false;        
         vueMoveUserIntoGroupes = true;         
     }
     private void listAllGroupUser(){
@@ -362,9 +401,9 @@ public class CurrentUser2 implements Serializable {
         vueListUser = false;
         vueListTheso = true;
         vueListSuperAdmin = false;
+        vueManageProject = false;        
         vueMoveThesoIntoGroupes = false;
         vueMoveUserIntoGroupes = false;           
-        
     }
     
     private void listThesoByGroup(){
@@ -611,6 +650,7 @@ public class CurrentUser2 implements Serializable {
      * @return 
      */
     public boolean addUserGroup() {
+        editPassed = false;
         if (!user.isIsSuperAdmin()) {
             return false;
         }
@@ -622,14 +662,26 @@ public class CurrentUser2 implements Serializable {
         }
         UserHelper2 userHelper = new UserHelper2();
         if (userHelper.isUserGroupExist(connect.getPoolConnexion(), groupAdded)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ce projet existe déjà"));            
             return false;
         }
         if (!userHelper.createUserGroup(connect.getPoolConnexion(), groupAdded)) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Erreur BDD")); 
             return false;
         }
+        editPassed = true;
         getGroupsOfUser();
+        getAllProject();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, langueBean.getMsg("info") + " :", "Projet ajouté")); 
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("idAddUserGroupDlg");
+        }
         return true;
     }
+    
+  
+    
     
     /**
      * permet d'ajouter un role pour l'utilisateur sur ce groupe
@@ -821,6 +873,7 @@ public class CurrentUser2 implements Serializable {
         if (connect.getPoolConnexion() != null) {
             user = new UserHelper2().getUser(connect.getPoolConnexion(), user.getIdUser());
             getGroupsOfUser();
+            initVue();
         }
     }
     
@@ -905,25 +958,74 @@ public class CurrentUser2 implements Serializable {
     }
 
 
-    
-    
     ////////////////////////////////////////////////////////////////////
-    //////// fonctions pour l'éditions des thésaurus ////////////////////
-    ////////////////////////////////////////////////////////////////////    
- /*   public getAutorizedThesaurus() {
-        if(user.isIsSuperAdmin()) {
-            // return all thesaurus
+    //////// fonctions pour la gestion des projets/groupes /////////////
+    ////////////////////////////////////////////////////////////////////  
+  
+    
+    /**
+     * permet de renommer un groupe/projet 
+     * @return 
+     */
+    public boolean renameUserGroup() {
+        editPassed = false;
+        if (!user.isIsSuperAdmin()) {
+            return false;
+        }
+        if (nodeUserGroupEdit == null) {
+            return false;
+        }
+        if (nodeUserGroupEdit.getGroupName().isEmpty()) {
+            return false;
+        }
+        UserHelper2 userHelper = new UserHelper2();
+        if (userHelper.isUserGroupExist(connect.getPoolConnexion(), nodeUserGroupEdit.getGroupName().trim())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, langueBean.getMsg("error") + " :", "Ce projet existe déjà"));            
+            return false;
+        }
+        if(!userHelper.updateProject(connect.getPoolConnexion(),
+                nodeUserGroupEdit.getGroupName(),
+                nodeUserGroupEdit.getIdGroup())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Modification refusée: ", nodeUserGroupEdit.getGroupName()));
         } else {
-            // return thes authorized theso
-            
-            
-            
+           FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Modification réussie: ", nodeUserGroupEdit.getGroupName()));
         }
         
+        editPassed = true;
+        getGroupsOfUser();
+        getAllProject();
+        PrimeFaces pf = PrimeFaces.current();
+        if (pf.isAjaxRequest()) {
+            pf.ajax().update("idEditUserGroupDlg");
+        }
+        return true;
+    }      
+    
+    /**
+     * permet de supprimer un Groupe/projet
+     * @param nodeUserGroup 
+     */
+    public void deleteProject(NodeUserGroup nodeUserGroup){
+        UserHelper2 userHelper = new UserHelper2();
+        if(!userHelper.deleteProjectGroup(connect.getPoolConnexion(), nodeUserGroup.getIdGroup())){
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur :", nodeUserGroup.getGroupName()));
+            return;
+        }
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Suppression :", nodeUserGroup.getGroupName()));
+        getAllProject();
+        listAllGroupUser();
+        getGroupsOfUser();
     }
-   */ 
     
-    
+    /**
+     * permet de récupérer tous les projets pour la gestion
+     */
+    private void getAllProject() {
+        UserHelper2 userHelper = new UserHelper2();
+        nodeAllProject = userHelper.getAllProject(connect.getPoolConnexion());
+    }    
     
     
     
@@ -1175,6 +1277,16 @@ public class CurrentUser2 implements Serializable {
         return vueListSuperAdmin;
     }
 
+    public boolean isVueManageProject() {
+        return vueManageProject;
+    }
+
+    public void setVueManageProject(boolean vueManageProject) {
+        this.vueManageProject = vueManageProject;
+    }
+
+    
+    
     public NodeUserRoleGroup getNodeUserRoleSuperAdmin() {
         return nodeUserRoleSuperAdmin;
     }
@@ -1277,6 +1389,25 @@ public class CurrentUser2 implements Serializable {
         this.password5 = password5;
     }
 
+    public boolean isEditPassed() {
+        return editPassed;
+    }
+
+    public ArrayList<NodeUserGroup> getNodeAllProject() {
+        return nodeAllProject;
+    }
+
+    public void setNodeAllProject(ArrayList<NodeUserGroup> nodeAllProject) {
+        this.nodeAllProject = nodeAllProject;
+    }
+
+    public NodeUserGroup getNodeUserGroupEdit() {
+        return nodeUserGroupEdit;
+    }
+
+    public void setNodeUserGroupEdit(NodeUserGroup nodeUserGroupEdit) {
+        this.nodeUserGroupEdit = nodeUserGroupEdit;
+    }
 
 
 }

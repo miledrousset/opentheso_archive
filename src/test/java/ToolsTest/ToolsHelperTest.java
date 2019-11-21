@@ -62,4 +62,9 @@ public class ToolsHelperTest {
         ds.close();
         
     }
+    
+    @Test
+    public void getConceptsWithoutBT(){
+        
+    }
 }

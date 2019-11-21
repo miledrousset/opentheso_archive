@@ -28,6 +28,8 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import mom.trd.opentheso.core.alignment.SelectedResource;
+import mom.trd.opentheso.core.alignment.helper.AgrovocHelper;
+import mom.trd.opentheso.core.alignment.helper.GemetHelper;
 import mom.trd.opentheso.core.alignment.helper.GettyAATHelper;
 import mom.trd.opentheso.core.alignment.helper.IdRefHelper;
 import mom.trd.opentheso.core.alignment.helper.OpenthesoHelper;
@@ -491,7 +493,7 @@ public class Alignment {
                     idLang);
         }
         
-        // ici  IdRef pour les noms
+        // ici  IdRef pour les noms de personnes
         if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefPersonnes")) {
             getAlignmentIdRefPerson(
                     selectedAlignementSource,
@@ -501,7 +503,7 @@ public class Alignment {
                     idLang);
         }         
         
-        // ici  IdRef pour les noms
+        // ici  IdRef pour les auteurs
         if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefAuteurs")) {
             getAlignmentIdRefNames(
                     selectedAlignementSource,
@@ -509,6 +511,26 @@ public class Alignment {
                     idConcept,
                     idLang);
         }
+        
+        // ici  IdRef pour les Lieux
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("idRefLieux")) {
+            getAlignmentIdRefLieux(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }
+        
+        // ici  IdRef pour les Titres Uniformes
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("IdRefTitreUniforme")) {
+            getAlignmentIdRefUniformtitle(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }        
         
         // ici  AAT du Getty
         if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("Getty_AAT")) {
@@ -530,7 +552,25 @@ public class Alignment {
                     idLang);
         }          
         
+        // ici pour un alignement de type Gemet
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("Gemet")) {
+            getAlignmentGemet(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }
         
+        // ici pour un alignement de type Agrovoc
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("Agrovoc")) {
+            getAlignmentAgrovoc(
+                    selectedAlignementSource,
+                    idTheso,
+                    idConcept,
+                    lexicalValue,
+                    idLang);
+        }        
         
     }
     
@@ -568,8 +608,7 @@ public class Alignment {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", wikidataHelper.getMessages()));
         }
     }
-    
-    
+ 
     /**
      * Cette fonction permet de récupérer les concepts à aligner de la source
      * juste la liste des concepts avec une note pour distinguer les concepts/
@@ -684,6 +723,71 @@ public class Alignment {
      * @param lexicalValue
      * @param idLang
      */
+    private void getAlignmentIdRefUniformtitle(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        IdRefHelper idRefHelper = new IdRefHelper();
+        listAlignValues = idRefHelper.queryIdRefUniformtitle(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
+        }
+    }        
+            
+            
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentIdRefLieux(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        IdRefHelper idRefHelper = new IdRefHelper();
+        listAlignValues = idRefHelper.queryIdRefLieux(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Item Unselected", idRefHelper.getMessages()));
+        }
+    }     
+    
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
     private void getAlignmentGettyAAT(
             AlignementSource alignementSource,
             String idTheso,
@@ -709,6 +813,78 @@ public class Alignment {
                     gettyAATHelper.getMessages()));
         }
     }
+        
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentGemet(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        GemetHelper gemetHelper = new GemetHelper();
+        
+        // action XML
+        //ici il faut appeler le filtre du Getty AAT 
+        listAlignValues = gemetHelper.queryGemet(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Pas de résultat",
+                    gemetHelper.getMessages()));
+        }
+    }        
+    
+    /**
+     * Cette fonction permet de récupérer les concepts à aligner de la source
+     * juste la liste des concepts avec une note pour distinguer les concepts/
+     *
+     * @param alignementSource
+     * @param idTheso
+     * @param idConcept
+     * @param lexicalValue
+     * @param idLang
+     */
+    private void getAlignmentAgrovoc(
+            AlignementSource alignementSource,
+            String idTheso,
+            String idConcept,
+            String lexicalValue,
+            String idLang
+            ) {
+        
+        if (alignementSource == null) {
+            listAlignValues = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Source :", "Pas de source sélectionnée"));            
+            return;
+        }
+        AgrovocHelper agrovocHelper = new AgrovocHelper();
+        
+        // action REST Json
+        //ici il faut appeler le filtre du Agrovoc 
+        listAlignValues = agrovocHelper.queryAgrovoc(idConcept, idTheso, lexicalValue.trim(),
+                    idLang, alignementSource.getRequete(),
+                    alignementSource.getSource());
+        if(listAlignValues == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Pas de résultat",
+                    agrovocHelper.getMessages()));
+        }
+    }    
     
     /**
      * Cette fonction permet de récupérer les concepts à aligner de la source
@@ -773,6 +949,7 @@ public class Alignment {
         alignmentInProgress = true;
         resetAlignmentResult();
         
+        this.selectedNodeAlignment = selectedNodeAlignment;
         // initialisation des valeurs du concept local pour comparaison avec le concept à aligner
         getValuesOfLocalConcept(idTheso, idConcept);
         
@@ -783,11 +960,9 @@ public class Alignment {
          */
         
         
-        
-        
         // si l'alignement est de type Wikidata
-        this.selectedNodeAlignment = selectedNodeAlignment;
-        if(selectedAlignementSource.getSource().equalsIgnoreCase("wikidata")) {
+
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("wikidata")) {
             WikidataHelper wikidataHelper = new WikidataHelper();
             resetVariables();
             
@@ -809,6 +984,33 @@ public class Alignment {
         // si l'alignement est de type Opentheso
         
         
+        // si l'alignement est de type Gemet        
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("gemet")) {
+            GemetHelper gemetHelper = new GemetHelper();
+            resetVariables();
+            
+            gemetHelper.setOptions(selectedNodeAlignment,
+                    selectedOptions,
+                    thesaurusUsedLanguageWithoutCurrentLang,
+                    thesaurusUsedLanguage);
+            setObjectTraductions(gemetHelper.getResourceTraductions());
+            setObjectDefinitions(gemetHelper.getResourceDefinitions());
+            setObjectImages(gemetHelper.getResourceImages());
+        }
+        
+        // si l'alignement est de type Agrovoc       
+        if(selectedAlignementSource.getSource_filter().equalsIgnoreCase("agrovoc")) {
+            AgrovocHelper agrovocHelper = new AgrovocHelper();
+            resetVariables();
+            
+            agrovocHelper.setOptions(selectedNodeAlignment,
+                    selectedOptions,
+                    thesaurusUsedLanguageWithoutCurrentLang,
+                    thesaurusUsedLanguage);
+            setObjectTraductions(agrovocHelper.getResourceTraductions());
+            setObjectDefinitions(agrovocHelper.getResourceDefinitions());
+            setObjectImages(agrovocHelper.getResourceImages());
+        }        
         
     }
  

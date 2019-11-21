@@ -2200,6 +2200,8 @@ create or replace function update_table_alignement_source() returns void as $$
             execute 'delete from alignement_source where source = ''idRefSujets'';
                      delete from alignement_source where source = ''idRefAuteurs'';
                      delete from alignement_source where source = ''idRefPersonnes'';
+                     delete from alignement_source where source = ''IdRefLieux'';
+                     delete from alignement_source where source = ''IdRefTitreUniforme'';
                      delete from alignement_source where source = ''wikidata'';
                      delete from alignement_source where source = ''IdRefSujets'';
                      delete from alignement_source where source = ''IdRefAuteurs'';
@@ -2207,7 +2209,9 @@ create or replace function update_table_alignement_source() returns void as $$
                      delete from alignement_source where source = ''Wikidata'';
                      delete from alignement_source where source = ''Getty_AAT'';
                      delete from alignement_source where source = ''GeoNames'';
-                     delete from alignement_source where source = ''Pactols'';';
+                     delete from alignement_source where source = ''Pactols'';
+                     delete from alignement_source where source = ''Gemet'';
+                     delete from alignement_source where source = ''Agrovoc'';';
 
 	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'IdRefSujets') THEN
 		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES
@@ -2223,6 +2227,16 @@ create or replace function update_table_alignement_source() returns void as $$
 		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES
                     (''IdRefPersonnes'', ''https://www.idref.fr/Sru/Solr?wt=json&q=persname_t:(##value##)&fl=ppn_z,affcourt_z,prenom_s,nom_s&start=0&rows=30&version=2.2'',
                      ''REST'', ''json'', 1, ''alignement avec les Noms de personnes de IdRef ABES'', false, ''IdRefPersonnes'');';
+            end if;
+	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'IdRefTitreUniforme') THEN
+		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES
+                    (''IdRefTitreUniforme'', ''https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=uniformtitle_t:(##value##)%20AND%20recordtype_z:f'',
+                     ''REST'', ''json'', 1, ''alignement avec les titres uniformes de IdRef ABES'', false, ''IdRefTitreUniforme'');';
+            end if;
+	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'IdRefPersonnes') THEN
+		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES
+                    (''IdRefLieux'', ''https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=geogname_t:(##value##)%20AND%20recordtype_z:c'',
+                     ''REST'', ''json'', 1, ''alignement avec les Lieux de IdRef ABES'', false, ''IdRefLieux'');';
             end if;
 	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'Wikidata') THEN
 		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES
@@ -2245,6 +2259,16 @@ create or replace function update_table_alignement_source() returns void as $$
 		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES 
                     (''Pactols'', ''https://pactols.frantiq.fr/opentheso/api/search?q=##value##&lang=##lang##&theso=TH_1'',
                      ''REST'', ''skos'', 1, ''Alignement avec PACTOLS'', false, ''Opentheso'');';
+            end if;
+	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'Gemet') THEN
+		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES 
+                    (''Gemet'', ''https://www.eionet.europa.eu/gemet/getConceptsMatchingKeyword?keyword=##value##&search_mode=3&thesaurus_uri=http://www.eionet.europa.eu/gemet/concept/&language=##lang##'',
+                     ''REST'', ''json'', 1, ''Alignement avec le thésaurus Gemet'', false, ''Gemet'');';
+            end if;
+	    IF NOT EXISTS (SELECT source FROM alignement_source WHERE source = 'Agrovoc') THEN
+		execute 'INSERT INTO alignement_source (source, requete, type_rqt, alignement_format, id_user, description, gps, source_filter) VALUES 
+                    (''Agrovoc'', ''http://agrovoc.uniroma2.it/agrovoc/rest/v1/search/?query=##value##&lang=##lang##'',
+                     ''REST'', ''json'', 1, ''Alignement avec le thésaurus Agrovoc'', false, ''Agrovoc'');';
             end if;
 	end;
 $$language plpgsql;
@@ -2280,9 +2304,9 @@ SELECT user_group_label();
 SELECT update_table_preferences_preferredname();
 SELECT update_table_imagesuri();
 SELECT create_table_external_images();
-
-SELECT update_table_alignement_source();
 SELECT update_table_alignement_source_filter();
+SELECT update_table_alignement_source();
+
 
 -- suppression des fonctions 
 select delete_fonction('alter_table_concept_group_addcolumn_id_handle','');

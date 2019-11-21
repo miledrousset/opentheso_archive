@@ -55,10 +55,10 @@
                     <p:layoutUnit position="center" resizable="true" size="850"  style="font-size: 12px">
                        
                         <!-- première ligne de haut ! choix de la source avec les options -->
-                        <h:panelGroup id="searchStep" rendered="#{!alignment.alignmentInProgress}"> 
+                        <h:panelGroup id="searchStep" rendered="#{!alignment.alignmentInProgress}" style="font-size: 12px"> 
                             <h:form>
                                 <div align="left">
-                                    <p:panelGrid styleClass="ui-noborder" >
+                                    <p:panelGrid styleClass="ui-noborder" style="font-size: 12px">
                                         <p:row>
                                             <p:column rendered="#{!alignment.isNameAlignment}" style="font-size: 12px">
                                                 <h:outputText value = "Aligner:"/>
@@ -83,8 +83,8 @@
                                                 <h:outputText value = "avec" />
                                             </p:column>
                                             <p:column style="font-size: 12px">
-                                                <p:selectOneMenu id="console" value="#{alignment.selectedAlignement}" style="width:100px" >
-                                                    <f:selectItems value="#{alignment.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>                                
+                                                <p:selectOneMenu id="console" value="#{alignment.selectedAlignement}" style="width:100px; font-size: 12px">
+                                                    <f:selectItems  value="#{alignment.alignementSources}" var="alig" itemLabel="#{alig.source}" itemValue="#{alig.source}"/>                                
                                                     <p:ajax event="change" listener="#{alignment.actionChoix()}"  update=":searchStep"/>
                                                 </p:selectOneMenu>
                                             </p:column>
@@ -93,7 +93,7 @@
                                                 <h:outputText value = "options:" title="Récupérer en plus les ..."/>
                                             </p:column>
                                             <p:column style="font-size: 12px">
-                                                <p:selectManyCheckbox id="options" value="#{alignment.selectedOptions}">
+                                                <p:selectManyCheckbox id="options" value="#{alignment.selectedOptions}" style="font-size: 12px">
                                                     <f:selectItem itemLabel="Langues" itemValue="langues" />
                                                     <f:selectItem itemLabel="Notes" itemValue="notes" />
                                                     <f:selectItem itemLabel="Images" itemValue="images" />
