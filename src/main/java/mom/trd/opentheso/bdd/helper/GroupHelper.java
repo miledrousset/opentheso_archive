@@ -1203,8 +1203,10 @@ public class GroupHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while adding ConceptGroup : " + idGroup, sqle);
+            if (sqle.getSQLState().equalsIgnoreCase("23505"))
+                status = true;
+            else
+                log.error("Error while adding ConceptGroup : " + idGroup, sqle);
         }
         return status;
     }
@@ -1403,8 +1405,10 @@ public class GroupHelper {
                 conn.close();
             }
         } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while adding traduction to ConceptGroupLabel : " + conceptGroupLabel.getIdgroup(), sqle);
+            if (sqle.getSQLState().equalsIgnoreCase("23505"))
+                status = true;
+            else
+                log.error("Error while adding traduction to ConceptGroupLabel : " + conceptGroupLabel.getIdgroup(), sqle);
         }
         return status;
     }
@@ -3288,8 +3292,8 @@ public class GroupHelper {
             case("group"):
             case("subGroup"):typeCode="G";            
             break;
-            case("thème"):
-            case("subThème"):typeCode="T";
+            case("theme"):
+            case("subTheme"):typeCode="T";
             break;
             case("microTheso"):
             case("subMicroTheso"):typeCode="MT";

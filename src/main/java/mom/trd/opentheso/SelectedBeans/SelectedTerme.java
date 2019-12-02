@@ -2831,11 +2831,11 @@ public class SelectedTerme implements Serializable {
         }
         ArrayList<Integer> temp = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();
-        for (Integer i : temp) {
+/*        for (Integer i : temp) {
             NodeFacet nf = new FacetHelper().getThisFacet(connect.getPoolConnexion(), i, idTheso, idlangue);
             String value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), idTheso, idlangue).getLexical_value();
             mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value + ")");
-        }
+        }*/
         arrayFacette = new ArrayList<>(mapTemp.entrySet());
 
         return arrayFacette;
@@ -2848,12 +2848,12 @@ public class SelectedTerme implements Serializable {
         ArrayList<NodeFacet> temp = new FacetHelper().getAllFacetsOfThesaurus(connect.getPoolConnexion(), idTheso, idlangue);
         ArrayList<Integer> temp2 = new FacetHelper().getIdFacetOfConcept(connect.getPoolConnexion(), idC, idTheso);
         Map<String, String> mapTemp = new HashMap<>();
-        for (NodeFacet nf : temp) {
+    /*    for (NodeFacet nf : temp) {
             if (!temp2.contains(nf.getIdFacet())) {
                 String value = new TermHelper().getThisTerm(connect.getPoolConnexion(), nf.getIdConceptParent(), idTheso, idlangue).getLexical_value();
                 mapTemp.put(String.valueOf(nf.getIdFacet()), nf.getLexicalValue() + " (" + value + ")");
             }
-        }
+        }*/
         arrayFacette = new ArrayList<>(mapTemp.entrySet());
         return arrayFacette;
     }

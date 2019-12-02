@@ -66,8 +66,8 @@ public class TreeChange {
             case ("collection"):
                 ((MyTreeNode) dragNode).setType("subCollection");
                 break;
-            case ("thème"):
-                ((MyTreeNode) dragNode).setType("subThème");
+            case ("theme"):
+                ((MyTreeNode) dragNode).setType("subTheme");
                 break;
             case ("microTheso"):
                 ((MyTreeNode) dragNode).setType("subMicroTheso");
@@ -84,8 +84,8 @@ public class TreeChange {
                 }
 
                 break;
-            case ("subThème"):
-                if (((MyTreeNode) dragNode).getType() != "subThème") {
+            case ("subTheme"):
+                if (((MyTreeNode) dragNode).getType() != "subTheme") {
                     ((MyTreeNode) dragNode).setType("dossier");
                 }
 

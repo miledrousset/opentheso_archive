@@ -33,11 +33,7 @@
     </dependency>-->
        
         
-        <dependency>
-            <groupId>net.handle</groupId>
-            <artifactId>hdllib</artifactId>
-            <version>7.3.1</version>
-        </dependency>
+
        
 
 

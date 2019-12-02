@@ -12,6 +12,10 @@ body {
     clear: both;
 }
 
+    .pi { 
+        color: orange;
+    }
+
 .groupArbre{
     font-weight: bold;
 }
@@ -21,6 +25,34 @@ input[type="button"], input[type="submit"]{
     font-family: "Palatino linotype",Times,serif;
     font-size: 14px;
 }
+
+.ui-toggleswitch-slider {
+                -webkit-transition: background-color 0.3s, box-shadow 0.2s;
+                transition: background-color 0.3s, box-shadow 0.2s;
+                background: #cccccc;
+            }
+
+            .ui-toggleswitch-slider:before {
+                background-color: #ffffff;
+            }
+
+            .ui-toggleswitch-focus .ui-toggleswitch-slider {
+                -moz-box-shadow: 0px 0px 5px #c0c0c0;
+                -webkit-box-shadow: 0px 0px 5px #c0c0c0;
+                box-shadow: 0px 0px 5px #c0c0c0;
+            }
+
+            .ui-toggleswitch:not(.ui-state-disabled):hover .ui-toggleswitch-slider {
+                background-color: #b7b7b7;
+            }
+
+            .ui-toggleswitch.ui-toggleswitch-checked .ui-toggleswitch-slider {
+                background-color: #3F51B5;
+            }
+
+            .ui-toggleswitch.ui-toggleswitch-checked:not(.ui-state-disabled):hover .ui-toggleswitch-slider {
+                background-color: #283593;
+            }
 
 .styleButton, .ui-dialog .ui-dialog-buttonpane button {
     cursor: pointer !important;
@@ -373,25 +405,25 @@ input[type="button"], input[type="submit"]{
     border-radius: 0px;
 }
 
-.ui-icon-thème-close {
+.ui-icon-theme-close {
     background: url("../images/themeClose.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
-.ui-icon-thème-open {
+.ui-icon-theme-open {
     background: url("../images/themeOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
-.ui-icon-sub-thème-close {
+.ui-icon-sub-theme-close {
     background: url("../images/subThemeClose.png") no-repeat !important;
     background: none;
     border-radius: 0px;
 }
 
-.ui-icon-sub-thème-open {
+.ui-icon-sub-theme-open {
     background: url("../images/subThemeOpen.png") no-repeat !important;
     background: none;
     border-radius: 0px;

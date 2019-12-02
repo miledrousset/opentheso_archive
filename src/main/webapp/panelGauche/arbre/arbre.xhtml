@@ -42,12 +42,12 @@
                                 collapsedIcon="ui-icon ui-icon-sub-collection-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
                     </p:treeNode>  
-                    <p:treeNode type="thème" expandedIcon="ui-icon ui-icon-thème-open" 
-                                collapsedIcon="ui-icon ui-icon-thème-close">  
+                    <p:treeNode type="theme" expandedIcon="ui-icon ui-icon-theme-open" 
+                                collapsedIcon="ui-icon ui-icon-theme-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" /> 
                     </p:treeNode>  
-                    <p:treeNode type="subThème" expandedIcon="ui-icon ui-icon-sub-thème-open" 
-                                collapsedIcon="ui-icon ui-icon-sub-thème-close">  
+                    <p:treeNode type="subTheme" expandedIcon="ui-icon ui-icon-sub-theme-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-theme-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" /> 
                     </p:treeNode>  
                     <p:treeNode type="microTheso" expandedIcon="ui-icon ui-icon-mircoTheso-open" 
@@ -68,10 +68,7 @@
                     <p:treeNode type="hidden" icon="ui-icon ui-icon-hidden">  
                         <h:outputText value="#{node}"/>  
                     </p:treeNode> 
-                    <p:treeNode type="orphan" expandedIcon="ui-icon ui-icon-domaine-open" 
-                                collapsedIcon="ui-icon ui-icon-domaine-close"> 
-                        <h:outputText value="#{node}"/> 
-                    </p:treeNode>
+
                 </p:tree>  
                 <p:tree  id="tree" rendered="#{currentUser.user != null
                                                and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso || roleOnTheso.isManagerOnThisTheso)}"
@@ -114,12 +111,12 @@
                                 collapsedIcon="ui-icon ui-icon-sub-collection-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" />  
                     </p:treeNode>  
-                    <p:treeNode type="thème" expandedIcon="ui-icon ui-icon-thème-open" 
-                                collapsedIcon="ui-icon ui-icon-thème-close">  
+                    <p:treeNode type="theme" expandedIcon="ui-icon ui-icon-theme-open" 
+                                collapsedIcon="ui-icon ui-icon-theme-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" /> 
                     </p:treeNode>  
-                    <p:treeNode type="subThème" expandedIcon="ui-icon ui-icon-sub-thème-open" 
-                                collapsedIcon="ui-icon ui-icon-sub-thème-close">  
+                    <p:treeNode type="subTheme" expandedIcon="ui-icon ui-icon-sub-theme-open" 
+                                collapsedIcon="ui-icon ui-icon-sub-theme-close">  
                         <h:outputText value="#{node}" styleClass="groupArbre" /> 
                     </p:treeNode>  
                     <p:treeNode type="microTheso" expandedIcon="ui-icon ui-icon-mircoTheso-open" 

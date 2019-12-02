@@ -164,7 +164,7 @@ public class NewTreeBean implements Serializable {
                 type = "collection";
                 break;
             case "T":
-                type = "thème";
+                type = "theme";
                 break;
             case "MT":
             default:
@@ -185,7 +185,7 @@ public class NewTreeBean implements Serializable {
                 type = "subCollection";
                 break;
             case "T":
-                type = "subThème";
+                type = "subTheme";
                 break;
             case "MT":
             default:
@@ -227,7 +227,7 @@ public class NewTreeBean implements Serializable {
         //      idThesoSelected = idTheso;
         //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
-        int count = 1;//attribut pour la numérotation des groupes
+
         ArrayList<MyTreeNode> listeNode = new ArrayList<>();//idem
         if (connect.getPoolConnexion() == null) {
             System.err.println("Opentheso n'a pas pu se connecter à la base de données");
@@ -250,7 +250,6 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getConceptGroup().getIdgroup(), root);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-
                 new DefaultTreeNode("facette", dynamicTreeNode);
             } else {
                 TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(),
@@ -282,9 +281,7 @@ public class NewTreeBean implements Serializable {
                  */
                 new DefaultTreeNode("facette", dynamicTreeNode);
                 listeNode.add((MyTreeNode) dynamicTreeNode);
-
             }
-
         }
         /**
          * *ici on trie la liste des groupes d après le champ data**
@@ -306,43 +303,6 @@ public class NewTreeBean implements Serializable {
         /**
          * *fin **
          */
-        if (idTheso != null) {
-            loadOrphan(idTheso, langue);
-        }
-
-    }
-
-    public void loadOrphan(String idTheso, String langue) {
-        String typeNode, value = "";
-        /*
-        this.typeMot = type;
-      this.idMot = id;
-      this.idTheso = idT;
-      this.langue = l;
-      this.idDomaine = idD;
-      this.typeDomaine = typeDomaine; 
-      this.idTopConcept = idTC;
-         */
-        TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, null, idTheso, langue, null, null, null, "orphan", langueBean.getMsg("index.orphans"), root);
-        orphans = new OrphanHelper().getListOrphanId(connect.getPoolConnexion(), idTheso);
-        for (String idC : orphans) {
-            if (new ConceptHelper().haveChildren(connect.getPoolConnexion(), idTheso, idC)) {
-                typeNode = "dossier";
-            } else {
-                typeNode = "fichier";
-            }
-            Term term = new TermHelper().getThisTerm(connect.getPoolConnexion(), idC, idTheso, langue);
-            if (term != null) {
-                value = term.getLexical_value() + " (id_" + idC + ")";
-        //        Concept temp = new ConceptHelper().getThisConcept(connect.getPoolConnexion(), idC, idTheso);
-                MyTreeNode mtn = new MyTreeNode(3, idC, idTheso, langue, "Orphan", null, null, typeNode, value, dynamicTreeNode);
-                if (typeNode.equals("dossier")) {
-                    new DefaultTreeNode("fake", mtn);
-                }
-            }
-
-        }
-
     }
 
     public void majSearchPermute() {
@@ -873,26 +833,6 @@ public class NewTreeBean implements Serializable {
             /**
              * *fin **
              */
-            loadOrphan(idTheso, langue);
-            //loadOrphan(idTheso, langue);
-            for (TreeNode tn : root.getChildren()) {
-                if (tn.getType().equals("orphan")) {
-                    for (TreeNode tn2 : tn.getChildren()) {
-                        for (ArrayList<String> tabId : listeId) {
-                            if (tabId.size() == 2 && tabId.get(1).equals(((MyTreeNode) tn2).getIdConcept())) {
-                                tn2.setSelected(true);
-                                selectedNode = tn2;
-                                selectedNodes.add(tn2);
-
-                            } else {
-                                if (tabId.get(1).equals(((MyTreeNode) tn2).getIdConcept())) {
-                                    reExpandChild(tabId, (MyTreeNode) tn2, 2);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         } else {
             List<TreeNode> racineNode = root.getChildren();
             for (TreeNode dynamicTreeNode : racineNode) {

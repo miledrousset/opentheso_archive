@@ -43,6 +43,7 @@ public class ArkRestTests {
             
             
     String serverHost = "https://ark.mom.fr/Arkeo";
+//    String serverHost = "http://localhost:8080/Arkeo";    
     String user = "demo";
     String password = "demo2";
     String naan = "66666";
@@ -201,9 +202,9 @@ public class ArkRestTests {
         String loginResp = login();
         if(loginResp == null) return;
         
-        String url = "http://iglsdev.mom.fr/IGLS/Image/IGLS_8-1_02377645fggg";
-        String title = "IGLS_8-1_02377645fggg";
-        String idArk = "66666/IGLS_8-1_02377645fggg";
+        String url = "https://www.mom.fr/valorisation-grand-public/expositions/recherches-archeologiques-en-azerbadjan-2020";
+        String title = "Recherches archéologiques en Azerbadjan";
+        String idArk = "66666/archeologiques-en-azerbadjan-2019";
         
         
         JSONObject loginrespasjson = new JSONObject(loginResp);
@@ -269,10 +270,10 @@ public class ArkRestTests {
         String loginResp = login();
         if(loginResp == null) return;
         
-        String url = "http://miled.fr/1";
+        String url = "http://miled.fr/testViaCurl1";
         String title = "IGLS_8-1_02377";
-        String idArk = "abcdefghijk";
-        
+        String idArk = "";
+        // type = prefixe à ajouter devant l'identifiant à générer
         
         JSONObject loginrespasjson = new JSONObject(loginResp);
         String token = loginrespasjson.getString("token");
@@ -289,7 +290,7 @@ public class ArkRestTests {
                 + "\"handle\":\"\","
                 + "\"handle_stored\":false,"
                 + "\"date\":\"2016-11-11\","
-                + "\"type\":\"Service\","
+                + "\"type\":\"pcrt\","
                 + "\"language\":\"fr\","
                 + "\"linkup\":true,"
                 + "\"ark\":\""+ idArk + "\","
@@ -344,7 +345,7 @@ public class ArkRestTests {
 
         //     String idArk = "{\"ark description\":\"Ark Added.\",\"handle description\":\"Handle Added.\",\"idArk\":\"srvy4btF7VkX8\",\"Ark\":\"66666/srvy4btF7VkX8\",\"status\":\"Success\",\"Handle\":\"20.500.11859/66666.srvy4btF7VkX8\",\"token\":\"25bqisma4g1hfbh7qgcadrvlk4\"}";
 
-        String url = "http://miled.fr/1";
+        String url = "https://www.mom.fr/valorisation-grand-public/expositions/recherches-archeologiques-en-azerbadjan-2020";
         String idArk = "{\"urlTarget\":\" "+ url + "\","
                 + "\"title\":\" vasevase\",\"creator\":\"\",\"handle_prefix\":\"20.500.11859\","
                 + "\"handle\":\"\",\"handle_stored\":false,\"date\":\"2018-07-24\","
@@ -399,9 +400,9 @@ public class ArkRestTests {
         String loginResp = login();
         if(loginResp == null) return;
         
-        String newUrl = "http://iglsdev.mom.fr/IGLS/Image/imageDe";
+        String newUrl = "https://www.mom.fr/valorisation-grand-public/expositions/recherches-archeologiques-en-azerbadjan-2020";
         String newTitle = "IGLS_8-1_02377PP";
-        String idArk = "66666/IGLS_8-1_02377645fggg";        
+        String idArk = "66666/archeologiques-en-azerbadjan-2019";        
         
         JSONObject loginrespasjson = new JSONObject(loginResp);
         String token = loginrespasjson.getString("token");

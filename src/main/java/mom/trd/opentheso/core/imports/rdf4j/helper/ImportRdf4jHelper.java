@@ -64,7 +64,6 @@ public class ImportRdf4jHelper {
     private String langueSource;
     private HikariDataSource ds;
     private String formatDate;
-    private String adressSite;
     private int idUser;
     private int idGroupUser;
 
@@ -82,7 +81,7 @@ public class ImportRdf4jHelper {
     Thesaurus thesaurus;
 
     HashMap<String, String> memberHashMap = new HashMap<>();
-    HashMap<String, String> groupSubGroup = new HashMap<>(); // pour garder en mémoire les relations de types (member) pour détecter ce qui groupe ou concept 
+    HashMap<String, String> groupSubGroup = new HashMap<>(); // pour garder en mémoire les relations de types (member) pour détecter ce qui est groupe ou concept 
     
     
     ArrayList<String> hasTopConcceptList = new ArrayList<>();
@@ -92,7 +91,7 @@ public class ImportRdf4jHelper {
     public ImportRdf4jHelper() {
         idTopConcept = new ArrayList<>();
         idGroups = new ArrayList<>();
-        idGroupDefault = "";
+        idGroupDefault = "orphans";
         message = new StringBuilder();
         defaultGroupToAdd = false;
     }
@@ -473,7 +472,7 @@ public class ImportRdf4jHelper {
         }
         conn.commit();
         conn.close();
-        idGroupDefault = getNewGroupId();
+        idGroupDefault = "orphans";//getNewGroupId();
 
         for (SKOSRelation relation : skosXmlDocument.getConceptScheme().getRelationsList()) {
             hasTopConcceptList.add(relation.getTargetUri());
@@ -607,7 +606,13 @@ public class ImportRdf4jHelper {
      */
     private void addGroupDefault() {
         if (defaultGroupToAdd) {
+            
             GroupHelper groupHelper = new GroupHelper();
+            idGroupDefault = "orphans"; 
+            if (!groupHelper.addGroupDefault(ds, langueSource, idTheso)) {
+            }
+           
+        /*  //  GroupHelper groupHelper = new GroupHelper();
             groupHelper.insertGroup(ds,
                     idGroupDefault,
                     thesaurus.getId_thesaurus(),
@@ -625,7 +630,7 @@ public class ImportRdf4jHelper {
 
             conceptGroupLabel.setLang(langueSource);
             conceptGroupLabel.setLexicalvalue("groupDefault");
-            groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);
+            groupHelper.addGroupTraduction(ds, conceptGroupLabel, idUser);*/
         }
     }
 

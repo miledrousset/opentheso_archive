@@ -6,17 +6,18 @@
     xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:p="http://primefaces.org/ui">
 
-
-        <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600" rendered="#{(poolConnexion.poolConnexion != null) and (newtreeBean.browserName != 'agent')}">
+    <p:dialog header="Aide" widgetVar="dlgHelp" modal="true" resizable="false" width="600"
+              rendered="#{(poolConnexion.poolConnexion != null) and (newtreeBean.browserName != 'agent')}">
+        <p:scrollPanel style="width:580px;height:450px" mode="native" >
             <h1>Gestionnaire de thésaurus</h1>
             <h:outputText value="version :  #{currentUser.versionOfOpentheso}" /><br/>
             <br/>
             <h:outputLink  value="https://github.com/miledrousset/opentheso/wiki" target="_blank" style="color: forestgreen"> 
-                        <h:outputText value="La doc complète d'Opentheso sur Github" />
+                <h:outputText value="La doc complète d'Opentheso sur Github" />
             </h:outputLink>
             <br/><br/>
-            
-            
+
+
             Depuis cette page d'accueil, il vous est possible de parcourir le thésaurus.<br/>
             <ul>
                 <li>Choisir le thésaurus en haut à gauche de la page (il sera en français par défaut)</li>
@@ -33,12 +34,13 @@
             plus bas dans l'arbre pour avoir accès à toutes les fonctionnalités.<br/><br/>
 
             La gestion des facettes permet de regrouper par thèmes différents concepts (peu importe leur place dans le thésaurus).
-            
+
             <h1>Webservcies</h1>
-            Pour avoir de l'aide et des exemples sur le fonctionnement du webservcice,<br/> c'est ici : 
+            Pour avoir de l'aide et des exemples sur le fonctionnement du webservices,<br/> c'est ici : 
             <h:outputLink  value="copyright.xhtml" style="color: forestgreen"> 
-                        <h:outputText value="webservices Opentheso" />
+                <h:outputText value="webservices Opentheso" />
             </h:outputLink>
             <br/> <br/>
-        </p:dialog>  
+        </p:scrollPanel>
+    </p:dialog>  
 </ui:composition>

@@ -1153,8 +1153,7 @@ public class TermHelper {
                          + " and prefered = true";*/
                         stmt.executeQuery(query);
                         resultSet = stmt.getResultSet();
-                        if (resultSet != null) {
-                            resultSet.next();
+                        if (resultSet.next()) {
                             term = new Term();
                             term.setId_term(resultSet.getString("id_term"));
                             term.setLexical_value(resultSet.getString("lexical_value"));

@@ -18,29 +18,31 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizing}" 
-                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" update=":messages"/>
                 </h:form> 
-                
+               
+                <!-- 
                 <h:form id="formRegenerateOrphans">
                     <table>
                         <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.reorganizing.regenerateOrphan')}" />  </td>
+                            <td><h:outputText value="# {langueBean.getMsg('conf.reorganizing.regenerateOrphan')}" />  </td>
                         </tr>
                     </table>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.regenerateOrphan}" 
+                    <p:commandButton value="# {langueBean.getMsg('conf.btnValid')}" actionListener="# {theso.regenerateOrphan}" 
                                      oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
                 </h:form>                   
-                
-                <h:form id="formReorganizingOrphans">
+                -->
+            <!--    <h:form id="formReorganizingOrphans">
                     <table>
                         <tr>
-                            <td><h:outputText value="#{langueBean.getMsg('conf.reorganizing.oprhanReplace')}" />  </td>
+                            <td><h:outputText value="# {langueBean.getMsg('conf.reorganizing.oprhanReplace')}" />  </td>
                         </tr>
                     </table>
-                    <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.orphanReplace}" 
+                    <p:commandButton value="# {langueBean.getMsg('conf.btnValid')}" actionListener="# {theso.orphanReplace}" 
                                      oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
                 </h:form>
-                
+            -->
+            
                 <h:form id="formReciprocalRelation">
                     <table>
                         <tr>
@@ -48,7 +50,7 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.completeReciprocalRelation}" 
-                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" update=":messages"/>
                 </h:form>
                 
                 <h:form id="formCompleteLackGroup">
@@ -58,7 +60,7 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.completeLackGroup}" 
-                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" update=":messages"/>
                 </h:form>   
                 
                 <h:form id="formDetectNoGroup">
@@ -68,7 +70,7 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.detectAndReplaceNoGroup}" 
-                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" update=":messages"/>
                 </h:form>                 
                 
                 <h:form id="formCompleteLackTopTerm">
@@ -78,7 +80,7 @@
                         </tr>
                     </table>
                     <p:commandButton value="#{langueBean.getMsg('conf.btnValid')}" actionListener="#{theso.reorganizingTopTerm}" 
-                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" />
+                                     oncomplete="PF('reorganizing').hide();" styleClass="styleButton" update=":messages"/>
                 </h:form>                
                 
             </fieldset>

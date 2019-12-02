@@ -4017,7 +4017,7 @@ public class ConceptHelper {
 
     /**
      * Cette fonction permet de récupérer l'identifiant du Concept d'après
-     * l'idArk
+     * l'idHandle
      *
      * @param ds
      * @param arkId
@@ -4055,6 +4055,47 @@ public class ConceptHelper {
         }
         return idConcept;
     }
+    
+    /**
+     * Cette fonction permet de récupérer l'identifiant du Concept d'après
+     * l'idArk
+     *
+     * @param ds
+     * @param handleId
+     * @return IdConcept
+     */
+    public String getIdConceptFromHandleId(HikariDataSource ds, String handleId) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idConcept = null;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_concept from concept where"
+                            + " id_handle = '" + handleId + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    if (resultSet.next()) {
+                        idConcept = resultSet.getString("id_concept");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting idConcept by idArk : " + handleId, sqle);
+        }
+        return idConcept;
+    }    
 
     /**
      * Cette fonction permet de récupérer l'identifiant du Concept d'après
@@ -4096,6 +4137,47 @@ public class ConceptHelper {
         }
         return idThesaurus;
     }
+    
+    /**
+     * Cette fonction permet de récupérer l'identifiant du Concept d'après
+     * l'idHandle
+     * 
+     * @param ds
+     * @param handleId
+     * @return IdConcept
+     */
+    public String getIdThesaurusFromHandleId(HikariDataSource ds, String handleId) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        String idThesaurus = null;
+        try {
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select id_thesaurus from concept where"
+                            + " id_handle = '" + handleId + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    if (resultSet.next()) {
+                        idThesaurus = resultSet.getString("id_thesaurus");
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting idThesaurus by idArk : " + handleId, sqle);
+        }
+        return idThesaurus;
+    }    
 
     /**
      * Cette fonction permet de récupérer l'identifiant du Group d'un Concept

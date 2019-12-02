@@ -9,29 +9,29 @@
         xmlns:p="http://primefaces.org/ui">
 
         <h:form id="formTools" >
-        <!--    
-            <h:panelGroup rendered="# {theso.thesaurus.id_thesaurus != null}"> 
-                <p:autoComplete id="nomTerme" value="# {selectedTerme.selectedTermComp}" completeMethod="# {autoComp.completTermFullText}" var="values"
-                                minQueryLength="1" itemLabel="# {values.prefLabel}" itemValue="# {values}" converter="termConverter"
+        <!---->    
+            <h:panelGroup rendered="#{theso.thesaurus.id_thesaurus != null}"> 
+                <p:autoComplete id="nomTerme" value="#{selectedTerme.selectedTermComp}" completeMethod="#{autoComp.completTermFullText}" var="values"
+                                minQueryLength="1" itemLabel="#{values.prefLabel}" itemValue="#{values}" converter="termConverter"
                                 scrollHeight="600"
-                                a:placeholder="# {langueBean.getMsg('indexSearch')}"  style="font-size: 12px;"
+                                a:placeholder="#{langueBean.getMsg('indexSearch')}"  style="font-size: 12px;"
                                 label="Recherche rapide sans déplier l'arbre">
-                    <p:column rendered="# {values.isAltLabel}" style="font-size: 12px;">
-                        <h:outputText title="# {values.idConcept}" value="# {values.altLabel}"
+                    <p:column rendered="#{values.isAltLabel}" style="font-size: 12px;">
+                        <h:outputText title="#{values.idConcept}" value="#{values.altLabel}"
                                       style="font-style: italic;" />
-                        <h:outputText title="# {values.idConcept}" value=" -> # {values.prefLabel}" style="color: blue" />                                        
+                        <h:outputText title="#{values.idConcept}" value=" -> #{values.prefLabel}" style="color: blue" />                                        
                     </p:column>
 
-                    <p:column rendered="# {!values.isAltLabel}" style="font-size: 12px;">
-                        <h:outputText title="# {values.idConcept}" value="# {values.prefLabel}" />
+                    <p:column rendered="#{!values.isAltLabel}" style="font-size: 12px;">
+                        <h:outputText title="#{values.idConcept}" value="#{values.prefLabel}" />
                     </p:column>
 
-                    <p:ajax event="itemSelect" listener="# {newtreeBean.majIndexRapidSearchWithoutExpand(theso.thesaurus.language)}"  
-                            update=":accordeonTree,:panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :accordeonTree:panelTree" 
+                    <p:ajax event="itemSelect" listener="#{newtreeBean.majIndexRapidSearchWithoutExpand(theso.thesaurus.language)}"  
+                            update=":panContenu,:note,:contenuDroite1,:contenuDroite2,:contenuDroite3, :messages" 
                             />
                 </p:autoComplete>
             </h:panelGroup>             
-            -->
+            <!---->
             
             <h:panelGroup rendered="#{currentUser.user.name != null and theso.getThisTheso() != null 
                           and (currentUser.user.isSuperAdmin || roleOnTheso.isAdminOnThisTheso)}" 
