@@ -155,14 +155,14 @@
                     <h:outputText title="#{selectedTerme.idC}" id="nom" value="#{selectedTerme.nom}" styleClass="textInfoTitle"/><br/>
                 </span>
 
-                <!-- Uri d'origine du concept -->
+                <!-- Uri d'origine du concept 
                 <span>
                     <h:outputText value="uri: " />
-                    <h:outputLink value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.idC}" target="_blank" styleClass="linkSmall">
-                        <h:outputText value="#{roleOnTheso.nodePreference.cheminSite}#{selectedTerme.idC}" styleClass="linkSmall"/>
+                    <h:outputLink value="# {roleOnTheso.nodePreference.cheminSite}# {selectedTerme.idC}" target="_blank" styleClass="linkSmall">
+                        <h:outputText value="# {roleOnTheso.nodePreference.cheminSite}# {selectedTerme.idC}" styleClass="linkSmall"/>
                     </h:outputLink>
                 </span>                
-                <br/>
+                <br/>-->
                 
                 <h:panelGroup rendered= "#{(roleOnTheso.nodePreference.z3950actif) or (roleOnTheso.nodePreference.bddActive)}">
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >

@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 //import java.util.logging.Level;
@@ -12,7 +11,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import javax.faces.context.ExternalContext;
 
 import javax.faces.context.FacesContext;
 
@@ -20,8 +18,6 @@ import javax.faces.context.FacesContext;
 //import org.slf4j.LoggerFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-
 
 @ManagedBean (name = "poolConnexion", eager = true)
 @ApplicationScoped

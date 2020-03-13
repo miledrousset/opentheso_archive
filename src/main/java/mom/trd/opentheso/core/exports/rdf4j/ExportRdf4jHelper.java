@@ -388,6 +388,7 @@ public class ExportRdf4jHelper {
 
     private void addMember(String id, String idThesaurus, SKOSResource resource) {
 
+        System.out.println("idConcept = " + id);
         RelationsHelper relationsHelper = new RelationsHelper();
         ArrayList<NodeHieraRelation> listChildren = relationsHelper.getListNT(ds, id, idThesaurus);
 

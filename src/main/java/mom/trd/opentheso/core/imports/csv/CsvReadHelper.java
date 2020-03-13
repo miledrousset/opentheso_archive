@@ -474,6 +474,22 @@ public class CsvReadHelper {
         String value;
         String values[];
         for (String idLang : langs) {
+            // note
+            try {
+                value = record.get("skos:note@" + idLang.trim());
+                values = value.split("##");
+                for (String value1 : values) {
+                    if(!value1.isEmpty()) {
+                        Label label = new Label();
+                        label.setLabel(value1);
+                        label.setLang(idLang);
+                        conceptObject.note.add(label);
+                    }
+                }
+
+            } catch (Exception e) {
+                //System.err.println("");
+            }            
             // définition
             try {
                 value = record.get("skos:definition@" + idLang.trim());
@@ -625,6 +641,7 @@ public class CsvReadHelper {
         private ArrayList<Label> hiddenLabels;
         
         // Les notes
+        private ArrayList<Label> note;        
         private ArrayList<Label> definitions;
         private ArrayList<Label> scopeNotes;
         private ArrayList<Label> examples;
@@ -664,6 +681,7 @@ public class CsvReadHelper {
             altLabels = new ArrayList<>(); 
             hiddenLabels = new ArrayList<>();
             
+            note = new ArrayList<>();
             definitions = new ArrayList<>();
             scopeNotes = new ArrayList<>();
             examples = new ArrayList<>();
@@ -740,6 +758,14 @@ public class CsvReadHelper {
 
         public void setHiddenLabels(ArrayList<Label> hiddenLabels) {
             this.hiddenLabels = hiddenLabels;
+        }
+
+        public ArrayList<Label> getNote() {
+            return note;
+        }
+
+        public void setNote(ArrayList<Label> note) {
+            this.note = note;
         }
 
         public ArrayList<Label> getDefinitions() {

@@ -54,7 +54,7 @@ public class GroupHelper {
     
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////
- ////////////////// Nouvelles fontions #MR//////////////////////////////
+ ////////////////// Nouvelles fonctions #MR//////////////////////////////
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////    
  
@@ -678,9 +678,264 @@ public class GroupHelper {
         return status;
     }    
     
+    /**
+     * permet de retourner la liste des domaines de premier niveau (MT, G, C, T)
+     *
+     * @param ds
+     * @param idTheso
+     * @param idLang
+     * #MR
+     * @return
+     */
+    public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
+            String idTheso, String idLang) {
+
+        ArrayList<NodeGroup> nodeConceptGroupList = new ArrayList<>();
+        ArrayList<String> tabIdConceptGroup = getListIdOfRootGroup(ds, idTheso);
+
+        for (String idGroup : tabIdConceptGroup) {
+            NodeGroup nodeConceptGroup;
+            nodeConceptGroup = getThisConceptGroup(ds, idGroup, idTheso, idLang);
+            if (nodeConceptGroup == null) {
+                return null;
+            }
+            if(isHaveSubGroup(ds, idTheso, idGroup))
+                nodeConceptGroup.setIsHaveChildren(true);
+            if(isGroupHaveConcepts(ds, idGroup, idTheso))
+                nodeConceptGroup.setIsHaveChildren(true);
+            
+            if(nodeConceptGroup.getLexicalValue().isEmpty())
+                nodeConceptGroup.setLexicalValue("__" + idGroup);
+            
+            nodeConceptGroupList.add(nodeConceptGroup);
+        }
+
+        return nodeConceptGroupList;
+
+    }    
+    
+    /**
+     * permet de trouver la liste des Id des Groupes de premier niveau
+     * @param ds
+     * @param idThesaurus
+     * @return 
+     */
+    public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
+            String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList tabIdConceptGroup = null;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "select idgroup, notation from concept_group where idthesaurus = '" 
+                            + idThesaurus +
+                            "' and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')" +
+                            " order by notation ASC";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    tabIdConceptGroup = new ArrayList();
+                    while (resultSet.next()) {
+                        tabIdConceptGroup.add(resultSet.getString("idgroup"));
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting List Id or Groups of thesaurus : " + idThesaurus, sqle);
+        }
+        return tabIdConceptGroup;
+    }    
+    
+    /**
+     * Permet de retourner un NodeConceptGroup par identifiant, par thésaurus et
+     * par langue / ou null si rien cette fonction ne retourne pas les détails
+     * et les traductions
+     *
+     * @param ds le pool de connexion
+     * @param idConceptGroup
+     * @param idThesaurus
+     * @param idLang
+     * @return Objet Class NodeConceptGroup
+     */
+    public NodeGroup getThisConceptGroup(HikariDataSource ds,
+            String idConceptGroup, String idThesaurus, String idLang) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        NodeGroup nodeConceptGroup = null;
+        ConceptGroup conceptGroup = null;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT * from concept_group where "
+                            + " idgroup = '" + idConceptGroup + "'"
+                            + " and idthesaurus = '" + idThesaurus + "'";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        resultSet.next();
+                        if (resultSet.getRow() != 0) {
+                            conceptGroup = new ConceptGroup();
+                            conceptGroup.setIdgroup(idConceptGroup);
+                            conceptGroup.setIdthesaurus(idThesaurus);
+                            conceptGroup.setIdARk(resultSet.getString("id_ark"));
+                            conceptGroup.setIdHandle(resultSet.getString("id_handle"));
+                            conceptGroup.setIdtypecode(resultSet.getString("idtypecode"));
+                            conceptGroup.setNotation(resultSet.getString("notation"));
+                        }
+                    }
+                    if (conceptGroup != null) {
+                        query = "SELECT * FROM concept_group_label WHERE"
+                                + " idgroup = '" + conceptGroup.getIdgroup() + "'"
+                                + " AND idthesaurus = '" + idThesaurus + "'"
+                                + " AND lang = '" + idLang + "'";
+
+                        stmt.executeQuery(query);
+                        resultSet = stmt.getResultSet();
+                        if (resultSet != null) {
+                            nodeConceptGroup = new NodeGroup();
+                            resultSet.next();
+                            if (resultSet.getRow() == 0) {
+                                // cas du Group non traduit
+                                nodeConceptGroup.setLexicalValue("");
+                                nodeConceptGroup.setIdLang(idLang);
+
+                            } else {
+                                nodeConceptGroup.setLexicalValue(resultSet.getString("lexicalvalue"));
+                                nodeConceptGroup.setIdLang(idLang);
+                                nodeConceptGroup.setCreated(resultSet.getDate("created"));
+                                nodeConceptGroup.setModified(resultSet.getDate("modified"));
+                            }
+                            nodeConceptGroup.setConceptGroup(conceptGroup);
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while adding element : " + idThesaurus, sqle);
+        }
+        return nodeConceptGroup;
+    }    
+    
+    
+    /**
+     * Permet de retourner la liste des sous_groupes d'un Group (type G/C/MT/T)
+     * si le group n'est pas traduit, on récupère l'ID à la place 
+     * 
+     * @param ds
+     * @param idConceptGroup
+     * @param idTheso
+     * @param idLang
+     * @return
+     * #MR
+     */
+    public ArrayList<NodeGroup> getListChildsOfGroup(HikariDataSource ds,
+            String idConceptGroup, String idTheso, String idLang) {
+        
+        ArrayList<String> lisIdGroups = getListGroupChildIdOfGroup(ds, idConceptGroup, idTheso);
+        if(lisIdGroups == null) return null;
+        if(lisIdGroups.isEmpty()) return null;
+
+        ArrayList<NodeGroup> nodeGroups = new ArrayList<>();
+
+        for (String idGroup : lisIdGroups) {
+            NodeGroup nodeConceptGroup;
+            nodeConceptGroup = getThisConceptGroup(ds, idGroup, idTheso, idLang);
+            if (nodeConceptGroup == null) {
+                return null;
+            }
+            if(isHaveSubGroup(ds, idTheso, idGroup))
+                nodeConceptGroup.setIsHaveChildren(true);
+            if(isGroupHaveConcepts(ds, idGroup, idTheso))
+                nodeConceptGroup.setIsHaveChildren(true);
+            
+            if(nodeConceptGroup.getLexicalValue().isEmpty())
+                nodeConceptGroup.setLexicalValue("__" + idGroup);
+            nodeGroups.add(nodeConceptGroup);
+        }
+        return nodeGroups;
+    }
+    
+    /**
+     * Retourne la liste des identifiants des groupes fils
+     * @param ds
+     * @param idGRoup
+     * @param idThesaurus
+     * @return 
+     */
+    public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
+            String idGRoup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> idGroupParentt = new ArrayList<>();
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT " +
+                                    "  concept_group.notation, " +
+                                    "  concept_group.idgroup" +
+                                    " FROM " +
+                                    "  relation_group, " +
+                                    "  concept_group" +
+                                    " WHERE " +
+                                    "  concept_group.idthesaurus = relation_group.id_thesaurus AND" +
+                                    "  concept_group.idgroup = relation_group.id_group2 AND" +
+                                    "  concept_group.idthesaurus = '" + idThesaurus + "' AND " +
+                                    "  relation_group.id_group1 = '" + idGRoup + "' AND " +
+                                    "  relation_group.relation = 'sub'" +
+                                    "  order by notation ASC;";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    if (resultSet != null) {
+                        while (resultSet.next()) {
+                            idGroupParentt.add(resultSet.getString("idgroup"));
+                        }
+                    }
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
+        }
+        return idGroupParentt;
+    }    
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////
- //////// fin des nouvelles fontions ////////////////////////////////
+ //////// fin des nouvelles fonctions ////////////////////////////////
  ////////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////////        
     
@@ -695,6 +950,87 @@ public class GroupHelper {
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    /** à supprimer (doublon) #MR
+     * Permet de retourner la liste des sous_groupes d'un Group (type G/C/MT/T)
+     * si le group n'est pas traduit, on récupère l'ID à la place 
+     * 
+     * @param ds
+     * @param idConceptGroup
+     * @param idThesaurus
+     * @param idLang
+     * @return
+     * 
+     */
+    public ArrayList<NodeConceptTree> getRelationGroupOf(HikariDataSource ds,
+            String idConceptGroup, String idThesaurus, String idLang) {
+        ArrayList<NodeConceptTree> nodeConceptTrees;
+        ArrayList<String> lisIdGroups = getListGroupChildIdOfGroup(ds, idConceptGroup, idThesaurus);
+        if(lisIdGroups == null) return null;
+        if(lisIdGroups.isEmpty()) return null;
+
+        nodeConceptTrees = new ArrayList<>();
+        for (String idGroup : lisIdGroups) {
+            NodeConceptTree nodeConceptTree = new NodeConceptTree();
+            nodeConceptTree.setIdConcept(idGroup);
+            nodeConceptTree.setIdLang(idLang);
+            nodeConceptTree.setIdThesaurus(idThesaurus);
+            nodeConceptTree.setTitle(getLexicalValueOfGroup(ds, idGroup, idThesaurus, idLang));
+            nodeConceptTree.setStatusConcept("");
+            nodeConceptTree.setHaveChildren(true);
+            nodeConceptTree.setIsGroup(false);
+            nodeConceptTree.setIsSubGroup(true);
+            nodeConceptTrees.add(nodeConceptTree);
+        }
+        return nodeConceptTrees;
+    }
     
     /**
      * permet d'ajouter un sous groupe
@@ -830,56 +1166,7 @@ public class GroupHelper {
         return status;
     }    
     
-    public ArrayList<String> getListGroupChildIdOfGroup(HikariDataSource ds,
-            String idGRoup, String idThesaurus) {
 
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        ArrayList<String> idGroupParentt = new ArrayList<>();
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    /*String query = "select id_group2 from relation_group where id_thesaurus = '"
-                            + idThesaurus + "'"
-                            + " and id_group1 = '" + idGRoup + "'"
-                            + " and relation='sub'";*/
-                    String query = "SELECT " +
-                                    "  concept_group.notation, " +
-                                    "  concept_group.idgroup" +
-                                    " FROM " +
-                                    "  relation_group, " +
-                                    "  concept_group" +
-                                    " WHERE " +
-                                    "  concept_group.idthesaurus = relation_group.id_thesaurus AND" +
-                                    "  concept_group.idgroup = relation_group.id_group2 AND" +
-                                    "  concept_group.idthesaurus = '" + idThesaurus + "' AND " +
-                                    "  relation_group.id_group1 = '" + idGRoup + "' AND " +
-                                    "  relation_group.relation = 'sub'" +
-                                    "  order by notation ASC;";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        while (resultSet.next()) {
-                            idGroupParentt.add(resultSet.getString("idgroup"));
-                        }
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while getting Id of group of Concept : " + idGRoup, sqle);
-        }
-        return idGroupParentt;
-    }
 
     /**
      * Fonction qui permet de supprimer un domaine de la branche donnée avec un
@@ -1583,39 +1870,7 @@ public class GroupHelper {
         return nodeGroupList;
     }
 
-    /**
-     * Permet de retourner la liste des sous_groupes d'un Group (type G/C/MT/T)
-     * si le group n'est pas traduit, on récupère l'ID à la place 
-     * 
-     * @param ds
-     * @param idConceptGroup
-     * @param idThesaurus
-     * @param idLang
-     * @return
-     * #MR
-     */
-    public ArrayList<NodeConceptTree> getRelationGroupOf(HikariDataSource ds,
-            String idConceptGroup, String idThesaurus, String idLang) {
-        ArrayList<NodeConceptTree> nodeConceptTrees;
-        ArrayList<String> lisIdGroups = getListGroupChildIdOfGroup(ds, idConceptGroup, idThesaurus);
-        if(lisIdGroups == null) return null;
-        if(lisIdGroups.isEmpty()) return null;
 
-        nodeConceptTrees = new ArrayList<>();
-        for (String idGroup : lisIdGroups) {
-            NodeConceptTree nodeConceptTree = new NodeConceptTree();
-            nodeConceptTree.setIdConcept(idGroup);
-            nodeConceptTree.setIdLang(idLang);
-            nodeConceptTree.setIdThesaurus(idThesaurus);
-            nodeConceptTree.setTitle(getLexicalValueOfGroup(ds, idGroup, idThesaurus, idLang));
-            nodeConceptTree.setStatusConcept("");
-            nodeConceptTree.setHaveChildren(true);
-            nodeConceptTree.setIsGroup(false);
-            nodeConceptTree.setIsSubGroup(true);
-            nodeConceptTrees.add(nodeConceptTree);
-        }
-        return nodeConceptTrees;
-    }
 
     public String getIdFather(HikariDataSource ds,
             String idGRoup, String idThesaurus) {
@@ -1654,87 +1909,7 @@ public class GroupHelper {
         return idFather;
     }
 
-    /**
-     * Permet de retourner un NodeConceptGroup par identifiant, par thésaurus et
-     * par langue / ou null si rien cette fonction ne retourne pas les détails
-     * et les traductions
-     *
-     * @param ds le pool de connexion
-     * @param idConceptGroup
-     * @param idThesaurus
-     * @param idLang
-     * @return Objet Class NodeConceptGroup
-     */
-    public NodeGroup getThisConceptGroup(HikariDataSource ds,
-            String idConceptGroup, String idThesaurus, String idLang) {
 
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        NodeGroup nodeConceptGroup = null;
-        ConceptGroup conceptGroup = null;
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "SELECT * from concept_group where "
-                            + " idgroup = '" + idConceptGroup + "'"
-                            + " and idthesaurus = '" + idThesaurus + "'";
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    if (resultSet != null) {
-                        resultSet.next();
-                        if (resultSet.getRow() != 0) {
-                            conceptGroup = new ConceptGroup();
-                            conceptGroup.setIdgroup(idConceptGroup);
-                            conceptGroup.setIdthesaurus(idThesaurus);
-                            conceptGroup.setIdARk(resultSet.getString("id_ark"));
-                            conceptGroup.setIdHandle(resultSet.getString("id_handle"));
-                            conceptGroup.setIdtypecode(resultSet.getString("idtypecode"));
-                            conceptGroup.setNotation(resultSet.getString("notation"));
-                        }
-                    }
-                    if (conceptGroup != null) {
-                        query = "SELECT * FROM concept_group_label WHERE"
-                                + " idgroup = '" + conceptGroup.getIdgroup() + "'"
-                                + " AND idthesaurus = '" + idThesaurus + "'"
-                                + " AND lang = '" + idLang + "'";
-
-                        stmt.executeQuery(query);
-                        resultSet = stmt.getResultSet();
-                        if (resultSet != null) {
-                            nodeConceptGroup = new NodeGroup();
-                            resultSet.next();
-                            if (resultSet.getRow() == 0) {
-                                // cas du Group non traduit
-                                nodeConceptGroup.setLexicalValue("");
-                                nodeConceptGroup.setIdLang(idLang);
-
-                            } else {
-                                nodeConceptGroup.setLexicalValue(resultSet.getString("lexicalvalue"));
-                                nodeConceptGroup.setIdLang(idLang);
-                                nodeConceptGroup.setCreated(resultSet.getDate("created"));
-                                nodeConceptGroup.setModified(resultSet.getDate("modified"));
-                            }
-                            nodeConceptGroup.setConceptGroup(conceptGroup);
-                        }
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while adding element : " + idThesaurus, sqle);
-        }
-        return nodeConceptGroup;
-    }
 
     public ArrayList<NodeGroup> getThisConceptGroup2(HikariDataSource ds,
             String idConceptGroup, String idThesaurus, String idLang, ArrayList<NodeGroup> nodeConceptGroupList) throws SQLException {
@@ -1930,34 +2105,7 @@ public class GroupHelper {
         return nodeConceptGroupList;
     }
 
-    /**
-     * permet de retournner la liste des domaines de premier niveau (MT, G, C, T
-     * )
-     *
-     * @param ds
-     * @param idThesaurus
-     * @param idLang
-     * @return
-     */
-    public ArrayList<NodeGroup> getListRootConceptGroup(HikariDataSource ds,
-            String idThesaurus, String idLang) {
 
-        ArrayList<NodeGroup> nodeConceptGroupList;
-        ArrayList tabIdConceptGroup = getListIdOfRootGroup(ds, idThesaurus);
-
-        nodeConceptGroupList = new ArrayList<>();
-        for (Object tabIdGroup1 : tabIdConceptGroup) {
-            NodeGroup nodeConceptGroup;
-            nodeConceptGroup = getThisConceptGroup(ds, tabIdGroup1.toString(), idThesaurus, idLang);
-            if (nodeConceptGroup == null) {
-                return null;
-            }
-            nodeConceptGroupList.add(nodeConceptGroup);
-        }
-
-        return nodeConceptGroupList;
-
-    }
 
     public ArrayList<NodeGroup> getListConceptGroup2(HikariDataSource ds,
             String idThesaurus, String idLang) throws SQLException {
@@ -2177,44 +2325,7 @@ public class GroupHelper {
         return tabIdConceptGroup;
     }
 
-    public ArrayList<String> getListIdOfRootGroup(HikariDataSource ds,
-            String idThesaurus) {
 
-        Connection conn;
-        Statement stmt;
-        ResultSet resultSet;
-        ArrayList tabIdConceptGroup = null;
-
-        try {
-            // Get connection from pool
-            conn = ds.getConnection();
-            try {
-                stmt = conn.createStatement();
-                try {
-                    String query = "select idgroup, notation from concept_group where idthesaurus = '" 
-                            + idThesaurus +
-                            "' and  idgroup NOT IN ( SELECT id_group2 FROM relation_group WHERE relation = 'sub')" +
-                            " order by notation ASC";
-
-                    stmt.executeQuery(query);
-                    resultSet = stmt.getResultSet();
-                    tabIdConceptGroup = new ArrayList();
-                    while (resultSet.next()) {
-                        tabIdConceptGroup.add(resultSet.getString("idgroup"));
-                    }
-
-                } finally {
-                    stmt.close();
-                }
-            } finally {
-                conn.close();
-            }
-        } catch (SQLException sqle) {
-            // Log exception
-            log.error("Error while getting List Id or Groups of thesaurus : " + idThesaurus, sqle);
-        }
-        return tabIdConceptGroup;
-    }
 
     /**
      * Permet de retourner l'hiérarchie complète d'un groupe 
@@ -2798,6 +2909,48 @@ public class GroupHelper {
         }
         return haveGroup;
     }    
+    
+    /**
+     * Cette fonction permet de savoir si le Groupe a des concepts 
+     *
+     * @param ds
+     * @param idGroup
+     * @param idThesaurus
+     * @return
+     */
+    public boolean isGroupHaveConcepts(HikariDataSource ds,
+            String idGroup, String idThesaurus) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        boolean haveConcept = false;
+
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT idconcept FROM concept_group_concept"
+                            + " WHERE idthesaurus='" + idThesaurus +"'"
+                            + " AND idgroup='" + idGroup + "'";
+
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+                    haveConcept = resultSet.next();
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while testing if Group have Concepts : " + idGroup, sqle);
+        }
+        return haveConcept;
+    }        
 
     /**
      * Cette fonction permet de savoir si le Group est vide (pas de concepts)
@@ -3028,7 +3181,7 @@ public class GroupHelper {
      * @param idGroup
      * @return
      */
-    public boolean haveSubGroup(HikariDataSource ds,
+    public boolean isHaveSubGroup(HikariDataSource ds,
             String idThesaurus, String idGroup) {
 
         Connection conn;

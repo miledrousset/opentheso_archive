@@ -21,6 +21,7 @@ public class NodeGroup implements Serializable, Comparable {
     private String original_value;
     private boolean  ispreferredterm;
     private String notation;
+    private boolean isHaveChildren = false;
 
     public NodeGroup() {
         conceptGroup = new ConceptGroup();
@@ -133,6 +134,14 @@ public class NodeGroup implements Serializable, Comparable {
 
     public void setNotation(String notation) {
         this.notation = notation;
+    }
+
+    public boolean isIsHaveChildren() {
+        return isHaveChildren;
+    }
+
+    public void setIsHaveChildren(boolean isHaveChildren) {
+        this.isHaveChildren = isHaveChildren;
     }
 
 

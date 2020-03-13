@@ -24,6 +24,7 @@ public class FieldsSkos {
     public static final String narrower = "narrower";
     public static final String related = "related";
     public static final String alignment = "alignment";
+    public static final String note = "note";    
     public static final String definition = "definition";
     public static final String scopeNote = "scopeNote";
     public static final String historyNote = "historyNote";
@@ -44,6 +45,7 @@ public class FieldsSkos {
     public static final int narrower_ = 7;
     public static final int related_ = 8;
     public static final int alignment_ = 9;
+    public static final int note_ = 16;   
     public static final int definition_ = 10;
     public static final int scopeNote_ = 11;
     public static final int historyNote_ = 12;
@@ -67,6 +69,7 @@ public class FieldsSkos {
         fields.add(FieldsSkos.narrower);
         fields.add(FieldsSkos.related);
         fields.add(FieldsSkos.alignment);
+        fields.add(FieldsSkos.note);        
         fields.add(FieldsSkos.definition);
         fields.add(FieldsSkos.scopeNote);
         fields.add(FieldsSkos.historyNote);

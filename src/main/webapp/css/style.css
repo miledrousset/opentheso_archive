@@ -12,9 +12,9 @@ body {
     clear: both;
 }
 
-    .pi { 
-        color: orange;
-    }
+.pi { 
+    color: #563310;
+}
 
 .groupArbre{
     font-weight: bold;
@@ -25,6 +25,37 @@ input[type="button"], input[type="submit"]{
     font-family: "Palatino linotype",Times,serif;
     font-size: 14px;
 }
+
+
+
+/***********************************Nouvelle css / fontawesome et PrimeIcons***********************************/
+/* #MR */
+
+.far{
+    color: #f47b2a;
+}
+.fa_custom_open {
+    color: #f47b2a;
+}
+.fa_custom_collapse {
+    color: #42a068;
+}
+.fa_custom_file{
+    color: #42a068;
+}
+/***********************************Fin Nouvelle css / fontawesome et PrimeIcons***********************************/
+
+
+
+
+
+
+
+
+
+
+
+
 
 .ui-toggleswitch-slider {
                 -webkit-transition: background-color 0.3s, box-shadow 0.2s;

@@ -80,6 +80,7 @@ import mom.trd.opentheso.bdd.helper.nodes.notes.NodeNote;
 import mom.trd.opentheso.bdd.helper.nodes.search.NodeSearch;
 import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
+import mom.trd.opentheso.beans.vuegroups.TreeNodeData;
 import mom.trd.opentheso.core.alignment.AlignementSource;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.NodeExpandEvent;
@@ -293,6 +294,8 @@ public class SelectedTerme implements Serializable {
         nodeGroupIdLabel = new ArrayList<>();
     }
 
+
+    
     /**
      * *************************************** MISE A JOUR
      * ****************************************

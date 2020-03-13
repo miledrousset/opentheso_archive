@@ -257,6 +257,23 @@ public class ReadFileTabule {
                                 tabulateDocument.addDefinition(label[0].trim(), label[1].trim());
                         }
                     }
+                    break;                     
+                case FieldsSkos.note_:
+                    if(valeurs[i].contains(fieldSeparate)) {
+                        String[] values = valeurs[i].split(fieldSeparate);
+                        for (String value : values) {
+                            if(!value.contains(subfieldSeparate)) return false;
+                            String[] label = value.split(subfieldSeparate);
+                            tabulateDocument.addNote(label[0].trim(), label[1].trim());
+                        }
+                    }
+                    else {
+                        if(!valeurs[i].trim().isEmpty()){                        
+                            if(!valeurs[i].contains(subfieldSeparate)) return false;
+                                String[] label = valeurs[i].split(subfieldSeparate);
+                                tabulateDocument.addDefinition(label[0].trim(), label[1].trim());
+                        }
+                    }
                     break; 
                 case FieldsSkos.scopeNote_:
                     if(valeurs[i].contains(fieldSeparate)) {

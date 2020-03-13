@@ -79,11 +79,11 @@ public class CompareConceptTest {
         
         NodeConcept nodeConcept;
         SearchHelper searchHelper = new SearchHelper();
-        ArrayList<NodeSearch> nodeSearchs;
+        ArrayList<NodeAutoCompletion> nodeSearchs;
         StringBuilder stringBuilder = new StringBuilder();
 
         // lecture du fichier tabulé /Users/Miled/
-        String path = "/Users/Miled/Desktop/Marion LAME/arsol2.csv";
+        String path = "/Users/miledrousset/Desktop/codePatriarche.csv";
        
        
         FileInputStream file = readFile(path);         
@@ -96,70 +96,89 @@ public class CompareConceptTest {
         
         boolean first = true;
         
-        stringBuilder.append("ID origine\tnom origine\tnom PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme\n");
-        
+        stringBuilder.append("nom origine\tprefLabel PACTOLS\taltLabel PACTOLS\tId PACTOLS\tURL Ark\tDéfinition\tTerme générique\tSynonyme");
+
+        System.out.println(stringBuilder.toString());
+        stringBuilder.delete(0, stringBuilder.capacity());
+
         BufferedReader bf = new BufferedReader(new InputStreamReader(file));
         try {
             while ((line = bf.readLine()) != null) {
-                lineOrigine = line.split("\t");
-                if(lineOrigine.length < 2) continue;
+             //   lineOrigine = line.split("\t");
+             //  if(lineOrigine.length < 2) continue;
                 
-                lineTmp = stringPlus.unaccentLowerString(lineOrigine[1]);
+                lineTmp = stringPlus.unaccentLowerString(line);
                 
-                nodeSearchs = searchHelper.searchTermNew(conn, lineTmp, idLang, idTheso, idGroup, 2, false);
+                nodeSearchs = searchHelper.searchFullText(conn, lineTmp, idLang, idTheso);
                 
-                stringBuilder.append(lineOrigine[0]);
-                stringBuilder.append("\t");
-                stringBuilder.append(lineOrigine[1]);
+         /*       stringBuilder.append(lineOrigine[0]);
+                stringBuilder.append("\t");*/
+                stringBuilder.append(line.trim());
                 //stringBuilder.append(" #### ");
-                stringBuilder.append("\t");
-                first = true;
-                for (NodeSearch nodeSearch : nodeSearchs) {
-                    if(!first){
-                        // stringBuilder.append(" $$$$ ");
-                        stringBuilder.append("\n");
-                        stringBuilder.append("\t");
-                        stringBuilder.append("\t");
-                    }
-                    stringBuilder.append(nodeSearch.getLexical_value());
-                    stringBuilder.append("\t");
-                    stringBuilder.append(nodeSearch.getIdConcept());
 
-                    
-                    // récupération des données d'un Concept
-                    nodeConcept = conceptHelper.getConcept(conn, nodeSearch.getIdConcept(), idTheso, idLang);
-                    
-                    // URL
+                if(nodeSearchs.isEmpty()) {
                     stringBuilder.append("\t");
-                    if(nodeConcept.getConcept().getIdArk() != null || !nodeConcept.getConcept().getIdArk().isEmpty()) {
-                        stringBuilder.append("http://ark.frantiq.fr/ark:/");
-                        stringBuilder.append(nodeConcept.getConcept().getIdArk());
-                    }
-                    
-                    // définition
                     stringBuilder.append("\t");
-                    for (NodeNote nodeNote : nodeConcept.getNodeNotesTerm()) {
-                        if(nodeNote.getNotetypecode().equalsIgnoreCase("definition"))
-                            stringBuilder.append(stringPlus.clearNewLine(nodeNote.getLexicalvalue()));
-                    }
-                    
-                    // BT
                     stringBuilder.append("\t");
-                    for (NodeBT nodeBT : nodeConcept.getNodeBT()) {
-                        stringBuilder.append(nodeBT.getTitle());
-                    }
-                    
-                    // UF
                     stringBuilder.append("\t");
-                    for (NodeEM nodeEM : nodeConcept.getNodeEM()) {
-                        stringBuilder.append(nodeEM.getLexical_value());
+                    stringBuilder.append("\t");
+                    stringBuilder.append("\t");
+                    stringBuilder.append("\t");                    
+                } else {
+                
+                    first = true;
+                    for (NodeAutoCompletion nodeSearch : nodeSearchs) {
+                        if(!first){
+                            // stringBuilder.append(" $$$$ ");
+                            stringBuilder.append("\n");
+                        }
+                        stringBuilder.append("\t");
+                        stringBuilder.append(nodeSearch.getPrefLabel());
+                        
+                        stringBuilder.append("\t");
+                        stringBuilder.append(nodeSearch.getAltLabel());                        
+                        
+                        stringBuilder.append("\t");
+                        stringBuilder.append(nodeSearch.getIdConcept());
+
+
+                        // récupération des données d'un Concept
+                        nodeConcept = conceptHelper.getConcept(conn, nodeSearch.getIdConcept(), idTheso, idLang);
+
+                        // URL
+                        stringBuilder.append("\t");
+                        if(nodeConcept.getConcept().getIdArk() != null || !nodeConcept.getConcept().getIdArk().isEmpty()) {
+                            stringBuilder.append("http://ark.frantiq.fr/ark:/");
+                            stringBuilder.append(nodeConcept.getConcept().getIdArk());
+                        }
+
+                        // définition
+                        stringBuilder.append("\t");
+                        for (NodeNote nodeNote : nodeConcept.getNodeNotesTerm()) {
+                            if(nodeNote.getNotetypecode().equalsIgnoreCase("definition")){
+                                stringBuilder.append(stringPlus.clearNewLine(nodeNote.getLexicalvalue()));
+                                stringBuilder.append(" ## ");
+                            }
+                        }
+
+                        // BT
+                        stringBuilder.append("\t");
+                        for (NodeBT nodeBT : nodeConcept.getNodeBT()) {
+                            stringBuilder.append(nodeBT.getTitle());
+                            stringBuilder.append(" ## ");
+                        }
+
+                        // UF
+                        stringBuilder.append("\t");
+                        for (NodeEM nodeEM : nodeConcept.getNodeEM()) {
+                            stringBuilder.append(nodeEM.getLexical_value());
+                            stringBuilder.append(" ## ");
+                        }
+                        first = false;
                     }
-                    first = false;
                 }
-
                 
                 System.out.println(stringBuilder.toString());
-                
                 stringBuilder.delete(0, stringBuilder.capacity());
             }
         } catch (IOException ex) {

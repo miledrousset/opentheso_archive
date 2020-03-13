@@ -7,8 +7,6 @@ package mom.trd.opentheso.SelectedBeans;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Named;
-import javax.enterprise.context.Dependent;
 import javax.faces.application.ViewHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;

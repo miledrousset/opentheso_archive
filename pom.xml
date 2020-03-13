@@ -5,7 +5,7 @@
 <!-- ici c'est pour la version du WAR, pour la version d'Opentheso, il faut modifier le fichier web.xml-->
     <groupId>trd</groupId>
     <artifactId>opentheso</artifactId>
-    <version>4.5.7</version>
+    <version>4.5.8</version>
     <packaging>war</packaging>
 
     <name>opentheso</name>
@@ -144,7 +144,7 @@
             <version>1.0.4</version>
         </dependency>
                     
-                <dependency>
+        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.4</version>
@@ -278,18 +278,61 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4.1212</version>
+            <version>42.2.9</version>
         </dependency>
 
 
 
-
-        <dependency>  
-            <groupId>org.primefaces</groupId>  
-            <artifactId>primefaces</artifactId>  
-            <version>7.0</version>  
+        <!-- implémentation du CDI -->
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>2.0</version>
+            <scope>provided</scope>
         </dependency>
+        <!-- implémentation du CDI dans Tomcat-->
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet-shaded</artifactId>
+            <version>3.1.2.Final</version>
+        </dependency>  
         
+        
+        
+            
+        <!-- JSF dependency évite l'utilisation de Glassfish-->
+        <dependency>
+            <groupId>javax.faces</groupId>
+            <artifactId>javax.faces-api</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.faces</groupId>
+            <artifactId>jsf-api</artifactId>
+            <version>2.2.20</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.faces</groupId>
+            <artifactId>jsf-impl</artifactId>
+            <version>2.2.20</version>
+        </dependency>        
+        
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>7.0</version>
+        </dependency> 
+
+        
+        <!-- Icons Awesome -->
+        <dependency>
+             <groupId>org.webjars</groupId>
+             <artifactId>font-awesome</artifactId>
+             <version>5.11.2</version>
+        </dependency>                
+                        
+                                        
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>

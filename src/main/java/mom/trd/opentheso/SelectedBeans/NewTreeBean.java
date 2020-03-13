@@ -37,6 +37,8 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeAutoCompletion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeRT;
 import mom.trd.opentheso.bdd.helper.nodes.concept.NodeConceptTree;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
+import mom.trd.opentheso.beans.vuegroups.TreeGroups;
+import mom.trd.opentheso.beans.vuegroups.TreeNodeData;
 import mom.trd.opentheso.core.imports.csv.CsvImportHelper;
 import mom.trd.opentheso.core.imports.csv.CsvReadHelper;
 import mom.trd.opentheso.dragdrop.StructIdBroaderTerm;
@@ -224,6 +226,7 @@ public class NewTreeBean implements Serializable {
 
     public void initTree(String idTheso, String langue) {
 
+        if(idTheso == null) return;
         //      idThesoSelected = idTheso;
         //      defaultLanguage = langue;
         root = (TreeNode) new DefaultTreeNode("Root", null);
@@ -233,6 +236,7 @@ public class NewTreeBean implements Serializable {
             System.err.println("Opentheso n'a pas pu se connecter à la base de données");
             return;
         }
+        GroupHelper groupHelper = new GroupHelper();
         List<NodeGroup> racineNode = new GroupHelper().getListRootConceptGroup(connect.getPoolConnexion(), idTheso, langue);
     //    Collections.sort(racineNode);
 
@@ -250,7 +254,7 @@ public class NewTreeBean implements Serializable {
                         null,
                         type, nodegroup.getConceptGroup().getIdgroup(), root);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
-                new DefaultTreeNode("facette", dynamicTreeNode);
+        //        new DefaultTreeNode("facette", dynamicTreeNode);
             } else {
                 TreeNode dynamicTreeNode = (TreeNode) new MyTreeNode(1, nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdthesaurus(),
@@ -260,26 +264,18 @@ public class NewTreeBean implements Serializable {
                         type, nodegroup.getLexicalValue(), null);
                 ((MyTreeNode) dynamicTreeNode).setIsGroup(true);
                 /**
-                 * **code pour la numérotation des groupes *****************
+                 * **code pour le préfix (Notation) des groupes pour permettre le tri *****************
                  */
-                GroupHelper groupHelper = new GroupHelper();
-                //String suffix = groupHelper.getSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup());
+                
                 String prefix = groupHelper.getNotationOfGroup(connect.getPoolConnexion(),
                         nodegroup.getConceptGroup().getIdgroup(),
                         nodegroup.getConceptGroup().getIdthesaurus());
-                /*
-                if (suffix.equalsIgnoreCase("0") || suffix.equalsIgnoreCase("00")) {
-
-                    suffix = "" + count;
-                    count++;
-                    groupHelper.saveSuffixFromNode(connect.getPoolConnexion(), nodegroup.getConceptGroup().getIdthesaurus(), nodegroup.getConceptGroup().getIdgroup(), suffix);
-                }*/
                 ((MyTreeNode) dynamicTreeNode).setPrefix(prefix);//ici c'est un groupe donc pas de suffix
                 ((MyTreeNode) dynamicTreeNode).setData(prefix + "  " + dynamicTreeNode.getData());//((MyTreeNode) dynamicTreeNode).getNumerotation() + " " + dynamicTreeNode.getData());
                 /**
-                 * ***fin de code pour la numérotation des groupes *********
+                 * ***fin de code pour le prefix des groupes *********
                  */
-                new DefaultTreeNode("facette", dynamicTreeNode);
+            //    new DefaultTreeNode("facette", dynamicTreeNode);
                 listeNode.add((MyTreeNode) dynamicTreeNode);
             }
         }
@@ -405,7 +401,7 @@ public class NewTreeBean implements Serializable {
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
                 treeNode2 = null;
                 value = nodeConceptTreeGroup.getTitle();
-                if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
+                if (groupHelper.isHaveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
 
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
@@ -647,7 +643,7 @@ public class NewTreeBean implements Serializable {
      */
     public boolean haveSubGroup() {
         GroupHelper groupHelper = new GroupHelper();
-        return groupHelper.haveSubGroup(connect.getPoolConnexion(),
+        return groupHelper.isHaveSubGroup(connect.getPoolConnexion(),
                 idThesoSelected, ((MyTreeNode) selectedNode).getIdCurrentGroup());
     }
 
@@ -921,7 +917,7 @@ public class NewTreeBean implements Serializable {
             for (NodeConceptTree nodeConceptTreeGroup : listeSubGroup) {
 
                 value = nodeConceptTreeGroup.getTitle();
-                if (groupHelper.haveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
+                if (groupHelper.isHaveSubGroup(connect.getPoolConnexion(), nodeConceptTreeGroup.getIdThesaurus(), nodeConceptTreeGroup.getIdConcept())
                         || nodeConceptTreeGroup.isHaveChildren()) {
 
                     icon = getTypeOfSubGroup(myTreeNode.getTypeDomaine());
@@ -1331,12 +1327,16 @@ public class NewTreeBean implements Serializable {
         return true;
     }
 
+ /*   public void editNom(TreeGroups treeGroups) {
+        treeGroups.getSelectedNode().
+    }*/
+    
     /**
      * Change le nom du terme courant avec mise à jour dans l'arbre Choix du
      * type de d'objet sélectionné (Group, sousGroup, Concept)
      *
      */
-    public void editNomT() {
+    public void editNomT(TreeGroups treeGroups) {
         duplicate = false;
         if (selectedTerme == null) {
             return;
@@ -1388,6 +1388,12 @@ public class NewTreeBean implements Serializable {
             ((MyTreeNode) selectedNode).setData(selectedTerme.getNom());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(langueBean.getMsg("info") + " :", selectedTerme.getNom() + " " + langueBean.getMsg("tree.info2")));
             selectedTerme.setNomEdit(selectedTerme.getNom());
+        }
+        TreeNode treeNode = treeGroups.getSelectedNode();
+        if(treeNode != null){
+            if( ((TreeNodeData)treeNode.getData()).getNodeId().equalsIgnoreCase(selectedTerme.getIdC()) ) {   
+                ((TreeNodeData)treeNode.getData()).setName(selectedTerme.getNom());
+            }
         }
 
         selectedTerme.setSelectedTermComp(new NodeAutoCompletion());

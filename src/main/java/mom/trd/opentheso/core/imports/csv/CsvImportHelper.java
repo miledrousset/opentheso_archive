@@ -540,6 +540,13 @@ public class CsvImportHelper {
             String idTheso,
             CsvReadHelper.ConceptObject conceptObject) {
         NoteHelper noteHelper = new NoteHelper();
+        for (CsvReadHelper.Label note : conceptObject.getNote()) {
+            noteHelper.addConceptNote(ds, conceptObject.getIdTerm(),
+                    note.getLang(),
+                    idTheso,
+                    note.getLabel(),
+                    "note", idUser);
+        }        
         for (CsvReadHelper.Label note : conceptObject.getDefinitions()) {
             noteHelper.addTermNote(ds, conceptObject.getIdTerm(),
                     note.getLang(),

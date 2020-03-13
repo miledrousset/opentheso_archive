@@ -35,6 +35,7 @@ public class TabulateDocument {
    
     private ArrayList<Alignment> alignments;    
     
+    private ArrayList<Note> note;    
     private ArrayList<Note> definition;
     private ArrayList<Note> scopeNote;
     private ArrayList<Note> historyNote;
@@ -57,6 +58,7 @@ public class TabulateDocument {
 
         alignments = new ArrayList<>();    
 
+        note = new ArrayList<>();
         definition = new ArrayList<>();
         scopeNote = new ArrayList<>();
         historyNote = new ArrayList<>();
@@ -198,6 +200,24 @@ public class TabulateDocument {
         
         this.definition.add(note);
     }    
+
+    public ArrayList<Note> getNote() {
+        return note;
+    }
+
+    public void setNote(ArrayList<Note> note) {
+        this.note = note;
+    }
+    
+    public void addNote(String text, String lang) {
+        Note note = new Note();
+        note.setNote(text);
+        note.setLang(lang);
+        
+        this.note.add(note);
+    }     
+    
+    
 
     public ArrayList<Note> getScopeNote() {
         return scopeNote;

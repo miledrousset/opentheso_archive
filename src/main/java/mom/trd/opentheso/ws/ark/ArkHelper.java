@@ -192,7 +192,7 @@ public class ArkHelper {
         nodeJson.setTitle(nodeMetaData.getTitle());
         nodeJson.setCreator(nodeMetaData.getCreator());
         nodeJson.setDcElements(nodeMetaData.getDcElementsList()); // n'est pas encore exploité
-        nodeJson.setType(nodePreference.getPrefixArk());  //pcrt : p= pactols, crt=code DCMI pour collection
+        nodeJson.setType(nodePreference.getPrefixArk());  //pcrt : préfixe pour sous distinguer une sous entité:  p= pactols, crt= code DCMI pour collection
         nodeJson.setLanguage(nodePreference.getSourceLang());
         nodeJson.setNaan(nodePreference.getIdNaan());
         nodeJson.setHandle_prefix("20.500.11859");

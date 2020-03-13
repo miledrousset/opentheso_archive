@@ -175,6 +175,15 @@ public class ImportTabuleIntoBDD {
         
         // ajouter les notes
         NoteHelper noteHelper = new NoteHelper();
+
+        for (Note note : tabulateDocument.getNote()) {
+            noteHelper.addConceptNote(ds,
+                    tabulateDocument.getId(),
+                    note.getLang(),
+                    idThesaurus,
+                    note.getNote(),
+                    "note", idUser);
+        }        
         for (Note note : tabulateDocument.getDefinition()) {
             noteHelper.addTermNote(ds,
                     tabulateDocument.getId(),
@@ -184,7 +193,7 @@ public class ImportTabuleIntoBDD {
                     "definition", idUser);
         }
         for (Note note : tabulateDocument.getScopeNote()) {
-            noteHelper.addTermNote(ds,
+            noteHelper.addConceptNote(ds,
                     tabulateDocument.getId(),
                     note.getLang(),
                     idThesaurus,

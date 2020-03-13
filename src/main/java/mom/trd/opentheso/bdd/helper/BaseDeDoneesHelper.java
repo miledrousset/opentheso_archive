@@ -19,6 +19,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.context.FacesContext;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 
 
@@ -515,5 +516,5 @@ public class BaseDeDoneesHelper implements Serializable {
         this.versionBddCurrent = versionBddCurrent;
     }
     
-    
+
 }

@@ -26,6 +26,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeConceptArkId;
 import mom.trd.opentheso.bdd.helper.nodes.NodeFusion;
 import mom.trd.opentheso.bdd.helper.nodes.NodeGps;
 import mom.trd.opentheso.bdd.helper.nodes.NodeHieraRelation;
+import mom.trd.opentheso.bdd.helper.nodes.NodeIdValue;
 import mom.trd.opentheso.bdd.helper.nodes.NodeMetaData;
 import mom.trd.opentheso.bdd.helper.nodes.NodePreference;
 import mom.trd.opentheso.bdd.helper.nodes.NodeTT;
@@ -62,6 +63,77 @@ public class ConceptHelper {
      * /**************************************************************
      * /*************************************************************
      */
+    
+    /**
+     * permet de retourner la liste des concepts pour un group donné
+     * retour au format de NodeConceptTree (informations pour construire l'arbre
+     * @param ds
+     * @param idThesaurus
+     * @param idLang
+     * @param idGroup
+     * @return 
+     */
+    public ArrayList<NodeIdValue> getListConceptsOfGroup(HikariDataSource ds,
+            String idThesaurus, String idLang, String idGroup) {
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        ArrayList<String> tabIdConcept = new ArrayList<>();
+        ArrayList<NodeIdValue> tabIdValues = new ArrayList<>();        
+
+        ConceptHelper conceptHelper = new ConceptHelper();
+        String lexicalValue;
+        try {
+            // Get connection from pool
+            conn = ds.getConnection();
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT DISTINCT concept.id_concept"
+                            + " FROM concept, concept_group_concept"
+                            + " WHERE"
+                            + " concept.id_concept = concept_group_concept.idconcept AND"
+                            + " concept.id_thesaurus = concept_group_concept.idthesaurus AND"
+                            + " concept.id_thesaurus = '" + idThesaurus + "' AND "
+                            + " concept_group_concept.idgroup = '" + idGroup + "';";
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }
+                    for (String idConcept : tabIdConcept) {
+                        NodeIdValue nodeIdValue = new NodeIdValue();
+                        lexicalValue = conceptHelper.getLexicalValueOfConcept(ds, idConcept, idThesaurus, idLang);
+                        if(lexicalValue == null || lexicalValue.isEmpty()) {
+                            nodeIdValue.setId(idConcept);
+                            nodeIdValue.setValue("__" + idConcept);
+                        } else {
+                            nodeIdValue.setId(idConcept);
+                            nodeIdValue.setValue(lexicalValue);
+                        }
+                        tabIdValues.add(nodeIdValue);
+                    }
+                    stmt.executeQuery(query);
+                    resultSet = stmt.getResultSet();
+
+                    while (resultSet.next()) {
+                        tabIdConcept.add(resultSet.getString("id_concept"));
+                    }                    
+
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException sqle) {
+            // Log exception
+            log.error("Error while getting All IdConcept of Thesaurus by Group : " + idThesaurus, sqle);
+        }
+        return tabIdValues;
+    }    
     
     /**
      * permet de mettre à jour la date du concept quand il y a une modification
@@ -3924,7 +3996,7 @@ public class ConceptHelper {
             // Log exception
             log.error("Error while getting LexicalValue of Concept : " + idConcept, sqle);
         }
-        return lexicalValue;
+        return lexicalValue.trim();
     }
 
     /**

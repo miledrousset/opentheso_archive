@@ -93,6 +93,7 @@ public class SearchHelper {
                             + " and term.id_thesaurus = '" + idThesaurus + "'"
                             + lang
                             + " order by term.lexical_value <-> '" + value + "'";
+                          //  + " limit 10" ;
 
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
@@ -124,7 +125,8 @@ public class SearchHelper {
                             + preparedValueNPT
                             + " and non_preferred_term.id_thesaurus = '" + idThesaurus + "'"
                             + langSynonyme
-                            + " order by non_preferred_term.lexical_value <-> '" + value + "'"; 
+                            + " order by non_preferred_term.lexical_value <-> '" + value + "'";
+                           // + " limit 5" ;
 
                     resultSet = stmt.executeQuery(query);
 

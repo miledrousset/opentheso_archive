@@ -46,6 +46,7 @@ import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeCandidatValue;
 import mom.trd.opentheso.bdd.helper.nodes.candidat.NodeTraductionCandidat;
 import mom.trd.opentheso.bdd.helper.nodes.group.NodeGroup;
 import mom.trd.opentheso.bdd.tools.StringPlus;
+import mom.trd.opentheso.beans.vuegroups.TreeGroups;
 import mom.trd.opentheso.core.exports.old.ExportFromBDD;
 import mom.trd.opentheso.core.jsonld.helper.JsonldHelper;
 import skos.SKOSXmlDocument;
@@ -53,6 +54,7 @@ import mom.trd.opentheso.core.exports.helper.ExportPrivatesDatas;
 import mom.trd.opentheso.core.exports.privatesdatas.LineOfData;
 import mom.trd.opentheso.core.exports.privatesdatas.tables.Table;
 import org.primefaces.model.StreamedContent;
+
 
 @ManagedBean(name = "theso", eager = true)
 @SessionScoped
@@ -150,6 +152,9 @@ public class SelectedThesaurus implements Serializable {
 
     @ManagedProperty(value = "#{externalResources}")
     private ExternalResources externalResources;    
+    
+    @ManagedProperty(value = "#{treeGroups}")
+    private TreeGroups treeGroups;      
     /**
      * ************************************ INITIALISATION
      * *************************************
@@ -1269,7 +1274,7 @@ public class SelectedThesaurus implements Serializable {
      * Met à jour le thésaurus courant lors d'un changement de thésaurus
      */
     public void maj() {
-       
+        
         tree.getSelectedTerme().reInitTerme();
         externalResources.init();
         tree.reInit();
@@ -1294,6 +1299,10 @@ public class SelectedThesaurus implements Serializable {
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
 
+        // init VueGroups 
+        // nouvelle méthode pour gérer la vue groupes #MR
+        treeGroups.initialise(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
+        
 /*        if (tree != null) {
             tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         }*/
@@ -1381,10 +1390,9 @@ public class SelectedThesaurus implements Serializable {
         languesTheso = new LanguageHelper().getSelectItemLanguagesOneThesaurus(connect.getPoolConnexion(), thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         candidat.maj(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
         vue.setCreat(false);
-
-        if (tree != null) {
-            tree.initTree(thesaurus.getId_thesaurus(), thesaurus.getLanguage());
-        }
+        // init VueGroups 
+        // nouvelle méthode pour gérer la vue groupes #MR
+        treeGroups.initialise(thesaurus.getId_thesaurus(), thesaurus.getLanguage());  
     }
 
     /**
@@ -2388,6 +2396,14 @@ public class SelectedThesaurus implements Serializable {
 
     public void setExternalResources(ExternalResources externalResources) {
         this.externalResources = externalResources;
+    }
+
+    public TreeGroups getTreeGroups() {
+        return treeGroups;
+    }
+
+    public void setTreeGroups(TreeGroups treeGroups) {
+        this.treeGroups = treeGroups;
     }
 
  

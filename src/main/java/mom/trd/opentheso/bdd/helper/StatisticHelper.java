@@ -340,8 +340,12 @@ public class StatisticHelper {
                         NodeStatConcept nsc = new NodeStatConcept();
                         nsc.setDateCreat(resultSet.getDate("created"));
                         nsc.setDateEdit(resultSet.getDate("modified"));
-                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
-                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+                 //       String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+                 //       nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+                        
+                        nsc.setGroup("(" + resultSet.getString("idgroup") + ")");
+                        
+                        
                         nsc.setIdConcept(resultSet.getString("idconcept"));
                         nsc.setValue(resultSet.getString("lexical_value"));
                         list.add(nsc);
@@ -393,8 +397,10 @@ public class StatisticHelper {
                         NodeStatConcept nsc = new NodeStatConcept();
                         nsc.setDateCreat(resultSet.getDate("created"));
                         nsc.setDateEdit(resultSet.getDate("modified"));
-                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
-                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+//                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+//                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+                        
+                        nsc.setGroup("(" + resultSet.getString("idgroup") + ")");
                         nsc.setIdConcept(resultSet.getString("idconcept"));
                         nsc.setValue(resultSet.getString("lexical_value"));
                         list.add(nsc);
@@ -445,8 +451,10 @@ public class StatisticHelper {
                         NodeStatConcept nsc = new NodeStatConcept();
                         nsc.setDateCreat(resultSet.getDate("created"));
                         nsc.setDateEdit(resultSet.getDate("modified"));
-                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
-                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+//                        String temp = new GroupHelper().getThisConceptGroup(ds, resultSet.getString("idgroup"), idThesaurus, langue).getLexicalValue();
+//                        nsc.setGroup(temp + "(" + resultSet.getString("idgroup") + ")");
+
+                        nsc.setGroup( "(" + resultSet.getString("idgroup") + ")");                        
                         nsc.setIdConcept(resultSet.getString("idconcept"));
                         nsc.setValue(resultSet.getString("lexical_value"));
                         list.add(nsc);
