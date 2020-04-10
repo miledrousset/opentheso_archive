@@ -35,6 +35,14 @@ public class JsonHelper {
         
     }
 
+    
+    public void addJsonObject(
+            String id, String value){
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add(id, value);
+        jab.add(builder);
+    }
+    
     public JsonArray getBuilder() {
         if(jab != null)
             return jab.build();

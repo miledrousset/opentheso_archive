@@ -8,16 +8,24 @@ import com.k_int.IR.SearchTask;
 import com.k_int.IR.Searchable;
 import com.k_int.IR.TimeoutExceededException;
 import com.k_int.hss.HeterogeneousSetOfSearchable;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import mom.trd.opentheso.bdd.tools.AsciiUtils;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -41,8 +49,16 @@ import javax.faces.validator.ValidatorException;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonException;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonString;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import mom.trd.opentheso.core.alignment.AlignmentQuery;
 import mom.trd.opentheso.bdd.datas.Concept;
@@ -82,6 +98,7 @@ import mom.trd.opentheso.bdd.helper.nodes.term.NodeTermTraduction;
 import mom.trd.opentheso.bdd.tools.StringPlus;
 import mom.trd.opentheso.beans.vuegroups.TreeNodeData;
 import mom.trd.opentheso.core.alignment.AlignementSource;
+import mom.trd.opentheso.ws.handle.HandleClient;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -511,16 +528,24 @@ public class SelectedTerme implements Serializable {
         } else {
             urlNotice = urlNotice.replace("##value##", nom);
         }
-
+       
         // récupération du total des notices 
-        String urlCounterBdd = roleOnTheso.getNodePreference().getUrlCounterBdd();
-        urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
+    //    String urlCounterBdd = roleOnTheso.getNodePreference().getUrlCounterBdd();
+    //    urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
   
+            nbNotices = getCountOfResources();
+            if(nbNotices < 0)
+                nbNotices = 0;
+        
+            
+        ///// à revoir par #MR    
+            
+        
         //urlCounterBdd = "http://healthandco.test.o2sources.com/concept/40/total";
         // exemple des données récupérées 
         // "{\"content\":[{\"nb_notices\":\"s7\"}],\"debug\":\"\",\"error\":0}\" ";   
         //{"content":[{"nb_notices":"7"}],"debug":"","error":0}
-        
+       /* 
         URL url;
         try {
             url = new URL(urlCounterBdd);
@@ -554,6 +579,8 @@ public class SelectedTerme implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
+
 
         // try {
         //  urlNotice = URLEncoder.encode(urlNotice);
@@ -561,6 +588,90 @@ public class SelectedTerme implements Serializable {
         //     Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
         // }
     }
+    
+    private int getCountOfResources() {
+        
+        String output;
+        String json = "";
+
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sc;
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (KeyManagementException ex) {
+            Logger.getLogger(SelectedTerme.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);        
+        
+        
+        // récupération du total des notices 
+        String urlCounterBdd = roleOnTheso.getNodePreference().getUrlCounterBdd();
+        urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
+        
+        try {
+            urlCounterBdd = urlCounterBdd.replace("http://", "https://");
+            URL url = new URL(urlCounterBdd);
+            
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setUseCaches(false);
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            int status = conn.getResponseCode();
+            InputStream in = status >= 400 ? conn.getErrorStream() : conn.getInputStream();
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            while ((output = br.readLine()) != null) {
+                json += output;
+            }
+            return getCountFromJson(json);            
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        return 0;
+    }
+    private int getCountFromJson(String jsonText) {
+        if(jsonText == null) return 0;
+        JsonObject jsonObject;
+        try ( //{"responseCode":1,"handle":"20.500.11942/opentheso443"}
+            JsonReader reader = Json.createReader(new StringReader(jsonText))) {
+            jsonObject = reader.readObject();
+            return jsonObject.getInt("count");            
+        }
+    }    
+    
 
     private void majTAsso() {
         termesAssocies = new ArrayList<>();

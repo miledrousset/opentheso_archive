@@ -7,8 +7,13 @@ package mom.trd.opentheso.ws.restnew;
 
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
@@ -19,8 +24,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import mom.trd.opentheso.bdd.datas.Thesaurus;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
+import mom.trd.opentheso.bdd.helper.ThesaurusHelper;
+import mom.trd.opentheso.bdd.helper.nodes.thesaurus.NodeThesaurus;
+import mom.trd.opentheso.core.json.helper.JsonHelper;
 import mom.trd.opentheso.ws.rest.ConnexionRest;
 import mom.trd.opentheso.ws.rest.RestRDFHelper;
 
@@ -1892,9 +1901,142 @@ public class Rest_new {
 ///////////////////////////////////////////////////// 
 /////////////////////////////////////////////////////      
     
-
     /**
-     * Pour retourner une branche complète à partir d'un identifiant d'un groupe
+     * Pour retourner la liste des thésaurus publics 
+     * https://pactols.frantiq.fr/opentheso/api/info/list?theso=all
+     * @param uri
+     * @return
+     */
+    @Path("info/list")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public Response getlistAllPublicTheso(@Context UriInfo uri) {
+        String idTheso = null;
+        for (Map.Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+            for (String valeur : e.getValue()) {
+                if(e.getKey().equalsIgnoreCase("theso")) 
+                    idTheso = valeur;
+            }
+        }
+        if(idTheso == null) {
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        if(!idTheso.equalsIgnoreCase("all")) {
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        
+        String datas = getlistAllPublicTheso__(ds);
+        ds.close();
+        
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();     
+    }
+    
+    private String getlistAllPublicTheso__(HikariDataSource ds) {
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        List<String> listPublicTheso = thesaurusHelper.getAllIdOfThesaurus(ds, false);
+        
+        NodeThesaurus nodeThesaurus; 
+
+        String datasJson ;
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();   
+        for (String idTheso : listPublicTheso) {
+            JsonObjectBuilder job = Json.createObjectBuilder();
+            job.add("idTheso", idTheso);
+            JsonArrayBuilder jsonArrayBuilderLang = Json.createArrayBuilder();            
+             
+            nodeThesaurus = thesaurusHelper.getNodeThesaurus(ds, idTheso);
+            for (Thesaurus thesaurus : nodeThesaurus.getListThesaurusTraduction()) {
+                JsonObjectBuilder jobLang = Json.createObjectBuilder();
+                jobLang.add("lang", thesaurus.getLanguage());
+                jobLang.add("title", thesaurus.getTitle());
+                jsonArrayBuilderLang.add(jobLang.build());
+            }
+            if(!nodeThesaurus.getListThesaurusTraduction().isEmpty()) {
+                job.add("labels", jsonArrayBuilderLang.build()); 
+            }
+            jsonArrayBuilder.add(job.build());
+        }        
+        datasJson = jsonArrayBuilder.build().toString();
+
+        if(datasJson != null)
+            return datasJson;
+        else 
+            return null;
+    }
+    
+    
+    /**
+     * Pour retourner la liste des langues d'un thésaurus 
+     * https://pactols.frantiq.fr/opentheso/api/info/list?theso=TH_1&lang=all
+     * @param uri
+     * @return
+     */
+    @Path("info/listLang")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public Response getlistLangOfTheso(@Context UriInfo uri) {
+        String idTheso = null;
+        String lang = null;
+        for (Map.Entry<String, List<String>> e : uri.getQueryParameters().entrySet()) {
+            for (String valeur : e.getValue()) {
+                if(e.getKey().equalsIgnoreCase("theso")) 
+                    idTheso = valeur;
+          
+            }
+            
+        }
+        if(idTheso == null ) {
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        if(idTheso.isEmpty() ) {
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        
+        
+        HikariDataSource ds = connect();
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        
+        String datas = getlistLangOfTheso__(ds, idTheso);
+        ds.close();
+        
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();     
+    }
+    
+    private String getlistLangOfTheso__(HikariDataSource ds, String idTheso) {
+        ThesaurusHelper thesaurusHelper = new ThesaurusHelper();
+        ArrayList<String> listLangOfTheso = thesaurusHelper.getAllUsedLanguagesOfThesaurus(ds, idTheso);
+        
+        String datasJson ;
+        
+        JsonArrayBuilder jsonArrayBuilderLang = Json.createArrayBuilder();
+               
+        for (String idLang : listLangOfTheso) {
+            JsonObjectBuilder jobLang = Json.createObjectBuilder();
+            jobLang.add("lang", idLang);
+            jsonArrayBuilderLang.add(jobLang.build());            
+        }
+        datasJson = jsonArrayBuilderLang.build().toString();
+
+        if(datasJson != null)
+            return datasJson;
+        else 
+            return null;
+    }    
+    
+    
+    
+    /**
+     * Pour retourner la dernière date de modification
      *
      * @param uri
      * @return

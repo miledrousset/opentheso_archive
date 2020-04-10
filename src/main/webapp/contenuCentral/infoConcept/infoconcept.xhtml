@@ -166,8 +166,7 @@
                 
                 <h:panelGroup rendered= "#{(roleOnTheso.nodePreference.z3950actif) or (roleOnTheso.nodePreference.bddActive)}">
                     <a href="#{selectedTerme.urlNotice}" target="blanc"  >
-                        <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" value="#{langueBean.getMsg('index.notice')}" />   
-                        <h:outputText rendered="#{(!roleOnTheso.nodePreference.bddUseId)}" id="nbNoti1" value="notices liées &lt;br/&gt;" escape="false" styleClass="textLink" />
+                        <h:outputText value="notices liées: " escape="false" styleClass="textLink"/>   
                         <h:outputText rendered="#{(roleOnTheso.nodePreference.bddUseId)}" id="nbNoti2" value=" #{selectedTerme.nbNotices} &lt;br/&gt;" escape="false" styleClass="textLink" />
                     </a>
                 </h:panelGroup>

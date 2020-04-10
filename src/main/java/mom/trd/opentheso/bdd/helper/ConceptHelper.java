@@ -3930,19 +3930,23 @@ public class ConceptHelper {
         if (nodeConcept == null || nodeConcept.getConcept() == null) {
             System.err.println("Attention Null proche de = : " + idConcept);
             return null;
-        }
-
-        nodeConceptExports.add(nodeConcept);
+        } else 
+            nodeConceptExports.add(nodeConcept);
 
         for (String listIdsOfConceptChildren1 : listIdsOfConceptChildren) {
             nodeConcept = conceptHelper.getConceptForExport(ds, listIdsOfConceptChildren1, idThesaurus, false);
-            nodeConceptExports.add(nodeConcept);
-            if (!nodeConcept.getNodeListOfNT().isEmpty()) {
-                for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
+            if (nodeConcept == null || nodeConcept.getConcept() == null) {
+                System.err.println("Attention Null proche de = : " + idConcept);
+                return null;
+            } else {
+                nodeConceptExports.add(nodeConcept);
+                if (!nodeConcept.getNodeListOfNT().isEmpty()) {
+                    for (int j = 0; j < nodeConcept.getNodeListOfNT().size(); j++) {
 
-                    exportAllConcepts(ds,
-                            nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
-                            idThesaurus, nodeConceptExports);
+                        exportAllConcepts(ds,
+                                nodeConcept.getNodeListOfNT().get(j).getUri().getIdConcept(),
+                                idThesaurus, nodeConceptExports);
+                    }
                 }
             }
         }

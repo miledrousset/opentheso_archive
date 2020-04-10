@@ -42,10 +42,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringReader;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import mom.trd.test.opentheso.HandleTest;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -134,6 +144,88 @@ public class AAT_test {
 
 //        return listeAlign;
     }
+    
+    
+    @Test
+    public void getCountKoha() {
+        String searchValue =
+                "camion";
+                //"camion à échelles";
+                //amphora type";//"Amphores puniques";//"amphores";
+
+        //https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=subjectheading_t:amphore*%20AND%20recordtype_z:r
+        //"http://vocabsservices.getty.edu/AATService.asmx/AATGetTermMatch?term=amphora&logop=and&notes="
+        //String query = "https://www.idref.fr/Sru/Solr?wt=json&version=2.2&start=&rows=100&indent=on&fl=id,ppn_z,affcourt_z&q=subjectheading_t:(##value##)%20AND%20recordtype_z:r";
+        String query = "https://pro.frantiq.fr/es/koha_frantiq_biblios/_count?q=koha-auth-number:13370";
+
+        ArrayList<NodeAlignment> listeAlign;
+
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sc;
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(HandleTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (KeyManagementException ex) {
+            Logger.getLogger(HandleTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+        try {
+            URL url = new URL("https://pro.frantiq.fr/es/koha_frantiq_biblios/_count?q=koha-auth-number:13370");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            
+
+            conn.setRequestMethod("GET");
+     //       conn.setRequestProperty("Accept", "application/xml");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            String output;
+            String xmlRecord = "";
+            while ((output = br.readLine()) != null) {
+                xmlRecord += output;
+            }
+            conn.disconnect();
+            System.out.println(xmlRecord);
+
+            listeAlign = getValuesXml2(xmlRecord);
+            String tt = "";
+        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
+//        return listeAlign;
+    }    
 
     private String clearName(String nom) {
         nom = nom.replaceAll("\\[|\\]", "");
