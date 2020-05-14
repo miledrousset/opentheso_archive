@@ -439,6 +439,7 @@ public class Rest_new {
     
 
 
+    
 
 
 
@@ -1197,6 +1198,62 @@ public class Rest_new {
 ////////////////////////////////////////////////////
             
             
+    
+    
+
+
+
+/////////////////////////////////////////////////////    
+///////////////////////////////////////////////////// 
+    /*
+     * Trouver la valeur d'après un ID Ark concept
+     */
+///////////////////////////////////////////////////// 
+///////////////////////////////////////////////////// 
+
+    /**
+     * pour produire du Json
+     * @param idLang
+     * @param naan
+     * @param arkId
+     * @return 
+     * #MR
+     */
+    @Path("/preflabel.{idLang}/{naan}/{idArk}.json")
+    @GET
+    @Produces("application/json;charset=UTF-8")
+    public Response getPrefLabelJsonFromArk(
+            @PathParam("idLang") String idLang,
+            @PathParam("naan") String naan,
+            @PathParam("idArk") String arkId) {
+        
+        HikariDataSource ds = connect();        
+        if(ds == null)
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        if(naan == null || naan.isEmpty()) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        if(arkId == null || arkId.isEmpty()){
+            ds.close();            
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        if(idLang == null || idLang.isEmpty()) {
+            ds.close();
+            return Response.status(Status.BAD_REQUEST).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+
+        RestRDFHelper restRDFHelper = new RestRDFHelper();
+        String datas = restRDFHelper.getPrefLabelFromArk(ds, naan, arkId, idLang);
+        ds.close();
+        if(datas == null) {
+            return Response.status(Status.NO_CONTENT).entity(messageEmptyJson()).type(MediaType.APPLICATION_JSON).build();
+        }
+        return Response.status(Response.Status.ACCEPTED).entity(datas).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    
+    
             
             
             
@@ -2085,6 +2142,7 @@ public class Rest_new {
     }
 
     private String messageEmptyJson() {
+        
         String message = "{\n"
                 + "}";
 

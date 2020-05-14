@@ -10,7 +10,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import mom.trd.opentheso.bdd.helper.ConceptHelper;
 import mom.trd.opentheso.bdd.helper.GroupHelper;
 import mom.trd.opentheso.bdd.helper.PreferencesHelper;
@@ -28,6 +32,70 @@ import org.eclipse.rdf4j.rio.Rio;
  * @author miled.rousset
  */
 public class RestRDFHelper {
+    
+    /**
+     * Permet de retourner le prefLabel d'après un idArk avec la langue donnée
+     * le résultat est en Json
+     * 
+     * @param ds 
+     * @param naan 
+     * @param idArk 
+     * @param idLang 
+     * @return  
+     */
+    public String getPrefLabelFromArk(HikariDataSource ds,
+            String naan,
+            String idArk,
+            String idLang) {
+
+        String datas = getPrefLabelFromArk__(ds,
+                 naan, idArk, idLang);
+        if(datas == null) return null;
+        return datas;
+    } 
+    
+    /**
+     * recherche par valeur
+     * @param ds
+     * @param value
+     * @param idTheso
+     * @param lang
+     * @return 
+     */
+    private String getPrefLabelFromArk__(
+            HikariDataSource ds,
+            String naan,
+            String idArk,
+            String idLang) {
+
+        if(idArk == null || idLang == null) {
+            return null;
+        }
+        ConceptHelper conceptHelper = new ConceptHelper();
+        String idTheso = conceptHelper.getIdThesaurusFromArkId(ds,  naan + "/" + idArk);
+        String idConcept = conceptHelper.getIdConceptFromArkId(ds, naan + "/" + idArk);
+        
+        if(idTheso == null || idConcept == null) return null;
+        
+        String value = conceptHelper.getLexicalValueOfConcept(ds, idConcept, idTheso, idLang);
+        
+        
+        if(value == null || value.isEmpty())
+            return null;
+
+        JsonObject datasJson = Json.createObjectBuilder().add("prefLabel", value).build();
+
+    /*    JsonArrayBuilder jab = Json.createArrayBuilder();        
+        jab.add(builder);        
+        
+        JsonArray datasJson = jab.build();*/
+
+        if(datasJson != null)
+            return datasJson.toString();
+        else 
+            return null;
+    }       
+    
     
     /**
      * Permet de retourner un concept au format défini en passant par l'identifiant du concept

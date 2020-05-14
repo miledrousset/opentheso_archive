@@ -341,6 +341,44 @@ public class UserHelper2 {
         }
         return nodeUserGroups;
     }
+    
+    public Map<String, String> getProjectOfUser(
+            HikariDataSource ds, int idUser) {
+        HashMap<String, String> listGroup = new LinkedHashMap();
+
+        Connection conn;
+        Statement stmt;
+        ResultSet resultSet;
+        try {
+            conn = ds.getConnection();
+
+            try {
+                stmt = conn.createStatement();
+                try {
+                    String query = "SELECT"
+                            + "  user_group_label.id_group,"
+                            + "  user_group_label.label_group"
+                            + " FROM"
+                            + "  user_role_group,"
+                            + "  user_group_label"
+                            + " WHERE"
+                            + "  user_role_group.id_group = user_group_label.id_group AND"
+                            + "  user_role_group.id_user = " + idUser + " order by label_group";
+                    resultSet = stmt.executeQuery(query);
+                    while (resultSet.next()) {
+                        listGroup.put("" + resultSet.getInt("id_group"), resultSet.getString("label_group"));
+                    }
+                } finally {
+                    stmt.close();
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserHelper2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listGroup;
+    }    
 
     /**
      * permet de retourner la liste des thésaurus pour un groupe pour un
