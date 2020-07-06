@@ -22,6 +22,7 @@ import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupThesaurus;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserGroupUser;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRole;
 import mom.trd.opentheso.bdd.helper.nodes.NodeUserRoleGroup;
+import mom.trd.opentheso.bdd.tools.StringPlus;
 
 public class UserHelper2 {
 
@@ -736,6 +737,7 @@ public class UserHelper2 {
             String userGroupName) {
         Statement stmt;
         boolean status = false;
+        userGroupName = new StringPlus().convertString(userGroupName);        
         try {
             Connection conn = ds.getConnection();
             try {

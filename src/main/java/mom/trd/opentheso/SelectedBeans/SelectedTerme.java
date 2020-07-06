@@ -589,6 +589,46 @@ public class SelectedTerme implements Serializable {
         // }
     }
     
+   private int getCountOfResources2() {
+
+       String output;
+       String json = "";
+
+       // récupération du total des notices 
+       String urlCounterBdd = roleOnTheso.getNodePreference().getUrlCounterBdd();
+       urlCounterBdd = urlCounterBdd.replace("##conceptId##", idC);
+
+       try {
+         //  urlCounterBdd = urlCounterBdd.replace("http://", "https://");
+           URL url = new URL(urlCounterBdd);
+
+           HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+           conn.setRequestMethod("GET");
+           conn.setRequestProperty("Content-Type", "application/json");
+           conn.setUseCaches(false);
+           conn.setDoInput(true);
+           conn.setDoOutput(true);
+           int status = conn.getResponseCode();
+           InputStream in = status >= 400 ? conn.getErrorStream() : conn.getInputStream();
+
+           BufferedReader br = new BufferedReader(new InputStreamReader(in));
+           while ((output = br.readLine()) != null) {
+               json += output;
+           }
+           return getCountFromJson(json);            
+
+       } catch (UnsupportedEncodingException ex) {
+           Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+       } catch (MalformedURLException ex) {
+           Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+       } catch (IOException ex) {
+           Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+       } catch (Exception ex) {
+           Logger.getLogger(HandleClient.class.getName()).log(Level.SEVERE, null, ex);
+       } 
+       return 0;
+   }    
+    
     private int getCountOfResources() {
         
         String output;
