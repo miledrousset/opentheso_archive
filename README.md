@@ -1,3 +1,8 @@
+# Opentheso est maintenant diffusé sous une nouvelle version à l'adresse suivante 
+# Opentheso is now released under a new version at the following address 
+https://github.com/miledrousset/Opentheso2
+
+
 # Qu'est-ce qu'Opentheso
 
 Opentheso est un gestionnaire de thésaurus multilingue et multi-hiérarchique. Il est conforme aux normes ISO 25964-1 2011 et ISO 25964-2:2012 (Information et documentation. Thésaurus et intéropérabilité avec d’autres vocabulaires)
