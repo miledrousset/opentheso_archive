@@ -41,6 +41,10 @@ Opentheso is a web-based thesaurus management tool dedicated to the management o
 
 OpenTheso is used by a network of 39 research libraries (FRANTIQ. Archaeology, 32 000 concepts. Contact : Blandine Nouvel), research units (Zoomatia, archaelogical research project), les Hospices civils de Lyon (medicine, 60000 concepts), l’Institut des Sciences de l’Homme (part of Rameau vocabulary)…
 
+## Quick Start
+
+Docker Images and a Docker Compose configuration are provided to enable you to get started quickly, see our: [Docker README.md](https://github.com/miledrousset/opentheso/tree/master/src).
+
 ## License
 
 OpenTheso is released under the terms of the [CeCILL_C](http://www.cecill.info/licences/Licence_CeCILL-C_V1-fr.html) license, fully compatible with the GNU GPL.
