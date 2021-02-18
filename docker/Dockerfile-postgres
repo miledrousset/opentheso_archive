@@ -1,0 +1,7 @@
+FROM postgres
+MAINTAINER Evolved Binary
+
+# Copy in the Opentheso database setup script
+ADD https://raw.githubusercontent.com/miledrousset/opentheso/master/src/main/resources/install/opentheso_current.sql /docker-entrypoint-initdb.d/
+
+RUN chmod 744 /docker-entrypoint-initdb.d/opentheso_current.sql
